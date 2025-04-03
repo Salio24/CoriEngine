@@ -4,7 +4,7 @@ set -e
 
 ARGUMENTS="$*"
 
-cd $(dirname "$0")/..
+cd $(dirname "$0")/../..
 cat .gitmodules | \
 while true; do
     read module || break
