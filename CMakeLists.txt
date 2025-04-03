@@ -56,23 +56,31 @@ project(Sandbox)
     # graphical backend v
     CoriEngine/thirdparty/imgui/backends/imgui_impl_opengl3.cpp
 )
-    
-    set(GLAD_SOURCES_DIR CoriEngine/thirdparty/glad2)
-    add_subdirectory(CoriEngine/thirdparty/glad2/cmake glad_cmake EXCLUDE_FROM_ALL)
 
-    glad_add_library(glad_gl_core_46 STATIC API gl:core=4.6)
+    set(GLAD_SOURCES_DIR "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/glad2")
+    add_subdirectory(${GLAD_SOURCES_DIR}/cmake glad_cmake)
+
+    glad_add_library(glad_gl_core_33 STATIC API gl:core=3.3)
 
 # Source files
-    file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Apps/Sandbox/*.cpp")
+    file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Apps/Sandbox/*.cpp)
 
     set(EXECUTABLE_NAME ${PROJECT_NAME})
 
 # Set output directories
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Apps/Sandbox/Build/$<CONFIG>/bin)
     
-    add_executable(${EXECUTABLE_NAME} "${MY_SOURCES}")
+    add_executable(${EXECUTABLE_NAME} ${MY_SOURCES})
     
     target_include_directories(imgui PUBLIC CoriEngine/thirdparty/imgui)
 
-    target_link_libraries(${EXECUTABLE_NAME} PUBLIC SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static glm::glm glad_gl_core_46)
+    target_link_libraries(${EXECUTABLE_NAME} PUBLIC glad_gl_core_33 SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static glm::glm)
     target_link_libraries(${EXECUTABLE_NAME} PRIVATE nlohmann_json::nlohmann_json tmxlite freetype imgui)
+
+#1> [CMake] -- CMAKE_SOURCE_DIR: C:/Users/salio/VSCode/VS2022/MyProject/EngineDev
+#1> [CMake] -- CMAKE_BINARY_DIR: C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/out/build/x64-Clang-RelWithDebInfo
+#1> [CMake] -- CMAKE_CURRENT_SOURCE_DIR: C:/Users/salio/VSCode/VS2022/MyProject/EngineDev
+#1> [CMake] -- CMAKE_CURRENT_BINARY_DIR: C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/out/build/x64-Clang-RelWithDebInfo
+#  ${PROJECT_SOURCE_DIR = C:/Users/salio/VSCode/VS2022/MyProject/EngineDev
+
+#add ${PROJECT_SOURCE_DIR} where possible
