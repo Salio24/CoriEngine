@@ -1,0 +1,24 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+
+# build directories 
+/Apps/Sandbox/Build/Debug
+/Apps/Sandbox/Build/Release
+/Apps/Sandbox/Build/RelWithDebInfo
+
+# git submodules 
+/CoriEngine/thirdparty/freetype/*
+/CoriEngine/thirdparty/glad2/*
+/CoriEngine/thirdparty/glm/*
+/CoriEngine/thirdparty/imgui/*
+/CoriEngine/thirdparty/nlohmann_json/*
+/CoriEngine/thirdparty/SDL3/*
+/CoriEngine/thirdparty/SDL3_image/*
+/CoriEngine/thirdparty/SDL3_mixer/*
+/CoriEngine/thirdparty/tmxlite/*
+
+# build directory for libs and tmp files
+/out

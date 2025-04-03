@@ -1,0 +1,36 @@
+[submodule "CoriEngine/thirdparty/SDL3"]
+	path = CoriEngine/thirdparty/SDL3
+	url = https://github.com/libsdl-org/SDL.git
+	branch = release-3.2.x
+[submodule "CoriEngine/thirdparty/SDL3_image"]
+	path = CoriEngine/thirdparty/SDL3_image
+	url = https://github.com/libsdl-org/SDL_image.git
+	branch = release-3.2.x
+[submodule "CoriEngine/thirdparty/SDL3_mixer"]
+	path = CoriEngine/thirdparty/SDL3_mixer
+	url = https://github.com/libsdl-org/SDL_mixer.git
+	branch = main
+[submodule "CoriEngine/thirdparty/glm"]
+	path = CoriEngine/thirdparty/glm
+	url = https://github.com/g-truc/glm.git
+	branch = release-1.0.2
+[submodule "CoriEngine/thirdparty/nlohmann_json"]
+	path = CoriEngine/thirdparty/nlohmann_json
+	url = https://github.com/nlohmann/json.git
+	branch = master
+[submodule "CoriEngine/thirdparty/tmxlite"]
+	path = CoriEngine/thirdparty/tmxlite
+	url = https://github.com/fallahn/tmxlite.git
+	branch = master
+[submodule "CoriEngine/thirdparty/freetype"]
+	path = CoriEngine/thirdparty/freetype
+	url = https://github.com/freetype/freetype.git
+	branch = master
+[submodule "CoriEngine/thirdparty/imgui"]
+	path = CoriEngine/thirdparty/imgui
+	url = https://github.com/ocornut/imgui.git
+	branch = master
+[submodule "CoriEngine/thirdparty/glad2"]
+	path = CoriEngine/thirdparty/glad2
+	url = https://github.com/Dav1dde/glad.git
+	branch = glad2
