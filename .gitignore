@@ -21,6 +21,7 @@
 # build directory for libs and tmp files
 /out
 
+
 /.local
 deinitSub.sh
 initSub.sh
