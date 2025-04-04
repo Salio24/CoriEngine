@@ -5,9 +5,7 @@
 /.vs
 
 # build directories 
-/Apps/Sandbox/Build/Debug
-/Apps/Sandbox/Build/Release
-/Apps/Sandbox/Build/RelWithDebInfo
+*/bin/*
 
 # git submodules 
 /CoriEngine/thirdparty/freetype/*
@@ -27,3 +25,7 @@
 deinitSub.sh
 initSub.sh
 rmSub.sh
+
+*.dll
+*.exe
+*.pdb
