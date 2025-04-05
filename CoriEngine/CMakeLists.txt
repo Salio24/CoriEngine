@@ -69,8 +69,8 @@ project(CoriEngine)
 
     set(EXECUTABLE_NAME ${PROJECT_NAME}_shared)
     set(EXPORT_HEADER_NAME ${PROJECT_NAME}_export.hpp)
-    set(EXPORT_HEADER_DIR ${PROJECT_SOURCE_DIR}/include)
-    set(EXPORT_HEADER_FILE ${EXPORT_HEADER_DIR}/${EXPORT_HEADER_NAME})
+    set(CORI_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
+    set(EXPORT_HEADER_FILE ${CORI_INCLUDE_DIR}/${EXPORT_HEADER_NAME})
 
     # source files
     file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/src/*.cpp)
@@ -86,27 +86,20 @@ project(CoriEngine)
     )
 
     # export header auto generation
-    file(TO_CMAKE_PATH ${EXPORT_HEADER_DIR} EXPORT_HEADER_DIR)
+    file(TO_CMAKE_PATH ${CORI_INCLUDE_DIR} CORI_INCLUDE_DIR)
     
     add_custom_command(
-        OUTPUT ${EXPORT_HEADER_DIR}/.keep
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${EXPORT_HEADER_DIR}
-        COMMAND ${CMAKE_COMMAND} -E touch ${EXPORT_HEADER_DIR}/.keep
+        OUTPUT ${CORI_INCLUDE_DIR}/.keep
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CORI_INCLUDE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E touch ${CORI_INCLUDE_DIR}/.keep
         COMMENT "Creating export header directory"
-    )
-
-    add_custom_command(
-        TARGET ${EXECUTABLE_NAME}
-        PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E rm -f ${EXPORT_HEADER_DIR}/${EXPORT_HEADER_NAME}
-        COMMENT "Deleting old export header to force regeneration"
     )
 
     include(GenerateExportHeader)
     generate_export_header(${EXECUTABLE_NAME}
         BASE_NAME ${PROJECT_NAME}
         EXPORT_MACRO_NAME CORI_ENGINE_API
-        EXPORT_FILE_NAME ${EXPORT_HEADER_DIR}/${EXPORT_HEADER_NAME}
+        EXPORT_FILE_NAME ${CORI_INCLUDE_DIR}/${EXPORT_HEADER_NAME}
     )
 
     target_compile_definitions(${EXECUTABLE_NAME} PRIVATE ${PROJECT_NAME}_EXPORTS)
@@ -114,9 +107,10 @@ project(CoriEngine)
     # includes
     target_include_directories(${EXECUTABLE_NAME} PUBLIC 
     ${PROJECT_SOURCE_DIR}/thirdparty/imgui
-    ${PROJECT_SOURCE_DIR}/src
-    ${EXPORT_HEADER_DIR}
+    ${CORI_INCLUDE_DIR}
     )
+
+    target_include_directories(${EXECUTABLE_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src/*.hpp)
 
     # lib linking
     target_link_libraries(${EXECUTABLE_NAME} PUBLIC SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static glm::glm nlohmann_json::nlohmann_json tmxlite imgui)

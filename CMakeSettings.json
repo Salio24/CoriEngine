@@ -35,7 +35,7 @@
       "ctestCommandArgs": "",
       "cmakeToolchain": "${projectDir}\\clang_toolchain.cmake",
       "inheritEnvironments": [ "clang_cl_x64_x64" ],
-      "variables": []
+      "intelliSenseMode": "windows-clang-x64"
     }
   ]
 }

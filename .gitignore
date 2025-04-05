@@ -34,4 +34,6 @@ CMakeSettings.json
 *.exe
 *.pdb
 
-/CoriEngine/include/*
+pidr.txt
+
+/CoriEngine/include/CoriEngine_export.hpp
