@@ -33,3 +33,5 @@ CMakeSettings.json
 *.dll
 *.exe
 *.pdb
+
+/CoriEngine/include/*
