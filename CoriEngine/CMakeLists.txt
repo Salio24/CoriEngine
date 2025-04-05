@@ -70,6 +70,7 @@ project(CoriEngine)
     set(EXECUTABLE_NAME ${PROJECT_NAME}_shared)
     set(EXPORT_HEADER_NAME ${PROJECT_NAME}_export.hpp)
     set(EXPORT_HEADER_DIR ${PROJECT_SOURCE_DIR}/include)
+    set(EXPORT_HEADER_FILE ${EXPORT_HEADER_DIR}/${EXPORT_HEADER_NAME})
 
     # source files
     file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/src/*.cpp)
@@ -103,11 +104,12 @@ project(CoriEngine)
 
     include(GenerateExportHeader)
     generate_export_header(${EXECUTABLE_NAME}
-        BASE_NAME CoriEngine
+        BASE_NAME ${PROJECT_NAME}
         EXPORT_MACRO_NAME CORI_ENGINE_API
         EXPORT_FILE_NAME ${EXPORT_HEADER_DIR}/${EXPORT_HEADER_NAME}
     )
-    target_compile_definitions(${EXECUTABLE_NAME} PRIVATE CORI_ENGINE_EXPORTS)
+
+    target_compile_definitions(${EXECUTABLE_NAME} PRIVATE ${PROJECT_NAME}_EXPORTS)
 
     # includes
     target_include_directories(${EXECUTABLE_NAME} PUBLIC 

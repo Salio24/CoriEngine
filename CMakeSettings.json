@@ -1,18 +1,6 @@
 ﻿{
   "configurations": [
     {
-      "name": "x64-Clang-RelWithDebInfo",
-      "generator": "Ninja",
-      "configurationType": "RelWithDebInfo",
-      "buildRoot": "${projectDir}\\out\\build\\${name}",
-      "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
-      "ctestCommandArgs": "",
-      "inheritEnvironments": [ "clang_cl_x64_x64" ],
-      "cmakeToolchain": "${projectDir}\\\\clang_toolchain.cmake"
-    },
-    {
       "name": "x64-Clang-Debug",
       "generator": "Ninja",
       "configurationType": "Debug",
@@ -22,7 +10,7 @@
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "clang_cl_x64_x64" ],
-      "cmakeToolchain": "${projectDir}\\\\clang_toolchain.cmake"
+      "cmakeToolchain": "${projectDir}\\clang_toolchain.cmake"
     },
     {
       "name": "x64-Clang-Release",
@@ -34,7 +22,20 @@
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "clang_cl_x64_x64" ],
-      "cmakeToolchain": "${projectDir}\\\\clang_toolchain.cmake"
+      "cmakeToolchain": "${projectDir}\\clang_toolchain.cmake"
+    },
+    {
+      "name": "x64-Clang-RelWithDebInfo",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "cmakeToolchain": "${projectDir}\\clang_toolchain.cmake",
+      "inheritEnvironments": [ "clang_cl_x64_x64" ],
+      "variables": []
     }
   ]
 }

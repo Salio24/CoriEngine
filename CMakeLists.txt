@@ -1,21 +1,22 @@
 cmake_minimum_required(VERSION 3.13)
 
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>$<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>>:>")
-
-# prevent installing to system directories. 
-set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
-
-set(CMAKE_CXX_STANDARD 20)
-
-add_compile_options(-mavx2)
-
-if(MSVC)
-    message(FATAL_ERROR "Compilers with MSVC frontend are not supported, use compiler with POSIX frontend (GCC or CLANG/LLVM)") 
-endif()
-
-
-add_subdirectory(${PROJECT_SOURCE_DIR}/CoriEngine)
-add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/Sandbox)
+project(main)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>$<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>>:>")
+    
+    # prevent installing to system directories. 
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
+    
+    set(CMAKE_CXX_STANDARD 20)
+    
+    add_compile_options(-mavx2)
+    
+    if(MSVC)
+        message(FATAL_ERROR "Compilers with MSVC frontend are not supported, use compiler with POSIX frontend (GCC or CLANG/LLVM)") 
+    endif()
+    
+    
+    add_subdirectory(${PROJECT_SOURCE_DIR}/CoriEngine)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/Sandbox)
 
 
 #1> [CMake] -- CMAKE_SOURCE_DIR: C:/Users/salio/VSCode/VS2022/MyProject/EngineDev

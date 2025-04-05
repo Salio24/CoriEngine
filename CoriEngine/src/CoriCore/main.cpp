@@ -11,7 +11,7 @@ int main() {
 
 	tmx::Map map;
 
-	std::cout << "Hello, World!" << std::endl;
+	std::cout << "Hello, Worl1d!" << std::endl;
 	std::cin.get();
 	return 0;
 }
