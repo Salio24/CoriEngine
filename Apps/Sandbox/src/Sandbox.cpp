@@ -11,7 +11,6 @@ public:
 	}
 };
 
-
 Cori::Application* Cori::CreateApplication() {
 	std::cout << "Creating Sandbox application" << std::endl;
 	return new Sandbox();

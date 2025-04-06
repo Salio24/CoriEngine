@@ -73,7 +73,7 @@ project(CoriEngine)
     # varible sets
     set(BUILD_SHARED_LIBS ON CACHE INTERNAL "")
 
-    set(EXECUTABLE_NAME ${PROJECT_NAME}_shared)
+    set(ENGINE_LIBRARY_NAME ${PROJECT_NAME}_shared)
     set(EXPORT_HEADER_NAME ${PROJECT_NAME}_export.hpp)
     set(CORI_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
     set(EXPORT_HEADER_FILE ${CORI_INCLUDE_DIR}/${EXPORT_HEADER_NAME})
@@ -82,10 +82,10 @@ project(CoriEngine)
     file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/src/*.cpp)
     
     # my shared lib
-    add_library(${EXECUTABLE_NAME} SHARED ${MY_SOURCES})
+    add_library(${ENGINE_LIBRARY_NAME} SHARED ${MY_SOURCES})
 
     # build binary output dir
-    set_target_properties(${EXECUTABLE_NAME} PROPERTIES
+    set_target_properties(${ENGINE_LIBRARY_NAME} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/$<CONFIG>
         ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/$<CONFIG>
         LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/$<CONFIG>
@@ -102,22 +102,22 @@ project(CoriEngine)
     )
 
     include(GenerateExportHeader)
-    generate_export_header(${EXECUTABLE_NAME}
+    generate_export_header(${ENGINE_LIBRARY_NAME}
         BASE_NAME ${PROJECT_NAME}
         EXPORT_MACRO_NAME CORI_ENGINE_API
         EXPORT_FILE_NAME ${CORI_INCLUDE_DIR}/${EXPORT_HEADER_NAME}
     )
 
-    target_compile_definitions(${EXECUTABLE_NAME} PRIVATE ${PROJECT_NAME}_EXPORTS)
+    target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE ${PROJECT_NAME}_EXPORTS)
 
     # includes
-    target_include_directories(${EXECUTABLE_NAME} PUBLIC 
+    target_include_directories(${ENGINE_LIBRARY_NAME} PUBLIC 
     ${PROJECT_SOURCE_DIR}/thirdparty/imgui
     ${CORI_INCLUDE_DIR}
     )
 
-    target_include_directories(${EXECUTABLE_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src/*.hpp)
+    target_include_directories(${ENGINE_LIBRARY_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src/*.hpp)
 
     # lib linking
-    target_link_libraries(${EXECUTABLE_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static glm::glm nlohmann_json::nlohmann_json tmxlite imgui)
-    target_link_libraries(${EXECUTABLE_NAME} PRIVATE freetype glad_gl_core_46)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static glm::glm nlohmann_json::nlohmann_json tmxlite imgui)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE freetype glad_gl_core_46)

@@ -34,4 +34,5 @@ CMakeSettings.json
 *.exe
 *.pdb
 
-/CoriEngine/include/CoriEngine_export.hpp
+CoriEngine_export.hpp
+.cori_engine_dll_copied.stamp
