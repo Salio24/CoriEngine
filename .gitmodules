@@ -34,3 +34,7 @@
 	path = CoriEngine/thirdparty/glad2
 	url = https://github.com/Dav1dde/glad.git
 	branch = glad2
+[submodule "CoriEngine/thirdparty/spdlog"]
+	path = CoriEngine/thirdparty/spdlog
+	url = https://github.com/gabime/spdlog.git
+	branch = v1.x

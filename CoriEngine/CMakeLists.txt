@@ -62,6 +62,12 @@ project(CoriEngine)
 
     glad_add_library(glad_gl_core_46 STATIC API gl:core=4.6)
 
+    # spdlog
+
+    set(SPDLOG_BUILD_PIC ON CACHE BOOL "")
+    set(SPDLOG_BUILD_SHARED OFF CACHE BOOL "")
+    add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/spdlog EXCLUDE_FROM_ALL)
+
 # project's binary setup vvv
 
     # varible sets
@@ -113,5 +119,5 @@ project(CoriEngine)
     target_include_directories(${EXECUTABLE_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src/*.hpp)
 
     # lib linking
-    target_link_libraries(${EXECUTABLE_NAME} PUBLIC SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static glm::glm nlohmann_json::nlohmann_json tmxlite imgui)
+    target_link_libraries(${EXECUTABLE_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static glm::glm nlohmann_json::nlohmann_json tmxlite imgui)
     target_link_libraries(${EXECUTABLE_NAME} PRIVATE freetype glad_gl_core_46)

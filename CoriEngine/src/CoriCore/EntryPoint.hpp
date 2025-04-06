@@ -1,8 +1,6 @@
 #pragma once
 
-
 extern Cori::Application* Cori::CreateApplication();
-
 
 int main(int argc, char** argv) {
 	Cori::Application* app = Cori::CreateApplication();
