@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.28)
 
 if (NOT (
         (EXISTS "${CMAKE_SOURCE_DIR}/CoriEngine/thirdparty/freetype/CMakeLists.txt") AND 

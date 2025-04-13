@@ -1,7 +1,10 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.28)
 
 project(CoriEngine)
 
+    # hides all compiler warnings caused by subprojects
+    set(HIDE_DEPENDANCY_WARNINGS ON CACHE BOOL "")
+    
     set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "") 
 
     # SDL3
@@ -76,13 +79,25 @@ project(CoriEngine)
     set(ENGINE_LIBRARY_NAME ${PROJECT_NAME}_shared)
     set(EXPORT_HEADER_NAME ${PROJECT_NAME}_export.hpp)
     set(CORI_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
+    set(CORI_HEADERS_DIR ${PROJECT_SOURCE_DIR}/internal_headers)
     set(EXPORT_HEADER_FILE ${CORI_INCLUDE_DIR}/${EXPORT_HEADER_NAME})
 
     # source files
-    file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/src/*.cpp)
+    file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS 
+    ${PROJECT_SOURCE_DIR}/src/*.cpp
+    )
     
     # my shared lib
     add_library(${ENGINE_LIBRARY_NAME} SHARED ${MY_SOURCES})
+
+    target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
+        $<$<CONFIG:Debug>:DEBUG_BUILD>
+        $<$<CONFIG:RelWithDebInfo>:DEBUG_BUILD>
+        $<$<CONFIG:Release>:RELEASE_BUILD>
+    )
+
+    # compile flags just for the engine dll
+    target_compile_options(${ENGINE_LIBRARY_NAME} PRIVATE -Wall -Wextra)
 
     # build binary output dir
     set_target_properties(${ENGINE_LIBRARY_NAME} PROPERTIES
@@ -116,8 +131,45 @@ project(CoriEngine)
     ${CORI_INCLUDE_DIR}
     )
 
-    target_include_directories(${ENGINE_LIBRARY_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src/*.hpp)
+    target_include_directories(${ENGINE_LIBRARY_NAME} PRIVATE
+    ${PROJECT_SOURCE_DIR}/src/*.hpp
+    ${CORI_HEADERS_DIR}
+    )
+
+    # pch
+
+    target_precompile_headers(${ENGINE_LIBRARY_NAME} PRIVATE ${CORI_HEADERS_DIR}/Cori_pch.hpp)
+
+    # disable compilation warnings from thirdparty libs
+
+    if(HIDE_DEPENDANCY_WARNINGS)
+        target_compile_options(SDL3-static PRIVATE -w)
+        target_compile_options(SDL3_mixer-static PRIVATE -w)
+        target_compile_options(SDL3_image-static PRIVATE -w)
+        target_compile_options(glm PRIVATE -w)
+        target_compile_options(nlohmann_json INTERFACE -w)
+        target_compile_options(tmxlite PRIVATE -w)
+        target_compile_options(imgui PRIVATE -w)
+        target_compile_options(freetype PRIVATE -w)
+        target_compile_options(glad_gl_core_46 PRIVATE -w)
+        if(TARGET TIFF::tiff)
+            # introduced in CMake 3.28
+            # TIFF::TIFF still exists, but it is an INTERFACE library linking to TIFF::tiff (no ALIAS library)
+            set(SDLIMAGE_TIF_TARGET "tiff")
+        else()
+            set(SDLIMAGE_TIF_TARGET "TIFF")
+        endif()
+        target_compile_options(${SDLIMAGE_TIF_TARGET} PRIVATE -w)
+        target_compile_options(wavpack PRIVATE -w)
+        #target_compile_options(spdlog PRIVATE -w)
+    endif()
 
     # lib linking
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static glm::glm nlohmann_json::nlohmann_json tmxlite imgui)
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE freetype glad_gl_core_46)
+
+    # should be public
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC spdlog::spdlog)
+
+    # can be private 
+
+    # idk will be private until it breaks something
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static glm::glm nlohmann_json::nlohmann_json tmxlite imgui freetype glad_gl_core_46)

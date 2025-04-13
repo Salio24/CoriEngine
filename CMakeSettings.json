@@ -10,7 +10,8 @@
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "clang_cl_x64_x64" ],
-      "cmakeToolchain": "${projectDir}\\clang_toolchain.cmake"
+      "cmakeToolchain": "${projectDir}\\clang_toolchain.cmake",
+      "intelliSenseMode": "windows-clang-x64"
     },
     {
       "name": "x64-Clang-Release",

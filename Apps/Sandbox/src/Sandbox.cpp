@@ -4,14 +4,13 @@
 class Sandbox : public Cori::Application {
 public:
 	Sandbox() {
-		std::cout << "Sandbox constructor called" << std::endl;
+		CORI_INFO("Sandbox application created");
 	}
 	~Sandbox() {
-		std::cout << "Sandbox destructor called" << std::endl;
+		CORI_INFO("Sandbox application destroyed");
 	}
 };
 
 Cori::Application* Cori::CreateApplication() {
-	std::cout << "Creating Sandbox application" << std::endl;
 	return new Sandbox();
 }

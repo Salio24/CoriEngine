@@ -1,0 +1,18 @@
+#ifndef CORI_PCH
+#define CORI_PCH
+
+#include <string>
+#include <functional>
+#include <memory>
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
+#include <array>
+#include <algorithm>
+#include <random>
+#include <map>
+#include <chrono>
+#include <iostream>
+#include <SDL3/SDL.h>
+
+#endif CORI_PCH
