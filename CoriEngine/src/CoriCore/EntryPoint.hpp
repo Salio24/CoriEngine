@@ -1,10 +1,12 @@
 #pragma once
+#include "EngineEntry.hpp"
 
 extern Cori::Application* Cori::CreateApplication();
 
 int main(int argc, char** argv) {
-	Cori::Application* app = Cori::CreateApplication();
+	EngineEntry engineEntry;
 
+	Cori::Application* app = Cori::CreateApplication();
 
 	if (app) {
 		app->Run();

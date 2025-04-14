@@ -19,15 +19,18 @@ endif()
     set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
 
 project(main)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>$<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>>:>")
-
     set(CMAKE_CXX_STANDARD 20)
-    
-    add_compile_options(-mavx2)
-    
+
     if(MSVC)
         message(FATAL_ERROR "Compilers with MSVC frontend are not supported, use compiler with POSIX frontend (GCC or CLANG/LLVM)") 
     endif()
+
+    if($<CONFIG:Debug>)
+        add_compile_options(-g)
+    endif()
+    
+    add_compile_options(-mavx2)
+    
     
     add_subdirectory(${PROJECT_SOURCE_DIR}/CoriEngine)
     add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/Sandbox)

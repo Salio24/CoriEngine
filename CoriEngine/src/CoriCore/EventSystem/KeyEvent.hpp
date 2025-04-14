@@ -1,6 +1,7 @@
 #pragma once
 #include <CoriEngine_export.hpp>
 #include "Event.hpp"
+#include "CoriKeycodes.hpp"
 
 namespace Cori {
 	class CORI_ENGINE_API KeyEvent : public Event {
@@ -8,38 +9,38 @@ namespace Cori {
 		inline int GetKeyCode() const { return m_KeyCode; }
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 	protected:
-		KeyEvent(int keycode)
+		KeyEvent(CoriKeycode keycode)
 			: m_KeyCode(keycode) {
 		}
-		int m_KeyCode{ 0 };
+		CoriKeycode m_KeyCode{ CORI_KEY_UNKNOWN };
 	};
 
 	class CORI_ENGINE_API KeyPressedEvent : public KeyEvent {
 	public:
-		KeyPressedEvent(int keycode, int repeatCount)
-			: KeyEvent(keycode), m_RepeatCount(repeatCount) {
+		KeyPressedEvent(CoriKeycode keycode, bool repeat)
+			: KeyEvent(keycode), m_Repeat(repeat) {
 		}
 
-		inline int GetRepeatCount() const { return m_RepeatCount; }
+		inline bool IsRepeated() const { return m_Repeat; }
 
 		std::string ToString() const override {
 			std::stringstream ss;
-			ss << "KeyPressedEvent: " << m_KeyCode << " (" << m_RepeatCount << " repeats)";
+			ss << "KeyPressedEvent: " << CoriGetKeyName(m_KeyCode) << " ( Repeated: " << std::boolalpha << m_Repeat << " )";
 			return ss.str();
 		}
 		EVENT_CLASS_TYPE(KeyPressed)
 	private:
-		int m_RepeatCount{ 0 };
+		bool m_Repeat{ 0 };
 	};
 
 	class CORI_ENGINE_API KeyReleasedEvent : public KeyEvent {
 	public:
-		KeyReleasedEvent(int keycode)
+		KeyReleasedEvent(CoriKeycode keycode)
 			: KeyEvent(keycode) {
 		}
 		std::string ToString() const override {
 			std::stringstream ss;
-			ss << "KeyReleasedEvent: " << m_KeyCode;
+			ss << "KeyReleasedEvent: " << CoriGetKeyName(m_KeyCode);
 			return ss.str();
 		}
 		EVENT_CLASS_TYPE(KeyReleased)

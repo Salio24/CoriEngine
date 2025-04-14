@@ -1,8 +1,13 @@
 #pragma once
 
 #include "../../Window.hpp"
-#include "../../Logger.hpp"
 #include <glad/gl.h>
+
+#include "../../EventSystem/AppEvent.hpp"
+#include "../../EventSystem/KeyEvent.hpp"
+#include "../../EventSystem/MouseEvent.hpp"
+
+
 
 namespace Cori {
 

@@ -14,5 +14,6 @@
 #include <chrono>
 #include <iostream>
 #include <SDL3/SDL.h>
+#include "../src/CoriCore/Logger.hpp"
 
 #endif CORI_PCH

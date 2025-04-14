@@ -71,6 +71,10 @@ project(CoriEngine)
     set(SPDLOG_BUILD_SHARED OFF CACHE BOOL "")
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/spdlog EXCLUDE_FROM_ALL)
 
+    # magic_enum
+
+    add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/magic_enum EXCLUDE_FROM_ALL)
+
 # project's binary setup vvv
 
     # varible sets
@@ -172,4 +176,4 @@ project(CoriEngine)
     # can be private 
 
     # idk will be private until it breaks something
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static glm::glm nlohmann_json::nlohmann_json tmxlite imgui freetype glad_gl_core_46)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static glm::glm nlohmann_json::nlohmann_json tmxlite imgui freetype glad_gl_core_46 magic_enum::magic_enum)

@@ -1,5 +1,4 @@
 #pragma once
-#include "Logger.hpp"
 #include <glad/gl.h>
 
 namespace Cori {
@@ -8,7 +7,5 @@ namespace Cori {
 	public:
 		static void Start();
 		static void Stop();
-	private:
-
 	};
 }

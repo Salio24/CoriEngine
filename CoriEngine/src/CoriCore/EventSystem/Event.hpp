@@ -38,7 +38,6 @@ namespace Cori {
 		inline bool IsInCategory(EventCategory category) {
 			return GetCategoryFlags() & category;
 		}
-	protected:
 		bool m_Handeled = false;
 	};
 

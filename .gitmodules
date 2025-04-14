@@ -38,3 +38,6 @@
 	path = CoriEngine/thirdparty/spdlog
 	url = https://github.com/gabime/spdlog.git
 	branch = v1.x
+[submodule "CoriEngine/thirdparty/magic_enum"]
+	path = CoriEngine/thirdparty/magic_enum
+	url = https://github.com/Neargye/magic_enum.git

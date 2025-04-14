@@ -30,20 +30,82 @@ namespace Cori {
 		int glad_version = gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress);
 		CORI_CORE_ASSERT_FATAL(glad_version != 0, "Failed to initialize GLAD");
 
+
 		CORI_CORE_TRACE("Vendor: " + std::string(reinterpret_cast<const char*>(glGetString(GL_VENDOR))));
 		CORI_CORE_TRACE("Renderer: " + std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))));
 		CORI_CORE_TRACE("GL Version: " + std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
 		CORI_CORE_TRACE("Shading Language Version: " + std::string(reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION))));
 
-		CORI_CORE_INFO('"' + props.Title + '"' + " Window Created");
+		CORI_CORE_INFO('"' + m_Data.Title + '"' + " Window Created");
 	}
 
 	void WindowsWindow::Shutdown() {
 		SDL_GL_DestroyContext(context);
 		SDL_DestroyWindow(m_Window);
+
+		CORI_CORE_INFO('"' + m_Data.Title + '"' + " Window Destroyed");
 	}
 
 	void WindowsWindow::OnUpdate() {
+		SDL_Event e;
+		while (SDL_PollEvent(&e)) {
+			switch (e.type) {
+			case SDL_EVENT_WINDOW_RESIZED:
+				{
+					m_Data.Width = e.window.data1;
+					m_Data.Height = e.window.data2;
+
+					WindowResizeEvent resizeEvent(m_Data.Width, m_Data.Height);
+					m_Data.EventCallback(resizeEvent);
+					break;
+				}
+			case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+				{
+					WindowCloseEvent closeEvent;
+					m_Data.EventCallback(closeEvent);
+					break;
+				}
+			case SDL_EVENT_KEY_DOWN:
+				{
+					KeyPressedEvent keyPressedEvent((CoriKeycode)e.key.scancode, e.key.repeat);
+					m_Data.EventCallback(keyPressedEvent);
+					break;
+				}
+			case SDL_EVENT_KEY_UP:
+				{
+					KeyReleasedEvent keyReleasedEvent((CoriKeycode)e.key.scancode);
+					m_Data.EventCallback(keyReleasedEvent);
+					break;
+				}
+			case SDL_EVENT_MOUSE_MOTION:
+				{
+					MouseMovedEvent mouseMovedEvent((int)e.motion.x, (int)e.motion.y);
+					m_Data.EventCallback(mouseMovedEvent);
+					break;
+				}
+			case SDL_EVENT_MOUSE_WHEEL:
+				{
+					MouseScrolledEvent mouseScrolledEvent((short)e.wheel.x, (short)e.wheel.y);
+					m_Data.EventCallback(mouseScrolledEvent);
+					break;
+				}
+			case SDL_EVENT_MOUSE_BUTTON_DOWN:
+				{
+					MouseButtonPressedEvent mouseButtonPressedEvent((CoriMouseCode)e.button.button);
+					m_Data.EventCallback(mouseButtonPressedEvent);
+					break;
+				}
+			case SDL_EVENT_MOUSE_BUTTON_UP:
+				{
+					MouseButtonReleasedEvent mouseButtonReleasedEvent((CoriMouseCode)e.button.button);
+					m_Data.EventCallback(mouseButtonReleasedEvent);
+					break;
+				}
+			}
+		}
+
+		SDL_SCANCODE_0;
+
 		glClearColor((14.0f / 256.0f), (7.0f / 256.0f), (27.0f / 256.0f), 1.0f);
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 		SDL_GL_SwapWindow(m_Window);
@@ -56,6 +118,8 @@ namespace Cori {
 		else {
 			SDL_GL_SetSwapInterval(1);
 		}
+
+		CORI_CORE_INFO("Set VSync to: " + enabled);
 
 		m_Data.VSync = enabled;
 	}
