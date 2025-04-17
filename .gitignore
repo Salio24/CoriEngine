@@ -36,3 +36,4 @@ CMakeSettings.json
 
 CoriEngine_export.hpp
 .cori_engine_dll_copied.stamp
+/Apps/Sandbox/bin/Debug/imgui.ini

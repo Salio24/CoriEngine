@@ -7,6 +7,10 @@ namespace Cori {
 
         // this is just an adapted sdl scancodes for cori API
 
+        // may use stringification of macros instead of magic_enum
+        // like here virtual const char* GetName() const override { return #type; }
+        // return #type
+
 	    CORI_KEY_UNKNOWN = 0,
 
         /**
@@ -382,7 +386,7 @@ namespace Cori {
 
     } CoriKeycode;
 
-    std::string_view CoriGetKeyName(CoriKeycode code) {
+    static std::string_view CoriGetKeyName(CoriKeycode code) {
         std::string_view name = magic_enum::enum_name(code);
         constexpr std::string_view prefix = "CORI_";
         if (name.starts_with(prefix)) {

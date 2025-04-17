@@ -12,7 +12,7 @@ namespace Cori {
         CORI_MOUSEBUTTON_X2 = 5
 	} CoriMouseCode;
 
-    std::string_view CoriGetKeyName(CoriMouseCode code) {
+    static std::string_view CoriGetKeyName(CoriMouseCode code) {
         std::string_view name = magic_enum::enum_name(code);
         constexpr std::string_view prefix = "CORI_";
         if (name.starts_with(prefix)) {

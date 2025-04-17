@@ -1,14 +1,16 @@
 #include <iostream>
 #include <Cori.hpp>
+#include <memory>
+
 
 class ExampleLayer : public Cori::Layer {
 public:
 	ExampleLayer() : Layer("Example") { 
-		CORI_INFO("ExampleLayer created");
+
 	}
 
 	void OnEvent(Cori::Event& event) override {
-		CORI_TRACE("{0}", event);
+		//CORI_TRACE("{0}", event);
 	}
 };
 
@@ -16,6 +18,7 @@ class Sandbox : public Cori::Application {
 public:
 	Sandbox() {
 		PushLayer(new ExampleLayer());
+		PushOverlay(new Cori::ImGuiLayer());
 
 		CORI_INFO("Sandbox application created");
 	}

@@ -1,4 +1,6 @@
 #include "WindowsWindow.hpp"
+#include <glad/gl.h>
+#include <backends/imgui_impl_sdl3.h>
 
 namespace Cori {
 
@@ -30,7 +32,6 @@ namespace Cori {
 		int glad_version = gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress);
 		CORI_CORE_ASSERT_FATAL(glad_version != 0, "Failed to initialize GLAD");
 
-
 		CORI_CORE_TRACE("Vendor: " + std::string(reinterpret_cast<const char*>(glGetString(GL_VENDOR))));
 		CORI_CORE_TRACE("Renderer: " + std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))));
 		CORI_CORE_TRACE("GL Version: " + std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
@@ -49,6 +50,7 @@ namespace Cori {
 	void WindowsWindow::OnUpdate() {
 		SDL_Event e;
 		while (SDL_PollEvent(&e)) {
+		ImGui_ImplSDL3_ProcessEvent(&e);
 			switch (e.type) {
 			case SDL_EVENT_WINDOW_RESIZED:
 				{
@@ -104,10 +106,7 @@ namespace Cori {
 			}
 		}
 
-		SDL_SCANCODE_0;
-
-		glClearColor((14.0f / 256.0f), (7.0f / 256.0f), (27.0f / 256.0f), 1.0f);
-		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+		
 		SDL_GL_SwapWindow(m_Window);
 	}
 

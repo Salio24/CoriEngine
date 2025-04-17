@@ -1,18 +1,25 @@
 #include "Application.hpp"
 #include "Engine.hpp"
+#include "Platform/Windows/WindowsWindow.hpp"
 
 namespace Cori {
 
 #define CORI_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
+	Application* Application::s_Instance = nullptr;
+
 	Application::Application() {
+		CORI_CORE_ASSERT_FATAL(!s_Instance, "Application already exists!");
+		s_Instance = this;
+
 		m_Window = std::unique_ptr<Window>(Window::Create());
 
 		m_Window->SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent));
+
 	}
 
 	Application::~Application() {
-		m_Window.reset();
+		//m_Window.reset();
 	}
 
 	void Application::OnEvent(Event& e) {
@@ -38,13 +45,14 @@ namespace Cori {
 	}
 
 	void Application::Run() {
-
 		while(m_Running) {
-			m_Window->OnUpdate();
-
+			glViewport(0, 0, m_Window->GetWidth(), m_Window->GetHeight());
+			glClearColor((14.0f / 256.0f), (7.0f / 256.0f), (27.0f / 256.0f), 1.0f);
+			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 			for (Layer* layer : m_LayerStack) {
 				layer->OnUpdate();
 			}
+			m_Window->OnUpdate();
 		}
 	}
 

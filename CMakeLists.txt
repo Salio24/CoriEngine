@@ -25,10 +25,7 @@ project(main)
         message(FATAL_ERROR "Compilers with MSVC frontend are not supported, use compiler with POSIX frontend (GCC or CLANG/LLVM)") 
     endif()
 
-    if($<CONFIG:Debug>)
-        add_compile_options(-g)
-    endif()
-    
+        #add_compile_options(-DDEBUG)
     add_compile_options(-mavx2)
     
     

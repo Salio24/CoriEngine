@@ -55,8 +55,10 @@ project(CoriEngine)
     ${PROJECT_SOURCE_DIR}/thirdparty/imgui/imgui_widgets.cpp
     # graphical backend v
     ${PROJECT_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_opengl3.cpp
+    ${PROJECT_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_sdl3.cpp
 )
     target_include_directories(imgui PUBLIC ${PROJECT_SOURCE_DIR}/thirdparty/imgui)    
+    target_link_libraries(imgui PRIVATE SDL3::SDL3-static)
 
     # glad 2
     set(GLAD_SOURCES_DIR ${PROJECT_SOURCE_DIR}/thirdparty/glad2)
@@ -70,6 +72,7 @@ project(CoriEngine)
     set(SPDLOG_BUILD_PIC ON CACHE BOOL "")
     set(SPDLOG_BUILD_SHARED OFF CACHE BOOL "")
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/spdlog EXCLUDE_FROM_ALL)
+
 
     # magic_enum
 
@@ -90,7 +93,12 @@ project(CoriEngine)
     file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS 
     ${PROJECT_SOURCE_DIR}/src/*.cpp
     )
-    
+
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_compile_options(-g)
+        #add_compile_options(-fsanitize=address)
+    endif()
+
     # my shared lib
     add_library(${ENGINE_LIBRARY_NAME} SHARED ${MY_SOURCES})
 
@@ -131,11 +139,11 @@ project(CoriEngine)
 
     # includes
     target_include_directories(${ENGINE_LIBRARY_NAME} PUBLIC 
-    ${PROJECT_SOURCE_DIR}/thirdparty/imgui
     ${CORI_INCLUDE_DIR}
     )
 
     target_include_directories(${ENGINE_LIBRARY_NAME} PRIVATE
+    #${PROJECT_SOURCE_DIR}/thirdparty/imgui
     ${PROJECT_SOURCE_DIR}/src/*.hpp
     ${CORI_HEADERS_DIR}
     )

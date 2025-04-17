@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../Window.hpp"
-#include <glad/gl.h>
 
 #include "../../EventSystem/AppEvent.hpp"
 #include "../../EventSystem/KeyEvent.hpp"
@@ -21,6 +20,9 @@ namespace Cori {
 		inline unsigned int GetWidth() const override { return m_Data.Width; }
 		inline unsigned int GetHeight() const override { return m_Data.Height; }
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
+
+		SDL_Window* GetSDLWindow() { return m_Window; }
+		SDL_GLContext GetSDLGLContext() { return context; }
 
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;

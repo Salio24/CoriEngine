@@ -19,7 +19,12 @@ namespace Cori {
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
 		
+		inline static Application& Get() { return *s_Instance; }
+
+		inline Window& GetWindow() { return *m_Window; }
+
 	private: 
+
 		bool OnWindowClose(WindowCloseEvent& e);
 
 		std::unique_ptr<Window> m_Window;
@@ -27,6 +32,8 @@ namespace Cori {
 		LayerStack m_LayerStack;
 
 		bool m_Running{ true };
+
+		static Application* s_Instance;
 	};
 
 	Application* CreateApplication();

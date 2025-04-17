@@ -10,7 +10,12 @@ project(Sandbox)
 
     # source files
     file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/src/*.cpp)
-    
+
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_compile_options(-g)
+        #add_compile_options(-fsanitize=address)
+    endif()
+
     add_executable(${EXECUTABLE_NAME} ${MY_SOURCES})
 
     target_compile_options(${EXECUTABLE_NAME} PRIVATE -Wall -Wextra)
