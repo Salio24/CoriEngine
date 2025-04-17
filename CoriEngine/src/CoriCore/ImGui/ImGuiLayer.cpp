@@ -15,6 +15,7 @@ namespace Cori {
 	}
 
 	void ImGuiLayer::OnAttach() {
+		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -24,8 +25,15 @@ namespace Cori {
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable multi-viewport
 
 		ImGui::StyleColorsDark();
-		ImGui_ImplSDL3_InitForOpenGL((SDL_Window*)Application::Get().GetWindow().GetNativeWindow(), (SDL_GLContext)Application::Get().GetWindow().GetNativeContex());
+
+		ImGuiStyle& style = ImGui::GetStyle();
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+			style.WindowRounding = 0.0f;
+			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+		}
+
 		
+		ImGui_ImplSDL3_InitForOpenGL((SDL_Window*)Application::Get().GetWindow().GetNativeWindow(), (SDL_GLContext)Application::Get().GetWindow().GetNativeContex());
 		// do an assert
 		bool test = ImGui_ImplOpenGL3_Init("#version 460");
 
@@ -59,6 +67,17 @@ namespace Cori {
 	void ImGuiLayer::EndFrame() {
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
+			SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+			SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
+		}
 	}
 
 }
