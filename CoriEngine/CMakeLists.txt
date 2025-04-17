@@ -179,9 +179,9 @@ project(CoriEngine)
     # lib linking
 
     # should be public
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC spdlog::spdlog)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC spdlog::spdlog magic_enum::magic_enum imgui glm::glm)
 
     # can be private 
 
     # idk will be private until it breaks something
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static glm::glm nlohmann_json::nlohmann_json tmxlite imgui freetype glad_gl_core_46 magic_enum::magic_enum)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static nlohmann_json::nlohmann_json tmxlite freetype glad_gl_core_46)

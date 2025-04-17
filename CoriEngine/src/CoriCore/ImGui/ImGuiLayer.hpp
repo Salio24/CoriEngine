@@ -2,7 +2,6 @@
 
 #include <CoriEngine_export.hpp>
 #include "../Layer.hpp"
-#include "../Application.hpp"
 
 
 namespace Cori {
@@ -10,12 +9,13 @@ namespace Cori {
 	public:
 		ImGuiLayer();
 		~ImGuiLayer();
-		void OnAttach() override;
-		void OnDetach() override;
-		void OnUpdate() override;
-		void OnEvent(Event& event) override;
-	private:
-		float m_Time{ 0.0f };
+		virtual void OnAttach() override;
+		virtual void OnDetach() override;
+		virtual void OnUpdate() override;
+		virtual void OnImGuiRender() override;
+
+		void StartFrame();
+		void EndFrame();
 	};
 
 

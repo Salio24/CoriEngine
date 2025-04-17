@@ -1,22 +1,22 @@
-#include "WindowsWindow.hpp"
+#include "WindowImpl.hpp"
 #include <glad/gl.h>
 #include <backends/imgui_impl_sdl3.h>
 
 namespace Cori {
 
 	Window* Window::Create(const WindowProperties& props) {
-		return new WindowsWindow(props);
+		return new WindowImpl(props);
 	}
 
-	WindowsWindow::WindowsWindow(const WindowProperties& props) {
+	WindowImpl::WindowImpl(const WindowProperties& props) {
 		Init(props);
 	}
 
-	WindowsWindow::~WindowsWindow() {
+	WindowImpl::~WindowImpl() {
 		Shutdown();
 	}
 
-	void WindowsWindow::Init(const WindowProperties& props) {
+	void WindowImpl::Init(const WindowProperties& props) {
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
@@ -40,14 +40,14 @@ namespace Cori {
 		CORI_CORE_INFO('"' + m_Data.Title + '"' + " Window Created");
 	}
 
-	void WindowsWindow::Shutdown() {
+	void WindowImpl::Shutdown() {
 		SDL_GL_DestroyContext(context);
 		SDL_DestroyWindow(m_Window);
 
 		CORI_CORE_INFO('"' + m_Data.Title + '"' + " Window Destroyed");
 	}
 
-	void WindowsWindow::OnUpdate() {
+	void WindowImpl::OnUpdate() {
 		SDL_Event e;
 		while (SDL_PollEvent(&e)) {
 		ImGui_ImplSDL3_ProcessEvent(&e);
@@ -110,7 +110,7 @@ namespace Cori {
 		SDL_GL_SwapWindow(m_Window);
 	}
 
-	void WindowsWindow::SetVSync(bool enabled) {
+	void WindowImpl::SetVSync(bool enabled) {
 		if (enabled == false) {
 			SDL_GL_SetSwapInterval(0);
 		}
@@ -123,7 +123,7 @@ namespace Cori {
 		m_Data.VSync = enabled;
 	}
 
-	bool WindowsWindow::IsVSync() const {
+	bool WindowImpl::IsVSync() const {
 		return m_Data.VSync;
 	}
 }

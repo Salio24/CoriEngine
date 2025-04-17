@@ -1,6 +1,8 @@
 #include "Application.hpp"
 #include "Engine.hpp"
-#include "Platform/Windows/WindowsWindow.hpp"
+#include "WindowImpl.hpp"
+#include "Input.hpp"
+
 
 namespace Cori {
 
@@ -14,8 +16,12 @@ namespace Cori {
 
 		m_Window = std::unique_ptr<Window>(Window::Create());
 
+
 		m_Window->SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent));
 
+		m_ImGuiLayer = new ImGuiLayer();  
+
+		PushOverlay(m_ImGuiLayer);
 	}
 
 	Application::~Application() {
@@ -52,6 +58,15 @@ namespace Cori {
 			for (Layer* layer : m_LayerStack) {
 				layer->OnUpdate();
 			}
+
+			m_ImGuiLayer->StartFrame();
+
+			for (Layer* layer : m_LayerStack) {
+				layer->OnImGuiRender();
+			}
+
+			m_ImGuiLayer->EndFrame();
+
 			m_Window->OnUpdate();
 		}
 	}

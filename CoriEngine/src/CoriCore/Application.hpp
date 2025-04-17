@@ -5,6 +5,8 @@
 #include "Window.hpp"
 #include "Layer.hpp"
 #include "LayerStack.hpp"
+#include "Input.hpp"
+#include "ImGui/ImGuiLayer.hpp"
 
 namespace Cori {
 	class CORI_ENGINE_API Application {
@@ -28,6 +30,8 @@ namespace Cori {
 		bool OnWindowClose(WindowCloseEvent& e);
 
 		std::unique_ptr<Window> m_Window;
+
+		ImGuiLayer* m_ImGuiLayer;
 
 		LayerStack m_LayerStack;
 

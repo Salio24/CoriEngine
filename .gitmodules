@@ -26,10 +26,6 @@
 	path = CoriEngine/thirdparty/freetype
 	url = https://github.com/freetype/freetype.git
 	branch = master
-[submodule "CoriEngine/thirdparty/imgui"]
-	path = CoriEngine/thirdparty/imgui
-	url = https://github.com/ocornut/imgui.git
-	branch = master
 [submodule "CoriEngine/thirdparty/glad2"]
 	path = CoriEngine/thirdparty/glad2
 	url = https://github.com/Dav1dde/glad.git

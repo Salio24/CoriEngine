@@ -1,19 +1,19 @@
 #pragma once
 
-#include "../../Window.hpp"
+#include "Window.hpp"
 
-#include "../../EventSystem/AppEvent.hpp"
-#include "../../EventSystem/KeyEvent.hpp"
-#include "../../EventSystem/MouseEvent.hpp"
+#include "EventSystem/AppEvent.hpp"
+#include "EventSystem/KeyEvent.hpp"
+#include "EventSystem/MouseEvent.hpp"
 
 
 
 namespace Cori {
 
-	class WindowsWindow : public Window {
+	class WindowImpl : public Window {
 	public:
-		WindowsWindow(const WindowProperties& props);
-		virtual ~WindowsWindow();
+		WindowImpl(const WindowProperties& props);
+		virtual ~WindowImpl();
 
 		void OnUpdate() override;
 
@@ -23,6 +23,9 @@ namespace Cori {
 
 		SDL_Window* GetSDLWindow() { return m_Window; }
 		SDL_GLContext GetSDLGLContext() { return context; }
+
+		inline virtual void* GetNativeContex() const override { return context; }
+		inline virtual void* GetNativeWindow() const override { return m_Window; }
 
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;

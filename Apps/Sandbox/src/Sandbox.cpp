@@ -18,7 +18,6 @@ class Sandbox : public Cori::Application {
 public:
 	Sandbox() {
 		PushLayer(new ExampleLayer());
-		PushOverlay(new Cori::ImGuiLayer());
 
 		CORI_INFO("Sandbox application created");
 	}
