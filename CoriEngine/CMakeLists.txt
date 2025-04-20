@@ -56,7 +56,7 @@ project(CoriEngine)
     # graphical backend v
     ${PROJECT_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_opengl3.cpp
     ${PROJECT_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_sdl3.cpp
-)
+    )
     target_include_directories(imgui PUBLIC ${PROJECT_SOURCE_DIR}/thirdparty/imgui)    
     target_link_libraries(imgui PRIVATE SDL3::SDL3-static)
 
@@ -92,6 +92,14 @@ project(CoriEngine)
     # source files
     file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS 
     ${PROJECT_SOURCE_DIR}/src/*.cpp
+    #${PROJECT_SOURCE_DIR}/thirdparty/imgui/imgui.cpp
+    #${PROJECT_SOURCE_DIR}/thirdparty/imgui/imgui_demo.cpp
+    #${PROJECT_SOURCE_DIR}/thirdparty/imgui/imgui_draw.cpp
+    #${PROJECT_SOURCE_DIR}/thirdparty/imgui/imgui_tables.cpp
+    #${PROJECT_SOURCE_DIR}/thirdparty/imgui/imgui_widgets.cpp
+    ## graphical backend v
+    #${PROJECT_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_opengl3.cpp
+    #${PROJECT_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_sdl3.cpp
     )
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -139,6 +147,7 @@ project(CoriEngine)
 
     # includes
     target_include_directories(${ENGINE_LIBRARY_NAME} PUBLIC 
+    #${PROJECT_SOURCE_DIR}/thirdparty/imgui
     ${CORI_INCLUDE_DIR}
     )
 

@@ -24,6 +24,7 @@ namespace Cori {
 		inline static Application& Get() { return *s_Instance; }
 
 		inline Window& GetWindow() { return *m_Window; }
+		inline static void test();
 
 	private: 
 
@@ -38,6 +39,7 @@ namespace Cori {
 		bool m_Running{ true };
 
 		static Application* s_Instance;
+
 	};
 
 	Application* CreateApplication();

@@ -15,6 +15,9 @@ namespace Cori {
 	}
 
 	void ImGuiLayer::OnAttach() {
+		static bool created = false;
+		CORI_ASSERT_FATAL(!created, "ImGui context already created");
+
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 
@@ -37,6 +40,7 @@ namespace Cori {
 		// do an assert
 		bool test = ImGui_ImplOpenGL3_Init("#version 460");
 
+		created = true;
 		CORI_CORE_INFO("ImGuiLayer attached");
 	}
 
@@ -56,6 +60,10 @@ namespace Cori {
 
 		static bool show = true;
 		ImGui::ShowDemoWindow(&show);
+
+		//ImGui::Begin("Example Layer");
+		//ImGui::Text("Hello from ExampleLayer");
+		//ImGui::End();
 	}
 
 	void ImGuiLayer::StartFrame() {

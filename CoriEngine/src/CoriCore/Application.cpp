@@ -2,10 +2,9 @@
 #include "Engine.hpp"
 #include "WindowImpl.hpp"
 #include "Input.hpp"
-
+#include <imgui.h>
 
 namespace Cori {
-
 #define CORI_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
 	Application* Application::s_Instance = nullptr;
@@ -62,6 +61,7 @@ namespace Cori {
 			m_ImGuiLayer->StartFrame();
 
 			for (Layer* layer : m_LayerStack) {
+			
 				layer->OnImGuiRender();
 			}
 
@@ -74,5 +74,11 @@ namespace Cori {
 	bool Application::OnWindowClose(WindowCloseEvent& e) {
 		m_Running = false;
 		return true;
+	}
+
+	void Application::test() {
+		ImGui::Begin("Example Layer");
+		ImGui::Text("Hello from ExampleLayer");
+		ImGui::End();
 	}
 }
