@@ -15,6 +15,11 @@ if (NOT (
     message(FATAL_ERROR "CoriEngine thirdparty dependencies not found. Please run the setup script (CoriEngine/thirdparty) to download them. Make sure you run both scripts.")
 endif()
 
+
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:RelWithDebInfo>:Debug>")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:>")
+
     # prevent installing to system directories. 
     set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
 
@@ -22,7 +27,7 @@ project(main)
     set(CMAKE_CXX_STANDARD 20)
 
     if(MSVC)
-        message(FATAL_ERROR "Compilers with MSVC frontend are not supported, use compiler with POSIX frontend (GCC or CLANG/LLVM)") 
+        message(FATAL_ERROR "Compilers with MSVC frontend are not supported, use compiler with POSIX frontend (GCC or CLANG/LLVM)")
     endif()
 
         #add_compile_options(-DDEBUG)

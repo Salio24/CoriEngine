@@ -1,5 +1,4 @@
 #pragma once 
-#include <CoriEngine_export.hpp>
 #include <spdlog/spdlog.h>
 
 namespace Cori {
@@ -27,7 +26,7 @@ namespace Cori {
 
 #define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
 
-	class CORI_ENGINE_API Event {
+	class Event {
 		friend class EventDispatcher;
 	public:
 		virtual EventType GetEventType() const = 0;
@@ -37,6 +36,9 @@ namespace Cori {
 
 		inline bool IsInCategory(EventCategory category) {
 			return GetCategoryFlags() & category;
+		}
+		inline bool IsOfType(EventType type) {
+			return GetEventType() == type;
 		}
 		bool m_Handeled = false;
 	};

@@ -1,11 +1,10 @@
 #pragma once
-#include <CoriEngine_export.hpp>
 #include "Event.hpp"
 #include "CoriMouseCodes.hpp"
 
 namespace Cori {
 
-	class CORI_ENGINE_API MouseMovedEvent : public Event {
+	class MouseMovedEvent : public Event {
 	public:
 		MouseMovedEvent(int x, int y)
 			: m_MouseX(x), m_MouseY(y) {
@@ -26,7 +25,7 @@ namespace Cori {
 		int m_MouseX{ 0 }, m_MouseY{ 0 };
 	};
 
-	class CORI_ENGINE_API MouseScrolledEvent : public Event {
+	class MouseScrolledEvent : public Event {
 	public:
 		MouseScrolledEvent(short xDirection, short yDirection)
 			: m_xDirection(xDirection), m_yDirection(yDirection) {}
@@ -45,7 +44,7 @@ namespace Cori {
 		short m_xDirection{ 0 }, m_yDirection{ 0 };
 	};
 
-	class CORI_ENGINE_API MouseButtonEvent : public Event {
+	class MouseButtonEvent : public Event {
 	public:
 		inline int GetMouseButton() const { return m_Button; }
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
@@ -56,7 +55,7 @@ namespace Cori {
 		CoriMouseCode m_Button{ CORI_MOUSEBUTTON_UNKNOWN };
 	};
 
-	class CORI_ENGINE_API MouseButtonPressedEvent : public MouseButtonEvent {
+	class MouseButtonPressedEvent : public MouseButtonEvent {
 	public:
 		MouseButtonPressedEvent(CoriMouseCode button)
 			: MouseButtonEvent(button) {}
@@ -69,7 +68,7 @@ namespace Cori {
 		EVENT_CLASS_TYPE(MouseButtonPressed)
 	};
 
-	class CORI_ENGINE_API MouseButtonReleasedEvent : public MouseButtonEvent {
+	class MouseButtonReleasedEvent : public MouseButtonEvent {
 	public:
 		MouseButtonReleasedEvent(CoriMouseCode button)
 			: MouseButtonEvent(button) {}

@@ -5,7 +5,7 @@
 #include "EventSystem/AppEvent.hpp"
 #include "EventSystem/KeyEvent.hpp"
 #include "EventSystem/MouseEvent.hpp"
-
+#include "Renderer/RenderingContext.hpp"
 
 
 namespace Cori {
@@ -20,11 +20,9 @@ namespace Cori {
 		inline unsigned int GetWidth() const override { return m_Data.Width; }
 		inline unsigned int GetHeight() const override { return m_Data.Height; }
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
+		inline GraphicsAPIs GetAPI() const override { return m_Data.API; }
 
-		SDL_Window* GetSDLWindow() { return m_Window; }
-		SDL_GLContext GetSDLGLContext() { return context; }
-
-		inline virtual void* GetNativeContex() const override { return context; }
+		inline virtual void* GetCoriContex() const override { return m_Context; }
 		inline virtual void* GetNativeWindow() const override { return m_Window; }
 
 		void SetVSync(bool enabled) override;
@@ -33,12 +31,13 @@ namespace Cori {
 		virtual void Init(const WindowProperties& props);
 		virtual void Shutdown();
 		
-		SDL_Window* m_Window{ nullptr };
+		RenderingContext* m_Context;
 
-		SDL_GLContext context{ nullptr };
+		SDL_Window* m_Window{ nullptr };
 
 		struct WindowData {
 			std::string Title;
+			GraphicsAPIs API;
 			unsigned int Width, Height;
 			bool VSync;
 			
@@ -46,6 +45,5 @@ namespace Cori {
 		};
 
 		WindowData m_Data;
-
 	};
 }

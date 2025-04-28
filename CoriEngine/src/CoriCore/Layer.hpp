@@ -1,11 +1,9 @@
 #pragma once
-
-#include <CoriEngine_export.hpp>
 #include "EventSystem/Event.hpp"
 
 namespace Cori {
 
-	class CORI_ENGINE_API Layer {
+	class Layer {
 	public:
 		Layer(const std::string& name = "Layer");
 

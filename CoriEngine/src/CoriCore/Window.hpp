@@ -1,24 +1,26 @@
 #pragma once
-
-#include <CoriEngine_export.hpp>
 #include "EventSystem/Event.hpp"
+#include "Renderer/GraphicsAPIs.hpp"
 
 namespace Cori {
 
 	struct WindowProperties {
 
+		GraphicsAPIs API;
 		std::string Title;
 		unsigned int Width;
 		unsigned int Height;
 
 		WindowProperties(const std::string& title = "Cori",
 			unsigned int width = 1600,
-			unsigned int height = 900)
-			: Title(title), Width(width), Height(height) {
+			unsigned int height = 900,
+			GraphicsAPIs api = GraphicsAPIs::OpenGL
+			)
+			: Title(title), Width(width), Height(height), API(api) {
 		}
 	};
 
-	class CORI_ENGINE_API Window {
+	class Window {
 
 	public:
 
@@ -32,11 +34,12 @@ namespace Cori {
 		virtual unsigned int GetHeight() const = 0;
 		
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
-		
+		virtual GraphicsAPIs GetAPI() const = 0;
+
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
 
-		virtual void* GetNativeContex() const = 0;
+		virtual void* GetCoriContex() const = 0;
 		virtual void* GetNativeWindow() const = 0;
 		
 		static Window* Create(const WindowProperties& props = WindowProperties());

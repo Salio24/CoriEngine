@@ -1,5 +1,7 @@
 #pragma once
 #include <string_view>
+#define MAGIC_ENUM_RANGE_MIN 0
+#define MAGIC_ENUM_RANGE_MAX 512
 #include <magic_enum/magic_enum.hpp>
 
 namespace Cori {

@@ -1,10 +1,9 @@
 #pragma once
-#include <CoriEngine_export.hpp>
 #include "Event.hpp"
 #include "CoriKeycodes.hpp"
 
 namespace Cori {
-	class CORI_ENGINE_API KeyEvent : public Event {
+	class KeyEvent : public Event {
 	public:
 		inline int GetKeyCode() const { return m_KeyCode; }
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
@@ -15,7 +14,7 @@ namespace Cori {
 		CoriKeycode m_KeyCode{ CORI_KEY_UNKNOWN };
 	};
 
-	class CORI_ENGINE_API KeyPressedEvent : public KeyEvent {
+	class KeyPressedEvent : public KeyEvent {
 	public:
 		KeyPressedEvent(CoriKeycode keycode, bool repeat)
 			: KeyEvent(keycode), m_Repeat(repeat) {
@@ -33,7 +32,7 @@ namespace Cori {
 		bool m_Repeat{ 0 };
 	};
 
-	class CORI_ENGINE_API KeyReleasedEvent : public KeyEvent {
+	class KeyReleasedEvent : public KeyEvent {
 	public:
 		KeyReleasedEvent(CoriKeycode keycode)
 			: KeyEvent(keycode) {

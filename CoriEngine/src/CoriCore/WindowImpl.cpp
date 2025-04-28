@@ -1,5 +1,4 @@
 #include "WindowImpl.hpp"
-#include <glad/gl.h>
 #include <backends/imgui_impl_sdl3.h>
 
 namespace Cori {
@@ -20,28 +19,32 @@ namespace Cori {
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
+		m_Data.API = props.API;
 
-		m_Window = SDL_CreateWindow(m_Data.Title.c_str(), m_Data.Width, m_Data.Height, SDL_WINDOW_OPENGL);
-		CORI_CORE_ASSERT_FATAL(!!m_Window, "Window could not be created! SDL_Error: " + std::string(SDL_GetError()));
+		m_Context = RenderingContext::Create(m_Data.API);
+
+		switch (m_Data.API) {
+		case GraphicsAPIs::None:
+			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
+			break;
+		case GraphicsAPIs::OpenGL:
+			m_Window = SDL_CreateWindow(m_Data.Title.c_str(), m_Data.Width, m_Data.Height, SDL_WINDOW_OPENGL);
+			CORI_CORE_ASSERT_FATAL(!!m_Window, "Window could not be created! SDL_Error: " + std::string(SDL_GetError()));
+			break;
+		case GraphicsAPIs::Vulkan:
+			CORI_CORE_ASSERT_FATAL(false, "Vulkan is not supported yet");
+			break;
+		}
 
 		SDL_SetWindowPosition(m_Window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
-		context = SDL_GL_CreateContext(m_Window);
-		CORI_CORE_ASSERT_FATAL(!!context, "OpenGL context could not be created! SDL_Error: " + std::string(SDL_GetError()));
-
-		int glad_version = gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress);
-		CORI_CORE_ASSERT_FATAL(glad_version != 0, "Failed to initialize GLAD");
-
-		CORI_CORE_TRACE("Vendor: " + std::string(reinterpret_cast<const char*>(glGetString(GL_VENDOR))));
-		CORI_CORE_TRACE("Renderer: " + std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))));
-		CORI_CORE_TRACE("GL Version: " + std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
-		CORI_CORE_TRACE("Shading Language Version: " + std::string(reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION))));
+		m_Context->Init(m_Window);
 
 		CORI_CORE_INFO('"' + m_Data.Title + '"' + " Window Created");
 	}
 
 	void WindowImpl::Shutdown() {
-		SDL_GL_DestroyContext(context);
+		delete m_Context;
 		SDL_DestroyWindow(m_Window);
 
 		CORI_CORE_INFO('"' + m_Data.Title + '"' + " Window Destroyed");
@@ -106,8 +109,7 @@ namespace Cori {
 			}
 		}
 
-		
-		SDL_GL_SwapWindow(m_Window);
+		m_Context->SwapBuffers();
 	}
 
 	void WindowImpl::SetVSync(bool enabled) {
@@ -118,7 +120,7 @@ namespace Cori {
 			SDL_GL_SetSwapInterval(1);
 		}
 
-		CORI_CORE_INFO("Set VSync to: " + enabled);
+		CORI_CORE_INFO("Set VSync to: {0}", enabled);
 
 		m_Data.VSync = enabled;
 	}

@@ -1,11 +1,9 @@
 #pragma once
-
-#include <CoriEngine_export.hpp>
 #include "Layer.hpp"
 
 namespace Cori {
 
-	class CORI_ENGINE_API LayerStack {
+	class LayerStack {
 	public:
 		LayerStack();
 		~LayerStack();

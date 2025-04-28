@@ -69,7 +69,7 @@ project(CoriEngine)
 
     # spdlog
 
-    set(SPDLOG_BUILD_PIC ON CACHE BOOL "")
+    #set(SPDLOG_BUILD_PIC ON CACHE BOOL "")
     set(SPDLOG_BUILD_SHARED OFF CACHE BOOL "")
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/spdlog EXCLUDE_FROM_ALL)
 
@@ -81,9 +81,9 @@ project(CoriEngine)
 # project's binary setup vvv
 
     # varible sets
-    set(BUILD_SHARED_LIBS ON CACHE INTERNAL "")
+    set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
 
-    set(ENGINE_LIBRARY_NAME ${PROJECT_NAME}_shared)
+    set(ENGINE_LIBRARY_NAME ${PROJECT_NAME}_static)
     set(EXPORT_HEADER_NAME ${PROJECT_NAME}_export.hpp)
     set(CORI_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
     set(CORI_HEADERS_DIR ${PROJECT_SOURCE_DIR}/internal_headers)
@@ -108,7 +108,7 @@ project(CoriEngine)
     endif()
 
     # my shared lib
-    add_library(${ENGINE_LIBRARY_NAME} SHARED ${MY_SOURCES})
+    add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES})
 
     target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
@@ -127,23 +127,23 @@ project(CoriEngine)
     )
 
     # export header auto generation
-    file(TO_CMAKE_PATH ${CORI_INCLUDE_DIR} CORI_INCLUDE_DIR)
-    
-    add_custom_command(
-        OUTPUT ${CORI_INCLUDE_DIR}/.keep
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${CORI_INCLUDE_DIR}
-        COMMAND ${CMAKE_COMMAND} -E touch ${CORI_INCLUDE_DIR}/.keep
-        COMMENT "Creating export header directory"
-    )
-
-    include(GenerateExportHeader)
-    generate_export_header(${ENGINE_LIBRARY_NAME}
-        BASE_NAME ${PROJECT_NAME}
-        EXPORT_MACRO_NAME CORI_ENGINE_API
-        EXPORT_FILE_NAME ${CORI_INCLUDE_DIR}/${EXPORT_HEADER_NAME}
-    )
-
-    target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE ${PROJECT_NAME}_EXPORTS)
+    #file(TO_CMAKE_PATH ${CORI_INCLUDE_DIR} CORI_INCLUDE_DIR)
+    #
+    #add_custom_command(
+    #    OUTPUT ${CORI_INCLUDE_DIR}/.keep
+    #    COMMAND ${CMAKE_COMMAND} -E make_directory ${CORI_INCLUDE_DIR}
+    #    COMMAND ${CMAKE_COMMAND} -E touch ${CORI_INCLUDE_DIR}/.keep
+    #    COMMENT "Creating export header directory"
+    #)
+    #
+    #include(GenerateExportHeader)
+    #generate_export_header(${ENGINE_LIBRARY_NAME}
+    #    BASE_NAME ${PROJECT_NAME}
+    #    EXPORT_MACRO_NAME CORI_ENGINE_API
+    #    EXPORT_FILE_NAME ${CORI_INCLUDE_DIR}/${EXPORT_HEADER_NAME}
+    #)
+    #
+    #target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE ${PROJECT_NAME}_EXPORTS)
 
     # includes
     target_include_directories(${ENGINE_LIBRARY_NAME} PUBLIC 

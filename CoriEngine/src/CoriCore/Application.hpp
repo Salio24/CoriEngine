@@ -1,5 +1,4 @@
 #pragma once 
-#include <CoriEngine_export.hpp>
 #include "EventSystem/Event.hpp"
 #include "EventSystem/AppEvent.hpp"
 #include "Window.hpp"
@@ -9,7 +8,7 @@
 #include "ImGui/ImGuiLayer.hpp"
 
 namespace Cori {
-	class CORI_ENGINE_API Application {
+	class Application {
 	public:
 		Application();
 		virtual ~Application();
@@ -24,7 +23,6 @@ namespace Cori {
 		inline static Application& Get() { return *s_Instance; }
 
 		inline Window& GetWindow() { return *m_Window; }
-		inline static void test();
 
 	private: 
 

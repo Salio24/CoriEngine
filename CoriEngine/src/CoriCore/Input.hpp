@@ -1,10 +1,9 @@
 #pragma once
-#include <CoriEngine_export.hpp>
 #include "../src/CoriCore/EventSystem/CoriMouseCodes.hpp"
 #include "../src/CoriCore/EventSystem/CoriKeycodes.hpp"
 
 namespace Cori {
-	class CORI_ENGINE_API Input {
+	class Input {
 	public:
 		inline static bool IsKeyPressed(CoriKeycode keycode) { return s_Instance->IsKeyPressedImpl(keycode); }
 		

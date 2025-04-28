@@ -1,0 +1,3116 @@
+﻿>------ Build started: Project: CMakeLists, Configuration: Debug ------
+  [0/2] Re-checking globbed directories...
+  [1/2] Re-running CMake...
+  -- Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE) 
+  -- Could NOT find LibUSB (missing: LibUSB_LIBRARY LibUSB_INCLUDE_PATH) (found version "LibUSB_VERSION-NOTFOUND")
+  -- 
+  -- SDL3 was configured with the following options:
+  -- 
+  -- Platform: Windows-10.0.19045
+  -- 64-bit:   TRUE
+  -- Compiler: C:/Program Files/LLVM/bin/clang.exe
+  -- Revision: SDL3-3.2.11-3b17d08
+  -- Vendor:   
+  -- 
+  -- Subsystems:
+  --   Audio:    ON
+  --   Video:    ON
+  --   GPU:      ON
+  --   Render:   ON
+  --   Camera:   ON
+  --   Joystick: ON
+  --   Haptic:   ON
+  --   Hidapi:   ON
+  --   Power:    ON
+  --   Sensor:   ON
+  --   Dialog:   ON
+  -- 
+  -- Options:
+  --   SDL_ALSA                    (Wanted: OFF): OFF
+  --   SDL_ALSA_SHARED             (Wanted: OFF): OFF
+  --   SDL_ALTIVEC                 (Wanted: OFF): OFF
+  --   SDL_ARMNEON                 (Wanted: OFF): OFF
+  --   SDL_ASAN                    (Wanted: OFF): OFF
+  --   SDL_ASSEMBLY                (Wanted: ON): ON
+  --   SDL_ASSERTIONS              (Wanted: auto): auto
+  --   SDL_AVX                     (Wanted: ON): ON
+  --   SDL_AVX2                    (Wanted: ON): ON
+  --   SDL_AVX512F                 (Wanted: ON): ON
+  --   SDL_BACKGROUNDING_SIGNAL    (Wanted: OFF): OFF
+  --   SDL_CCACHE                  (Wanted: OFF): OFF
+  --   SDL_CLANG_TIDY              (Wanted: OFF): OFF
+  --   SDL_CLOCK_GETTIME           (Wanted: OFF): OFF
+  --   SDL_COCOA                   (Wanted: OFF): OFF
+  --   SDL_DBUS                    (Wanted: OFF): OFF
+  --   SDL_DEPS_SHARED             (Wanted: ON): OFF
+  --   SDL_DIRECTX                 (Wanted: ON): ON
+  --   SDL_DISKAUDIO               (Wanted: ON): ON
+  --   SDL_DUMMYAUDIO              (Wanted: ON): ON
+  --   SDL_DUMMYCAMERA             (Wanted: ON): ON
+  --   SDL_DUMMYVIDEO              (Wanted: ON): ON
+  --   SDL_EXAMPLES                (Wanted: OFF): OFF
+  --   SDL_EXAMPLES_LINK_SHARED    (Wanted: OFF): OFF
+  --   SDL_FOREGROUNDING_SIGNAL    (Wanted: OFF): OFF
+  --   SDL_GCC_ATOMICS             (Wanted: ON): ON
+  --   SDL_GPU_DXVK                (Wanted: OFF): OFF
+  --   SDL_HIDAPI                  (Wanted: ON): ON
+  --   SDL_HIDAPI_JOYSTICK         (Wanted: ON): ON
+  --   SDL_HIDAPI_LIBUSB           (Wanted: ON): OFF
+  --   SDL_HIDAPI_LIBUSB_SHARED    (Wanted: ON): OFF
+  --   SDL_IBUS                    (Wanted: OFF): OFF
+  --   SDL_INSTALL                 (Wanted: OFF): OFF
+  --   SDL_INSTALL_TESTS           (Wanted: OFF): OFF
+  --   SDL_JACK                    (Wanted: OFF): OFF
+  --   SDL_JACK_SHARED             (Wanted: OFF): OFF
+  --   SDL_KMSDRM                  (Wanted: OFF): OFF
+  --   SDL_KMSDRM_SHARED           (Wanted: OFF): OFF
+  --   SDL_LASX                    (Wanted: OFF): OFF
+  --   SDL_LIBC                    (Wanted: ON): ON
+  --   SDL_LIBICONV                (Wanted: OFF): OFF
+  --   SDL_LIBUDEV                 (Wanted: ON): OFF
+  --   SDL_LIBURING                (Wanted: OFF): OFF
+  --   SDL_LSX                     (Wanted: OFF): OFF
+  --   SDL_METAL                   (Wanted: OFF): OFF
+  --   SDL_MMX                     (Wanted: ON): ON
+  --   SDL_OFFSCREEN               (Wanted: ON): ON
+  --   SDL_OPENGL                  (Wanted: ON): ON
+  --   SDL_OPENGLES                (Wanted: ON): ON
+  --   SDL_OPENVR                  (Wanted: OFF): OFF
+  --   SDL_OSS                     (Wanted: OFF): OFF
+  --   SDL_PIPEWIRE                (Wanted: OFF): OFF
+  --   SDL_PIPEWIRE_SHARED         (Wanted: OFF): OFF
+  --   SDL_PTHREADS                (Wanted: OFF): OFF
+  --   SDL_PTHREADS_SEM            (Wanted: OFF): OFF
+  --   SDL_PULSEAUDIO              (Wanted: OFF): OFF
+  --   SDL_PULSEAUDIO_SHARED       (Wanted: OFF): OFF
+  --   SDL_RENDER_D3D              (Wanted: ON): ON
+  --   SDL_RENDER_D3D11            (Wanted: ON): ON
+  --   SDL_RENDER_D3D12            (Wanted: ON): ON
+  --   SDL_RENDER_GPU              (Wanted: ON): ON
+  --   SDL_RENDER_METAL            (Wanted: ON): OFF
+  --   SDL_RENDER_VULKAN           (Wanted: ON): ON
+  --   SDL_ROCKCHIP                (Wanted: OFF): OFF
+  --   SDL_RPATH                   (Wanted: OFF): OFF
+  --   SDL_RPI                     (Wanted: OFF): OFF
+  --   SDL_SNDIO                   (Wanted: OFF): OFF
+  --   SDL_SNDIO_SHARED            (Wanted: OFF): OFF
+  --   SDL_SSE                     (Wanted: ON): ON
+  --   SDL_SSE2                    (Wanted: ON): ON
+  --   SDL_SSE3                    (Wanted: ON): ON
+  --   SDL_SSE4_1                  (Wanted: ON): ON
+  --   SDL_SSE4_2                  (Wanted: ON): ON
+  --   SDL_SYSTEM_ICONV            (Wanted: OFF): OFF
+  --   SDL_TESTS                   (Wanted: OFF): OFF
+  --   SDL_TESTS_LINK_SHARED       (Wanted: OFF): OFF
+  --   SDL_UNINSTALL               (Wanted: OFF): OFF
+  --   SDL_VIRTUAL_JOYSTICK        (Wanted: ON): ON
+  --   SDL_VIVANTE                 (Wanted: OFF): OFF
+  --   SDL_VULKAN                  (Wanted: ON): ON
+  --   SDL_WASAPI                  (Wanted: ON): ON
+  --   SDL_WAYLAND                 (Wanted: OFF): OFF
+  --   SDL_WAYLAND_LIBDECOR        (Wanted: OFF): OFF
+  --   SDL_WAYLAND_LIBDECOR_SHARED (Wanted: OFF): OFF
+  --   SDL_WAYLAND_SHARED          (Wanted: OFF): OFF
+  --   SDL_X11                     (Wanted: OFF): OFF
+  --   SDL_X11_SHARED              (Wanted: OFF): OFF
+  --   SDL_X11_XCURSOR             (Wanted: OFF): OFF
+  --   SDL_X11_XDBE                (Wanted: OFF): OFF
+  --   SDL_X11_XFIXES              (Wanted: OFF): OFF
+  --   SDL_X11_XINPUT              (Wanted: OFF): OFF
+  --   SDL_X11_XRANDR              (Wanted: OFF): OFF
+  --   SDL_X11_XSCRNSAVER          (Wanted: OFF): OFF
+  --   SDL_X11_XSHAPE              (Wanted: OFF): OFF
+  --   SDL_X11_XSYNC               (Wanted: OFF): OFF
+  --   SDL_XINPUT                  (Wanted: ON): ON
+  -- 
+  --  Build Shared Library: OFF
+  --  Build Static Library: ON
+  --  Build Static Library with Position Independent Code: 
+  -- 
+  -- Configuring SDL3_mixer 3.0.0
+  -- Enabled ogg music: using stb_vorbis
+  -- Using vendored WavPack
+  -- Could NOT find Iconv (missing: Iconv_LIBRARY Iconv_INCLUDE_DIR) 
+  -- The following features have been enabled:
+  
+   * BUILD_SHARED_LIBS, Build shared library.
+   * WAVPACK_ENABLE_DSD, Enable support for WavPack DSD files.
+  
+  -- The following features have been disabled:
+  
+   * BUILD_TESTING, Build tests.
+   * WAVPACK_ENABLE_LEGACY, Decode legacy (< 4.0) WavPack files.
+   * WAVPACK_ENABLE_THREADS, Enable support for threading in libwavpack.
+   * WAVPACK_INSTALL_CMAKE_MODULE, Generate and install CMake package configuration module.
+   * WAVPACK_ENABLE_ASM, Enable assembly optimizations.
+   * WAVPACK_BUILD_PROGRAMS, Build programs.
+   * WAVPACK_BUILD_COOLEDIT_PLUGIN, Build CoolEdit plugin.
+   * WAVPACK_BUILD_WINAMP_PLUGIN, Build WinAmp plugin.
+   * WAVPACK_INSTALL_DOCS, Install documentation.
+   * WAVPACK_INSTALL_PKGCONFIG_MODULE, Generate and install wavpack.pc.
+  
+  -- The following OPTIONAL packages have not been found:
+  
+   * LibUSB
+  
+  -- The following RECOMMENDED packages have not been found:
+  
+   * Iconv, converts from one character encoding to another through Unicode conversion 
+     Required to build programs.
+  
+  -- Dynamic WavPack: $<TARGET_FILE_NAME:wavpack>
+  -- SDL3_mixer backends:
+  -- - enabled:  vorbis_stb flac_drflac mp3_drmp3 midi_timidity wave wavpack
+  -- - disabled: sndfile opus vorbis_tremor vorbis_vorbisfile flac_libflac gme mod_xmp mp3_mpg123 midi_fluidsynth midi_native
+  -- Configuring SDL3_image 3.2.5
+  -- SDL3_image: Using vendored libtiff
+  -- Building tiff version 4.6.0
+  -- Could NOT find ZLIB (missing: ZLIB_LIBRARY ZLIB_INCLUDE_DIR) 
+  -- Could NOT find Deflate (missing: Deflate_LIBRARY Deflate_INCLUDE_DIR) 
+  -- Could NOT find JPEG (missing: JPEG_LIBRARY JPEG_INCLUDE_DIR) 
+  -- Could NOT find JBIG (missing: JBIG_LIBRARY JBIG_INCLUDE_DIR) 
+  -- Could NOT find LERC (missing: LERC_LIBRARY LERC_INCLUDE_DIR) 
+  -- Could NOT find liblzma (missing: LIBLZMA_LIBRARY LIBLZMA_INCLUDE_DIR LIBLZMA_HAS_AUTO_DECODER LIBLZMA_HAS_EASY_ENCODER LIBLZMA_HAS_LZMA_PRESET) 
+  -- Could NOT find ZSTD (missing: ZSTD_LIBRARY ZSTD_INCLUDE_DIR) 
+  CMake Warning (dev) at C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.29/Modules/FindPackageHandleStandardArgs.cmake:438 (message):
+    The package name passed to `find_package_handle_standard_args` (webp) does
+    not match the name of the calling package (WebP).  This can lead to
+    problems in calling code that expects `find_package` result variables
+    (e.g., `_FOUND`) to follow a certain pattern.
+  Call Stack (most recent call first):
+    CoriEngine/thirdparty/SDL3_image/cmake/Findwebp.cmake:31 (find_package_handle_standard_args)
+    CoriEngine/thirdparty/SDL3_image/external/libtiff/cmake/WebPCodec.cmake:29 (find_package)
+    CoriEngine/thirdparty/SDL3_image/external/libtiff/CMakeLists.txt:123 (include)
+  This warning is for project developers.  Use -Wno-dev to suppress it.
+  
+  -- Could NOT find webp (missing: webp_LIBRARY webp_INCLUDE_PATH webpdemux_LIBRARY webpdemux_INCLUDE_PATH) 
+  -- 
+  -- Libtiff is now configured for Windows-10.0.19045
+  -- 
+  --   Libtiff build version:       4.6.0
+  --   Libtiff library version:     6.0.2
+  --   Libtiff release date:        20230908
+  -- 
+  --   Installation directory:             C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/out/build/x64-Clang-Debug
+  --   Documentation directory:            share/doc/SDL3_image
+  --   C compiler:                         C:/Program Files/LLVM/bin/clang.exe
+  --   C++ compiler:                       C:/Program Files/LLVM/bin/clang++.exe
+  --   Build shared libraries:             ON
+  --   Build tools:                        OFF
+  --   Build tools-unsupported:            OFF
+  --   Build tests:                        OFF
+  --   Build contrib:                      OFF
+  --   Build docs:                         OFF
+  --   Build deprecated features:          OFF
+  --   Enable linker symbol versioning:    TRUE
+  --   Support Microsoft Document Imaging: ON
+  --   Use win32 IO:                       ON
+  -- 
+  --  Support for internal codecs:
+  --   CCITT Group 3 & 4 algorithms:       ON
+  --   Macintosh PackBits algorithm:       ON
+  --   LZW algorithm:                      ON
+  --   ThunderScan 4-bit RLE algorithm:    ON
+  --   NeXT 2-bit RLE algorithm:           ON
+  --   LogLuv high dynamic range encoding: ON
+  -- 
+  --  Support for external codecs:
+  --   ZLIB support:                       Requested:OFF Availability:FALSE Support:FALSE
+  --   libdeflate support:                 Requested:OFF Availability:FALSE Support:FALSE (Depends on ZLIB Support)
+  --   Pixar log-format algorithm:         Requested:OFF Availability:FALSE Support:FALSE (Depends on ZLIB Support)
+  --   JPEG support:                       Requested:OFF Availability:FALSE Support:FALSE
+  --   Old JPEG support:                   Requested:OFF Availability:FALSE Support:FALSE (Depends on JPEG Support)
+  --   JPEG 8/12 bit dual mode:            Requested:OFF Availability:FALSE Support:FALSE
+  --   ISO JBIG support:                   Requested:OFF Availability:FALSE Support:FALSE
+  --   LERC support:                       Requested:OFF Availability:FALSE Support:FALSE (Depends on ZLIB Support)
+  --   LZMA2 support:                      Requested:OFF Availability:FALSE Support:FALSE
+  --   ZSTD support:                       Requested:OFF Availability:FALSE Support:FALSE
+  --   WEBP support:                       Requested:OFF Availability:0 Support:FALSE
+  -- 
+  --   C++ support:                        ON (requested) TRUE (availability)
+  -- 
+  -- Dynamic libtiff: $<TARGET_FILE_NAME:tiff>
+  -- SDL3_image backends:
+  -- - enabled:  stb gif jpg lbm pcx png pnm qoi svg tga tif xcf xpm xv
+  -- - disabled: imageio wic avif bmp jxl webp
+  -- GLM: Version 1.0.2
+  -- GLM: Disable -Wc++98-compat warnings
+  -- GLM: Build with C++20 features
+  -- GLM: AVX2 instruction set
+  -- Using the multi-header code from C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/CoriEngine/thirdparty/nlohmann_json/include/
+  CMake Deprecation Warning at CoriEngine/thirdparty/tmxlite/tmxlite/CMakeLists.txt:1 (cmake_minimum_required):
+    Compatibility with CMake < 3.5 will be removed from a future version of
+    CMake.
+  
+    Update the VERSION argument <min> value or use a ...<max> suffix to tell
+    CMake that the project does not need compatibility with older versions.
+  
+  
+  -- Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE) 
+  CMake Warning at CoriEngine/thirdparty/freetype/builds/cmake/FindHarfBuzz.cmake:99 (message):
+    Required version (2.0.0) is higher than found version ()
+  Call Stack (most recent call first):
+    CoriEngine/thirdparty/freetype/CMakeLists.txt:248 (find_package)
+  
+  
+  -- Could NOT find ZLIB (missing: ZLIB_LIBRARY ZLIB_INCLUDE_DIR) 
+  -- Could NOT find PNG (missing: PNG_LIBRARY PNG_PNG_INCLUDE_DIR) 
+  -- Could NOT find ZLIB (missing: ZLIB_LIBRARY ZLIB_INCLUDE_DIR) 
+  -- Could NOT find BZip2 (missing: BZIP2_LIBRARIES BZIP2_INCLUDE_DIR) 
+  -- Could NOT find BrotliDec (missing: BROTLIDEC_INCLUDE_DIRS BROTLIDEC_LIBRARIES) 
+  -- Glad Library 'glad_gl_core_46'
+  -- Build spdlog: 1.15.2
+  -- Build type: Debug
+  -- Configuring done (2.8s)
+  -- Generating done (0.3s)
+  -- Build files have been written to: C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/out/build/x64-Clang-Debug
+  [0/4] Re-checking globbed directories...
+  [0/494] glad_gl_core_46-generate
+  Cleaning C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/out/build/x64-Clang-Debug/CoriEngine/gladsources/glad_gl_core_46 
+  Generating with args --out-path C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/out/build/x64-Clang-Debug/CoriEngine/gladsources/glad_gl_core_46 --api gl:core=4.6 c 
+  [20.04.2025 20:22:34][INFO	][glad   	]: getting 'gl' specification from remote location
+  [20.04.2025 20:22:34][INFO	][glad.opener	]: opening: 'https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/main/xml/gl.xml'
+  [20.04.2025 20:22:35][INFO	][glad   	]: generating gl:core/gl=Version(major=4, minor=6)
+  [20.04.2025 20:22:35][INFO	][glad   	]: adding all extensions for api gl to result
+  [20.04.2025 20:22:35][INFO	][glad   	]: generating feature set FeatureSet(name=gl, info=[gl:core=4.6], extensions=620)
+  [20.04.2025 20:22:39][INFO	][glad.opener	]: opening: 'https://raw.githubusercontent.com/KhronosGroup/EGL-Registry/main/api/KHR/khrplatform.h'
+  Writing C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/out/build/x64-Clang-Debug/CoriEngine/gladsources/glad_gl_core_46/args.txt 
+  [188/494] Building C object CoriEngine/thirdparty/SDL3_mixer/external/wavpack-build/CMakeFiles/wavpack.dir/src/open_raw.c.obj
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_raw.c(196,28): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    196 |                 if (error) strcpy (error, "main block overran available data!");
+  
+        |                            ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_raw.c(243,32): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    243 |                     if (error) strcpy (error, "correction block overran available data!");
+  
+        |                                ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_raw.c(275,24): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    275 |             if (error) strcpy (error, "leftover multiblock data!");
+  
+        |                        ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+  3 warnings generated.
+  
+  [190/494] Building C object CoriEngine/thirdparty/SDL3_mixer/external/wavpack-build/CMakeFiles/wavpack.dir/src/open_filename.c.obj
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_filename.c(279,55): warning G5F7974A8: 'fopen' is deprecated: This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    279 |     FILE *(*fopen_func)(const char *, const char *) = fopen;
+  
+        |                                                       ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\stdio.h:212:20: note: 'fopen' has been explicitly marked deprecated here
+  
+    212 |     _Check_return_ _CRT_INSECURE_DEPRECATE(fopen_s)
+  
+        |                    ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_filename.c(297,20): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    297 |         if (error) strcpy (error, (flags & OPEN_EDIT_TAGS) ? "can't open file for editing" : "can't open file");
+  
+        |                    ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_filename.c(304,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    304 |         strcpy (in2filename, infilename);
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_filename.c(305,9): warning GF9063583: 'strcat' is deprecated: This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    305 |         strcat (in2filename, "c");
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:91:5: note: 'strcat' has been explicitly marked deprecated here
+  
+     91 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_filename.c(346,9): warning G5D030D9A: '_wfopen' is deprecated: This function or variable may be unsafe. Consider using _wfopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    346 |                 ret = _wfopen(filename_utf16, mode_utf16);
+  
+        |                       ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt_wstdio.h:132:20: note: '_wfopen' has been explicitly marked deprecated here
+  
+    132 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_wfopen_s)
+  
+        |                    ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+  5 warnings generated.
+  
+  [192/494] Building C object CoriEngine/thirdparty/SDL3/CMakeFiles/SDL3-static.dir/src/stdlib/SDL_string.c.obj
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3\src\stdlib\SDL_string.c(1157,12): warning G5CB5A2F3: 'itoa' is deprecated: The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _itoa. See online help for details. [-Wdeprecated-declarations]
+  
+   1157 |     return itoa(value, string, radix);
+  
+        |            ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\stdlib.h:1315:5: note: 'itoa' has been explicitly marked deprecated here
+  
+   1315 |     _CRT_NONSTDC_DEPRECATE(_itoa) _CRT_INSECURE_DEPRECATE(_itoa_s)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:428:50: note: expanded from macro '_CRT_NONSTDC_DEPRECATE'
+  
+    428 |         #define _CRT_NONSTDC_DEPRECATE(_NewName) _CRT_DEPRECATE_TEXT(             \
+  
+        |                                                  ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3\src\stdlib\SDL_string.c(1175,12): warning G69E37C4D: '_ltoa' is deprecated: This function or variable may be unsafe. Consider using _ltoa_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+   1175 |     return _ltoa(value, string, radix);
+  
+        |            ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\stdlib.h:664:1: note: '_ltoa' has been explicitly marked deprecated here
+  
+    664 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_1_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:847:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_1_1'
+  
+    847 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_1_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _HType1, _HArg1, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1906:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_1_1_EX'
+  
+   1906 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_HType1 _HArg1, _SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3\src\stdlib\SDL_string.c(1193,12): warning GA41C26B2: '_ultoa' is deprecated: This function or variable may be unsafe. Consider using _ultoa_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+   1193 |     return _ultoa(value, string, radix);
+  
+        |            ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\stdlib.h:687:1: note: '_ultoa' has been explicitly marked deprecated here
+  
+    687 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_1_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:847:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_1_1'
+  
+    847 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_1_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _HType1, _HArg1, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1906:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_1_1_EX'
+  
+   1906 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_HType1 _HArg1, _SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3\src\stdlib\SDL_string.c(1217,12): warning G3BF191AC: '_i64toa' is deprecated: This function or variable may be unsafe. Consider using _i64toa_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+   1217 |     return _i64toa(value, string, radix);
+  
+        |            ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\stdlib.h:704:1: note: '_i64toa' has been explicitly marked deprecated here
+  
+    704 | _CRT_INSECURE_DEPRECATE(_i64toa_s)
+  
+        | ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3\src\stdlib\SDL_string.c(1235,12): warning G784B7167: '_ui64toa' is deprecated: This function or variable may be unsafe. Consider using _ui64toa_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+   1235 |     return _ui64toa(value, string, radix);
+  
+        |            ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\stdlib.h:720:1: note: '_ui64toa' has been explicitly marked deprecated here
+  
+    720 | _CRT_INSECURE_DEPRECATE(_ui64toa_s)
+  
+        | ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+  5 warnings generated.
+  
+  [196/494] Building C object CoriEngine/thirdparty/SDL3_mixer/external/wavpack-build/CMakeFiles/wavpack.dir/src/tag_utils.c.obj
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\tag_utils.c(314,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    314 |         strcpy (value, lvalue);
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\tag_utils.c(318,9): warning G0BD46789: 'strncpy' is deprecated: This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    318 |         strncpy (value, lvalue, size - 1);
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:334:1: note: 'strncpy' has been explicitly marked deprecated here
+  
+    334 | __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_EX(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1935:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_EX'
+  
+   1935 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1, _TType2 _TArg2);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\tag_utils.c(377,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    377 |         strcpy (lvalue, "Title");
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\tag_utils.c(379,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    379 |         strcpy (lvalue, "Artist");
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\tag_utils.c(381,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    381 |         strcpy (lvalue, "Album");
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\tag_utils.c(383,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    383 |         strcpy (lvalue, "Year");
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\tag_utils.c(385,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    385 |         strcpy (lvalue, "Comment");
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\tag_utils.c(387,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    387 |         strcpy (lvalue, "Track");
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\tag_utils.c(397,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    397 |         strcpy (item, lvalue);
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\tag_utils.c(401,9): warning G0BD46789: 'strncpy' is deprecated: This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    401 |         strncpy (item, lvalue, size - 1);
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:334:1: note: 'strncpy' has been explicitly marked deprecated here
+  
+    334 | __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_EX(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1935:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_EX'
+  
+   1935 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1, _TType2 _TArg2);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\tag_utils.c(428,13): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    428 |             strcpy (wpc->error_message, "APEv2 tag exceeds maximum allowed length!");
+  
+        |             ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\tag_utils.c(447,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    447 |         strcpy ((char *) p, item);
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\tag_utils.c(485,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    485 |         strcpy (wpc->error_message, "can't write WavPack data, disk probably full!");
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\tag_utils.c(501,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    501 |         strcpy (wpc->error_message, "can't edit tags located at the beginning of files!");
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\tag_utils.c(506,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    506 |         strcpy (wpc->error_message, "can't edit tags on pipes or unseekable files!");
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\tag_utils.c(511,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    511 |         strcpy (wpc->error_message, "can't edit tags without OPEN_EDIT_TAGS flag!");
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\tag_utils.c(553,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    553 |         strcpy (wpc->error_message, "can't write WavPack data, disk probably full!");
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+  17 warnings generated.
+  
+  [198/494] Building C object CoriEngine/thirdparty/SDL3_mixer/external/wavpack-build/CMakeFiles/wavpack.dir/src/open_utils.c.obj
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_utils.c(44,20): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+     44 |         if (error) strcpy (error, "can't allocate memory");
+  
+        |                    ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_utils.c(65,24): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+     65 |             if (error) strcpy (error, "can't edit tags located at the beginning of files!");
+  
+        |                        ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_utils.c(72,20): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+     72 |         if (error) strcpy (error, "can't read all of WavPack file!");
+  
+        |                    ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_utils.c(82,20): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+     82 |         if (error) strcpy (error, "this legacy WavPack file is deprecated, use version 4.80.0 to transcode");
+  
+        |                    ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_utils.c(89,20): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+     89 |         if (error) strcpy (error, "can't allocate memory");
+  
+        |                    ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_utils.c(95,20): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+     95 |         if (error) strcpy (error, "can't allocate memory");
+  
+        |                    ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_utils.c(108,28): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    108 |                 if (error) strcpy (error, "not compatible with this version of WavPack file!");
+  
+        |                            ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_utils.c(115,24): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    115 |             if (error) strcpy (error, "can't allocate memory");
+  
+        |                        ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_utils.c(121,24): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    121 |             if (error) strcpy (error, "can't read all of WavPack file!");
+  
+        |                        ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_utils.c(171,24): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    171 |             if (error) strcpy (error, "not compatible with this version of correction file!");
+  
+        |                        ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_utils.c(176,24): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    176 |             if (error) strcpy (error, wpc->error_message [0] ? wpc->error_message :
+  
+        |                        ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_utils.c(215,24): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    215 |             if (error) strcpy (error, "not configured to handle DSD WavPack files!");
+  
+        |                        ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\open_utils.c(359,13): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    359 |             strcpy (wpc->error_message, "can't unpack correction files alone!");
+  
+        |             ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+  13 warnings generated.
+  
+  [201/494] Building C object CoriEngine/thirdparty/SDL3_mixer/external/wavpack-build/CMakeFiles/wavpack.dir/src/pack_utils.c.obj
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\pack_utils.c(71,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+     71 |         strcpy (wpc->file_extension, file_extension);
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\pack_utils.c(209,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    209 |         strcpy (wpc->error_message, "sample rate cannot be zero or negative!");
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\pack_utils.c(214,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    214 |         strcpy (wpc->error_message, "invalid total sample count!");
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\pack_utils.c(219,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    219 |         strcpy (wpc->error_message, "invalid channel count!");
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\pack_utils.c(224,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    224 |         strcpy (wpc->error_message, "invalid custom block samples!");
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\pack_utils.c(248,13): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    248 |             strcpy (wpc->error_message, "hybrid mode not available for DSD!");
+  
+        |             ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\pack_utils.c(288,17): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    288 |                 strcpy (wpc->error_message, "incorrect bits/bytes configuration for float data!");
+  
+        |                 ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\pack_utils.c(298,17): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    298 |                 strcpy (wpc->error_message, "invalid bytes per sample!");
+  
+        |                 ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\pack_utils.c(303,17): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    303 |                 strcpy (wpc->error_message, "invalid bits per sample!");
+  
+        |                 ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\pack_utils.c(367,13): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    367 |             strcpy (wpc->error_message, "chan_ids longer than num channels!");
+  
+        |             ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\pack_utils.c(479,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    479 |         strcpy (wpc->error_message, "too many channels!");
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\pack_utils.c(915,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    915 |         strcpy (wpc->error_message, "can't create valid RIFF wav header for non-normalized floating data!");
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\pack_utils.c(1058,13): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+   1058 |             strcpy (wpc->error_message, "can't write WavPack data, disk probably full!");
+  
+        |             ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\pack_utils.c(1073,17): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+   1073 |                 strcpy (wpc->error_message, "can't write WavPack data, disk probably full!");
+  
+        |                 ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\pack_utils.c(1220,17): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+   1220 |                 strcpy (wpc->error_message, "output buffer overflowed!");
+  
+        |                 ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\pack_utils.c(1536,13): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+   1536 |             strcpy (wpc->error_message, "can't write WavPack data, disk probably full!");
+  
+        |             ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+  16 warnings generated.
+  
+  [266/494] Building RC object CoriEngine/thirdparty/SDL3_mixer/external/wavpack-build/CMakeFiles/wavpack.dir/wavpackdll/wavpackdll.rc.res
+  Microsoft (R) Windows (R) Resource Compiler Version 10.0.10011.16384
+  
+  
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  
+  
+  
+  [269/494] Building C object CoriEngine/thirdparty/SDL3_mixer/external/wavpack-build/CMakeFiles/wavpack.dir/src/unpack_utils.c.obj
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\unpack_utils.c(163,25): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    163 |                         strcpy (wpc->error_message, "can't read all of last block!");
+  
+        |                         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\unpack_utils.c(223,17): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    223 |                 strcpy (wpc->error_message, "discontinuity found, aborting file!");
+  
+        |                 ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\unpack_utils.c(450,13): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    450 |             strcpy (wpc->error_message, "can't read all of last block!");
+  
+        |             ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+  3 warnings generated.
+  
+  [271/494] Building C object CoriEngine/thirdparty/SDL3_mixer/external/wavpack-build/CMakeFiles/wavpack.dir/src/unpack_dsd.c.obj
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\external\wavpack\src\unpack_dsd.c(519,9): warning G183B9D1E: variable 'skipped_terms' set but not used [-Wunused-but-set-variable]
+  
+    519 |     int skipped_terms, i, j;
+  
+        |         ^
+  
+  1 warning generated.
+  
+  [290/494] Building C object CoriEngine/thirdparty/SDL3_image/external/libtiff-build/libtiff/CMakeFiles/tiff.dir/tif_compress.c.obj
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_image\external\libtiff\libtiff\tif_compress.c(217,9): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    217 |         strcpy(cd->info->name, name);
+  
+        |         ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+  1 warning generated.
+  
+  [299/494] Building C object CoriEngine/thirdparty/SDL3_image/external/libtiff-build/libtiff/CMakeFiles/tiff.dir/tif_extension.c.obj
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_image\external\libtiff\libtiff\tif_extension.c(106,5): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+    106 |     strcpy(psLink->name, name);
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+  
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+  
+        | ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+  
+        |     ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+  
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+  
+        |                 ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+  1 warning generated.
+  
+  [303/494] Building C object CoriEngine/thirdparty/SDL3_image/external/libtiff-build/libtiff/CMakeFiles/tiff.dir/tif_dirread.c.obj
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_image\external\libtiff\libtiff\tif_dirread.c(7153,30): warning G3FF16C77: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  
+   7153 |         const char *pszMax = getenv("LIBTIFF_STRILE_ARRAY_MAX_RESIZE_COUNT");
+  
+        |                              ^
+  
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\stdlib.h:1183:20: note: 'getenv' has been explicitly marked deprecated here
+  
+   1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+  
+        |                    ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+  1 warning generated.
+  
+  [320/494] Building C object CoriEngine/thirdparty/SDL3_image/external/libtiff-build/libtiff/CMakeFiles/tiff.dir/tif_tile.c.obj
+  [322/494] Building C object CoriEngine/thirdparty/SDL3_image/external/libtiff-build/libtiff/CMakeFiles/tiff.dir/tif_version.c.obj
+  [323/494] Building C object CoriEngine/thirdparty/SDL3_image/external/libtiff-build/libtiff/CMakeFiles/tiff.dir/tif_warning.c.obj
+  [324/494] Building C object CoriEngine/thirdparty/SDL3_image/external/libtiff-build/libtiff/CMakeFiles/tiff.dir/tif_webp.c.obj
+  [325/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/music_flac.c.obj
+  [326/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/music_fluidsynth.c.obj
+  [327/494] Building C object CoriEngine/thirdparty/SDL3_image/external/libtiff-build/libtiff/CMakeFiles/tiff.dir/tif_write.c.obj
+  [328/494] Building C object CoriEngine/thirdparty/SDL3_image/external/libtiff-build/libtiff/CMakeFiles/tiff.dir/tif_zip.c.obj
+  [329/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/music_gme.c.obj
+  [330/494] Building C object CoriEngine/thirdparty/SDL3_image/external/libtiff-build/libtiff/CMakeFiles/tiff.dir/tif_zstd.c.obj
+  [331/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/music_mpg123.c.obj
+  [332/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/music_nativemidi.c.obj
+  [333/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/music_ogg.c.obj
+  [334/494] Building C object CoriEngine/thirdparty/SDL3_image/external/libtiff-build/libtiff/CMakeFiles/tiff.dir/tif_win32.c.obj
+  [335/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/music_opus.c.obj
+  [336/494] Building C object CoriEngine/thirdparty/SDL3/CMakeFiles/SDL3-static.dir/src/joystick/windows/SDL_windows_gaming_input.c.obj
+  [337/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/music_xmp.c.obj
+  [338/494] Building C object CoriEngine/thirdparty/SDL3/CMakeFiles/SDL3-static.dir/src/joystick/windows/SDL_rawinputjoystick.c.obj
+  [339/494] Building C object CoriEngine/thirdparty/SDL3_image/external/libtiff-build/libtiff/CMakeFiles/tiff.dir/tif_open.c.obj
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_image\external\libtiff\libtiff\tif_open.c(243,5): warning GCBC0EE8B: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    243 |     strcpy(tif->tif_name, name);
+        |     ^
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\string.h:130:1: note: 'strcpy' has been explicitly marked deprecated here
+    130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+        | ^
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:835:5: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+    835 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+        |     ^
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\corecrt.h:1894:17: note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+   1894 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+        |                 ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+  1 warning generated.
+  
+  [340/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/utils.c.obj
+  [341/494] Building CXX object CoriEngine/CMakeFiles/imgui.dir/thirdparty/imgui/backends/imgui_impl_opengl3.cpp.obj
+  [342/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/load_voc.c.obj
+  [343/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/load_aiff.c.obj
+  [344/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/load_sndfile.c.obj
+  [345/494] Building C object CoriEngine/CMakeFiles/glad_gl_core_46.dir/gladsources/glad_gl_core_46/src/gl.c.obj
+  [346/494] Building CXX object CoriEngine/CMakeFiles/imgui.dir/thirdparty/imgui/imgui_demo.cpp.obj
+  [347/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/mp3utils.c.obj
+  [348/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/music_drmp3.c.obj
+  [349/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/music_timidity.c.obj
+  [350/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/effect_stereoreverse.c.obj
+  [351/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/music_wav.c.obj
+  [352/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/music_wavpack.c.obj
+  [353/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/effects_internal.c.obj
+  [354/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/effect_position.c.obj
+  [355/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/music.c.obj
+  [356/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_WIC.c.obj
+  [357/494] Building CXX object CoriEngine/CMakeFiles/imgui.dir/thirdparty/imgui/imgui_tables.cpp.obj
+  [358/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/mixer.c.obj
+  [359/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/music_ogg_stb.c.obj
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\src\codecs\music_ogg_stb.c:68:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\src\codecs\stb_vorbis\stb_vorbis.h(1065,24): warning G1ED23CBC: static variable 'crc_table' is used in an inline function with external linkage [-Wstatic-in-inline]
+   1065 |    return (crc << 8) ^ crc_table[byte ^ (crc >> 24)];
+        |                        ^
+  C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\src\codecs\stb_vorbis\stb_vorbis.h:1063:1: note: use 'static' to give inline function 'crc32_update' internal linkage
+   1063 | STB_FORCEINLINE uint32 crc32_update(uint32 crc, uint8 byte)
+        | ^
+        | static 
+  C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\src\codecs\music_ogg_stb.c:35:25: note: expanded from macro 'STB_FORCEINLINE'
+     35 | #define STB_FORCEINLINE SDL_FORCE_INLINE
+        |                         ^
+  C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3\include\SDL3\SDL_begin_code.h:383:26: note: expanded from macro 'SDL_FORCE_INLINE'
+    383 | #define SDL_FORCE_INLINE __forceinline
+        |                          ^
+  C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\src\codecs\stb_vorbis\stb_vorbis.h:1051:15: note: 'crc_table' declared here
+   1051 | static uint32 crc_table[256];
+        |               ^
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\src\codecs\stb_vorbis\stb_vorbis.h(1786,14): warning GC9A9DCD8: static function 'get8_packet_raw' is used in an inline function with external linkage [-Wstatic-in-inline]
+   1786 |          z = get8_packet_raw(f);
+        |              ^
+  C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\src\codecs\stb_vorbis\stb_vorbis.h:1779:1: note: use 'static' to give inline function 'prep_huffman' internal linkage
+   1779 | STB_FORCEINLINE void prep_huffman(vorb *f)
+        | ^
+        | static 
+  C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\src\codecs\music_ogg_stb.c:35:25: note: expanded from macro 'STB_FORCEINLINE'
+     35 | #define STB_FORCEINLINE SDL_FORCE_INLINE
+        |                         ^
+  C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3\include\SDL3\SDL_begin_code.h:383:26: note: expanded from macro 'SDL_FORCE_INLINE'
+    383 | #define SDL_FORCE_INLINE __forceinline
+        |                          ^
+  C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\src\codecs\stb_vorbis\stb_vorbis.h:1706:12: note: 'get8_packet_raw' declared here
+   1706 | static int get8_packet_raw(vorb *f)
+        |            ^
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\src\codecs\stb_vorbis\stb_vorbis.h(2217,26): warning G1ED23CBC: static variable 'inverse_db_table' is used in an inline function with external linkage [-Wstatic-in-inline]
+   2217 |       LINE_OP(output[x], inverse_db_table[(uint32)y&255]);
+        |                          ^
+  C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\src\codecs\stb_vorbis\stb_vorbis.h:2181:1: note: use 'static' to give inline function 'draw_line' internal linkage
+   2181 | STB_FORCEINLINE void draw_line(float *output, int x0, int y0, int x1, int y1, int n)
+        | ^
+        | static 
+  C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\src\codecs\music_ogg_stb.c:35:25: note: expanded from macro 'STB_FORCEINLINE'
+     35 | #define STB_FORCEINLINE SDL_FORCE_INLINE
+        |                         ^
+  C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3\include\SDL3\SDL_begin_code.h:383:26: note: expanded from macro 'SDL_FORCE_INLINE'
+    383 | #define SDL_FORCE_INLINE __forceinline
+        |                          ^
+  C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\src\codecs\stb_vorbis\stb_vorbis.h:2093:20: note: 'inverse_db_table' declared here
+   2093 | static const float inverse_db_table[256] =
+        |                    ^
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\src\codecs\stb_vorbis\stb_vorbis.h(2225,29): warning G1ED23CBC: static variable 'inverse_db_table' is used in an inline function with external linkage [-Wstatic-in-inline]
+   2225 |          LINE_OP(output[x], inverse_db_table[(uint32)y&255]);
+        |                             ^
+  C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\src\codecs\stb_vorbis\stb_vorbis.h:2181:1: note: use 'static' to give inline function 'draw_line' internal linkage
+   2181 | STB_FORCEINLINE void draw_line(float *output, int x0, int y0, int x1, int y1, int n)
+        | ^
+        | static 
+  C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\src\codecs\music_ogg_stb.c:35:25: note: expanded from macro 'STB_FORCEINLINE'
+     35 | #define STB_FORCEINLINE SDL_FORCE_INLINE
+        |                         ^
+  C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3\include\SDL3\SDL_begin_code.h:383:26: note: expanded from macro 'SDL_FORCE_INLINE'
+    383 | #define SDL_FORCE_INLINE __forceinline
+        |                          ^
+  C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\SDL3_mixer\src\codecs\stb_vorbis\stb_vorbis.h:2093:20: note: 'inverse_db_table' declared here
+   2093 | static const float inverse_db_table[256] =
+        |                    ^
+  4 warnings generated.
+  
+  [360/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/music_drflac.c.obj
+  [361/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/timidity/common.c.obj
+  [362/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/timidity/instrum.c.obj
+  [363/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/timidity/output.c.obj
+  [364/494] Building CXX object CoriEngine/CMakeFiles/imgui.dir/thirdparty/imgui/imgui_draw.cpp.obj
+  [365/494] Building CXX object CoriEngine/CMakeFiles/imgui.dir/thirdparty/imgui/backends/imgui_impl_sdl3.cpp.obj
+  [366/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/timidity/mix.c.obj
+  [367/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/timidity/playmidi.c.obj
+  [368/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/timidity/readmidi.c.obj
+  [369/494] Linking C static library CoriEngine\thirdparty\SDL3\SDL3-static.lib
+  [370/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/timidity/tables.c.obj
+  [371/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/timidity/timidity.c.obj
+  [372/494] Building C object CoriEngine/thirdparty/SDL3_mixer/CMakeFiles/SDL3_mixer-static.dir/src/codecs/timidity/resample.c.obj
+  [373/494] Building CXX object CoriEngine/CMakeFiles/imgui.dir/thirdparty/imgui/imgui_widgets.cpp.obj
+  [374/494] Linking C shared library CoriEngine\thirdparty\SDL3_mixer\external\wavpack-build\wavpackdll.dll
+  [375/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG.c.obj
+  [376/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_bmp.c.obj
+  [377/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_gif.c.obj
+  [378/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_avif.c.obj
+  [379/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_jxl.c.obj
+  [380/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_jpg.c.obj
+  [381/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_lbm.c.obj
+  [382/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_pnm.c.obj
+  [383/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_pcx.c.obj
+  [384/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_qoi.c.obj
+  [385/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_png.c.obj
+  [386/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_tga.c.obj
+  [387/494] Building C object CoriEngine/thirdparty/tmxlite/tmxlite/CMakeFiles/tmxlite.dir/src/miniz.c.obj
+  [388/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_xpm.c.obj
+  [389/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_webp.c.obj
+  [390/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_tif.c.obj
+  [391/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_xv.c.obj
+  [392/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/ftbbox.c.obj
+  [393/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/ftbdf.c.obj
+  [394/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_svg.c.obj
+  [395/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_stb.c.obj
+  [396/494] Building C object CoriEngine/thirdparty/SDL3_image/CMakeFiles/SDL3_image-static.dir/src/IMG_xcf.c.obj
+  [397/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/ftcid.c.obj
+  [398/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/ftfstype.c.obj
+  [399/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/ftbitmap.c.obj
+  [400/494] Linking C shared library CoriEngine\thirdparty\SDL3_image\external\libtiff-build\libtiff\tiff.dll
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\out\build\x64-Clang-Debug\lld-link : warning : ignoring unknown argument '--version-script=C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/CoriEngine/thirdparty/SDL3_image/external/libtiff/libtiff/libtiff.map'
+  
+  [401/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/ftgasp.c.obj
+  [402/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/ftgxval.c.obj
+  [403/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/autofit/autofit.c.obj
+  [404/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/ftinit.c.obj
+  [405/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/ftbase.c.obj
+  [406/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/ftpfr.c.obj
+  [407/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/ftmm.c.obj
+  [408/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/ftglyph.c.obj
+  [409/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/ftotval.c.obj
+  [410/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/ftpatent.c.obj
+  [411/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/ftstroke.c.obj
+  [412/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/ftwinfnt.c.obj
+  [413/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/ftsynth.c.obj
+  [414/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/fttype1.c.obj
+  [415/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/bzip2/ftbzip2.c.obj
+  [416/494] Building CXX object CoriEngine/CMakeFiles/imgui.dir/thirdparty/imgui/imgui.cpp.obj
+  [417/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/bdf/bdf.c.obj
+  [418/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/cache/ftcache.c.obj
+  [419/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/cid/type1cid.c.obj
+  [420/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/lzw/ftlzw.c.obj
+  [421/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/pcf/pcf.c.obj
+  [422/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/pshinter/pshinter.c.obj
+  [423/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/gzip/ftgzip.c.obj
+  [424/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/cff/cff.c.obj
+  [425/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/raster/raster.c.obj
+  [426/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/pfr/pfr.c.obj
+  [427/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/psnames/psnames.c.obj
+  [428/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/svg/svg.c.obj
+  [429/494] Building RC object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/base/ftver.rc.res
+  Microsoft (R) Windows (R) Resource Compiler Version 10.0.10011.16384
+  
+  
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  
+  
+  
+  [430/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/sdf/sdf.c.obj
+  [431/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/smooth/smooth.c.obj
+  [432/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/type42/type42.c.obj
+  [433/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/winfonts/winfnt.c.obj
+  [434/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/psaux/psaux.c.obj
+  [435/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/builds/windows/ftdebug.c.obj
+  [436/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/type1/type1.c.obj
+  [437/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/truetype/truetype.c.obj
+  [438/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/src/sfnt/sfnt.c.obj
+  [439/494] Building C object CoriEngine/thirdparty/freetype/CMakeFiles/freetype.dir/builds/windows/ftsystem.c.obj
+  [440/494] Building CXX object CoriEngine/thirdparty/tmxlite/tmxlite/CMakeFiles/tmxlite.dir/src/detail/pugixml.cpp.obj
+  [441/494] Linking C static library CoriEngine\thirdparty\SDL3_image\SDL3_image.lib
+  [442/494] Linking C static library CoriEngine\glad_gl_core_46.lib
+  [443/494] Linking CXX static library CoriEngine\imgui.lib
+  [444/494] Linking C static library CoriEngine\thirdparty\SDL3_mixer\SDL3_mixer.lib
+  [445/494] Linking C static library CoriEngine\thirdparty\freetype\freetyped.lib
+  [446/494] Building CXX object CoriEngine/thirdparty/tmxlite/tmxlite/CMakeFiles/tmxlite.dir/src/FreeFuncs.cpp.obj
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\src\FreeFuncs.cpp:33:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\FreeFuncs.hpp:55:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\detail\Log.hpp(145,37): warning GABDFBF04: 'localtime' is deprecated: This function or variable may be unsafe. Consider using localtime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    145 |                     auto tm = *std::localtime(&time);
+        |                                     ^
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\time.h:524:9: note: 'localtime' has been explicitly marked deprecated here
+    524 |         _CRT_INSECURE_DEPRECATE(localtime_s)
+        |         ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+        |                                                       ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+        |                                               ^
+  
+  1 warning generated.
+  
+  [447/494] Scanning C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/Apps/Sandbox/src/Sandbox.cpp for CXX dependencies
+  [448/494] Building CXX object CoriEngine/thirdparty/tmxlite/tmxlite/CMakeFiles/tmxlite.dir/src/ImageLayer.cpp.obj
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\src\ImageLayer.cpp:34:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\FreeFuncs.hpp:55:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\detail\Log.hpp(145,37): warning GABDFBF04: 'localtime' is deprecated: This function or variable may be unsafe. Consider using localtime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    145 |                     auto tm = *std::localtime(&time);
+        |                                     ^
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\time.h:524:9: note: 'localtime' has been explicitly marked deprecated here
+    524 |         _CRT_INSECURE_DEPRECATE(localtime_s)
+        |         ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+        |                                                       ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+        |                                               ^
+  
+  1 warning generated.
+  
+  [449/494] Generating CXX dyndep file Apps/Sandbox/CMakeFiles/Sandbox.dir/CXX.dd
+  [450/494] Building CXX object CoriEngine/thirdparty/tmxlite/tmxlite/CMakeFiles/tmxlite.dir/src/Property.cpp.obj
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\src\Property.cpp:34:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\detail\Log.hpp(145,37): warning GABDFBF04: 'localtime' is deprecated: This function or variable may be unsafe. Consider using localtime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    145 |                     auto tm = *std::localtime(&time);
+        |                                     ^
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\time.h:524:9: note: 'localtime' has been explicitly marked deprecated here
+    524 |         _CRT_INSECURE_DEPRECATE(localtime_s)
+        |         ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+  
+        |                                                       ^
+  
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+  
+        |                                               ^
+  
+  1 warning generated.
+  
+  [451/494] Building CXX object CoriEngine/thirdparty/tmxlite/tmxlite/CMakeFiles/tmxlite.dir/src/TileLayer.cpp.obj
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\src\TileLayer.cpp:39:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\FreeFuncs.hpp:55:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\detail\Log.hpp(145,37): warning GABDFBF04: 'localtime' is deprecated: This function or variable may be unsafe. Consider using localtime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    145 |                     auto tm = *std::localtime(&time);
+        |                                     ^
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\time.h:524:9: note: 'localtime' has been explicitly marked deprecated here
+    524 |         _CRT_INSECURE_DEPRECATE(localtime_s)
+        |         ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+        |                                                       ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+        |                                               ^
+  
+  1 warning generated.
+  
+  [452/494] Building CXX object CoriEngine/thirdparty/tmxlite/tmxlite/CMakeFiles/tmxlite.dir/src/ObjectGroup.cpp.obj
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\src\ObjectGroup.cpp:33:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\FreeFuncs.hpp:55:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\detail\Log.hpp(145,37): warning GABDFBF04: 'localtime' is deprecated: This function or variable may be unsafe. Consider using localtime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    145 |                     auto tm = *std::localtime(&time);
+        |                                     ^
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\time.h:524:9: note: 'localtime' has been explicitly marked deprecated here
+    524 |         _CRT_INSECURE_DEPRECATE(localtime_s)
+        |         ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+        |                                                       ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+        |                                               ^
+  
+  1 warning generated.
+  
+  [453/494] Building CXX object CoriEngine/thirdparty/tmxlite/tmxlite/CMakeFiles/tmxlite.dir/src/LayerGroup.cpp.obj
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\src\LayerGroup.cpp:34:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\FreeFuncs.hpp:55:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\detail\Log.hpp(145,37): warning GABDFBF04: 'localtime' is deprecated: This function or variable may be unsafe. Consider using localtime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    145 |                     auto tm = *std::localtime(&time);
+        |                                     ^
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\time.h:524:9: note: 'localtime' has been explicitly marked deprecated here
+    524 |         _CRT_INSECURE_DEPRECATE(localtime_s)
+        |         ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+        |                                                       ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+        |                                               ^
+  
+  1 warning generated.
+  
+  [454/494] Building CXX object CoriEngine/thirdparty/tmxlite/tmxlite/CMakeFiles/tmxlite.dir/src/Object.cpp.obj
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\src\Object.cpp:34:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\FreeFuncs.hpp:55:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\detail\Log.hpp(145,37): warning GABDFBF04: 'localtime' is deprecated: This function or variable may be unsafe. Consider using localtime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    145 |                     auto tm = *std::localtime(&time);
+        |                                     ^
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\time.h:524:9: note: 'localtime' has been explicitly marked deprecated here
+    524 |         _CRT_INSECURE_DEPRECATE(localtime_s)
+        |         ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+        |                                                       ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+        |                                               ^
+  
+  1 warning generated.
+  
+  [455/494] Building CXX object CoriEngine/thirdparty/tmxlite/tmxlite/CMakeFiles/tmxlite.dir/src/ObjectTypes.cpp.obj
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\src\ObjectTypes.cpp:32:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\FreeFuncs.hpp:55:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\detail\Log.hpp(145,37): warning GABDFBF04: 'localtime' is deprecated: This function or variable may be unsafe. Consider using localtime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    145 |                     auto tm = *std::localtime(&time);
+        |                                     ^
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\time.h:524:9: note: 'localtime' has been explicitly marked deprecated here
+    524 |         _CRT_INSECURE_DEPRECATE(localtime_s)
+        |         ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+        |                                                       ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+        |                                               ^
+  
+  1 warning generated.
+  
+  [456/494] Building CXX object CoriEngine/thirdparty/tmxlite/tmxlite/CMakeFiles/tmxlite.dir/src/Tileset.cpp.obj
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\src\Tileset.cpp:34:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\FreeFuncs.hpp:55:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\detail\Log.hpp(145,37): warning GABDFBF04: 'localtime' is deprecated: This function or variable may be unsafe. Consider using localtime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    145 |                     auto tm = *std::localtime(&time);
+        |                                     ^
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\time.h:524:9: note: 'localtime' has been explicitly marked deprecated here
+    524 |         _CRT_INSECURE_DEPRECATE(localtime_s)
+        |         ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+        |                                                       ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+        |                                               ^
+  
+  1 warning generated.
+  
+  [457/494] Building CXX object CoriEngine/CMakeFiles/CoriEngine_shared.dir/cmake_pch.hxx.pch
+  [458/494] Building CXX object CoriEngine/thirdparty/tmxlite/tmxlite/CMakeFiles/tmxlite.dir/src/Map.cpp.obj
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\src\Map.cpp:34:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\FreeFuncs.hpp:55:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\thirdparty\tmxlite\tmxlite\include\tmxlite\detail\Log.hpp(145,37): warning GABDFBF04: 'localtime' is deprecated: This function or variable may be unsafe. Consider using localtime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    145 |                     auto tm = *std::localtime(&time);
+        |                                     ^
+  C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\time.h:524:9: note: 'localtime' has been explicitly marked deprecated here
+    524 |         _CRT_INSECURE_DEPRECATE(localtime_s)
+        |         ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+        |                                                       ^
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+    346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+        |                                               ^
+  
+  1 warning generated.
+  
+  [459/494] Building CXX object CoriEngine/thirdparty/glm/glm/CMakeFiles/glm.dir/detail/glm.cpp.obj
+  [460/494] Linking CXX static library CoriEngine\thirdparty\tmxlite\tmxlite\tmxlite-s-d.lib
+  [461/494] Linking CXX static library CoriEngine\thirdparty\glm\glm\glm.lib
+  [462/494] Building CXX object CoriEngine/thirdparty/spdlog/CMakeFiles/spdlog.dir/src/bundled_fmtlib_format.cpp.obj
+  [463/494] Scanning C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/CoriEngine/src/CoriCore/Engine.cpp for CXX dependencies
+  [464/494] Scanning C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/CoriEngine/src/CoriCore/Application.cpp for CXX dependencies
+  [465/494] Scanning C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/CoriEngine/src/CoriCore/EngineEntry.cpp for CXX dependencies
+  [466/494] Scanning C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/CoriEngine/src/CoriCore/Input.cpp for CXX dependencies
+  [467/494] Scanning C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/CoriEngine/src/CoriCore/LayerStack.cpp for CXX dependencies
+  [468/494] Scanning C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/CoriEngine/src/CoriCore/Layer.cpp for CXX dependencies
+  [469/494] Scanning C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/CoriEngine/src/CoriCore/ImGui/ImGuiLayer.cpp for CXX dependencies
+  [470/494] Building CXX object CoriEngine/thirdparty/spdlog/CMakeFiles/spdlog.dir/src/file_sinks.cpp.obj
+  [471/494] Scanning C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/CoriEngine/src/CoriCore/Logger.cpp for CXX dependencies
+  [472/494] Scanning C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/CoriEngine/src/CoriCore/WindowImpl.cpp for CXX dependencies
+  [473/494] Generating CXX dyndep file CoriEngine/CMakeFiles/CoriEngine_shared.dir/CXX.dd
+  [474/494] Building CXX object CoriEngine/thirdparty/spdlog/CMakeFiles/spdlog.dir/src/async.cpp.obj
+  [475/494] Building CXX object CoriEngine/thirdparty/spdlog/CMakeFiles/spdlog.dir/src/cfg.cpp.obj
+  [476/494] Building CXX object CoriEngine/thirdparty/spdlog/CMakeFiles/spdlog.dir/src/color_sinks.cpp.obj
+  [477/494] Building CXX object CoriEngine/thirdparty/spdlog/CMakeFiles/spdlog.dir/src/stdout_sinks.cpp.obj
+  [478/494] Building CXX object CoriEngine/CMakeFiles/CoriEngine_shared.dir/src/CoriCore/EngineEntry.cpp.obj
+  [479/494] Building CXX object CoriEngine/CMakeFiles/CoriEngine_shared.dir/src/CoriCore/Logger.cpp.obj
+  [480/494] Building CXX object CoriEngine/CMakeFiles/CoriEngine_shared.dir/src/CoriCore/LayerStack.cpp.obj
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\LayerStack.cpp:1:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\LayerStack.hpp:2:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\Layer.hpp(16,31): warning G24ACD1A9: unused parameter 'event' [-Wunused-parameter]
+     16 |                 virtual void OnEvent(Event& event) {}
+        |                                             ^
+  1 warning generated.
+  
+  [481/494] Building CXX object CoriEngine/CMakeFiles/CoriEngine_shared.dir/src/CoriCore/Layer.cpp.obj
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\Layer.cpp:1:
+  
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\Layer.hpp(16,31): warning G24ACD1A9: unused parameter 'event' [-Wunused-parameter]
+  
+     16 |                 virtual void OnEvent(Event& event) {}
+  
+        |                                             ^
+  
+  1 warning generated.
+  
+  [482/494] Building CXX object CoriEngine/CMakeFiles/CoriEngine_shared.dir/src/CoriCore/Engine.cpp.obj
+  [483/494] Building CXX object CoriEngine/CMakeFiles/CoriEngine_shared.dir/src/CoriCore/Input.cpp.obj
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\Input.cpp:1:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\Input.hpp:2:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\EventSystem\CoriMouseCodes.hpp(15,29): warning GF055929C: unused function 'CoriGetKeyName' [-Wunused-function]
+     15 |     static std::string_view CoriGetKeyName(CoriMouseCode code) {
+        |                             ^~~~~~~~~~~~~~
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\Input.cpp:1:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\Input.hpp:3:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\EventSystem\CoriKeycodes.hpp(389,29): warning GF055929C: unused function 'CoriGetKeyName' [-Wunused-function]
+    389 |     static std::string_view CoriGetKeyName(CoriKeycode code) {
+        |                             ^~~~~~~~~~~~~~
+  
+  2 warnings generated.
+  
+  [484/494] Building CXX object CoriEngine/CMakeFiles/CoriEngine_shared.dir/src/CoriCore/ImGui/ImGuiLayer.cpp.obj
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\ImGui\ImGuiLayer.cpp:1:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\ImGui\ImGuiLayer.hpp:2:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\Layer.hpp(16,31): warning G24ACD1A9: unused parameter 'event' [-Wunused-parameter]
+     16 |                 virtual void OnEvent(Event& event) {}
+        |                                             ^
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\ImGui\ImGuiLayer.cpp(41,8): warning G41AE70B8: unused variable 'test' [-Wunused-variable]
+  
+     41 |                 bool test = ImGui_ImplOpenGL3_Init("#version 460");
+  
+        |                      ^~~~
+  
+  2 warnings generated.
+  
+  [485/494] Building CXX object CoriEngine/CMakeFiles/CoriEngine_shared.dir/src/CoriCore/Application.cpp.obj
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\Application.cpp:1:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\Application.hpp:5:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\Layer.hpp(16,31): warning G24ACD1A9: unused parameter 'event' [-Wunused-parameter]
+     16 |                 virtual void OnEvent(Event& event) {}
+        |                                             ^
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\Application.cpp(74,52): warning G24ACD1A9: unused parameter 'e' [-Wunused-parameter]
+  
+     74 |         bool Application::OnWindowClose(WindowCloseEvent& e) {
+  
+        |                                                           ^
+  
+  2 warnings generated.
+  
+  [486/494] Building CXX object Apps/Sandbox/CMakeFiles/Sandbox.dir/src/Sandbox.cpp.obj
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\Apps\Sandbox\src\Sandbox.cpp:2:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\include\Cori.hpp:3:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\Application.hpp:5:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\Layer.hpp(16,31): warning G24ACD1A9: unused parameter 'event' [-Wunused-parameter]
+     16 |                 virtual void OnEvent(Event& event) {}
+        |                                             ^
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\Apps\Sandbox\src\Sandbox.cpp:2:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\include\Cori.hpp:11:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\EntryPoint.hpp(4,14): warning G24ACD1A9: unused parameter 'argc' [-Wunused-parameter]
+      4 | int main(int argc, char** argv) {
+        |              ^
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\EntryPoint.hpp(4,27): warning G24ACD1A9: unused parameter 'argv' [-Wunused-parameter]
+      4 | int main(int argc, char** argv) {
+        |                           ^
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\Apps\Sandbox\src\Sandbox.cpp:2:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\include\Cori.hpp:3:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\Application.hpp:7:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\Input.hpp:2:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\EventSystem\CoriMouseCodes.hpp(15,29): warning GF055929C: unused function 'CoriGetKeyName' [-Wunused-function]
+     15 |     static std::string_view CoriGetKeyName(CoriMouseCode code) {
+        |                             ^~~~~~~~~~~~~~
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\Apps\Sandbox\src\Sandbox.cpp:2:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\include\Cori.hpp:3:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\Application.hpp:7:
+  In file included from C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\Input.hpp:3:
+C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\src\CoriCore\EventSystem\CoriKeycodes.hpp(389,29): warning GF055929C: unused function 'CoriGetKeyName' [-Wunused-function]
+  
+    389 |     static std::string_view CoriGetKeyName(CoriKeycode code) {
+  
+        |                             ^~~~~~~~~~~~~~
+  
+  5 warnings generated.
+  
+  [487/494] Building CXX object CoriEngine/CMakeFiles/CoriEngine_shared.dir/src/CoriCore/WindowImpl.cpp.obj
+  [488/494] Building CXX object CoriEngine/thirdparty/spdlog/CMakeFiles/spdlog.dir/src/spdlog.cpp.obj
+  [489/494] Linking CXX static library CoriEngine\thirdparty\spdlog\spdlogd.lib
+  [490/494] Linking CXX static library C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\CoriEngine\bin\Debug\CoriEngine_shared.lib
+  [491/494] Linking CXX executable C:\Users\salio\VSCode\VS2022\MyProject\EngineDev\Apps\Sandbox\bin\Debug\Sandbox.exe

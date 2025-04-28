@@ -1,47 +1,37 @@
 #include <iostream>
 #include <Cori.hpp>
 #include <imgui.h>
-#include "../../src/CoriCore/ImGui/IGWrapper.hpp"
+#include <memory>
+
 
 class ExampleLayer : public Cori::Layer {
 public:
 	ExampleLayer() : Layer("Example") { 
 
 	}
-
+	
 	void OnEvent(Cori::Event& event) override {
-		CORI_TRACE("{0}", event);
+		if (!event.IsOfType(Cori::EventType::MouseMoved)) {
+			CORI_TRACE("| Layer: {0} | Event: {1}", this->GetName(), event);
+		}
 	}
 
 	virtual void OnImGuiRender() override {
-		//IG::test();
-		IG::Begin("Example Layer");
-		IG::Text("Hello from ExampleLayer");
-		IG::End();
-
-		//Cori::Application::test();
-		// create a wrapper for imgui to call all of its funcs inside dll
-		// vvv THIS WILL NOT WORK
-		//ImGui::Begin("Example Layer");
-		//ImGui::Text("Hello from ExampleLayer");
-		//ImGui::End();
-
-		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_H)) {
-			CORI_DEBUG("TEST");
-		}
 
 	}
 
 	void OnUpdate() override {
 		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_H)) {
-			CORI_WARN("TEST");
+			CORI_WARN("test");
 		}
+		
 	}
 };
 
 class Sandbox : public Cori::Application {
 public:
 	Sandbox() {
+
 		PushLayer(new ExampleLayer());
 
 		CORI_INFO("Sandbox application created");

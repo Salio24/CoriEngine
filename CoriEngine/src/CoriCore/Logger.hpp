@@ -1,12 +1,10 @@
 #pragma once
-#pragma once
-#include <CoriEngine_export.hpp>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/fmt/ostr.h>
 
 namespace Cori {
-	class CORI_ENGINE_API Logger {
+	class Logger {
 	public:
 		static void Init();
 

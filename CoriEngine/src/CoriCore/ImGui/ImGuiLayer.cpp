@@ -4,6 +4,7 @@
 #include <backends/imgui_impl_sdl3.h>
 #include "../WindowImpl.hpp"
 #include "../Application.hpp"
+#include "../Renderer/OpenGL/GL_GraphicsContext.hpp"
 
 namespace Cori {
 	ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {
@@ -36,7 +37,7 @@ namespace Cori {
 		}
 
 		
-		ImGui_ImplSDL3_InitForOpenGL((SDL_Window*)Application::Get().GetWindow().GetNativeWindow(), (SDL_GLContext)Application::Get().GetWindow().GetNativeContex());
+		ImGui_ImplSDL3_InitForOpenGL((SDL_Window*)Application::Get().GetWindow().GetNativeWindow(), ((OpenGLContext*)Application::Get().GetWindow().GetCoriContex())->GetNativeContext());
 		// do an assert
 		bool test = ImGui_ImplOpenGL3_Init("#version 460");
 
@@ -57,13 +58,15 @@ namespace Cori {
 	}
 
 	void ImGuiLayer::OnImGuiRender() {
-
 		static bool show = true;
-		ImGui::ShowDemoWindow(&show);
-
-		//ImGui::Begin("Example Layer");
-		//ImGui::Text("Hello from ExampleLayer");
-		//ImGui::End();
+		static bool show_ui = true;
+		
+		if (ImGui::IsKeyPressed(ImGuiKey_F1)) {
+			show_ui = !show_ui;
+		}
+		if (show_ui) {
+			ImGui::ShowDemoWindow(&show);
+		}
 	}
 
 	void ImGuiLayer::StartFrame() {
