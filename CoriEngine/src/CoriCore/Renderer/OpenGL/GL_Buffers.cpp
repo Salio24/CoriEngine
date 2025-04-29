@@ -1,4 +1,5 @@
-#pragma once
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "GL_Buffers.hpp"
 #include <glad/gl.h>
 
@@ -15,6 +16,7 @@ namespace Cori {
 			glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
 			break;
 		default:
+			CORI_CORE_WARN("Unknown draw type selected");
 			break;
 		}
 	}

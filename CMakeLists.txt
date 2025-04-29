@@ -15,6 +15,14 @@ if (NOT (
     message(FATAL_ERROR "CoriEngine thirdparty dependencies not found. Please run the setup script (CoriEngine/thirdparty) to download them. Make sure you run both scripts.")
 endif()
 
+include(FetchContent)
+FetchContent_Declare(
+    PVS_CMakeModule
+    GIT_REPOSITORY "https://github.com/viva64/pvs-studio-cmake-module.git"
+    GIT_TAG        "master"
+)
+FetchContent_MakeAvailable(PVS_CMakeModule)
+include("${pvs_cmakemodule_SOURCE_DIR}/PVS-Studio.cmake")
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:RelWithDebInfo>:Debug>")

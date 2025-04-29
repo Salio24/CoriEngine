@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "WindowImpl.hpp"
 #include <backends/imgui_impl_sdl3.h>
 
@@ -53,7 +55,9 @@ namespace Cori {
 	void WindowImpl::OnUpdate() {
 		SDL_Event e;
 		while (SDL_PollEvent(&e)) {
-		ImGui_ImplSDL3_ProcessEvent(&e);
+			if (!ImGui_ImplSDL3_ProcessEvent(&e)) {
+				//CORI_CORE_ERROR("Error processing sdl event in imgui");
+			}
 			switch (e.type) {
 			case SDL_EVENT_WINDOW_RESIZED:
 				{
@@ -72,37 +76,37 @@ namespace Cori {
 				}
 			case SDL_EVENT_KEY_DOWN:
 				{
-					KeyPressedEvent keyPressedEvent((CoriKeycode)e.key.scancode, e.key.repeat);
+					KeyPressedEvent keyPressedEvent(static_cast<CoriKeycode>(e.key.scancode), e.key.repeat);
 					m_Data.EventCallback(keyPressedEvent);
 					break;
 				}
 			case SDL_EVENT_KEY_UP:
 				{
-					KeyReleasedEvent keyReleasedEvent((CoriKeycode)e.key.scancode);
+					KeyReleasedEvent keyReleasedEvent(static_cast<CoriKeycode>(e.key.scancode));
 					m_Data.EventCallback(keyReleasedEvent);
 					break;
 				}
 			case SDL_EVENT_MOUSE_MOTION:
 				{
-					MouseMovedEvent mouseMovedEvent((int)e.motion.x, (int)e.motion.y);
+					MouseMovedEvent mouseMovedEvent(static_cast<int>(e.motion.x), static_cast<int>(e.motion.y));
 					m_Data.EventCallback(mouseMovedEvent);
 					break;
 				}
 			case SDL_EVENT_MOUSE_WHEEL:
 				{
-					MouseScrolledEvent mouseScrolledEvent((short)e.wheel.x, (short)e.wheel.y);
+					MouseScrolledEvent mouseScrolledEvent(static_cast<short>(e.wheel.x), static_cast<short>(e.wheel.y));
 					m_Data.EventCallback(mouseScrolledEvent);
 					break;
 				}
 			case SDL_EVENT_MOUSE_BUTTON_DOWN:
 				{
-					MouseButtonPressedEvent mouseButtonPressedEvent((CoriMouseCode)e.button.button);
+					MouseButtonPressedEvent mouseButtonPressedEvent(static_cast<CoriMouseCode>(e.button.button));
 					m_Data.EventCallback(mouseButtonPressedEvent);
 					break;
 				}
 			case SDL_EVENT_MOUSE_BUTTON_UP:
 				{
-					MouseButtonReleasedEvent mouseButtonReleasedEvent((CoriMouseCode)e.button.button);
+					MouseButtonReleasedEvent mouseButtonReleasedEvent(static_cast<CoriMouseCode>(e.button.button));
 					m_Data.EventCallback(mouseButtonReleasedEvent);
 					break;
 				}

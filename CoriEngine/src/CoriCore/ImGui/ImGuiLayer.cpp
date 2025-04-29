@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "ImGuiLayer.hpp"
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -37,7 +39,7 @@ namespace Cori {
 		}
 
 		
-		ImGui_ImplSDL3_InitForOpenGL((SDL_Window*)Application::Get().GetWindow().GetNativeWindow(), ((OpenGLContext*)Application::Get().GetWindow().GetCoriContex())->GetNativeContext());
+		ImGui_ImplSDL3_InitForOpenGL(static_cast<SDL_Window*>(Application::Get().GetWindow().GetNativeWindow()), static_cast<OpenGLContext*>(Application::Get().GetWindow().GetCoriContex())->GetNativeContext());
 		// do an assert
 		bool test = ImGui_ImplOpenGL3_Init("#version 460");
 

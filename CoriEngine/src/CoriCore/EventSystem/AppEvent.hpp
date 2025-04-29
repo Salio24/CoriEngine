@@ -25,7 +25,7 @@ namespace Cori {
 
 	class WindowCloseEvent : public Event {
 	public:
-		WindowCloseEvent() {}
+		WindowCloseEvent() = default;
 
 		std::string ToString() const override {
 			return "WindowCloseEvent";
@@ -37,7 +37,7 @@ namespace Cori {
 	
 	class AppTickEvent : public Event {
 	public:
-		AppTickEvent() {}
+		AppTickEvent() = default;
 
 		std::string ToString() const override {
 			return "AppTickEvent";
@@ -49,7 +49,7 @@ namespace Cori {
 
 	class AppUpdateEvent : public Event {
 	public:
-		AppUpdateEvent() {}
+		AppUpdateEvent() = default;
 
 		std::string ToString() const override {
 			return "AppUpdateEvent";
@@ -61,7 +61,7 @@ namespace Cori {
 
 	class AppRenderEvent : public Event {
 	public:
-		AppRenderEvent() {}
+		AppRenderEvent() = default;
 
 		std::string ToString() const override {
 			return "AppRenderEvent";

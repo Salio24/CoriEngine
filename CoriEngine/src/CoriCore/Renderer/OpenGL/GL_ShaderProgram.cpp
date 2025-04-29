@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "GL_ShaderProgram.hpp"
 #include <glad/gl.h>
 
@@ -69,7 +71,7 @@ namespace Cori {
             m_CreationSuccessful = false;
         }
         // if geometry shader is given, compile geometry shader
-        if (geometryPath != nullptr)
+        if (!geometryPath)
         {
             const char* gShaderCode = geometryCode.c_str();
             geometry = glCreateShader(GL_GEOMETRY_SHADER);
@@ -84,8 +86,9 @@ namespace Cori {
         glProgramParameteri(m_ID, GL_PROGRAM_SEPARABLE, GL_TRUE);
         glAttachShader(m_ID, vertex);
         glAttachShader(m_ID, fragment);
-        if (geometryPath != nullptr)
+        if (!geometryPath) {
             glAttachShader(m_ID, geometry);
+        }
         glLinkProgram(m_ID);
 
         if (CheckCompileErrors(m_ID, "PROGRAM") == false) {
@@ -94,7 +97,7 @@ namespace Cori {
 
         glDeleteShader(vertex);
         glDeleteShader(fragment);
-        if (geometryPath != nullptr) {
+        if (!geometryPath) {
             glDeleteShader(geometry);
         }
 
@@ -118,19 +121,19 @@ namespace Cori {
 		glUseProgram(0);
 	}
 
-    void OpenGLShaderProgram::UseInPipeline(const uint32_t& PipelinePrgramID) const {
+    void OpenGLShaderProgram::UseInPipeline(const uint32_t PipelinePrgramID) const {
         glUseProgramStages(PipelinePrgramID, GL_ALL_SHADER_BITS, m_ID);
     }
 
-    void OpenGLShaderProgram::SetBool(const std::string& name, const bool& value) const {
-        glProgramUniform1i(m_ID, glGetUniformLocation(m_ID, name.c_str()), (int)value);
+    void OpenGLShaderProgram::SetBool(const std::string& name, const bool value) const {
+        glProgramUniform1i(m_ID, glGetUniformLocation(m_ID, name.c_str()), static_cast<int>(value));
     }
 
-    void OpenGLShaderProgram::SetInt(const std::string& name, const int& value) const {
+    void OpenGLShaderProgram::SetInt(const std::string& name, const int value) const {
         glProgramUniform1i(m_ID, glGetUniformLocation(m_ID, name.c_str()), value);
     }
 
-    void OpenGLShaderProgram::SetFloat(const std::string& name, const float& value) const {
+    void OpenGLShaderProgram::SetFloat(const std::string& name, const float value) const {
         glProgramUniform1f(m_ID, glGetUniformLocation(m_ID, name.c_str()), value);
     }
 
@@ -161,12 +164,13 @@ namespace Cori {
     bool OpenGLShaderProgram::CheckCompileErrors(uint32_t shader, std::string type) {
         GLint success;
         GLchar infoLog[1024];
+        bool result = true;
         if (type != "PROGRAM") {
             glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
             if (!success) {
                 glGetShaderInfoLog(shader, 1024, NULL, infoLog);
                 CORI_CORE_ERROR("Shader compilation error in OpenGLShaderProgram with shaders:\n{0}\nProblematic type: {1} \nInfoLog: {2}", m_ShaderNames, type, infoLog);
-                return false;
+                result = false;
             }
         }
         else {
@@ -174,10 +178,10 @@ namespace Cori {
             if (!success) {
                 glGetProgramInfoLog(shader, 1024, NULL, infoLog);
                 CORI_CORE_ERROR("Shader linking error in OpenGLShaderProgram with shaders:\n{0}\nProblematic type: {1} \nInfoLog: {2}", m_ShaderNames, type, infoLog);
-                return false;
+                result = false;
             }
         }
-        return true;
+        return result;
     }
 
     std::string OpenGLShaderProgram::GetFilename(const char* filepath) {
@@ -197,6 +201,7 @@ namespace Cori {
             filename = last_backslash + 1;
         }
 
-        return (std::string)filename;
+		return static_cast<std::string>(filename);
+
     }
 }

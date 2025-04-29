@@ -8,11 +8,11 @@ namespace Cori {
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		virtual void UseInPipeline(const uint32_t& PipelinePrgramID) const = 0;
+		virtual void UseInPipeline(const uint32_t PipelinePrgramID) const = 0;
 
-		virtual void SetBool(const std::string& name, const bool& value) const = 0;
-		virtual void SetInt(const std::string& name, const int& value) const = 0;
-		virtual void SetFloat(const std::string& name, const float& value) const = 0;
+		virtual void SetBool(const std::string& name, const bool value) const = 0;
+		virtual void SetInt(const std::string& name, const int value) const = 0;
+		virtual void SetFloat(const std::string& name, const float value) const = 0;
 		virtual void SetVec2(const std::string& name, const glm::vec2& value) const = 0;
 		virtual void SetVec3(const std::string& name, const glm::vec3& value) const = 0;
 		virtual void SetVec4(const std::string& name, const glm::vec4& value) const = 0;

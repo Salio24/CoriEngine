@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "GL_GraphicsContext.hpp"
 #include <glad/gl.h>
 #include "../../Application.hpp"
@@ -34,6 +36,6 @@ namespace Cori {
 	}
 
 	void OpenGLContext::SwapBuffers() {
-		SDL_GL_SwapWindow((SDL_Window*)Application::Get().GetWindow().GetNativeWindow());
+		SDL_GL_SwapWindow(static_cast<SDL_Window*>(Application::Get().GetWindow().GetNativeWindow()));
 	}
 }

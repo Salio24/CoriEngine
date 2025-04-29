@@ -28,8 +28,8 @@ namespace Cori {
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
 	private:
-		virtual void Init(const WindowProperties& props);
-		virtual void Shutdown();
+		void Init(const WindowProperties& props);
+		void Shutdown();
 		
 		RenderingContext* m_Context;
 

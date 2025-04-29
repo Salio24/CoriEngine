@@ -110,6 +110,26 @@ project(CoriEngine)
     # my shared lib
     add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES})
 
+    pvs_studio_add_target(
+        TARGET ${ENGINE_LIBRARY_NAME}.analyze
+        ALL                         # run on every build of ALL
+        ANALYZE ${ENGINE_LIBRARY_NAME}               # which target to analyze
+        MODE 
+            GA:1,2,3     # General Analysis, levels 1–3
+            64:1,2,3    # 64-bit issues
+            OP:1,2,3     # Micro-optimizations
+            CS:1,2,3     # Customer-specific
+            MISRA:1,2,3  # MISRA C/C++
+            OWASP:1,2,3  # OWASP ASVS rules
+            AUTOSAR:1,2,3
+        OUTPUT FORMAT json          # produce JSON
+        LOG pvs.json                 # log file name
+        ARGS 
+            -e "${PROJECT_SOURCE_DIR}/thirdparty"
+            -e "*gl.h"
+            -e "*khrplatform.h"
+    )
+
     target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
         $<$<CONFIG:RelWithDebInfo>:DEBUG_BUILD>

@@ -46,7 +46,7 @@ namespace Cori {
 
 	class MouseButtonEvent : public Event {
 	public:
-		inline int GetMouseButton() const { return m_Button; }
+		inline CoriMouseCode GetMouseButton() const { return m_Button; }
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 	protected:
 		MouseButtonEvent(CoriMouseCode button)

@@ -87,13 +87,13 @@ namespace Cori {
 		uint32_t m_Offset{ 0 };
 		ShaderDataType m_Type;
 
-		size_t GetComponentCount() const { ShaderDataTypeComponentCount(m_Type); }
+		size_t GetComponentCount() const { return ShaderDataTypeComponentCount(m_Type); }
 
 	};
 
 	class VBLayout {
 	public:
-		VBLayout() {}
+		VBLayout() = default;
 
 		VBLayout(const std::initializer_list<VBElement>& elements) : m_Elements(elements) {
 			for (auto& element : m_Elements) {

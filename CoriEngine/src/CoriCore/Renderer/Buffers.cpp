@@ -1,36 +1,45 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "Buffers.hpp"
 #include "OpenGL/GL_Buffers.hpp"
 #include "../Application.hpp"
 
 namespace Cori {
 	VertexBuffer* VertexBuffer::Create(float* vertices, uint32_t size, DRAW_TYPE drawtype) {
+		VertexBuffer* result = nullptr;
 		switch (Application::Get().GetWindow().GetAPI()) {
 		case GraphicsAPIs::None:
 			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
-			return nullptr;
+			break;
 		case GraphicsAPIs::OpenGL:
-			return new OpenGLVertexBuffer(vertices, size, drawtype);
+			result = new OpenGLVertexBuffer(vertices, size, drawtype);
+			break;
 		case GraphicsAPIs::Vulkan:
 			CORI_CORE_ASSERT_FATAL(false, "Vulkan is not supported yet");
-			return nullptr;
+			break;
+		default:
+			CORI_CORE_ASSERT_FATAL(false, "Unknown graphics API");
+			break;
 		}
-		CORI_CORE_ASSERT_FATAL(false, "Unknown graphics API");
-		return nullptr;
+		return result;
 	}
 
 	IndexBuffer* IndexBuffer::Create(uint32_t* indices, uint32_t count) {
+		IndexBuffer* result = nullptr;
 		switch (Application::Get().GetWindow().GetAPI()) {
 		case GraphicsAPIs::None:
 			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
-			return nullptr;
+			break;
 		case GraphicsAPIs::OpenGL:
-			return new OpenGLIndexBuffer(indices, count);
+			result = new OpenGLIndexBuffer(indices, count);
+			break;
 		case GraphicsAPIs::Vulkan:
 			CORI_CORE_ASSERT_FATAL(false, "Vulkan is not supported yet");
-			return nullptr;
+			break;
+		default:
+			CORI_CORE_ASSERT_FATAL(false, "Unknown graphics API");
+			break;
 		}
-		CORI_CORE_ASSERT_FATAL(false, "Unknown graphics API");
-		return nullptr;
-
+		return result;
 	}
 }
