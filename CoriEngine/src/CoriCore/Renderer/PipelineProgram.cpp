@@ -7,7 +7,7 @@
 namespace Cori {
 	PipelineProgram* PipelineProgram::Create() {
 		PipelineProgram* result = nullptr;
-		switch (Application::Get().GetWindow().GetAPI()) {
+		switch (Application::GetWindow().GetAPI()) {
 		case GraphicsAPIs::None:
 			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
 			break;

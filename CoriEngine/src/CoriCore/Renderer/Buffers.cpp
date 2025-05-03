@@ -5,14 +5,14 @@
 #include "../Application.hpp"
 
 namespace Cori {
-	VertexBuffer* VertexBuffer::Create(float* vertices, uint32_t size, DRAW_TYPE drawtype) {
+	VertexBuffer* VertexBuffer::Create() {
 		VertexBuffer* result = nullptr;
-		switch (Application::Get().GetWindow().GetAPI()) {
+		switch (Application::GetWindow().GetAPI()) {
 		case GraphicsAPIs::None:
 			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
 			break;
 		case GraphicsAPIs::OpenGL:
-			result = new OpenGLVertexBuffer(vertices, size, drawtype);
+			result = new OpenGLVertexBuffer();
 			break;
 		case GraphicsAPIs::Vulkan:
 			CORI_CORE_ASSERT_FATAL(false, "Vulkan is not supported yet");
@@ -26,7 +26,7 @@ namespace Cori {
 
 	IndexBuffer* IndexBuffer::Create(uint32_t* indices, uint32_t count) {
 		IndexBuffer* result = nullptr;
-		switch (Application::Get().GetWindow().GetAPI()) {
+		switch (Application::GetWindow().GetAPI()) {
 		case GraphicsAPIs::None:
 			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
 			break;

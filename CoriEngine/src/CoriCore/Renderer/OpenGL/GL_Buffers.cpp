@@ -4,7 +4,13 @@
 #include <glad/gl.h>
 
 namespace Cori {
-	OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t size, DRAW_TYPE drawtype) {
+
+	OpenGLVertexBuffer::~OpenGLVertexBuffer() {
+		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
+		glDeleteBuffers(1, &m_ID);
+	}
+
+	void OpenGLVertexBuffer::Init(float* vertices, uint32_t size, DRAW_TYPE drawtype) {
 		glCreateBuffers(1, &m_ID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
 		switch (drawtype)
@@ -22,11 +28,6 @@ namespace Cori {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
-	OpenGLVertexBuffer::~OpenGLVertexBuffer() {
-		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
-		glDeleteBuffers(1, &m_ID);
-	}
-
 	void OpenGLVertexBuffer::Bind() const {
 		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
 	}
@@ -42,7 +43,7 @@ namespace Cori {
 	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count) : m_Count(count) {
 		glCreateBuffers(1, &m_ID);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), indices, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count, indices, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 

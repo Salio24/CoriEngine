@@ -39,7 +39,7 @@ namespace Cori {
 		}
 
 		
-		ImGui_ImplSDL3_InitForOpenGL(static_cast<SDL_Window*>(Application::Get().GetWindow().GetNativeWindow()), static_cast<OpenGLContext*>(Application::Get().GetWindow().GetCoriContex())->GetNativeContext());
+		ImGui_ImplSDL3_InitForOpenGL(static_cast<SDL_Window*>(Application::GetWindow().GetNativeWindow()), static_cast<OpenGLContext*>(Application::GetWindow().GetCoriContex())->GetNativeContext());
 		// do an assert
 		bool test = ImGui_ImplOpenGL3_Init("#version 460");
 
@@ -55,7 +55,7 @@ namespace Cori {
 		CORI_CORE_INFO("ImGuiLayer detached");
 	}
 
-	void ImGuiLayer::OnUpdate() {
+	void ImGuiLayer::OnUpdate(const double deltaTime) {
 
 	}
 
@@ -67,7 +67,7 @@ namespace Cori {
 			show_ui = !show_ui;
 		}
 		if (show_ui) {
-			ImGui::ShowDemoWindow(&show);
+			//ImGui::ShowDemoWindow(&show);
 		}
 	}
 

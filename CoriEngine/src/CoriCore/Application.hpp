@@ -8,6 +8,7 @@
 #include "ImGui/ImGuiLayer.hpp"
 #include "Renderer/VertexArray.hpp"
 #include "Renderer/ShaderProgram.hpp"
+#include "Time.hpp"
 
 namespace Cori {
 	class Application {
@@ -22,11 +23,18 @@ namespace Cori {
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
 		
-		inline static Application& Get() { return *s_Instance; }
+		inline static Window& GetWindow() { return *(*s_Instance).m_Window; }
 
-		inline Window& GetWindow() { return *m_Window; }
+		inline static GameTimer& GetGameTimer() { return (*s_Instance).m_GameTimer; }
+
+		// do fixed tickrate update
 
 	private: 
+
+		// idk if i even need this Get func
+		inline static Application& Get() { return *s_Instance; }
+
+		void TickrateUpdate();
 
 		bool OnWindowClose(WindowCloseEvent& e);
 
@@ -35,6 +43,8 @@ namespace Cori {
 		ImGuiLayer* m_ImGuiLayer;
 
 		LayerStack m_LayerStack;
+
+		GameTimer m_GameTimer;
 
 		bool m_Running{ true };
 

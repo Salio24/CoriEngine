@@ -3,39 +3,12 @@
 #include <imgui.h>
 #include <memory>
 #include <glm/glm.hpp>
+#include <glm/ext/matrix_transform.hpp>
 
 class ExampleLayer : public Cori::Layer {
 public:
 	ExampleLayer() : Layer("Example") { 
-
-		//m_VertexArray.reset(Cori::VertexArray::Create());
-		//
-		//float vertices[3 * 7] = {
-		//	1.0f, 1.0f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
-		//	2.0f, 3.0f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
-		//	3.0f, 1.0f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
-		//};
-		//
-		//std::shared_ptr<Cori::VertexBuffer> vertexBuffer;
-		//vertexBuffer.reset(Cori::VertexBuffer::Create(vertices, sizeof(vertices), Cori::DRAW_TYPE::STATIC));
-		//
-		//vertexBuffer->SetLayout({
-		//	{ Cori::ShaderDataType::Vec3, "a_Position" },
-		//	{ Cori::ShaderDataType::Vec4, "a_Color" }
-		//	});
-		//
-		//m_VertexArray->AddVertexBuffer(vertexBuffer);
-		//
-		//uint32_t indices[3] = { 0, 1, 2 };
-		//std::shared_ptr<Cori::IndexBuffer> indexBuffer;
-		//indexBuffer.reset(Cori::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
-		//m_VertexArray->AddIndexBuffer(indexBuffer);
-		//
-		//m_Shader.reset(Cori::ShaderProgram::Create("C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/CoriEngine/src/CoriCore/Renderer/ShaderTemp/defaultVert.glsl", "C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/CoriEngine/src/CoriCore/Renderer/ShaderTemp/defaultFrag.glsl"));
-		//
-		//m_Pipeline.reset(Cori::PipelineProgram::Create());
-
-		Cori::Renderer2D::Init();
+		Cori::Application::GetWindow().SetVSync(true);
 	}
 	
 	void OnEvent(Cori::Event& event) override {
@@ -45,44 +18,52 @@ public:
 	}
 
 	virtual void OnImGuiRender() override {
-
+		ImGui::Begin("Test");
+		ImGui::SliderFloat("Test float", &testFloat, 0.0f, 150.0f);
+		ImGui::End();
 	}
 
-	void OnUpdate() override {
+	void OnUpdate(const double deltaTime) override {
 
-		Cori::Renderer::GetCoriGraphicsAPI()->SetViewport(0, 0, Cori::Application::Get().GetWindow().GetWidth(), Cori::Application::Get().GetWindow().GetHeight());
-		Cori::Renderer::GetCoriGraphicsAPI()->SetClearColor({ 1.0f, 1.0f, 0.0f, 1.0f });
-		Cori::Renderer::GetCoriGraphicsAPI()->ClearFramebuffer();
+		Cori::GraphicsCall::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
+		Cori::GraphicsCall::SetClearColor({ 1.0f, 1.0f, 0.0f, 1.0f });
+		Cori::GraphicsCall::ClearFramebuffer();
 
-		Cori::Renderer2D::DrawQuad(glm::vec2(50.0f, 50.0f), glm::vec2(50.0f, 50.0f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
+		Cori::Renderer2D::BeginBatch();
 
-		//m_Pipeline->Bind();
-		//m_Pipeline->BindShaderProgram(m_Shader);
-		//m_Shader->SetMat4("u_ViewProjection", m_Camera.GetProjectionMatrix());
-		//Cori::Renderer::Render(m_VertexArray);
+		Cori::Renderer2D::DrawQuadBatch(glm::vec2(50.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+		Cori::Renderer2D::DrawQuadBatch(glm::vec2(150.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+		Cori::Renderer2D::DrawQuadBatch(glm::vec2(250.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+		Cori::Renderer2D::DrawQuadBatch(glm::vec2(350.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+		Cori::Renderer2D::DrawQuadBatch(glm::vec2(450.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+		Cori::Renderer2D::DrawQuadBatch(glm::vec2(550.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
 
-		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_H)) {
-			CORI_WARN("test");
+		Cori::Renderer2D::EndBatch();
+
+		for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < 5; j++) {
+				glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(i * (50.0f + testFloat), j * (50.0f + testFloat), 0.0f));
+				Cori::Renderer2D::DrawQuadSeparate(glm::vec2(50.0f, 50.0f), glm::vec2(50.0f, 50.0f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), model);
+			}
 		}
 	}
 
-	//Cori::OrtoCamera m_Camera = Cori::OrtoCamera(glm::vec4(0.0f, 4.0f, 0.0f, 4.0f));
+	void OnTickUpdate() {
+		
+	}
 
+	float testFloat = 0.0f;
 
-
-	//std::shared_ptr<Cori::ShaderProgram> m_Shader;
-	//std::shared_ptr<Cori::VertexArray> m_VertexArray;
-	//std::shared_ptr<Cori::PipelineProgram> m_Pipeline;
 };
 
 class Sandbox : public Cori::Application {
 public:
 	Sandbox() {
-
 		PushLayer(new ExampleLayer());
 
 		CORI_INFO("Sandbox application created");
 	}
+
 	~Sandbox() {
 		CORI_INFO("Sandbox application destroyed");
 	}

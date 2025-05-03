@@ -36,6 +36,6 @@ namespace Cori {
 	}
 
 	void OpenGLContext::SwapBuffers() {
-		SDL_GL_SwapWindow(static_cast<SDL_Window*>(Application::Get().GetWindow().GetNativeWindow()));
+		SDL_GL_SwapWindow(static_cast<SDL_Window*>(Application::GetWindow().GetNativeWindow()));
 	}
 }

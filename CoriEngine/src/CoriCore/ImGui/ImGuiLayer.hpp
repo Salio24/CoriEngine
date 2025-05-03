@@ -9,7 +9,7 @@ namespace Cori {
 		~ImGuiLayer();
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;
-		virtual void OnUpdate() override;
+		virtual void OnUpdate(const double deltaTime) override;
 		virtual void OnImGuiRender() override;
 
 		void StartFrame();

@@ -7,7 +7,7 @@
 namespace Cori {
 	ShaderProgram* ShaderProgram::Create(const std::string& vertexPath, const std::string& fragmentPath, const std::string& geometryPath) {
 		ShaderProgram* result = nullptr;
-		switch (Application::Get().GetWindow().GetAPI()) {
+		switch (Application::GetWindow().GetAPI()) {
 		case GraphicsAPIs::None:
 			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
 			break;

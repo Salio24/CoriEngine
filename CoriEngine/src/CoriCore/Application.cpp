@@ -6,7 +6,7 @@
 #include "Input.hpp"
 #include <imgui.h>
 #include "Renderer/Buffers.hpp"
-#include "Renderer/Renderer.hpp"
+#include "Renderer/GraphicsCall.hpp"
 
 namespace Cori {
 #define CORI_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
@@ -25,11 +25,14 @@ namespace Cori {
 
 		PushOverlay(m_ImGuiLayer);
 
-		Renderer::Init();
+		GraphicsCall::InitRenderers();
+
+		m_GameTimer.SetTickrate(128);
+		m_GameTimer.SetTickrateUpdateFunc(std::bind(&Application::TickrateUpdate, this));
 	}
 
 	Application::~Application() {
-		Renderer::Shutdown();
+		GraphicsCall::ShutdownRenderers();
 	}
 
 	void Application::OnEvent(Event& e) {
@@ -55,8 +58,10 @@ namespace Cori {
 	void Application::Run() {
 		while(m_Running) {
 
+			m_GameTimer.Update();
+
 			for (Layer* layer : m_LayerStack) {
-				layer->OnUpdate();
+				layer->OnUpdate(m_GameTimer);
 			}
 
 			m_ImGuiLayer->StartFrame();
@@ -71,6 +76,13 @@ namespace Cori {
 			m_Window->OnUpdate();
 		}
 	}
+
+	void Application::TickrateUpdate() {
+		for (Layer* layer : m_LayerStack) {
+			layer->OnTickUpdate();
+		}
+	}
+
 
 	bool Application::OnWindowClose(WindowCloseEvent& e) {
 		m_Running = false;

@@ -11,7 +11,8 @@ namespace Cori {
 
 		virtual void OnAttach();
 		virtual void OnDetach();
-		virtual void OnUpdate() {}
+		virtual void OnUpdate(const double deltaTime) {}
+		virtual void OnTickUpdate() {}
 		virtual void OnImGuiRender() {}
 		virtual void OnEvent(Event& event) {}
 
