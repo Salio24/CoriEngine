@@ -7,13 +7,13 @@
 namespace Cori {
 	class OpenGLShaderProgram : public ShaderProgram {
 	public:
-		OpenGLShaderProgram(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
+		OpenGLShaderProgram(const std::string& vertexPath, const std::string& fragmentPath, const std::string& geometryPath = "");
 		virtual ~OpenGLShaderProgram();
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
-
-		virtual void UseInPipeline(const uint32_t PipelinePrgramID) const override;
+		
+		virtual uint32_t GetID() const override { return m_ID; }
 
 		virtual void SetBool(const std::string& name, const bool value) const override;
 		virtual void SetInt(const std::string& name, const int value) const override;
@@ -33,9 +33,6 @@ namespace Cori {
 		std::string m_ShaderNames;
 
 		bool CheckCompileErrors(uint32_t shader, std::string type);
-
-		// THIS IS TEMPORARY AND REALY SHOULD NOT BE HERE, WILL MOVE IT TO "IO" CLASS AS SOON AS I WILL HAVE ONE
-		std::string GetFilename(const char* filepath);
 	};
 
 }

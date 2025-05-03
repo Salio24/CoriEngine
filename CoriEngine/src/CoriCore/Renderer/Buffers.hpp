@@ -25,7 +25,7 @@ namespace Cori {
 			sizeof(float) * 4,               // Vec4
 			sizeof(float) * 3 * 3,           // Mat3
 			sizeof(float) * 4 * 4,           // Mat4
-			sizeof(int),                     // Int
+			sizeof(int),                     // Int 
 			sizeof(int) * 2,                 // Int2
 			sizeof(int) * 3,                 // Int3
 			sizeof(int) * 4,                 // Int4
@@ -81,11 +81,11 @@ namespace Cori {
 	struct VBElement { 
 		VBElement(ShaderDataType type, const std::string& name, const bool normalized = false) : m_Name(name), m_Type(type), m_Normalized(normalized), m_Size(ShaderDataTypeSize(type)) {}
 
-		bool m_Normalized{ false };
 		std::string m_Name;
+		ShaderDataType m_Type;
+		bool m_Normalized{ false };
 		uint32_t m_Size;
 		uint32_t m_Offset{ 0 };
-		ShaderDataType m_Type;
 
 		size_t GetComponentCount() const { return ShaderDataTypeComponentCount(m_Type); }
 
@@ -116,19 +116,21 @@ namespace Cori {
 
 	class VertexBuffer {
 	public:
-		virtual ~VertexBuffer() {};
+		virtual ~VertexBuffer() = default;
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
 		virtual void SetLayout(const VBLayout& layout) = 0;
 		virtual const VBLayout& GetLayout() const = 0;
 
+		virtual void SetData(const void* data, uint32_t size) const = 0;
+
 		static VertexBuffer* Create(float* vertices, uint32_t size, DRAW_TYPE drawtype);
 	};
 
 	class IndexBuffer {
 	public:
-		virtual ~IndexBuffer() {};
+		virtual ~IndexBuffer() = default;
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 

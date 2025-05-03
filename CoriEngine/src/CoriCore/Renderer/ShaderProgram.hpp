@@ -1,5 +1,6 @@
 #pragma once
 #include "GraphicsAPIs.hpp"
+#include <glm/glm.hpp>
 
 namespace Cori {
 	class ShaderProgram {
@@ -8,7 +9,7 @@ namespace Cori {
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		virtual void UseInPipeline(const uint32_t PipelinePrgramID) const = 0;
+		virtual uint32_t GetID() const = 0;
 
 		virtual void SetBool(const std::string& name, const bool value) const = 0;
 		virtual void SetInt(const std::string& name, const int value) const = 0;
@@ -22,6 +23,6 @@ namespace Cori {
 		
 		virtual std::string GetShaderNames() const = 0;
 
-		static ShaderProgram* Create(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
+		static ShaderProgram* Create(const std::string& vertexPath, const std::string& fragmentPath, const std::string& geometryPath = "");
 	};
 }

@@ -6,6 +6,8 @@
 #include "LayerStack.hpp"
 #include "Input.hpp"
 #include "ImGui/ImGuiLayer.hpp"
+#include "Renderer/VertexArray.hpp"
+#include "Renderer/ShaderProgram.hpp"
 
 namespace Cori {
 	class Application {

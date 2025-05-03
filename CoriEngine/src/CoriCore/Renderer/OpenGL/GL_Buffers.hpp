@@ -9,6 +9,8 @@ namespace Cori {
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
 
+		virtual void SetData(const void* data, uint32_t size) const override;
+
 		virtual void SetLayout(const VBLayout& layout) override { m_Layout = layout; }
 		virtual const VBLayout& GetLayout() const override { return m_Layout; }
 

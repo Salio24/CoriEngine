@@ -2,91 +2,55 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "GL_ShaderProgram.hpp"
 #include <glad/gl.h>
+#include "../../FileManager.hpp"
 
 namespace Cori {
 
-    OpenGLShaderProgram::OpenGLShaderProgram(const char* vertexPath, const char* fragmentPath, const char* geometryPath) {
+    OpenGLShaderProgram::OpenGLShaderProgram(const std::string& vertexPath, const std::string& fragmentPath, const std::string& geometryPath) {
+
+        bool geometryShaderPresent = false;
 
 #ifdef DEBUG_BUILD
-        m_ShaderNames = "  Vertex shader: " + GetFilename(vertexPath) + "\n  Fragment shader: " + GetFilename(fragmentPath) + "\n  Geometry shader: " + GetFilename(geometryPath);
+        m_ShaderNames = "  Vertex shader: " + FileManager::GetFilename(vertexPath) + "\n  Fragment shader: " + FileManager::GetFilename(fragmentPath) + "\n  Geometry shader: " + FileManager::GetFilename(geometryPath);
 #endif
 
-        // 1. retrieve the vertex/fragment source code from filePath
-        std::string vertexCode;
-        std::string fragmentCode;
-        std::string geometryCode;
-        std::ifstream vShaderFile;
-        std::ifstream fShaderFile;
-        std::ifstream gShaderFile;
-        // ensure ifstream objects can throw exceptions:
-        vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-        fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-        gShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-        try
-        {
-            // open files
-            vShaderFile.open(vertexPath);
-            fShaderFile.open(fragmentPath);
-            std::stringstream vShaderStream, fShaderStream;
-            // read file's buffer contents into streams
-            vShaderStream << vShaderFile.rdbuf();
-            fShaderStream << fShaderFile.rdbuf();
-            // close file handlers
-            vShaderFile.close();
-            fShaderFile.close();
-            // convert stream into string
-            vertexCode = vShaderStream.str();
-            fragmentCode = fShaderStream.str();
-            // if geometry shader path is present, also load a geometry shader
-            if (geometryPath != nullptr)
-            {
-                gShaderFile.open(geometryPath);
-                std::stringstream gShaderStream;
-                gShaderStream << gShaderFile.rdbuf();
-                gShaderFile.close();
-                geometryCode = gShaderStream.str();
-            }
-        }
-        catch (std::ifstream::failure& e)
-        {
-            CORI_CORE_ERROR("Creation of OpenGLShaderProgram with shaders:\n{0}\nERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: {1}", m_ShaderNames, e.what());
-        }
-        const char* vShaderCode = vertexCode.c_str();
+        std::string vertexCode = FileManager::ReadTextFile(vertexPath);
+        const char* vertexSource = vertexCode.c_str();
 
-        const char* fShaderCode = fragmentCode.c_str();
-        // 2. compile shaders
+        std::string fragmentCode = FileManager::ReadTextFile(fragmentPath);
+		const char* fragmentSource = fragmentCode.c_str();
+         
         GLuint vertex, fragment, geometry;
-        // vertex shader
         vertex = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertex, 1, &vShaderCode, NULL);
+        glShaderSource(vertex, 1, &vertexSource, NULL);
         glCompileShader(vertex);
         if (CheckCompileErrors(vertex, "VERTEX") == false) {
             m_CreationSuccessful = false;
         }
-        // fragment Shader
         fragment = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragment, 1, &fShaderCode, NULL);
+        glShaderSource(fragment, 1, &fragmentSource, NULL);
         glCompileShader(fragment);
         if (CheckCompileErrors(fragment, "FRAGMENT") == false) {
             m_CreationSuccessful = false;
         }
-        // if geometry shader is given, compile geometry shader
-        if (!geometryPath)
-        {
-            const char* gShaderCode = geometryCode.c_str();
+        if (geometryPath != "") {
+            geometryShaderPresent = true;
+
+            std::string geometryCode = FileManager::ReadTextFile(geometryPath);
+            const char* geometrySource = geometryCode.c_str();
+            
             geometry = glCreateShader(GL_GEOMETRY_SHADER);
-            glShaderSource(geometry, 1, &gShaderCode, NULL);
+            glShaderSource(geometry, 1, &geometrySource, NULL);
             glCompileShader(geometry);
             if (CheckCompileErrors(geometry, "GEOMETRY") == false) {
                 m_CreationSuccessful = false;
             }
         }
-        // shader Program
         m_ID = glCreateProgram();
         glProgramParameteri(m_ID, GL_PROGRAM_SEPARABLE, GL_TRUE);
         glAttachShader(m_ID, vertex);
         glAttachShader(m_ID, fragment);
-        if (!geometryPath) {
+        if (geometryShaderPresent) {
             glAttachShader(m_ID, geometry);
         }
         glLinkProgram(m_ID);
@@ -97,7 +61,7 @@ namespace Cori {
 
         glDeleteShader(vertex);
         glDeleteShader(fragment);
-        if (!geometryPath) {
+        if (geometryShaderPresent) {
             glDeleteShader(geometry);
         }
 
@@ -114,16 +78,14 @@ namespace Cori {
 	}
 
 	void OpenGLShaderProgram::Bind() const {
+        CORI_CORE_WARN("You shouldn't really use this when using separable shader programs");
 		glUseProgram(m_ID);
 	}
 
 	void OpenGLShaderProgram::Unbind() const {
+		CORI_CORE_WARN("You shouldn't really use this when using separable shader programs");
 		glUseProgram(0);
 	}
-
-    void OpenGLShaderProgram::UseInPipeline(const uint32_t PipelinePrgramID) const {
-        glUseProgramStages(PipelinePrgramID, GL_ALL_SHADER_BITS, m_ID);
-    }
 
     void OpenGLShaderProgram::SetBool(const std::string& name, const bool value) const {
         glProgramUniform1i(m_ID, glGetUniformLocation(m_ID, name.c_str()), static_cast<int>(value));
@@ -182,26 +144,5 @@ namespace Cori {
             }
         }
         return result;
-    }
-
-    std::string OpenGLShaderProgram::GetFilename(const char* filepath) {
-        if (!filepath) { return "No filepath specified"; }
-
-        const char* last_slash = std::strrchr(filepath, '/');
-        const char* last_backslash = std::strrchr(filepath, '\\');
-
-        const char* filename = filepath;
-        if (last_slash && last_backslash) {
-            filename = (last_slash > last_backslash) ? last_slash + 1 : last_backslash + 1;
-        }
-        else if (last_slash) {
-            filename = last_slash + 1;
-        }
-        else if (last_backslash) {
-            filename = last_backslash + 1;
-        }
-
-		return static_cast<std::string>(filename);
-
     }
 }

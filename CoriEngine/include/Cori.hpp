@@ -6,6 +6,13 @@
 #include "../src/CoriCore/ImGui/ImGuiLayer.hpp"
 #include "../src/CoriCore/EventSystem/CoriMouseCodes.hpp"
 #include "../src/CoriCore/EventSystem/CoriKeycodes.hpp"
+#include "../src/CoriCore/Renderer/Buffers.hpp"
+#include "../src/CoriCore/Renderer/Renderer.hpp"
+#include "../src/CoriCore/Renderer/Renderer2D.hpp"
+#include "../src/CoriCore/Renderer/VertexArray.hpp"
+#include "../src/CoriCore/Renderer/ShaderProgram.hpp"
+#include "../src/CoriCore/Renderer/PipelineProgram.hpp"
+#include "../src/CoriCore/Renderer/Camera.hpp"
 
 
 // should be included LAST!

@@ -6,6 +6,7 @@
 #include "Input.hpp"
 #include <imgui.h>
 #include "Renderer/Buffers.hpp"
+#include "Renderer/Renderer.hpp"
 
 namespace Cori {
 #define CORI_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
@@ -23,10 +24,12 @@ namespace Cori {
 		m_ImGuiLayer = new ImGuiLayer();
 
 		PushOverlay(m_ImGuiLayer);
+
+		Renderer::Init();
 	}
 
 	Application::~Application() {
-
+		Renderer::Shutdown();
 	}
 
 	void Application::OnEvent(Event& e) {
@@ -50,11 +53,8 @@ namespace Cori {
 	}
 
 	void Application::Run() {
-
 		while(m_Running) {
-			glViewport(0, 0, m_Window->GetWidth(), m_Window->GetHeight());
-			glClearColor((14.0f / 256.0f), (7.0f / 256.0f), (27.0f / 256.0f), 1.0f);
-			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
 			for (Layer* layer : m_LayerStack) {
 				layer->OnUpdate();
 			}
