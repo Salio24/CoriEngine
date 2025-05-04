@@ -9,7 +9,7 @@
 #include "Renderer/GraphicsCall.hpp"
 
 namespace Cori {
-#define CORI_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
+//#define CORI_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
 	Application* Application::s_Instance = nullptr;
 
@@ -19,7 +19,7 @@ namespace Cori {
 
 		m_Window = std::unique_ptr<Window>(Window::Create());
 
-		m_Window->SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent));
+		m_Window->SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent, CORI_PLACEHOLDERS(1)));
 
 		m_ImGuiLayer = new ImGuiLayer();
 
@@ -28,7 +28,7 @@ namespace Cori {
 		GraphicsCall::InitRenderers();
 
 		m_GameTimer.SetTickrate(128);
-		m_GameTimer.SetTickrateUpdateFunc(std::bind(&Application::TickrateUpdate, this));
+		m_GameTimer.SetTickrateUpdateFunc(CORI_BIND_EVENT_FN(Application::TickrateUpdate));
 	}
 
 	Application::~Application() {
@@ -37,7 +37,7 @@ namespace Cori {
 
 	void Application::OnEvent(Event& e) {
 		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<WindowCloseEvent>(CORI_BIND_EVENT_FN(Application::OnWindowClose));
+		dispatcher.Dispatch<WindowCloseEvent>(CORI_BIND_EVENT_FN(Application::OnWindowClose, CORI_PLACEHOLDERS(1)));
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
 			(*--it)->OnEvent(e);

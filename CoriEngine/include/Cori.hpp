@@ -13,6 +13,10 @@
 #include "../src/CoriCore/Renderer/ShaderProgram.hpp"
 #include "../src/CoriCore/Renderer/PipelineProgram.hpp"
 #include "../src/CoriCore/Renderer/Camera.hpp"
+#include "../src/CoriCore/Renderer/Texture.hpp"
+#include "../src/CoriCore/Renderer/Image.hpp"
+
+
 
 
 // should be included LAST!

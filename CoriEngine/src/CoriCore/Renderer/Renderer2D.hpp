@@ -4,13 +4,15 @@
 #include "ShaderProgram.hpp"
 #include "Camera.hpp"
 #include "PipelineProgram.hpp"
+#include "Texture.hpp"
 
 namespace Cori {
 
 	struct QuadBatchVertexSetup {
 		glm::vec2 Position;
 		glm::vec4 Color;
-	};;
+		glm::vec2 TexCoords;
+	};
 
 	class Renderer2D {
 	public:
@@ -36,6 +38,7 @@ namespace Cori {
 
 		static std::shared_ptr<ShaderProgram> s_Shader;
 		static std::shared_ptr<PipelineProgram> s_Pipeline;
+		static std::shared_ptr<Texture2D> s_MissingTexture;
 
 		// for separate rendering
 		static std::shared_ptr<VertexArray> s_VertexArray_separate;
@@ -56,5 +59,6 @@ namespace Cori {
 
 		static QuadBatchVertexSetup* s_QuadBuffer;
 		static QuadBatchVertexSetup* s_QuadBufferPtr;
+
 	};
 }

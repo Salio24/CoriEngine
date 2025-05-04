@@ -17,7 +17,7 @@
 #include <filesystem>
 #include <SDL3/SDL.h>
 #include "../src/CoriCore/Logger.hpp"
-#include "Macros.hpp"
+#include <Macros.hpp>
 #include <glm/glm.hpp>
 
 #endif CORI_PCH

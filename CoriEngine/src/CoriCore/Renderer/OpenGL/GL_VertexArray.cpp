@@ -57,14 +57,14 @@ namespace Cori {
 	void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer) {
 		if CORI_CORE_ASSERT_ERROR(vertexBuffer->GetLayout().GetElements().size(), "Vertex buffer has no layout") return;
 		// explicitly binding is great for readability, tho i can impact performance, need to think of a way to strip unnecessary binds on release build
-
+		
 		glBindVertexArray(m_ID); 
 		vertexBuffer->Bind();
 		uint32_t index = 0;
 		const VBLayout& layout = vertexBuffer->GetLayout();
 		for (const auto& element : layout) {
 			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(index, element.GetComponentCount(), ShaderDataTypeToGLDataType(element.m_Type), element.m_Normalized ? GL_TRUE : GL_FALSE, layout.GetStrinde(), (const void*)element.m_Offset);
+			glVertexAttribPointer(index, static_cast<GLint>(element.GetComponentCount()), ShaderDataTypeToGLDataType(element.m_Type), element.m_Normalized ? GL_TRUE : GL_FALSE, static_cast<GLsizei>(layout.GetStrinde()), (const void*)element.m_Offset);
 			index++;
 		}
 		vertexBuffer->Unbind();

@@ -43,7 +43,7 @@ public:
 		for (int i = 0; i < 5; i++) {
 			for (int j = 0; j < 5; j++) {
 				glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(i * (50.0f + testFloat), j * (50.0f + testFloat), 0.0f));
-				Cori::Renderer2D::DrawQuadSeparate(glm::vec2(50.0f, 50.0f), glm::vec2(50.0f, 50.0f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), model);
+				//Cori::Renderer2D::DrawQuadSeparate(glm::vec2(50.0f, 50.0f), glm::vec2(50.0f, 50.0f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), model);
 			}
 		}
 	}

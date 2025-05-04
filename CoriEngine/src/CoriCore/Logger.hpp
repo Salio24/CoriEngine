@@ -25,17 +25,17 @@ namespace Cori {
 	#define CORI_CORE_ERROR(...) ::Cori::Logger::GetCoreLogger()->error(__VA_ARGS__)
 	#define CORI_CORE_FATAL(...) ::Cori::Logger::GetCoreLogger()->critical(__VA_ARGS__)
 
-	#define CORI_CORE_ASSERT_DEBUG(x, ...) (!(x) ? (CORI_CORE_DEBUG("Assertion Failed: {0}", __VA_ARGS__), true) : false)
-	#define CORI_CORE_ASSERT_INFO(x, ...) (!(x) ? (CORI_CORE_INFO("Assertion Failed: {0}", __VA_ARGS__), true) : false)
-	#define CORI_CORE_ASSERT_WARN(x, ...) (!(x) ? (CORI_CORE_WARN("Assertion Failed: {0}", __VA_ARGS__), true) : false)
-	#define CORI_CORE_ASSERT_ERROR(x, ...) (!(x) ? (CORI_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__), true) : false)
-	#define CORI_CORE_ASSERT_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Assertion Failed: {0}", __VA_ARGS__), __builtin_debugtrap(), true) : false)
+	#define CORI_CORE_ASSERT_DEBUG(x, ...) (!(x) ? (CORI_CORE_DEBUG("Assertion Failed: " __VA_ARGS__), true) : false)
+	#define CORI_CORE_ASSERT_INFO(x, ...) (!(x) ? (CORI_CORE_INFO("Assertion Failed: " __VA_ARGS__), true) : false)
+	#define CORI_CORE_ASSERT_WARN(x, ...) (!(x) ? (CORI_CORE_WARN("Assertion Failed: " __VA_ARGS__), true) : false)
+	#define CORI_CORE_ASSERT_ERROR(x, ...) (!(x) ? (CORI_CORE_ERROR("Assertion Failed: " __VA_ARGS__), true) : false)
+	#define CORI_CORE_ASSERT_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Assertion Failed: " __VA_ARGS__), __builtin_debugtrap(), true) : false)
 	
-	#define CORI_CORE_VERIFY_DEBUG(x, ...) (!(x) ? (CORI_CORE_DEBUG("Assertion Failed: {0}", __VA_ARGS__), true) : false)
-	#define CORI_CORE_VERIFY_INFO(x, ...) (!(x) ? (CORI_CORE_INFO("Assertion Failed: {0}", __VA_ARGS__), true) : false)
-	#define CORI_CORE_VERIFY_WARN(x, ...) (!(x) ? (CORI_CORE_WARN("Assertion Failed: {0}", __VA_ARGS__), true) : false)
-	#define CORI_CORE_VERIFY_ERROR(x, ...) (!(x) ? (CORI_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__), true) : false)
-	#define CORI_CORE_VERIFY_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Assertion Failed: {0}", __VA_ARGS__), __builtin_debugtrap(), true) : false)
+	#define CORI_CORE_VERIFY_DEBUG(x, ...) (!(x) ? (CORI_CORE_DEBUG("Verify Failed: " __VA_ARGS__), true) : false)
+	#define CORI_CORE_VERIFY_INFO(x, ...) (!(x) ? (CORI_CORE_INFO("Verify Failed: " __VA_ARGS__), true) : false)
+	#define CORI_CORE_VERIFY_WARN(x, ...) (!(x) ? (CORI_CORE_WARN("Verify Failed: " __VA_ARGS__), true) : false)
+	#define CORI_CORE_VERIFY_ERROR(x, ...) (!(x) ? (CORI_CORE_ERROR("Verify Failed: " __VA_ARGS__), true) : false)
+	#define CORI_CORE_VERIFY_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Verify Failed: " __VA_ARGS__), __builtin_debugtrap(), true) : false)
 
 #else
 	#define CORI_CORE_TRACE
@@ -66,8 +66,8 @@ namespace Cori {
 	#define CORI_ERROR(...)      ::Cori::Logger::GetClientLogger()->error(__VA_ARGS__)
 	#define CORI_FATAL(...)      ::Cori::Logger::GetClientLogger()->critical(__VA_ARGS__)
 	
-	#define CORI_ASSERT_DEBUG(x, ...) (!(x) ? (CORI_DEBUG("Assertion Failed: {0}", __VA_ARGS__), true) : false)
-	#define CORI_ASSERT_INFO(x, ...) (!(x) ? (CORI_INFO("Assertion Failed: {0}", __VA_ARGS__), true) : false)
-	#define CORI_ASSERT_WARN(x, ...) (!(x) ? (CORI_WARN("Assertion Failed: {0}", __VA_ARGS__), true) : false)
-	#define CORI_ASSERT_ERROR(x, ...) (!(x) ? (CORI_ERROR("Assertion Failed: {0}", __VA_ARGS__), true) : false)
-	#define CORI_ASSERT_FATAL(x, ...) (!(x) ? (CORI_FATAL("Assertion Failed: {0}", __VA_ARGS__), __builtin_debugtrap(), true) : false)
+	#define CORI_ASSERT_DEBUG(x, ...) (!(x) ? (CORI_DEBUG("Assertion Failed: " __VA_ARGS__), true) : false)
+	#define CORI_ASSERT_INFO(x, ...) (!(x) ? (CORI_INFO("Assertion Failed: " __VA_ARGS__), true) : false)
+	#define CORI_ASSERT_WARN(x, ...) (!(x) ? (CORI_WARN("Assertion Failed: " __VA_ARGS__), true) : false)
+	#define CORI_ASSERT_ERROR(x, ...) (!(x) ? (CORI_ERROR("Assertion Failed: " __VA_ARGS__), true) : false)
+	#define CORI_ASSERT_FATAL(x, ...) (!(x) ? (CORI_FATAL("Assertion Failed: " __VA_ARGS__), __builtin_debugtrap(), true) : false)

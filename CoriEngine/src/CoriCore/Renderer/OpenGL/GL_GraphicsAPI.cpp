@@ -89,8 +89,9 @@ namespace Cori {
 
 	}
 
-	void OpenGLGraphicsAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
+	void OpenGLGraphicsAPI::SetViewport(int x, int y, int width, int height) {
 		glViewport(x, y, width, height);
+		
 	}
 
 	void OpenGLGraphicsAPI::SetClearColor(const glm::vec4& color) {
@@ -105,7 +106,7 @@ namespace Cori {
 		vertexArray->Bind();
 		vertexArray->GetIndexBuffer()->Bind();
 
-		glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+		glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(vertexArray->GetIndexBuffer()->GetCount()), GL_UNSIGNED_INT, nullptr);
 		vertexArray->Unbind();
 	}
 }

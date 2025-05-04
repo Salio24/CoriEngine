@@ -16,10 +16,10 @@ namespace Cori {
 		switch (drawtype)
 		{
 		case DRAW_TYPE::DYNAMIC:
-			glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(size), vertices, GL_DYNAMIC_DRAW);
 			break;
 		case DRAW_TYPE::STATIC:
-			glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(size), vertices, GL_STATIC_DRAW);
 			break;
 		default:
 			CORI_CORE_WARN("Unknown draw type selected");
@@ -43,7 +43,7 @@ namespace Cori {
 	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count) : m_Count(count) {
 		glCreateBuffers(1, &m_ID);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count, indices, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(count), indices, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 

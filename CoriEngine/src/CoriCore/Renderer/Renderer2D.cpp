@@ -7,6 +7,7 @@ namespace Cori {
 
 	std::shared_ptr<ShaderProgram> Renderer2D::s_Shader;
 	std::shared_ptr<PipelineProgram> Renderer2D::s_Pipeline;
+	std::shared_ptr<Texture2D> Renderer2D::s_MissingTexture;
 
 	std::shared_ptr<VertexArray> Renderer2D::s_VertexArray_separate;
 	std::shared_ptr<VertexBuffer> Renderer2D::s_VertexBuffer_separate;
@@ -25,18 +26,22 @@ namespace Cori {
 
 	void Renderer2D::Init() {
 		// separate camera/shader for each renderer type
-		s_Shader.reset(ShaderProgram::Create("C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/CoriEngine/src/CoriCore/Renderer/ShaderTemp/defaultVert.glsl", "C:/Users/salio/VSCode/VS2022/MyProject/EngineDev/CoriEngine/src/CoriCore/Renderer/ShaderTemp/defaultFrag.glsl"));
+		// TODO: add a global path tracker / manager, spitting hardcoded paths all over cpp and hpp files is kind-of a bad idea, want to have all my paths specified in one place
+		s_Shader.reset(ShaderProgram::Create("assets/engine/shaders/defaultVert.glsl", "assets/engine/shaders/defaultFrag.glsl"));
 
 		s_Pipeline.reset(PipelineProgram::Create());
 
 		s_Camera.SetCameraSize(0, 1920, 0, 1080);
+
+		s_MissingTexture = Texture2D::Create("assets/engine/textures/orientation_test24.png");
 
 		// separate renderer (1 draw call per object)
 		s_VertexArray_separate.reset(VertexArray::Create());
 		s_VertexBuffer_separate.reset(VertexBuffer::Create());
 		s_VertexBuffer_separate->SetLayout({
 			{ ShaderDataType::Vec2, "a_Position" },
-			{ ShaderDataType::Vec4, "a_Color" }
+			{ ShaderDataType::Vec4, "a_Color" },
+			{ ShaderDataType::Vec2, "a_TexCoords" }
 		});
 
 		s_VertexBuffer_separate->Init(nullptr, 4 * s_VertexBuffer_separate->GetLayout().GetStrinde(), DRAW_TYPE::DYNAMIC);
@@ -51,7 +56,8 @@ namespace Cori {
 		s_VertexBuffer_batch.reset(VertexBuffer::Create());
 		s_VertexBuffer_batch->SetLayout({
 			{ ShaderDataType::Vec2, "a_Position" },
-			{ ShaderDataType::Vec4, "a_Color" }
+			{ ShaderDataType::Vec4, "a_Color" },
+			{ ShaderDataType::Vec2, "a_TexCoords" }
 		});
 
 		s_VertexBuffer_batch->Init(nullptr, s_MaxQuadCount * s_VertexBuffer_batch->GetLayout().GetStrinde(), DRAW_TYPE::DYNAMIC);
@@ -124,8 +130,12 @@ namespace Cori {
 		s_Pipeline->BindShaderProgram(s_Shader);
 		s_Shader->SetMat4("u_ViewProjection", s_Camera.GetProjectionMatrix());
 		s_Shader->SetMat4("u_ModelMatrix", s_CurrentBatchModelMatrix);
+		s_Shader->SetInt("u_Texture", 1);
 
 		s_VertexArray_batch->Bind();
+
+		s_MissingTexture->Bind(1);
+
 		GraphicsCall::DrawElements(s_VertexArray_batch);
 		s_VertexArray_batch->Unbind();
 		s_QuadIndexCount = 0;
@@ -139,18 +149,22 @@ namespace Cori {
 
 		s_QuadBufferPtr->Position = { position.x, position.y };
 		s_QuadBufferPtr->Color = color;
+		s_QuadBufferPtr->TexCoords = { 0.0f, 0.0f };
 		s_QuadBufferPtr++;
 
 		s_QuadBufferPtr->Position = { position.x + size.x, position.y };
 		s_QuadBufferPtr->Color = color;
+		s_QuadBufferPtr->TexCoords = { 1.0f, 0.0f };
 		s_QuadBufferPtr++;
 
 		s_QuadBufferPtr->Position = { position.x + size.x, position.y + size.y };
 		s_QuadBufferPtr->Color = color;
+		s_QuadBufferPtr->TexCoords = { 1.0f, 1.0f };
 		s_QuadBufferPtr++;
 
 		s_QuadBufferPtr->Position = { position.x, position.y + size.y };
 		s_QuadBufferPtr->Color = color;
+		s_QuadBufferPtr->TexCoords = { 0.0f, 1.0f };
 		s_QuadBufferPtr++;
 
 		s_QuadIndexCount += 6;

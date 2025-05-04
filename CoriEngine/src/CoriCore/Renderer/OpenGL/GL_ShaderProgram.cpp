@@ -88,7 +88,7 @@ namespace Cori {
 	}
 
     void OpenGLShaderProgram::SetBool(const std::string& name, const bool value) const {
-        glProgramUniform1i(m_ID, glGetUniformLocation(m_ID, name.c_str()), static_cast<int>(value));
+        glProgramUniform1i(m_ID, glGetUniformLocation(m_ID, name.c_str()), static_cast<GLint>(value));
     }
 
     void OpenGLShaderProgram::SetInt(const std::string& name, const int value) const {
