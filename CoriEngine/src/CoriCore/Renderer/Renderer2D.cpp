@@ -2,68 +2,66 @@
 #include "GraphicsCall.hpp"
 
 namespace Cori {
-	
-	OrtoCamera Renderer2D::s_Camera;
 
-	std::shared_ptr<ShaderProgram> Renderer2D::s_Shader;
-	std::shared_ptr<PipelineProgram> Renderer2D::s_Pipeline;
 	std::shared_ptr<Texture2D> Renderer2D::s_MissingTexture;
 
 	std::shared_ptr<VertexArray> Renderer2D::s_VertexArray_separate;
 	std::shared_ptr<VertexBuffer> Renderer2D::s_VertexBuffer_separate;
 	std::shared_ptr<IndexBuffer> Renderer2D::s_IndexBuffer_separate;
 
-	std::shared_ptr<VertexArray> Renderer2D::s_VertexArray_batch;
-	std::shared_ptr<VertexBuffer> Renderer2D::s_VertexBuffer_batch;
-	std::shared_ptr<IndexBuffer> Renderer2D::s_IndexBuffer_batch;
-
+	// for batch rendering
+	// global
 	glm::mat4 Renderer2D::s_CurrentBatchModelMatrix;
-	uint32_t Renderer2D::s_QuadIndexCount{ 0 };
+	glm::mat4 Renderer2D::s_CurrentBatchViewProjectionMatrix;
+	BatchDrawType Renderer2D::s_CurrentBatchDrawType{ BatchDrawType::DEFAULT };
 
-	QuadBatchVertexSetup* Renderer2D::s_QuadBuffer{ nullptr };
-	QuadBatchVertexSetup* Renderer2D::s_QuadBufferPtr{ nullptr };
+	// flat color quad
+	std::shared_ptr<ShaderProgram> Renderer2D::s_Shader_FlatColorQuad;
+	std::shared_ptr<VertexArray> Renderer2D::s_VertexArray_FlatColorQuad;
+	std::shared_ptr<VertexBuffer> Renderer2D::s_VertexBuffer_FlatColorQuad;
+	std::shared_ptr<IndexBuffer> Renderer2D::s_IndexBuffer_FlatColorQuad;
+
+	uint32_t Renderer2D::s_IndexCount_FlatColorQuad{ 0 };
+	QuadBatchVertexSetup* Renderer2D::s_VertexDataBuffer_FlatColorQuad{ nullptr };
+	QuadBatchVertexSetup* Renderer2D::s_VertexDataBufferPtr_FlatColorQuad{ nullptr };
+
+	// textured quad
+	std::shared_ptr<ShaderProgram> Renderer2D::s_Shader_TexturedQuad;
+	std::shared_ptr<VertexArray> Renderer2D::s_VertexArray_TexturedQuad;
+	std::shared_ptr<VertexBuffer> Renderer2D::s_VertexBuffer_TexturedQuad;
+	std::shared_ptr<IndexBuffer> Renderer2D::s_IndexBuffer_TexturedQuad;
+
+	std::shared_ptr<Texture2D> Renderer2D::s_CurrentTexture_TexturedQuad;
+
+	uint32_t Renderer2D::s_IndexCount_TexturedQuad{ 0 };
+	TexturedQuadVertexSetup* Renderer2D::s_VertexDataBuffer_TexturedQuad{ nullptr };
+	TexturedQuadVertexSetup* Renderer2D::s_VertexDataBufferPtr_TexturedQuad{ nullptr };
+
 
 
 	void Renderer2D::Init() {
-		// separate camera/shader for each renderer type
 		// TODO: add a global path tracker / manager, spitting hardcoded paths all over cpp and hpp files is kind-of a bad idea, want to have all my paths specified in one place
-		s_Shader.reset(ShaderProgram::Create("assets/engine/shaders/defaultVert.glsl", "assets/engine/shaders/defaultFrag.glsl"));
-
-		s_Pipeline.reset(PipelineProgram::Create());
-
-		s_Camera.SetCameraSize(0, 1920, 0, 1080);
 
 		s_MissingTexture = Texture2D::Create("assets/engine/textures/orientation_test24.png");
 
-		// separate renderer (1 draw call per object)
-		s_VertexArray_separate.reset(VertexArray::Create());
-		s_VertexBuffer_separate.reset(VertexBuffer::Create());
-		s_VertexBuffer_separate->SetLayout({
-			{ ShaderDataType::Vec2, "a_Position" },
-			{ ShaderDataType::Vec4, "a_Color" },
-			{ ShaderDataType::Vec2, "a_TexCoords" }
-		});
-
-		s_VertexBuffer_separate->Init(nullptr, 4 * s_VertexBuffer_separate->GetLayout().GetStrinde(), DRAW_TYPE::DYNAMIC);
-		s_VertexArray_separate->AddVertexBuffer(s_VertexBuffer_separate);
-
-		uint32_t indicesSeparate[6] = { 0, 1, 2, 2, 3, 0 };
-		s_IndexBuffer_separate.reset(IndexBuffer::Create(indicesSeparate, sizeof(indicesSeparate)));
-		s_VertexArray_separate->AddIndexBuffer(s_IndexBuffer_separate);
+		/// need to fix vvv
+		//// separate renderer (1 draw call per object)
+		//s_VertexArray_separate.reset(VertexArray::Create());
+		//s_VertexBuffer_separate.reset(VertexBuffer::Create());
+		//s_VertexBuffer_separate->SetLayout({
+		//	{ ShaderDataType::Vec2, "a_Position" },
+		//	{ ShaderDataType::Vec4, "a_Color" },
+		//});
+		//
+		//s_VertexBuffer_separate->Init(nullptr, 4 * s_VertexBuffer_separate->GetLayout().GetStrinde(), DRAW_TYPE::DYNAMIC);
+		//s_VertexArray_separate->AddVertexBuffer(s_VertexBuffer_separate);
+		//
+		//uint32_t indicesSeparate[6] = { 0, 1, 2, 2, 3, 0 };
+		//s_IndexBuffer_separate.reset(IndexBuffer::Create(indicesSeparate, sizeof(indicesSeparate)));
+		//s_VertexArray_separate->AddIndexBuffer(s_IndexBuffer_separate);
 
 		// batch renderer
-		s_VertexArray_batch.reset(VertexArray::Create());
-		s_VertexBuffer_batch.reset(VertexBuffer::Create());
-		s_VertexBuffer_batch->SetLayout({
-			{ ShaderDataType::Vec2, "a_Position" },
-			{ ShaderDataType::Vec4, "a_Color" },
-			{ ShaderDataType::Vec2, "a_TexCoords" }
-		});
-
-		s_VertexBuffer_batch->Init(nullptr, s_MaxQuadCount * s_VertexBuffer_batch->GetLayout().GetStrinde(), DRAW_TYPE::DYNAMIC);
-
-		s_VertexArray_batch->AddVertexBuffer(s_VertexBuffer_batch);
-
+		// global
 		uint32_t indicesBatch[s_MaxIndexCount];
 		uint32_t offset = 0;
 		for (int i = 0; i < s_MaxIndexCount; i += 6) {
@@ -78,95 +76,213 @@ namespace Cori {
 			offset += 4;
 		}
 
-		s_IndexBuffer_batch.reset(IndexBuffer::Create(indicesBatch, sizeof(indicesBatch)));
-		s_VertexArray_batch->AddIndexBuffer(s_IndexBuffer_batch);
+		// flat color quad
+		
+		s_Shader_FlatColorQuad.reset(ShaderProgram::Create("assets/engine/shaders/flatColorQuadVert.glsl", "assets/engine/shaders/flatColorQuadFrag.glsl"));
 
-		s_QuadBuffer = new QuadBatchVertexSetup[s_MaxIndexCount];
+		s_VertexArray_FlatColorQuad.reset(VertexArray::Create());
+		s_VertexBuffer_FlatColorQuad.reset(VertexBuffer::Create());
+		s_VertexBuffer_FlatColorQuad->SetLayout({
+			{ ShaderDataType::Vec2, "a_Position" },
+			{ ShaderDataType::Vec4, "a_Color" },
+		});
+
+		s_VertexBuffer_FlatColorQuad->Init(nullptr, s_MaxQuadCount * s_VertexBuffer_FlatColorQuad->GetLayout().GetStrinde(), DRAW_TYPE::DYNAMIC);
+
+		s_VertexArray_FlatColorQuad->AddVertexBuffer(s_VertexBuffer_FlatColorQuad);
+
+
+		s_IndexBuffer_FlatColorQuad.reset(IndexBuffer::Create(indicesBatch, sizeof(indicesBatch)));
+		s_VertexArray_FlatColorQuad->AddIndexBuffer(s_IndexBuffer_FlatColorQuad);
+
+		s_VertexDataBuffer_FlatColorQuad = new QuadBatchVertexSetup[s_MaxIndexCount];
+
+		// textured quad
+
+		s_Shader_TexturedQuad.reset(ShaderProgram::Create("assets/engine/shaders/texturedQuadVert.glsl", "assets/engine/shaders/texturedQuadFrag.glsl"));
+
+		s_VertexArray_TexturedQuad.reset(VertexArray::Create());
+		s_VertexBuffer_TexturedQuad.reset(VertexBuffer::Create());
+		s_VertexBuffer_TexturedQuad->SetLayout({
+			{ ShaderDataType::Vec2, "a_Position" },
+			{ ShaderDataType::Vec2, "a_TexurePosition" }
+		});
+
+		s_VertexBuffer_TexturedQuad->Init(nullptr, s_MaxQuadCount * s_VertexBuffer_TexturedQuad->GetLayout().GetStrinde(), DRAW_TYPE::DYNAMIC);
+		s_VertexArray_TexturedQuad->AddVertexBuffer(s_VertexBuffer_TexturedQuad);
+
+		s_IndexBuffer_TexturedQuad.reset(IndexBuffer::Create(indicesBatch, sizeof(indicesBatch)));
+		s_VertexArray_TexturedQuad->AddIndexBuffer(s_IndexBuffer_TexturedQuad);
+
+		s_VertexDataBuffer_TexturedQuad = new TexturedQuadVertexSetup[s_MaxIndexCount];
 	}
 
 	void Renderer2D::Shutdown() {
-		delete[] s_QuadBuffer;
-	}
-
-	void Renderer2D::ResizeCamera(int left, int right, int bottom, int top) {
-		s_Camera.SetCameraSize(left, right, bottom, top);
+		delete[] s_VertexDataBuffer_FlatColorQuad;
 	}
 
 	void Renderer2D::DrawQuadSeparate(const glm::vec2 position, const glm::vec2 size, const glm::vec4& color, const glm::mat4& modelMatrix) {
-		float vertices[6 * 4] = {
-			position.x,          position.y,          color.r, color.g, color.b, color.a,
-			position.x + size.x, position.y,          color.r, color.g, color.b, color.a,
-			position.x + size.x, position.y + size.y, color.r, color.g, color.b, color.a,
-			position.x,          position.y + size.y, color.r, color.g, color.b, color.a
-		};
-
-		s_VertexBuffer_separate->Bind();
-		s_VertexBuffer_separate->SetData(vertices, sizeof(vertices));
-
-		s_Pipeline->Bind();
-		s_Pipeline->BindShaderProgram(s_Shader);
-		s_Shader->SetMat4("u_ViewProjection", s_Camera.GetProjectionMatrix());
-		s_Shader->SetMat4("u_ModelMatrix", modelMatrix);
-
-		s_VertexArray_separate->Bind();
-		GraphicsCall::DrawElements(s_VertexArray_separate);
-		s_VertexArray_separate->Unbind();
+		/// to fix vvvv
+		//float vertices[6 * 4] = {
+		//	position.x,          position.y,          color.r, color.g, color.b, color.a,
+		//	position.x + size.x, position.y,          color.r, color.g, color.b, color.a,
+		//	position.x + size.x, position.y + size.y, color.r, color.g, color.b, color.a,
+		//	position.x,          position.y + size.y, color.r, color.g, color.b, color.a
+		//};
+		//
+		//s_VertexBuffer_separate->Bind();
+		//s_VertexBuffer_separate->SetData(vertices, sizeof(vertices));
+		//
+		//s_Shader_FlatColorQuad->Bind();
+		////s_Shader_FlatColorQuad->SetMat4("u_ViewProjection", s_Camera.GetProjectionMatrix());
+		//s_Shader_FlatColorQuad->SetMat4("u_ModelMatrix", modelMatrix);
+		//
+		//s_VertexArray_separate->Bind();
+		////GraphicsCall::DrawElements(s_VertexArray_separate);
+		//s_VertexArray_separate->Unbind();
 	}
 
-	void Renderer2D::BeginBatch(const glm::mat4& model) {
-		s_QuadBufferPtr = s_QuadBuffer;
+	// batching 
+
+	void Renderer2D::BeginBatch(const glm::mat4& viewProjection, const glm::mat4& model) {
+
+		// maybe separate begin and end batch for each batch renderer, and invoke them from something like scene begin/end?
+		// TODO ^^^^^
 		s_CurrentBatchModelMatrix = model;
+		s_CurrentBatchViewProjectionMatrix = viewProjection;
+
+		BeginBatch_FlatColorQuad();
+
+		BeginBatch_TexturedQuad();
 	}
 
 	void Renderer2D::EndBatch() {
-		auto size = reinterpret_cast<uint8_t*>(s_QuadBufferPtr) - reinterpret_cast<uint8_t*>(s_QuadBuffer);
-		s_VertexBuffer_batch->Bind();
-		s_VertexBuffer_batch->SetData(s_QuadBuffer, size);
-		Flush();
-	}
 
-	void Renderer2D::Flush() {
-		s_Pipeline->Bind();
-		s_Pipeline->BindShaderProgram(s_Shader);
-		s_Shader->SetMat4("u_ViewProjection", s_Camera.GetProjectionMatrix());
-		s_Shader->SetMat4("u_ModelMatrix", s_CurrentBatchModelMatrix);
-		s_Shader->SetInt("u_Texture", 1);
-
-		s_VertexArray_batch->Bind();
-
-		s_MissingTexture->Bind(1);
-
-		GraphicsCall::DrawElements(s_VertexArray_batch);
-		s_VertexArray_batch->Unbind();
-		s_QuadIndexCount = 0;
-	}
-
-	void Renderer2D::DrawQuadBatch(const glm::vec2 position, const glm::vec2 size, const glm::vec4& color) {
-		if (s_QuadIndexCount >= s_MaxIndexCount) {
-			EndBatch();
-			BeginBatch(s_CurrentBatchModelMatrix);
+		if (s_IndexCount_FlatColorQuad) {
+			EndBatch_FlatColorQuad();
 		}
 
-		s_QuadBufferPtr->Position = { position.x, position.y };
-		s_QuadBufferPtr->Color = color;
-		s_QuadBufferPtr->TexCoords = { 0.0f, 0.0f };
-		s_QuadBufferPtr++;
-
-		s_QuadBufferPtr->Position = { position.x + size.x, position.y };
-		s_QuadBufferPtr->Color = color;
-		s_QuadBufferPtr->TexCoords = { 1.0f, 0.0f };
-		s_QuadBufferPtr++;
-
-		s_QuadBufferPtr->Position = { position.x + size.x, position.y + size.y };
-		s_QuadBufferPtr->Color = color;
-		s_QuadBufferPtr->TexCoords = { 1.0f, 1.0f };
-		s_QuadBufferPtr++;
-
-		s_QuadBufferPtr->Position = { position.x, position.y + size.y };
-		s_QuadBufferPtr->Color = color;
-		s_QuadBufferPtr->TexCoords = { 0.0f, 1.0f };
-		s_QuadBufferPtr++;
-
-		s_QuadIndexCount += 6;
+		if (s_IndexCount_TexturedQuad) {
+			EndBatch_TexturedQuad();
+		}
 	}
+
+	void Renderer2D::NewBatch() {
+		EndBatch();
+		BeginBatch(s_CurrentBatchViewProjectionMatrix, s_CurrentBatchModelMatrix);
+	}
+
+	// flat color quad
+
+	void Renderer2D::BeginBatch_FlatColorQuad() {
+		s_VertexDataBufferPtr_FlatColorQuad = s_VertexDataBuffer_FlatColorQuad;
+	}
+
+	void Renderer2D::EndBatch_FlatColorQuad() {
+		auto size = reinterpret_cast<uint8_t*>(s_VertexDataBufferPtr_FlatColorQuad) - reinterpret_cast<uint8_t*>(s_VertexDataBuffer_FlatColorQuad);
+		s_VertexBuffer_FlatColorQuad->Bind();
+		s_VertexBuffer_FlatColorQuad->SetData(s_VertexDataBuffer_FlatColorQuad, size);
+
+		s_Shader_FlatColorQuad->Bind();
+		s_Shader_FlatColorQuad->SetMat4("u_ViewProjection", s_CurrentBatchViewProjectionMatrix);
+		s_Shader_FlatColorQuad->SetMat4("u_ModelMatrix", s_CurrentBatchModelMatrix);
+
+		s_VertexArray_FlatColorQuad->Bind();
+		GraphicsCall::DrawElements(s_VertexArray_FlatColorQuad, s_IndexCount_FlatColorQuad);
+		s_IndexCount_FlatColorQuad = 0;
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const glm::vec4& color) {
+		if (s_IndexCount_FlatColorQuad >= s_MaxIndexCount) {
+			NewBatch();
+		}
+
+		if (s_CurrentBatchDrawType != BatchDrawType::FLAT_COLOR_QUAD) {
+			NewBatch();
+			s_CurrentBatchDrawType == BatchDrawType::FLAT_COLOR_QUAD;
+		}
+
+		s_VertexDataBufferPtr_FlatColorQuad->Position = { position.x, position.y };
+		s_VertexDataBufferPtr_FlatColorQuad->Color = color;
+		s_VertexDataBufferPtr_FlatColorQuad++;
+
+		s_VertexDataBufferPtr_FlatColorQuad->Position = { position.x + size.x, position.y };
+		s_VertexDataBufferPtr_FlatColorQuad->Color = color;
+		s_VertexDataBufferPtr_FlatColorQuad++;
+
+		s_VertexDataBufferPtr_FlatColorQuad->Position = { position.x + size.x, position.y + size.y };
+		s_VertexDataBufferPtr_FlatColorQuad->Color = color;
+		s_VertexDataBufferPtr_FlatColorQuad++;
+
+		s_VertexDataBufferPtr_FlatColorQuad->Position = { position.x, position.y + size.y };
+		s_VertexDataBufferPtr_FlatColorQuad->Color = color;
+		s_VertexDataBufferPtr_FlatColorQuad++;
+
+		s_IndexCount_FlatColorQuad += 6;
+	}
+
+	// textured quad
+
+	void Renderer2D::BeginBatch_TexturedQuad() {
+		s_VertexDataBufferPtr_TexturedQuad = s_VertexDataBuffer_TexturedQuad;
+	}
+
+	void Renderer2D::EndBatch_TexturedQuad() {
+		auto size = reinterpret_cast<uint8_t*>(s_VertexDataBufferPtr_TexturedQuad) - reinterpret_cast<uint8_t*>(s_VertexDataBuffer_TexturedQuad);
+		s_VertexBuffer_TexturedQuad->Bind();
+		s_VertexBuffer_TexturedQuad->SetData(s_VertexDataBuffer_TexturedQuad, size);
+
+		s_Shader_TexturedQuad->Bind();
+		s_Shader_TexturedQuad->SetMat4("u_ViewProjection", s_CurrentBatchViewProjectionMatrix);
+		s_Shader_TexturedQuad->SetMat4("u_ModelMatrix", s_CurrentBatchModelMatrix);
+		s_Shader_TexturedQuad->SetInt("u_Texture", 2);
+
+		s_VertexArray_TexturedQuad->Bind();
+
+		s_CurrentTexture_TexturedQuad->Bind(2);
+		GraphicsCall::DrawElements(s_VertexArray_TexturedQuad, s_IndexCount_TexturedQuad);
+		s_IndexCount_TexturedQuad = 0;
+		s_CurrentTexture_TexturedQuad.reset();
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, std::shared_ptr<Texture2D>& texture, const glm::vec2 textureSize, const glm::vec2 texturePosition) {
+		if (s_IndexCount_TexturedQuad >= s_MaxIndexCount) {
+			NewBatch();
+		}
+
+		if (s_CurrentBatchDrawType != BatchDrawType::TEXTURED_QUAD) {
+			NewBatch();
+			s_CurrentBatchDrawType == BatchDrawType::TEXTURED_QUAD;
+		}
+
+		if (s_CurrentTexture_TexturedQuad != texture) {
+			if (s_IndexCount_TexturedQuad == 0) {
+				s_CurrentTexture_TexturedQuad = texture;
+			}
+			else {
+				NewBatch();
+				s_CurrentTexture_TexturedQuad = texture;
+			}
+		}
+
+		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x, position.y };
+		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { texturePosition.x, texturePosition.y };
+		s_VertexDataBufferPtr_TexturedQuad++;
+
+		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x + size.x, position.y };
+		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { texturePosition.x + textureSize.x, texturePosition.y };
+		s_VertexDataBufferPtr_TexturedQuad++;
+
+		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x + size.x, position.y + size.y };
+		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { texturePosition.x + textureSize.x, texturePosition.y + textureSize.y };
+		s_VertexDataBufferPtr_TexturedQuad++;
+
+		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x, position.y + size.y };
+		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { texturePosition.x, texturePosition.y + textureSize.y };
+		s_VertexDataBufferPtr_TexturedQuad++;
+
+		s_IndexCount_TexturedQuad += 6;
+
+	}
+
 }

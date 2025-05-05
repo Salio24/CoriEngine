@@ -12,7 +12,7 @@ namespace Cori {
 		virtual void SetClearColor(const glm::vec4& color) override;
 		virtual void ClearFramebuffer() override;
 		
-		virtual void DrawElements(const std::shared_ptr<VertexArray>& vertexArray) override;
+		virtual void DrawElements(const std::shared_ptr<VertexArray>& vertexArray, const uint32_t elementCount) override;
 		
 	};
 }

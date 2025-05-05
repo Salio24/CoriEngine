@@ -11,10 +11,6 @@ out vec4 v_Color;
 uniform mat4 u_ViewProjection;
 uniform mat4 u_ModelMatrix;
 
-out gl_PerVertex {
-    vec4 gl_Position;
-};
-
 void main() {
     v_Position = a_Position;
     v_Color = a_Color;

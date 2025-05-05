@@ -85,8 +85,8 @@ namespace Cori {
 		glDebugMessageCallback(GLDebugMessageCallback, nullptr);
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 #endif
-		//glEnable(GL_BLEND)
-
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 	void OpenGLGraphicsAPI::SetViewport(int x, int y, int width, int height) {
@@ -102,11 +102,11 @@ namespace Cori {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	void OpenGLGraphicsAPI::DrawElements(const std::shared_ptr<VertexArray>& vertexArray) {
+	void OpenGLGraphicsAPI::DrawElements(const std::shared_ptr<VertexArray>& vertexArray, const uint32_t elementCount) {
 		vertexArray->Bind();
 		vertexArray->GetIndexBuffer()->Bind();
 
-		glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(vertexArray->GetIndexBuffer()->GetCount()), GL_UNSIGNED_INT, nullptr);
+		glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(elementCount), GL_UNSIGNED_INT, nullptr);
 		vertexArray->Unbind();
 	}
 }

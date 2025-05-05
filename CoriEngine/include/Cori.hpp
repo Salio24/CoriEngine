@@ -15,6 +15,8 @@
 #include "../src/CoriCore/Renderer/Camera.hpp"
 #include "../src/CoriCore/Renderer/Texture.hpp"
 #include "../src/CoriCore/Renderer/Image.hpp"
+#include "../src/CoriCore/Renderer/Camera.hpp"
+
 
 
 

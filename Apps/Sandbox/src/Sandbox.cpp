@@ -9,6 +9,13 @@ class ExampleLayer : public Cori::Layer {
 public:
 	ExampleLayer() : Layer("Example") { 
 		Cori::Application::GetWindow().SetVSync(true);
+
+		m_Camera.SetCameraSize(0, 1600, 0, 900);
+		m_Texture1 = Cori::Texture2D::Create("assets/engine/textures/brick.png");
+		m_Texture2 = Cori::Texture2D::Create("assets/engine/textures/cake_top.png");
+		m_Texture3 = Cori::Texture2D::Create("assets/engine/textures/leggings.png");
+		m_Texture4 = Cori::Texture2D::Create("assets/engine/textures/orientation_test24.png");
+
 	}
 	
 	void OnEvent(Cori::Event& event) override {
@@ -29,28 +36,52 @@ public:
 		Cori::GraphicsCall::SetClearColor({ 1.0f, 1.0f, 0.0f, 1.0f });
 		Cori::GraphicsCall::ClearFramebuffer();
 
-		Cori::Renderer2D::BeginBatch();
+		Cori::Renderer2D::BeginBatch(m_Camera.GetViewProjectionMatrix());
 
-		Cori::Renderer2D::DrawQuadBatch(glm::vec2(50.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-		Cori::Renderer2D::DrawQuadBatch(glm::vec2(150.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-		Cori::Renderer2D::DrawQuadBatch(glm::vec2(250.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-		Cori::Renderer2D::DrawQuadBatch(glm::vec2(350.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-		Cori::Renderer2D::DrawQuadBatch(glm::vec2(450.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-		Cori::Renderer2D::DrawQuadBatch(glm::vec2(550.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+		Cori::Renderer2D::DrawQuad(glm::vec2(50.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+		Cori::Renderer2D::DrawQuad(glm::vec2(150.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+		Cori::Renderer2D::DrawQuad(glm::vec2(250.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+		Cori::Renderer2D::DrawQuad(glm::vec2(350.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+		Cori::Renderer2D::DrawQuad(glm::vec2(450.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+		Cori::Renderer2D::DrawQuad(glm::vec2(550.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+
+		Cori::Renderer2D::DrawQuad(glm::vec2(550.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture1);
+		Cori::Renderer2D::DrawQuad(glm::vec2(650.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture1);
+		Cori::Renderer2D::DrawQuad(glm::vec2(750.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture1);
+		Cori::Renderer2D::DrawQuad(glm::vec2(850.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture1);
+		Cori::Renderer2D::DrawQuad(glm::vec2(950.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture1);
+
+		Cori::Renderer2D::DrawQuad(glm::vec2(550.0f, 250.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture2);
+		Cori::Renderer2D::DrawQuad(glm::vec2(650.0f, 250.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture2);
+		Cori::Renderer2D::DrawQuad(glm::vec2(750.0f, 250.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture2);
+		Cori::Renderer2D::DrawQuad(glm::vec2(850.0f, 250.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture2);
+		Cori::Renderer2D::DrawQuad(glm::vec2(950.0f, 250.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture2);
+
+		Cori::Renderer2D::DrawQuad(glm::vec2(550.0f, 450.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture3, glm::vec2(0.5f), glm::vec2(0.0f, 0.5f));
+		Cori::Renderer2D::DrawQuad(glm::vec2(650.0f, 450.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture3, glm::vec2(0.5f), glm::vec2(0.0f, 0.5f));
+		Cori::Renderer2D::DrawQuad(glm::vec2(750.0f, 450.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture3, glm::vec2(0.5f), glm::vec2(0.0f, 0.5f));
+		Cori::Renderer2D::DrawQuad(glm::vec2(850.0f, 450.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture3, glm::vec2(0.5f), glm::vec2(0.0f, 0.5f));
+		Cori::Renderer2D::DrawQuad(glm::vec2(950.0f, 450.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture3, glm::vec2(0.5f), glm::vec2(0.0f, 0.5f));
+
+		Cori::Renderer2D::DrawQuad(glm::vec2(550.0f, 650.0f + testFloat), glm::vec2(32.0f), m_Texture4);
+		Cori::Renderer2D::DrawQuad(glm::vec2(650.0f, 650.0f + testFloat), glm::vec2(32.0f), m_Texture4);
+		Cori::Renderer2D::DrawQuad(glm::vec2(750.0f, 650.0f + testFloat), glm::vec2(32.0f), m_Texture4);
+		Cori::Renderer2D::DrawQuad(glm::vec2(850.0f, 650.0f + testFloat), glm::vec2(32.0f), m_Texture4);
+		Cori::Renderer2D::DrawQuad(glm::vec2(950.0f, 650.0f + testFloat), glm::vec2(32.0f), m_Texture4);
 
 		Cori::Renderer2D::EndBatch();
-
-		for (int i = 0; i < 5; i++) {
-			for (int j = 0; j < 5; j++) {
-				glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(i * (50.0f + testFloat), j * (50.0f + testFloat), 0.0f));
-				//Cori::Renderer2D::DrawQuadSeparate(glm::vec2(50.0f, 50.0f), glm::vec2(50.0f, 50.0f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), model);
-			}
-		}
 	}
 
 	void OnTickUpdate() {
 		
 	}
+
+	Cori::OrtoCamera m_Camera;
+
+	std::shared_ptr<Cori::Texture2D> m_Texture1;
+	std::shared_ptr<Cori::Texture2D> m_Texture2;
+	std::shared_ptr<Cori::Texture2D> m_Texture3;
+	std::shared_ptr<Cori::Texture2D> m_Texture4;
 
 	float testFloat = 0.0f;
 

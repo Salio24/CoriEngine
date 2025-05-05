@@ -47,7 +47,7 @@ namespace Cori {
             }
         }
         m_ID = glCreateProgram();
-        glProgramParameteri(m_ID, GL_PROGRAM_SEPARABLE, GL_TRUE);
+        //glProgramParameteri(m_ID, GL_PROGRAM_SEPARABLE, GL_TRUE);
         glAttachShader(m_ID, vertex);
         glAttachShader(m_ID, fragment);
         if (geometryShaderPresent) {
@@ -78,12 +78,12 @@ namespace Cori {
 	}
 
 	void OpenGLShaderProgram::Bind() const {
-        CORI_CORE_WARN("You shouldn't really use this when using separable shader programs");
+        //CORI_CORE_WARN("You shouldn't really use this when using separable shader programs");
 		glUseProgram(m_ID);
 	}
 
 	void OpenGLShaderProgram::Unbind() const {
-		CORI_CORE_WARN("You shouldn't really use this when using separable shader programs");
+		//CORI_CORE_WARN("You shouldn't really use this when using separable shader programs");
 		glUseProgram(0);
 	}
 

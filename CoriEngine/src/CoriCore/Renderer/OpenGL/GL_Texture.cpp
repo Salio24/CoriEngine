@@ -14,11 +14,9 @@ namespace Cori {
 		glTextureStorage2D(m_ID, 1, GL_RGBA8, static_cast<GLsizei>(m_Width), static_cast<GLsizei>(m_Height));
 
 		glTextureParameteri(m_ID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTextureParameteri(m_ID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(m_ID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);	
 		glTextureParameteri(m_ID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTextureParameteri(m_ID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-		// make missing texture 
 
 		image->FlipVertically();
 

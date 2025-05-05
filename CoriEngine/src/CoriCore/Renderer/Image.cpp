@@ -8,18 +8,21 @@ namespace Cori {
 
 		if CORI_CORE_ASSERT_ERROR(static_cast<SDL_Surface*>(surface), "Failed to load image: {0}, {1}", FileManager::GetFilename(path), SDL_GetError()) { 
 			surface = IMG_Load("assets/engine/textures/missing_texture32.png");
-
-			//return; SDL_DestroySurface(static_cast<SDL_Surface*>(surface)); 
 		}
 
 		if (static_cast<SDL_Surface*>(surface)->format != SDL_PIXELFORMAT_RGBA32) {
 			CORI_CORE_WARN("Converting {0} to RGBA32 (ARGB8888) format\n    You should convert all the images you're loading to RGBA32 before loading them; you shouldn't rely on the engine's automatic conversion.", FileManager::GetFilename(path));
 
 			SDL_Surface* converted = SDL_ConvertSurface(static_cast<SDL_Surface*>(surface), SDL_PIXELFORMAT_RGBA32);
-			if CORI_CORE_ASSERT_ERROR(converted, "Failed to convert image: {0}, {1}", FileManager::GetFilename(path), SDL_GetError()) { return; SDL_DestroySurface(static_cast<SDL_Surface*>(surface)); SDL_DestroySurface(converted); }
-
-			SDL_DestroySurface(static_cast<SDL_Surface*>(surface));
-			surface = static_cast<void*>(converted);
+			if CORI_CORE_ASSERT_ERROR(converted, "Failed to convert image: {0}, {1}", FileManager::GetFilename(path), SDL_GetError()) { 
+				surface = IMG_Load("assets/engine/textures/missing_texture32.png");
+				SDL_DestroySurface(converted); 
+				
+			}
+			else {
+				SDL_DestroySurface(static_cast<SDL_Surface*>(surface));
+				surface = static_cast<void*>(converted);
+			}
 		}
 
 		CORI_CORE_TRACE("Loaded image {0} successfully", FileManager::GetFilename(path));

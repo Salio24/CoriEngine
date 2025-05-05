@@ -6,13 +6,15 @@
 
 namespace Cori {
 	PipelineProgram* PipelineProgram::Create() {
+		CORI_CORE_ERROR("Dont use pipeline program, not using separable programs rn");
+		return nullptr;
 		PipelineProgram* result = nullptr;
 		switch (Application::GetWindow().GetAPI()) {
 		case GraphicsAPIs::None:
 			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
 			break;
 		case GraphicsAPIs::OpenGL:
-			result = new OpenGLPipelineProgram();
+			//result = new OpenGLPipelineProgram();
 			break;
 		case GraphicsAPIs::Vulkan:
 			CORI_CORE_ASSERT_FATAL(false, "Vulkan is not supported yet");

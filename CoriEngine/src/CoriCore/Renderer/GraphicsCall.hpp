@@ -20,8 +20,8 @@ namespace Cori {
 			s_GraphicsAPI->ClearFramebuffer();
 		}
 
-		static void DrawElements(const std::shared_ptr<VertexArray>& vertexArray) {
-			s_GraphicsAPI->DrawElements(vertexArray);
+		static void DrawElements(const std::shared_ptr<VertexArray>& vertexArray, const uint32_t elementCount) {
+			s_GraphicsAPI->DrawElements(vertexArray, elementCount);
 		}
 
 	private:
