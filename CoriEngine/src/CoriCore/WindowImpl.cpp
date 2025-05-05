@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "WindowImpl.hpp"
 #include <backends/imgui_impl_sdl3.h>
+#include <SDL3_image/SDL_image.h>
 
 namespace Cori {
 
@@ -38,6 +39,14 @@ namespace Cori {
 			break;
 		}
 
+		SDL_Surface* logo = IMG_Load("assets/engine/textures/ui/logo256.png");
+
+		if (!CORI_CORE_ASSERT_ERROR(logo, "Failed to load App Logo: {0}", SDL_GetError())) {
+			SDL_SetWindowIcon(m_Window, logo);
+		}
+
+		SDL_DestroySurface(logo);
+
 		SDL_SetWindowPosition(m_Window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
 		m_Context->Init(m_Window);
@@ -61,6 +70,9 @@ namespace Cori {
 			switch (e.type) {
 			case SDL_EVENT_WINDOW_RESIZED:
 				{
+					if (e.window.windowID != SDL_GetWindowID(m_Window)) {
+						break;
+					}
 					m_Data.Width = e.window.data1;
 					m_Data.Height = e.window.data2;
 

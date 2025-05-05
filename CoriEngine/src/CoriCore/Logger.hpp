@@ -38,24 +38,24 @@ namespace Cori {
 	#define CORI_CORE_VERIFY_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Verify Failed: " __VA_ARGS__), __builtin_debugtrap(), true) : false)
 
 #else
-	#define CORI_CORE_TRACE
-	#define CORI_CORE_DEBUG
-	#define CORI_CORE_INFO
-	#define CORI_CORE_WARN
-	#define CORI_CORE_ERROR
-	#define CORI_CORE_FATAL 
+	#define CORI_CORE_TRACE(...)
+	#define CORI_CORE_DEBUG(...)
+	#define CORI_CORE_INFO(...)
+	#define CORI_CORE_WARN(...)
+	#define CORI_CORE_ERROR(...)
+	#define CORI_CORE_FATAL(...)
 	
-	#define CORI_CORE_ASSERT_DEBUG(x, ...)
-	#define CORI_CORE_ASSERT_INFO(x, ...)
-	#define CORI_CORE_ASSERT_WARN(x, ...)
-	#define CORI_CORE_ASSERT_ERROR(x, ...)
-	#define CORI_CORE_ASSERT_FATAL(x, ...)
+	#define CORI_CORE_ASSERT_DEBUG(x, ...) (false)
+	#define CORI_CORE_ASSERT_INFO(x, ...) (false)
+	#define CORI_CORE_ASSERT_WARN(x, ...) (false)
+	#define CORI_CORE_ASSERT_ERROR(x, ...) (false)
+	#define CORI_CORE_ASSERT_FATAL(x, ...) (false)
 	
-	#define CORI_CORE_VERIFY_DEBUG(x, ...) x
-	#define CORI_CORE_VERIFY_INFO(x, ...) x
-	#define CORI_CORE_VERIFY_WARN(x, ...) x
-	#define CORI_CORE_VERIFY_ERROR(x, ...) x
-	#define CORI_CORE_VERIFY_FATAL(x, ...) x
+	#define CORI_CORE_VERIFY_DEBUG(x, ...) (true) x; if (false)
+	#define CORI_CORE_VERIFY_INFO(x, ...) (true) x; if (false)
+	#define CORI_CORE_VERIFY_WARN(x, ...) (true) x; if (false)
+	#define CORI_CORE_VERIFY_ERROR(x, ...) (true) x; if (false)
+	#define CORI_CORE_VERIFY_FATAL(x, ...) (true) x; if (false)
 
 #endif
 

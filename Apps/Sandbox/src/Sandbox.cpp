@@ -8,9 +8,9 @@
 class ExampleLayer : public Cori::Layer {
 public:
 	ExampleLayer() : Layer("Example") { 
-		Cori::Application::GetWindow().SetVSync(true);
+		//Cori::Application::GetWindow().SetVSync(true);
 
-		m_Camera.SetCameraSize(0, 1600, 0, 900);
+		m_Camera.SetCameraSize(0, 7680, 0, 4320);
 		m_Texture1 = Cori::Texture2D::Create("assets/engine/textures/brick.png");
 		m_Texture2 = Cori::Texture2D::Create("assets/engine/textures/cake_top.png");
 		m_Texture3 = Cori::Texture2D::Create("assets/engine/textures/leggings.png");
@@ -32,37 +32,38 @@ public:
 
 	void OnUpdate(const double deltaTime) override {
 
+		// TODO, get rid of raw pointers in create funcs
+
 		Cori::GraphicsCall::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
 		Cori::GraphicsCall::SetClearColor({ 1.0f, 1.0f, 0.0f, 1.0f });
 		Cori::GraphicsCall::ClearFramebuffer();
 
-		Cori::Renderer2D::BeginBatch(m_Camera.GetViewProjectionMatrix());
+		Cori::Renderer2D::BeginBatch(m_Camera.GetViewProjectionMatrix(), model);
 
 		Cori::Renderer2D::DrawQuad(glm::vec2(50.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
 		Cori::Renderer2D::DrawQuad(glm::vec2(150.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
 		Cori::Renderer2D::DrawQuad(glm::vec2(250.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
 		Cori::Renderer2D::DrawQuad(glm::vec2(350.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
 		Cori::Renderer2D::DrawQuad(glm::vec2(450.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-		Cori::Renderer2D::DrawQuad(glm::vec2(550.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-
+		
 		Cori::Renderer2D::DrawQuad(glm::vec2(550.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture1);
 		Cori::Renderer2D::DrawQuad(glm::vec2(650.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture1);
 		Cori::Renderer2D::DrawQuad(glm::vec2(750.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture1);
 		Cori::Renderer2D::DrawQuad(glm::vec2(850.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture1);
 		Cori::Renderer2D::DrawQuad(glm::vec2(950.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture1);
-
+		
 		Cori::Renderer2D::DrawQuad(glm::vec2(550.0f, 250.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture2);
 		Cori::Renderer2D::DrawQuad(glm::vec2(650.0f, 250.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture2);
 		Cori::Renderer2D::DrawQuad(glm::vec2(750.0f, 250.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture2);
 		Cori::Renderer2D::DrawQuad(glm::vec2(850.0f, 250.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture2);
 		Cori::Renderer2D::DrawQuad(glm::vec2(950.0f, 250.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture2);
-
+		
 		Cori::Renderer2D::DrawQuad(glm::vec2(550.0f, 450.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture3, glm::vec2(0.5f), glm::vec2(0.0f, 0.5f));
 		Cori::Renderer2D::DrawQuad(glm::vec2(650.0f, 450.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture3, glm::vec2(0.5f), glm::vec2(0.0f, 0.5f));
 		Cori::Renderer2D::DrawQuad(glm::vec2(750.0f, 450.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture3, glm::vec2(0.5f), glm::vec2(0.0f, 0.5f));
 		Cori::Renderer2D::DrawQuad(glm::vec2(850.0f, 450.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture3, glm::vec2(0.5f), glm::vec2(0.0f, 0.5f));
 		Cori::Renderer2D::DrawQuad(glm::vec2(950.0f, 450.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture3, glm::vec2(0.5f), glm::vec2(0.0f, 0.5f));
-
+		
 		Cori::Renderer2D::DrawQuad(glm::vec2(550.0f, 650.0f + testFloat), glm::vec2(32.0f), m_Texture4);
 		Cori::Renderer2D::DrawQuad(glm::vec2(650.0f, 650.0f + testFloat), glm::vec2(32.0f), m_Texture4);
 		Cori::Renderer2D::DrawQuad(glm::vec2(750.0f, 650.0f + testFloat), glm::vec2(32.0f), m_Texture4);
@@ -75,6 +76,8 @@ public:
 	void OnTickUpdate() {
 		
 	}
+
+	glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(4.0f, 4.0f, 0.0f));
 
 	Cori::OrtoCamera m_Camera;
 

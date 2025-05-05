@@ -30,6 +30,8 @@ namespace Cori {
 		uint32_t m_ID;
 		bool m_CreationSuccessful{ true };
 
+		mutable std::unordered_map<std::string, int32_t> m_UniformLocations;
+
 		std::string m_ShaderNames;
 
 		bool CheckCompileErrors(uint32_t shader, std::string type);

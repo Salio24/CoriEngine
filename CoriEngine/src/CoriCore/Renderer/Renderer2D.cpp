@@ -1,5 +1,6 @@
 #include "Renderer2D.hpp"
 #include "GraphicsCall.hpp"
+#include "../Time.hpp"
 
 namespace Cori {
 
@@ -87,7 +88,7 @@ namespace Cori {
 			{ ShaderDataType::Vec4, "a_Color" },
 		});
 
-		s_VertexBuffer_FlatColorQuad->Init(nullptr, s_MaxQuadCount * s_VertexBuffer_FlatColorQuad->GetLayout().GetStrinde(), DRAW_TYPE::DYNAMIC);
+		s_VertexBuffer_FlatColorQuad->Init(nullptr, s_MaxVertexCount * s_VertexBuffer_FlatColorQuad->GetLayout().GetStrinde(), DRAW_TYPE::DYNAMIC);
 
 		s_VertexArray_FlatColorQuad->AddVertexBuffer(s_VertexBuffer_FlatColorQuad);
 
@@ -108,7 +109,7 @@ namespace Cori {
 			{ ShaderDataType::Vec2, "a_TexurePosition" }
 		});
 
-		s_VertexBuffer_TexturedQuad->Init(nullptr, s_MaxQuadCount * s_VertexBuffer_TexturedQuad->GetLayout().GetStrinde(), DRAW_TYPE::DYNAMIC);
+		s_VertexBuffer_TexturedQuad->Init(nullptr, s_MaxVertexCount * s_VertexBuffer_TexturedQuad->GetLayout().GetStrinde(), DRAW_TYPE::DYNAMIC);
 		s_VertexArray_TexturedQuad->AddVertexBuffer(s_VertexBuffer_TexturedQuad);
 
 		s_IndexBuffer_TexturedQuad.reset(IndexBuffer::Create(indicesBatch, sizeof(indicesBatch)));
@@ -183,12 +184,15 @@ namespace Cori {
 		s_VertexBuffer_FlatColorQuad->Bind();
 		s_VertexBuffer_FlatColorQuad->SetData(s_VertexDataBuffer_FlatColorQuad, size);
 
+		// redundant shader binds, and subbufferdata calls 
+		// overdraw is also a concern 
 		s_Shader_FlatColorQuad->Bind();
 		s_Shader_FlatColorQuad->SetMat4("u_ViewProjection", s_CurrentBatchViewProjectionMatrix);
 		s_Shader_FlatColorQuad->SetMat4("u_ModelMatrix", s_CurrentBatchModelMatrix);
-
-		s_VertexArray_FlatColorQuad->Bind();
+		
 		GraphicsCall::DrawElements(s_VertexArray_FlatColorQuad, s_IndexCount_FlatColorQuad);
+		
+
 		s_IndexCount_FlatColorQuad = 0;
 	}
 
@@ -198,8 +202,13 @@ namespace Cori {
 		}
 
 		if (s_CurrentBatchDrawType != BatchDrawType::FLAT_COLOR_QUAD) {
-			NewBatch();
-			s_CurrentBatchDrawType == BatchDrawType::FLAT_COLOR_QUAD;
+			if (s_IndexCount_FlatColorQuad == 0) {
+				s_CurrentBatchDrawType = BatchDrawType::FLAT_COLOR_QUAD;
+			}
+			else {
+				NewBatch();
+				s_CurrentBatchDrawType = BatchDrawType::FLAT_COLOR_QUAD;
+			}
 		}
 
 		s_VertexDataBufferPtr_FlatColorQuad->Position = { position.x, position.y };
@@ -235,11 +244,9 @@ namespace Cori {
 		s_Shader_TexturedQuad->Bind();
 		s_Shader_TexturedQuad->SetMat4("u_ViewProjection", s_CurrentBatchViewProjectionMatrix);
 		s_Shader_TexturedQuad->SetMat4("u_ModelMatrix", s_CurrentBatchModelMatrix);
-		s_Shader_TexturedQuad->SetInt("u_Texture", 2);
+		s_Shader_TexturedQuad->SetInt("u_Texture", 0);
 
-		s_VertexArray_TexturedQuad->Bind();
-
-		s_CurrentTexture_TexturedQuad->Bind(2);
+		s_CurrentTexture_TexturedQuad->Bind(0);
 		GraphicsCall::DrawElements(s_VertexArray_TexturedQuad, s_IndexCount_TexturedQuad);
 		s_IndexCount_TexturedQuad = 0;
 		s_CurrentTexture_TexturedQuad.reset();
@@ -251,8 +258,13 @@ namespace Cori {
 		}
 
 		if (s_CurrentBatchDrawType != BatchDrawType::TEXTURED_QUAD) {
-			NewBatch();
-			s_CurrentBatchDrawType == BatchDrawType::TEXTURED_QUAD;
+			if (s_IndexCount_TexturedQuad == 0) {
+				s_CurrentBatchDrawType = BatchDrawType::TEXTURED_QUAD;
+			}
+			else {
+				NewBatch();
+				s_CurrentBatchDrawType = BatchDrawType::TEXTURED_QUAD;
+			}
 		}
 
 		if (s_CurrentTexture_TexturedQuad != texture) {

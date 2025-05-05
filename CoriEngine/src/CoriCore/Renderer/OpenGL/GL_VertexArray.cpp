@@ -56,7 +56,7 @@ namespace Cori {
 
 	void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer) {
 		if CORI_CORE_ASSERT_ERROR(vertexBuffer->GetLayout().GetElements().size(), "Vertex buffer has no layout") return;
-		// explicitly binding is great for readability, tho i can impact performance, need to think of a way to strip unnecessary binds on release build
+		// explicitly binding is great for readability, tho it can impact performance, need to think of a way to strip unnecessary binds on release build
 		
 		glBindVertexArray(m_ID); 
 		vertexBuffer->Bind();
