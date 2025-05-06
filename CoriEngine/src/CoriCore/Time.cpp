@@ -2,7 +2,6 @@
 #include <SDL3/SDL_timer.h>
 
 namespace Cori {
-
 	GameTimer::GameTimer() {
 		m_LastTime = SDL_GetPerformanceCounter();
 	}
@@ -56,4 +55,14 @@ namespace Cori {
 		double elapsedMS = (double)(end - m_Start) * 1000.0 / SDL_GetPerformanceFrequency();
 		CORI_CORE_DEBUG("[ScopeTimer] {0}: Has stoped, and took {1}ms", m_Name, elapsedMS);
 	}
+
+	void ManualTimer::Start() {
+		m_Start = SDL_GetPerformanceCounter();
+	}
+
+	double ManualTimer::End() {
+		uint64_t end = SDL_GetPerformanceCounter();
+		return (double)(end - m_Start) * 1000.0 / SDL_GetPerformanceFrequency();
+	}
+
 }

@@ -68,7 +68,7 @@ namespace Cori {
 
 			for (Layer* layer : m_LayerStack) {
 			
-				layer->OnImGuiRender();
+				layer->OnImGuiRender(m_GameTimer);
 			}
 
 			m_ImGuiLayer->EndFrame();

@@ -59,7 +59,7 @@ namespace Cori {
 
 	}
 
-	void ImGuiLayer::OnImGuiRender() {
+	void ImGuiLayer::OnImGuiRender(const double deltaTime) {
 		static bool show = true;
 		static bool show_ui = true;
 		
@@ -68,6 +68,17 @@ namespace Cori {
 		}
 		if (show_ui) {
 			//ImGui::ShowDemoWindow(&show);
+		}
+	}
+
+	void ImGuiLayer::OnEvent(Event& e) {
+		ImGuiIO& io = ImGui::GetIO();
+
+		if (e.IsInCategory(EventCategoryMouse) && io.WantCaptureMouse) {
+			e.m_Handeled = true;
+		}
+		else if (e.IsInCategory(EventCategoryKeyboard) && io.WantCaptureKeyboard) {
+			e.m_Handeled = true;
 		}
 	}
 

@@ -4,17 +4,19 @@
 
 namespace Cori {
 
-	std::shared_ptr<Texture2D> Renderer2D::s_MissingTexture;
-
-	std::shared_ptr<VertexArray> Renderer2D::s_VertexArray_separate;
-	std::shared_ptr<VertexBuffer> Renderer2D::s_VertexBuffer_separate;
-	std::shared_ptr<IndexBuffer> Renderer2D::s_IndexBuffer_separate;
-
 	// for batch rendering
 	// global
+
+	size_t Renderer2D::s_MaxQuadCount{ 3000 };
+	size_t Renderer2D::s_MaxVertexCount{ s_MaxQuadCount * 4 };
+	size_t Renderer2D::s_MaxIndexCount{ s_MaxQuadCount * 6 };
 	glm::mat4 Renderer2D::s_CurrentBatchModelMatrix;
 	glm::mat4 Renderer2D::s_CurrentBatchViewProjectionMatrix;
 	BatchDrawType Renderer2D::s_CurrentBatchDrawType{ BatchDrawType::DEFAULT };
+
+	bool Renderer2D::s_BatchActive{ false };
+
+	uint32_t Renderer2D::s_DrawCallCount{ 0 };
 
 	// flat color quad
 	std::shared_ptr<ShaderProgram> Renderer2D::s_Shader_FlatColorQuad;
@@ -42,24 +44,6 @@ namespace Cori {
 
 	void Renderer2D::Init() {
 		// TODO: add a global path tracker / manager, spitting hardcoded paths all over cpp and hpp files is kind-of a bad idea, want to have all my paths specified in one place
-
-		s_MissingTexture = Texture2D::Create("assets/engine/textures/orientation_test24.png");
-
-		/// need to fix vvv
-		//// separate renderer (1 draw call per object)
-		//s_VertexArray_separate.reset(VertexArray::Create());
-		//s_VertexBuffer_separate.reset(VertexBuffer::Create());
-		//s_VertexBuffer_separate->SetLayout({
-		//	{ ShaderDataType::Vec2, "a_Position" },
-		//	{ ShaderDataType::Vec4, "a_Color" },
-		//});
-		//
-		//s_VertexBuffer_separate->Init(nullptr, 4 * s_VertexBuffer_separate->GetLayout().GetStrinde(), DRAW_TYPE::DYNAMIC);
-		//s_VertexArray_separate->AddVertexBuffer(s_VertexBuffer_separate);
-		//
-		//uint32_t indicesSeparate[6] = { 0, 1, 2, 2, 3, 0 };
-		//s_IndexBuffer_separate.reset(IndexBuffer::Create(indicesSeparate, sizeof(indicesSeparate)));
-		//s_VertexArray_separate->AddIndexBuffer(s_IndexBuffer_separate);
 
 		// batch renderer
 		// global
@@ -122,35 +106,17 @@ namespace Cori {
 		delete[] s_VertexDataBuffer_FlatColorQuad;
 	}
 
-	void Renderer2D::DrawQuadSeparate(const glm::vec2 position, const glm::vec2 size, const glm::vec4& color, const glm::mat4& modelMatrix) {
-		/// to fix vvvv
-		//float vertices[6 * 4] = {
-		//	position.x,          position.y,          color.r, color.g, color.b, color.a,
-		//	position.x + size.x, position.y,          color.r, color.g, color.b, color.a,
-		//	position.x + size.x, position.y + size.y, color.r, color.g, color.b, color.a,
-		//	position.x,          position.y + size.y, color.r, color.g, color.b, color.a
-		//};
-		//
-		//s_VertexBuffer_separate->Bind();
-		//s_VertexBuffer_separate->SetData(vertices, sizeof(vertices));
-		//
-		//s_Shader_FlatColorQuad->Bind();
-		////s_Shader_FlatColorQuad->SetMat4("u_ViewProjection", s_Camera.GetProjectionMatrix());
-		//s_Shader_FlatColorQuad->SetMat4("u_ModelMatrix", modelMatrix);
-		//
-		//s_VertexArray_separate->Bind();
-		////GraphicsCall::DrawElements(s_VertexArray_separate);
-		//s_VertexArray_separate->Unbind();
-	}
-
 	// batching 
 
 	void Renderer2D::BeginBatch(const glm::mat4& viewProjection, const glm::mat4& model) {
 
 		// maybe separate begin and end batch for each batch renderer, and invoke them from something like scene begin/end?
 		// TODO ^^^^^
+
 		s_CurrentBatchModelMatrix = model;
 		s_CurrentBatchViewProjectionMatrix = viewProjection;
+
+		s_BatchActive = true;
 
 		BeginBatch_FlatColorQuad();
 
@@ -158,7 +124,7 @@ namespace Cori {
 	}
 
 	void Renderer2D::EndBatch() {
-
+		s_BatchActive = false;
 		if (s_IndexCount_FlatColorQuad) {
 			EndBatch_FlatColorQuad();
 		}
@@ -168,9 +134,25 @@ namespace Cori {
 		}
 	}
 
+	void Renderer2D::ResetDebugStats() {
+		s_DrawCallCount = 0;
+	}
+
+	uint32_t Renderer2D::GetDrawCallCount() {
+		return s_DrawCallCount;
+	}
+
+	void Renderer2D::SetQuadsPerDraw(const uint32_t count) {
+		s_MaxQuadCount = count;
+		s_MaxVertexCount = s_MaxQuadCount * 4;
+		s_MaxIndexCount = s_MaxQuadCount * 6;
+	}
+
 	void Renderer2D::NewBatch() {
 		EndBatch();
-		BeginBatch(s_CurrentBatchViewProjectionMatrix, s_CurrentBatchModelMatrix);
+		s_BatchActive = true;
+		BeginBatch_FlatColorQuad();
+		BeginBatch_TexturedQuad();
 	}
 
 	// flat color quad
@@ -191,12 +173,13 @@ namespace Cori {
 		s_Shader_FlatColorQuad->SetMat4("u_ModelMatrix", s_CurrentBatchModelMatrix);
 		
 		GraphicsCall::DrawElements(s_VertexArray_FlatColorQuad, s_IndexCount_FlatColorQuad);
-		
+		s_DrawCallCount++;
 
 		s_IndexCount_FlatColorQuad = 0;
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const glm::vec4& color) {
+		if (CORI_CORE_ASSERT_ERROR(s_BatchActive, "You're trying to call DrawQuad, but you have not started a batch, it will not work.")) { return;  }
 		if (s_IndexCount_FlatColorQuad >= s_MaxIndexCount) {
 			NewBatch();
 		}
@@ -248,11 +231,14 @@ namespace Cori {
 
 		s_CurrentTexture_TexturedQuad->Bind(0);
 		GraphicsCall::DrawElements(s_VertexArray_TexturedQuad, s_IndexCount_TexturedQuad);
+		s_DrawCallCount++;
+
 		s_IndexCount_TexturedQuad = 0;
 		s_CurrentTexture_TexturedQuad.reset();
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, std::shared_ptr<Texture2D>& texture, const glm::vec2 textureSize, const glm::vec2 texturePosition) {
+		if (CORI_CORE_ASSERT_ERROR(s_BatchActive, "You're trying to call DrawQuad, but you have not started a batch, it will not work.")) { return; }
 		if (s_IndexCount_TexturedQuad >= s_MaxIndexCount) {
 			NewBatch();
 		}

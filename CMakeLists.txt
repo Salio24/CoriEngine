@@ -32,7 +32,7 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:>")
     set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
 
 project(main)
-    set(CMAKE_CXX_STANDARD 20)
+    set(CMAKE_CXX_STANDARD 23)
 
     if(MSVC)
         message(FATAL_ERROR "Compilers with MSVC frontend are not supported, use compiler with POSIX frontend (GCC or CLANG/LLVM)")
@@ -43,7 +43,9 @@ project(main)
     
     
     add_subdirectory(${PROJECT_SOURCE_DIR}/CoriEngine)
+        
     add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/Sandbox)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/RendererSandbox)
 
 
 #1> [CMake] -- CMAKE_SOURCE_DIR: C:/Users/salio/VSCode/VS2022/MyProject/EngineDev

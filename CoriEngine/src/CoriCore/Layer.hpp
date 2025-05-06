@@ -13,7 +13,7 @@ namespace Cori {
 		virtual void OnDetach();
 		virtual void OnUpdate(const double deltaTime) {}
 		virtual void OnTickUpdate() {}
-		virtual void OnImGuiRender() {}
+		virtual void OnImGuiRender(const double deltaTime) {}
 		virtual void OnEvent(Event& event) {}
 
 		inline const std::string& GetName() const { return m_DebugName; }

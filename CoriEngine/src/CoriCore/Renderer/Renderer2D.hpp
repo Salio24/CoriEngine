@@ -31,19 +31,24 @@ namespace Cori {
 
 		static void Shutdown();
 
-		static void DrawQuadSeparate(const glm::vec2 position, const glm::vec2 size, const glm::vec4& color, const glm::mat4& modelMatrix = glm::mat4(1.0f));
-
 		static void BeginBatch(const glm::mat4& viewProjection, const glm::mat4& model = glm::mat4(1.0f));
 
 		static void EndBatch();
 
+		static void ResetDebugStats();
+
+		static uint32_t GetDrawCallCount();
+
+
 		static void DrawQuad(const glm::vec2 position, const glm::vec2 size, const glm::vec4& color);
 
 		static void DrawQuad(const glm::vec2 position, const glm::vec2 size, std::shared_ptr<Texture2D>& texture, const glm::vec2 textureSize = glm::vec2(1.0f), const glm::vec2 texturePosition = glm::vec2(0.0f));
-
-
+		
 	private:
 
+		// vvv FOR DEBUG ONLY
+		static void SetQuadsPerDraw(const uint32_t count);
+		
 		static void NewBatch();
 
 		static void BeginBatch_FlatColorQuad();
@@ -52,22 +57,19 @@ namespace Cori {
 		static void EndBatch_FlatColorQuad();
 		static void EndBatch_TexturedQuad();
 
-		static std::shared_ptr<Texture2D> s_MissingTexture;
-
-		// for separate rendering
-		static std::shared_ptr<VertexArray> s_VertexArray_separate;
-		static std::shared_ptr<VertexBuffer> s_VertexBuffer_separate;
-		static std::shared_ptr<IndexBuffer> s_IndexBuffer_separate;
-
 
 		// for batch rendering
 		// global
-		static const size_t s_MaxQuadCount{ 1000 };
-		static const size_t s_MaxVertexCount{ s_MaxQuadCount * 4 };
-		static const size_t s_MaxIndexCount{ s_MaxQuadCount * 6 };
+		static size_t s_MaxQuadCount;
+		static size_t s_MaxVertexCount;
+		static size_t s_MaxIndexCount;
 		static glm::mat4 s_CurrentBatchModelMatrix;
 		static glm::mat4 s_CurrentBatchViewProjectionMatrix;
 		static BatchDrawType s_CurrentBatchDrawType;
+
+		static bool s_BatchActive;
+
+		static uint32_t s_DrawCallCount;
 
 		// flat color quad
 		static std::shared_ptr<ShaderProgram> s_Shader_FlatColorQuad;

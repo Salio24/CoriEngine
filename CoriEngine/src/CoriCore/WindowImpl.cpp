@@ -64,15 +64,24 @@ namespace Cori {
 	void WindowImpl::OnUpdate() {
 		SDL_Event e;
 		while (SDL_PollEvent(&e)) {
+
+			// FIX: event in imgui affect main layer
+			if (e.window.windowID != SDL_GetWindowID(m_Window)) {
+				//CORI_CORE_DEBUG("event");
+			}
+
 			if (!ImGui_ImplSDL3_ProcessEvent(&e)) {
 				//CORI_CORE_ERROR("Error processing sdl event in imgui");
 			}
+
+
 			switch (e.type) {
 			case SDL_EVENT_WINDOW_RESIZED:
 				{
 					if (e.window.windowID != SDL_GetWindowID(m_Window)) {
 						break;
 					}
+					// FIX: handling resize event here is just wrong 
 					m_Data.Width = e.window.data1;
 					m_Data.Height = e.window.data2;
 

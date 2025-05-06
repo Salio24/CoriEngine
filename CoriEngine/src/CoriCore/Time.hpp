@@ -46,4 +46,16 @@ namespace Cori {
 		std::string m_Name;
 		uint64_t m_Start;
 	};
+
+	class ManualTimer {
+	public:
+		ManualTimer() = default;
+		~ManualTimer() = default;
+
+		void Start();
+		double End();
+	private:
+		uint64_t m_Start{ 0 };
+
+	};
 }

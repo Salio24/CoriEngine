@@ -18,13 +18,13 @@ public:
 
 	}
 	
-	void OnEvent(Cori::Event& event) override {
+	virtual void OnEvent(Cori::Event& event) override {
 		if (!event.IsOfType(Cori::EventType::MouseMoved)) {
 			CORI_TRACE("| Layer: {0} | Event: {1}", this->GetName(), event);
 		}
 	}
 
-	virtual void OnImGuiRender() override {
+	virtual void OnImGuiRender(const double deltaTime) override {
 		ImGui::Begin("Test");
 		ImGui::SliderFloat("Test float", &testFloat, 0.0f, 150.0f);
 		ImGui::End();
@@ -73,13 +73,13 @@ public:
 		Cori::Renderer2D::EndBatch();
 	}
 
-	void OnTickUpdate() {
+	virtual void OnTickUpdate() override {
 		
 	}
 
 	glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(4.0f, 4.0f, 0.0f));
 
-	Cori::OrtoCamera m_Camera;
+	Cori::OrthoCamera m_Camera;
 
 	std::shared_ptr<Cori::Texture2D> m_Texture1;
 	std::shared_ptr<Cori::Texture2D> m_Texture2;
