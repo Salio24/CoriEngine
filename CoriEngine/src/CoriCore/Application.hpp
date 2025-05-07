@@ -24,9 +24,9 @@ namespace Cori {
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
 		
-		inline static Window& GetWindow() { return *(*s_Instance).m_Window; }
+		inline static Window& GetWindow() { return *Get().m_Window; }
 
-		inline static GameTimer& GetGameTimer() { return (*s_Instance).m_GameTimer; }
+		inline static GameTimer& GetGameTimer() { return Get().m_GameTimer; }
 
 	private: 
 

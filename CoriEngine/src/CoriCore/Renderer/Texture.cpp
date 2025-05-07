@@ -25,7 +25,7 @@ namespace Cori {
 		}
 	}
 
-	std::shared_ptr<Texture2D> Texture2D::Create(const Texture2DDescroptor& descriptor) {
+	std::shared_ptr<Texture2D> Texture2D::Create(const Texture2DDescriptor& descriptor) {
 		switch (Application::GetWindow().GetAPI()) {
 		case GraphicsAPIs::None:
 			CORI_CORE_FATAL("No graphics API selected");

@@ -15,7 +15,7 @@ namespace Cori {
 		CORI_CORE_INFO("AssetManager: Preloaded {0} shaders", descriptors.size());
 	}
 
-	void AssetManager::PreloadTexture2DsImpl(std::initializer_list<Texture2DDescroptor> descriptors) {
+	void AssetManager::PreloadTexture2DsImpl(std::initializer_list<Texture2DDescriptor> descriptors) {
 		CORI_CORE_INFO("AssetManager: Preloading {0} shaders", descriptors.size());
 		for (const auto& descriptor : descriptors) {
 			GetTexture2DImpl(descriptor);
@@ -42,7 +42,7 @@ namespace Cori {
 		}
 	}
 
-	std::shared_ptr<Texture2D> AssetManager::GetTexture2DImpl(const Texture2DDescroptor& descriptor) {
+	std::shared_ptr<Texture2D> AssetManager::GetTexture2DImpl(const Texture2DDescriptor& descriptor) {
 		auto it = m_Texture2DCache.find(descriptor.GetRuntimeID());
 		if (it != m_Texture2DCache.end()) {
 			return it->second;

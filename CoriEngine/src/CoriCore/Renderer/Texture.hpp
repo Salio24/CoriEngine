@@ -16,7 +16,7 @@ namespace Cori {
 	public:
 		static std::shared_ptr<Texture2D> Create(const std::string& path);
 
-		static std::shared_ptr<Texture2D> Create(const Texture2DDescroptor& descriptor);
+		static std::shared_ptr<Texture2D> Create(const Texture2DDescriptor& descriptor);
 
 	};
 }

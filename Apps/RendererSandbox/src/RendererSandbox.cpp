@@ -8,11 +8,19 @@
 #include <algorithm>
 
 namespace Cori {
+	namespace Shaders {
+
+	}
+	
 	namespace Texture2Ds {
-		inline const Texture2DDescroptor TestBrickTexture {
+		inline const Texture2DDescriptor TestBrickTexture {
 			"Test Brick Texture",
 			"assets/engine/textures/brick.png"
 		};
+	}
+	
+	namespace Images {
+
 	}
 }
 
@@ -21,10 +29,12 @@ public:
 	ExampleLayer() : Layer("Example") { 
 		m_Camera.SetCameraSize(0, 7680, 0, 4320);
 
-		//Cori::AssetManager::PreloadTexture2Ds({
-		//	Cori::Texture2Ds::TestBrickTexture
-		//});
-
+		// can also preload assets like this vvv
+		///Cori::AssetManager::PreloadTexture2Ds({
+		///	Cori::Texture2Ds::TestBrickTexture
+		///});
+		// if the asset is not preloaded it will be loaded the first time it is requested via appropriate
+		// Get function from the Asset Manager
 	}
 
 	virtual void OnEvent(Cori::Event& event) override {
