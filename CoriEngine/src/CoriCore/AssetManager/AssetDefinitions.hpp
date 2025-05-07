@@ -1,6 +1,5 @@
 #pragma once
 #include "ShaderDescriptor.hpp"
-#include "AssetDefenitions.hpp"
 
 namespace Cori {
 	namespace Shaders {
@@ -18,10 +17,7 @@ namespace Cori {
 	}
 
 	namespace Texture2Ds {
-		inline const Texture2DDescroptor TestBrickTexture{
-			"Test Brick Texture",
-			"assets/engine/textures/brick.png"
-		};
+
 	}
 
 	namespace Images {

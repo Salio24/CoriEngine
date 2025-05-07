@@ -2,7 +2,7 @@
 #include "GraphicsCall.hpp"
 #include "../Time.hpp"
 #include "../Application.hpp"
-#include "../AssetManager/AssetDefenitions.hpp"
+#include "../AssetManager/AssetDefinitions.hpp"
 
 namespace Cori {
 
@@ -72,8 +72,8 @@ namespace Cori {
 		
 		//s_Shader_FlatColorQuad.reset(ShaderProgram::Create("assets/engine/shaders/flatColorQuadVert.glsl", "assets/engine/shaders/flatColorQuadFrag.glsl"));
 
-		s_VertexArray_FlatColorQuad.reset(VertexArray::Create());
-		s_VertexBuffer_FlatColorQuad.reset(VertexBuffer::Create());
+		s_VertexArray_FlatColorQuad = VertexArray::Create();
+		s_VertexBuffer_FlatColorQuad = VertexBuffer::Create();
 		s_VertexBuffer_FlatColorQuad->SetLayout({
 			{ ShaderDataType::Vec2, "a_Position" },
 			{ ShaderDataType::Vec4, "a_Color" },
@@ -84,7 +84,7 @@ namespace Cori {
 		s_VertexArray_FlatColorQuad->AddVertexBuffer(s_VertexBuffer_FlatColorQuad);
 
 
-		s_IndexBuffer_FlatColorQuad.reset(IndexBuffer::Create(indicesBatch, sizeof(indicesBatch)));
+		s_IndexBuffer_FlatColorQuad = IndexBuffer::Create(indicesBatch, sizeof(indicesBatch));
 		s_VertexArray_FlatColorQuad->AddIndexBuffer(s_IndexBuffer_FlatColorQuad);
 
 		s_VertexDataBuffer_FlatColorQuad = new QuadBatchVertexSetup[s_MaxIndexCount];
@@ -93,8 +93,8 @@ namespace Cori {
 
 		//s_Shader_TexturedQuad.reset(ShaderProgram::Create("assets/engine/shaders/texturedQuadVert.glsl", "assets/engine/shaders/texturedQuadFrag.glsl"));
 
-		s_VertexArray_TexturedQuad.reset(VertexArray::Create());
-		s_VertexBuffer_TexturedQuad.reset(VertexBuffer::Create());
+		s_VertexArray_TexturedQuad = VertexArray::Create();
+		s_VertexBuffer_TexturedQuad = VertexBuffer::Create();
 		s_VertexBuffer_TexturedQuad->SetLayout({
 			{ ShaderDataType::Vec2, "a_Position" },
 			{ ShaderDataType::Vec2, "a_TexurePosition" }
@@ -103,7 +103,7 @@ namespace Cori {
 		s_VertexBuffer_TexturedQuad->Init(nullptr, s_MaxVertexCount * s_VertexBuffer_TexturedQuad->GetLayout().GetStrinde(), DRAW_TYPE::DYNAMIC);
 		s_VertexArray_TexturedQuad->AddVertexBuffer(s_VertexBuffer_TexturedQuad);
 
-		s_IndexBuffer_TexturedQuad.reset(IndexBuffer::Create(indicesBatch, sizeof(indicesBatch)));
+		s_IndexBuffer_TexturedQuad = IndexBuffer::Create(indicesBatch, sizeof(indicesBatch));
 		s_VertexArray_TexturedQuad->AddIndexBuffer(s_IndexBuffer_TexturedQuad);
 
 		s_VertexDataBuffer_TexturedQuad = new TexturedQuadVertexSetup[s_MaxIndexCount];

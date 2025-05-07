@@ -39,10 +39,10 @@ namespace Cori {
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
 
-		virtual void* GetCoriContex() const = 0;
+		virtual void* GetNativeContext() const = 0;
 		virtual void* GetNativeWindow() const = 0;
 		
-		static Window* Create(const WindowProperties& props = WindowProperties());
+		static std::unique_ptr<Window> Create(const WindowProperties& props = WindowProperties());
 	};
 
 

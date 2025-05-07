@@ -5,22 +5,23 @@
 #include "../Application.hpp"
 
 namespace Cori {
-	VertexArray* VertexArray::Create() {
-		VertexArray* result = nullptr;
+	std::shared_ptr<VertexArray> VertexArray::Create() {
 		switch (Application::GetWindow().GetAPI()) {
 		case GraphicsAPIs::None:
 			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
+			return nullptr;
 			break;
 		case GraphicsAPIs::OpenGL:
-			result = new OpenGLVertexArray();
+			return std::make_shared<OpenGLVertexArray>();
 			break;
 		case GraphicsAPIs::Vulkan:
 			CORI_CORE_ASSERT_FATAL(false, "Vulkan is not supported yet");
+			return nullptr;
 			break;
 		default:
 			CORI_CORE_ASSERT_FATAL(false, "Unknown graphics API");
+			return nullptr;
 			break;
 		}
-		return result;
 	}
 }

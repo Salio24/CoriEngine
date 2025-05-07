@@ -8,7 +8,7 @@ namespace Cori {
 		virtual ~OpenGLContext();
 		virtual void Init(SDL_Window* window) override;
 		virtual void SwapBuffers() override;
-		inline SDL_GLContext GetNativeContext() const { return m_Context; }
+		virtual inline void* GetNativeContext() const override { return static_cast<void*>(m_Context); }
 	private:
 		SDL_GLContext m_Context{ nullptr };
 	};

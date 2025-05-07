@@ -116,7 +116,7 @@ project(CoriEngine)
         ANALYZE ${ENGINE_LIBRARY_NAME}               # which target to analyze
         MODE 
             GA:1,2,3     # General Analysis, levels 1–3
-            64:1,2,3    # 64-bit issues
+            64:1,2,3     # 64-bit issues
             OP:1,2,3     # Micro-optimizations
             CS:1,2,3     # Customer-specific
             MISRA:1,2,3  # MISRA C/C++
@@ -214,3 +214,4 @@ project(CoriEngine)
 
     # idk will be private until it breaks something
     target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static nlohmann_json::nlohmann_json tmxlite freetype glad_gl_core_46)
+    

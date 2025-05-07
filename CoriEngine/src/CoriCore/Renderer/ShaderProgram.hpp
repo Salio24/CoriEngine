@@ -27,6 +27,5 @@ namespace Cori {
 
 		static std::shared_ptr<ShaderProgram> Create(const ShaderProgramDescriptor& descriptor);
 
-		static ShaderProgram* Create(const std::string& vertexPath, const std::string& fragmentPath, const std::string& geometryPath = "");
 	};
 }

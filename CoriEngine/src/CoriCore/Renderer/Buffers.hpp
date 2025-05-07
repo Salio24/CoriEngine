@@ -126,7 +126,7 @@ namespace Cori {
 
 		virtual void SetData(const void* data, uint32_t size) const = 0;
 
-		static VertexBuffer* Create();
+		static std::shared_ptr<VertexBuffer> Create();
 	};
 
 	class IndexBuffer {
@@ -137,7 +137,7 @@ namespace Cori {
 
 		virtual uint32_t GetCount() const = 0;
 
-		static IndexBuffer* Create(uint32_t* indices, uint32_t count);
+		static std::shared_ptr<IndexBuffer> Create(uint32_t* indices, uint32_t count);
 
 	};
 }

@@ -6,8 +6,8 @@
 
 namespace Cori {
 
-	Window* Window::Create(const WindowProperties& props) {
-		return new WindowImpl(props);
+	std::unique_ptr<Window> Window::Create(const WindowProperties& props) {
+		return std::make_unique<WindowImpl>(props);
 	}
 
 	WindowImpl::WindowImpl(const WindowProperties& props) {
@@ -55,7 +55,6 @@ namespace Cori {
 	}
 
 	void WindowImpl::Shutdown() {
-		delete m_Context;
 		SDL_DestroyWindow(m_Window);
 
 		CORI_CORE_INFO('"' + m_Data.Title + '"' + " Window Destroyed");

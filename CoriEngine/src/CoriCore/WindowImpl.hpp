@@ -22,7 +22,7 @@ namespace Cori {
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
 		inline GraphicsAPIs GetAPI() const override { return m_Data.API; }
 
-		inline virtual void* GetCoriContex() const override { return m_Context; }
+		inline virtual void* GetNativeContext() const override { return m_Context->GetNativeContext(); }
 		inline virtual void* GetNativeWindow() const override { return m_Window; }
 
 		void SetVSync(bool enabled) override;
@@ -31,7 +31,7 @@ namespace Cori {
 		void Init(const WindowProperties& props);
 		void Shutdown();
 		
-		RenderingContext* m_Context;
+		std::unique_ptr<RenderingContext> m_Context;
 
 		SDL_Window* m_Window{ nullptr };
 

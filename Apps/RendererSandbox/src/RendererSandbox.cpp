@@ -7,6 +7,15 @@
 #include <imgui_internal.h>
 #include <algorithm>
 
+namespace Cori {
+	namespace Texture2Ds {
+		inline const Texture2DDescroptor TestBrickTexture {
+			"Test Brick Texture",
+			"assets/engine/textures/brick.png"
+		};
+	}
+}
+
 class ExampleLayer : public Cori::Layer {
 public:
 	ExampleLayer() : Layer("Example") { 
@@ -167,12 +176,11 @@ public:
 		float offset = 5.0f;
 
 		for (int i = 0; i < m_QuadRows; i++) {
-
 			for (int y = 0; y < m_QuadColumns; y++) {
 				Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset , i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetTexture2D(Cori::Texture2Ds::TestBrickTexture));
 			}
 		}
-	
+
 		Cori::Renderer2D::EndBatch();
 	}
 

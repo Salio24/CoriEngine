@@ -39,7 +39,7 @@ namespace Cori {
 		}
 
 		
-		ImGui_ImplSDL3_InitForOpenGL(static_cast<SDL_Window*>(Application::GetWindow().GetNativeWindow()), static_cast<OpenGLContext*>(Application::GetWindow().GetCoriContex())->GetNativeContext());
+		ImGui_ImplSDL3_InitForOpenGL(static_cast<SDL_Window*>(Application::GetWindow().GetNativeWindow()), static_cast<OpenGLContext*>(Application::GetWindow().GetNativeContext()));
 		// do an assert
 		bool test = ImGui_ImplOpenGL3_Init("#version 460");
 

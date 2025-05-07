@@ -5,22 +5,23 @@
 #include "../Application.hpp"
 
 namespace Cori {
-	RenderingContext* RenderingContext::Create(GraphicsAPIs api) {
-		RenderingContext* result = nullptr;
+	std::unique_ptr<RenderingContext> RenderingContext::Create(GraphicsAPIs api) {
 		switch (api) {
 		case GraphicsAPIs::None:
 			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
+			return nullptr;
 			break;
 		case GraphicsAPIs::OpenGL:
-			result = new OpenGLContext();
+			return std::make_unique<OpenGLContext>();
 			break;
 		case GraphicsAPIs::Vulkan:
 			CORI_CORE_ASSERT_FATAL(false, "Vulkan is not supported yet");
+			return nullptr;
 			break;
 		default:
 			CORI_CORE_ASSERT_FATAL(false, "Unknown graphics API");
+			return nullptr;
 			break;
 		}
-		return result;
 	}
 }

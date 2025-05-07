@@ -7,7 +7,7 @@
 #include <imgui.h>
 #include "Renderer/Buffers.hpp"
 #include "Renderer/GraphicsCall.hpp"
-#include "AssetManager/AssetDefenitions.hpp"
+#include "AssetManager/AssetDefinitions.hpp"
 
 namespace Cori {
 //#define CORI_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
@@ -18,7 +18,7 @@ namespace Cori {
 		CORI_CORE_ASSERT_FATAL(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
-		m_Window = std::unique_ptr<Window>(Window::Create());
+		m_Window = Window::Create();
 
 		m_Window->SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent, CORI_PLACEHOLDERS(1)));
 
