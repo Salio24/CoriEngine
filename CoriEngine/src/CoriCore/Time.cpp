@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "Time.hpp"
 #include <SDL3/SDL_timer.h>
 
@@ -52,7 +54,7 @@ namespace Cori {
 
 	ScopeTimer::~ScopeTimer() {
 		uint64_t end = SDL_GetPerformanceCounter();
-		double elapsedMS = (double)(end - m_Start) * 1000.0 / SDL_GetPerformanceFrequency();
+		double elapsedMS = static_cast<double>(end - m_Start) * 1000.0f / SDL_GetPerformanceFrequency();
 		CORI_CORE_DEBUG("[ScopeTimer] {0}: Has stoped, and took {1}ms", m_Name, elapsedMS);
 	}
 
@@ -62,7 +64,7 @@ namespace Cori {
 
 	double ManualTimer::End() {
 		uint64_t end = SDL_GetPerformanceCounter();
-		return (double)(end - m_Start) * 1000.0 / SDL_GetPerformanceFrequency();
+		return static_cast<double>(end - m_Start) * 1000.0f / SDL_GetPerformanceFrequency();
 	}
 
 }

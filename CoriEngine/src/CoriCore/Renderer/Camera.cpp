@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "Camera.hpp"
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
@@ -22,7 +24,7 @@ namespace Cori {
 	}
 
 	void OrthoCamera::ZoomVP(const float factor) {
-		if (factor <= 0) { CORI_CORE_WARN("Are you sure you want zoom factor to be 0?"); }
+		if (factor <= 0.0f) { CORI_CORE_WARN("Are you sure you want zoom factor to be 0?"); }
 		m_ZoomFactor = factor;
 		RecalculateVP();
 	}

@@ -10,7 +10,7 @@ namespace Cori {
 		glDeleteBuffers(1, &m_ID);
 	}
 
-	void OpenGLVertexBuffer::Init(float* vertices, uint32_t size, DRAW_TYPE drawtype) {
+	void OpenGLVertexBuffer::Init(const float* vertices, uint32_t size, DRAW_TYPE drawtype) {
 		glCreateBuffers(1, &m_ID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
 		switch (drawtype)

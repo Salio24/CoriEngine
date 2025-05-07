@@ -35,7 +35,7 @@ namespace Cori {
 
 		void TickrateUpdate();
 
-		bool OnWindowClose(WindowCloseEvent& e);
+		bool OnWindowClose();
 
 		std::unique_ptr<Window> m_Window;
 

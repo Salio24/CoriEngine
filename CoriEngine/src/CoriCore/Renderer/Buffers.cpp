@@ -26,7 +26,6 @@ namespace Cori {
 	}
 
 	std::shared_ptr<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count) {
-		std::shared_ptr<IndexBuffer> result = nullptr;
 		switch (Application::GetWindow().GetAPI()) {
 		case GraphicsAPIs::None:
 			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");

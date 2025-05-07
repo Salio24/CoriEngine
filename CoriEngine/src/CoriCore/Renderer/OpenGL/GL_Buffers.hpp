@@ -6,7 +6,7 @@ namespace Cori {
 	public:
 		OpenGLVertexBuffer() {};
 		virtual ~OpenGLVertexBuffer();
-		virtual void Init(float* vertices, uint32_t size, DRAW_TYPE drawtype) override;
+		virtual void Init(const float* vertices, uint32_t size, DRAW_TYPE drawtype) override;
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
 

@@ -28,18 +28,20 @@ namespace Cori {
 
 		switch (m_Data.API) {
 		case GraphicsAPIs::None:
-			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
+			CORI_CORE_FATAL("No graphics API selected");
 			break;
 		case GraphicsAPIs::OpenGL:
 			m_Window = SDL_CreateWindow(m_Data.Title.c_str(), m_Data.Width, m_Data.Height, SDL_WINDOW_OPENGL);
 			CORI_CORE_ASSERT_FATAL(!!m_Window, "Window could not be created! SDL_Error: " + std::string(SDL_GetError()));
 			break;
 		case GraphicsAPIs::Vulkan:
-			CORI_CORE_ASSERT_FATAL(false, "Vulkan is not supported yet");
+			CORI_CORE_FATAL("Vulkan is not supported yet");
 			break;
 		}
 
-		SDL_Surface* logo = IMG_Load("assets/engine/textures/ui/logo256.png");
+		std::string logoPath = "assets/engine/textures/ui/logo256.png";
+
+		SDL_Surface* logo = IMG_Load(logoPath.c_str());
 
 		if (!CORI_CORE_ASSERT_ERROR(logo, "Failed to load App Logo: {0}", SDL_GetError())) {
 			SDL_SetWindowIcon(m_Window, logo);

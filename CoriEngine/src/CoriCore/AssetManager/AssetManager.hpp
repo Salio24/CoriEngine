@@ -28,10 +28,7 @@ namespace Cori {
 		AssetManager(AssetManager&&) = delete;
 		AssetManager& operator=(AssetManager&&) = delete;
 
-		static AssetManager& Get() {
-			static AssetManager instance;
-			return instance;
-		}
+		static AssetManager& Get();
 
 		std::shared_ptr<ShaderProgram> GetShaderImpl(const ShaderProgramDescriptor& descriptor);
 		std::shared_ptr<Texture2D> GetTexture2DImpl(const Texture2DDescroptor& descriptor);

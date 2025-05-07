@@ -4,6 +4,11 @@
 
 namespace Cori {
 
+	Input& Input::Get() {
+		static Input instance;
+		return instance;
+	}
+
 	bool Input::IsKeyPressedImpl(CoriKeycode keycode) {
 		auto state = SDL_GetKeyboardState(nullptr);
 		return (state[keycode] == 1);

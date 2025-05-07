@@ -22,10 +22,7 @@ namespace Cori {
 		Input(Input&&) = delete;
 		Input& operator=(Input&&) = delete;
 
-		static Input& Get() {
-			static Input instance;
-			return instance;
-		}
+		static Input& Get();
 
 		bool IsKeyPressedImpl(CoriKeycode keycode);
 

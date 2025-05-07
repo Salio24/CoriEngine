@@ -60,9 +60,9 @@ namespace Cori {
 
 		// for batch rendering
 		// global
-		static size_t s_MaxQuadCount;
-		static size_t s_MaxVertexCount;
-		static size_t s_MaxIndexCount;
+		static uint32_t s_MaxQuadCount;
+		static uint32_t s_MaxVertexCount;
+		static uint32_t s_MaxIndexCount;
 		static glm::mat4 s_CurrentBatchModelMatrix;
 		static glm::mat4 s_CurrentBatchViewProjectionMatrix;
 		static BatchDrawType s_CurrentBatchDrawType;

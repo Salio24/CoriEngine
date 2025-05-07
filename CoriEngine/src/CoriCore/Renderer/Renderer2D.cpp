@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "Renderer2D.hpp"
 #include "GraphicsCall.hpp"
 #include "../Time.hpp"
@@ -9,9 +11,9 @@ namespace Cori {
 	// for batch rendering
 	// global
 
-	size_t Renderer2D::s_MaxQuadCount{ 3000 };
-	size_t Renderer2D::s_MaxVertexCount{ s_MaxQuadCount * 4 };
-	size_t Renderer2D::s_MaxIndexCount{ s_MaxQuadCount * 6 };
+	uint32_t Renderer2D::s_MaxQuadCount{ 3000 };
+	uint32_t Renderer2D::s_MaxVertexCount{ s_MaxQuadCount * 4 };
+	uint32_t Renderer2D::s_MaxIndexCount{ s_MaxQuadCount * 6 };
 	glm::mat4 Renderer2D::s_CurrentBatchModelMatrix;
 	glm::mat4 Renderer2D::s_CurrentBatchViewProjectionMatrix;
 	BatchDrawType Renderer2D::s_CurrentBatchDrawType{ BatchDrawType::DEFAULT };
@@ -87,7 +89,7 @@ namespace Cori {
 		s_IndexBuffer_FlatColorQuad = IndexBuffer::Create(indicesBatch, sizeof(indicesBatch));
 		s_VertexArray_FlatColorQuad->AddIndexBuffer(s_IndexBuffer_FlatColorQuad);
 
-		s_VertexDataBuffer_FlatColorQuad = new QuadBatchVertexSetup[s_MaxIndexCount];
+		s_VertexDataBuffer_FlatColorQuad = new QuadBatchVertexSetup[static_cast<size_t>(s_MaxIndexCount)];
 
 		// textured quad
 
@@ -106,7 +108,7 @@ namespace Cori {
 		s_IndexBuffer_TexturedQuad = IndexBuffer::Create(indicesBatch, sizeof(indicesBatch));
 		s_VertexArray_TexturedQuad->AddIndexBuffer(s_IndexBuffer_TexturedQuad);
 
-		s_VertexDataBuffer_TexturedQuad = new TexturedQuadVertexSetup[s_MaxIndexCount];
+		s_VertexDataBuffer_TexturedQuad = new TexturedQuadVertexSetup[static_cast<size_t>(s_MaxIndexCount)];
 	}
 
 	void Renderer2D::Shutdown() {

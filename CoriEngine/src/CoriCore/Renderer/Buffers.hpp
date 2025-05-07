@@ -117,7 +117,7 @@ namespace Cori {
 	class VertexBuffer {
 	public:
 		virtual ~VertexBuffer() = default;
-		virtual void Init(float* vertices, uint32_t size, DRAW_TYPE drawtype) = 0;
+		virtual void Init(const float* vertices, uint32_t size, DRAW_TYPE drawtype) = 0;
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 

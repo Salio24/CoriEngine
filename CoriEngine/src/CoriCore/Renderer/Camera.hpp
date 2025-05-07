@@ -3,7 +3,7 @@
 namespace Cori {
 	class OrthoCamera {
 	public:
-		OrthoCamera() {}
+		OrthoCamera() = default;
 
 		void SetCameraSize(int left, int right, int bottom, int top);
 

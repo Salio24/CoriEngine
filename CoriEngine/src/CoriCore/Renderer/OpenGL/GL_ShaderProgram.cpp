@@ -12,6 +12,10 @@ namespace Cori {
 
 		bool geometryShaderPresent = false;
 
+		if (geometryPath != "") {
+			geometryShaderPresent = true;
+		}
+
 #ifdef DEBUG_BUILD
 		m_ShaderNames = "  Vertex shader: " + FileManager::GetFilename(vertexPath) + "\n  Fragment shader: " + FileManager::GetFilename(fragmentPath) + "\n  Geometry shader: " + (geometryShaderPresent ? FileManager::GetFilename(geometryPath) : "Not specified (not an error)");
 #endif
@@ -37,8 +41,7 @@ namespace Cori {
 		if (CheckCompileErrors(fragment, "FRAGMENT") == false) {
 			m_CreationSuccessful = false;
 		}
-		if (geometryPath != "") {
-			geometryShaderPresent = true;
+		if (geometryShaderPresent) {
 
 			std::string geometryCode = FileManager::ReadTextFile(geometryPath);
 			const char* geometrySource = geometryCode.c_str();

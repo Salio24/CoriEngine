@@ -38,7 +38,7 @@ namespace Cori {
 
 	void Application::OnEvent(Event& e) {
 		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<WindowCloseEvent>(CORI_BIND_EVENT_FN(Application::OnWindowClose, CORI_PLACEHOLDERS(1)));
+		dispatcher.Dispatch<WindowCloseEvent>(CORI_BIND_EVENT_FN(Application::OnWindowClose));
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
 			(*--it)->OnEvent(e);
@@ -68,7 +68,6 @@ namespace Cori {
 			m_ImGuiLayer->StartFrame();
 
 			for (Layer* layer : m_LayerStack) {
-			
 				layer->OnImGuiRender(m_GameTimer);
 			}
 
@@ -85,7 +84,7 @@ namespace Cori {
 	}
 
 
-	bool Application::OnWindowClose(WindowCloseEvent& e) {
+	bool Application::OnWindowClose() {
 		m_Running = false;
 		return true;
 	}

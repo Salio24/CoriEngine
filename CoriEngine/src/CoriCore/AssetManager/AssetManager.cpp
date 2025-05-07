@@ -2,6 +2,11 @@
 
 namespace Cori {
 
+	AssetManager& AssetManager::Get() {
+		static AssetManager instance;
+		return instance;
+	}
+
 	void AssetManager::PreloadShadersImpl(std::initializer_list<ShaderProgramDescriptor> descriptors) {
 		CORI_CORE_INFO("AssetManager: Preloading {0} shaders", descriptors.size());
 		for (const auto& descriptor : descriptors) {
@@ -17,6 +22,7 @@ namespace Cori {
 		}
 		CORI_CORE_INFO("AssetManager: Preloaded {0} shaders", descriptors.size());
 	}
+
 
 	std::shared_ptr<ShaderProgram> AssetManager::GetShaderImpl(const ShaderProgramDescriptor& descriptor) {
 		auto it = m_ShaderCache.find(descriptor.GetRuntimeID());
