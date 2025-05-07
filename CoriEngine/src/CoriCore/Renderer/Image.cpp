@@ -1,6 +1,6 @@
 #include "Image.hpp"
 #include <SDL3_image/SDL_image.h>
-#include "../FileManager.hpp" 
+#include "../AssetManager/FileManager.hpp" 
 
 namespace Cori {
 	Image::Image(const std::string& path) {

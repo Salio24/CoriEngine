@@ -15,17 +15,17 @@ namespace Cori {
 
 		void RecalculateVP();
 
-		const glm::vec2 GetPosition() const { 
+		glm::vec2 GetPosition() const { 
 			CORI_CORE_ASSERT_WARN(m_Created, "Using non initialized OrthoCamera");
 			return m_Position; 
 		}
 
-		const float GetRotation() const {
+		float GetRotation() const {
 			CORI_CORE_ASSERT_WARN(m_Created, "Using non initialized OrthoCamera");
 			return m_Angle;
 		}
 
-		const float GetZoomFactor() const {
+		float GetZoomFactor() const {
 			CORI_CORE_ASSERT_WARN(m_Created, "Using non initialized OrthoCamera");
 			return m_ZoomFactor;
 		}
@@ -35,7 +35,7 @@ namespace Cori {
 			return m_ProjectionMatrix; 
 		}
 
-		const glm::mat4& GetViewProjectionMatrix() const { 
+		const glm::mat4& GetViewProjectionMatrix() const {
 			CORI_CORE_ASSERT_WARN(m_Created, "Using non initialized OrthoCamera");
 			return m_ViewProjectionMatrix; 
 		}

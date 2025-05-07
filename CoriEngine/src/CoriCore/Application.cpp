@@ -7,6 +7,7 @@
 #include <imgui.h>
 #include "Renderer/Buffers.hpp"
 #include "Renderer/GraphicsCall.hpp"
+#include "AssetManager/AssetDefenitions.hpp"
 
 namespace Cori {
 //#define CORI_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)

@@ -25,6 +25,6 @@ namespace Cori {
 		}
 
 	private:
-		static CoriGraphicsAPI* s_GraphicsAPI;
+		static std::unique_ptr<CoriGraphicsAPI> s_GraphicsAPI;
 	};
 }

@@ -4,9 +4,7 @@
 #include "Renderer2D.hpp"
 
 namespace Cori {
-	CoriGraphicsAPI* GraphicsCall::s_GraphicsAPI = nullptr;
-	// make it a namespace interface for corigraphicsAPI
-	// this renderer is absolutely uselses as a renderer, it does nothing
+	std::unique_ptr<CoriGraphicsAPI> GraphicsCall::s_GraphicsAPI = nullptr;
 	void GraphicsCall::InitRenderers() {
 		if CORI_CORE_ASSERT_ERROR(s_GraphicsAPI == nullptr , "Trying reinitialize an already initialized renderer") return;
 
@@ -17,7 +15,7 @@ namespace Cori {
 	}
 
 	void GraphicsCall::ShutdownRenderers() {
-		delete s_GraphicsAPI;
+		s_GraphicsAPI.reset();
 	}
 
 }

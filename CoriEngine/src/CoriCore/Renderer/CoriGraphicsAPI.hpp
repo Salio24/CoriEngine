@@ -16,6 +16,6 @@ namespace Cori {
 
 		virtual void DrawElements(const std::shared_ptr<VertexArray>& vertexArray, const uint32_t elementCount) = 0;
 
-		static CoriGraphicsAPI* Create();
+		static std::unique_ptr<CoriGraphicsAPI> Create();
 	};
 }

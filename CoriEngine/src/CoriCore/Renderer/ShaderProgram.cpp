@@ -24,4 +24,23 @@ namespace Cori {
 		return result;
 	}
 
+
+	std::shared_ptr<ShaderProgram> ShaderProgram::Create(const ShaderProgramDescriptor& descriptor) {
+		std::shared_ptr<ShaderProgram> result = nullptr;
+		switch (Application::GetWindow().GetAPI()) {
+		case GraphicsAPIs::None:
+			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
+			break;
+		case GraphicsAPIs::OpenGL:
+			result = std::make_shared<OpenGLShaderProgram>(descriptor.GetDebugName() ,descriptor.m_VertexPath, descriptor.m_FragmentPath, descriptor.m_GeometryPath);
+			break;
+		case GraphicsAPIs::Vulkan:
+			CORI_CORE_ASSERT_FATAL(false, "Vulkan is not supported yet");
+			break;
+		default:
+			CORI_CORE_ASSERT_FATAL(false, "Unknown graphics API");
+			break;
+		}
+		return result;
+	}
 }

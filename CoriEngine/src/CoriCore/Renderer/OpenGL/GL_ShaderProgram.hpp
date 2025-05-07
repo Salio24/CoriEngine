@@ -7,7 +7,7 @@
 namespace Cori {
 	class OpenGLShaderProgram : public ShaderProgram {
 	public:
-		OpenGLShaderProgram(const std::string& vertexPath, const std::string& fragmentPath, const std::string& geometryPath = "");
+		OpenGLShaderProgram(const std::string_view debugName, const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view geometryPath = "");
 		virtual ~OpenGLShaderProgram();
 
 		virtual void Bind() const override;
@@ -31,6 +31,8 @@ namespace Cori {
 		bool m_CreationSuccessful{ true };
 
 		mutable std::unordered_map<std::string, int32_t> m_UniformLocations;
+
+		std::string m_DebugName;
 
 		std::string m_ShaderNames;
 

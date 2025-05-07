@@ -5,22 +5,23 @@
 #include "OpenGL/GL_GraphicsAPI.hpp"
 
 namespace Cori {
-	CoriGraphicsAPI* CoriGraphicsAPI::Create() {
-		CoriGraphicsAPI* result = nullptr;
+	std::unique_ptr<CoriGraphicsAPI> CoriGraphicsAPI::Create() {
 		switch (Application::GetWindow().GetAPI()) {
 		case GraphicsAPIs::None:
 			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
+			return nullptr;
 			break;
 		case GraphicsAPIs::OpenGL:
-			result = new OpenGLGraphicsAPI();
+			return std::make_unique<OpenGLGraphicsAPI>();
 			break;
 		case GraphicsAPIs::Vulkan:
 			CORI_CORE_ASSERT_FATAL(false, "Vulkan is not supported yet");
+			return nullptr;
 			break;
 		default:
 			CORI_CORE_ASSERT_FATAL(false, "Unknown graphics API");
+			return nullptr;
 			break;
 		}
-		return result;
 	}
 }

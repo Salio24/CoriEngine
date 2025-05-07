@@ -11,7 +11,11 @@ class ExampleLayer : public Cori::Layer {
 public:
 	ExampleLayer() : Layer("Example") { 
 		m_Camera.SetCameraSize(0, 7680, 0, 4320);
-		m_Texture = Cori::Texture2D::Create("assets/engine/textures/brick.png");
+
+		//Cori::AssetManager::PreloadTexture2Ds({
+		//	Cori::Texture2Ds::TestBrickTexture
+		//});
+
 	}
 
 	virtual void OnEvent(Cori::Event& event) override {
@@ -165,12 +169,9 @@ public:
 		for (int i = 0; i < m_QuadRows; i++) {
 
 			for (int y = 0; y < m_QuadColumns; y++) {
-				Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset , i * 30.0f + offset), glm::vec2(25.0f, 25.0f), m_Texture);
-
+				Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset , i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetTexture2D(Cori::Texture2Ds::TestBrickTexture));
 			}
-
 		}
-		
 	
 		Cori::Renderer2D::EndBatch();
 	}
@@ -199,10 +200,7 @@ public:
 	int m_QuadColumns{ 1 };
 	int m_QuadRows{ 1 };
 
-
 	Cori::OrthoCamera m_Camera;
-
-	std::shared_ptr<Cori::Texture2D> m_Texture;
 
 	float m_CameraMoveSpeed = 10.0f;
 

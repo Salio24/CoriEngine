@@ -1,6 +1,8 @@
 #include "Renderer2D.hpp"
 #include "GraphicsCall.hpp"
 #include "../Time.hpp"
+#include "../Application.hpp"
+#include "../AssetManager/AssetDefenitions.hpp"
 
 namespace Cori {
 
@@ -45,6 +47,11 @@ namespace Cori {
 	void Renderer2D::Init() {
 		// TODO: add a global path tracker / manager, spitting hardcoded paths all over cpp and hpp files is kind-of a bad idea, want to have all my paths specified in one place
 
+		//AssetManager::PreloadShaders({
+		//	Shaders::FlatColorQuad,
+		//	Shaders::TexturedQuad
+		//});
+
 		// batch renderer
 		// global
 		uint32_t indicesBatch[s_MaxIndexCount];
@@ -63,7 +70,7 @@ namespace Cori {
 
 		// flat color quad
 		
-		s_Shader_FlatColorQuad.reset(ShaderProgram::Create("assets/engine/shaders/flatColorQuadVert.glsl", "assets/engine/shaders/flatColorQuadFrag.glsl"));
+		//s_Shader_FlatColorQuad.reset(ShaderProgram::Create("assets/engine/shaders/flatColorQuadVert.glsl", "assets/engine/shaders/flatColorQuadFrag.glsl"));
 
 		s_VertexArray_FlatColorQuad.reset(VertexArray::Create());
 		s_VertexBuffer_FlatColorQuad.reset(VertexBuffer::Create());
@@ -84,7 +91,7 @@ namespace Cori {
 
 		// textured quad
 
-		s_Shader_TexturedQuad.reset(ShaderProgram::Create("assets/engine/shaders/texturedQuadVert.glsl", "assets/engine/shaders/texturedQuadFrag.glsl"));
+		//s_Shader_TexturedQuad.reset(ShaderProgram::Create("assets/engine/shaders/texturedQuadVert.glsl", "assets/engine/shaders/texturedQuadFrag.glsl"));
 
 		s_VertexArray_TexturedQuad.reset(VertexArray::Create());
 		s_VertexBuffer_TexturedQuad.reset(VertexBuffer::Create());
@@ -168,9 +175,12 @@ namespace Cori {
 
 		// redundant shader binds, and subbufferdata calls 
 		// overdraw is also a concern 
-		s_Shader_FlatColorQuad->Bind();
-		s_Shader_FlatColorQuad->SetMat4("u_ViewProjection", s_CurrentBatchViewProjectionMatrix);
-		s_Shader_FlatColorQuad->SetMat4("u_ModelMatrix", s_CurrentBatchModelMatrix);
+
+		std::shared_ptr<ShaderProgram> shader = AssetManager::GetShader(Shaders::FlatColorQuad);
+
+		shader->Bind();
+		shader->SetMat4("u_ViewProjection", s_CurrentBatchViewProjectionMatrix);
+		shader->SetMat4("u_ModelMatrix", s_CurrentBatchModelMatrix);
 		
 		GraphicsCall::DrawElements(s_VertexArray_FlatColorQuad, s_IndexCount_FlatColorQuad);
 		s_DrawCallCount++;
@@ -224,10 +234,12 @@ namespace Cori {
 		s_VertexBuffer_TexturedQuad->Bind();
 		s_VertexBuffer_TexturedQuad->SetData(s_VertexDataBuffer_TexturedQuad, size);
 
-		s_Shader_TexturedQuad->Bind();
-		s_Shader_TexturedQuad->SetMat4("u_ViewProjection", s_CurrentBatchViewProjectionMatrix);
-		s_Shader_TexturedQuad->SetMat4("u_ModelMatrix", s_CurrentBatchModelMatrix);
-		s_Shader_TexturedQuad->SetInt("u_Texture", 0);
+		std::shared_ptr<ShaderProgram> shader = AssetManager::GetShader(Shaders::TexturedQuad);
+
+		shader->Bind();
+		shader->SetMat4("u_ViewProjection", s_CurrentBatchViewProjectionMatrix);
+		shader->SetMat4("u_ModelMatrix", s_CurrentBatchModelMatrix);
+		shader->SetInt("u_Texture", 0);
 
 		s_CurrentTexture_TexturedQuad->Bind(0);
 		GraphicsCall::DrawElements(s_VertexArray_TexturedQuad, s_IndexCount_TexturedQuad);
@@ -237,7 +249,7 @@ namespace Cori {
 		s_CurrentTexture_TexturedQuad.reset();
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, std::shared_ptr<Texture2D>& texture, const glm::vec2 textureSize, const glm::vec2 texturePosition) {
+	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const glm::vec2 textureSize, const glm::vec2 texturePosition) {
 		if (CORI_CORE_ASSERT_ERROR(s_BatchActive, "You're trying to call DrawQuad, but you have not started a batch, it will not work.")) { return; }
 		if (s_IndexCount_TexturedQuad >= s_MaxIndexCount) {
 			NewBatch();

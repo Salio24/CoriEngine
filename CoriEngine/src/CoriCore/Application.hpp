@@ -8,6 +8,7 @@
 #include "ImGui/ImGuiLayer.hpp"
 #include "Renderer/VertexArray.hpp"
 #include "Renderer/ShaderProgram.hpp"
+#include "AssetManager/AssetManager.hpp"
 #include "Time.hpp"
 
 namespace Cori {
@@ -26,8 +27,6 @@ namespace Cori {
 		inline static Window& GetWindow() { return *(*s_Instance).m_Window; }
 
 		inline static GameTimer& GetGameTimer() { return (*s_Instance).m_GameTimer; }
-
-		// do fixed tickrate update
 
 	private: 
 

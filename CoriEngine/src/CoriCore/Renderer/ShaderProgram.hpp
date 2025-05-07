@@ -1,8 +1,10 @@
 #pragma once
 #include "GraphicsAPIs.hpp"
 #include <glm/glm.hpp>
+#include "../AssetManager/ShaderDescriptor.hpp"
 
 namespace Cori {
+	
 	class ShaderProgram {
 	public:
 		virtual ~ShaderProgram() {};
@@ -22,6 +24,8 @@ namespace Cori {
 		virtual void SetMat4(const std::string& name, const glm::mat4& value) const = 0;
 		
 		virtual std::string GetShaderNames() const = 0;
+
+		static std::shared_ptr<ShaderProgram> Create(const ShaderProgramDescriptor& descriptor);
 
 		static ShaderProgram* Create(const std::string& vertexPath, const std::string& fragmentPath, const std::string& geometryPath = "");
 	};

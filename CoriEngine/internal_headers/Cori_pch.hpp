@@ -15,6 +15,14 @@
 #include <iostream>
 #include <system_error>
 #include <filesystem>
+#include <string_view>
+#include <cstdint>
+#include <atomic>
+#include <functional>
+#include <compare>
+#include <stdexcept>
+#include <system_error>
+#include <expected>
 #include <SDL3/SDL.h>
 #include "../src/CoriCore/Logger.hpp"
 #include <Macros.hpp>
