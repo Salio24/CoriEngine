@@ -17,6 +17,7 @@ namespace Cori {
 		static std::shared_ptr<spdlog::logger> s_ClientLogger;
 	};
 }
+
 const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') + "]: ";
 
 #define CORI_CORE_TRACE(...) ::Cori::Logger::GetCoreLogger()->trace(__VA_ARGS__)

@@ -1,0 +1,107 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 28, 
+    "patch": 0
+  },
+  "vendor": {
+    "microsoft.com/VisualStudioSettings/CMake/1.0": {
+      "intelliSenseMode": "windows-clang-x64"
+    },
+    "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+      "intelliSenseMode": "windows-clang-x64"
+    },
+    "ms-vscode.cmake-tools": {
+      "intelliSenseMode": "windows-clang-x64"
+    }
+  },
+  "configurePresets": [
+    {
+      "name": "common-clang-x64",
+      "hidden": true, 
+      "generator": "Ninja",
+      //"toolset": {
+      //  "value": "clang", 
+      //  "strategy": "set"
+      //},
+      "toolchainFile": "${sourceDir}/clang_toolchain.cmake",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "enableClangTidyCodeAnalysis": false
+        }
+      }
+    },
+    {
+      "name": "x64-clang-debug",
+      "displayName": "x64 Clang Debug",
+      "inherits": "common-clang-x64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "x64-clang-release",
+      "displayName": "x64 Clang Release",
+      "inherits": "common-clang-x64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "x64-clang-relwithdebinfo",
+      "displayName": "x64 Clang RelWithDebInfo",
+      "inherits": "common-clang-x64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "x64-clang-debug",
+      "displayName": "Build x64 Clang Debug",
+      "configurePreset": "x64-clang-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "x64-clang-release",
+      "displayName": "Build x64 Clang Release",
+      "configurePreset": "x64-clang-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "x64-clang-relwithdebinfo",
+      "displayName": "Build x64 Clang RelWithDebInfo",
+      "configurePreset": "x64-clang-relwithdebinfo",
+      "configuration": "RelWithDebInfo"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "x64-clang-debug",
+      "displayName": "Test x64 Clang Debug",
+      "configurePreset": "x64-clang-debug",
+      "configuration": "Debug",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "x64-clang-release",
+      "displayName": "Test x64 Clang Release",
+      "configurePreset": "x64-clang-release",
+      "configuration": "Release",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "x64-clang-relwithdebinfo",
+      "displayName": "Test x64 Clang RelWithDebInfo",
+      "configurePreset": "x64-clang-relwithdebinfo",
+      "configuration": "RelWithDebInfo",
+      "output": { "outputOnFailure": true }
+    }
+  ]
+}

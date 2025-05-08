@@ -1,0 +1,45 @@
+﻿{
+  "configurations": [
+    {
+      "name": "x64-Clang-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "clang_cl_x64_x64" ],
+      "cmakeToolchain": "${projectDir}\\clang_toolchain.cmake",
+      "intelliSenseMode": "windows-clang-x64",
+      "enableClangTidyCodeAnalysis": false
+    },
+    {
+      "name": "x64-Clang-Release",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "clang_cl_x64_x64" ],
+      "cmakeToolchain": "${projectDir}\\clang_toolchain.cmake",
+      "enableClangTidyCodeAnalysis": false
+    },
+    {
+      "name": "x64-Clang-RelWithDebInfo",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "cmakeToolchain": "${projectDir}\\clang_toolchain.cmake",
+      "inheritEnvironments": [ "clang_cl_x64_x64" ],
+      "intelliSenseMode": "windows-clang-x64",
+      "enableClangTidyCodeAnalysis": false
+    }
+  ]
+}

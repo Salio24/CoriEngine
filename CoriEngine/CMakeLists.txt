@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 
 project(CoriEngine)
-
     # hides all compiler warnings caused by subprojects
     set(HIDE_DEPENDANCY_WARNINGS ON CACHE BOOL "")
     
@@ -68,8 +67,6 @@ project(CoriEngine)
     glad_add_library(glad_gl_core_46 STATIC API gl:core=4.6)
 
     # spdlog
-
-    #set(SPDLOG_BUILD_PIC ON CACHE BOOL "")
     set(SPDLOG_BUILD_SHARED OFF CACHE BOOL "")
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/spdlog EXCLUDE_FROM_ALL)
 
@@ -92,14 +89,6 @@ project(CoriEngine)
     # source files
     file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS 
     ${PROJECT_SOURCE_DIR}/src/*.cpp
-    #${PROJECT_SOURCE_DIR}/thirdparty/imgui/imgui.cpp
-    #${PROJECT_SOURCE_DIR}/thirdparty/imgui/imgui_demo.cpp
-    #${PROJECT_SOURCE_DIR}/thirdparty/imgui/imgui_draw.cpp
-    #${PROJECT_SOURCE_DIR}/thirdparty/imgui/imgui_tables.cpp
-    #${PROJECT_SOURCE_DIR}/thirdparty/imgui/imgui_widgets.cpp
-    ## graphical backend v
-    #${PROJECT_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_opengl3.cpp
-    #${PROJECT_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_sdl3.cpp
     )
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -110,6 +99,7 @@ project(CoriEngine)
     # my shared lib
     add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES})
 
+if(PVS_STUDIO_ACTIVE)
     pvs_studio_add_target(
         TARGET ${ENGINE_LIBRARY_NAME}.analyze
         ALL                         # run on every build of ALL
@@ -129,6 +119,7 @@ project(CoriEngine)
             -e "*gl.h"
             -e "*khrplatform.h"
     )
+endif()
 
     target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
@@ -146,39 +137,17 @@ project(CoriEngine)
         LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/$<CONFIG>
     )
 
-    # export header auto generation
-    #file(TO_CMAKE_PATH ${CORI_INCLUDE_DIR} CORI_INCLUDE_DIR)
-    #
-    #add_custom_command(
-    #    OUTPUT ${CORI_INCLUDE_DIR}/.keep
-    #    COMMAND ${CMAKE_COMMAND} -E make_directory ${CORI_INCLUDE_DIR}
-    #    COMMAND ${CMAKE_COMMAND} -E touch ${CORI_INCLUDE_DIR}/.keep
-    #    COMMENT "Creating export header directory"
-    #)
-    #
-    #include(GenerateExportHeader)
-    #generate_export_header(${ENGINE_LIBRARY_NAME}
-    #    BASE_NAME ${PROJECT_NAME}
-    #    EXPORT_MACRO_NAME CORI_ENGINE_API
-    #    EXPORT_FILE_NAME ${CORI_INCLUDE_DIR}/${EXPORT_HEADER_NAME}
-    #)
-    #
-    #target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE ${PROJECT_NAME}_EXPORTS)
-
     # includes
     target_include_directories(${ENGINE_LIBRARY_NAME} PUBLIC 
-    #${PROJECT_SOURCE_DIR}/thirdparty/imgui
     ${CORI_INCLUDE_DIR}
     )
 
     target_include_directories(${ENGINE_LIBRARY_NAME} PRIVATE
-    #${PROJECT_SOURCE_DIR}/thirdparty/imgui
     ${PROJECT_SOURCE_DIR}/src/*.hpp
     ${CORI_HEADERS_DIR}
     )
 
     # pch
-
     target_precompile_headers(${ENGINE_LIBRARY_NAME} PRIVATE ${CORI_HEADERS_DIR}/Cori_pch.hpp)
 
     # disable compilation warnings from thirdparty libs
@@ -194,15 +163,13 @@ project(CoriEngine)
         target_compile_options(freetype PRIVATE -w)
         target_compile_options(glad_gl_core_46 PRIVATE -w)
         if(TARGET TIFF::tiff)
-            # introduced in CMake 3.28
-            # TIFF::TIFF still exists, but it is an INTERFACE library linking to TIFF::tiff (no ALIAS library)
             set(SDLIMAGE_TIF_TARGET "tiff")
         else()
             set(SDLIMAGE_TIF_TARGET "TIFF")
         endif()
         target_compile_options(${SDLIMAGE_TIF_TARGET} PRIVATE -w)
         target_compile_options(wavpack PRIVATE -w)
-        #target_compile_options(spdlog PRIVATE -w)
+        target_compile_options(spdlog PRIVATE -w)
     endif()
 
     # lib linking
@@ -211,7 +178,4 @@ project(CoriEngine)
     target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC spdlog::spdlog magic_enum::magic_enum imgui glm::glm)
 
     # can be private 
-
-    # idk will be private until it breaks something
     target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static nlohmann_json::nlohmann_json tmxlite freetype glad_gl_core_46)
-    
