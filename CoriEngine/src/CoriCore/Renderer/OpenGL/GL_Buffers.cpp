@@ -31,18 +31,16 @@ namespace Cori {
 		CORI_CORE_TRACE("GL_VertexBuffer (GL_RuntimeID: {0}): VBO with size {1}, and type {2}, was created successfully", m_ID, size, (drawtype == DRAW_TYPE::DYNAMIC ? "DYNAMIC_DRAW" : drawtype == DRAW_TYPE::STATIC ? "STATIC_DRAW" : "ERROR"));
 		
 #ifdef DEBUG_BUILD  
-		std::string layoutText;
+		{
+		std::string layoutText = "";
 
 		uint32_t index = 0;
 		for (const auto& element : m_Layout) {
-			std::string element_layout = "    Location: '" + std::to_string(index) +
+			std::string element_layout = CORI_SECOND_LINE_SPACING + "Location: '" + std::to_string(index) +
 				"' | Type: '" + static_cast<std::string>(magic_enum::enum_name(element.m_Type)) +
-				"' | Name: '" + element.m_Name +
-				"' | Stride: '" + std::to_string(element.m_Offset) +
-				"' | Size: '" + std::to_string(element.m_Size) + "'";
+				"' | Name: '" + element.m_Name + "'";
 
 			layoutText.append(element_layout);
-
 			if (element != m_Layout.back()) {
 				layoutText.append("\n");
 			}
@@ -51,6 +49,7 @@ namespace Cori {
 		}
 
 		CORI_CORE_TRACE("GL_VertexBuffer (GL_RuntimeID: {0}): VBO has the following Attribute Layout: \n{1}", m_ID, layoutText);
+		}
 #endif
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);

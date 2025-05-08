@@ -80,7 +80,7 @@ namespace Cori {
 		s_VertexBuffer_FlatColorQuad = VertexBuffer::Create();
 		s_VertexBuffer_FlatColorQuad->SetLayout({
 			{ ShaderDataType::Vec2, "a_Position" },
-			{ ShaderDataType::Vec4, "a_Color" },
+			{ ShaderDataType::Vec4, "a_Color" }
 		});
 
 		s_VertexBuffer_FlatColorQuad->Init(nullptr, s_MaxVertexCount * s_VertexBuffer_FlatColorQuad->GetLayout().GetStrinde(), DRAW_TYPE::DYNAMIC);
@@ -101,7 +101,7 @@ namespace Cori {
 		s_VertexBuffer_TexturedQuad = VertexBuffer::Create();
 		s_VertexBuffer_TexturedQuad->SetLayout({
 			{ ShaderDataType::Vec2, "a_Position" },
-			{ ShaderDataType::Vec2, "a_TexurePosition" }
+			{ ShaderDataType::Vec2, "a_TexturePosition" }
 		});
 
 		s_VertexBuffer_TexturedQuad->Init(nullptr, s_MaxVertexCount * s_VertexBuffer_TexturedQuad->GetLayout().GetStrinde(), DRAW_TYPE::DYNAMIC);
