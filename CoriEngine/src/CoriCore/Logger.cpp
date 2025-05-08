@@ -15,14 +15,14 @@ namespace Cori {
 		int max_files = 5;
 
 		auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("logs/cori_log.txt", max_size, max_files);
-		file_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] [%n] %v");
+		file_sink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-6n] [%-8l]: %v%$");
 
 		core_sinks.push_back(file_sink);
 		client_sinks.push_back(file_sink);
 
 #ifdef DEBUG_BUILD
 		auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-		console_sink->set_pattern("%^[%T] %n-%l: %v%$");
+		console_sink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-6n] [%-8l]: %v%$");
 
 		core_sinks.push_back(console_sink);
 		client_sinks.push_back(console_sink);

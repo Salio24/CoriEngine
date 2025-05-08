@@ -81,7 +81,7 @@ namespace Cori {
 		glBindVertexArray(m_ID);
 		indexBuffer->Bind();
 		m_IndexBuffer = indexBuffer;
-		CORI_CORE_TRACE("GL_VertexArray(GL_RuntimeID: {0}) : IndexBuffer with GL_RuntimeID : {1} was added to successfully", m_ID ,reinterpret_pointer_cast<OpenGLIndexBuffer>(indexBuffer)->m_ID);
+		CORI_CORE_TRACE("GL_VertexArray (GL_RuntimeID: {0}) : IndexBuffer with GL_RuntimeID : {1} was added to successfully", m_ID ,reinterpret_pointer_cast<OpenGLIndexBuffer>(indexBuffer)->m_ID);
 		indexBuffer->Unbind();
 		glBindVertexArray(0);
 	}

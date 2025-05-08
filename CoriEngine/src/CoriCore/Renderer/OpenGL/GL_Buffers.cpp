@@ -29,6 +29,29 @@ namespace Cori {
 		}
 
 		CORI_CORE_TRACE("GL_VertexBuffer (GL_RuntimeID: {0}): VBO with size {1}, and type {2}, was created successfully", m_ID, size, (drawtype == DRAW_TYPE::DYNAMIC ? "DYNAMIC_DRAW" : drawtype == DRAW_TYPE::STATIC ? "STATIC_DRAW" : "ERROR"));
+		
+#ifdef DEBUG_BUILD  
+		std::string layoutText;
+
+		uint32_t index = 0;
+		for (const auto& element : m_Layout) {
+			std::string element_layout = "    Location: '" + std::to_string(index) +
+				"' | Type: '" + static_cast<std::string>(magic_enum::enum_name(element.m_Type)) +
+				"' | Name: '" + element.m_Name +
+				"' | Stride: '" + std::to_string(element.m_Offset) +
+				"' | Size: '" + std::to_string(element.m_Size) + "'";
+
+			layoutText.append(element_layout);
+
+			if (element != m_Layout.back()) {
+				layoutText.append("\n");
+			}
+
+			index++;
+		}
+
+		CORI_CORE_TRACE("GL_VertexBuffer (GL_RuntimeID: {0}): VBO has the following Attribute Layout: \n{1}", m_ID, layoutText);
+#endif
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
@@ -49,29 +72,6 @@ namespace Cori {
 	void OpenGLVertexBuffer::SetLayout(const VBLayout& layout)
 	{
 		m_Layout = layout;
-
-#ifdef DEBUG_BUILD  
-		std::string layoutText;
-
-		uint32_t index = 0;
-		for (const auto& element : layout) {
-			std::string element_layout = "    Location: '" + std::to_string(index) +
-				"' | Type: '" + static_cast<std::string>(magic_enum::enum_name(element.m_Type)) +
-				"' | Name: '" + element.m_Name +
-				"' | Stride: '" + std::to_string(element.m_Offset) +
-				"' | Size: " + std::to_string(element.m_Size);
-
-			layoutText.append(element_layout);
-
-			if (element != layout.back()) {
-				layoutText.append("\n");
-			}
-
-			index++;
-		}
-
-		CORI_CORE_TRACE("GL_VertexBuffer (GL_RuntimeID: {0}): Attribute Layout is set to the following: \n{1}", m_ID, layoutText);
-#endif
 	}
 
 	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count) : m_Count(count) {
@@ -79,8 +79,8 @@ namespace Cori {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(count), indices, GL_STATIC_DRAW);
 
-
 		CORI_CORE_TRACE("GL_IndexBuffer (GL_RuntimeID: {0}): IBO with size {1}, and type STATIC_DRAW, was created successfully", m_ID, count);
+
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
