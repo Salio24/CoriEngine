@@ -36,7 +36,7 @@ namespace Cori {
 	private:
 
 		const std::string_view m_DebugName;
-		const uint32_t m_RuntimeID;
+		const uint32_t m_RuntimeID{ 0 };
 		inline static std::atomic<uint32_t> s_NextRuntimeID{ 1 };
 	};
 }

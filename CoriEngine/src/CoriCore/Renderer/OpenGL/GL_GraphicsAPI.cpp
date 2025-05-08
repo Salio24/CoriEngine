@@ -96,6 +96,7 @@ namespace Cori {
 
 	void OpenGLGraphicsAPI::SetViewport(int x, int y, int width, int height) {
 		glViewport(x, y, width, height);
+		CORI_CORE_TRACE("GL_GraphicsAPI: Viewport was set size: x={0}, y={1}, width={2}, height={3}", x, y, width, height);
 	}
 
 	void OpenGLGraphicsAPI::SetClearColor(const glm::vec4& color) {

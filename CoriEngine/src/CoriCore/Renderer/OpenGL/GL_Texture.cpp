@@ -16,13 +16,19 @@ namespace Cori {
 		glTextureStorage2D(m_ID, 1, GL_RGBA8, static_cast<GLsizei>(m_Width), static_cast<GLsizei>(m_Height));
 
 		glTextureParameteri(m_ID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTextureParameteri(m_ID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);	
+		glTextureParameteri(m_ID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTextureParameteri(m_ID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTextureParameteri(m_ID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 		image->FlipVertically();
 
 		glTextureSubImage2D(m_ID, 0, 0, 0, m_Width, m_Height, GL_RGBA, GL_UNSIGNED_BYTE, image->GetPixelData());
+		if (image->GetSuccessStatus()) {
+			CORI_CORE_DEBUG("GL_Texture2D (GL_RuntimeID; {0}): Successfully created texture from '{1}'", m_ID, path);
+		}
+		else {
+			CORI_CORE_WARN("GL_Texture2D (GL_RuntimeID; {0}): Image loading failed to load '{0}', a placeholder was used to create texture2D instead", path);
+		}
 	}
 
 	OpenGLTexture2D::~OpenGLTexture2D() {

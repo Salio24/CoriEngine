@@ -24,13 +24,13 @@ namespace Cori {
 	}
 
 	void OrthoCamera::ZoomVP(const float factor) {
-		if (factor <= 0.0f) { CORI_CORE_WARN("Are you sure you want zoom factor to be 0?"); }
+		if (factor <= 0.0f) { CORI_CORE_WARN("Camera: Are you sure you want zoom factor to be <= 0?"); }
 		m_ZoomFactor = factor;
 		RecalculateVP();
 	}
 
 	void OrthoCamera::RecalculateVP() {
-		if CORI_CORE_ASSERT_WARN(m_Created, "Using non initialized OrthoCamera") return;
+		if (CORI_CORE_ASSERT_WARN(m_Created, "Camera: Using non initialized OrthoCamera")) return;
 
 		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-m_Position, 0.0f)) * 
 							glm::rotate(glm::mat4(1.0f), glm::radians(m_Angle), glm::vec3(0.0f, 0.0f, 1.0f)) * 

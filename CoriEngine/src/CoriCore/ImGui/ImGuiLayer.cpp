@@ -19,7 +19,7 @@ namespace Cori {
 
 	void ImGuiLayer::OnAttach() {
 		static bool created = false;
-		CORI_ASSERT_FATAL(!created, "ImGui context already created");
+		if (CORI_ASSERT_ERROR(!created, "ImGui context already created")) { return; }
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -44,7 +44,7 @@ namespace Cori {
 		bool test = ImGui_ImplOpenGL3_Init("#version 460");
 
 		created = true;
-		CORI_CORE_INFO("ImGuiLayer attached");
+		CORI_CORE_DEBUG("ImGuiLayer attached");
 	}
 
 	void ImGuiLayer::OnDetach() {
@@ -52,7 +52,7 @@ namespace Cori {
 		ImGui_ImplSDL3_Shutdown();
 		ImGui::DestroyContext();
 
-		CORI_CORE_INFO("ImGuiLayer detached");
+		CORI_CORE_DEBUG("ImGuiLayer detached");
 	}
 
 	void ImGuiLayer::OnUpdate(const double deltaTime) {

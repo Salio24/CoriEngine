@@ -54,6 +54,8 @@ namespace Cori {
 		//	Shaders::TexturedQuad
 		//});
 
+		CORI_CORE_INFO("Renderer2D: Initialization");
+
 		// batch renderer
 		// global
 		uint32_t indicesBatch[s_MaxIndexCount];
@@ -109,6 +111,9 @@ namespace Cori {
 		s_VertexArray_TexturedQuad->AddIndexBuffer(s_IndexBuffer_TexturedQuad);
 
 		s_VertexDataBuffer_TexturedQuad = new TexturedQuadVertexSetup[static_cast<size_t>(s_MaxIndexCount)];
+
+		CORI_CORE_INFO("Renderer2D: Initialization has been successfully");
+
 	}
 
 	void Renderer2D::Shutdown() {

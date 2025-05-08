@@ -5,6 +5,7 @@
 
 namespace Cori {
 	GameTimer::GameTimer() {
+		CORI_CORE_DEBUG("GameTimer created");
 		m_LastTime = SDL_GetPerformanceCounter();
 	}
 

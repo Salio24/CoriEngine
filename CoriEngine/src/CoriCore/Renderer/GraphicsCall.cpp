@@ -6,7 +6,7 @@
 namespace Cori {
 	std::unique_ptr<CoriGraphicsAPI> GraphicsCall::s_GraphicsAPI = nullptr;
 	void GraphicsCall::InitRenderers() {
-		if CORI_CORE_ASSERT_ERROR(s_GraphicsAPI == nullptr , "Trying reinitialize an already initialized renderer") return;
+		if (CORI_CORE_ASSERT_WARN(s_GraphicsAPI == nullptr, "GraphicsCall: Trying to reinitialize an already initialized renderers")) { return; }
 
 		s_GraphicsAPI = CoriGraphicsAPI::Create();
 		s_GraphicsAPI->Init();

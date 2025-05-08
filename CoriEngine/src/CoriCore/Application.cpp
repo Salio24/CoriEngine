@@ -10,12 +10,10 @@
 #include "AssetManager/AssetDefinitions.hpp"
 
 namespace Cori {
-//#define CORI_BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
-
 	Application* Application::s_Instance = nullptr;
 
 	Application::Application() {
-		CORI_CORE_ASSERT_FATAL(!s_Instance, "Application already exists!");
+		CORI_CORE_ASSERT_FATAL(!s_Instance, "Trying to construct application for the second time. Application already exists!");
 		s_Instance = this;
 
 		m_Window = Window::Create();

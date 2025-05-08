@@ -40,7 +40,7 @@ namespace Cori {
 
 		if ((size_t)type >= (sizeof(sizes) / sizeof(size_t)))
 		{
-			CORI_CORE_ASSERT_ERROR(false, "Unknown shader data type");
+			CORI_CORE_ASSERT_ERROR(false, "ShaderDataTypeSize: Unknown shader data type");
 			return 0;
 		}
 
@@ -67,19 +67,20 @@ namespace Cori {
 			1,            // Bool
 		};
 
-		static_assert(sizeof(sizes) / sizeof(size_t) == (size_t)ShaderDataType::Bool + 1, "ShaderDataTypeSize: Size array is out of sync with ShaderDataType enum");
+		static_assert(sizeof(sizes) / sizeof(size_t) == (size_t)ShaderDataType::Bool + 1, "ShaderDataTypeComponentCount: Size array is out of sync with ShaderDataType enum");
 
 		if ((size_t)type >= (sizeof(sizes) / sizeof(size_t)))
 		{
-			CORI_CORE_ASSERT_ERROR(false, "Unknown shader data type");
+			CORI_CORE_ASSERT_ERROR(false, "ShaderDataTypeComponentCount: shader data type");
 			return 0;
 		}
 
 		return sizes[(size_t)type];
 	}
 
-	struct VBElement { 
-		VBElement(ShaderDataType type, const std::string& name, const bool normalized = false) : m_Name(name), m_Type(type), m_Normalized(normalized), m_Size(ShaderDataTypeSize(type)) {}
+	class VBElement { 
+	public:
+		VBElement(ShaderDataType type, const std::string& name, const bool normalized = false) : m_Name(name), m_Type(type), m_Normalized(normalized), m_Size(ShaderDataTypeSize(type)), m_RuntimeID(s_NextRuntimeID.fetch_add(1, std::memory_order_relaxed)) {}
 
 		std::string m_Name;
 		ShaderDataType m_Type;
@@ -89,6 +90,47 @@ namespace Cori {
 
 		size_t GetComponentCount() const { return ShaderDataTypeComponentCount(m_Type); }
 
+		bool operator==(const VBElement& other) const {
+			return m_RuntimeID == other.m_RuntimeID;
+		}
+
+		bool operator!=(const VBElement& other) const {
+			return m_RuntimeID != other.m_RuntimeID;
+		}
+
+		VBElement(const VBElement& other)
+			: m_Name(other.m_Name),
+			m_Type(other.m_Type),
+			m_Normalized(other.m_Normalized),
+			m_Size(other.m_Size),
+			m_Offset(other.m_Offset),
+			m_RuntimeID(s_NextRuntimeID.fetch_add(1, std::memory_order_relaxed))
+		{ }
+
+		VBElement(VBElement&& other) noexcept
+			: m_Name(std::move(other.m_Name)),
+			m_Type(other.m_Type),
+			m_Normalized(other.m_Normalized),
+			m_Size(other.m_Size),
+			m_Offset(other.m_Offset),
+			m_RuntimeID(other.m_RuntimeID)
+		{ }
+
+		VBElement& operator=(VBElement&& other) noexcept {
+			if (this != &other) {
+				m_Name = std::move(other.m_Name);
+				m_Type = other.m_Type;
+				m_Normalized = other.m_Normalized;
+				m_Size = other.m_Size;
+				m_Offset = other.m_Offset;
+			}
+
+			return *this;
+		}
+
+	private:
+		const uint32_t m_RuntimeID{ 0 };
+		inline static std::atomic<uint32_t> s_NextRuntimeID{ 1 };
 	};
 
 	class VBLayout {
@@ -102,9 +144,55 @@ namespace Cori {
 			}
 		}
 
+		VBLayout(const VBLayout& other)
+			: m_Elements(other.m_Elements),
+			m_Stride(other.m_Stride)
+		{ }
+
+		VBLayout& operator=(const VBLayout& other) {
+			if (this == &other) {
+				return *this;
+			}
+
+			m_Elements.clear();
+			m_Elements.reserve(other.m_Elements.size());
+			
+			for (const auto& src_element : other.m_Elements) {
+				m_Elements.emplace_back(src_element);
+			}
+
+			m_Stride = other.m_Stride;
+
+			return *this;
+		}
+
+		VBLayout(VBLayout&& other) noexcept
+			: m_Elements(std::move(other.m_Elements)),
+			m_Stride(other.m_Stride)
+		{
+			other.m_Stride = 0;
+		}
+
+		VBLayout& operator=(VBLayout&& other) noexcept {
+			if (this == &other) {
+				return *this;
+			}
+
+			m_Elements = std::move(other.m_Elements);
+			m_Stride = other.m_Stride;
+			other.m_Stride = 0;
+
+			return *this;
+		}
+
 		inline uint32_t GetStrinde() const { return m_Stride; }
 		inline const std::vector<VBElement>& GetElements() const { return m_Elements; }
 		
+		inline VBElement& front() { return m_Elements.front(); }
+		inline const VBElement& front() const { return m_Elements.front(); }
+		inline VBElement& back() { return m_Elements.back(); }
+		inline const VBElement& back() const { return m_Elements.back(); }
+
 		inline std::vector<VBElement>::iterator begin() { return m_Elements.begin(); }
 		inline std::vector<VBElement>::iterator end() { return m_Elements.end(); }
 		inline std::vector<VBElement>::const_iterator begin() const { return m_Elements.begin(); }

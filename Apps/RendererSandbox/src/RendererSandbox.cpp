@@ -35,6 +35,7 @@ public:
 		///});
 		// if the asset is not preloaded it will be loaded the first time it is requested via appropriate
 		// Get function from the Asset Manager
+		Cori::GraphicsCall::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
 	}
 
 	virtual void OnEvent(Cori::Event& event) override {
@@ -174,8 +175,6 @@ public:
 	void OnUpdate(const double deltaTime) override {
 
 		// TODO, get rid of raw pointers in create funcs
-
-		Cori::GraphicsCall::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
 		Cori::GraphicsCall::SetClearColor({ 0.875f, 0.6875f, 1.0f, 1.0f });
 		Cori::GraphicsCall::ClearFramebuffer();
 

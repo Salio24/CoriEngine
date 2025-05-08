@@ -13,6 +13,9 @@ namespace Cori {
 		void* GetPixelData() const;
 		uint32_t GetWidth() const;
 		uint32_t GetHeight() const;
+		inline bool GetSuccessStatus() const {
+			return m_Status;
+		}
 
 		Image& operator=(Image&& other) = delete;
 		Image(Image&& other) = delete;
@@ -20,6 +23,7 @@ namespace Cori {
 		Image(const Image&) = delete;
 		Image& operator=(const Image&) = delete;
 	private:
-		void* surface;
+		bool m_Status{ false };
+		void* m_Surface;
 	};
 }

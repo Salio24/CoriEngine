@@ -28,14 +28,14 @@ namespace Cori {
 
 		switch (m_Data.API) {
 		case GraphicsAPIs::None:
-			CORI_CORE_FATAL("No graphics API selected");
+			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
 			break;
 		case GraphicsAPIs::OpenGL:
 			m_Window = SDL_CreateWindow(m_Data.Title.c_str(), m_Data.Width, m_Data.Height, SDL_WINDOW_OPENGL);
 			CORI_CORE_ASSERT_FATAL(!!m_Window, "Window could not be created! SDL_Error: " + std::string(SDL_GetError()));
 			break;
 		case GraphicsAPIs::Vulkan:
-			CORI_CORE_FATAL("Vulkan is not supported yet");
+			CORI_CORE_ASSERT_FATAL(false ,"Vulkan is not supported yet");
 			break;
 		}
 
@@ -43,7 +43,7 @@ namespace Cori {
 
 		SDL_Surface* logo = IMG_Load(logoPath.c_str());
 
-		if (!CORI_CORE_ASSERT_ERROR(logo, "Failed to load App Logo: {0}", SDL_GetError())) {
+		if (!CORI_CORE_ASSERT_WARN(logo, "Failed to load App Logo: {0}", SDL_GetError())) {
 			SDL_SetWindowIcon(m_Window, logo);
 		}
 
@@ -146,7 +146,7 @@ namespace Cori {
 			SDL_GL_SetSwapInterval(1);
 		}
 
-		CORI_CORE_INFO("Set VSync to: {0}", enabled);
+		CORI_CORE_INFO("VSync is now set to: {0}", enabled);
 
 		m_Data.VSync = enabled;
 	}

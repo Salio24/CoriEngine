@@ -1,7 +1,11 @@
 #pragma once
 #include "../Buffers.hpp"
 
+
 namespace Cori {
+
+	class OpenGLVertexArray;
+
 	class OpenGLVertexBuffer : public VertexBuffer {
 	public:
 		OpenGLVertexBuffer() {};
@@ -12,11 +16,14 @@ namespace Cori {
 
 		virtual void SetData(const void* data, uint32_t size) const override;
 
-		virtual void SetLayout(const VBLayout& layout) override { m_Layout = layout; }
+		// log layout
+		virtual void SetLayout(const VBLayout& layout) override;
 		virtual const VBLayout& GetLayout() const override { return m_Layout; }
 
 	private:
-		uint32_t m_ID;
+		friend class OpenGLVertexArray;
+
+		uint32_t m_ID; ///////
 		VBLayout m_Layout;
 	};
 
@@ -29,6 +36,9 @@ namespace Cori {
 
 		virtual uint32_t GetCount() const override;
 	private:
+
+		friend class OpenGLVertexArray;
+
 		uint32_t m_ID;
 		uint32_t m_Count{ 0 };
 		
