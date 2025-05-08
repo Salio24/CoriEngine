@@ -17,7 +17,7 @@ namespace Cori {
 		}
 
 #ifdef DEBUG_BUILD
-		m_ShaderNames = "    Vertex shader: " + FileManager::GetFilename(vertexPath) + "\n    Fragment shader: " + FileManager::GetFilename(fragmentPath) + "\n    Geometry shader: " + (geometryShaderPresent ? FileManager::GetFilename(geometryPath) : "Not specified (not an error)");
+		m_ShaderNames = CORI_SECOND_LINE_SPACING + "Vertex shader: " + FileManager::GetFilename(vertexPath) + "\n" + CORI_SECOND_LINE_SPACING + "Fragment shader: " + FileManager::GetFilename(fragmentPath) + "\n" + CORI_SECOND_LINE_SPACING + "Geometry shader: " + (geometryShaderPresent ? FileManager::GetFilename(geometryPath) + "" : "Not specified (not an error)");
 #endif
 
 
@@ -73,10 +73,10 @@ namespace Cori {
 		}
 
 		if (m_CreationSuccessful) {
-			CORI_CORE_DEBUG("GL_ShaderProgram (GL_RuntimeID: {0}): Creation of {1} with shaders:\n{2}\nHas been successful", m_ID, m_DebugName, m_ShaderNames);
+			CORI_CORE_DEBUG("GL_ShaderProgram (GL_RuntimeID: {0}): Creation of {1} with shaders:\n{2}\n{3}Has been successful", m_ID, m_DebugName, m_ShaderNames, CORI_SECOND_LINE_SPACING);
 		}
 		else {
-			CORI_CORE_ERROR("GL_ShaderProgram (GL_RuntimeID: {0}): Creation of {1} with shaders:\n{2}\nHas failed", m_ID, m_DebugName,m_ShaderNames);
+			CORI_CORE_ERROR("GL_ShaderProgram (GL_RuntimeID: {0}): Creation of {1} with shaders:\n{2}\n{3}Has failed", m_ID, m_DebugName,m_ShaderNames, CORI_SECOND_LINE_SPACING);
 		}
 	}
 
@@ -174,7 +174,7 @@ namespace Cori {
 			glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 			if (!success) {
 				glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-				CORI_CORE_ERROR("GL_ShaderProgram (GL_RuntimeID: {0}): Shader compilation error in {1} with shaders:\n{2}\nProblematic type: {3} \nInfoLog: {4}", m_ID, m_DebugName, m_ShaderNames, type, infoLog);
+				CORI_CORE_ERROR("GL_ShaderProgram (GL_RuntimeID: {0}): Shader compilation error in {1} with shaders:\n{5}{2}\n{5}Problematic type: {3}\n{5}InfoLog: {4}", m_ID, m_DebugName, m_ShaderNames, type, infoLog, CORI_SECOND_LINE_SPACING);
 				result = false;
 			}
 		}
@@ -182,7 +182,7 @@ namespace Cori {
 			glGetProgramiv(shader, GL_LINK_STATUS, &success);
 			if (!success) {
 				glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-				CORI_CORE_ERROR("GL_ShaderProgram (GL_RuntimeID: {0}): Shader linking error in {1} with shaders:\n{2}\nProblematic type: {3} \nInfoLog: {4}", m_ID, m_DebugName, m_ShaderNames, type, infoLog);
+				CORI_CORE_ERROR("GL_ShaderProgram (GL_RuntimeID: {0}): Shader linking error in {1} with shaders:\n{5}{2}\n{5}Problematic type: {3}\n{5}InfoLog: {4}", m_ID, m_DebugName, m_ShaderNames, type, infoLog, CORI_SECOND_LINE_SPACING);
 				result = false;
 			}
 		}

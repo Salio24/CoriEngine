@@ -30,10 +30,11 @@ namespace Cori {
 		CORI_CORE_ASSERT_FATAL(glad_version != 0, "Failed to initialize GLAD");
 
 		CORI_CORE_DEBUG("GL_GraphicsContext: Rendering context was created successfully");
-		CORI_CORE_TRACE("    Vendor: " + std::string(reinterpret_cast<const char*>(glGetString(GL_VENDOR))));
-		CORI_CORE_TRACE("    Renderer: " + std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))));
-		CORI_CORE_TRACE("    GL Version: " + std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
-		CORI_CORE_TRACE("    Shading Language Version: " + std::string(reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION))));
+		CORI_CORE_TRACE("GL_GraphicsContext: Using hardware renderer: \n{4}Vendor: {0}\n{4}Renderer: {1}\n{4}OpenGL Version {2}\n{4}Shading Language Version: {3}", 
+			std::string(reinterpret_cast<const char*>(glGetString(GL_VENDOR))),
+			std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))),
+			std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))),
+			std::string(reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION))), CORI_SECOND_LINE_SPACING);
 	}
 
 	void OpenGLContext::SwapBuffers() {

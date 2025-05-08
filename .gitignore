@@ -16,7 +16,9 @@
 /CoriEngine/thirdparty/SDL3/*
 /CoriEngine/thirdparty/SDL3_image/*
 /CoriEngine/thirdparty/SDL3_mixer/*
+/CoriEngine/thirdparty/spdlog/*
 /CoriEngine/thirdparty/tmxlite/*
+/CoriEngine/thirdparty/magic_enum/*
 
 # build directory for libs and tmp files
 /out
@@ -27,16 +29,13 @@ deinitSub.sh
 initSub.sh
 rmSub.sh
 
-clang_toolchain.cmake
-CMakeSettings.json
+/CMakeSettings.json
 
 *.dll
 *.exe
 *.pdb
 
-CoriEngine_export.hpp
-.cori_engine_dll_copied.stamp
-/Apps/Sandbox/bin/Debug/imgui.ini
+*.cori_engine_dll_copied.stamp
 /Apps/Sandbox/bin/*
 /Apps/RendererSandbox/bin/*
 /notes.txt
