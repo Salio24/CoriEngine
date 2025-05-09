@@ -6,7 +6,7 @@ Cori is my game engine that I’m actively working on. When building, I took som
 
 ***
 
-## Install Guide
+## Getting Started
 
 Cori Engine uses CMake as a build system. Currently, it supports only Windows.
 
