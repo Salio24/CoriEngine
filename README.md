@@ -1,5 +1,7 @@
 # Cori Engine (WIP)
 
+![Cori](/CoriEngine/git_logo.png?raw=true "Cori")
+
 Cori is my game engine that I’m actively working on. When building I took some inspiration from Hazel Engine by The Cherno. Current feature set of the engine is: Basic 2D Batch Renderer, Asset Manager, Event System, Layer System, Input handler, Logging, ImGui integration, API agnostic window/graphics/rendering abstraction.
 
 ***
@@ -17,7 +19,7 @@ Cori engine uses cmake as a build system. For now it supports only Windows.
 
 <ins>**2. Donwloading the repository and dependencies:**</ins>
 
-1. Clone the repository with `git clone -b CoriStable https://github.com/Salio24/VoidScapeDev.git`.
+1. Clone the repository with `git clone -b CoriStable https://github.com/Salio24/VoidScapeDev.git`
 2. Download dependencies by running 'download_dependencies.bat' script in the root directory.
 
 <ins>**3. Compiling:**</ins>
@@ -29,7 +31,7 @@ Cori engine uses cmake as a build system. For now it supports only Windows.
 1. Instal CMake tools and clang-cl toolset for Visal Studio in Visual Studio installer.
 2. Copy file `CMakeSettings.json` from platform folder into the root folder.
 3. Open the root folder as a local folder in Visual Studio.
-4. Done
+4. Done.
 
 Make sure to check compiler paths in `cmake_toolchain.cmake`, it should point to your LLVM instalation folders. Althought it point to default instalation folder of LLVM, if you changed the install folder, you'll have to specify the correct path in the toolchain file.
 
@@ -37,7 +39,7 @@ Make sure to check compiler paths in `cmake_toolchain.cmake`, it should point to
 
 - Copy file `CMakePresets.json` from platform folder into the root folder.
 
-From now everyting depends on your specific enviroment, for example, to used CMake from terminal:
+From now everyting depends on your specific enviroment, for example, to use CMake from terminal:
 
 1. List available presets with `cmake --list-presets`
 2. Configure CMake preset with `cmake --preset PresetName`
@@ -46,7 +48,7 @@ From now everyting depends on your specific enviroment, for example, to used CMa
 - `CoriEngine/bin/PresetName`
 - `Apps/RendererSandbox/bin/PresetName`
 - `Apps/Sandbox/bin/PresetName`
-5. Done
+5. Done.
 
 Make sure to check compiler paths in `cmake_toolchain.cmake`, it should point to your LLVM instalation folders. Althought it point to default instalation folder of LLVM, if you changed the install folder, you'll have to specify the correct path in the toolchain file.
 
@@ -57,9 +59,9 @@ Make sure to check compiler paths in `cmake_toolchain.cmake`, it should point to
 ### 2D Batch Renderer:
 
 2D Batch Renderer can render flat color quads, and textured quads, all user need to do Is:
-1 - Call BeginBatch.
-2 - Call specific appropriate DrawQuad function, with or without texture.
-3 - Call EndBatch.
+1. Call BeginBatch.
+2. Call specific appropriate DrawQuad function, with or without texture.
+3. Call EndBatch.
 renderer will handle everything else. 
 
 ### Asset Manager:
@@ -86,7 +88,7 @@ Window/graphics/rendering are all abstracted, user code has no calls to OpenGL a
 
 ## Plans for the future
 
-- Make ImGui window templates. For example, instead of user having to write a custom window that will show a frame graph, we just call something like this: CoriImGuiPerformanceMetrics();.
+- Make ImGui window templates. For example, instead of user having to write a custom window that will show a frame graph, we just call something like this: CoriImGuiPerformanceMetrics();
 - By the end of May I’m planning to port my game into Cori engine.
 - I also want to start playing with Vulkan.
 	- I’m planning to make Vulkan a main graphics API for Cori.
