@@ -12,43 +12,43 @@ Cori engine uses cmake as a build system. For now it supports only Windows.
 - CMake 3.28 or newer 
 - Ninja build system
 - LLVM Clang compiler with C++23 support
-	- Not Visual Stduio's clang-cl, that has MSVC frontend. You need LLVM Clang that comes with Posix frontend. (Can be found here: 'https://github.com/llvm/llvm-project')
+	- Not Visual Stduio's clang-cl, that has MSVC frontend. You need LLVM Clang that comes with Posix frontend. (Can be found here: `https://github.com/llvm/llvm-project`)
 		- You can also use other compilers with Posix frontend, but the project is configured to use LLVM. Thus using something other than LLVM will not work without tweaking toolchain file.
 
 <ins>**2. Donwloading the repository and dependencies:**</ins>
 
-1. Clone the repository with 'git clone -b CoriStable https://github.com/Salio24/VoidScapeDev.git'.
+1. Clone the repository with `git clone -b CoriStable https://github.com/Salio24/VoidScapeDev.git`.
 2. Download dependencies by running 'download_dependencies.bat' script in the root directory.
 
 <ins>**3. Compiling:**</ins>
 
-Here you have 2 paths:
+*Here you have 2 paths:*
 
 ### Using Visual Studio 2022 CMake integration (the prefered way, i use it):
 
 1. Instal CMake tools and clang-cl toolset for Visal Studio in Visual Studio installer.
-2. Copy file 'CMakeSettings.json' from platform folder into the root folder.
+2. Copy file `CMakeSettings.json` from platform folder into the root folder.
 3. Open the root folder as a local folder in Visual Studio.
 4. Done
 
-Make sure to check compiler paths in 'cmake_toolchain.cmake', it should point to your LLVM instalation folders. Althought it point to default instalation folder of LLVM, if you changed the install folder, you'll have to specify the correct path in the toolchain file.
+Make sure to check compiler paths in `cmake_toolchain.cmake`, it should point to your LLVM instalation folders. Althought it point to default instalation folder of LLVM, if you changed the install folder, you'll have to specify the correct path in the toolchain file.
 
 ### Not using Visual Studio 2022
 
-1. Copy file 'CMakePresets.json' from platform folder into the root folder.
+- Copy file `CMakePresets.json` from platform folder into the root folder.
 
 From now everyting depends on your specific enviroment, for example, to used CMake from terminal:
 
-1. List available presets with 'cmake --list-presets'
-2. Configure CMake preset with 'cmake --preset PresetName'
-3. Compile all targets with 'cmake --build --preset PresetName'
+1. List available presets with `cmake --list-presets`
+2. Configure CMake preset with `cmake --preset PresetName`
+3. Compile all targets with `cmake --build --preset PresetName`
 4. Build binaries are located in: 
-- 'CoriEngine/bin/PresetName'
-- 'Apps/RendererSandbox/bin/PresetName'
-- 'Apps/Sandbox/bin/PresetName'
+- `CoriEngine/bin/PresetName`
+- `Apps/RendererSandbox/bin/PresetName`
+- `Apps/Sandbox/bin/PresetName`
 5. Done
 
-Make sure to check compiler paths in 'cmake_toolchain.cmake', it should point to your LLVM instalation folders. Althought it point to default instalation folder of LLVM, if you changed the install folder, you'll have to specify the correct path in the toolchain file.
+Make sure to check compiler paths in `cmake_toolchain.cmake`, it should point to your LLVM instalation folders. Althought it point to default instalation folder of LLVM, if you changed the install folder, you'll have to specify the correct path in the toolchain file.
 
 ***
 
@@ -92,4 +92,3 @@ Window/graphics/rendering are all abstracted, user code has no calls to OpenGL a
 	- I’m planning to make Vulkan a main graphics API for Cori.
 - Also, in the near future I want to implement some kind of Game Entity component system.
 
-# ONLY SUPPORTS COMPILERS WITH GNU-LIKE COMAND-LINE (POSIX), THERE"S NO SUPPORT FOR COMPILERS WITH MSVC-LIKE FRONTEND/COMAND-LINE
