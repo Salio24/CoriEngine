@@ -23,7 +23,7 @@ namespace Cori {
 	private:
 		friend class OpenGLVertexArray;
 
-		uint32_t m_ID; ///////
+		uint32_t m_ID;
 		VBLayout m_Layout;
 	};
 
@@ -35,8 +35,8 @@ namespace Cori {
 		virtual void Unbind() const override;
 
 		virtual uint32_t GetCount() const override;
+		
 	private:
-
 		friend class OpenGLVertexArray;
 
 		uint32_t m_ID;
