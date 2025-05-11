@@ -48,4 +48,62 @@ namespace Cori {
 		CORI_CORE_INFO("");
 		CORI_CORE_INFO("");
 	}
+
+	void Logger::SetClientLogLevel(LogLevel level) {
+		switch (level) {
+		case Cori::LogLevel::TRACE:
+			CORI_CORE_INFO("Client log level is set to TRACE");
+			s_ClientLogger->set_level(spdlog::level::trace);
+			break;
+		case Cori::LogLevel::DEBUG:
+			CORI_CORE_INFO("Client log level is set to DEBUG");
+			s_ClientLogger->set_level(spdlog::level::debug);
+			break;
+		case Cori::LogLevel::INFO:
+			CORI_CORE_INFO("Client log level is set to INFO");
+			s_ClientLogger->set_level(spdlog::level::info);
+			break;
+		case Cori::LogLevel::WARN:
+			CORI_CORE_INFO("Client log level is set to WARN");
+			s_ClientLogger->set_level(spdlog::level::warn);
+			break;
+		case Cori::LogLevel::ERROR:
+			CORI_CORE_INFO("Client log level is set to ERROR");
+			s_ClientLogger->set_level(spdlog::level::err);
+			break;
+		case Cori::LogLevel::FATAL:
+			CORI_CORE_INFO("Client log level is set to FATAL");
+			s_ClientLogger->set_level(spdlog::level::critical);
+			break;
+		}
+	}
+
+	void Logger::SetCoreLogLevel(LogLevel level) {
+		switch (level) {
+		case Cori::LogLevel::TRACE:
+			CORI_CORE_INFO("Core log level is set to TRACE");
+			s_CoreLogger->set_level(spdlog::level::trace);
+			break;
+		case Cori::LogLevel::DEBUG:
+			CORI_CORE_INFO("Core log level is set to DEBUG");
+			s_CoreLogger->set_level(spdlog::level::debug);
+			break;
+		case Cori::LogLevel::INFO:
+			CORI_CORE_INFO("Core log level is set to INFO");
+			s_CoreLogger->set_level(spdlog::level::info);
+			break;
+		case Cori::LogLevel::WARN:
+			CORI_CORE_INFO("Core log level is set to WARN");
+			s_CoreLogger->set_level(spdlog::level::warn);
+			break;
+		case Cori::LogLevel::ERROR:
+			CORI_CORE_INFO("Core log level is set to ERROR");
+			s_CoreLogger->set_level(spdlog::level::err);
+			break;
+		case Cori::LogLevel::FATAL:
+			CORI_CORE_INFO("Core log level is set to FATAL");
+			s_CoreLogger->set_level(spdlog::level::critical);
+			break;
+		}
+	}
 }

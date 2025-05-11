@@ -30,7 +30,7 @@ namespace Cori {
 
 		CORI_CORE_TRACE("GL_VertexBuffer (GL_RuntimeID: {0}): VBO with size {1}, and type {2}, was created successfully", m_ID, size, (drawtype == DRAW_TYPE::DYNAMIC ? "DYNAMIC_DRAW" : drawtype == DRAW_TYPE::STATIC ? "STATIC_DRAW" : "ERROR"));
 		
-#ifdef DEBUG_BUILD  
+#ifdef DEBUG_BUILD
 		{
 		std::string layoutText = "";
 

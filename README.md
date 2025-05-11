@@ -18,7 +18,7 @@ Cori Engine uses CMake as a build system. Currently, it supports only Windows.
 	- (Can be found here: `https://github.com/llvm/llvm-project`)
 		- You can also use other compilers with a Posix frontend, but the project is configured to use LLVM. Thus using something other than LLVM will not work without tweaking the toolchain file.
 
-<ins>**2. Donwloading the repository and dependencies:**</ins>
+<ins>**2. Downloading the repository and dependencies:**</ins>
 
 1. Clone the repository with `git clone -b CoriStable https://github.com/Salio24/VoidScapeDev.git`
 2. Download dependencies by running the 'download_dependencies.bat' script in the root directory.
@@ -27,20 +27,20 @@ Cori Engine uses CMake as a build system. Currently, it supports only Windows.
 
 *Here you have two paths:*
 
-### Using Visual Studio 2022 CMake integration (the prefered way, i use it):
+### Using Visual Studio 2022 CMake integration (the preferred way, i use it):
 
 1. Install CMake tools and the clang-cl toolset for Visual Studio in the Visual Studio Installer.
 2. Copy the file `CMakeSettings.json` from the platform folder into the root folder.
 3. Open the root folder as a local folder in Visual Studio.
 4. Done.
 
-Make sure to check compiler paths in `cmake_toolchain.cmake`. It should point to your LLVM installation folders. Althought it points to the default installation folder of LLVM, if you changed the install folder, you'll have to specify the correct path in the toolchain file.
+Make sure to check compiler paths in `cmake_toolchain.cmake`. It should point to your LLVM installation folders. Although it points to the default installation folder of LLVM, if you changed the install folder, you'll have to specify the correct path in the toolchain file.
 
 ### Not using Visual Studio 2022
 
 - Copy the file `CMakePresets.json` from the platform folder into the root folder.
 
-From now on, everyting depends on your specific environment. For example, to use CMake from the terminal:
+From now on, everything depends on your specific environment. For example, to use CMake from the terminal:
 
 1. List available presets with `cmake --list-presets`
 2. Configure the CMake preset with `cmake --preset PresetName`
@@ -51,7 +51,7 @@ From now on, everyting depends on your specific environment. For example, to use
 - `Apps/Sandbox/bin/PresetName`
 5. Done.
 
-Make sure to check compiler paths in `cmake_toolchain.cmake`. It should point to your LLVM installation folders. Althought it points to the default installation folder of LLVM, if you changed the install folder, you'll have to specify the correct path in the toolchain file.
+Make sure to check compiler paths in `cmake_toolchain.cmake`. It should point to your LLVM installation folders. Although it points to the default installation folder of LLVM, if you changed the install folder, you'll have to specify the correct path in the toolchain file.
 
 ***
 
@@ -83,7 +83,7 @@ Logging and ImGui helps a lot with debugging. The Logger logs everything to the 
 	
 ### Abstraction:
 
-Window/graphics/rendering are all abstracted, user code has no direct calls to OpenGL and other libs, the only exceptions being ImGui and GLM. I’m planning to start experementing with Vulkan in the future, so having a good abstraction is will be very handy. 
+Window/graphics/rendering are all abstracted, user code has no direct calls to OpenGL and other libs, the only exceptions being ImGui and GLM. I’m planning to start experimenting with Vulkan in the future, so having a good abstraction is will be very handy. 
 
 ***
 
@@ -91,8 +91,10 @@ Window/graphics/rendering are all abstracted, user code has no direct calls to O
 
 - Make ImGui window templates. For example, instead of the user having to write a custom window to show a frame graph, we just call something like this: 'CoriImGuiPerformanceMetrics();'
 - By the end of May, I’m planning to port my game VoidScape into the Cori Engine.
-- I also want to start experementing with Vulkan.
+- I also want to start experimenting with Vulkan.
 	- I’m planning to make Vulkan the main graphics API for Cori.
+- Separating engine execution into different threads.
+	- Creating a render command que, and a separate render thread.
 - Also, in the near future, I want to implement some kind of Entity Component System.
 
 ## Currently available Apps

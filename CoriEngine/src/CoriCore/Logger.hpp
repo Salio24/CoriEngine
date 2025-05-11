@@ -5,12 +5,25 @@
 #include <spdlog/fmt/ostr.h>
 
 namespace Cori {
+
+	enum class LogLevel {
+		TRACE,
+		DEBUG,
+		INFO,
+		WARN,
+		ERROR,
+		FATAL
+	};
+
 	class Logger {
 	public:
 		static void Init();
 
 		inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
 		inline static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
+
+		static void SetCoreLogLevel(LogLevel level);
+		static void SetClientLogLevel(LogLevel level);
 
 	private:
 		static std::shared_ptr<spdlog::logger> s_CoreLogger;
