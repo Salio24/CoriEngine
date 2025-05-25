@@ -37,9 +37,15 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
 project(main)
     set(CMAKE_CXX_STANDARD 23)
 
-    if(MSVC)
-        message(FATAL_ERROR "Compilers with MSVC frontend are not supported, use compiler with POSIX frontend (GCC or CLANG/LLVM)")
+    if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        message(FATAL_ERROR "Only Clang/LLVM compiler is supported")
     endif()
+
+    if(MSVC)
+        message(FATAL_ERROR "MSVC Compiler frontend is not supported, use Clang/LLVM with posix frontend")
+    endif()
+
+
 
     add_compile_options(-mavx2)
     

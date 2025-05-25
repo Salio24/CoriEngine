@@ -20,7 +20,7 @@
 #include "../src/CoriCore/Renderer/Image.hpp"
 #include "../src/CoriCore/Renderer/Camera.hpp"
 #include "../src/CoriCore/AssetManager/AssetDefinitions.hpp"
-
+#include "../src/CoriCore/Tile.hpp"
 
 
 

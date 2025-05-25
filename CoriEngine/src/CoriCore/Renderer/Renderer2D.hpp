@@ -5,6 +5,9 @@
 #include "Camera.hpp"
 #include "PipelineProgram.hpp"
 #include "Texture.hpp"
+#include "SpriteAtlas.hpp"
+#include "Sprite.hpp"
+#include "../Tile.hpp"
 
 namespace Cori {
 
@@ -42,8 +45,16 @@ namespace Cori {
 
 		static void DrawQuad(const glm::vec2 position, const glm::vec2 size, const glm::vec4& color);
 
-		static void DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const glm::vec2 textureSize = glm::vec2(1.0f), const glm::vec2 texturePosition = glm::vec2(0.0f));
+		static void DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const glm::vec2 UVmin = glm::vec2(0.0f), const glm::vec2 UVmax = glm::vec2(1.0f));
+
+		static void DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const UVs& uvs);
 		
+		static void DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<SpriteAtlas>& atlas, uint32_t index);
+
+		static void DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Sprite>& sprite);
+
+		static void DrawTile(const std::shared_ptr<Tile> tile);
+
 	private:
 
 		// vvv FOR DEBUG ONLY

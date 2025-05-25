@@ -47,6 +47,11 @@ namespace Cori {
 		CORI_CORE_INFO("");
 		CORI_CORE_INFO("");
 		CORI_CORE_INFO("");
+
+		std::cout << "__PRETTY_FUNCTION__: " << __PRETTY_FUNCTION__ << std::endl;
+		std::cout << "__func__: " << __func__ << std::endl;
+		std::cout << "__FUNCTION__: " << __FUNCTION__ << std::endl;
+		std::cout << "__LINE__: " << __LINE__ << std::endl;
 	}
 
 	void Logger::SetClientLogLevel(LogLevel level) {

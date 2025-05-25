@@ -17,11 +17,24 @@ namespace Cori {
 			"Test Brick Texture",
 			"assets/engine/textures/brick.png"
 		};
+		inline const Texture2DDescriptor TestTileset{
+			"Test Tileset 32",
+			"assets/engine/textures/testTileset32.png"
+		};
 	}
 	
 	namespace Images {
 
 	}
+	
+	namespace SpriteAtlases {
+		inline const SpriteAtlasDescriptor test {
+			"test sprite atlas",
+			Texture2Ds::TestTileset,
+			{32, 32}
+		};
+	}
+
 }
 
 class ExampleLayer : public Cori::Layer {
@@ -30,12 +43,16 @@ public:
 		m_Camera.SetCameraSize(0, 7680, 0, 4320);
 
 		// can also preload assets like this vvv
-		///Cori::AssetManager::PreloadTexture2Ds({
-		///	Cori::Texture2Ds::TestBrickTexture
-		///});
+		Cori::AssetManager::PreloadTexture2Ds({
+			Cori::Texture2Ds::TestBrickTexture
+			});
+
+		Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::test);
+
 		// if the asset is not preloaded it will be loaded the first time it is requested via appropriate
 		// Get function from the Asset Manager
 		Cori::GraphicsCall::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
+
 	}
 
 	virtual void OnEvent(Cori::Event& event) override {
@@ -186,7 +203,9 @@ public:
 
 		for (int i = 0; i < m_QuadRows; i++) {
 			for (int y = 0; y < m_QuadColumns; y++) {
-				Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset , i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetTexture2D(Cori::Texture2Ds::TestBrickTexture));
+				//Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset , i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetTexture2D(Cori::Texture2Ds::TestBrickTexture));
+				//Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset, i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::test), 23);
+				Cori::Renderer2D::DrawTile(testTile);
 			}
 		}
 
@@ -218,6 +237,8 @@ public:
 	int m_QuadRows{ 1 };
 
 	Cori::OrthoCamera m_Camera;
+
+	std::shared_ptr<Cori::Tile> testTile = Cori::Tile::Create({ 30.0f, 30.0f }, { 500.0f, 500.0f }, Cori::SpriteAtlases::test, 23);
 
 	float m_CameraMoveSpeed = 10.0f;
 
