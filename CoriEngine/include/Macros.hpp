@@ -1,6 +1,7 @@
 #pragma once
 
 namespace Cori {
+
 	#define CORI_PLACEHOLDERS(x) PLACEHOLDER_SELECT(x)
 	#define PLACEHOLDER_SELECT(x) PLACEHOLDER_IMPL_##x
 	

@@ -1,7 +1,6 @@
 #pragma once
 #include "../Buffers.hpp"
 
-
 namespace Cori {
 
 	class OpenGLVertexArray;

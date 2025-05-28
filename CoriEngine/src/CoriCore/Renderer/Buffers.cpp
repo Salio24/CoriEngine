@@ -6,7 +6,7 @@
 
 namespace Cori {
 	std::shared_ptr<VertexBuffer> VertexBuffer::Create() {
-		switch (Application::GetWindow().GetAPI()) {
+		switch (Application::GetCurrentAPI()) {
 		case GraphicsAPIs::None:
 			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
 			return nullptr;
@@ -26,7 +26,7 @@ namespace Cori {
 	}
 
 	std::shared_ptr<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count) {
-		switch (Application::GetWindow().GetAPI()) {
+		switch (Application::GetCurrentAPI()) {
 		case GraphicsAPIs::None:
 			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
 			return nullptr;

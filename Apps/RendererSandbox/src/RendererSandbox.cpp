@@ -34,7 +34,6 @@ namespace Cori {
 			{32, 32}
 		};
 	}
-
 }
 
 class ExampleLayer : public Cori::Layer {
@@ -205,6 +204,7 @@ public:
 			for (int y = 0; y < m_QuadColumns; y++) {
 				//Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset , i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetTexture2D(Cori::Texture2Ds::TestBrickTexture));
 				//Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset, i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::test), 23);
+				
 				Cori::Renderer2D::DrawTile(testTile);
 			}
 		}
@@ -213,6 +213,8 @@ public:
 	}
 
 	virtual void OnTickUpdate() override {
+		//Cori::InstanceMetrics<Cori::Sprite>::Report();
+		
 		glm::vec2 cameraPosDelta = glm::vec2(0.0f);
 
 		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_W)) {

@@ -26,7 +26,9 @@ namespace Cori {
 		glm::ivec2 m_SpriteAtlasDimensions;
 		uint32_t m_SpriteAtlasSize;
 
-		const Texture2DDescriptor& m_TextureDescriptor;
+		// replaced with std::shared
+
+		std::shared_ptr<Texture2D> m_Texture;
 
 		std::vector<UVs> m_SpriteUVs;
 	};

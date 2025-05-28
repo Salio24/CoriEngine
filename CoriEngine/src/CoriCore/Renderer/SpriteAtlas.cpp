@@ -22,11 +22,11 @@ namespace Cori {
 	}
 
 	const std::shared_ptr<Texture2D> SpriteAtlas::GetTexture() const {
-		return AssetManager::GetTexture2D(m_TextureDescriptor);
+		return m_Texture;
 	}
 
-	SpriteAtlas::SpriteAtlas(const SpriteAtlasDescriptor& descriptor) : m_TextureDescriptor(descriptor.m_TextureDescriptor) {
-		std::shared_ptr<Texture2D> m_Texture = AssetManager::GetTexture2D(m_TextureDescriptor);
+	SpriteAtlas::SpriteAtlas(const SpriteAtlasDescriptor& descriptor) {
+		m_Texture = AssetManager::GetTexture2D(descriptor.m_TextureDescriptor);
 
 		CORI_CORE_ASSERT_ERROR((!(m_Texture->GetHeight() % descriptor.m_SpriteResolution.y) || !(m_Texture->GetWidth() % descriptor.m_SpriteResolution.x)), "SpriteAtlas: {0}, invalid sprite resolution, sprite resolution on x and y should be divisible by texture resolution without remainder.");
 

@@ -28,6 +28,8 @@ namespace Cori {
 
 		inline static GameTimer& GetGameTimer() { return Get().m_GameTimer; }
 
+		inline static GraphicsAPIs GetCurrentAPI() { return GetWindow().GetAPI(); }
+
 	private: 
 
 		// idk if i even need this Get func

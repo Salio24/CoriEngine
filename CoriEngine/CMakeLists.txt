@@ -149,6 +149,7 @@ endif()
 
     # pch
     target_precompile_headers(${ENGINE_LIBRARY_NAME} PRIVATE ${CORI_HEADERS_DIR}/Cori_pch.hpp)
+    target_precompile_headers(${ENGINE_LIBRARY_NAME} PUBLIC ${CORI_HEADERS_DIR}/App_pch.hpp)
 
     # disable compilation warnings from thirdparty libs
 
