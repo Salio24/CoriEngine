@@ -1,10 +1,11 @@
 #pragma once
 #include "Texture.hpp"
-#include "../Profiling/FactoryBaseCRTP.hpp"
+#include "../Profiling/Trackable.hpp"
+#include "../SelfFactory.hpp"
 
 namespace Cori {
-	class Sprite : public SharedFactoryTrackable<Sprite> {
-		CORI_DECLARE_SHARED_FACTORY_TRACKABLE(Sprite, (const std::shared_ptr<Texture2D>& texture, const UVs& uv));
+	class Sprite : public Trackable<Sprite>, public SharedSeflFactory<Sprite> {
+		CORI_DECLARE_SHARED_SELF_FACTORY(Sprite, (const std::shared_ptr<Texture2D>& texture, const UVs& uv));
 
 	public:
 

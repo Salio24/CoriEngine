@@ -127,6 +127,11 @@ endif()
         $<$<CONFIG:Release>:RELEASE_BUILD>
     )
 
+    target_compile_definitions(${ENGINE_LIBRARY_NAME} PUBLIC
+        $<$<CONFIG:Debug>:CORI_ENABLE_PROFILING>
+        $<$<CONFIG:RelWithDebInfo>:CORI_ENABLE_PROFILING>
+    )
+
     # compile flags just for the engine dll
     target_compile_options(${ENGINE_LIBRARY_NAME} PRIVATE -Wall -Wextra)
 

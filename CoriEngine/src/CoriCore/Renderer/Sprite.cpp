@@ -3,7 +3,7 @@
 
 namespace Cori {
 
-	CORI_DEFINE_SHARED_FACTORY_TRACKABLE(
+	CORI_DEFINE_SHARED_SELF_FACTORY(
 		Sprite,
 			{
 

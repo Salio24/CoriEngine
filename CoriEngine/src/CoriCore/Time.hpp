@@ -36,17 +36,6 @@ namespace Cori {
 		std::function<void()> m_TickrateUpdateFunc{ nullptr };
 	};
 
-	class ScopeTimer {
-	public:
-		ScopeTimer(std::string name);
-
-		~ScopeTimer();
-
-	private:
-		std::string m_Name;
-		uint64_t m_Start;
-	};
-
 	class ManualTimer {
 	public:
 		ManualTimer() = default;

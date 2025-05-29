@@ -37,10 +37,10 @@ namespace Cori {
 		return sizes[(GLenum)type];
 	}
 
-	OpenGLVertexArray::OpenGLVertexArray() {
+	CORI_DEFINE_SHARED_FACTORY_REGISTERED(OpenGLVertexArray, {}, (), { 
 		glGenVertexArrays(1, &m_ID);
-		glBindVertexArray(0);
-	}
+		glBindVertexArray(0); 
+		});
 
 	OpenGLVertexArray::~OpenGLVertexArray() {
 		glBindVertexArray(m_ID);

@@ -72,6 +72,7 @@ namespace Cori {
 			m_ImGuiLayer->EndFrame();
 
 			m_Window->OnUpdate();
+
 		}
 	}
 

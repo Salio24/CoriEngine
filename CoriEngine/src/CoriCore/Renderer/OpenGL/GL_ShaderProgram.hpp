@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include "../ShaderProgram.hpp"
+#include "../../Profiling/Trackable.hpp"
 
 namespace Cori {
 	class OpenGLShaderProgram : public ShaderProgram {

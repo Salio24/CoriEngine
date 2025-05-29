@@ -123,7 +123,6 @@ namespace Cori {
 	// batching 
 
 	void Renderer2D::BeginBatch(const glm::mat4& viewProjection, const glm::mat4& model) {
-
 		// maybe separate begin and end batch for each batch renderer, and invoke them from something like scene begin/end?
 		// TODO ^^^^^
 
@@ -156,6 +155,7 @@ namespace Cori {
 		return s_DrawCallCount;
 	}
 
+	// dangerous, dont use
 	void Renderer2D::SetQuadsPerDraw(const uint32_t count) {
 		s_MaxQuadCount = count;
 		s_MaxVertexCount = s_MaxQuadCount * 4;

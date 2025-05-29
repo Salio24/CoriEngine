@@ -34,5 +34,4 @@ namespace Cori {
 		const uint32_t runtimeID{ 0 };
 		inline static std::atomic<uint32_t> s_NextRuntimeID{ 1 };
 	};
-
 }
