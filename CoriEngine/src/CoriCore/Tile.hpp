@@ -5,7 +5,7 @@
 #include "SelfFactory.hpp"
 
 namespace Cori {
-	class Tile : public Trackable<Tile>, public SharedSeflFactory<Tile>{
+	class Tile : public Profiling::Trackable<Tile>, public SharedSeflFactory<Tile>{
 	public:
 		
 		const std::shared_ptr<Sprite> GetSprite() const { return m_Sprite; }

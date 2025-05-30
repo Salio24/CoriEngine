@@ -189,6 +189,5 @@ namespace Cori {
 		ScopedTimer::~ScopedTimer() {
 			TimeProfiler::Get().RecordRawEvent(RawEventType::ScopeEnd, m_Name, m_Line);
 		}
-
 	}
 }
