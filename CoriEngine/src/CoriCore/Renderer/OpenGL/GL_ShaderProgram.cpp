@@ -6,8 +6,8 @@
 
 namespace Cori {
 
-	OpenGLShaderProgram::OpenGLShaderProgram(const std::string_view debugName, const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view geometryPath) {
-
+	CORI_DEFINE_SHARED_FACTORY_REGISTERED(OpenGLShaderProgram, {}, (const std::string_view debugName, const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view geometryPath), {
+		
 		m_DebugName = debugName;
 
 		bool geometryShaderPresent = false;
@@ -78,7 +78,7 @@ namespace Cori {
 		else {
 			CORI_CORE_ERROR("GL_ShaderProgram (GL_RuntimeID: {0}): Creation of {1} with shaders:\n{2}\n{3}Has failed", m_ID, m_DebugName,m_ShaderNames, CORI_SECOND_LINE_SPACING);
 		}
-	}
+	});
 
 	OpenGLShaderProgram::~OpenGLShaderProgram() {
 		glDeleteProgram(m_ID);

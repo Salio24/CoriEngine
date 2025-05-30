@@ -21,7 +21,7 @@ namespace Cori {
 			SDL_Surface* converted = SDL_ConvertSurface(static_cast<SDL_Surface*>(m_Surface), SDL_PIXELFORMAT_RGBA32);
 			if CORI_CORE_ASSERT_ERROR(converted, "Image: Failed to convert image: '{0}', {1}", path, SDL_GetError()) { 
 				m_Surface = IMG_Load("assets/engine/textures/missing_texture32.png");
-				SDL_DestroySurface(converted); 
+				SDL_DestroySurface(converted);
 				
 			}
 			else {

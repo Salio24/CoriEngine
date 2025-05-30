@@ -220,7 +220,7 @@ public:
 	virtual void OnTickUpdate() override {
 
 		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_8)) {
-			Cori::InstanceMetrics<Cori::Sprite>::Report();
+			Cori::InstanceMetrics<Cori::SpriteAtlas>::Report();
 		}
 
 		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_9)) {
@@ -252,7 +252,7 @@ public:
 
 	Cori::OrthoCamera m_Camera;
 
-	std::shared_ptr<Cori::Tile> testTile = Cori::Tile::Create({ 30.0f, 30.0f }, { 500.0f, 500.0f }, Cori::SpriteAtlases::test, 23);
+	std::shared_ptr<Cori::Tile> testTile = Cori::Tile::Create(glm::vec2(30.0f), glm::vec2(500.0f), Cori::SpriteAtlases::test, 23);
 
 	float m_CameraMoveSpeed = 10.0f;
 

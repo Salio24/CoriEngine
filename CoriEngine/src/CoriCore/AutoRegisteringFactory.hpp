@@ -2,6 +2,10 @@
 
 namespace Cori {
 
+	// MAKE SURE THAT THE CTORARGS ARE THE SAME IN CreateShared\Unique and in RegisterInSharedFactory\UniqueFactory
+
+	// probuably will get rid of this types of macros, they're more annoying than helpful, intellisense is freaking out because of them
+
 	// make unique factory as well
 	template <typename BaseType, typename KeyType, typename... CtorArgs>
 	class Factory {
@@ -15,6 +19,7 @@ namespace Cori {
 		}
 
 		bool RegisterShared(const KeyType& key, SharedCreator creator) {
+
 			if (m_SharedCreators.count(key)) {
 				return false;
 			}
@@ -42,6 +47,7 @@ namespace Cori {
 
 	private:
 		std::shared_ptr<BaseType> CreateSharedImpl(const KeyType& key, CtorArgs... ctorArgs) {
+
 			auto it = m_SharedCreators.find(key);
 			if (it == m_SharedCreators.end()) {
 				CORI_CORE_ERROR("Factory: No shared creator registered for Key: '{0}' (numeric: {1}) (BaseType: '{2}')", typeid(key).name(), static_cast<int>(key), Logger::ColoredText(typeid(BaseType).name(), fmt::color::violet));

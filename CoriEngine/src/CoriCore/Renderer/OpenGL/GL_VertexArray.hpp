@@ -7,7 +7,6 @@
 namespace Cori {
 
 	class OpenGLVertexArray : public VertexArray, public Trackable<OpenGLVertexArray, VertexArray>, public RegisterInSharedFactory<VertexArray, OpenGLVertexArray, GraphicsAPIs, GraphicsAPIs::OpenGL> {
-	CORI_DECLARE_SHARED_FACTORY_REGISTERED(OpenGLVertexArray, ());
 	public:
 		virtual ~OpenGLVertexArray();
 		virtual void Bind() const override;
@@ -27,5 +26,6 @@ namespace Cori {
 		std::shared_ptr<IndexBuffer> m_IndexBuffer;
 
 
+		CORI_DECLARE_SHARED_FACTORY_REGISTERED(OpenGLVertexArray, ());
 	};
 }

@@ -56,7 +56,7 @@ namespace Cori {
 		static void RegisterDerivedReporter(const std::type_index& derivedTypeId, DerivedMetricsReporter reporter) {
 			if (s_DerivedMetricsReporters.find(derivedTypeId) == s_DerivedMetricsReporters.end()) {
 				s_DerivedMetricsReporters.insert({ derivedTypeId, reporter });
-				CORI_CORE_TRACE("InstanceMetrics<{0}>: Registered reporter for derived type '{1}'", Logger::ColoredText(typeid(T).name(), fmt::color::violet), Logger::ColoredText(derivedTypeId.name(), fmt::color::crimson));
+				CORI_CORE_DEBUG("InstanceMetrics<{0}>: Registered reporter for derived type: {1}", typeid(T).name(), Logger::ColoredText(derivedTypeId.name(), fmt::color::crimson));
 			}
 		}
 
@@ -81,7 +81,7 @@ namespace Cori {
 		static void RegisterDerivedMetricsProvider(const std::type_index& derivedTypeId, DerivedMetricsProvider provider) {
 			if (s_DerivedMetricsProviders.find(derivedTypeId) == s_DerivedMetricsProviders.end()) {
 				s_DerivedMetricsProviders.insert({ derivedTypeId, provider });
-				CORI_CORE_TRACE("InstanceMetrics<{0}>: Registered metrics provider for derived type: '{1}'", Logger::ColoredText(typeid(T).name(), fmt::color::violet), Logger::ColoredText(derivedTypeId.name(), fmt::color::crimson));
+				CORI_CORE_DEBUG("InstanceMetrics<{0}>: Registered metrics provider for derived type: {1}", typeid(T).name(), Logger::ColoredText(derivedTypeId.name(), fmt::color::crimson));
 			}
 		}
 

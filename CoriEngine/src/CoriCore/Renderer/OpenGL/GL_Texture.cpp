@@ -6,11 +6,11 @@
 
 namespace Cori {
 
-	OpenGLTexture2D::OpenGLTexture2D(const std::string& path) {
+	CORI_DEFINE_SHARED_FACTORY_REGISTERED(OpenGLTexture2D, {}, (const std::string& path), {
 		std::unique_ptr<Image> image = std::make_unique<Image>(path);
 		m_Width = image->GetWidth();
 		m_Height = image->GetHeight();
-		
+
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_ID);
 
 		glTextureStorage2D(m_ID, 1, GL_RGBA8, static_cast<GLsizei>(m_Width), static_cast<GLsizei>(m_Height));
@@ -29,7 +29,9 @@ namespace Cori {
 		else {
 			CORI_CORE_WARN("GL_Texture2D (GL_RuntimeID; {0}): Image loading failed to load '{0}', a placeholder was used to create texture2D instead", path);
 		}
-	}
+		});
+
+	
 
 	OpenGLTexture2D::~OpenGLTexture2D() {
 		glDeleteTextures(1, &m_ID);

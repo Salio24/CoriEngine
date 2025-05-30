@@ -1,6 +1,8 @@
 #pragma once
 
 namespace Cori {
+	// TODO: adapt factory here, later
+
 	class OrthoCamera {
 	public:
 		OrthoCamera() = default;

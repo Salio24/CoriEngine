@@ -7,6 +7,11 @@
 
 namespace Cori {
 
+	CORI_DEFINE_SHARED_FACTORY_REGISTERED(OpenGLVertexBuffer, {}, (), {
+		glCreateBuffers(1, &m_ID);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	});
+
 	OpenGLVertexBuffer::~OpenGLVertexBuffer() {
 		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
 		glDeleteBuffers(1, &m_ID);
@@ -73,7 +78,7 @@ namespace Cori {
 		m_Layout = layout;
 	}
 
-	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count) : m_Count(count) {
+	CORI_DEFINE_SHARED_FACTORY_REGISTERED(OpenGLIndexBuffer, {}, (uint32_t* indices, uint32_t count), : m_Count(count) {
 		glCreateBuffers(1, &m_ID);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(count), indices, GL_STATIC_DRAW);
@@ -81,7 +86,7 @@ namespace Cori {
 		CORI_CORE_TRACE("GL_IndexBuffer (GL_RuntimeID: {0}): IBO with size {1}, and type STATIC_DRAW, was created successfully", m_ID, count);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	}
+	});
 
 	OpenGLIndexBuffer::~OpenGLIndexBuffer() {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);

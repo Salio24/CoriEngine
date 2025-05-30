@@ -2,13 +2,13 @@
 #include "../AssetManager/SpriteAtlasDescriptor.hpp"
 #include "Sprite.hpp"
 #include "Texture.hpp"
+#include "../Profiling/Trackable.hpp"
+#include "../SelfFactory.hpp"
 
 namespace Cori {
 
-	class SpriteAtlas {
+	class SpriteAtlas : public Trackable<SpriteAtlas>, public SharedSeflFactory<SpriteAtlas> {
 	public:
-
-		static std::shared_ptr<SpriteAtlas> Create(const SpriteAtlasDescriptor& descriptor);
 
 		const std::shared_ptr<Texture2D> GetTexture() const;
 
@@ -17,8 +17,6 @@ namespace Cori {
 		const UVs& GetSpriteUVsAtPosition(glm::ivec2 pos) const;
 
 	private:
-
-		SpriteAtlas(const SpriteAtlasDescriptor& descriptor);
 
 		std::string_view m_DebugName;
 
@@ -31,5 +29,7 @@ namespace Cori {
 		std::shared_ptr<Texture2D> m_Texture;
 
 		std::vector<UVs> m_SpriteUVs;
+
+		CORI_DECLARE_SHARED_SELF_FACTORY(SpriteAtlas, (const SpriteAtlasDescriptor& descriptor));
 	};
 }
