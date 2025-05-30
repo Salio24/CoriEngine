@@ -21,7 +21,7 @@
 #include "../src/CoriCore/Renderer/Camera.hpp"
 #include "../src/CoriCore/AssetManager/AssetDefinitions.hpp"
 #include "../src/CoriCore/Tile.hpp"
-
+#include "../src/CoriCore/Profiling/TimeProfiler.hpp"
 
 
 

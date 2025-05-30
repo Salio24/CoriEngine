@@ -196,6 +196,7 @@ namespace Cori {
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const glm::vec4& color) {
+		CORI_PROFILE_FUNCTION();
 		if (CORI_CORE_ASSERT_ERROR(s_BatchActive, "You're trying to call DrawQuad, but you have not started a batch, it will not work.")) { return;  }
 		if (s_IndexCount_FlatColorQuad >= s_MaxIndexCount) {
 			NewBatch();
@@ -257,6 +258,8 @@ namespace Cori {
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const glm::vec2 UVmin, const glm::vec2 UVmax) {
+		CORI_PROFILE_FUNCTION();
+
 		if (CORI_CORE_ASSERT_ERROR(s_BatchActive, "You're trying to call DrawQuad, but you have not started a batch, it will not work.")) { return; }
 		if (s_IndexCount_TexturedQuad >= s_MaxIndexCount) {
 			NewBatch();

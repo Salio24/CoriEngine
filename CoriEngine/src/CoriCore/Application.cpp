@@ -56,7 +56,7 @@ namespace Cori {
 
 	void Application::Run() {
 		while(m_Running) {
-
+			CORI_PROFILER_FRAME_START();
 			m_GameTimer.Update();
 
 			for (Layer* layer : m_LayerStack) {
@@ -72,7 +72,7 @@ namespace Cori {
 			m_ImGuiLayer->EndFrame();
 
 			m_Window->OnUpdate();
-
+			CORI_PROFILER_FRAME_END();
 		}
 	}
 

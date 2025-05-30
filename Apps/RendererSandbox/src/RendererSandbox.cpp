@@ -67,6 +67,7 @@ public:
 
 		dispatcher.Dispatch<Cori::KeyReleasedEvent>([this](const Cori::KeyReleasedEvent& e) -> bool {
 			if (e.GetKeyCode() == Cori::CORI_KEY_P) {
+				CORI_PROFILE_REQUEST_NEXT_FRAME();
 			}
 			return false;
 		});
@@ -195,6 +196,7 @@ public:
 	}
 
 	void OnUpdate(const double deltaTime) override {
+		CORI_PROFILE_FUNCTION();
 		// TODO, get rid of raw pointers in create funcs
 		Cori::GraphicsCall::SetClearColor({ 0.875f, 0.6875f, 1.0f, 1.0f });
 		Cori::GraphicsCall::ClearFramebuffer();
@@ -218,7 +220,7 @@ public:
 	}
 
 	virtual void OnTickUpdate() override {
-
+		CORI_PROFILE_FUNCTION();
 		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_8)) {
 			Cori::InstanceMetrics<Cori::SpriteAtlas>::Report();
 		}
