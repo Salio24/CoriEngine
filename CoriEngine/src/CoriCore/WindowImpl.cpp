@@ -63,6 +63,7 @@ namespace Cori {
 	}
 
 	void WindowImpl::OnUpdate() {
+		CORI_PROFILE_FUNCTION();
 		SDL_Event e;
 		while (SDL_PollEvent(&e)) {
 

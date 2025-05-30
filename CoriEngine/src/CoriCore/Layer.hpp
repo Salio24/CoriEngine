@@ -1,5 +1,6 @@
 #pragma once
 #include "EventSystem/Event.hpp"
+#include "Profiling/TimeProfiler.hpp"
 
 namespace Cori {
 
@@ -11,9 +12,9 @@ namespace Cori {
 
 		virtual void OnAttach();
 		virtual void OnDetach();
-		virtual void OnUpdate(const double deltaTime) {}
+		virtual void OnUpdate(const double deltaTime) { }
 		virtual void OnTickUpdate() {}
-		virtual void OnImGuiRender(const double deltaTime) {}
+		virtual void OnImGuiRender(const double deltaTime) { }
 		virtual void OnEvent(Event& event) {}
 
 		inline const std::string& GetName() const { return m_DebugName; }

@@ -74,7 +74,7 @@ public:
 	}
 
 	virtual void OnImGuiRender(const double deltaTime) override {
-
+		CORI_PROFILE_FUNCTION();
 		ImGui::Begin("Performance metrics");
 
 		ImGui::SeparatorText("Frametime graph (of last 500 frames)");
@@ -197,7 +197,6 @@ public:
 
 	void OnUpdate(const double deltaTime) override {
 		CORI_PROFILE_FUNCTION();
-		// TODO, get rid of raw pointers in create funcs
 		Cori::GraphicsCall::SetClearColor({ 0.875f, 0.6875f, 1.0f, 1.0f });
 		Cori::GraphicsCall::ClearFramebuffer();
 
@@ -209,8 +208,8 @@ public:
 
 		for (int i = 0; i < m_QuadRows; i++) {
 			for (int y = 0; y < m_QuadColumns; y++) {
-				Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset , i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetTexture2D(Cori::Texture2Ds::TestBrickTexture));
-				//Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset, i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::test), 23);
+				//Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset , i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetTexture2D(Cori::Texture2Ds::TestBrickTexture));
+				Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset, i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::test), 23);
 				
 				//Cori::Renderer2D::DrawTile(testTile);
 			}
@@ -222,11 +221,11 @@ public:
 	virtual void OnTickUpdate() override {
 		CORI_PROFILE_FUNCTION();
 		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_8)) {
-			Cori::InstanceMetrics<Cori::SpriteAtlas>::Report();
+			Cori::Profiling::InstanceMetrics<Cori::SpriteAtlas>::Report();
 		}
 
 		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_9)) {
-			Cori::InstanceMetrics<Cori::VertexArray>::Report();
+			Cori::Profiling::InstanceMetrics<Cori::VertexArray>::Report();
 		}
 		
 		glm::vec2 cameraPosDelta = glm::vec2(0.0f);

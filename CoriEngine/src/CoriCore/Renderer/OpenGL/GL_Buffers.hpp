@@ -7,7 +7,7 @@ namespace Cori {
 
 	class OpenGLVertexArray;
 
-	class OpenGLVertexBuffer : public VertexBuffer, public Trackable<OpenGLVertexBuffer, VertexBuffer>, public RegisterInSharedFactory<VertexBuffer, OpenGLVertexBuffer, GraphicsAPIs, GraphicsAPIs::OpenGL> {
+	class OpenGLVertexBuffer : public VertexBuffer, public Profiling::Trackable<OpenGLVertexBuffer, VertexBuffer>, public RegisterInSharedFactory<VertexBuffer, OpenGLVertexBuffer, GraphicsAPIs, GraphicsAPIs::OpenGL> {
 	public:
 		virtual ~OpenGLVertexBuffer();
 		virtual void Init(const float* vertices, uint32_t size, DRAW_TYPE drawtype) override;
@@ -28,7 +28,7 @@ namespace Cori {
 		CORI_DECLARE_SHARED_FACTORY_REGISTERED(OpenGLVertexBuffer, ());
 	};
 
-	class OpenGLIndexBuffer : public IndexBuffer, public Trackable<OpenGLIndexBuffer, IndexBuffer>, public RegisterInSharedFactory<IndexBuffer, OpenGLIndexBuffer, GraphicsAPIs, GraphicsAPIs::OpenGL, uint32_t*, uint32_t> {
+	class OpenGLIndexBuffer : public IndexBuffer, public Profiling::Trackable<OpenGLIndexBuffer, IndexBuffer>, public RegisterInSharedFactory<IndexBuffer, OpenGLIndexBuffer, GraphicsAPIs, GraphicsAPIs::OpenGL, uint32_t*, uint32_t> {
 	public:
 
 		virtual ~OpenGLIndexBuffer();

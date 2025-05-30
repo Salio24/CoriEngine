@@ -4,7 +4,7 @@
 #include "../../AutoRegisteringFactory.hpp"
 
 namespace Cori {
-	class OpenGLShaderProgram : public ShaderProgram, public Trackable<OpenGLShaderProgram, ShaderProgram>, public RegisterInSharedFactory<ShaderProgram, OpenGLShaderProgram, GraphicsAPIs, GraphicsAPIs::OpenGL, const std::string_view, const std::string_view, const std::string_view, const std::string_view> {
+	class OpenGLShaderProgram : public ShaderProgram, public Profiling::Trackable<OpenGLShaderProgram, ShaderProgram>, public RegisterInSharedFactory<ShaderProgram, OpenGLShaderProgram, GraphicsAPIs, GraphicsAPIs::OpenGL, const std::string_view, const std::string_view, const std::string_view, const std::string_view> {
 	public:
 		virtual ~OpenGLShaderProgram();
 

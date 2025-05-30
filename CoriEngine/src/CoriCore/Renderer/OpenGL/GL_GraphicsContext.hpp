@@ -4,7 +4,7 @@
 #include "../../AutoRegisteringFactory.hpp"
 
 namespace Cori {
-	class OpenGLContext : public RenderingContext, public Trackable<OpenGLContext, RenderingContext>, public RegisterInUniqueFactory<RenderingContext, OpenGLContext, GraphicsAPIs, GraphicsAPIs::OpenGL> {
+	class OpenGLContext : public RenderingContext, public Profiling::Trackable<OpenGLContext, RenderingContext>, public RegisterInUniqueFactory<RenderingContext, OpenGLContext, GraphicsAPIs, GraphicsAPIs::OpenGL> {
 	public:
 		virtual ~OpenGLContext();
 		virtual void Init(SDL_Window* window) override;

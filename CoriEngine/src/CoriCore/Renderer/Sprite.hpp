@@ -4,7 +4,7 @@
 #include "../SelfFactory.hpp"
 
 namespace Cori {
-	class Sprite : public Trackable<Sprite>, public SharedSeflFactory<Sprite> {
+	class Sprite : public Profiling::Trackable<Sprite>, public SharedSeflFactory<Sprite> {
 		CORI_DECLARE_SHARED_SELF_FACTORY(Sprite, (const std::shared_ptr<Texture2D>& texture, const UVs& uv));
 
 	public:

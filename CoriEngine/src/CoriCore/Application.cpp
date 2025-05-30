@@ -57,21 +57,24 @@ namespace Cori {
 	void Application::Run() {
 		while(m_Running) {
 			CORI_PROFILER_FRAME_START();
-			m_GameTimer.Update();
+			{
+				CORI_PROFILE_SCOPE("Cori Engine Global Update");
+				m_GameTimer.Update();
 
-			for (Layer* layer : m_LayerStack) {
-				layer->OnUpdate(m_GameTimer);
+				for (Layer* layer : m_LayerStack) {
+					layer->OnUpdate(m_GameTimer);
+				}
+
+				m_ImGuiLayer->StartFrame();
+
+				for (Layer* layer : m_LayerStack) {
+					layer->OnImGuiRender(m_GameTimer);
+				}
+
+				m_ImGuiLayer->EndFrame();
+
+				m_Window->OnUpdate();
 			}
-
-			m_ImGuiLayer->StartFrame();
-
-			for (Layer* layer : m_LayerStack) {
-				layer->OnImGuiRender(m_GameTimer);
-			}
-
-			m_ImGuiLayer->EndFrame();
-
-			m_Window->OnUpdate();
 			CORI_PROFILER_FRAME_END();
 		}
 	}

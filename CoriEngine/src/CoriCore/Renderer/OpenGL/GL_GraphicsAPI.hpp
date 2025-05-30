@@ -4,7 +4,7 @@
 #include "../../AutoRegisteringFactory.hpp"
 
 namespace Cori {
-	class OpenGLGraphicsAPI : public CoriGraphicsAPI, public Trackable<OpenGLGraphicsAPI, CoriGraphicsAPI>, public RegisterInUniqueFactory<CoriGraphicsAPI, OpenGLGraphicsAPI, GraphicsAPIs, GraphicsAPIs::OpenGL> {
+	class OpenGLGraphicsAPI : public CoriGraphicsAPI, public Profiling::Trackable<OpenGLGraphicsAPI, CoriGraphicsAPI>, public RegisterInUniqueFactory<CoriGraphicsAPI, OpenGLGraphicsAPI, GraphicsAPIs, GraphicsAPIs::OpenGL> {
 	public:
 
 		virtual void Init() override;

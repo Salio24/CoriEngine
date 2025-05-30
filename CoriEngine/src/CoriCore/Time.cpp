@@ -10,6 +10,7 @@ namespace Cori {
 	}
 
 	void GameTimer::Update() {
+		CORI_PROFILE_FUNCTION();
 		uint64_t now = SDL_GetPerformanceCounter();
 		m_DeltaTime = static_cast<double>(now - m_LastTime) / SDL_GetPerformanceFrequency();
 		m_LastTime = now;

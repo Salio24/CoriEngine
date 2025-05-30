@@ -6,7 +6,7 @@
 
 namespace Cori {
 
-	class OpenGLVertexArray : public VertexArray, public Trackable<OpenGLVertexArray, VertexArray>, public RegisterInSharedFactory<VertexArray, OpenGLVertexArray, GraphicsAPIs, GraphicsAPIs::OpenGL> {
+	class OpenGLVertexArray : public VertexArray, public Profiling::Trackable<OpenGLVertexArray, VertexArray>, public RegisterInSharedFactory<VertexArray, OpenGLVertexArray, GraphicsAPIs, GraphicsAPIs::OpenGL> {
 	public:
 		virtual ~OpenGLVertexArray();
 		virtual void Bind() const override;

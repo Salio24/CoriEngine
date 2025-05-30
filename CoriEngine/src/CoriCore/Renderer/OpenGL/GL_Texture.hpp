@@ -5,7 +5,7 @@
 #include "../GraphicsAPIs.hpp"
 
 namespace Cori {
-	class OpenGLTexture2D : public Texture2D, public Trackable<OpenGLTexture2D, Texture2D>, public RegisterInSharedFactory<Texture2D, OpenGLTexture2D, GraphicsAPIs, GraphicsAPIs::OpenGL, const std::string&> {
+	class OpenGLTexture2D : public Texture2D, public Profiling::Trackable<OpenGLTexture2D, Texture2D>, public RegisterInSharedFactory<Texture2D, OpenGLTexture2D, GraphicsAPIs, GraphicsAPIs::OpenGL, const std::string&> {
 	public:
 		virtual ~OpenGLTexture2D();
 

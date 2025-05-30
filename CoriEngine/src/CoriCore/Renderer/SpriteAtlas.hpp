@@ -7,7 +7,7 @@
 
 namespace Cori {
 
-	class SpriteAtlas : public Trackable<SpriteAtlas>, public SharedSeflFactory<SpriteAtlas> {
+	class SpriteAtlas : public Profiling::Trackable<SpriteAtlas>, public SharedSeflFactory<SpriteAtlas> {
 	public:
 
 		const std::shared_ptr<Texture2D> GetTexture() const;

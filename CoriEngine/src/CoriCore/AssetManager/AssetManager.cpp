@@ -32,6 +32,7 @@ namespace Cori {
 	}
 
 	std::shared_ptr<ShaderProgram> AssetManager::GetShaderImpl(const ShaderProgramDescriptor& descriptor) {
+		CORI_PROFILE_FUNCTION();
 		auto it = m_ShaderCache.find(descriptor.GetRuntimeID());
 		if (it != m_ShaderCache.end()) {
 			return it->second;
@@ -50,6 +51,7 @@ namespace Cori {
 	}
 
 	std::shared_ptr<Texture2D> AssetManager::GetTexture2DImpl(const Texture2DDescriptor& descriptor) {
+		CORI_PROFILE_FUNCTION();
 		auto it = m_Texture2DCache.find(descriptor.GetRuntimeID());
 		if (it != m_Texture2DCache.end()) {
 			return it->second;
@@ -68,6 +70,7 @@ namespace Cori {
 	}
 
 	std::shared_ptr<SpriteAtlas> AssetManager::GetSpriteAtlasImpl(const SpriteAtlasDescriptor& descriptor) {
+		CORI_PROFILE_FUNCTION();
 		auto it = m_SpriteAtlasCache.find(descriptor.GetRuntimeID());
 		if (it != m_SpriteAtlasCache.end()) {
 			return it->second;
