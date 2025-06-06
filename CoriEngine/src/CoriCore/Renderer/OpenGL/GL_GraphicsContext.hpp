@@ -6,6 +6,8 @@
 namespace Cori {
 	class OpenGLContext : public RenderingContext, public Profiling::Trackable<OpenGLContext, RenderingContext>, public RegisterInUniqueFactory<RenderingContext, OpenGLContext, GraphicsAPIs, GraphicsAPIs::OpenGL> {
 	public:
+		static bool PreCreateHook();
+		OpenGLContext();
 		virtual ~OpenGLContext();
 		virtual void Init(SDL_Window* window) override;
 		virtual void SwapBuffers() override;
@@ -13,6 +15,6 @@ namespace Cori {
 	private:
 		SDL_GLContext m_Context{ nullptr };
 
-		CORI_DECLARE_UNIQUE_FACTORY_REGISTERED(OpenGLContext, ());
+		CORI_REGISTERED_FACTORY_INIT;
 	};
 }

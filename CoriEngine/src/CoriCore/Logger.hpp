@@ -204,6 +204,8 @@ const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') + "]: ";
 #define CORI_ERROR(...)      ::Cori::Logger::GetClientLogger()->error(__VA_ARGS__)
 #define CORI_FATAL(...)      ::Cori::Logger::GetClientLogger()->critical(__VA_ARGS__)
 
+// TODO: utilize pretty_function in asserts and verfies
+
 #define CORI_CORE_ASSERT_DEBUG(x, ...) (!(x) ? (CORI_CORE_DEBUG("Assertion Failed: " __VA_ARGS__), true) : false)
 #define CORI_CORE_ASSERT_INFO(x, ...)  (!(x) ? (CORI_CORE_INFO("Assertion Failed: " __VA_ARGS__), true) : false)
 #define CORI_CORE_ASSERT_WARN(x, ...)  (!(x) ? (CORI_CORE_WARN("Assertion Failed: " __VA_ARGS__), true) : false)

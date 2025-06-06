@@ -84,25 +84,33 @@ namespace Cori {
 			eventStack.reserve(1024);
 
 			for (uint32_t i = 0; i < rawEventCount; ++i) {
-				const RawProfileEvent& currentEvent = m_RawEvents[i];
+				if (i < MAX_PROFILE_EVENTS_PER_FRAME) {
+					const RawProfileEvent& currentEvent = m_RawEvents[i];
 
-				if (currentEvent.Type == RawEventType::ScopeBegin) {
-					eventStack.push_back(&currentEvent);
+					if (currentEvent.Type == RawEventType::ScopeBegin) {
+						eventStack.push_back(&currentEvent);
+					}
+					else if (currentEvent.Type == RawEventType::ScopeEnd) {
+						const RawProfileEvent* beginEventPtr = eventStack.back();
+						eventStack.pop_back();
+
+						if (beginEventPtr->Name == currentEvent.Name) {
+							ProfileResult result;
+							result.Name = beginEventPtr->Name;
+							result.Category = "function/scope"; // add categories, later
+							result.StartTimeMicros = ConvertRawToMicroseconds(beginEventPtr->RawTimestamp);
+							result.EndTimeMicros = ConvertRawToMicroseconds(currentEvent.RawTimestamp);
+							result.ThreadID = static_cast<uint32_t>(SDL_GetThreadID(NULL));
+							result.Line = beginEventPtr->Line;
+
+							WriteJsonEvent(m_FrameOutputStream, result, jsonEventCounter);
+						}
+					}
 				}
-				else if (currentEvent.Type == RawEventType::ScopeEnd) {
-					const RawProfileEvent* beginEventPtr = eventStack.back();
-					eventStack.pop_back();
-
-					if (beginEventPtr->Name == currentEvent.Name) {
-						ProfileResult result;
-						result.Name = beginEventPtr->Name;
-						result.Category = "function/scope"; // add categories, later
-						result.StartTimeMicros = ConvertRawToMicroseconds(beginEventPtr->RawTimestamp);
-						result.EndTimeMicros = ConvertRawToMicroseconds(currentEvent.RawTimestamp);
-						result.ThreadID = static_cast<uint32_t>(SDL_GetThreadID(NULL));
-						result.Line = beginEventPtr->Line;
-
-						WriteJsonEvent(m_FrameOutputStream, result, jsonEventCounter);
+				else {
+					static std::atomic<bool> overflow_logged_this_frame{ false };
+					if (!overflow_logged_this_frame.exchange(true, std::memory_order_relaxed)) {
+						CORI_CORE_ERROR("TimeProfiler: Trying to profile more than {0} scopes/function calls, are you sure you need that much? Preventing buffer overflow, some data will be lost. Frame: {1}", MAX_PROFILE_EVENTS_PER_FRAME, frameIDBeingProcessed);
 					}
 				}
 			}

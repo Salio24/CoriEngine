@@ -8,6 +8,10 @@
 #include "Renderer/Buffers.hpp"
 #include "Renderer/GraphicsCall.hpp"
 #include "AssetManager/AssetDefinitions.hpp"
+#include "ECS/SceneManager.hpp"
+#include "ECS/TriggerManager.hpp"
+#include "EventSystem/GameEvents.hpp"
+#include "ECS/Components.hpp"
 
 namespace Cori {
 	Application* Application::s_Instance = nullptr;
@@ -19,6 +23,8 @@ namespace Cori {
 		m_Window = Window::Create();
 
 		m_Window->SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent, CORI_PLACEHOLDERS(1)));
+
+		TriggerManager::Get().SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent, CORI_PLACEHOLDERS(1)));
 
 		m_ImGuiLayer = new ImGuiLayer();
 
@@ -37,6 +43,10 @@ namespace Cori {
 	void Application::OnEvent(Event& e) {
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(CORI_BIND_EVENT_FN(Application::OnWindowClose));
+		dispatcher.Dispatch<GameTriggerStayEvent>([](Cori::GameTriggerStayEvent& e) -> bool {
+			return e.GetTriggerEntity().GetComponents<TriggerComponent>().TriggerScript(e.GetTriggerEntity(), e.GetOtherEntity());
+		});
+
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
 			(*--it)->OnEvent(e);
@@ -64,6 +74,8 @@ namespace Cori {
 				for (Layer* layer : m_LayerStack) {
 					layer->OnUpdate(m_GameTimer);
 				}
+
+				SceneManager::OnUpdate(m_GameTimer);
 
 				m_ImGuiLayer->StartFrame();
 

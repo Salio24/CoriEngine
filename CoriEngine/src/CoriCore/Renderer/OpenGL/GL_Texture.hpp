@@ -7,6 +7,8 @@
 namespace Cori {
 	class OpenGLTexture2D : public Texture2D, public Profiling::Trackable<OpenGLTexture2D, Texture2D>, public RegisterInSharedFactory<Texture2D, OpenGLTexture2D, GraphicsAPIs, GraphicsAPIs::OpenGL, const std::string&> {
 	public:
+		static bool PreCreateHook(const std::string& path); 
+		OpenGLTexture2D(const std::string& path);
 		virtual ~OpenGLTexture2D();
 
 		virtual void Bind(uint32_t slot = 0) const override;
@@ -19,6 +21,6 @@ namespace Cori {
 		uint32_t m_Width{ 0 };
 		uint32_t m_Height{ 0 };
 
-		CORI_DECLARE_SHARED_FACTORY_REGISTERED(OpenGLTexture2D, (const std::string& path));
+		CORI_REGISTERED_FACTORY_INIT;
 	};
 }

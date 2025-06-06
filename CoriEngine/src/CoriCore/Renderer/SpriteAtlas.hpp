@@ -10,12 +10,16 @@ namespace Cori {
 	class SpriteAtlas : public Profiling::Trackable<SpriteAtlas>, public SharedSeflFactory<SpriteAtlas> {
 	public:
 
+		static bool PreCreateHook(const SpriteAtlasDescriptor& descriptor);
+
 		const std::shared_ptr<Texture2D> GetTexture() const;
 
 		const UVs& GetSpriteUVsAtIndex(uint32_t index) const;
 
 		const UVs& GetSpriteUVsAtPosition(glm::ivec2 pos) const;
 
+	protected: 
+		SpriteAtlas(const SpriteAtlasDescriptor& descriptor); 
 	private:
 
 		std::string_view m_DebugName;
@@ -29,7 +33,5 @@ namespace Cori {
 		std::shared_ptr<Texture2D> m_Texture;
 
 		std::vector<UVs> m_SpriteUVs;
-
-		CORI_DECLARE_SHARED_SELF_FACTORY(SpriteAtlas, (const SpriteAtlasDescriptor& descriptor));
 	};
 }

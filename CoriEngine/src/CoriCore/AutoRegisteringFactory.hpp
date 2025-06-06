@@ -92,7 +92,7 @@ namespace Cori {
 
 	protected:
 
-		inline static bool _RegisterShared = Factory<BaseType, KeyType, CtorArgs...>::Instance().RegisterShared(KeyValue, Create);
+		inline static bool _Register = Factory<BaseType, KeyType, CtorArgs...>::Instance().RegisterShared(KeyValue, Create);
 
 		RegisterInSharedFactory() = default;
 		~RegisterInSharedFactory() = default;
@@ -119,7 +119,7 @@ namespace Cori {
 
 	protected:
 
-		inline static bool _RegisterUnique = Factory<BaseType, KeyType, CtorArgs...>::Instance().RegisterUnique(KeyValue, Create);
+		inline static bool _Register = Factory<BaseType, KeyType, CtorArgs...>::Instance().RegisterUnique(KeyValue, Create);
 
 		RegisterInUniqueFactory() = default;
 		~RegisterInUniqueFactory() = default;
@@ -131,46 +131,13 @@ namespace Cori {
 
 	};
 
-#define CORI_DECLARE_SHARED_FACTORY_REGISTERED(ClassName, CtorArgs) \
-public: \
-static bool PreCreateHook CtorArgs; \
-	ClassName CtorArgs; \
+#define CORI_REGISTERED_FACTORY_INIT \
 private: \
 	struct StaticInitHelper { \
 	    StaticInitHelper() { \
-		    (void)_RegisterShared; \
+		    (void)_Register; \
 	    } \
 	}; \
-	inline static StaticInitHelper s_InitHelper;
-
-#define CORI_DEFINE_SHARED_FACTORY_REGISTERED(ClassName, HookBody, CtorArgs, ...) \
-ClassName::ClassName CtorArgs \
-	__VA_ARGS__ \
-	bool ClassName::PreCreateHook CtorArgs { \
-		HookBody \
-		return true; \
-	} \
-	static_assert(true, "Semicolon expected after CORI_DEFINE_SHARED_FACTORY_REGISTERED")
-
-#define CORI_DECLARE_UNIQUE_FACTORY_REGISTERED(ClassName, CtorArgs) \
-public: \
-static bool PreCreateHook CtorArgs; \
-	ClassName CtorArgs; \
-private: \
-	struct StaticInitHelper { \
-	    StaticInitHelper() { \
-		    (void)_RegisterUnique; \
-	    } \
-	}; \
-	inline static StaticInitHelper s_InitHelper;
-
-#define CORI_DEFINE_UNIQUE_FACTORY_REGISTERED(ClassName, HookBody, CtorArgs, ...) \
-ClassName::ClassName CtorArgs \
-	__VA_ARGS__ \
-	bool ClassName::PreCreateHook CtorArgs { \
-		HookBody \
-		return true; \
-	} \
-	static_assert(true, "Semicolon expected after CORI_DEFINE_UNIQUE_FACTORY_REGISTERED")
+	inline static StaticInitHelper s_InitHelper
 
 }

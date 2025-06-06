@@ -2,10 +2,11 @@
 
 namespace Cori {
 
+}
 	#define CORI_PLACEHOLDERS(x) PLACEHOLDER_SELECT(x)
 	#define PLACEHOLDER_SELECT(x) PLACEHOLDER_IMPL_##x
 	
-		// Valid values (0–19)
+	// Valid values (0–19)
 	#define PLACEHOLDER_IMPL_1 std::placeholders::_1
 	#define PLACEHOLDER_IMPL_2 std::placeholders::_2
 	#define PLACEHOLDER_IMPL_3 std::placeholders::_3
@@ -27,4 +28,3 @@ namespace Cori {
 	#define PLACEHOLDER_IMPL_19 std::placeholders::_19
 
 	#define CORI_BIND_EVENT_FN(x, ...) std::bind(&x, this, __VA_ARGS__)
-}

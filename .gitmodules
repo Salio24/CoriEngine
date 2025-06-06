@@ -41,3 +41,7 @@
 	path = CoriEngine/thirdparty/imgui
 	url = https://github.com/ocornut/imgui.git
 	branch = docking
+[submodule "CoriEngine/thirdparty/entt"]
+	path = CoriEngine/thirdparty/entt
+	url = https://github.com/skypjack/entt.git
+	branch = master

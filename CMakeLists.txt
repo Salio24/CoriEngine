@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
 
+# add entt check
+
 if (NOT (
         (EXISTS "${CMAKE_SOURCE_DIR}/CoriEngine/thirdparty/freetype/CMakeLists.txt") AND 
         (EXISTS "${CMAKE_SOURCE_DIR}/CoriEngine/thirdparty/glad2/cmake/CMakeLists.txt") AND 

@@ -115,5 +115,11 @@ namespace Cori {
 		vertexArray->Unbind();
 	}
 
-	CORI_DEFINE_UNIQUE_FACTORY_REGISTERED(OpenGLGraphicsAPI, {}, (), {});
+	OpenGLGraphicsAPI::OpenGLGraphicsAPI() {
+	
+	} 
+	
+	bool OpenGLGraphicsAPI::PreCreateHook() {
+		return true;
+	}
 }

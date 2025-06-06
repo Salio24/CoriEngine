@@ -23,7 +23,7 @@ namespace Cori {
 			int Line;
 		};
 
-		constexpr size_t MAX_PROFILE_EVENTS_PER_FRAME = 100000;
+		inline constexpr size_t MAX_PROFILE_EVENTS_PER_FRAME = 100000;
 
 		class TimeProfiler {
 		public:

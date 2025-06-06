@@ -37,25 +37,34 @@ namespace Cori {
 		return sizes[(GLenum)type];
 	}
 
-	CORI_DEFINE_SHARED_FACTORY_REGISTERED(OpenGLVertexArray, {}, (), { 
+	bool OpenGLVertexArray::PreCreateHook() {
+		return true;
+	}
+
+	OpenGLVertexArray::OpenGLVertexArray() {
+		CORI_PROFILE_FUNCTION();
 		glGenVertexArrays(1, &m_ID);
-		glBindVertexArray(0); 
-		});
+		glBindVertexArray(0);	
+	}
 
 	OpenGLVertexArray::~OpenGLVertexArray() {
+		CORI_PROFILE_FUNCTION();
 		glBindVertexArray(m_ID);
 		glDeleteVertexArrays(1, &m_ID);
 	}
 
 	void OpenGLVertexArray::Bind() const {
+		CORI_PROFILE_FUNCTION();
 		glBindVertexArray(m_ID);
 	}
 
 	void OpenGLVertexArray::Unbind() const {
+		CORI_PROFILE_FUNCTION();
 		glBindVertexArray(0);
 	}
 
 	void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer) {
+		CORI_PROFILE_FUNCTION();
 		if (CORI_CORE_ASSERT_ERROR(vertexBuffer->GetLayout().GetElements().size(), "GL_VertexArray (GL_RuntimeID: {0}): Trying to add VBO that has no layout", m_ID)) { return; }
 		//explicitly binding is great for readability, tho it can impact performance, need to think of a way to strip unnecessary binds on release build
 		
@@ -76,6 +85,7 @@ namespace Cori {
 	}
 
 	void OpenGLVertexArray::AddIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer) {
+		CORI_PROFILE_FUNCTION();
 		if (CORI_CORE_ASSERT_ERROR(m_VertexBuffers.size(), "GL_VertexArray (GL_RuntimeID: {0}): adding IBO to VAO before a valid VBO was added", m_ID)) { return; }
 
 		glBindVertexArray(m_ID);

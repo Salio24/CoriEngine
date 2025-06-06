@@ -5,8 +5,12 @@
 #include <glad/gl.h>
 
 namespace Cori {
+	bool OpenGLTexture2D::PreCreateHook(const std::string& path) {
+		return true;
+	}
 
-	CORI_DEFINE_SHARED_FACTORY_REGISTERED(OpenGLTexture2D, {}, (const std::string& path), {
+	OpenGLTexture2D::OpenGLTexture2D(const std::string& path) {
+		CORI_PROFILE_FUNCTION();
 		std::unique_ptr<Image> image = std::make_unique<Image>(path);
 		m_Width = image->GetWidth();
 		m_Height = image->GetHeight();
@@ -29,15 +33,15 @@ namespace Cori {
 		else {
 			CORI_CORE_WARN("GL_Texture2D (GL_RuntimeID; {0}): Image loading failed to load '{0}', a placeholder was used to create texture2D instead", path);
 		}
-		});
-
-	
+	}
 
 	OpenGLTexture2D::~OpenGLTexture2D() {
+		CORI_PROFILE_FUNCTION();
 		glDeleteTextures(1, &m_ID);
 	}
 
 	void OpenGLTexture2D::Bind(uint32_t slot) const {
+		CORI_PROFILE_FUNCTION();
 		glBindTextureUnit(slot, m_ID);
 	}
 

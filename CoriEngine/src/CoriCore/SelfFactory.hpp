@@ -64,40 +64,7 @@ namespace Cori {
 		}
 	};
 
-#define CORI_DECLARE_SHARED_SELF_FACTORY(ClassName, CtorArgs) \
-protected: \
-	ClassName CtorArgs; \
-public: \
-static bool PreCreateHook CtorArgs
-
-#define CORI_DEFINE_SHARED_SELF_FACTORY(ClassName, HookBody, CtorArgs, ...) \
-	\
-	ClassName::ClassName CtorArgs \
-	__VA_ARGS__ \
-	\
-	bool ClassName::PreCreateHook CtorArgs { \
-		HookBody \
-		return true; \
-	} \
-	static_assert(true, "Semicolon expected after CORI_DEFINE_SHARED_FACTORY_TRACKABLE")
-
-#define CORI_DECLARE_UNIQUE_SELF_FACTORY(ClassName, CtorArgs) \
-protected: \
-	ClassName CtorArgs; \
-public: \
-static bool PreCreateHook CtorArgs
-
-#define CORI_DEFINE_UNIQUE_SELF_FACTORY(ClassName, HookBody, CtorArgs, ...) \
-	\
-	ClassName::ClassName CtorArgs \
-	__VA_ARGS__ \
-	\
-	bool ClassName::PreCreateHook CtorArgs { \
-		HookBody \
-		return true; \
-	} \
-	static_assert(true, "Semicolon expected after CORI_DEFINE_UNIQUE_FACTORY_TRACKABLE")
-
+	// TODO: rewrite this
 	/*
 	usage example
 

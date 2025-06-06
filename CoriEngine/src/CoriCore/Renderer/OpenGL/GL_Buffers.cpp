@@ -6,11 +6,16 @@
 #include <magic_enum/magic_enum.hpp>
 
 namespace Cori {
+	bool OpenGLVertexBuffer::PreCreateHook() {
+		return true;
+	}
 
-	CORI_DEFINE_SHARED_FACTORY_REGISTERED(OpenGLVertexBuffer, {}, (), {
+	OpenGLVertexBuffer::OpenGLVertexBuffer() {
+		CORI_PROFILE_FUNCTION();
 		glCreateBuffers(1, &m_ID);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-	});
+	}
+	
 
 	OpenGLVertexBuffer::~OpenGLVertexBuffer() {
 		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
@@ -18,6 +23,7 @@ namespace Cori {
 	}
 
 	void OpenGLVertexBuffer::Init(const float* vertices, uint32_t size, DRAW_TYPE drawtype) {
+		CORI_PROFILE_FUNCTION();
 		glCreateBuffers(1, &m_ID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
 		switch (drawtype)
@@ -62,14 +68,17 @@ namespace Cori {
 
 
 	void OpenGLVertexBuffer::Bind() const {
+		CORI_PROFILE_FUNCTION();
 		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
 	}
 
 	void OpenGLVertexBuffer::Unbind() const {
+		CORI_PROFILE_FUNCTION();
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
 	void OpenGLVertexBuffer::SetData(const void* data, uint32_t size) const {
+		CORI_PROFILE_FUNCTION();
 		glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
 	}
 
@@ -78,7 +87,12 @@ namespace Cori {
 		m_Layout = layout;
 	}
 
-	CORI_DEFINE_SHARED_FACTORY_REGISTERED(OpenGLIndexBuffer, {}, (uint32_t* indices, uint32_t count), : m_Count(count) {
+	bool OpenGLIndexBuffer::PreCreateHook(uint32_t* indices, uint32_t count) {
+		return true;
+	}
+
+	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count) : m_Count(count) {
+		CORI_PROFILE_FUNCTION();
 		glCreateBuffers(1, &m_ID);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(count), indices, GL_STATIC_DRAW);
@@ -86,18 +100,21 @@ namespace Cori {
 		CORI_CORE_TRACE("GL_IndexBuffer (GL_RuntimeID: {0}): IBO with size {1}, and type STATIC_DRAW, was created successfully", m_ID, count);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	});
+	}
 
 	OpenGLIndexBuffer::~OpenGLIndexBuffer() {
+		CORI_PROFILE_FUNCTION();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
 		glDeleteBuffers(1, &m_ID);
 	}
 
 	void OpenGLIndexBuffer::Bind() const {
+		CORI_PROFILE_FUNCTION();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
 	}
 
 	void OpenGLIndexBuffer::Unbind() const {
+		CORI_PROFILE_FUNCTION();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 

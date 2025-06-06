@@ -128,7 +128,6 @@ namespace Cori {
 
 	}
 
-
 	/*
 	InstanceMetric usage example:
 

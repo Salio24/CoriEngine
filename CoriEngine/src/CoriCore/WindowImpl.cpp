@@ -64,7 +64,9 @@ namespace Cori {
 
 	void WindowImpl::OnUpdate() {
 		CORI_PROFILE_FUNCTION();
+		// high timing in this function, may be a sign of big overdraw problem/overhead
 		SDL_Event e;
+		
 		while (SDL_PollEvent(&e)) {
 
 			// FIX: event in imgui affect main layer
@@ -79,64 +81,67 @@ namespace Cori {
 
 			switch (e.type) {
 			case SDL_EVENT_WINDOW_RESIZED:
-				{
-					if (e.window.windowID != SDL_GetWindowID(m_Window)) {
-						break;
-					}
-					// FIX: handling resize event here is just wrong 
-					m_Data.Width = e.window.data1;
-					m_Data.Height = e.window.data2;
+			{
+				if (e.window.windowID != SDL_GetWindowID(m_Window)) {
+					break;
+				}
+				// FIX: handling resize event here is just wrong 
+				m_Data.Width = e.window.data1;
+				m_Data.Height = e.window.data2;
 
-					WindowResizeEvent resizeEvent(m_Data.Width, m_Data.Height);
-					m_Data.EventCallback(resizeEvent);
-					break;
-				}
-			case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
-				{
-					WindowCloseEvent closeEvent;
-					m_Data.EventCallback(closeEvent);
-					break;
-				}
-			case SDL_EVENT_KEY_DOWN:
-				{
-					KeyPressedEvent keyPressedEvent(static_cast<CoriKeycode>(e.key.scancode), e.key.repeat);
-					m_Data.EventCallback(keyPressedEvent);
-					break;
-				}
-			case SDL_EVENT_KEY_UP:
-				{
-					KeyReleasedEvent keyReleasedEvent(static_cast<CoriKeycode>(e.key.scancode));
-					m_Data.EventCallback(keyReleasedEvent);
-					break;
-				}
-			case SDL_EVENT_MOUSE_MOTION:
-				{
-					MouseMovedEvent mouseMovedEvent(static_cast<int>(e.motion.x), static_cast<int>(e.motion.y));
-					m_Data.EventCallback(mouseMovedEvent);
-					break;
-				}
-			case SDL_EVENT_MOUSE_WHEEL:
-				{
-					MouseScrolledEvent mouseScrolledEvent(static_cast<short>(e.wheel.x), static_cast<short>(e.wheel.y));
-					m_Data.EventCallback(mouseScrolledEvent);
-					break;
-				}
-			case SDL_EVENT_MOUSE_BUTTON_DOWN:
-				{
-					MouseButtonPressedEvent mouseButtonPressedEvent(static_cast<CoriMouseCode>(e.button.button));
-					m_Data.EventCallback(mouseButtonPressedEvent);
-					break;
-				}
-			case SDL_EVENT_MOUSE_BUTTON_UP:
-				{
-					MouseButtonReleasedEvent mouseButtonReleasedEvent(static_cast<CoriMouseCode>(e.button.button));
-					m_Data.EventCallback(mouseButtonReleasedEvent);
-					break;
-				}
+				WindowResizeEvent resizeEvent(m_Data.Width, m_Data.Height);
+				m_Data.EventCallback(resizeEvent);
+				break;
 			}
-		}
+			case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+			{
+				WindowCloseEvent closeEvent;
+				m_Data.EventCallback(closeEvent);
+				break;
+			}
+			case SDL_EVENT_KEY_DOWN:
+			{
+				KeyPressedEvent keyPressedEvent(static_cast<CoriKeycode>(e.key.scancode), e.key.repeat);
+				m_Data.EventCallback(keyPressedEvent);
+				break;
+			}
+			case SDL_EVENT_KEY_UP:
+			{
+				KeyReleasedEvent keyReleasedEvent(static_cast<CoriKeycode>(e.key.scancode));
+				m_Data.EventCallback(keyReleasedEvent);
+				break;
+			}
+			case SDL_EVENT_MOUSE_MOTION:
+			{
+				MouseMovedEvent mouseMovedEvent(static_cast<int>(e.motion.x), static_cast<int>(e.motion.y));
+				m_Data.EventCallback(mouseMovedEvent);
+				break;
+			}
+			case SDL_EVENT_MOUSE_WHEEL:
+			{
+				MouseScrolledEvent mouseScrolledEvent(static_cast<short>(e.wheel.x), static_cast<short>(e.wheel.y));
+				m_Data.EventCallback(mouseScrolledEvent);
+				break;
+			}
+			case SDL_EVENT_MOUSE_BUTTON_DOWN:
+			{
+				MouseButtonPressedEvent mouseButtonPressedEvent(static_cast<CoriMouseCode>(e.button.button));
+				m_Data.EventCallback(mouseButtonPressedEvent);
+				break;
+			}
+			case SDL_EVENT_MOUSE_BUTTON_UP:
+			{
+				MouseButtonReleasedEvent mouseButtonReleasedEvent(static_cast<CoriMouseCode>(e.button.button));
+				m_Data.EventCallback(mouseButtonReleasedEvent);
+				break;
+			}
 
+			}
+
+		}
+		
 		m_Context->SwapBuffers();
+	
 	}
 
 	void WindowImpl::SetVSync(bool enabled) {

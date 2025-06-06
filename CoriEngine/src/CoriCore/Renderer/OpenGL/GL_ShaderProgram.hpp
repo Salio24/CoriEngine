@@ -6,6 +6,8 @@
 namespace Cori {
 	class OpenGLShaderProgram : public ShaderProgram, public Profiling::Trackable<OpenGLShaderProgram, ShaderProgram>, public RegisterInSharedFactory<ShaderProgram, OpenGLShaderProgram, GraphicsAPIs, GraphicsAPIs::OpenGL, const std::string_view, const std::string_view, const std::string_view, const std::string_view> {
 	public:
+		static bool PreCreateHook(const std::string_view debugName, const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view geometryPath = ""); 
+		OpenGLShaderProgram(const std::string_view debugName, const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view geometryPath = "");
 		virtual ~OpenGLShaderProgram();
 
 		virtual void Bind() const override;
@@ -36,7 +38,7 @@ namespace Cori {
 
 		bool CheckCompileErrors(uint32_t shader, std::string type);
 
-		CORI_DECLARE_SHARED_FACTORY_REGISTERED(OpenGLShaderProgram, (const std::string_view debugName, const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view geometryPath = ""));
+		CORI_REGISTERED_FACTORY_INIT;
 	};
 
 }

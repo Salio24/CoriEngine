@@ -12,10 +12,10 @@ namespace Cori {
 
 		virtual void OnAttach();
 		virtual void OnDetach();
-		virtual void OnUpdate(const double deltaTime) { }
+		virtual void OnUpdate([[maybe_unused]] const double deltaTime) { }
 		virtual void OnTickUpdate() {}
-		virtual void OnImGuiRender(const double deltaTime) { }
-		virtual void OnEvent(Event& event) {}
+		virtual void OnImGuiRender([[maybe_unused]] const double deltaTime) { }
+		virtual void OnEvent([[maybe_unused]] Event& event) {}
 
 		inline const std::string& GetName() const { return m_DebugName; }
 	protected:

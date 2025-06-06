@@ -17,7 +17,7 @@ namespace Cori {
 			"Test Brick Texture",
 			"assets/engine/textures/brick.png"
 		};
-		inline const Texture2DDescriptor TestTileset{
+		inline const Texture2DDescriptor TestTileset {
 			"Test Tileset 32",
 			"assets/engine/textures/testTileset32.png"
 		};

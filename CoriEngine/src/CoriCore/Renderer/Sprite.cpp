@@ -2,16 +2,14 @@
 #include "../AssetManager/AssetManager.hpp"
 
 namespace Cori {
+	bool Sprite::PreCreateHook(const std::shared_ptr<Texture2D>& texture, const UVs& uv) {
 
-	CORI_DEFINE_SHARED_SELF_FACTORY(
-		Sprite,
-			{
+		return true;
+	}
 
-			},
-			(const std::shared_ptr<Texture2D>& texture, const UVs& uv),
-				: m_Texture(texture), m_UVs(uv) {
+	Sprite::Sprite(const std::shared_ptr<Texture2D>& texture, const UVs& uv) : m_Texture(texture), m_UVs(uv) {
 
-			}
-		);
+	}
+
 
 }

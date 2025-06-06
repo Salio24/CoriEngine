@@ -18,7 +18,6 @@ project(Sandbox)
 
     add_executable(${EXECUTABLE_NAME} ${MY_SOURCES})
 
-
     target_compile_options(${EXECUTABLE_NAME} PRIVATE -Wall -Wextra)
 
     target_compile_definitions(${EXECUTABLE_NAME} PRIVATE
@@ -29,7 +28,7 @@ project(Sandbox)
 
     target_link_libraries(${EXECUTABLE_NAME} PRIVATE CoriEngine_static)
 
-    set(ENGINE_ASSETS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/CoriEngine/assets")
+    set(ENGINE_ASSETS_SOURCE_DIR "${PROJECT_SOURCE_DIR}/../../CoriEngine/assets")
 
     set(ENGINE_ASSETS_DEST_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/engine")
 
