@@ -32,7 +32,6 @@ namespace Cori {
 
 		TriggerComponent() = default;
 		TriggerComponent(const EventCallbackFn& func) { TriggerScript = func; }
-		//TriggerTagComponent(std::function<void(Entity, Entity)>&& func) : TriggerScript(std::move(func)) {}
 	};
 
 	struct PlayerTagComponent {
@@ -60,19 +59,4 @@ namespace Cori {
 		CameraContextComponent(const glm::mat4& projectionMatrix, glm::mat4& viewProjectionMatrix, const glm::vec2& cameraPosition, float cameraRotation, float cameraZoomFactor)
 			: ProjectionMatrix(projectionMatrix), ViewProjectionMatrix(viewProjectionMatrix), CameraPosition(cameraPosition), CameraRotation(cameraRotation), CameraZoomFactor(cameraZoomFactor) {}
 	};
-	
-
 }
-
-//namespace std {
-//	template <>
-//	struct uses_allocator<Cori::TriggerTagComponent, std::allocator<Cori::TriggerTagComponent>>
-//		: std::false_type {
-//	};
-//
-//	// A more general one is good practice, though entt likely uses std::allocator<Component>
-//	template <typename Alloc>
-//	struct uses_allocator<Cori::TriggerTagComponent, Alloc>
-//		: std::false_type {
-//	};
-//} // namespace std
