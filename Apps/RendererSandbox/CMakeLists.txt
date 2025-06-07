@@ -28,7 +28,7 @@ project(RendererSandbox)
 
     target_link_libraries(${EXECUTABLE_NAME} PRIVATE CoriEngine_static)
 
-    set(ENGINE_ASSETS_SOURCE_DIR "${PROJECT_SOURCE_DIR}../../CoriEngine/assets")
+    set(ENGINE_ASSETS_SOURCE_DIR "${PROJECT_SOURCE_DIR}/../../CoriEngine/assets")
 
     set(ENGINE_ASSETS_DEST_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/engine")
 
@@ -53,5 +53,5 @@ project(RendererSandbox)
     add_dependencies(${EXECUTABLE_NAME} copy_engine_assets_for_rendererSandbox)
 
 else()
-    message(WARNING "Engine asset source directory not found, skipping copy: ${ENGINE_ASSETS_SOURCE_DIR}")
+    message(ERROR "Engine asset source directory not found, skipping copy: ${ENGINE_ASSETS_SOURCE_DIR}")
 endif()

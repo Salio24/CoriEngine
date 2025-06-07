@@ -13,7 +13,7 @@ namespace Cori {
 			return instance;
 		}
 
-		void OnUpdate(const double deltaTime, Scene* scene);
+		void OnUpdate(const double deltaTime, std::shared_ptr<Scene> scene);
 		void SetEventCallback(const EventCallbackFn& callback) { m_EventCallback = callback; }
 
 		void Test() {

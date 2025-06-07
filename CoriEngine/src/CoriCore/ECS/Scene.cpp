@@ -6,6 +6,7 @@ namespace Cori {
 
 	Scene::Scene(const std::string& name) : m_Name(name){
 		AddContextComponent<CameraContextComponent>();
+		ActiveCamera.BindCameraComponent(&GetContextComponent<CameraContextComponent>());
 		CORI_CORE_DEBUG("Scene: '{0}' created.", m_Name);
 		auto renderGroup = m_Registry.group<PositionComponent, RenderingComponent>();
 	}
@@ -16,6 +17,8 @@ namespace Cori {
 	}
 
 	Entity Scene::CreateEntity(const std::string& name) {
+		CORI_CORE_ASSERT_FATAL(this != nullptr, "Called scene instance is null (instance pointer = nullptr), this causes undefined behavior, and this assert also relies on this undefined behavior and is not guarantied.");
+
 		entt::entity entity = m_Registry.create();
 		m_Registry.emplace<NameComponent>(entity, name);
 		m_NamedEntities.insert({ name, entt::handle{m_Registry, entity} });
@@ -31,7 +34,7 @@ namespace Cori {
 	}
 
 	Entity Scene::GetNamedEntity(const std::string& name) {
-		if (CORI_CORE_ASSERT_ERROR(m_NamedEntities.contains(name), "Scene::GetNamedEntity: Named entity with name '{0}' doesn't exist, returned null entity.")) { return Entity{}; }
+		if (CORI_CORE_ASSERT_ERROR(m_NamedEntities.contains(name), "Named entity with name '{0}' doesn't exist, returned null entity.", name)) { return Entity{}; }
 		return Entity{ m_NamedEntities.at(name) };
 	}
 

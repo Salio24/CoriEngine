@@ -32,9 +32,9 @@ project(Sandbox)
 
     set(ENGINE_ASSETS_DEST_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/engine")
 
-
     # copy asset files from engine dir
     if(EXISTS "${ENGINE_ASSETS_SOURCE_DIR}")
+	
         file(GLOB_RECURSE ENGINE_ASSET_FILES
                 FOLLOW_SYMLINKS
                 CONFIGURE_DEPENDS
@@ -54,5 +54,5 @@ project(Sandbox)
         add_dependencies(${EXECUTABLE_NAME} copy_engine_assets_for_sandbox)
     
     else()
-        message(WARNING "Engine asset source directory not found, skipping copy: ${ENGINE_ASSETS_SOURCE_DIR}")
+        message(ERROR "Engine asset source directory not found, skipping copy: ${ENGINE_ASSETS_SOURCE_DIR}")
     endif()

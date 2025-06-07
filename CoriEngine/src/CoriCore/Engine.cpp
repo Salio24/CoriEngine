@@ -4,10 +4,10 @@
 
 namespace Cori {
 	void Engine::Start() {
-		Cori::Logger::Init();
+		Logger::Init();
 
 		bool SDL_verify = SDL_Init(SDL_INIT_VIDEO);
-		CORI_CORE_ASSERT_FATAL(SDL_verify, "SDL3 failed to initialized! SDL_Error: " + std::string(SDL_GetError()));
+		CORI_CORE_ASSERT_FATAL(SDL_verify, "SDL3 failed to initialized! SDL_Error: {}", std::string(SDL_GetError()));
 
 		CORI_CORE_INFO("Cori Engine Core initialized");
 	}

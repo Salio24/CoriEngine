@@ -50,7 +50,7 @@ namespace Cori {
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
 			(*--it)->OnEvent(e);
-			if (e.m_Handeled) {
+			if (e.m_Handeled || (*--it)->IsModal()) {
 				break;
 			}
 		}
@@ -71,11 +71,22 @@ namespace Cori {
 				CORI_PROFILE_SCOPE("Cori Engine Global Update");
 				m_GameTimer.Update();
 
+				GraphicsCall::SetClearColor({ 1.0f, 1.0f, 0.0f, 1.0f });
+				GraphicsCall::ClearFramebuffer();
+
 				for (Layer* layer : m_LayerStack) {
 					layer->OnUpdate(m_GameTimer);
+					if (layer->IsModal()) {
+						break;
+					}
 				}
 
-				SceneManager::OnUpdate(m_GameTimer);
+				for (Layer* layer : m_LayerStack) {
+					layer->SceneUpdate(m_GameTimer);
+					if (layer->IsModal()) {
+						break;
+					}
+				}
 
 				m_ImGuiLayer->StartFrame();
 

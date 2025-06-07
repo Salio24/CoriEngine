@@ -10,7 +10,7 @@ namespace Cori {
 	SpriteAtlas::SpriteAtlas(const SpriteAtlasDescriptor& descriptor) {
 		m_Texture = AssetManager::GetTexture2D(descriptor.m_TextureDescriptor);
 
-		CORI_CORE_ASSERT_ERROR((!(m_Texture->GetHeight() % descriptor.m_SpriteResolution.y) || !(m_Texture->GetWidth() % descriptor.m_SpriteResolution.x)), "SpriteAtlas: {0}, invalid sprite resolution, sprite resolution on x and y should be divisible by texture resolution without remainder.");
+		CORI_CORE_ASSERT_ERROR((!(m_Texture->GetHeight() % descriptor.m_SpriteResolution.y) || !(m_Texture->GetWidth() % descriptor.m_SpriteResolution.x)), "Invalid sprite resolution, sprite resolution on x and y should be divisible by texture resolution without remainder. Atlas: {0}", descriptor.GetDebugName());
 
 		m_DebugName = descriptor.GetDebugName();
 
@@ -34,12 +34,12 @@ namespace Cori {
 	}
 
 	const UVs& SpriteAtlas::GetSpriteUVsAtIndex(uint32_t index) const {
-		if (CORI_CORE_ASSERT_ERROR(index + 1 <= m_SpriteAtlasSize, "Sprite Atlas: Requested a sprite UVs from ({0}) at invalid index: {1} : returned data from index: 0", m_DebugName, index)) { return m_SpriteUVs[0]; }
+		if (CORI_CORE_ASSERT_ERROR(index + 1 <= m_SpriteAtlasSize, "Requested a sprite UVs from ({0}) at invalid index: {1} : returned data from index: 0", m_DebugName, index)) { return m_SpriteUVs[0]; }
 		return m_SpriteUVs[index];
 	}
 
 	const UVs& SpriteAtlas::GetSpriteUVsAtPosition(glm::ivec2 pos) const  {
-		if (CORI_CORE_ASSERT_ERROR(pos.x * pos.y <= m_SpriteAtlasSize, "Sprite Atlas: Requested a sprite UVs from ({0}) at invalid position: ({1}, {2}) : returned data from position: (0, 0)", m_DebugName, pos.x, pos.y)) { return m_SpriteUVs[0]; }
+		if (CORI_CORE_ASSERT_ERROR(pos.x * pos.y <= m_SpriteAtlasSize, "Requested a sprite UVs from ({0}) at invalid position: ({1}, {2}) : returned data from position: (0, 0)", m_DebugName, pos.x, pos.y)) { return m_SpriteUVs[0]; }
 		return m_SpriteUVs[pos.x * pos.y - 1];
 	}
 

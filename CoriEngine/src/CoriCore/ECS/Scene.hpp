@@ -2,24 +2,17 @@
 #include "Entity.hpp"
 #include "../SelfFactory.hpp"
 #include "../Profiling/Trackable.hpp"
+#include "../Renderer/CameraController.hpp"
 
 namespace Cori {
-	
-	class SceneManager;
 
 	template<typename... T>
 	inline constexpr auto& Exclude = entt::exclude<T...>;
 
-	class Scene : public Profiling::Trackable<Scene>, public UniqueSeflFactory<Scene> {
+	class Scene : public Profiling::Trackable<Scene>, public SharedSeflFactory<Scene> {
 	public:
 		static bool PreCreateHook(const std::string& name) { return true; }
 		~Scene();
-
-	protected:
-
-		friend class SceneManager;
-
-		Scene(const std::string& name);
 
 		bool OnBind();
 		bool OnUnbind();
@@ -71,11 +64,17 @@ namespace Cori {
 		void RemoveContextComponent() {
 			m_Registry.ctx().erase<T>();
 		}
+
+		CameraController ActiveCamera;
+		
+		std::string m_Name;
+	protected:
+		Scene(const std::string& name);
 	private:
 		
+
 		entt::registry m_Registry;
 
-		std::string m_Name;
 
 		std::unordered_map<std::string, entt::handle> m_NamedEntities;
 

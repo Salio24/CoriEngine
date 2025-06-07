@@ -180,7 +180,7 @@ namespace Cori {
 			GetCoreLogger()->debug("{}", ColoredText("Sample Text color: white_smoke", fmt::color::white_smoke));
 			GetCoreLogger()->debug("{}", ColoredText("Sample Text color: yellow", fmt::color::yellow));
 			GetCoreLogger()->debug("{}", ColoredText("Sample Text color: yellow_green", fmt::color::yellow_green));
-		}
+}
 
 	private:
 		static std::shared_ptr<spdlog::logger> s_CoreLogger;
@@ -190,9 +190,20 @@ namespace Cori {
 
 const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') + "]: ";
 
+#ifdef DEBUG_BUILD
+
 #define CORI_CORE_TRACE(...) ::Cori::Logger::GetCoreLogger()->trace(__VA_ARGS__)
 #define CORI_CORE_DEBUG(...) ::Cori::Logger::GetCoreLogger()->debug(__VA_ARGS__)
 #define CORI_CORE_INFO(...)  ::Cori::Logger::GetCoreLogger()->info(__VA_ARGS__)
+
+#else 
+
+#define CORI_CORE_TRACE(...)
+#define CORI_CORE_DEBUG(...)
+#define CORI_CORE_INFO(...)
+
+#endif 
+
 #define CORI_CORE_WARN(...)  ::Cori::Logger::GetCoreLogger()->warn(__VA_ARGS__)
 #define CORI_CORE_ERROR(...) ::Cori::Logger::GetCoreLogger()->error(__VA_ARGS__)
 #define CORI_CORE_FATAL(...) ::Cori::Logger::GetCoreLogger()->critical(__VA_ARGS__)
@@ -206,17 +217,42 @@ const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') + "]: ";
 
 // TODO: utilize pretty_function in asserts and verfies
 
-#define CORI_CORE_ASSERT_DEBUG(x, ...) (!(x) ? (CORI_CORE_DEBUG("Assertion Failed: " __VA_ARGS__), true) : false)
-#define CORI_CORE_ASSERT_INFO(x, ...)  (!(x) ? (CORI_CORE_INFO("Assertion Failed: " __VA_ARGS__), true) : false)
-#define CORI_CORE_ASSERT_WARN(x, ...)  (!(x) ? (CORI_CORE_WARN("Assertion Failed: " __VA_ARGS__), true) : false)
-#define CORI_CORE_ASSERT_ERROR(x, ...) (!(x) ? (CORI_CORE_ERROR("Assertion Failed: " __VA_ARGS__), true) : false)
-#define CORI_CORE_ASSERT_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Assertion Failed: " __VA_ARGS__), __builtin_debugtrap(), true) : false)
+#ifdef DEBUG_BUILD
+
+#define CORI_CORE_ASSERT_DEBUG(x, ...) (!(x) ? (CORI_CORE_DEBUG("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_DEBUG("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
+#define CORI_CORE_ASSERT_INFO(x, ...)  (!(x) ? (CORI_CORE_INFO("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_INFO("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
+#define CORI_CORE_ASSERT_WARN(x, ...)  (!(x) ? (CORI_CORE_WARN("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_WARN("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
+#define CORI_CORE_ASSERT_ERROR(x, ...) (!(x) ? (CORI_CORE_ERROR("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_ERROR("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
+#define CORI_CORE_ASSERT_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_FATAL("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), __builtin_debugtrap(), true) : false)
+
+//#define CORI_CORE_ASSERT_DEBUG(x, message, ...) ((!(x)) ? (CORI_CORE_DEBUG("Assertion '{}' failed in function '{}' (Line {}). Message: " message, #x, __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__), true) : false)
+//#define CORI_CORE_ASSERT_INFO(x, message, ...) ((!(x)) ? (CORI_CORE_INFO("Assertion '{}' failed in function '{}' (Line {}). Message: " message, #x, __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__), true) : false)
+//#define CORI_CORE_ASSERT_WARN(x, message, ...) ((!(x)) ? (CORI_CORE_WARN("Assertion '{}' failed in function '{}' (Line {}). Message: " message, #x, __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__), true) : false)
+//#define CORI_CORE_ASSERT_ERROR(x, message, ...) ((!(x)) ? (CORI_CORE_ERROR("Assertion '{}' failed in function '{}' (Line {}). Message: " message, #x, __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__), true) : false)
+//#define CORI_CORE_ASSERT_FATAL(x, message, ...) ((!(x)) ? (CORI_CORE_FATAL("Assertion '{}' failed in function '{}' (Line {}). Message: " message, #x, __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__), __builtin_debugtrap(), true) : false)
+
 
 #define CORI_CORE_VERIFY_DEBUG(x, ...) (!(x) ? (CORI_CORE_DEBUG("Verify Failed: " __VA_ARGS__), true) : false)
 #define CORI_CORE_VERIFY_INFO(x, ...)  (!(x) ? (CORI_CORE_INFO("Verify Failed: " __VA_ARGS__), true) : false)
 #define CORI_CORE_VERIFY_WARN(x, ...)  (!(x) ? (CORI_CORE_WARN("Verify Failed: " __VA_ARGS__), true) : false)
 #define CORI_CORE_VERIFY_ERROR(x, ...) (!(x) ? (CORI_CORE_ERROR("Verify Failed: " __VA_ARGS__), true) : false)
 #define CORI_CORE_VERIFY_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Verify Failed: " __VA_ARGS__), __builtin_debugtrap(), true) : false)
+
+#else
+
+#define CORI_CORE_ASSERT_DEBUG(x, ...) false
+#define CORI_CORE_ASSERT_INFO(x, ...) false
+#define CORI_CORE_ASSERT_WARN(x, ...) false
+#define CORI_CORE_ASSERT_ERROR(x, ...) false
+#define CORI_CORE_ASSERT_FATAL(x, ...) false
+
+#define CORI_CORE_VERIFY_DEBUG(x, ...) (x && false)
+#define CORI_CORE_VERIFY_INFO(x, ...)  (x && false)
+#define CORI_CORE_VERIFY_WARN(x, ...)  (x && false)
+#define CORI_CORE_VERIFY_ERROR(x, ...) (x && false)
+#define CORI_CORE_VERIFY_FATAL(x, ...) (x && false)
+
+#endif
 
 #define CORI_ASSERT_DEBUG(x, ...) (!(x) ? (CORI_DEBUG("Assertion Failed: " __VA_ARGS__), true) : false)
 #define CORI_ASSERT_INFO(x, ...)  (!(x) ? (CORI_INFO("Assertion Failed: " __VA_ARGS__), true) : false)

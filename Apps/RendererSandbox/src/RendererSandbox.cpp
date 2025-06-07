@@ -1,11 +1,7 @@
-#include <iostream>
 #include <Cori.hpp>
-#include <imgui.h>
-#include <memory>
-#include <glm/glm.hpp>
+#include <CoriEntry.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <imgui_internal.h>
-#include <algorithm>
 
 namespace Cori {
 	namespace Shaders {

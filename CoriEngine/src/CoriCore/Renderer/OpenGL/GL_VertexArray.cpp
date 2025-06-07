@@ -30,7 +30,7 @@ namespace Cori {
 
 		if ((GLenum)type >= (sizeof(sizes) / sizeof(GLenum)))
 		{
-			CORI_CORE_ASSERT_ERROR(false, "ShaderDataTypeToGLDataType: Unknown shader data type");
+			CORI_CORE_ASSERT_ERROR(false, "Unknown shader data type");
 			return 0;
 		}
 

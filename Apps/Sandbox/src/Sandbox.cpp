@@ -1,9 +1,5 @@
-#include <iostream>
 #include <Cori.hpp>
-#include <imgui.h>
-#include <memory>
-#include <glm/glm.hpp>
-#include <glm/ext/matrix_transform.hpp>
+#include <CoriEntry.hpp>
 
 class ExampleLayer : public Cori::Layer {
 public:
@@ -31,19 +27,19 @@ public:
 
 		if (ImGui::Button("Add box")) {
 			a++;
-			auto ent = Cori::SceneManager::ActiveScene::CreateEntity("Test Entity " + std::to_string(a));
+			auto ent = ActiveScene->CreateEntity("Test Entity " + std::to_string(a));
 			ent.AddComponent<Cori::RenderingComponent>(glm::vec2{50.0f, 50.0f});
 			ent.AddComponent<Cori::PositionComponent>(glm::vec2{ 50.0f * a, 500.0f });
 		}
 
 		if (ImGui::Button("Create Trigger")) {
-			auto other = Cori::SceneManager::ActiveScene::CreateEntity("Other Entity");
+			auto other = ActiveScene->CreateEntity("Other Entity");
 			other.AddComponent<Cori::RenderingComponent>(glm::vec2{ 50.0f, 50.0f });
 			other.AddComponent<Cori::ColliderComponent>();
 			other.AddComponent<Cori::PositionComponent>(glm::vec2{ 50.0f, 50.0f });
 			other.AddComponent<Cori::PlayerTagComponent>();
 
-			auto trigger = Cori::SceneManager::ActiveScene::CreateEntity("Trigger Entity");
+			auto trigger = ActiveScene->CreateEntity("Trigger Entity");
 			trigger.AddComponent<Cori::ColliderComponent>();
 			trigger.AddComponent<Cori::PositionComponent>(glm::vec2{ 50.0f, 50.0f });
 			trigger.AddComponent<Cori::TriggerComponent>([](Cori::Entity& trigger, Cori::Entity& entity) -> bool {
@@ -52,6 +48,8 @@ public:
 				return true;
 			});
 		}
+
+		
 
 		if (ImGui::Button("Activate Trigger")) {
 			Cori::TriggerManager::Get().Test();
@@ -66,7 +64,7 @@ public:
 		}
 
 		if (ImGui::Button("Set Camera")) {
-			Cori::CameraController::CreateOrthoCamera(0, 7680, 0, 4320);
+			ActiveScene->ActiveCamera.CreateOrthoCamera(0, 7680, 0, 4320);
 		}
 
 		if (ImGui::Button("Destroy Test2")) {
@@ -78,19 +76,23 @@ public:
 		}
 
 		if (ImGui::Button("Unbind Scene")) {
-			Cori::SceneManager::UnbindScene();
+			UnbindScene();
 		}
 
 		if (ImGui::Button("Test2 bind")) {
-			Cori::SceneManager::BindScene("Test2 Scene");
+			BindScene("Test2 Scene");
 		}
 
 		if (ImGui::Button("Test bind")) {
-			Cori::SceneManager::BindScene("Test Scene");
+			BindScene("Test Scene");
 		}
 
 		if (ImGui::Button("Crash")) {
-			Cori::SceneManager::ActiveScene::GetNamedEntity("Crash Entity");
+			ActiveScene->GetNamedEntity("Crash Entity");
+		}
+
+		if (ImGui::Button("Assert")) {
+			CORI_CORE_ASSERT_DEBUG(false, "Message: {0}", std::string("test"));
 		}
 
 		ImGui::End();
@@ -98,8 +100,6 @@ public:
 
 	void OnUpdate(const double deltaTime) override {
 
-		Cori::GraphicsCall::SetClearColor({ 1.0f, 1.0f, 0.0f, 1.0f });
-		Cori::GraphicsCall::ClearFramebuffer();
 
 	}
 

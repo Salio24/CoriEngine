@@ -32,7 +32,8 @@
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
-          "enableClangTidyCodeAnalysis": false
+          "enableClangTidyCodeAnalysis": false,
+		  "intelliSenseMode": "windows-clang-x64"
         }
       }
     },
