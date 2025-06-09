@@ -5,7 +5,7 @@
 namespace Cori {
 	class GameTriggerStayEvent : public Event {
 	public:
-		GameTriggerStayEvent(Entity triggerEntity, Entity otherEntity) : m_TriggerEntity(std::move(triggerEntity)), m_OtherEntity(std::move(otherEntity)) {}
+		GameTriggerStayEvent(Entity triggerEntity, Entity otherEntity, EventCallbackFn& callback) : m_TriggerEntity(std::move(triggerEntity)), m_OtherEntity(std::move(otherEntity)), m_EventCallback(callback) {}
 
 		std::string ToString() const override {
 			return "GameTriggerStayEvent";
@@ -25,6 +25,8 @@ namespace Cori {
 
 		Entity m_TriggerEntity;
 		Entity m_OtherEntity;
+	public:
+		EventCallbackFn& m_EventCallback;
 	};
 
 

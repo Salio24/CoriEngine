@@ -1,6 +1,24 @@
 #include <Cori.hpp>
 #include <CoriEntry.hpp>
 
+namespace Cori {
+	namespace Texture2Ds {
+		inline const Texture2DDescriptor AtlasTexture{
+			"Test AtlasTexture",
+			"assets/engine/textures/testTileset32.png"
+		};
+	}
+
+	namespace SpriteAtlases {
+		inline const SpriteAtlasDescriptor Atlas{
+			"Test Atlas",
+			Texture2Ds::AtlasTexture,
+			{32, 32}
+		};
+
+	}
+}
+
 class ExampleLayer : public Cori::Layer {
 public:
 	ExampleLayer() : Layer("Example") { 
@@ -30,6 +48,8 @@ public:
 			auto ent = ActiveScene->CreateEntity("Test Entity " + std::to_string(a));
 			ent.AddComponent<Cori::RenderingComponent>(glm::vec2{50.0f, 50.0f});
 			ent.AddComponent<Cori::PositionComponent>(glm::vec2{ 50.0f * a, 500.0f });
+			auto atlas = Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::Atlas);
+			ent.AddComponent<Cori::SpriteComponent>(atlas->GetTexture(), atlas->GetSpriteUVsAtIndex(a));
 		}
 
 		if (ImGui::Button("Create Trigger")) {

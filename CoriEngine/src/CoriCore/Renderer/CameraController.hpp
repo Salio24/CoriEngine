@@ -15,7 +15,7 @@ namespace Cori {
 
 		void SetZoomLevel(const float factor);
 
-		void CameraController::BindCameraComponent(CameraContextComponent* camera) {
+		void BindCameraComponent(CameraContextComponent* camera) {
 			m_CurrentCameraComponent = camera;
 		}
 

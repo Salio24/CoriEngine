@@ -1,5 +1,7 @@
 #pragma once
 #include "Entity.hpp"
+#include "../EventSystem/Event.hpp"
+#include "../Renderer/Texture.hpp"
 
 namespace Cori {
 
@@ -12,10 +14,19 @@ namespace Cori {
 	struct RenderingComponent {
 		glm::vec2 Size{ 0.0f, 0.0f };
 		float ZIndex{ 0.0f };
+		bool Textured{ true };
 		bool Visible{ true };
 		RenderingComponent() = default;
-		RenderingComponent(const glm::vec2& size, float zIndex = 0.0f, bool visible = true)
-			: Size(size), ZIndex(zIndex), Visible(visible) {}
+		RenderingComponent(const glm::vec2& size, float zIndex = 0.0f, bool textured = true, bool visible = true)
+			: Size(size), ZIndex(zIndex), Textured(textured), Visible(visible) { }
+	};
+
+	struct SpriteComponent {
+		std::shared_ptr<Texture2D> Texture{ nullptr };
+		UVs UV;
+		SpriteComponent() = default;
+		SpriteComponent(const std::shared_ptr<Texture2D>& texture, const UVs& uv = {})
+			: Texture(texture), UV(uv) { }
 	};
 
 	struct PositionComponent {
@@ -25,17 +36,18 @@ namespace Cori {
 	};
 
 	struct TriggerComponent {
-		using EventCallbackFn = std::function<bool(Entity&, Entity&)>;
+		using EventCallbackFn = std::function<void(Event&)>;
 
-		bool m_Trigger{ true };
-		EventCallbackFn TriggerScript;
+		using TriggerCallbackFn = std::function<bool(Entity&, Entity&, const EventCallbackFn)>;
+
+		TriggerCallbackFn TriggerScript;
 
 		TriggerComponent() = default;
-		TriggerComponent(const EventCallbackFn& func) { TriggerScript = func; }
+		TriggerComponent(const TriggerCallbackFn& func) { TriggerScript = func; }
 	};
 
 	struct PlayerTagComponent {
-		bool m_Trigger{ true };
+		const bool placeholder{ true };
 		PlayerTagComponent() = default;
 	};
 
@@ -45,6 +57,12 @@ namespace Cori {
 		ColliderComponent() = default;
 		ColliderComponent(const glm::vec2& size, const glm::vec2& offset = { 0.0f, 0.0f })
 			: Size(size), Offset(offset) {}
+	};
+
+	struct SpawnpointComponent {
+		glm::vec2 Position{ 0.0f, 0.0f };
+		SpawnpointComponent() = default;
+		SpawnpointComponent(const glm::vec2& pos) : Position(pos) {}
 	};
 
 	struct CameraContextComponent {

@@ -27,7 +27,7 @@ namespace Cori {
 		CORI_CORE_DEBUG("Layer: Binding scene '{0}'", name);
 		std::shared_ptr<Scene> scene = SceneManager::Get().GetScene(name);
 		
-		bool success = scene->OnBind();
+		bool success = scene->OnBind(CORI_BIND_EVENT_FN(Layer::OnEvent, CORI_PLACEHOLDERS(1)));
 
 		if (CORI_CORE_ASSERT_ERROR(success, "Failed to bind scene '{0}'!", name)) { return; }
 		

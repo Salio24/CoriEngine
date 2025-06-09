@@ -44,24 +44,24 @@ namespace Cori {
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(CORI_BIND_EVENT_FN(Application::OnWindowClose));
 		dispatcher.Dispatch<GameTriggerStayEvent>([](Cori::GameTriggerStayEvent& e) -> bool {
-			return e.GetTriggerEntity().GetComponents<TriggerComponent>().TriggerScript(e.GetTriggerEntity(), e.GetOtherEntity());
+			return e.GetTriggerEntity().GetComponents<TriggerComponent>().TriggerScript(e.GetTriggerEntity(), e.GetOtherEntity(), e.m_EventCallback);
 		});
 
-
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
-			(*--it)->OnEvent(e);
-			if (e.m_Handeled || (*--it)->IsModal()) {
+			--it;
+			(*it)->OnEvent(e);
+			if (e.m_Handeled || (*it)->IsModal()) {
 				break;
 			}
 		}
 	}
 
 	void Application::PushLayer(Layer* layer) {
-		m_LayerStack.PushLayer(layer);
+		Get().m_LayerStack.PushLayer(layer);
 	}
 
 	void Application::PushOverlay(Layer* layer) {
-		m_LayerStack.PushOverlay(layer);
+		Get().m_LayerStack.PushOverlay(layer);
 	}
 
 	void Application::Run() {
@@ -107,7 +107,6 @@ namespace Cori {
 			layer->OnTickUpdate();
 		}
 	}
-
 
 	bool Application::OnWindowClose() {
 		m_Running = false;

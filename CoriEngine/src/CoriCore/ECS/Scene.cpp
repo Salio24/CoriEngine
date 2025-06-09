@@ -8,7 +8,7 @@ namespace Cori {
 		AddContextComponent<CameraContextComponent>();
 		ActiveCamera.BindCameraComponent(&GetContextComponent<CameraContextComponent>());
 		CORI_CORE_DEBUG("Scene: '{0}' created.", m_Name);
-		auto renderGroup = m_Registry.group<PositionComponent, RenderingComponent>();
+		auto renderGroup = m_Registry.group<PositionComponent, RenderingComponent, SpriteComponent>();
 	}
 
 	Scene::~Scene() {
@@ -28,7 +28,7 @@ namespace Cori {
 
 	Entity Scene::CreateEntity() {
 		entt::entity entity = m_Registry.create();
-		CORI_CORE_TRACE("Created Unnamed Entity With ID: {0}, Version: {1}", entt::to_integral(entity), entt::to_version(entity));
+		//CORI_CORE_TRACE("Created Unnamed Entity With ID: {0}, Version: {1}", entt::to_integral(entity), entt::to_version(entity));
 		return Entity{ {m_Registry, entity} };
 
 	}
@@ -40,25 +40,35 @@ namespace Cori {
 
 
 	void Scene::OnUpdate(const double deltaTime) {
+
 		Renderer2D::BeginBatch(GetContextComponent<CameraContextComponent>().ViewProjectionMatrix);
 
-		auto renderGroup = m_Registry.group<PositionComponent, RenderingComponent>();
+		auto renderGroup = m_Registry.group<PositionComponent, RenderingComponent, SpriteComponent>();
+
+		{
+			CORI_PROFILE_SCOPE("Group sort");
+			renderGroup.sort<SpriteComponent>([](const SpriteComponent& lhs, const SpriteComponent& rhs) {
+				return reinterpret_cast<uint64_t>(lhs.Texture.get()) > reinterpret_cast<uint64_t>(rhs.Texture.get());
+			});
+		}
 
 		for (auto entity : renderGroup) {
-			auto [posComp, renderComp] = renderGroup.get<PositionComponent, RenderingComponent>(entity);
+			auto [posComp, renderComp, spriteComp] = renderGroup.get<PositionComponent, RenderingComponent, SpriteComponent>(entity);
 			if (renderComp.Visible) {
-				Renderer2D::DrawQuad(posComp.Position, renderComp.Size, glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
+				Renderer2D::DrawQuad(posComp.Position, renderComp.Size, spriteComp.Texture, spriteComp.UV);
 			}
 		}
 
 		Renderer2D::EndBatch();
 	}
 
-	bool Scene::OnBind() {
+	bool Scene::OnBind(const EventCallbackFn& callback) {
+		m_TriggerEventCallback = callback;
 		return true;
 	}
 
 	bool Scene::OnUnbind() {
+		m_TriggerEventCallback = EventCallbackFn();
 		return true;
 	}
 

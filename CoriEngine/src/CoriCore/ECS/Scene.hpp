@@ -3,6 +3,7 @@
 #include "../SelfFactory.hpp"
 #include "../Profiling/Trackable.hpp"
 #include "../Renderer/CameraController.hpp"
+#include "../EventSystem/Event.hpp"
 
 namespace Cori {
 
@@ -11,10 +12,10 @@ namespace Cori {
 
 	class Scene : public Profiling::Trackable<Scene>, public SharedSeflFactory<Scene> {
 	public:
-		static bool PreCreateHook(const std::string& name) { return true; }
+		static bool PreCreateHook([[maybe_unused]] const std::string& name) { return true; }
 		~Scene();
 
-		bool OnBind();
+		bool OnBind(const EventCallbackFn& callback);
 		bool OnUnbind();
 
 		void OnUpdate(const double deltaTime);
@@ -23,6 +24,10 @@ namespace Cori {
 		Entity CreateEntity();
 
 		Entity GetNamedEntity(const std::string& name);
+
+		Entity EntityFromEnTT(const entt::entity& entity) {
+			return Entity{ entt::handle{m_Registry, entity} };
+		}
 
 		// and const variants
 		template<typename... T, typename... Args>
@@ -66,13 +71,13 @@ namespace Cori {
 		}
 
 		CameraController ActiveCamera;
-		
+
+		EventCallbackFn m_TriggerEventCallback;
+
 		std::string m_Name;
 	protected:
 		Scene(const std::string& name);
 	private:
-		
-
 		entt::registry m_Registry;
 
 

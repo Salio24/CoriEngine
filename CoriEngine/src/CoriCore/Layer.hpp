@@ -8,6 +8,8 @@ namespace Cori {
 
 	class Layer {
 	public:
+		using EventCallbackFn = std::function<void(Event&)>;
+
 		Layer(const std::string& name = "Layer");
 
 		virtual ~Layer();

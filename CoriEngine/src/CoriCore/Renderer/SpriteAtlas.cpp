@@ -10,7 +10,7 @@ namespace Cori {
 	SpriteAtlas::SpriteAtlas(const SpriteAtlasDescriptor& descriptor) {
 		m_Texture = AssetManager::GetTexture2D(descriptor.m_TextureDescriptor);
 
-		CORI_CORE_ASSERT_ERROR((!(m_Texture->GetHeight() % descriptor.m_SpriteResolution.y) || !(m_Texture->GetWidth() % descriptor.m_SpriteResolution.x)), "Invalid sprite resolution, sprite resolution on x and y should be divisible by texture resolution without remainder. Atlas: {0}", descriptor.GetDebugName());
+		CORI_CORE_ASSERT_ERROR((!(m_Texture->GetHeight() % descriptor.m_SpriteResolution.y) && !(m_Texture->GetWidth() % descriptor.m_SpriteResolution.x)), "Invalid sprite resolution, sprite resolution on x and y should be divisible by texture resolution without remainder. Atlas: {0}", descriptor.GetDebugName());
 
 		m_DebugName = descriptor.GetDebugName();
 

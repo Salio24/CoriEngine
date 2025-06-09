@@ -2,7 +2,6 @@
 #include <spdlog/spdlog.h>
 
 namespace Cori {
-
 	enum class EventType {
 		None = 0,
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
@@ -72,5 +71,7 @@ namespace Cori {
 	inline std::string format_as(const Event& e) {
 		return e.ToString();
 	}
+
+	using EventCallbackFn = std::function<void(Event&)>;
 }
 
