@@ -15,12 +15,13 @@ namespace Cori {
 
 		void SetZoomLevel(const float factor);
 
+		void RecalculateVP();
+
 		void BindCameraComponent(CameraContextComponent* camera) {
 			m_CurrentCameraComponent = camera;
 		}
 
 	private:
-		void RecalculateVP();
 
 		CameraContextComponent* m_CurrentCameraComponent{ nullptr };
 

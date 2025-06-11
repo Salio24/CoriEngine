@@ -2,6 +2,8 @@
 #include <entt/entt.hpp>
 
 namespace Cori {
+	class Scene;
+
 	class Entity {
 	public:
 
@@ -9,6 +11,8 @@ namespace Cori {
 		Entity() = default;
 
 		Entity(entt::handle handle) : m_EntityHandle(handle) {}
+
+		Entity(const entt::entity& entity);
 
 		template<typename T, typename... Args>
 		T& AddComponent(Args&&... args) {
@@ -76,9 +80,15 @@ namespace Cori {
 
 		inline bool IsValid() const {
 			return bool(this);
-		}
+		} 
 
 	private:
 		entt::handle m_EntityHandle;
+
+		friend class Scene;
+
+		//for internal use ONLY
+		static void SetViewScene(Scene* ptr);
+
 	};
 }

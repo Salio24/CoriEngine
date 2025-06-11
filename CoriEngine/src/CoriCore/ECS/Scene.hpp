@@ -32,6 +32,7 @@ namespace Cori {
 		// and const variants
 		template<typename... T, typename... Args>
 		auto View(Args&& ... args) {
+			Entity::SetViewScene(this);
 			return m_Registry.view<T...>(std::forward<Args>(args)...);
 		}
 
@@ -78,10 +79,11 @@ namespace Cori {
 	protected:
 		Scene(const std::string& name);
 	private:
-		entt::registry m_Registry;
-
 
 		std::unordered_map<std::string, entt::handle> m_NamedEntities;
 
+		entt::registry m_Registry;
+
+		friend class Entity;
 	};
 }

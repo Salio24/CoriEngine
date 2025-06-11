@@ -5,23 +5,23 @@
 namespace Cori {
 	void CameraController::CreateOrthoCamera(int left, int right, int bottom, int top, float zNear /*= -1.0f*/, float zFar /*= 1.0f*/) {
 		m_CurrentCameraComponent->ProjectionMatrix = glm::ortho((float)left, (float)right, (float)bottom, (float)top, zNear, zFar);
-		RecalculateVP();
+		m_CurrentCameraComponent->ViewProjectionMatrix = m_CurrentCameraComponent->ProjectionMatrix;
 	}
 
 	void CameraController::SetPosition(const glm::vec2 newPos) {
 		m_CurrentCameraComponent->CameraPosition = newPos;
-		RecalculateVP();
+		//RecalculateVP();
 	}
 
 	void CameraController::SetRotation(const float angle) {
 		m_CurrentCameraComponent->CameraRotation = angle;
-		RecalculateVP();
+		//RecalculateVP();
 	}
 
 	void CameraController::SetZoomLevel(const float factor) {
 		CORI_CORE_ASSERT_WARN(factor > 0.0f, "Are you sure you want zoom factor to be <= 0 ? ");
 		m_CurrentCameraComponent->CameraZoomFactor = factor;
-		RecalculateVP();
+		//RecalculateVP();
 	}
 
 	void CameraController::RecalculateVP() {

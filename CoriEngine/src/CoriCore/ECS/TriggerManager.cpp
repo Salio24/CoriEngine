@@ -16,8 +16,9 @@ namespace Cori {
 			auto [pPos, pCol] = playerView.get<PositionComponent, ColliderComponent>(player);
 			for (auto trigger : triggerView) {
 				auto [tPos, tCol] = triggerView.get<PositionComponent, ColliderComponent>(trigger);
+
 				if (RectVsRect(pCol, pPos, tCol, tPos)) {
-					GameTriggerStayEvent event(scene->EntityFromEnTT(trigger), scene->EntityFromEnTT(player), scene->m_TriggerEventCallback);
+					GameTriggerStayEvent event(trigger, player, scene->m_TriggerEventCallback);
 					m_EventCallback(event);
 				}
 			}

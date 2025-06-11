@@ -45,3 +45,6 @@
 	path = CoriEngine/thirdparty/entt
 	url = https://github.com/skypjack/entt.git
 	branch = master
+[submodule "CoriEngine/thirdparty/box2d"]
+	path = CoriEngine/thirdparty/box2d
+	url = https://github.com/erincatto/box2d.git
