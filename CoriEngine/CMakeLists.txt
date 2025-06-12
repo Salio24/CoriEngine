@@ -94,6 +94,11 @@ project(CoriEngine)
     set(ENTT_INSTALL OFF CACHE BOOL "")
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/entt EXCLUDE_FROM_ALL)
 
+    #box2d
+    set(BOX2D_AVX2 ON CACHE BOOL "")
+    set(BOX2D_DOCS ON CACHE BOOL "")
+    add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/box2d EXCLUDE_FROM_ALL)
+
 # project's binary setup vvv
 
     # varible sets
@@ -200,7 +205,7 @@ endif()
     # lib linking
 
     # should be public
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm tmxlite nlohmann_json::nlohmann_json)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm tmxlite nlohmann_json::nlohmann_json box2d::box2d)
 
     # can be private 
     target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static freetype glad_gl_core_46)

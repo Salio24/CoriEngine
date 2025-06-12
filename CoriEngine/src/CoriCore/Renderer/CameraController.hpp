@@ -7,7 +7,7 @@ namespace Cori {
 		CameraController() = default;
 		~CameraController() = default;
 
-		void CreateOrthoCamera(int left, int right, int bottom, int top, float zNear = -1.0f, float zFar = 1.0f);
+		void CreateOrthoCamera(float left, float right, float bottom, float top, float zNear = -1.0f, float zFar = 1.0f);
 
 		void SetPosition(const glm::vec2 newPos);
 

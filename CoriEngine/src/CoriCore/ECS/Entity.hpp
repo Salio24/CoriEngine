@@ -30,7 +30,7 @@ namespace Cori {
 		}
 
 		template<typename... T>
-		decltype(auto) GetComponents() {
+		[[nodiscard]] decltype(auto) GetComponents() {
 			if (!HasComponents<T...>()) {
 				CORI_CORE_ERROR("Entity does not have component type {0}!", ([]() {
 					std::ostringstream oss;
@@ -42,7 +42,7 @@ namespace Cori {
 		}
 
 		template<typename... T>
-		decltype(auto) GetComponents() const {
+		[[nodiscard]] decltype(auto) GetComponents() const {
 			if (!HasComponents<T...>()) {
 				CORI_CORE_ERROR("Entity does not have component type {0} (const)!", ([]() {
 					std::ostringstream oss;

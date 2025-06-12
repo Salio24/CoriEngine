@@ -5,7 +5,7 @@ namespace Cori {
 	enum class EventType {
 		None = 0,
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
-		GameTriggerEntered, GameTriggerExit, GameTriggerStay,
+		GameTriggerEntered, GameTriggerExit, GameTriggerStay, GameUserDefinedEvent,
 		AppTick, AppUpdate, AppRender,
 		KeyPressed, KeyReleased, KeyTyped,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
@@ -20,12 +20,6 @@ namespace Cori {
 		EventCategoryMouse       = 1 << 4,
 		EventCategoryMouseButton = 1 << 5
 	};
-
-#define EVENT_CLASS_TYPE(type) static EventType GetStaticType() { return EventType::type; }\
-								virtual EventType GetEventType() const override { return GetStaticType(); }\
-								virtual const char* GetName() const override { return #type; }
-
-#define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
 
 	class Event {
 		friend class EventDispatcher;
@@ -75,3 +69,9 @@ namespace Cori {
 	using EventCallbackFn = std::function<void(Event&)>;
 }
 
+
+#define EVENT_CLASS_TYPE(type) static ::Cori::EventType GetStaticType() { return ::Cori::EventType::type; }\
+								virtual ::Cori::EventType GetEventType() const override { return GetStaticType(); }\
+								virtual const char* GetName() const override { return #type; }
+
+#define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }

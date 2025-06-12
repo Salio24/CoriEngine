@@ -6,8 +6,8 @@ namespace Cori {
 
 	struct WindowProperties {
 		WindowProperties(const std::string& title = "Cori",
-			unsigned int width = 1600,
-			unsigned int height = 900,
+			unsigned int width = 1920,
+			unsigned int height = 1080,
 			GraphicsAPIs api = GraphicsAPIs::OpenGL
 			)
 			: Title(title), Width(width), Height(height), API(api) {

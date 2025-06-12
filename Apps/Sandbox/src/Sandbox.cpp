@@ -19,6 +19,25 @@ namespace Cori {
 	}
 }
 
+class CustomEvent : public Cori::Event {
+public:
+	CustomEvent(const std::string& somedata) : m_Data(somedata) {}
+
+	std::string ToString() const override {
+		return "UDE";
+	}
+
+	inline std::string& GetData() {
+		return m_Data;
+	}
+
+	EVENT_CLASS_TYPE(GameUserDefinedEvent)
+	EVENT_CLASS_CATEGORY(Cori::EventCategoryGameplay)
+private:
+	std::string m_Data;
+};
+
+
 class ExampleLayer : public Cori::Layer {
 public:
 	ExampleLayer() : Layer("Example") { 
@@ -32,6 +51,12 @@ public:
 	virtual void OnEvent(Cori::Event& event) override {
 
 		Cori::EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<CustomEvent>([](CustomEvent& e) -> bool {
+			CORI_DEBUG("Event data {}", e.GetData());
+			return true;
+			
+		});
+
 
 		if (!event.IsOfType(Cori::EventType::MouseMoved)) {
 			CORI_TRACE("| Layer: {0} | Event: {1}", this->GetName(), event);
@@ -55,24 +80,35 @@ public:
 		if (ImGui::Button("Create Trigger")) {
 			auto other = ActiveScene->CreateEntity("Other Entity");
 			other.AddComponent<Cori::RenderingComponent>(glm::vec2{ 50.0f, 50.0f });
-			other.AddComponent<Cori::ColliderComponent>();
-			other.AddComponent<Cori::PositionComponent>(glm::vec2{ 50.0f, 50.0f });
+			other.AddComponent<Cori::ColliderComponent>(glm::vec2{ 50.0f, 50.0f });
+			other.AddComponent<Cori::PositionComponent>(glm::vec2{ 40.0f, 40.0f });
 			other.AddComponent<Cori::PlayerTagComponent>();
 
 			auto trigger = ActiveScene->CreateEntity("Trigger Entity");
-			trigger.AddComponent<Cori::ColliderComponent>();
-			trigger.AddComponent<Cori::PositionComponent>(glm::vec2{ 50.0f, 50.0f });
-			trigger.AddComponent<Cori::TriggerComponent>([](Cori::Entity& trigger, Cori::Entity& entity) -> bool {
+			trigger.AddComponent<Cori::ColliderComponent>(glm::vec2{ 10.0f, 10.0f });
+			trigger.AddComponent<Cori::PositionComponent>(glm::vec2{ 100.0f, 100.0f });
+			trigger.AddComponent<Cori::TriggerComponent>([](Cori::Entity& trigger, Cori::Entity& entity, Cori::EventCallbackFn eventCallback) -> bool {
+
+				CustomEvent event("sample data");
+				eventCallback(event);
+
 				// trigger logic/script
-				CORI_WARN("trigger");
+				CORI_DEBUG("trigger");
 				return true;
 			});
 		}
 
-		
-
 		if (ImGui::Button("Activate Trigger")) {
-			Cori::TriggerManager::Get().Test();
+			auto entity = ActiveScene->GetNamedEntity("Other Entity");
+			decltype(auto) pos = entity.GetComponents<Cori::PositionComponent>();
+			pos.Position = glm::vec2{ 90.0f, 90.0f };
+
+		}
+
+		if (ImGui::Button("Deactivate Trigger")) {
+			auto entity = ActiveScene->GetNamedEntity("Other Entity");
+			decltype(auto) pos = entity.GetComponents<Cori::PositionComponent>();
+			pos.Position = glm::vec2{ 40.0f, 40.0f };
 		}
 
 		if (ImGui::Button("Create 'Test2' Scene")) {

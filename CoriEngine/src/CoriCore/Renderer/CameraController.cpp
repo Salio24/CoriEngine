@@ -3,8 +3,8 @@
 #include <glm/ext/matrix_transform.hpp>
 
 namespace Cori {
-	void CameraController::CreateOrthoCamera(int left, int right, int bottom, int top, float zNear /*= -1.0f*/, float zFar /*= 1.0f*/) {
-		m_CurrentCameraComponent->ProjectionMatrix = glm::ortho((float)left, (float)right, (float)bottom, (float)top, zNear, zFar);
+	void CameraController::CreateOrthoCamera(float left, float right, float bottom, float top, float zNear /*= -1.0f*/, float zFar /*= 1.0f*/) {
+		m_CurrentCameraComponent->ProjectionMatrix = glm::ortho(left, right, bottom, top, zNear, zFar);
 		m_CurrentCameraComponent->ViewProjectionMatrix = m_CurrentCameraComponent->ProjectionMatrix;
 	}
 
