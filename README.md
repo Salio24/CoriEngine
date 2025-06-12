@@ -34,7 +34,7 @@ Cori Engine uses CMake as a build system. Currently, it supports only Windows.
 3. Open the root folder as a local folder in Visual Studio.
 4. Done.
 
-Make sure to check compiler paths in `cmake_toolchain.cmake`. It should point to your LLVM installation folders. Although it points to the default installation folder of LLVM, if you changed the install folder, you'll have to specify the correct path in the toolchain file.
+Make sure to check compiler paths in `cmake_toolchain.cmake`. It should point to your LLVM installation folder. Although it points to the default installation folder of LLVM, if you changed the install folder, you'll have to specify the correct path in the toolchain file.
 
 ### Using plain cmake
 
@@ -48,7 +48,7 @@ Make sure to check compiler paths in `cmake_toolchain.cmake`. It should point to
 	- `Apps/RendererSandbox/bin/PresetName`
 	- `Apps/Sandbox/bin/PresetName`
 
-Make sure to check compiler paths in `cmake_toolchain.cmake`. It should point to your LLVM installation folders. Although it points to the default installation folder of LLVM, if you changed the install folder, you'll have to specify the correct path in the toolchain file.
+Make sure to check compiler paths in `cmake_toolchain.cmake`. It should point to your LLVM installation folder. Although it points to the default installation folder of LLVM, if you changed the install folder, you'll have to specify the correct path in the toolchain file.
 
 ### Visual Studio Solution IS NOT SUPPORTED!
 
