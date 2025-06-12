@@ -39,9 +39,9 @@ Make sure to check compiler paths in `cmake_toolchain.cmake`. It should point to
 ### Using plain cmake
 
 - There Are 3 build scripts in the root folder:
-	- `build_x64-clang-debug.sh`
-	- `build_x64-clang-release.sh`
-	- `build_x64-clang-relwithdebinfo.sh`
+	- `build_x64-clang-debug.bat`
+	- `build_x64-clang-release.bat`
+	- `build_x64-clang-relwithdebinfo.bat`
 - Each will build an engine as a static libarary, and all the available apps. 
 - Built binaries are located in: 
 	- `CoriEngine/bin/PresetName`

@@ -19,6 +19,8 @@
 /CoriEngine/thirdparty/spdlog/*
 /CoriEngine/thirdparty/tmxlite/*
 /CoriEngine/thirdparty/magic_enum/*
+/CoriEngine/thirdparty/entt/*
+/CoriEngine/thirdparty/box2d/*
 
 # build directory for libs and tmp files
 /out
