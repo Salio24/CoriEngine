@@ -10,6 +10,7 @@ namespace Cori {
 	}
 
 	void GameTimer::Update() {
+		CORI_PROFILE_FUNCTION();
 		uint64_t now = SDL_GetPerformanceCounter();
 		m_DeltaTime = static_cast<double>(now - m_LastTime) / SDL_GetPerformanceFrequency();
 		m_LastTime = now;
@@ -47,16 +48,6 @@ namespace Cori {
 
 	double GameTimer::GetHours() const {
 		return m_Time / 3600.0f;
-	}
-
-	ScopeTimer::ScopeTimer(std::string name) : m_Name(name), m_Start(SDL_GetPerformanceCounter()) {
-		CORI_CORE_DEBUG("[ScopeTimer] {0}: Has started", m_Name);
-	}
-
-	ScopeTimer::~ScopeTimer() {
-		uint64_t end = SDL_GetPerformanceCounter();
-		double elapsedMS = static_cast<double>(end - m_Start) * 1000.0f / SDL_GetPerformanceFrequency();
-		CORI_CORE_DEBUG("[ScopeTimer] {0}: Has stoped, and took {1}ms", m_Name, elapsedMS);
 	}
 
 	void ManualTimer::Start() {

@@ -6,22 +6,10 @@
 
 namespace Cori {
 	std::unique_ptr<RenderingContext> RenderingContext::Create(GraphicsAPIs api) {
-		switch (api) {
-		case GraphicsAPIs::None:
-			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
-			return nullptr;
-			break;
-		case GraphicsAPIs::OpenGL:
-			return std::make_unique<OpenGLContext>();
-			break;
-		case GraphicsAPIs::Vulkan:
-			CORI_CORE_ASSERT_FATAL(false, "Vulkan is not supported yet");
-			return nullptr;
-			break;
-		default:
-			CORI_CORE_ASSERT_FATAL(false, "Unknown graphics API");
-			return nullptr;
-			break;
-		}
+
+
+		std::unique_ptr<RenderingContext> context = Factory<RenderingContext, GraphicsAPIs>::CreateUnique(api);
+		CORI_CORE_ASSERT_FATAL(context, "Failed to create RenderingContext for API: {0}. Check registrations and API validity.", static_cast<int>(Application::GetCurrentAPI())); // output api as a string
+		return context;
 	}
 }

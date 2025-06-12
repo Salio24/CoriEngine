@@ -6,8 +6,12 @@
 
 namespace Cori {
 
-	OpenGLShaderProgram::OpenGLShaderProgram(const std::string_view debugName, const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view geometryPath) {
+	bool OpenGLShaderProgram::PreCreateHook(const std::string_view debugName, const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view geometryPath) {
+		return true;
+	}
 
+	OpenGLShaderProgram::OpenGLShaderProgram(const std::string_view debugName, const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view geometryPath) {
+		CORI_PROFILE_FUNCTION();
 		m_DebugName = debugName;
 
 		bool geometryShaderPresent = false;
@@ -19,7 +23,6 @@ namespace Cori {
 #ifdef DEBUG_BUILD
 		m_ShaderNames = CORI_SECOND_LINE_SPACING + "Vertex shader: " + FileManager::GetFilename(vertexPath) + "\n" + CORI_SECOND_LINE_SPACING + "Fragment shader: " + FileManager::GetFilename(fragmentPath) + "\n" + CORI_SECOND_LINE_SPACING + "Geometry shader: " + (geometryShaderPresent ? FileManager::GetFilename(geometryPath) + "" : "Not specified (not an error)");
 #endif
-
 
 		std::string vertexCode = FileManager::ReadTextFile(vertexPath);
 		const char* vertexSource = vertexCode.c_str();

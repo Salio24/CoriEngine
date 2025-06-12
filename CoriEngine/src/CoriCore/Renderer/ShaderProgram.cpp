@@ -6,22 +6,10 @@
 
 namespace Cori {
 	std::shared_ptr<ShaderProgram> ShaderProgram::Create(const ShaderProgramDescriptor& descriptor) {
-		switch (Application::GetWindow().GetAPI()) {
-		case GraphicsAPIs::None:
-			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
-			return nullptr;
-			break;
-		case GraphicsAPIs::OpenGL:
-			return std::make_shared<OpenGLShaderProgram>(descriptor.GetDebugName() ,descriptor.m_VertexPath, descriptor.m_FragmentPath, descriptor.m_GeometryPath);
-			break;
-		case GraphicsAPIs::Vulkan:
-			CORI_CORE_ASSERT_FATAL(false, "Vulkan is not supported yet");
-			return nullptr;
-			break;
-		default:
-			CORI_CORE_ASSERT_FATAL(false, "Unknown graphics API");
-			return nullptr;
-			break;
-		}
+
+
+		std::shared_ptr<ShaderProgram> shader = Factory<ShaderProgram, GraphicsAPIs, const std::string_view, const std::string_view, const std::string_view, const std::string_view>::CreateShared(Application::GetCurrentAPI(), descriptor.GetDebugName(), descriptor.m_VertexPath, descriptor.m_FragmentPath, descriptor.m_GeometryPath);
+		CORI_CORE_ASSERT_FATAL(shader, "Failed to create ShaderProgram for API: {0}. Check registrations and API validity.", static_cast<int>(Application::GetCurrentAPI())); // output api as a string
+		return shader;
 	}
 }

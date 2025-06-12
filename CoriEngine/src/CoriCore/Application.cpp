@@ -8,6 +8,10 @@
 #include "Renderer/Buffers.hpp"
 #include "Renderer/GraphicsCall.hpp"
 #include "AssetManager/AssetDefinitions.hpp"
+#include "ECS/SceneManager.hpp"
+#include "ECS/TriggerManager.hpp"
+#include "EventSystem/GameEvents.hpp"
+#include "ECS/Components.hpp"
 
 namespace Cori {
 	Application* Application::s_Instance = nullptr;
@@ -19,6 +23,8 @@ namespace Cori {
 		m_Window = Window::Create();
 
 		m_Window->SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent, CORI_PLACEHOLDERS(1)));
+
+		TriggerManager::Get().SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent, CORI_PLACEHOLDERS(1)));
 
 		m_ImGuiLayer = new ImGuiLayer();
 
@@ -37,41 +43,62 @@ namespace Cori {
 	void Application::OnEvent(Event& e) {
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(CORI_BIND_EVENT_FN(Application::OnWindowClose));
+		dispatcher.Dispatch<GameTriggerStayEvent>([](Cori::GameTriggerStayEvent& e) -> bool {
+			return e.GetTriggerEntity().GetComponents<TriggerComponent>().TriggerScript(e.GetTriggerEntity(), e.GetOtherEntity(), e.m_EventCallback);
+		});
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
-			(*--it)->OnEvent(e);
-			if (e.m_Handeled) {
+			--it;
+			(*it)->OnEvent(e);
+			if (e.m_Handeled || (*it)->IsModal()) {
 				break;
 			}
 		}
 	}
 
 	void Application::PushLayer(Layer* layer) {
-		m_LayerStack.PushLayer(layer);
+		Get().m_LayerStack.PushLayer(layer);
 	}
 
 	void Application::PushOverlay(Layer* layer) {
-		m_LayerStack.PushOverlay(layer);
+		Get().m_LayerStack.PushOverlay(layer);
 	}
 
 	void Application::Run() {
 		while(m_Running) {
+			CORI_PROFILER_FRAME_START();
+			{
+				CORI_PROFILE_SCOPE("Cori Engine Global Update");
+				m_GameTimer.Update();
 
-			m_GameTimer.Update();
+				GraphicsCall::SetClearColor({ 1.0f, 1.0f, 0.0f, 1.0f });
+				GraphicsCall::ClearFramebuffer();
 
-			for (Layer* layer : m_LayerStack) {
-				layer->OnUpdate(m_GameTimer);
+				for (Layer* layer : m_LayerStack) {
+					layer->OnUpdate(m_GameTimer);
+					if (layer->IsModal()) {
+						break;
+					}
+				}
+
+				for (Layer* layer : m_LayerStack) {
+					layer->SceneUpdate(m_GameTimer);
+					if (layer->IsModal()) {
+						break;
+					}
+				}
+
+				m_ImGuiLayer->StartFrame();
+
+				for (Layer* layer : m_LayerStack) {
+					layer->OnImGuiRender(m_GameTimer);
+				}
+
+				m_ImGuiLayer->EndFrame();
+
+				m_Window->OnUpdate();
 			}
-
-			m_ImGuiLayer->StartFrame();
-
-			for (Layer* layer : m_LayerStack) {
-				layer->OnImGuiRender(m_GameTimer);
-			}
-
-			m_ImGuiLayer->EndFrame();
-
-			m_Window->OnUpdate();
+			CORI_PROFILER_FRAME_END();
 		}
 	}
 
@@ -80,7 +107,6 @@ namespace Cori {
 			layer->OnTickUpdate();
 		}
 	}
-
 
 	bool Application::OnWindowClose() {
 		m_Running = false;

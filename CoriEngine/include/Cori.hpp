@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include "../src/CoriCore/Application.hpp"
 #include "../src/CoriCore/Layer.hpp"
 #include "../src/CoriCore/Logger.hpp"
@@ -9,6 +8,7 @@
 #include "../src/CoriCore/EventSystem/MouseEvent.hpp"
 #include "../src/CoriCore/EventSystem/AppEvent.hpp"
 #include "../src/CoriCore/EventSystem/KeyEvent.hpp"
+#include "../src/CoriCore/EventSystem/GameEvents.hpp"
 #include "../src/CoriCore/Renderer/Buffers.hpp"
 #include "../src/CoriCore/Renderer/GraphicsCall.hpp"
 #include "../src/CoriCore/Renderer/Renderer2D.hpp"
@@ -20,9 +20,8 @@
 #include "../src/CoriCore/Renderer/Image.hpp"
 #include "../src/CoriCore/Renderer/Camera.hpp"
 #include "../src/CoriCore/AssetManager/AssetDefinitions.hpp"
-
-
-
-
-// should be included LAST!
-#include "../src/CoriCore/EntryPoint.hpp"
+#include "../src/CoriCore/Tile.hpp"
+#include "../src/CoriCore/Profiling/TimeProfiler.hpp"
+#include "../src/CoriCore/ECS/Scene.hpp"
+#include "../src/CoriCore/ECS/SceneManager.hpp"
+#include "../src/CoriCore/Renderer/CameraController.hpp"

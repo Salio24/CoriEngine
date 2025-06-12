@@ -21,8 +21,8 @@ namespace Cori {
 		}
 
 		struct Hasher {
-			std::size_t operator()(const Texture2DDescriptor& handle) const noexcept {
-				return std::hash<uint32_t>{}(handle.runtimeID);
+			std::size_t operator()(const Texture2DDescriptor& descriptor) const noexcept {
+				return std::hash<uint32_t>{}(descriptor.runtimeID);
 			}
 		};
 
@@ -34,5 +34,4 @@ namespace Cori {
 		const uint32_t runtimeID{ 0 };
 		inline static std::atomic<uint32_t> s_NextRuntimeID{ 1 };
 	};
-
 }

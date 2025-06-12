@@ -70,7 +70,7 @@ namespace Cori {
 
 		if ((size_t)type >= (sizeof(sizes) / sizeof(size_t)))
 		{
-			CORI_CORE_ASSERT_ERROR(false, "ShaderDataTypeComponentCount: shader data type");
+			CORI_CORE_ASSERT_ERROR(false, "Unknown shader data type");
 			return 0;
 		}
 

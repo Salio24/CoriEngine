@@ -21,12 +21,14 @@ namespace Cori {
 
 		void OnEvent(Event& e);
 
-		void PushLayer(Layer* layer);
-		void PushOverlay(Layer* layer);
+		static void PushLayer(Layer* layer);
+		static void PushOverlay(Layer* layer);
 		
 		inline static Window& GetWindow() { return *Get().m_Window; }
 
 		inline static GameTimer& GetGameTimer() { return Get().m_GameTimer; }
+
+		inline static GraphicsAPIs GetCurrentAPI() { return GetWindow().GetAPI(); }
 
 	private: 
 

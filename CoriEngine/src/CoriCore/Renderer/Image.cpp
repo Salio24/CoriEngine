@@ -8,7 +8,7 @@ namespace Cori {
 	Image::Image(const std::string& path) {
 		m_Surface = IMG_Load(path.c_str());
 
-		if CORI_CORE_ASSERT_ERROR(static_cast<SDL_Surface*>(m_Surface), "Image: Failed to load image: '{0}', {1}", path, SDL_GetError()) {
+		if CORI_CORE_ASSERT_ERROR(static_cast<SDL_Surface*>(m_Surface), "Failed to load image: '{}', {}", path, SDL_GetError()) {
 			m_Surface = IMG_Load("assets/engine/textures/missing_texture32.png");
 		}
 		else {
@@ -19,9 +19,9 @@ namespace Cori {
 			CORI_CORE_WARN("Image: Converting '{0}' to RGBA32 (ARGB8888) format\n    You should convert all the images you're loading to RGBA32 before loading them; you shouldn't rely on the engine's automatic conversion.", path);
 
 			SDL_Surface* converted = SDL_ConvertSurface(static_cast<SDL_Surface*>(m_Surface), SDL_PIXELFORMAT_RGBA32);
-			if CORI_CORE_ASSERT_ERROR(converted, "Image: Failed to convert image: '{0}', {1}", path, SDL_GetError()) { 
+			if CORI_CORE_ASSERT_ERROR(converted, "Failed to convert image: '{}', {}", path, SDL_GetError()) { 
 				m_Surface = IMG_Load("assets/engine/textures/missing_texture32.png");
-				SDL_DestroySurface(converted); 
+				SDL_DestroySurface(converted);
 				
 			}
 			else {

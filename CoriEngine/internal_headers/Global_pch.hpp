@@ -1,0 +1,42 @@
+#ifndef GLOBAL_PCH
+#define GLOBAL_PCH
+
+#include <functional>
+#include <memory>
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
+#include <array>
+#include <algorithm>
+#include <random>
+#include <map>
+#include <chrono>
+#include <iostream>
+#include <system_error>
+#include <filesystem>
+#include <string_view>
+#include <cstdint>
+#include <atomic>
+#include <functional>
+#include <compare>
+#include <stdexcept>
+#include <system_error>
+#include <expected>
+#include <typeinfo> 
+#include <utility> 
+#include <typeindex>
+#include <type_traits>
+#include <mutex>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
+#include <ostream>
+#include <thread>
+#include <fstream>
+#include <glm/glm.hpp>
+#include <imgui.h>
+#include "../include/Macros.hpp"
+#include "../src/CoriCore/Logger.hpp"
+#include "../src/CoriCore/Profiling/TimeProfiler.hpp"
+
+#endif

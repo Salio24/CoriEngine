@@ -6,22 +6,9 @@
 
 namespace Cori {
 	std::shared_ptr<VertexArray> VertexArray::Create() {
-		switch (Application::GetWindow().GetAPI()) {
-		case GraphicsAPIs::None:
-			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
-			return nullptr;
-			break;
-		case GraphicsAPIs::OpenGL:
-			return std::make_shared<OpenGLVertexArray>();
-			break;
-		case GraphicsAPIs::Vulkan:
-			CORI_CORE_ASSERT_FATAL(false, "Vulkan is not supported yet");
-			return nullptr;
-			break;
-		default:
-			CORI_CORE_ASSERT_FATAL(false, "Unknown graphics API");
-			return nullptr;
-			break;
-		}
+		std::shared_ptr<VertexArray> vao = Factory<VertexArray, GraphicsAPIs>::CreateShared(Application::GetCurrentAPI());
+		CORI_CORE_ASSERT_FATAL(vao, "Failed to create VertexArray for API: {0}. Check registrations and API validity.", static_cast<int>(Application::GetCurrentAPI())); // output api as a string
+		return vao;
+
 	}
 }

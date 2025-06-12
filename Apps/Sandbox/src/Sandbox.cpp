@@ -1,24 +1,63 @@
-#include <iostream>
 #include <Cori.hpp>
-#include <imgui.h>
-#include <memory>
-#include <glm/glm.hpp>
-#include <glm/ext/matrix_transform.hpp>
+#include <CoriEntry.hpp>
+
+namespace Cori {
+	namespace Texture2Ds {
+		inline const Texture2DDescriptor AtlasTexture{
+			"Test AtlasTexture",
+			"assets/engine/textures/testTileset32.png"
+		};
+	}
+
+	namespace SpriteAtlases {
+		inline const SpriteAtlasDescriptor Atlas{
+			"Test Atlas",
+			Texture2Ds::AtlasTexture,
+			{32, 32}
+		};
+
+	}
+}
+
+class CustomEvent : public Cori::Event {
+public:
+	CustomEvent(const std::string& somedata) : m_Data(somedata) {}
+
+	std::string ToString() const override {
+		return "UDE";
+	}
+
+	inline std::string& GetData() {
+		return m_Data;
+	}
+
+	EVENT_CLASS_TYPE(GameUserDefinedEvent)
+	EVENT_CLASS_CATEGORY(Cori::EventCategoryGameplay)
+private:
+	std::string m_Data;
+};
+
 
 class ExampleLayer : public Cori::Layer {
 public:
 	ExampleLayer() : Layer("Example") { 
-		//Cori::Application::GetWindow().SetVSync(true);
+		Cori::GraphicsCall::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
+	}
 
-		m_Camera.SetCameraSize(0, 7680, 0, 4320);
-		m_Texture1 = Cori::Texture2D::Create("assets/engine/textures/brick.png");
-		m_Texture2 = Cori::Texture2D::Create("assets/engine/textures/cake_top.png");
-		m_Texture3 = Cori::Texture2D::Create("assets/engine/textures/leggings.png");
-		m_Texture4 = Cori::Texture2D::Create("assets/engine/textures/orientation_test24.png");
+	~ExampleLayer() {
 
 	}
 	
 	virtual void OnEvent(Cori::Event& event) override {
+
+		Cori::EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<CustomEvent>([](CustomEvent& e) -> bool {
+			CORI_DEBUG("Event data {}", e.GetData());
+			return true;
+			
+		});
+
+
 		if (!event.IsOfType(Cori::EventType::MouseMoved)) {
 			CORI_TRACE("| Layer: {0} | Event: {1}", this->GetName(), event);
 		}
@@ -26,67 +65,103 @@ public:
 
 	virtual void OnImGuiRender(const double deltaTime) override {
 		ImGui::Begin("Test");
-		ImGui::SliderFloat("Test float", &testFloat, 0.0f, 150.0f);
+
+		static int a = 0;
+
+		if (ImGui::Button("Add box")) {
+			a++;
+			auto ent = ActiveScene->CreateEntity("Test Entity " + std::to_string(a));
+			ent.AddComponent<Cori::RenderingComponent>(glm::vec2{50.0f, 50.0f});
+			ent.AddComponent<Cori::PositionComponent>(glm::vec2{ 50.0f * a, 500.0f });
+			auto atlas = Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::Atlas);
+			ent.AddComponent<Cori::SpriteComponent>(atlas->GetTexture(), atlas->GetSpriteUVsAtIndex(a));
+		}
+
+		if (ImGui::Button("Create Trigger")) {
+			auto other = ActiveScene->CreateEntity("Other Entity");
+			other.AddComponent<Cori::RenderingComponent>(glm::vec2{ 50.0f, 50.0f });
+			other.AddComponent<Cori::ColliderComponent>(glm::vec2{ 50.0f, 50.0f });
+			other.AddComponent<Cori::PositionComponent>(glm::vec2{ 40.0f, 40.0f });
+			other.AddComponent<Cori::PlayerTagComponent>();
+
+			auto trigger = ActiveScene->CreateEntity("Trigger Entity");
+			trigger.AddComponent<Cori::ColliderComponent>(glm::vec2{ 10.0f, 10.0f });
+			trigger.AddComponent<Cori::PositionComponent>(glm::vec2{ 100.0f, 100.0f });
+			trigger.AddComponent<Cori::TriggerComponent>([](Cori::Entity& trigger, Cori::Entity& entity, Cori::EventCallbackFn eventCallback) -> bool {
+
+				CustomEvent event("sample data");
+				eventCallback(event);
+
+				// trigger logic/script
+				CORI_DEBUG("trigger");
+				return true;
+			});
+		}
+
+		if (ImGui::Button("Activate Trigger")) {
+			auto entity = ActiveScene->GetNamedEntity("Other Entity");
+			decltype(auto) pos = entity.GetComponents<Cori::PositionComponent>();
+			pos.Position = glm::vec2{ 90.0f, 90.0f };
+
+		}
+
+		if (ImGui::Button("Deactivate Trigger")) {
+			auto entity = ActiveScene->GetNamedEntity("Other Entity");
+			decltype(auto) pos = entity.GetComponents<Cori::PositionComponent>();
+			pos.Position = glm::vec2{ 40.0f, 40.0f };
+		}
+
+		if (ImGui::Button("Create 'Test2' Scene")) {
+			Cori::SceneManager::CreateScene("Test2 Scene");
+		}
+
+		if (ImGui::Button("Create 'Test' Scene")) {
+			Cori::SceneManager::CreateScene("Test Scene");
+		}
+
+		if (ImGui::Button("Set Camera")) {
+			ActiveScene->ActiveCamera.CreateOrthoCamera(0, 7680, 0, 4320);
+		}
+
+		if (ImGui::Button("Destroy Test2")) {
+			Cori::SceneManager::DestroyScene("Test2 Scene");
+		}
+
+		if (ImGui::Button("Destroy Test")) {
+			Cori::SceneManager::DestroyScene("Test Scene");
+		}
+
+		if (ImGui::Button("Unbind Scene")) {
+			UnbindScene();
+		}
+
+		if (ImGui::Button("Test2 bind")) {
+			BindScene("Test2 Scene");
+		}
+
+		if (ImGui::Button("Test bind")) {
+			BindScene("Test Scene");
+		}
+
+		if (ImGui::Button("Crash")) {
+			ActiveScene->GetNamedEntity("Crash Entity");
+		}
+
+		if (ImGui::Button("Assert")) {
+			CORI_CORE_ASSERT_DEBUG(false, "Message: {0}", std::string("test"));
+		}
+
 		ImGui::End();
 	}
 
 	void OnUpdate(const double deltaTime) override {
 
-		// TODO, get rid of raw pointers in create funcs
 
-		Cori::GraphicsCall::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
-		Cori::GraphicsCall::SetClearColor({ 1.0f, 1.0f, 0.0f, 1.0f });
-		Cori::GraphicsCall::ClearFramebuffer();
-
-		Cori::Renderer2D::BeginBatch(m_Camera.GetViewProjectionMatrix(), model);
-
-		Cori::Renderer2D::DrawQuad(glm::vec2(50.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-		Cori::Renderer2D::DrawQuad(glm::vec2(150.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-		Cori::Renderer2D::DrawQuad(glm::vec2(250.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-		Cori::Renderer2D::DrawQuad(glm::vec2(350.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-		Cori::Renderer2D::DrawQuad(glm::vec2(450.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-		
-		Cori::Renderer2D::DrawQuad(glm::vec2(550.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture1);
-		Cori::Renderer2D::DrawQuad(glm::vec2(650.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture1);
-		Cori::Renderer2D::DrawQuad(glm::vec2(750.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture1);
-		Cori::Renderer2D::DrawQuad(glm::vec2(850.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture1);
-		Cori::Renderer2D::DrawQuad(glm::vec2(950.0f, 50.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture1);
-		
-		Cori::Renderer2D::DrawQuad(glm::vec2(550.0f, 250.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture2);
-		Cori::Renderer2D::DrawQuad(glm::vec2(650.0f, 250.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture2);
-		Cori::Renderer2D::DrawQuad(glm::vec2(750.0f, 250.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture2);
-		Cori::Renderer2D::DrawQuad(glm::vec2(850.0f, 250.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture2);
-		Cori::Renderer2D::DrawQuad(glm::vec2(950.0f, 250.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture2);
-		
-		Cori::Renderer2D::DrawQuad(glm::vec2(550.0f, 450.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture3, glm::vec2(0.5f), glm::vec2(0.0f, 0.5f));
-		Cori::Renderer2D::DrawQuad(glm::vec2(650.0f, 450.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture3, glm::vec2(0.5f), glm::vec2(0.0f, 0.5f));
-		Cori::Renderer2D::DrawQuad(glm::vec2(750.0f, 450.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture3, glm::vec2(0.5f), glm::vec2(0.0f, 0.5f));
-		Cori::Renderer2D::DrawQuad(glm::vec2(850.0f, 450.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture3, glm::vec2(0.5f), glm::vec2(0.0f, 0.5f));
-		Cori::Renderer2D::DrawQuad(glm::vec2(950.0f, 450.0f + testFloat), glm::vec2(50.0f, 50.0f), m_Texture3, glm::vec2(0.5f), glm::vec2(0.0f, 0.5f));
-		
-		Cori::Renderer2D::DrawQuad(glm::vec2(550.0f, 650.0f + testFloat), glm::vec2(32.0f), m_Texture4);
-		Cori::Renderer2D::DrawQuad(glm::vec2(650.0f, 650.0f + testFloat), glm::vec2(32.0f), m_Texture4);
-		Cori::Renderer2D::DrawQuad(glm::vec2(750.0f, 650.0f + testFloat), glm::vec2(32.0f), m_Texture4);
-		Cori::Renderer2D::DrawQuad(glm::vec2(850.0f, 650.0f + testFloat), glm::vec2(32.0f), m_Texture4);
-		Cori::Renderer2D::DrawQuad(glm::vec2(950.0f, 650.0f + testFloat), glm::vec2(32.0f), m_Texture4);
-
-		Cori::Renderer2D::EndBatch();
 	}
 
 	virtual void OnTickUpdate() override {
 		
 	}
-
-	glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(4.0f, 4.0f, 0.0f));
-
-	Cori::OrthoCamera m_Camera;
-
-	std::shared_ptr<Cori::Texture2D> m_Texture1;
-	std::shared_ptr<Cori::Texture2D> m_Texture2;
-	std::shared_ptr<Cori::Texture2D> m_Texture3;
-	std::shared_ptr<Cori::Texture2D> m_Texture4;
-
-	float testFloat = 0.0f;
 
 };
 

@@ -1,4 +1,3 @@
-// This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "Logger.hpp"
 
@@ -47,6 +46,7 @@ namespace Cori {
 		CORI_CORE_INFO("");
 		CORI_CORE_INFO("");
 		CORI_CORE_INFO("");
+
 	}
 
 	void Logger::SetClientLogLevel(LogLevel level) {

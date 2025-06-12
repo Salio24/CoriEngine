@@ -6,6 +6,18 @@ project(CoriEngine)
     
     set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "") 
 
+    #jinja2
+    find_package(Python 3.9 REQUIRED COMPONENTS Interpreter)
+	
+	execute_process(
+		COMMAND ${Python_EXECUTABLE} -m pip install Jinja2
+		RESULT_VARIABLE PIP_RESULT
+	)
+	
+	if(NOT PIP_RESULT EQUAL 0)
+		message(FATAL_ERROR "Failed to execute: pip install Jinja2")
+	endif()
+
     # SDL3
     set(SDL_SHARED OFF)
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/SDL3 EXCLUDE_FROM_ALL)
@@ -75,6 +87,18 @@ project(CoriEngine)
 
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/magic_enum EXCLUDE_FROM_ALL)
 
+    #entt
+    set(ENTT_BUILD_DOCS ON CACHE BOOL "")
+    set(ENTT_INCLUDE_HEADERS ON CACHE BOOL "")
+    set(ENTT_INCLUDE_TOOLS ON CACHE BOOL "")
+    set(ENTT_INSTALL OFF CACHE BOOL "")
+    add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/entt EXCLUDE_FROM_ALL)
+
+    #box2d
+    set(BOX2D_AVX2 ON CACHE BOOL "")
+    set(BOX2D_DOCS ON CACHE BOOL "")
+    add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/box2d EXCLUDE_FROM_ALL)
+
 # project's binary setup vvv
 
     # varible sets
@@ -127,6 +151,11 @@ endif()
         $<$<CONFIG:Release>:RELEASE_BUILD>
     )
 
+    target_compile_definitions(${ENGINE_LIBRARY_NAME} PUBLIC
+        $<$<CONFIG:Debug>:CORI_ENABLE_PROFILING>
+        $<$<CONFIG:RelWithDebInfo>:CORI_ENABLE_PROFILING>
+    )
+
     # compile flags just for the engine dll
     target_compile_options(${ENGINE_LIBRARY_NAME} PRIVATE -Wall -Wextra)
 
@@ -149,6 +178,7 @@ endif()
 
     # pch
     target_precompile_headers(${ENGINE_LIBRARY_NAME} PRIVATE ${CORI_HEADERS_DIR}/Cori_pch.hpp)
+    target_precompile_headers(${ENGINE_LIBRARY_NAME} PUBLIC ${CORI_HEADERS_DIR}/App_pch.hpp)
 
     # disable compilation warnings from thirdparty libs
 
@@ -175,7 +205,7 @@ endif()
     # lib linking
 
     # should be public
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC spdlog::spdlog magic_enum::magic_enum imgui glm::glm)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm tmxlite nlohmann_json::nlohmann_json box2d::box2d)
 
     # can be private 
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static nlohmann_json::nlohmann_json tmxlite freetype glad_gl_core_46)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static freetype glad_gl_core_46)

@@ -1,9 +1,13 @@
 #pragma once
 #include "../Texture.hpp"
+#include "../../Profiling/Trackable.hpp"
+#include "../../AutoRegisteringFactory.hpp"
+#include "../GraphicsAPIs.hpp"
 
 namespace Cori {
-	class OpenGLTexture2D : public Texture2D {
+	class OpenGLTexture2D : public Texture2D, public Profiling::Trackable<OpenGLTexture2D, Texture2D>, public RegisterInSharedFactory<Texture2D, OpenGLTexture2D, GraphicsAPIs, GraphicsAPIs::OpenGL, const std::string&> {
 	public:
+		static bool PreCreateHook(const std::string& path); 
 		OpenGLTexture2D(const std::string& path);
 		virtual ~OpenGLTexture2D();
 
@@ -16,5 +20,7 @@ namespace Cori {
 		uint32_t m_ID{ 0 };
 		uint32_t m_Width{ 0 };
 		uint32_t m_Height{ 0 };
+
+		CORI_REGISTERED_FACTORY_INIT;
 	};
 }

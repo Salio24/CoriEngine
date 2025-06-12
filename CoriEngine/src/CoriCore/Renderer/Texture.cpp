@@ -5,44 +5,12 @@
 #include "OpenGL/GL_Texture.hpp"
 
 namespace Cori {
-	std::shared_ptr<Texture2D> Texture2D::Create(const std::string& path) {
-		switch (Application::GetWindow().GetAPI()) {
-		case GraphicsAPIs::None:
-			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
-			return nullptr;
-			break;
-		case GraphicsAPIs::OpenGL:
-			return std::make_shared<OpenGLTexture2D>(path);
-			break;
-		case GraphicsAPIs::Vulkan:
-			CORI_CORE_ASSERT_FATAL(false, "Vulkan is not supported yet");
-			return nullptr;
-			break;
-		default:
-			CORI_CORE_ASSERT_FATAL(false, "Unknown graphics API");
-			return nullptr;
-			break;
-		}
-	}
-
 	std::shared_ptr<Texture2D> Texture2D::Create(const Texture2DDescriptor& descriptor) {
-		switch (Application::GetWindow().GetAPI()) {
-		case GraphicsAPIs::None:
-			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
-			return nullptr;
-			break;
-		case GraphicsAPIs::OpenGL:
-			return std::make_shared<OpenGLTexture2D>((std::string)descriptor.imagePath);
-			break;
-		case GraphicsAPIs::Vulkan:
-			CORI_CORE_ASSERT_FATAL(false, "Vulkan is not supported yet");
-			return nullptr;
-			break;
-		default:
-			CORI_CORE_ASSERT_FATAL(false, "Unknown graphics API");
-			return nullptr;
-			break;
-		}
+
+
+		std::shared_ptr<Texture2D> texture = Factory<Texture2D, GraphicsAPIs, const std::string&>::CreateShared(Application::GetCurrentAPI(), (std::string)descriptor.imagePath);
+		CORI_CORE_ASSERT_FATAL(texture, "Failed to create Texture2D for API: {0}. Check registrations and API validity.", static_cast<int>(Application::GetCurrentAPI())); // output api as a string
+		return texture;
 	}
 
 }

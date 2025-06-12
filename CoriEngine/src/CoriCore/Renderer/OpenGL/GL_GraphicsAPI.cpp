@@ -114,4 +114,12 @@ namespace Cori {
 		glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(elementCount), GL_UNSIGNED_INT, nullptr);
 		vertexArray->Unbind();
 	}
+
+	OpenGLGraphicsAPI::OpenGLGraphicsAPI() {
+	
+	} 
+	
+	bool OpenGLGraphicsAPI::PreCreateHook() {
+		return true;
+	}
 }

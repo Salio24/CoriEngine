@@ -1,11 +1,7 @@
-#include <iostream>
 #include <Cori.hpp>
-#include <imgui.h>
-#include <memory>
-#include <glm/glm.hpp>
+#include <CoriEntry.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <imgui_internal.h>
-#include <algorithm>
 
 namespace Cori {
 	namespace Shaders {
@@ -17,10 +13,22 @@ namespace Cori {
 			"Test Brick Texture",
 			"assets/engine/textures/brick.png"
 		};
+		inline const Texture2DDescriptor TestTileset {
+			"Test Tileset 32",
+			"assets/engine/textures/testTileset32.png"
+		};
 	}
 	
 	namespace Images {
 
+	}
+	
+	namespace SpriteAtlases {
+		inline const SpriteAtlasDescriptor test {
+			"test sprite atlas",
+			Texture2Ds::TestTileset,
+			{32, 32}
+		};
 	}
 }
 
@@ -30,12 +38,16 @@ public:
 		m_Camera.SetCameraSize(0, 7680, 0, 4320);
 
 		// can also preload assets like this vvv
-		///Cori::AssetManager::PreloadTexture2Ds({
-		///	Cori::Texture2Ds::TestBrickTexture
-		///});
+		Cori::AssetManager::PreloadTexture2Ds({
+			Cori::Texture2Ds::TestBrickTexture
+			});
+
+		Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::test);
+
 		// if the asset is not preloaded it will be loaded the first time it is requested via appropriate
 		// Get function from the Asset Manager
 		Cori::GraphicsCall::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
+
 	}
 
 	virtual void OnEvent(Cori::Event& event) override {
@@ -48,10 +60,17 @@ public:
 			m_Camera.ZoomVP(std::clamp((m_Camera.GetZoomFactor() + e.GetYOffset() * 0.0625f), 0.0625f, 1000.0f));
 			return true;
 		});
+
+		dispatcher.Dispatch<Cori::KeyReleasedEvent>([this](const Cori::KeyReleasedEvent& e) -> bool {
+			if (e.GetKeyCode() == Cori::CORI_KEY_P) {
+				CORI_PROFILE_REQUEST_NEXT_FRAME();
+			}
+			return false;
+		});
 	}
 
 	virtual void OnImGuiRender(const double deltaTime) override {
-
+		CORI_PROFILE_FUNCTION();
 		ImGui::Begin("Performance metrics");
 
 		ImGui::SeparatorText("Frametime graph (of last 500 frames)");
@@ -173,8 +192,7 @@ public:
 	}
 
 	void OnUpdate(const double deltaTime) override {
-
-		// TODO, get rid of raw pointers in create funcs
+		CORI_PROFILE_FUNCTION();
 		Cori::GraphicsCall::SetClearColor({ 0.875f, 0.6875f, 1.0f, 1.0f });
 		Cori::GraphicsCall::ClearFramebuffer();
 
@@ -186,7 +204,10 @@ public:
 
 		for (int i = 0; i < m_QuadRows; i++) {
 			for (int y = 0; y < m_QuadColumns; y++) {
-				Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset , i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetTexture2D(Cori::Texture2Ds::TestBrickTexture));
+				//Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset , i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetTexture2D(Cori::Texture2Ds::TestBrickTexture));
+				Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset, i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::test), 23);
+				
+				//Cori::Renderer2D::DrawTile(testTile);
 			}
 		}
 
@@ -194,6 +215,15 @@ public:
 	}
 
 	virtual void OnTickUpdate() override {
+		CORI_PROFILE_FUNCTION();
+		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_8)) {
+			Cori::Profiling::InstanceMetrics<Cori::SpriteAtlas>::Report();
+		}
+
+		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_9)) {
+			Cori::Profiling::InstanceMetrics<Cori::VertexArray>::Report();
+		}
+		
 		glm::vec2 cameraPosDelta = glm::vec2(0.0f);
 
 		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_W)) {
@@ -218,6 +248,8 @@ public:
 	int m_QuadRows{ 1 };
 
 	Cori::OrthoCamera m_Camera;
+
+	std::shared_ptr<Cori::Tile> testTile = Cori::Tile::Create(glm::vec2(30.0f), glm::vec2(500.0f), Cori::SpriteAtlases::test, 23);
 
 	float m_CameraMoveSpeed = 10.0f;
 

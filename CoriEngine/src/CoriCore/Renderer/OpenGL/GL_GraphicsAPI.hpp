@@ -1,9 +1,13 @@
 #pragma once
 #include "../CoriGraphicsAPI.hpp"
+#include "../../Profiling/Trackable.hpp"
+#include "../../AutoRegisteringFactory.hpp"
 
 namespace Cori {
-	class OpenGLGraphicsAPI : public CoriGraphicsAPI {
+	class OpenGLGraphicsAPI : public CoriGraphicsAPI, public Profiling::Trackable<OpenGLGraphicsAPI, CoriGraphicsAPI>, public RegisterInUniqueFactory<CoriGraphicsAPI, OpenGLGraphicsAPI, GraphicsAPIs, GraphicsAPIs::OpenGL> {
 	public:
+		static bool PreCreateHook(); 
+		OpenGLGraphicsAPI();
 
 		virtual void Init() override;
 
@@ -13,6 +17,7 @@ namespace Cori {
 		virtual void ClearFramebuffer() override;
 		
 		virtual void DrawElements(const std::shared_ptr<VertexArray>& vertexArray, const uint32_t elementCount) override;
-		
+
+		CORI_REGISTERED_FACTORY_INIT;
 	};
 }

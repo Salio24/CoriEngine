@@ -1,12 +1,12 @@
 #pragma once 
-#include <string>
-#include <fstream>
-#include <sstream>
 #include "../ShaderProgram.hpp"
+#include "../../Profiling/Trackable.hpp"
+#include "../../AutoRegisteringFactory.hpp"
 
 namespace Cori {
-	class OpenGLShaderProgram : public ShaderProgram {
+	class OpenGLShaderProgram : public ShaderProgram, public Profiling::Trackable<OpenGLShaderProgram, ShaderProgram>, public RegisterInSharedFactory<ShaderProgram, OpenGLShaderProgram, GraphicsAPIs, GraphicsAPIs::OpenGL, const std::string_view, const std::string_view, const std::string_view, const std::string_view> {
 	public:
+		static bool PreCreateHook(const std::string_view debugName, const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view geometryPath = ""); 
 		OpenGLShaderProgram(const std::string_view debugName, const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view geometryPath = "");
 		virtual ~OpenGLShaderProgram();
 
@@ -37,6 +37,8 @@ namespace Cori {
 		std::string m_ShaderNames;
 
 		bool CheckCompileErrors(uint32_t shader, std::string type);
+
+		CORI_REGISTERED_FACTORY_INIT;
 	};
 
 }

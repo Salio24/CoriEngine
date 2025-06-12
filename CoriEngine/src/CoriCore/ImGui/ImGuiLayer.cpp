@@ -83,12 +83,14 @@ namespace Cori {
 	}
 
 	void ImGuiLayer::StartFrame() {
+		CORI_PROFILE_FUNCTION();
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplSDL3_NewFrame();
 		ImGui::NewFrame();
 	}
 
 	void ImGuiLayer::EndFrame() {
+		CORI_PROFILE_FUNCTION();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

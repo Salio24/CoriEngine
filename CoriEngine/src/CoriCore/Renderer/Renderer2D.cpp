@@ -123,9 +123,7 @@ namespace Cori {
 	// batching 
 
 	void Renderer2D::BeginBatch(const glm::mat4& viewProjection, const glm::mat4& model) {
-
-		// maybe separate begin and end batch for each batch renderer, and invoke them from something like scene begin/end?
-		// TODO ^^^^^
+		CORI_PROFILE_FUNCTION();
 
 		s_CurrentBatchModelMatrix = model;
 		s_CurrentBatchViewProjectionMatrix = viewProjection;
@@ -138,6 +136,7 @@ namespace Cori {
 	}
 
 	void Renderer2D::EndBatch() {
+		CORI_PROFILE_FUNCTION();
 		s_BatchActive = false;
 		if (s_IndexCount_FlatColorQuad) {
 			EndBatch_FlatColorQuad();
@@ -156,6 +155,7 @@ namespace Cori {
 		return s_DrawCallCount;
 	}
 
+	// dangerous, dont use
 	void Renderer2D::SetQuadsPerDraw(const uint32_t count) {
 		s_MaxQuadCount = count;
 		s_MaxVertexCount = s_MaxQuadCount * 4;
@@ -163,6 +163,7 @@ namespace Cori {
 	}
 
 	void Renderer2D::NewBatch() {
+		CORI_PROFILE_FUNCTION();
 		EndBatch();
 		s_BatchActive = true;
 		BeginBatch_FlatColorQuad();
@@ -172,10 +173,12 @@ namespace Cori {
 	// flat color quad
 
 	void Renderer2D::BeginBatch_FlatColorQuad() {
+		CORI_PROFILE_FUNCTION();
 		s_VertexDataBufferPtr_FlatColorQuad = s_VertexDataBuffer_FlatColorQuad;
 	}
 
 	void Renderer2D::EndBatch_FlatColorQuad() {
+		CORI_PROFILE_FUNCTION();
 		auto size = reinterpret_cast<uint8_t*>(s_VertexDataBufferPtr_FlatColorQuad) - reinterpret_cast<uint8_t*>(s_VertexDataBuffer_FlatColorQuad);
 		s_VertexBuffer_FlatColorQuad->Bind();
 		s_VertexBuffer_FlatColorQuad->SetData(s_VertexDataBuffer_FlatColorQuad, size);
@@ -233,10 +236,12 @@ namespace Cori {
 	// textured quad
 
 	void Renderer2D::BeginBatch_TexturedQuad() {
+		CORI_PROFILE_FUNCTION();
 		s_VertexDataBufferPtr_TexturedQuad = s_VertexDataBuffer_TexturedQuad;
 	}
 
 	void Renderer2D::EndBatch_TexturedQuad() {
+		CORI_PROFILE_FUNCTION();
 		auto size = reinterpret_cast<uint8_t*>(s_VertexDataBufferPtr_TexturedQuad) - reinterpret_cast<uint8_t*>(s_VertexDataBuffer_TexturedQuad);
 		s_VertexBuffer_TexturedQuad->Bind();
 		s_VertexBuffer_TexturedQuad->SetData(s_VertexDataBuffer_TexturedQuad, size);
@@ -256,7 +261,8 @@ namespace Cori {
 		s_CurrentTexture_TexturedQuad.reset();
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const glm::vec2 textureSize, const glm::vec2 texturePosition) {
+	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const glm::vec2 UVmin, const glm::vec2 UVmax) {
+
 		if (CORI_CORE_ASSERT_ERROR(s_BatchActive, "You're trying to call DrawQuad, but you have not started a batch, it will not work.")) { return; }
 		if (s_IndexCount_TexturedQuad >= s_MaxIndexCount) {
 			NewBatch();
@@ -283,23 +289,39 @@ namespace Cori {
 		}
 
 		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x, position.y };
-		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { texturePosition.x, texturePosition.y };
+		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { UVmin.x, UVmin.y };
 		s_VertexDataBufferPtr_TexturedQuad++;
 
 		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x + size.x, position.y };
-		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { texturePosition.x + textureSize.x, texturePosition.y };
+		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { UVmax.x, UVmin.y };
 		s_VertexDataBufferPtr_TexturedQuad++;
 
 		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x + size.x, position.y + size.y };
-		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { texturePosition.x + textureSize.x, texturePosition.y + textureSize.y };
+		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { UVmax.x, UVmax.y };
 		s_VertexDataBufferPtr_TexturedQuad++;
 
 		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x, position.y + size.y };
-		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { texturePosition.x, texturePosition.y + textureSize.y };
+		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { UVmin.x, UVmax.y };
 		s_VertexDataBufferPtr_TexturedQuad++;
 
 		s_IndexCount_TexturedQuad += 6;
 
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const UVs& uvs) {
+		DrawQuad(position, size, texture, uvs.UVmin, uvs.UVmax);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<SpriteAtlas>& atlas, uint32_t index) {
+		DrawQuad(position, size, atlas->GetTexture(), atlas->GetSpriteUVsAtIndex(index));
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Sprite>& sprite) {
+		DrawQuad(position, size, sprite->GetTexture(), sprite->GetUVs());
+	}
+
+	void Renderer2D::DrawTile(const std::shared_ptr<Tile> tile) {
+		DrawQuad(tile->GetPosition(), tile->GetSize(), tile->GetSprite());
 	}
 
 }

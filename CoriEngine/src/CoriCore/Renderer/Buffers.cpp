@@ -6,42 +6,14 @@
 
 namespace Cori {
 	std::shared_ptr<VertexBuffer> VertexBuffer::Create() {
-		switch (Application::GetWindow().GetAPI()) {
-		case GraphicsAPIs::None:
-			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
-			return nullptr;
-			break;
-		case GraphicsAPIs::OpenGL:
-			return std::make_shared<OpenGLVertexBuffer>();
-			break;
-		case GraphicsAPIs::Vulkan:
-			CORI_CORE_ASSERT_FATAL(false, "Vulkan is not supported yet");
-			return nullptr;
-			break;
-		default:
-			CORI_CORE_ASSERT_FATAL(false, "Unknown graphics API");
-			return nullptr;
-			break;
-		}
+		std::shared_ptr<VertexBuffer> vbo = Factory<VertexBuffer, GraphicsAPIs>::CreateShared(Application::GetCurrentAPI());
+		CORI_CORE_ASSERT_FATAL(vbo, "Failed to create VertexBuffer for API: {0}. Check registrations and API validity.", static_cast<int>(Application::GetCurrentAPI())); // output api as a string
+		return vbo;
 	}
 
 	std::shared_ptr<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count) {
-		switch (Application::GetWindow().GetAPI()) {
-		case GraphicsAPIs::None:
-			CORI_CORE_ASSERT_FATAL(false, "No graphics API selected");
-			return nullptr;
-			break;
-		case GraphicsAPIs::OpenGL:
-			return std::make_shared<OpenGLIndexBuffer>(indices, count);
-			break;
-		case GraphicsAPIs::Vulkan:
-			CORI_CORE_ASSERT_FATAL(false, "Vulkan is not supported yet");
-			return nullptr;
-			break;
-		default:
-			CORI_CORE_ASSERT_FATAL(false, "Unknown graphics API");
-			return nullptr;
-			break;
-		}
+		std::shared_ptr<IndexBuffer> ibo = Factory<IndexBuffer, GraphicsAPIs, uint32_t*, uint32_t>::CreateShared(Application::GetCurrentAPI(), indices, count);
+		CORI_CORE_ASSERT_FATAL(ibo, "Failed to create IndexBuffer for API: {0}. Check registrations and API validity.", static_cast<int>(Application::GetCurrentAPI())); // output api as a string
+		return ibo;
 	}
 }
