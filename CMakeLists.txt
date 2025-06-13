@@ -33,7 +33,7 @@ project(main)
             (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/entt/CMakeLists.txt") AND 
             (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/imgui/LICENSE.txt")
             ))
-        message(FATAL_ERROR "CoriEngine thirdparty dependencies not found. Please run the setup script (CoriEngine/thirdparty) to download them. Make sure you run both scripts.")
+        message(FATAL_ERROR "CoriEngine thirdparty dependencies not found. Are you sure you cloned the repo recursively? Try running 'git submodule update --init --recursive' to download dependencies.")
     endif()
     set(CMAKE_CXX_STANDARD 23)
 
@@ -44,8 +44,6 @@ project(main)
     if(MSVC)
         message(FATAL_ERROR "MSVC Compiler frontend is not supported, use Clang/LLVM with posix frontend")
     endif()
-
-
 
     add_compile_options(-mavx2)
     
