@@ -32,8 +32,8 @@ namespace Cori {
 
 		GraphicsCall::InitRenderers();
 
-		m_GameTimer.SetTickrate(128);
-		m_GameTimer.SetTickrateUpdateFunc(CORI_BIND_EVENT_FN(Application::TickrateUpdate));
+		m_GameTimer.SetTickrate(60);
+		m_GameTimer.SetTickrateUpdateFunc(CORI_BIND_EVENT_FN(Application::TickrateUpdate, CORI_PLACEHOLDERS(1)));
 	}
 
 	Application::~Application() {
@@ -46,6 +46,15 @@ namespace Cori {
 		dispatcher.Dispatch<GameTriggerStayEvent>([](Cori::GameTriggerStayEvent& e) -> bool {
 			return e.GetTriggerEntity().GetComponents<TriggerComponent>().TriggerScript(e.GetTriggerEntity(), e.GetOtherEntity(), e.m_EventCallback);
 		});
+
+#ifdef DEBUG_BUILD
+		dispatcher.Dispatch<KeyReleasedEvent>([this](const KeyReleasedEvent& e) -> bool {
+			if (e.GetKeyCode() == Cori::CORI_KEY_F8) {
+				CORI_PROFILE_REQUEST_NEXT_FRAME();
+			}
+			return false;
+		});
+#endif
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
 			--it;
@@ -102,9 +111,9 @@ namespace Cori {
 		}
 	}
 
-	void Application::TickrateUpdate() {
+	void Application::TickrateUpdate(const float timeStep) {
 		for (Layer* layer : m_LayerStack) {
-			layer->OnTickUpdate();
+			layer->OnTickUpdate(timeStep);
 		}
 	}
 

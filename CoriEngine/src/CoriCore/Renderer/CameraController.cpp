@@ -6,6 +6,7 @@ namespace Cori {
 	void CameraController::CreateOrthoCamera(float left, float right, float bottom, float top, float zNear /*= -1.0f*/, float zFar /*= 1.0f*/) {
 		m_CurrentCameraComponent->ProjectionMatrix = glm::ortho(left, right, bottom, top, zNear, zFar);
 		m_CurrentCameraComponent->ViewProjectionMatrix = m_CurrentCameraComponent->ProjectionMatrix;
+		CORI_CORE_DEBUG("Created orthographic camera with properties - (left: {}, right: {}, bottom: {}, top: {}, zNear: {}, zFar: {})", left, right, bottom, top, zNear, zFar);
 	}
 
 	void CameraController::SetPosition(const glm::vec2 newPos) {

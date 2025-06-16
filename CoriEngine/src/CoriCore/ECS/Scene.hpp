@@ -4,6 +4,7 @@
 #include "../Profiling/Trackable.hpp"
 #include "../Renderer/CameraController.hpp"
 #include "../EventSystem/Event.hpp"
+#include "../Physics/World.hpp"
 
 namespace Cori {
 
@@ -24,6 +25,8 @@ namespace Cori {
 		Entity CreateEntity();
 
 		Entity GetNamedEntity(const std::string& name);
+
+		void SortRenderGroup();
 
 		Entity EntityFromEnTT(const entt::entity& entity) {
 			return Entity{ entt::handle{m_Registry, entity} };
@@ -72,15 +75,22 @@ namespace Cori {
 		}
 
 		CameraController ActiveCamera;
+		
+		Physics::World PhysicsWorld;
 
 		EventCallbackFn m_TriggerEventCallback;
 
 		std::string m_Name;
+
 	protected:
 		Scene(const std::string& name);
 	private:
 
+		void OnRigidbodyConstruct(entt::registry& registry, entt::entity entity);
+		void OnRigidbodyDestroy(entt::registry& registry, entt::entity entity);
+
 		std::unordered_map<std::string, entt::handle> m_NamedEntities;
+
 
 		entt::registry m_Registry;
 

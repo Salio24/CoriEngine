@@ -60,13 +60,6 @@ public:
 			m_Camera.ZoomVP(std::clamp((m_Camera.GetZoomFactor() + e.GetYOffset() * 0.0625f), 0.0625f, 1000.0f));
 			return true;
 		});
-
-		dispatcher.Dispatch<Cori::KeyReleasedEvent>([this](const Cori::KeyReleasedEvent& e) -> bool {
-			if (e.GetKeyCode() == Cori::CORI_KEY_P) {
-				CORI_PROFILE_REQUEST_NEXT_FRAME();
-			}
-			return false;
-		});
 	}
 
 	virtual void OnImGuiRender(const double deltaTime) override {
@@ -214,7 +207,7 @@ public:
 		Cori::Renderer2D::EndBatch();
 	}
 
-	virtual void OnTickUpdate() override {
+	virtual void OnTickUpdate(const float timeStep) override {
 		CORI_PROFILE_FUNCTION();
 		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_8)) {
 			Cori::Profiling::InstanceMetrics<Cori::SpriteAtlas>::Report();

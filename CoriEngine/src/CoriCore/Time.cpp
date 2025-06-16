@@ -22,7 +22,7 @@ namespace Cori {
 		if (m_Timestep != 0) {
 			while (m_Accumulator >= m_Timestep) {
 
-				m_TickrateUpdateFunc();
+				m_TickrateUpdateFunc(m_Timestep);
 
 				m_Accumulator -= m_Timestep;
 			}
@@ -31,7 +31,7 @@ namespace Cori {
 
 	void GameTimer::SetTickrate(uint16_t tickrate) {
 		m_Tickrate = tickrate;
-		m_Timestep = 1 / (double)tickrate;
+		m_Timestep = 1.0f / (float)tickrate;
 	}
 
 	double GameTimer::GetMiliseconds() const {
@@ -39,7 +39,6 @@ namespace Cori {
 	}
 
 	double GameTimer::GetSeconds() const {
-		return m_Time;
 	}
 
 	double GameTimer::GetMinutes() const {

@@ -3,6 +3,7 @@
 #include "Profiling/TimeProfiler.hpp"
 #include "ECS/Scene.hpp"
 #include "ECS/TriggerManager.hpp"
+#include "ImGui/debug_imgui_renderer.h"
 
 namespace Cori {
 
@@ -17,7 +18,7 @@ namespace Cori {
 		virtual void OnAttach();
 		virtual void OnDetach();
 		virtual void OnUpdate([[maybe_unused]] const double deltaTime) {}
-		virtual void OnTickUpdate() {}
+		virtual void OnTickUpdate([[maybe_unused]] const float timeStep) {}
 		virtual void OnImGuiRender([[maybe_unused]] const double deltaTime) { }
 		virtual void OnEvent([[maybe_unused]] Event& event) {}
 
@@ -37,6 +38,8 @@ namespace Cori {
 		}
 
 		std::shared_ptr<Scene> ActiveScene{ nullptr };
+
+		static DebugImguiRenderer debug_renderer;
 
 	protected:
 

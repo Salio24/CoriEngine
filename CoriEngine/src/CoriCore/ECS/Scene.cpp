@@ -9,6 +9,9 @@ namespace Cori {
 		ActiveCamera.BindCameraComponent(&GetContextComponent<CameraContextComponent>());
 		CORI_CORE_DEBUG("Scene: '{0}' created.", m_Name);
 		auto renderGroup = m_Registry.group<PositionComponent, RenderingComponent, SpriteComponent>();
+
+		m_Registry.on_construct<Physics::Rigidbody_EntityComponent>().connect<&Physics::World::OnRigidbodyConstruct>(PhysicsWorld);
+		m_Registry.on_destroy<Physics::Rigidbody_EntityComponent>().connect<&Physics::World::OnRigidbodyDestroy>(PhysicsWorld);
 	}
 
 	Scene::~Scene() {
@@ -39,27 +42,28 @@ namespace Cori {
 	}
 
 
+	void Scene::SortRenderGroup() {
+		auto renderGroup = m_Registry.group<PositionComponent, RenderingComponent, SpriteComponent>();
+		renderGroup.sort<SpriteComponent>([](const SpriteComponent& lhs, const SpriteComponent& rhs) {
+			return reinterpret_cast<uint64_t>(lhs.Texture.get()) > reinterpret_cast<uint64_t>(rhs.Texture.get());
+		});
+	}
+
 	void Scene::OnUpdate(const double deltaTime) {
+		CORI_PROFILE_FUNCTION();
 
 		Renderer2D::BeginBatch(GetContextComponent<CameraContextComponent>().ViewProjectionMatrix);
 
 		auto renderGroup = m_Registry.group<PositionComponent, RenderingComponent, SpriteComponent>();
-
-		{
-			CORI_PROFILE_SCOPE("Group sort");
-			renderGroup.sort<SpriteComponent>([](const SpriteComponent& lhs, const SpriteComponent& rhs) {
-				return reinterpret_cast<uint64_t>(lhs.Texture.get()) > reinterpret_cast<uint64_t>(rhs.Texture.get());
-			});
-		}
-
+		
 		for (auto entity : renderGroup) {
 			auto [posComp, renderComp, spriteComp] = renderGroup.get<PositionComponent, RenderingComponent, SpriteComponent>(entity);
 			if (renderComp.Visible) {
 				Renderer2D::DrawQuad(posComp.Position, renderComp.Size, spriteComp.Texture, spriteComp.UV);
 			}
 		}
-
-		Renderer2D::EndBatch();
+		Renderer2D::EndBatch();		
+		
 	}
 
 	bool Scene::OnBind(const EventCallbackFn& callback) {
@@ -71,6 +75,5 @@ namespace Cori {
 		m_TriggerEventCallback = EventCallbackFn();
 		return true;
 	}
-
 
 }

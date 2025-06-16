@@ -18,12 +18,12 @@ namespace Cori {
 		inline double GetMinutes() const;
 		inline double GetHours() const;
 
-		inline void SetTickrateUpdateFunc(const std::function<void()>& func) { m_TickrateUpdateFunc = func; }
+		inline void SetTickrateUpdateFunc(const std::function<void(const float)>& func) { m_TickrateUpdateFunc = func; }
 
 	private:
 		double m_DeltaTime{ 0 };
 
-		double m_Timestep{ 0 };
+		float m_Timestep{ 0 };
 		double m_Accumulator{ 0 };
 
 		// time in seconds since start
@@ -33,7 +33,7 @@ namespace Cori {
 
 		uint16_t m_Tickrate{ 0 };
 
-		std::function<void()> m_TickrateUpdateFunc{ nullptr };
+		std::function<void(const float)> m_TickrateUpdateFunc{ nullptr };
 	};
 
 	class ManualTimer {

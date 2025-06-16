@@ -40,4 +40,5 @@ rmSub.sh
 *.cori_engine_dll_copied.stamp
 /Apps/Sandbox/bin/*
 /Apps/RendererSandbox/bin/*
+/Apps/PhysicsSandbox/bin/*
 /notes.txt

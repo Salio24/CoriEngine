@@ -50,4 +50,6 @@ project(main)
     add_subdirectory(${PROJECT_SOURCE_DIR}/CoriEngine)
     add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/Sandbox)
     add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/RendererSandbox)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/PhysicsSandbox)
+
 

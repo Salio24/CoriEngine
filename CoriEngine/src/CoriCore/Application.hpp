@@ -35,7 +35,7 @@ namespace Cori {
 		// idk if i even need this Get func
 		inline static Application& Get() { return *s_Instance; }
 
-		void TickrateUpdate();
+		void TickrateUpdate(const float timeStep);
 
 		bool OnWindowClose();
 
