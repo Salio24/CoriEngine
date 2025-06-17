@@ -132,10 +132,10 @@ namespace Cori::Physics
 		DebugImguiRenderer(const DebugImguiRenderer& other) : callbacks(other.callbacks) { callbacks.context = this; }
 		DebugImguiRenderer& operator=(const DebugImguiRenderer& other) { callbacks = other.callbacks; callbacks.context = this; return *this; }
 
-		void ViewportCalc(glm::vec2 camerasize) {
+		void ViewportCalc(const glm::vec2 cameraBounds, const int pixelsPerMeter) {
 
 			const ImVec2 viewportSize = ImGui::GetMainViewport()->WorkSize;
-			camera_scale = (camerasize.y / viewportSize.y) * 16;
+			camera_scale = viewportSize.y / (cameraBounds.y / pixelsPerMeter);
 
 			camera_pos.x = viewportSize.x / (camera_scale * 2);
 			camera_pos.y = viewportSize.y / (camera_scale * 2);
@@ -187,15 +187,12 @@ namespace Cori::Physics
 				ImGui::Checkbox("Islands", &callbacks.drawIslands);
 				ImGui::Separator();
 				ImGui::Checkbox("Mouse drag", &enable_mouse_drag);
-				ImGui::SliderFloat("Scale", &camera_scale, 1.0f, 128.0f);
-				ImGui::SliderFloat("PosX", &camera_pos.x, 1.0f, 128.0f);
-				ImGui::SliderFloat("PosY", &camera_pos.y, 1.0f, 128.0f);
 
 			}
 			ImGui::End();
 		}
 
-		void HandleMouseDrag(WorldRef world)
+		void HandleMouseDrag(WorldRef world, const float mouseForce = 1000.0f)
 		{
 			if (!enable_mouse_drag) {
 				if (mouse_joint) {
@@ -207,7 +204,7 @@ namespace Cori::Physics
 
 			b2Vec2 point = ImguiToBox2dPoint(ImGui::GetMousePos());
 
-			CORI_INFO("Pos: {}, {}", point.x, point.y);
+			//CORI_INFO("Pos: {}, {}", point.x, point.y);
 
 
 			if (mouse_joint) {
@@ -238,7 +235,7 @@ namespace Cori::Physics
 						joint_params.bodyIdA = mouse_joint_body;
 						joint_params.bodyIdB = target.GetBody();
 						joint_params.target = point;
-						joint_params.maxForce = 1000.0f * target.GetBody().GetMass();
+						joint_params.maxForce = mouseForce * target.GetBody().GetMass();
 						mouse_joint = world.CreateJoint(DestroyWithParent, joint_params);
 						target.GetBody().SetAwake(true);
 					}

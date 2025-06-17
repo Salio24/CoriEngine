@@ -4,7 +4,7 @@
 #include "../Profiling/Trackable.hpp"
 #include "../Renderer/CameraController.hpp"
 #include "../EventSystem/Event.hpp"
-#include "../Physics/World.hpp"
+#include "../Physics/Physics.hpp"
 
 namespace Cori {
 

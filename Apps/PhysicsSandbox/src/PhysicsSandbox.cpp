@@ -1,3 +1,4 @@
+#define CORI_PIXELS_PER_METER 16
 #include <Cori.hpp>
 #include <CoriEntry.hpp>
 
@@ -43,13 +44,7 @@ public:
 		static bool b2draw = false;
 
 		if (b2draw) {
-			debug_renderer.ViewportCalc({ 640, 360 });
-			debug_renderer.DrawShapes(ActiveScene->PhysicsWorld);
-			if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) && !ImGui::IsAnyItemActive())
-			{
-				debug_renderer.HandleMouseDrag(ActiveScene->PhysicsWorld);
-			}
-			debug_renderer.DrawModeToggles();
+			Cori::ImGuiPresets::Box2dDebugDraw({ 640, 360 }, CORI_PIXELS_PER_METER, this, true, 2000.0f);
 		}
 
 		ImGui::Begin("Test");
@@ -59,22 +54,10 @@ public:
 		if (ImGui::Button("Add box")) {
 			a++;
 			auto ent = ActiveScene->CreateEntity("Test Entity " + std::to_string(a));
-			ent.AddComponent<Cori::RenderingComponent>(glm::vec2{ 50.0f, 50.0f });
-			ent.AddComponent<Cori::PositionComponent>(glm::vec2{ 50.0f * a, 500.0f });
+			ent.AddComponent<Cori::RenderingComponent>(glm::vec2{ 16.0f, 16.0f });
+			ent.AddComponent<Cori::PositionComponent>(glm::vec2{ 50.0f * a, 200.0f });
 			auto atlas = Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::Atlas);
 			ent.AddComponent<Cori::SpriteComponent>(atlas->GetTexture(), atlas->GetSpriteUVsAtIndex(a));
-		}
-
-		if (ImGui::Button("Create 'Test2' Scene")) {
-			Cori::SceneManager::CreateScene("Test2 Scene");
-		}
-
-		if (ImGui::Button("Create 'Test' Scene")) {
-			Cori::SceneManager::CreateScene("Test Scene");
-		}
-
-		if (ImGui::Button("Set Camera")) {
-			ActiveScene->ActiveCamera.CreateOrthoCamera(0, 640, 0, 360);
 		}
 
 		if (ImGui::Button("Destroy Test2")) {
@@ -89,51 +72,48 @@ public:
 			UnbindScene();
 		}
 
-		if (ImGui::Button("Test2 bind")) {
+		if (ImGui::Button("Create 'Test2' Scene")) {
+			Cori::SceneManager::CreateScene("Test2 Scene");
 			BindScene("Test2 Scene");
+			ActiveScene->ActiveCamera.CreateOrthoCamera(0, 640, 0, 360);
 		}
 
-		if (ImGui::Button("Test bind")) {
+		if (ImGui::Button("Create 'Test' Scene")) {
+			Cori::SceneManager::CreateScene("Test Scene");
 			BindScene("Test Scene");
+			ActiveScene->ActiveCamera.CreateOrthoCamera(0, 640, 0, 360);
 		}
 
 		if (ImGui::Button("box2d draw")) {
 			b2draw = !b2draw;
 		}
 
-		if (ImGui::Button("test")) {
-			auto player = ActiveScene->CreateEntity("Player");
+		if (ImGui::Button("Add b2Box")) {
+			auto ent = ActiveScene->CreateEntity();
 
 			Cori::Physics::Body::Params bp;
 			bp.type = b2_dynamicBody;
-			bp.position = { 20.0f, 20.0f };
+			bp.position = { 4.0f, 4.0f };
 
-			auto& rb = player.AddComponent<Cori::Physics::Rigidbody_EntityComponent>(ActiveScene->PhysicsWorld, bp);
-
-			CORI_INFO("Cent: {}, {}", rb.GetMassData().center.x, rb.GetMassData().center.y);
-
-			CORI_INFO("Pos: {}, {}", rb.GetPosition().x, rb.GetPosition().y);
+			auto& rb = ent.AddComponent<Cori::Physics::Rigidbody_EntityComponent>(ActiveScene->PhysicsWorld, bp);
 			
 			Cori::Physics::Shape::Params sp;
-			sp.density = 5.0f;
 
-			rb.CreateShape(Cori::Physics::DestroyWithParent, sp, Cori::Physics::Polygon::CreateBox({ 4.0f, 4.0f }));
-
-			CORI_INFO("Cent: {}, {}", rb.GetWorldCenterOfMass().x, rb.GetWorldCenterOfMass().y);
-
-			CORI_INFO("Pos: {}, {}", rb.GetPosition().x, rb.GetPosition().y);
+			rb.CreateShape(Cori::Physics::DestroyWithParent, sp, Cori::Physics::Polygon::CreateBox({ 1.0f, 1.0f }));
 		}
 
+		if (ImGui::Button("Add Floor")) {
+			auto ent = ActiveScene->CreateEntity("Floor");
 
-		if (ImGui::Button("Tst2")) {
-			auto p = ActiveScene->GetNamedEntity("Player");
-			auto& rb = p.GetComponents<Cori::Physics::Rigidbody_EntityComponent>();
-			
+			Cori::Physics::Body::Params bp;
+			bp.type = b2_staticBody;
+			bp.position = { 0.0f, 0.0f };
 
-			CORI_INFO("Cent: {}, {}", rb.GetWorldCenterOfMass().x, rb.GetWorldCenterOfMass().y);
+			auto& rb = ent.AddComponent<Cori::Physics::Rigidbody_EntityComponent>(ActiveScene->PhysicsWorld, bp);
 
+			Cori::Physics::Shape::Params sp;
 
-			CORI_INFO("Pos: {}, {}", rb.GetPosition().x, rb.GetPosition().y);
+			rb.CreateShape(Cori::Physics::DestroyWithParent, sp, Cori::Physics::Polygon::CreateBox({ 40.0f, 1.0f }));
 		}
 
 		ImGui::End();

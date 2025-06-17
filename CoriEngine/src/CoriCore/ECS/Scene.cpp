@@ -19,6 +19,7 @@ namespace Cori {
 
 	Entity Scene::CreateEntity(const std::string& name) {
 		CORI_CORE_ASSERT_FATAL(this != nullptr, "Called scene instance is null (instance pointer = nullptr), this causes undefined behavior, and this assert also relies on this undefined behavior and is not guarantied.");
+		if (CORI_CORE_ASSERT_ERROR(!m_NamedEntities.contains(name), "Trying to create a named entity, but the specified name already exists in a hashmap, this is not permited, named entities should have exclusive names. Name: '{}'. Invalid entity returned.", name)) { return Entity{}; }
 
 		entt::entity entity = m_Registry.create();
 		m_Registry.emplace<NameComponent>(entity, name);
