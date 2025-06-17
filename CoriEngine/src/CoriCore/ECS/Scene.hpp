@@ -21,6 +21,8 @@ namespace Cori {
 
 		void OnUpdate(const double deltaTime);
 
+		void OnTickUpdate(const float timeStep);
+
 		Entity CreateEntity(const std::string& name);
 		Entity CreateEntity();
 
@@ -76,7 +78,7 @@ namespace Cori {
 
 		CameraController ActiveCamera;
 		
-		Physics::World PhysicsWorld;
+		Physics::PhysicsWorld PhysicsWorld;
 
 		EventCallbackFn m_TriggerEventCallback;
 
@@ -85,9 +87,6 @@ namespace Cori {
 	protected:
 		Scene(const std::string& name);
 	private:
-
-		void OnRigidbodyConstruct(entt::registry& registry, entt::entity entity);
-		void OnRigidbodyDestroy(entt::registry& registry, entt::entity entity);
 
 		std::unordered_map<std::string, entt::handle> m_NamedEntities;
 

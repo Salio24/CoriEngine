@@ -68,7 +68,7 @@ project(CoriEngine)
     ${PROJECT_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_opengl3.cpp
     ${PROJECT_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_sdl3.cpp
     )
-    target_include_directories(imgui PUBLIC ${PROJECT_SOURCE_DIR}/thirdparty/imgui)    
+    target_include_directories(imgui PUBLIC ${PROJECT_SOURCE_DIR}/thirdparty/imgui)
     target_link_libraries(imgui PRIVATE SDL3::SDL3-static)
 
     # glad 2
@@ -167,7 +167,8 @@ endif()
     )
 
     # includes
-    target_include_directories(${ENGINE_LIBRARY_NAME} PUBLIC 
+    target_include_directories(${ENGINE_LIBRARY_NAME} PUBLIC
+    ${PROJECT_SOURCE_DIR}/thirdparty/box2cpp/include
     ${CORI_INCLUDE_DIR}
     )
 

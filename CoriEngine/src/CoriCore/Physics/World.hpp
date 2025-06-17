@@ -1,41 +1,41 @@
 #pragma once
 #include <entt/entt.hpp>
 #include <box2d/box2d.h>
+#include <box2cpp/box2cpp.h>
 
 namespace Cori {
 	class Scene;
 
 	namespace Physics {
-		class World;
+		enum class BodyType : uint8_t { Static = 0, Kinematic, Dynamic };
+		class PhysicsWorld;
 
+		using Vec2 = b2Vec2;
+		using Rot = b2Rot;
 
-		class Shape {
-		public:
-			Shape(b2ShapeId id) : m_ShapeID(id) {}
+		enum class PolygonType : uint8_t { Box = 0, Polygon };
 
-			operator b2ShapeId() {
-				return m_ShapeID;
-			}
-
-		private:
-			b2ShapeId m_ShapeID{ b2_nullShapeId };
-
-		};
-
-		enum class BodyType { Static = 0, Kinematic, Dynamic };
-		enum class PolygonType { Box = 0, Polyhon };
+		enum class ShapeType : uint8_t { Circle = 0, Capsule, Segment, Polygon, ChainSegment };
 
 		class Polygon {
 		public:
-			Polygon(glm::vec2 size) {
+			Polygon(const b2Polygon& polygon) : m_Polygon(polygon) {}
 
+			static Polygon CreateBox(Vec2 size) {
+				return b2MakeOffsetBox(size.x, size.y, size, Rot{1, 0});
 			}
 
-			static Polygon CreateBox(glm::vec2 size);
+			static Polygon CreateBox(Vec2 size, Vec2 offset, Rot rotation = Rot{1, 0}) {
+				return b2MakeOffsetBox(size.x, size.y, offset, rotation);
+			}
+
+			static Polygon CreateBoxCentered(Vec2 size) {
+				return b2MakeBox(size.x, size.y);
+			}
 
 			// at the rest of polygon types, setters getters etc
 
-			operator const b2Polygon&() const {
+			operator b2Polygon&() {
 				return m_Polygon;
 			}
 
@@ -49,13 +49,15 @@ namespace Cori {
 
 		class Circle {
 		public:
-			Circle(glm::vec2 center, float radius) {
+			Circle(const b2Circle& circle) : m_Circle(circle) {}
+
+			Circle(Vec2 center, float radius) {
 
 			}
 
-			static Circle Create(glm::vec2 center, float radius);
+			static Circle Create(Vec2 center, float radius);
 
-			operator const b2Circle& () const {
+			operator b2Circle& () {
 				return m_Circle;
 			}
 
@@ -67,89 +69,40 @@ namespace Cori {
 			b2Circle m_Circle;
 		};
 
-		// capsules
+		class Capsule {
+		public:
+			Capsule(const b2Capsule& capsule) : m_Capsule(capsule) {}
+
+			Capsule(Vec2 center1, Vec2 center2 ,float radius) {
+
+			}
+
+			static Capsule Create(Vec2 center1, Vec2 center2, float radius);
+
+			operator b2Capsule& () {
+				return m_Capsule;
+			}
+
+			operator const b2Capsule* () const {
+				return &m_Capsule;
+			}
+
+		private:
+			b2Capsule m_Capsule;
+		};
+
 		// segments ughhh....
 
-
-
-	
-		struct Rigidbody_EntityComponent {
-			Rigidbody_EntityComponent(BodyType type, glm::vec2 position) : m_Type(type), m_Position(position) {}
-
-			Shape AddShape(const Polygon& polygon, bool enableSensorEvents = false, bool isSensor = false, bool enableContactEvents = false /*filter*/) {
-				b2ShapeDef def = b2DefaultShapeDef();
-				def.enableSensorEvents = enableSensorEvents;
-				def.isSensor = isSensor;
-				def.enableContactEvents = enableContactEvents;
-
-				return Shape(b2CreatePolygonShape(m_BodyID, &def, polygon));
-
-			}
-
-			// setters getters
-
-			operator b2BodyId() {
-				return m_BodyID;
-			}
-
-			glm::vec2 m_Position;
-			BodyType m_Type;
-		private:
-			friend class Scene;
-			friend class World;
-
-
-			b2BodyId m_BodyID{ b2_nullBodyId };
-
+		struct Rigidbody_EntityComponent : public BodyRef {
+			Rigidbody_EntityComponent(WorldRef world, const std::derived_from<b2BodyDef> auto& def) : BodyRef{ world.CreateBody(DestroyWithParent, def) } {}
+			~Rigidbody_EntityComponent() { if (IsValid()) { Destroy(); } }
 		};
-	
-		
-	
 
-		class World {
+		class PhysicsWorld : public World {
 		public:
-			World() {
-				b2WorldDef def = b2DefaultWorldDef();
-				m_WorldID = b2CreateWorld(&def);
+			PhysicsWorld() : World{ World::Params{} } {
 			}
-			~World() {
-				b2DestroyWorld(m_WorldID);
-			}
-
-			void OnRigidbodyConstruct(entt::registry& registry, entt::entity entity) {
-				b2BodyDef def = b2DefaultBodyDef();
-
-				auto& rb = registry.get<Physics::Rigidbody_EntityComponent>(entity);
-
-				switch (rb.m_Type) {
-				case Physics::BodyType::Static:    def.type = b2_staticBody; break;
-				case Physics::BodyType::Kinematic: def.type = b2_kinematicBody; break;
-				case Physics::BodyType::Dynamic:   def.type = b2_dynamicBody; break;
-				}
-
-				def.position.x = rb.m_Position.x;
-				def.position.y = rb.m_Position.y;
-
-				rb.m_BodyID = b2CreateBody(m_WorldID, &def);
-
-			}
-
-			void OnRigidbodyDestroy(entt::registry& registry, entt::entity entity) {
-				auto& rb = registry.get<Physics::Rigidbody_EntityComponent>(entity);
-				b2DestroyBody(rb.m_BodyID);
-			}
-
-			operator b2WorldId() {
-				return m_WorldID;
-			}
-
-		private:
-			friend class Scene;
-
-			b2WorldId m_WorldID{ b2_nullWorldId };
 		};
 	}
-
-
 
 }

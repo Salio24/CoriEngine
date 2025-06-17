@@ -10,8 +10,6 @@ namespace Cori {
 		CORI_CORE_DEBUG("Scene: '{0}' created.", m_Name);
 		auto renderGroup = m_Registry.group<PositionComponent, RenderingComponent, SpriteComponent>();
 
-		m_Registry.on_construct<Physics::Rigidbody_EntityComponent>().connect<&Physics::World::OnRigidbodyConstruct>(PhysicsWorld);
-		m_Registry.on_destroy<Physics::Rigidbody_EntityComponent>().connect<&Physics::World::OnRigidbodyDestroy>(PhysicsWorld);
 	}
 
 	Scene::~Scene() {
@@ -64,6 +62,10 @@ namespace Cori {
 		}
 		Renderer2D::EndBatch();		
 		
+	}
+
+	void Scene::OnTickUpdate(const float timeStep) {
+		PhysicsWorld.Step(timeStep, 4);
 	}
 
 	bool Scene::OnBind(const EventCallbackFn& callback) {

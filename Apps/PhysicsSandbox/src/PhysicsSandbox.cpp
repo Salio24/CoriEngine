@@ -40,11 +40,21 @@ public:
 	}
 
 	virtual void OnImGuiRender(const double deltaTime) override {
+		static bool b2draw = false;
+
+		if (b2draw) {
+			debug_renderer.ViewportCalc({ 640, 360 });
+			debug_renderer.DrawShapes(ActiveScene->PhysicsWorld);
+			if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) && !ImGui::IsAnyItemActive())
+			{
+				debug_renderer.HandleMouseDrag(ActiveScene->PhysicsWorld);
+			}
+			debug_renderer.DrawModeToggles();
+		}
+
 		ImGui::Begin("Test");
 
 		static int a = 0;
-
-		static bool b2draw = false;
 
 		if (ImGui::Button("Add box")) {
 			a++;
@@ -64,7 +74,7 @@ public:
 		}
 
 		if (ImGui::Button("Set Camera")) {
-			ActiveScene->ActiveCamera.CreateOrthoCamera(0, 7680, 0, 4320);
+			ActiveScene->ActiveCamera.CreateOrthoCamera(0, 640, 0, 360);
 		}
 
 		if (ImGui::Button("Destroy Test2")) {
@@ -91,12 +101,42 @@ public:
 			b2draw = !b2draw;
 		}
 
-		ImGui::End();
+		if (ImGui::Button("test")) {
+			auto player = ActiveScene->CreateEntity("Player");
 
-		if (b2draw) {
-			//debug_renderer.DrawShapes(world); // Draw Box2D shapes.
-			//debug_renderer.DrawModeToggles(); // Checkboxes for adjusting visualization.
+			Cori::Physics::Body::Params bp;
+			bp.type = b2_dynamicBody;
+			bp.position = { 20.0f, 20.0f };
+
+			auto& rb = player.AddComponent<Cori::Physics::Rigidbody_EntityComponent>(ActiveScene->PhysicsWorld, bp);
+
+			CORI_INFO("Cent: {}, {}", rb.GetMassData().center.x, rb.GetMassData().center.y);
+
+			CORI_INFO("Pos: {}, {}", rb.GetPosition().x, rb.GetPosition().y);
+			
+			Cori::Physics::Shape::Params sp;
+			sp.density = 5.0f;
+
+			rb.CreateShape(Cori::Physics::DestroyWithParent, sp, Cori::Physics::Polygon::CreateBox({ 4.0f, 4.0f }));
+
+			CORI_INFO("Cent: {}, {}", rb.GetWorldCenterOfMass().x, rb.GetWorldCenterOfMass().y);
+
+			CORI_INFO("Pos: {}, {}", rb.GetPosition().x, rb.GetPosition().y);
 		}
+
+
+		if (ImGui::Button("Tst2")) {
+			auto p = ActiveScene->GetNamedEntity("Player");
+			auto& rb = p.GetComponents<Cori::Physics::Rigidbody_EntityComponent>();
+			
+
+			CORI_INFO("Cent: {}, {}", rb.GetWorldCenterOfMass().x, rb.GetWorldCenterOfMass().y);
+
+
+			CORI_INFO("Pos: {}, {}", rb.GetPosition().x, rb.GetPosition().y);
+		}
+
+		ImGui::End();
 	}
 
 	void OnUpdate(const double deltaTime) override {

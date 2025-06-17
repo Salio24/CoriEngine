@@ -11,9 +11,6 @@ namespace Cori {
 		Entity() = default;
 
 		Entity(entt::handle handle) : m_EntityHandle(handle) {
-			entt::entity ent = entt::null;
-
-			void* test = (void*)ent;
 		
 		}
 
@@ -41,7 +38,7 @@ namespace Cori {
 					std::ostringstream oss;
 					((oss << ", " << typeid(T).name()), ...);
 					return oss.str();
-				})());
+					})());
 			}
 			return m_EntityHandle.get<T...>();
 		}

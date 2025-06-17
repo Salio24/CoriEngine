@@ -12,6 +12,8 @@ namespace Cori {
 	class AssetManager {
 	public:
 
+		// TODO: make owning getters that dont add to hashmap
+
 		static std::shared_ptr<ShaderProgram> GetShader(const ShaderProgramDescriptor& descriptor) { return Get().GetShaderImpl(descriptor); }
 		static std::shared_ptr<Texture2D> GetTexture2D(const Texture2DDescriptor& descriptor) { return Get().GetTexture2DImpl(descriptor); }
 		static std::shared_ptr<SpriteAtlas> GetSpriteAtlas(const SpriteAtlasDescriptor& descriptor) { return Get().GetSpriteAtlasImpl(descriptor); }

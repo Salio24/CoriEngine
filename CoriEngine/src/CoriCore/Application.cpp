@@ -80,18 +80,12 @@ namespace Cori {
 				CORI_PROFILE_SCOPE("Cori Engine Global Update");
 				m_GameTimer.Update();
 
-				GraphicsCall::SetClearColor({ 1.0f, 1.0f, 0.0f, 1.0f });
+				GraphicsCall::SetClearColor({ 0.5f, 0.5f, 0.0f, 1.0f });
 				GraphicsCall::ClearFramebuffer();
 
 				for (Layer* layer : m_LayerStack) {
-					layer->OnUpdate(m_GameTimer);
-					if (layer->IsModal()) {
-						break;
-					}
-				}
-
-				for (Layer* layer : m_LayerStack) {
 					layer->SceneUpdate(m_GameTimer);
+					layer->OnUpdate(m_GameTimer);
 					if (layer->IsModal()) {
 						break;
 					}
@@ -113,6 +107,7 @@ namespace Cori {
 
 	void Application::TickrateUpdate(const float timeStep) {
 		for (Layer* layer : m_LayerStack) {
+			layer->SceneTickrateUpdate(timeStep);
 			layer->OnTickUpdate(timeStep);
 		}
 	}

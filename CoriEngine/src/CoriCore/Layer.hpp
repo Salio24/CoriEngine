@@ -3,7 +3,7 @@
 #include "Profiling/TimeProfiler.hpp"
 #include "ECS/Scene.hpp"
 #include "ECS/TriggerManager.hpp"
-#include "ImGui/debug_imgui_renderer.h"
+#include <box2cpp/debug_imgui_renderer.h>
 
 namespace Cori {
 
@@ -37,9 +37,15 @@ namespace Cori {
 			}
 		}
 
+		void SceneTickrateUpdate(const float timeStep) {
+			if (ActiveScene != nullptr) {
+				ActiveScene->OnTickUpdate(timeStep);
+			}
+		}
+
 		std::shared_ptr<Scene> ActiveScene{ nullptr };
 
-		static DebugImguiRenderer debug_renderer;
+		inline static Physics::DebugImguiRenderer debug_renderer;
 
 	protected:
 
