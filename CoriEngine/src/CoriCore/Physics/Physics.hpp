@@ -88,8 +88,6 @@ namespace Cori {
 				return b2MakeOffsetRoundedPolygon(hull, offset, rotation, radius);
 			}
 
-			// at the rest of polygon types, setters getters etc
-
 			operator b2Polygon& () {
 				return m_Polygon;
 			}
@@ -140,13 +138,6 @@ namespace Cori {
 
 		private:
 			b2Capsule m_Capsule;
-		};
-
-		// segments ughhh....
-
-		struct Rigidbody_EntityComponent : public BodyRef {
-			Rigidbody_EntityComponent(WorldRef world, const std::derived_from<b2BodyDef> auto& def) : BodyRef{ world.CreateBody(DestroyWithParent, def) } {}
-			~Rigidbody_EntityComponent() { if (IsValid()) { Destroy(); } }
 		};
 
 		class PhysicsWorld : public World {

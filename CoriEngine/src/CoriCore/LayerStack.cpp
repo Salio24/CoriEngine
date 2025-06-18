@@ -17,6 +17,16 @@ namespace Cori {
 	}
 
 	void LayerStack::PushLayer(Layer* layer) {
+#ifdef DEBUG_BUILD
+		bool duplicateName = false;
+		for (Layer* l : m_Layers) {
+			if (!duplicateName) {
+				duplicateName = (l->GetName() == layer->GetName());
+			}
+		}
+		if (CORI_CORE_ASSERT_ERROR(!duplicateName, "Trying to push a layer, but the layer with the specified debug name already in the LayerStack. Name: '{}'.", layer->GetName())) { return; }
+#endif
+
 		m_Layers.emplace(m_Layers.begin() + m_LayerInsertIndex, layer);
 		m_LayerInsertIndex++; 
 		layer->OnAttach();

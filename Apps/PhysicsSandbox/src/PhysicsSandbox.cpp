@@ -54,10 +54,9 @@ public:
 		if (ImGui::Button("Add box")) {
 			a++;
 			auto ent = ActiveScene->CreateEntity("Test Entity " + std::to_string(a));
-			ent.AddComponent<Cori::RenderingComponent>(glm::vec2{ 16.0f, 16.0f });
-			ent.AddComponent<Cori::PositionComponent>(glm::vec2{ 50.0f * a, 200.0f });
+			ent.AddComponent<Cori::Components::Entity::Render>(glm::vec2{ 50.0f * a, 200.0f }, glm::vec2{ 16.0f, 16.0f });
 			auto atlas = Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::Atlas);
-			ent.AddComponent<Cori::SpriteComponent>(atlas->GetTexture(), atlas->GetSpriteUVsAtIndex(a));
+			ent.AddComponent<Cori::Components::Entity::Sprite>(atlas->GetTexture(), atlas->GetSpriteUVsAtIndex(a));
 		}
 
 		if (ImGui::Button("Destroy Test2")) {
@@ -95,7 +94,7 @@ public:
 			bp.type = b2_dynamicBody;
 			bp.position = { 4.0f, 4.0f };
 
-			auto& rb = ent.AddComponent<Cori::Physics::Rigidbody_EntityComponent>(ActiveScene->PhysicsWorld, bp);
+			auto& rb = ent.AddComponent<Cori::Components::Entity::Rigidbody>(ActiveScene->PhysicsWorld, bp);
 			
 			Cori::Physics::Shape::Params sp;
 
@@ -109,7 +108,7 @@ public:
 			bp.type = b2_staticBody;
 			bp.position = { 0.0f, 0.0f };
 
-			auto& rb = ent.AddComponent<Cori::Physics::Rigidbody_EntityComponent>(ActiveScene->PhysicsWorld, bp);
+			auto& rb = ent.AddComponent<Cori::Components::Entity::Rigidbody>(ActiveScene->PhysicsWorld, bp);
 
 			Cori::Physics::Shape::Params sp;
 

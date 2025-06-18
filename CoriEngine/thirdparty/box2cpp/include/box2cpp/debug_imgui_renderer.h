@@ -136,7 +136,7 @@ namespace Cori::Physics
 
 			const ImVec2 viewportSize = ImGui::GetMainViewport()->WorkSize;
 			camera_scale = viewportSize.y / (cameraBounds.y / pixelsPerMeter);
-
+			
 			camera_pos.x = viewportSize.x / (camera_scale * 2);
 			camera_pos.y = viewportSize.y / (camera_scale * 2);
 
@@ -144,7 +144,7 @@ namespace Cori::Physics
 
 		void DrawShapes(WorldRef world)
 		{
-			callbacks.useDrawingBounds = true;
+			callbacks.useDrawingBounds = false;
 			struct Guard { DebugImguiRenderer& self; ~Guard() { self.callbacks.useDrawingBounds = false; } };
 			Guard guard{ *this };
 
@@ -187,6 +187,10 @@ namespace Cori::Physics
 				ImGui::Checkbox("Islands", &callbacks.drawIslands);
 				ImGui::Separator();
 				ImGui::Checkbox("Mouse drag", &enable_mouse_drag);
+				ImGui::SliderFloat("Scale", &camera_scale, 0.1f, 128.f);
+				ImGui::SliderFloat("cam offset x", &camera_pos.x, -256.0f, 256.f);
+				ImGui::SliderFloat("cam offset y", &camera_pos.y, -256.0f, 256.f);
+
 
 			}
 			ImGui::End();

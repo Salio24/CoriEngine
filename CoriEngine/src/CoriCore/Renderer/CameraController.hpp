@@ -17,13 +17,13 @@ namespace Cori {
 
 		void RecalculateVP();
 
-		void BindCameraComponent(CameraContextComponent* camera) {
+		void BindCameraComponent(Components::Scene::Camera* camera) {
 			m_CurrentCameraComponent = camera;
 		}
 
 	private:
 
-		CameraContextComponent* m_CurrentCameraComponent{ nullptr };
+		Components::Scene::Camera* m_CurrentCameraComponent{ nullptr };
 
 	};
 }

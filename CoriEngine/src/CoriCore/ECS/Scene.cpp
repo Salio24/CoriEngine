@@ -5,10 +5,10 @@
 namespace Cori {
 
 	Scene::Scene(const std::string& name) : m_Name(name){
-		AddContextComponent<CameraContextComponent>();
-		ActiveCamera.BindCameraComponent(&GetContextComponent<CameraContextComponent>());
+		AddContextComponent<Components::Scene::Camera>();
+		ActiveCamera.BindCameraComponent(&GetContextComponent<Components::Scene::Camera>());
 		CORI_CORE_DEBUG("Scene: '{0}' created.", m_Name);
-		auto renderGroup = m_Registry.group<PositionComponent, RenderingComponent, SpriteComponent>();
+		auto renderGroup = m_Registry.group<Components::Entity::Render, Components::Entity::Sprite>();
 
 	}
 
@@ -22,7 +22,7 @@ namespace Cori {
 		if (CORI_CORE_ASSERT_ERROR(!m_NamedEntities.contains(name), "Trying to create a named entity, but the specified name already exists in a hashmap, this is not permited, named entities should have exclusive names. Name: '{}'. Invalid entity returned.", name)) { return Entity{}; }
 
 		entt::entity entity = m_Registry.create();
-		m_Registry.emplace<NameComponent>(entity, name);
+		m_Registry.emplace<Components::Entity::Name>(entity, name);
 		m_NamedEntities.insert({ name, entt::handle{m_Registry, entity} });
 		CORI_CORE_TRACE("Created Named Entity With ID: {0}, Version: {1}, Name: {2}",entt::to_integral(entity), entt::to_version(entity), name);
 		return Entity{ {m_Registry, entity} };
@@ -42,23 +42,23 @@ namespace Cori {
 
 
 	void Scene::SortRenderGroup() {
-		auto renderGroup = m_Registry.group<PositionComponent, RenderingComponent, SpriteComponent>();
-		renderGroup.sort<SpriteComponent>([](const SpriteComponent& lhs, const SpriteComponent& rhs) {
-			return reinterpret_cast<uint64_t>(lhs.Texture.get()) > reinterpret_cast<uint64_t>(rhs.Texture.get());
+		auto renderGroup = m_Registry.group<Components::Entity::Render, Components::Entity::Sprite>();
+		renderGroup.sort<Components::Entity::Sprite>([](const Components::Entity::Sprite& lhs, const Components::Entity::Sprite& rhs) {
+			return reinterpret_cast<uint64_t>(lhs.m_Texture.get()) > reinterpret_cast<uint64_t>(rhs.m_Texture.get());
 		});
 	}
 
 	void Scene::OnUpdate(const double deltaTime) {
 		CORI_PROFILE_FUNCTION();
 
-		Renderer2D::BeginBatch(GetContextComponent<CameraContextComponent>().ViewProjectionMatrix);
+		Renderer2D::BeginBatch(GetContextComponent<Components::Scene::Camera>().m_ViewProjectionMatrix);
 
-		auto renderGroup = m_Registry.group<PositionComponent, RenderingComponent, SpriteComponent>();
+		auto renderGroup = m_Registry.group<Components::Entity::Render, Components::Entity::Sprite>();
 		
 		for (auto entity : renderGroup) {
-			auto [posComp, renderComp, spriteComp] = renderGroup.get<PositionComponent, RenderingComponent, SpriteComponent>(entity);
-			if (renderComp.Visible) {
-				Renderer2D::DrawQuad(posComp.Position, renderComp.Size, spriteComp.Texture, spriteComp.UV);
+			auto [renderComp, spriteComp] = renderGroup.get<Components::Entity::Render, Components::Entity::Sprite>(entity);
+			if (renderComp.m_Visible) {
+				Renderer2D::DrawQuad(renderComp.m_Position, renderComp.m_Size, spriteComp.m_Texture, spriteComp.m_UVs);
 			}
 		}
 		Renderer2D::EndBatch();		
