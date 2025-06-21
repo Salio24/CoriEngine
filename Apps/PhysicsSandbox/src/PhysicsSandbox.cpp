@@ -76,7 +76,7 @@ public:
 			BindScene("Test2 Scene");
 			ActiveScene->ActiveCamera.CreateOrthoCamera(0, 640, 0, 360);
 		}
-
+		 
 		if (ImGui::Button("Create 'Test' Scene")) {
 			Cori::SceneManager::CreateScene("Test Scene");
 			BindScene("Test Scene");

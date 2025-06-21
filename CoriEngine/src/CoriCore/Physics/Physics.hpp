@@ -1,5 +1,6 @@
 #pragma once
 #include <box2cpp/box2cpp.h>
+#include <tmxlite/Map.hpp>
 
 #ifndef CORI_PIXELS_PER_METER
 	#define CORI_PIXELS_PER_METER 16
@@ -7,6 +8,12 @@
 
 namespace Cori {
 	namespace Physics {
+
+		enum class WindingOrder : uint8_t {
+			COLLINEAR,
+			CLOCKWISE,
+			COUNTER_CLOCKWISE
+		};
 
 		bool PointVsRect(const glm::vec2& point, const glm::vec2& boxSize, const glm::vec2& boxPos);
 
@@ -24,6 +31,8 @@ namespace Cori {
 		inline Vec2 ToMeters(const glm::vec2 vec) {
 			return { vec.x / (float)CORI_PIXELS_PER_METER, vec.y / (float)CORI_PIXELS_PER_METER };
 		}
+
+
 
 		class ConvexHull {
 		public:
@@ -145,5 +154,75 @@ namespace Cori {
 			PhysicsWorld() : World{ World::Params{} } {
 			}
 		};
+
+		inline WindingOrder GetPolygonWindingOrder(const std::vector<Vec2>& polygon) {
+			int n = polygon.size();
+			if (n < 3) {
+				return WindingOrder::COLLINEAR;
+			}
+
+			double signedAreaSum = 0.0f;
+
+			for (int i = 0; i < n; ++i) {
+				const Vec2& p1 = polygon.at(i);
+				const Vec2& p2 = polygon.at((i + 1) % n);
+				signedAreaSum += (p1.x * p2.y) - (p2.x * p1.y);
+			}
+
+			double epsilon = 1e-9;
+
+			if (signedAreaSum > epsilon) {
+				return WindingOrder::CLOCKWISE;
+			}
+			else if (signedAreaSum < -epsilon) {
+				return WindingOrder::COUNTER_CLOCKWISE;
+			}
+			else {
+				return WindingOrder::COLLINEAR;
+			}
+		}
+
+		inline WindingOrder GetPolygonWindingOrder(const std::vector<tmx::Vector2f>& polygon) {
+			int n = polygon.size();
+			if (n < 3) {
+				return WindingOrder::COLLINEAR;
+			}
+
+			double signedAreaSum = 0.0f;
+
+			for (int i = 0; i < n; ++i) {
+				const tmx::Vector2f& p1 = polygon.at(i);
+				const tmx::Vector2f& p2 = polygon.at((i + 1) % n);
+
+				signedAreaSum += (p1.x * p2.y) - (p2.x * p1.y);
+			}
+
+			double epsilon = 1e-9;
+
+			if (signedAreaSum > epsilon) {
+				return WindingOrder::CLOCKWISE;
+			}
+			else if (signedAreaSum < -epsilon) {
+				return WindingOrder::COUNTER_CLOCKWISE;
+			}
+			else {
+				return WindingOrder::COLLINEAR;
+			}
+		}
+
+
+		inline std::string WindingOrderToString(WindingOrder order) {
+			switch (order) {
+			case WindingOrder::COLLINEAR:
+				return "Collinear";
+				break;
+			case WindingOrder::CLOCKWISE:
+				return "Clockwise (CW)";
+				break;
+			case WindingOrder::COUNTER_CLOCKWISE:
+				return "Counter-Clockwise (CCW)";
+				break;
+			}
+		}
 	}
 }

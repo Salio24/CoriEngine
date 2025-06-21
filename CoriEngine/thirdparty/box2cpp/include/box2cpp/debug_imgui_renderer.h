@@ -126,7 +126,7 @@ namespace Cori::Physics
 						(self.text_background_padding.x + self.text_background_padding.y) / 2
 					);
 					self.DrawList().AddText(text_pos, self.ShapeColorToImguiColor(color, false), s);
-				};
+			};
 		}
 
 		DebugImguiRenderer(const DebugImguiRenderer& other) : callbacks(other.callbacks) { callbacks.context = this; }
@@ -288,7 +288,6 @@ namespace Cori::Physics
 			return ret;
 		}
 
-	protected:
 		ImDrawList& DrawList() const {
 			return *ImGui::GetBackgroundDrawList();
 		}
@@ -354,6 +353,21 @@ namespace Cori::Physics
 			DrawList().PathFillConvex(ShapeColorToImguiColor(color, true));
 			DrawCapsule(p1, p2, radius, color);
 		}
+
+		void DrawCircle(b2Vec2 center, float radius, b2HexColor color) {
+			DrawList().AddCircle(Box2dToImguiPoint(center), Box2dToImguiLength(radius), ShapeColorToImguiColor(color, false), 0, line_thickness);
+		}
+		void DrawCircleFilled(b2Transform xf, float radius, b2HexColor color) {
+			DrawList().AddCircleFilled(Box2dToImguiPoint(xf.p), Box2dToImguiLength(radius), ShapeColorToImguiColor(color, true));
+			DrawList().AddCircle(Box2dToImguiPoint(xf.p), Box2dToImguiLength(radius), ShapeColorToImguiColor(color, false), 0, line_thickness);
+
+			DrawLine(xf.p, b2Vec2(xf.p.x + xf.q.c * radius, xf.p.y + xf.q.s * radius), color);
+		}
+		void DrawPoint(b2Vec2 p, float size, b2HexColor color) {
+			DrawList().AddCircleFilled(Box2dToImguiPoint(p), size * line_thickness, ShapeColorToImguiColor(color, true));
+		}
+
+
 
 		MouseJointRef mouse_joint;
 		Body mouse_joint_body;
