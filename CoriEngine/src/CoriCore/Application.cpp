@@ -84,8 +84,8 @@ namespace Cori {
 				GraphicsCall::ClearFramebuffer();
 
 				for (Layer* layer : m_LayerStack) {
-					layer->SceneUpdate(m_GameTimer);
-					layer->OnUpdate(m_GameTimer);
+					layer->SceneUpdate(m_GameTimer.m_DeltaTime);
+					layer->OnUpdate(m_GameTimer.m_DeltaTime, m_GameTimer.m_TickAlpha);
 					if (layer->IsModal()) {
 						break;
 					}
@@ -94,7 +94,7 @@ namespace Cori {
 				m_ImGuiLayer->StartFrame();
 
 				for (Layer* layer : m_LayerStack) {
-					layer->OnImGuiRender(m_GameTimer);
+					layer->OnImGuiRender(m_GameTimer.m_DeltaTime);
 				}
 
 				m_ImGuiLayer->EndFrame();

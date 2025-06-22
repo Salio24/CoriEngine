@@ -17,7 +17,7 @@ namespace Cori {
 
 		virtual void OnAttach();
 		virtual void OnDetach();
-		virtual void OnUpdate([[maybe_unused]] const double deltaTime) {}
+		virtual void OnUpdate([[maybe_unused]] const double deltaTime, [[maybe_unused]] const double tickAlpha) {}
 		virtual void OnTickUpdate([[maybe_unused]] const float timeStep) {}
 		virtual void OnImGuiRender([[maybe_unused]] const double deltaTime) { }
 		virtual void OnEvent([[maybe_unused]] Event& event) {}

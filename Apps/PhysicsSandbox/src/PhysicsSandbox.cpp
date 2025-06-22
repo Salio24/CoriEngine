@@ -118,7 +118,7 @@ public:
 		ImGui::End();
 	}
 
-	void OnUpdate(const double deltaTime) override {
+	void OnUpdate(const double deltaTime, const double tickAlpha) override {
 
 
 	}

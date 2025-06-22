@@ -10,9 +10,7 @@ namespace Cori {
 		// add const variants
 		Entity() = default;
 
-		Entity(entt::handle handle) : m_EntityHandle(handle) {
-		
-		}
+		Entity(entt::handle handle) : m_EntityHandle(handle) {}
 
 		Entity(const entt::entity& entity);
 

@@ -11,7 +11,6 @@ namespace Cori {
 		// method GetDeltaTime can be used to retrieve deltatime 
 		// also casting this class instance to double will return the deltatime
 		double GetDeltaTime() { return m_DeltaTime; };
-		operator double() const { return m_DeltaTime; }
 
 		inline double GetMiliseconds() const;
 		inline double GetSeconds() const;
@@ -19,9 +18,11 @@ namespace Cori {
 		inline double GetHours() const;
 
 		inline void SetTickrateUpdateFunc(const std::function<void(const float)>& func) { m_TickrateUpdateFunc = func; }
+		
+		double m_DeltaTime{ 0 };
+		double m_TickAlpha{ 0 };
 
 	private:
-		double m_DeltaTime{ 0 };
 
 		float m_Timestep{ 0 };
 		double m_Accumulator{ 0 };

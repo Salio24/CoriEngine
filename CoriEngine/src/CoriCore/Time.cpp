@@ -26,6 +26,9 @@ namespace Cori {
 
 				m_Accumulator -= m_Timestep;
 			}
+
+			m_TickAlpha = m_Accumulator / m_Timestep;
+
 		}
 	}
 

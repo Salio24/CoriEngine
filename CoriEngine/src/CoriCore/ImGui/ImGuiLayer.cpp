@@ -55,10 +55,6 @@ namespace Cori {
 		CORI_CORE_DEBUG("ImGuiLayer detached");
 	}
 
-	void ImGuiLayer::OnUpdate(const double deltaTime) {
-
-	}
-
 	void ImGuiLayer::OnImGuiRender(const double deltaTime) {
 		static bool show = true;
 		static bool show_ui = true;
