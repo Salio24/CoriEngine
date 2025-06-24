@@ -37,6 +37,15 @@ namespace Cori {
 			return fmt::styled(text, fmt::bg(c) | s);
 		}
 
+		inline static std::string BoolAlpha(bool b) {
+			if (b) {
+				return "True";
+			}
+			else {
+				return "False";
+			}
+		}
+
 		static void SampleColors() {
 			GetCoreLogger()->debug("Sample Text Start Here!!!!!!!!!!!!!!!!!!!!");
 			GetCoreLogger()->debug("{}", ColoredText("Sample Text color: alice_blue", fmt::color::alice_blue));

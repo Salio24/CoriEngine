@@ -124,6 +124,9 @@ namespace Cori {
 			return { vec.x / (float)CORI_PIXELS_PER_METER, vec.y / (float)CORI_PIXELS_PER_METER };
 		}
 
+		inline std::string Vec2ToString(Vec2 vec) {
+			return std::string("(") + std::to_string(vec.x) + std::string(", ") + std::to_string(vec.y) + std::string(")");
+		}
 
 
 		class ConvexHull {

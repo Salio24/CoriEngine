@@ -26,5 +26,6 @@
 #include "../src/CoriCore/ECS/SceneManager.hpp"
 #include "../src/CoriCore/Renderer/CameraController.hpp"
 #include "../src/CoriCore/Physics/Physics.hpp"
+#include "../src/CoriCore/Math/Math.hpp"
 
 

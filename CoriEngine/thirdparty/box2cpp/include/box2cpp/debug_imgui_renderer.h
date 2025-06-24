@@ -77,7 +77,7 @@ namespace Cori::Physics
 
 			callbacks.DrawSolidCapsuleFcn = [](b2Vec2 p1, b2Vec2 p2, float radius, b2HexColor color, void* context)
 				{
-					auto& self = *static_cast<DebugImguiRenderer*>(context);
+					auto& self = *static_cast<DebugImguiRenderer*>(context); 
 					self.DrawCapsuleFilled(p1, p2, radius, color);
 				};
 
@@ -293,7 +293,13 @@ namespace Cori::Physics
 		}
 
 		ImU32 ShapeColorToImguiColor(const b2HexColor& color, bool fill) const {
-			return IM_COL32(color >> 16, (color >> 8) & 0xff, color & 0xff, std::clamp(0xff * shape_alpha * (fill ? shape_fill_alpha_factor : 1.f), 0.f, 255.f));
+			return IM_COL32(color >> 16, (color >> 8) & 0xff, color & 0xff, std::clamp(0xff * shape_alpha * (fill ? shape_fill_alpha_factor : 1.0f), 0.0f, 255.0f));
+		}
+
+		ImU32 FmtColorToImguiColor(fmt::color color) const {
+			uint32_t color_value = static_cast<uint32_t>(color);
+			return IM_COL32((color_value >> 16) & 0xff, (color_value >> 8) & 0xff, color_value & 0xff, 0xff);
+
 		}
 
 		b2Vec2 GetPolygonVertex(const b2Vec2* data, int size, int i, const b2Transform* xf) const {
@@ -365,6 +371,12 @@ namespace Cori::Physics
 		}
 		void DrawPoint(b2Vec2 p, float size, b2HexColor color) {
 			DrawList().AddCircleFilled(Box2dToImguiPoint(p), size * line_thickness, ShapeColorToImguiColor(color, true));
+		}
+
+
+		void DrawText(b2Vec2 p, fmt::color color, std::string text) {
+			DrawList().AddText(Box2dToImguiPoint(p), FmtColorToImguiColor(color), text.c_str());
+			
 		}
 
 
