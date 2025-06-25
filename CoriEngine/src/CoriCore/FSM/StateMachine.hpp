@@ -1,7 +1,7 @@
 #pragma once
 
 #include "State.hpp"
-#include "../ECS/Entity.hpp" // Your Entity wrapper
+#include "../ECS/Entity.hpp"
 
 namespace Cori {
 	namespace FSM {

@@ -14,6 +14,9 @@ namespace Cori {
 				Name(const std::string& name) : m_Name(name) {}
 			};
 
+
+			// add an ability to add multiple plains to an entity
+			// combing sprite and render component into one
 			struct Render {
 				glm::vec2 m_Position{ 0.0f, 0.0f };
 				glm::vec2 m_Size{ 0.0f, 0.0f };
@@ -21,6 +24,7 @@ namespace Cori {
 				bool m_Textured{ true };
 				bool m_Visible{ true };
 				bool m_Flipped{ false };
+
 				Render() = default;
 				Render(const glm::vec2& position, const glm::vec2& size, float zIndex = 0.0f, bool textured = true, bool visible = true)
 					: m_Position(position), m_Size(size), m_ZIndex(zIndex), m_Textured(textured), m_Visible(visible) {}

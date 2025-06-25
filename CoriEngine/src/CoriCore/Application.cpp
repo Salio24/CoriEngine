@@ -28,7 +28,7 @@ namespace Cori {
 
 		m_ImGuiLayer = new ImGuiLayer();
 
-		PushOverlay(m_ImGuiLayer);
+		m_LayerStack.PushOverlay(m_ImGuiLayer);
 
 		GraphicsCall::InitRenderers();
 
@@ -66,14 +66,14 @@ namespace Cori {
 	}
 
 	void Application::PushLayer(Layer* layer) {
-		Get().m_LayerStack.PushLayer(layer);
-		layer->OnAttach();
+		Get().m_LayerStack.PushLayerToQueue(layer);
 	}
 
 	void Application::PushOverlay(Layer* layer) {
-		Get().m_LayerStack.PushOverlay(layer);
-		layer->OnAttach();
+		Get().m_LayerStack.PushOverlayToQueue(layer);
 	}
+
+
 
 	void Application::Run() {
 		while(m_Running) {
@@ -95,14 +95,22 @@ namespace Cori {
 
 				m_ImGuiLayer->StartFrame();
 
+				int te = 0;
+					te++;
+
 				for (Layer* layer : m_LayerStack) {
-					if (CORI_CORE_ASSERT_WARN(layer, "What the fk????")) { continue; }
+					//if (CORI_CORE_ASSERT_WARN(layer, "What the fk????")) { 
+					//	continue;
+					//}
 					layer->OnImGuiRender(m_GameTimer.m_TickAlpha);
 				}
 
 				m_ImGuiLayer->EndFrame();
 
 				m_Window->OnUpdate();
+
+				m_LayerStack.ProcessQueue();
+
 			}
 			CORI_PROFILER_FRAME_END();
 		}

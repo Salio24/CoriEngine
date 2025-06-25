@@ -19,7 +19,7 @@ namespace Cori {
 
 	void ImGuiLayer::OnAttach() {
 		static bool created = false;
-		if (CORI_ASSERT_ERROR(!created, "ImGui context already created")) { return; }
+		if (CORI_CORE_ASSERT_ERROR(!created, "ImGui context already created")) { return; }
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();

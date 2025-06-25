@@ -5,7 +5,7 @@
 namespace Cori {
 	class CoriGraphicsAPI {
 	public:
-		virtual ~CoriGraphicsAPI() = default;
+		virtual ~CoriGraphicsAPI() = default; 
 
 		virtual void Init() = 0;
 

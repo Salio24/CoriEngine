@@ -264,7 +264,7 @@ namespace Cori {
 	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const glm::vec2 UVmin, const glm::vec2 UVmax) {
 
 		if (CORI_CORE_ASSERT_ERROR(s_BatchActive, "You're trying to call DrawQuad, but you have not started a batch, it will not work.")) { return; }
-		if (CORI_CORE_ASSERT_FATAL(texture, "You're trying to call DrawQuad, but you have not started a batch, it will not work.")) { return; }
+		if (CORI_CORE_ASSERT_ERROR(texture, "Texture is nullptr, trying to avoid read access violation")) { return; }
 		if (s_IndexCount_TexturedQuad >= s_MaxIndexCount) {
 			NewBatch();
 		}
@@ -309,13 +309,57 @@ namespace Cori {
 
 	}
 
+	void Renderer2D::DrawQuadFlipped(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const glm::vec2 UVmin, const glm::vec2 UVmax) {
+
+		if (CORI_CORE_ASSERT_ERROR(s_BatchActive, "You're trying to call DrawQuad, but you have not started a batch, it will not work.")) { return; }
+		if (CORI_CORE_ASSERT_ERROR(texture, "Texture is nullptr, trying to avoid read access violation")) { return; }
+		if (s_IndexCount_TexturedQuad >= s_MaxIndexCount) {
+			NewBatch();
+		}
+
+		if (s_CurrentBatchDrawType != BatchDrawType::TEXTURED_QUAD) {
+			if (s_IndexCount_TexturedQuad == 0) {
+				s_CurrentBatchDrawType = BatchDrawType::TEXTURED_QUAD;
+			}
+			else {
+				NewBatch();
+				s_CurrentBatchDrawType = BatchDrawType::TEXTURED_QUAD;
+			}
+		}
+
+		if (s_CurrentTexture_TexturedQuad != texture) {
+			if (s_IndexCount_TexturedQuad == 0) {
+				s_CurrentTexture_TexturedQuad = texture;
+			}
+			else {
+				NewBatch();
+				s_CurrentTexture_TexturedQuad = texture;
+			}
+		}
+
+		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x, position.y };
+		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { UVmax.x, UVmin.y };
+		s_VertexDataBufferPtr_TexturedQuad++;
+
+		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x + size.x, position.y };
+		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { UVmin.x, UVmin.y };
+		s_VertexDataBufferPtr_TexturedQuad++;
+
+		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x + size.x, position.y + size.y };
+		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { UVmin.x, UVmax.y };
+		s_VertexDataBufferPtr_TexturedQuad++;
+
+		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x, position.y + size.y };
+		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { UVmax.x, UVmax.y };
+		s_VertexDataBufferPtr_TexturedQuad++;
+
+		s_IndexCount_TexturedQuad += 6;
+
+	}
+
 	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const UVs& uvs, bool flipped) {
-		// do flipping with conditional later, temp solution
 		if (flipped) {
-			UVs luvs;
-			luvs.UVmin = { uvs.UVmax.x, uvs.UVmin.y };
-			luvs.UVmax = { uvs.UVmin.x, uvs.UVmax.y };
-			DrawQuad(position, size, texture, luvs.UVmin, luvs.UVmax);
+			DrawQuadFlipped(position, size, texture, uvs.UVmin, uvs.UVmax);
 		}
 		else {
 			DrawQuad(position, size, texture, uvs.UVmin, uvs.UVmax);
