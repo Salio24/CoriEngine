@@ -3,6 +3,7 @@
 #include "Entity.hpp"
 #include "../EventSystem/Event.hpp"
 #include "../Renderer/Texture.hpp"
+#include "../FSM/StateMachine.hpp"
 
 namespace Cori {
 	namespace Components {
@@ -19,6 +20,7 @@ namespace Cori {
 				float m_ZIndex{ 0.0f };
 				bool m_Textured{ true };
 				bool m_Visible{ true };
+				bool m_Flipped{ false };
 				Render() = default;
 				Render(const glm::vec2& position, const glm::vec2& size, float zIndex = 0.0f, bool textured = true, bool visible = true)
 					: m_Position(position), m_Size(size), m_ZIndex(zIndex), m_Textured(textured), m_Visible(visible) {}
@@ -43,6 +45,48 @@ namespace Cori {
 				Spawnpoint() = default;
 				Spawnpoint(const glm::vec2& point) 
 					: m_Spawnpoint(point) {}
+			};
+
+			struct StateMachine {
+				StateMachine(Cori::Entity owner) : m_StateMachine(owner) {}
+
+				template<typename S, typename ... Args>
+				void Register(Args&&... args) {
+					m_StateMachine.RegisterState<S>(std::forward<Args>(args)...);
+				}
+
+				template<typename S>
+				void SetState() {
+					m_StateMachine.ChangeState<S>();
+				}
+
+				template<typename S>
+				void SetStateIfNotInState() {
+					if (!m_StateMachine.IsInState<S>()) {
+						m_StateMachine.ChangeState<S>();
+					}
+				}
+
+				template<typename S>
+				bool IsInState() const {
+					return m_StateMachine.IsInState<S>();
+				}
+
+				FSM::State* GetCurrentState() const {
+					return m_StateMachine.GetCurrentState();
+				}
+
+
+			protected:
+
+				void Update(float timeStep) {
+					m_StateMachine.Update(timeStep);
+				}
+
+				friend class Scene;
+
+			private:
+				FSM::Machine m_StateMachine;
 			};
 		}
 

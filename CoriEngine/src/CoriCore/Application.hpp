@@ -30,6 +30,10 @@ namespace Cori {
 
 		inline static GraphicsAPIs GetCurrentAPI() { return GetWindow().GetAPI(); }
 
+		inline static uint64_t GetTest() { return Get().test123; }
+
+		uint64_t test123{ 0 };
+
 	private: 
 
 		// idk if i even need this Get func

@@ -67,10 +67,12 @@ namespace Cori {
 
 	void Application::PushLayer(Layer* layer) {
 		Get().m_LayerStack.PushLayer(layer);
+		layer->OnAttach();
 	}
 
 	void Application::PushOverlay(Layer* layer) {
 		Get().m_LayerStack.PushOverlay(layer);
+		layer->OnAttach();
 	}
 
 	void Application::Run() {
@@ -84,8 +86,8 @@ namespace Cori {
 				GraphicsCall::ClearFramebuffer();
 
 				for (Layer* layer : m_LayerStack) {
-					layer->SceneUpdate(m_GameTimer.m_DeltaTime);
 					layer->OnUpdate(m_GameTimer.m_DeltaTime, m_GameTimer.m_TickAlpha);
+					layer->SceneUpdate(m_GameTimer.m_DeltaTime);
 					if (layer->IsModal()) {
 						break;
 					}
@@ -94,7 +96,8 @@ namespace Cori {
 				m_ImGuiLayer->StartFrame();
 
 				for (Layer* layer : m_LayerStack) {
-					layer->OnImGuiRender(m_GameTimer.m_DeltaTime);
+					if (CORI_CORE_ASSERT_WARN(layer, "What the fk????")) { continue; }
+					layer->OnImGuiRender(m_GameTimer.m_TickAlpha);
 				}
 
 				m_ImGuiLayer->EndFrame();
@@ -106,6 +109,7 @@ namespace Cori {
 	}
 
 	void Application::TickrateUpdate(const float timeStep) {
+			test123++;
 		for (Layer* layer : m_LayerStack) {
 			layer->SceneTickrateUpdate(timeStep);
 			layer->OnTickUpdate(timeStep);

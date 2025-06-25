@@ -58,7 +58,7 @@ namespace Cori {
 		for (auto entity : renderGroup) {
 			auto [renderComp, spriteComp] = renderGroup.get<Components::Entity::Render, Components::Entity::Sprite>(entity);
 			if (renderComp.m_Visible) {
-				Renderer2D::DrawQuad(renderComp.m_Position, renderComp.m_Size, spriteComp.m_Texture, spriteComp.m_UVs);
+				Renderer2D::DrawQuad(renderComp.m_Position, renderComp.m_Size, spriteComp.m_Texture, spriteComp.m_UVs, renderComp.m_Flipped);
 			}
 		}
 		Renderer2D::EndBatch();		
@@ -67,6 +67,13 @@ namespace Cori {
 
 	void Scene::OnTickUpdate(const float timeStep) {
 		PhysicsWorld.Step(timeStep, 4);
+
+		auto view = m_Registry.view<Components::Entity::StateMachine>();
+
+		for (auto entity : view) {
+			auto& fsm = view.get<Components::Entity::StateMachine>(entity);
+			fsm.Update(timeStep);
+		}
 	}
 
 	bool Scene::OnBind(const EventCallbackFn& callback) {

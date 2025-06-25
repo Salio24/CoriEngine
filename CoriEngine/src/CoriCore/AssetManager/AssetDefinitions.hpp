@@ -21,7 +21,10 @@ namespace Cori {
 	}
 
 	namespace Texture2Ds {
-
+		inline const Cori::Texture2DDescriptor Placeholder{
+			"Placeholder Texture",
+			"assets/engine/textures/missing_texture32.png"
+		};
 	}
 
 	namespace Images {

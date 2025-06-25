@@ -258,12 +258,13 @@ namespace Cori {
 		s_DrawCallCount++;
 
 		s_IndexCount_TexturedQuad = 0;
-		s_CurrentTexture_TexturedQuad.reset();
+		//s_CurrentTexture_TexturedQuad.reset();
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const glm::vec2 UVmin, const glm::vec2 UVmax) {
 
 		if (CORI_CORE_ASSERT_ERROR(s_BatchActive, "You're trying to call DrawQuad, but you have not started a batch, it will not work.")) { return; }
+		if (CORI_CORE_ASSERT_FATAL(texture, "You're trying to call DrawQuad, but you have not started a batch, it will not work.")) { return; }
 		if (s_IndexCount_TexturedQuad >= s_MaxIndexCount) {
 			NewBatch();
 		}
@@ -308,9 +309,21 @@ namespace Cori {
 
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const UVs& uvs) {
-		DrawQuad(position, size, texture, uvs.UVmin, uvs.UVmax);
+	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const UVs& uvs, bool flipped) {
+		// do flipping with conditional later, temp solution
+		if (flipped) {
+			UVs luvs;
+			luvs.UVmin = { uvs.UVmax.x, uvs.UVmin.y };
+			luvs.UVmax = { uvs.UVmin.x, uvs.UVmax.y };
+			DrawQuad(position, size, texture, luvs.UVmin, luvs.UVmax);
+		}
+		else {
+			DrawQuad(position, size, texture, uvs.UVmin, uvs.UVmax);
+		}
+
 	}
+
+
 
 	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<SpriteAtlas>& atlas, uint32_t index) {
 		DrawQuad(position, size, atlas->GetTexture(), atlas->GetSpriteUVsAtIndex(index));

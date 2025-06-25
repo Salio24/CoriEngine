@@ -5,6 +5,7 @@
 #include "../Renderer/CameraController.hpp"
 #include "../EventSystem/Event.hpp"
 #include "../Physics/Physics.hpp"
+#include "../FSM/StateMachine.hpp"
 
 namespace Cori {
 
