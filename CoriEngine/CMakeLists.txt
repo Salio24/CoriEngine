@@ -169,11 +169,11 @@ endif()
     # includes
     target_include_directories(${ENGINE_LIBRARY_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/thirdparty/box2cpp/include
+    ${PROJECT_SOURCE_DIR}/src
     ${CORI_INCLUDE_DIR}
     )
 
     target_include_directories(${ENGINE_LIBRARY_NAME} PRIVATE
-    ${PROJECT_SOURCE_DIR}/src/*.hpp
     ${CORI_HEADERS_DIR}
     )
 

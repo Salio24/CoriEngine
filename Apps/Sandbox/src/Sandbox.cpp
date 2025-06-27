@@ -68,49 +68,6 @@ public:
 
 		static int a = 0;
 
-		if (ImGui::Button("Add box")) {
-			a++;
-			auto ent = ActiveScene->CreateEntity("Test Entity " + std::to_string(a));
-			ent.AddComponent<Cori::RenderingComponent>(glm::vec2{50.0f, 50.0f});
-			ent.AddComponent<Cori::PositionComponent>(glm::vec2{ 50.0f * a, 500.0f });
-			auto atlas = Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::Atlas);
-			ent.AddComponent<Cori::SpriteComponent>(atlas->GetTexture(), atlas->GetSpriteUVsAtIndex(a));
-		}
-
-		if (ImGui::Button("Create Trigger")) {
-			auto other = ActiveScene->CreateEntity("Other Entity");
-			other.AddComponent<Cori::RenderingComponent>(glm::vec2{ 50.0f, 50.0f });
-			other.AddComponent<Cori::ColliderComponent>(glm::vec2{ 50.0f, 50.0f });
-			other.AddComponent<Cori::PositionComponent>(glm::vec2{ 40.0f, 40.0f });
-			other.AddComponent<Cori::PlayerTagComponent>();
-
-			auto trigger = ActiveScene->CreateEntity("Trigger Entity");
-			trigger.AddComponent<Cori::ColliderComponent>(glm::vec2{ 10.0f, 10.0f });
-			trigger.AddComponent<Cori::PositionComponent>(glm::vec2{ 100.0f, 100.0f });
-			trigger.AddComponent<Cori::TriggerComponent>([](Cori::Entity& trigger, Cori::Entity& entity, Cori::EventCallbackFn eventCallback) -> bool {
-
-				CustomEvent event("sample data");
-				eventCallback(event);
-
-				// trigger logic/script
-				CORI_DEBUG("trigger");
-				return true;
-			});
-		}
-
-		if (ImGui::Button("Activate Trigger")) {
-			auto entity = ActiveScene->GetNamedEntity("Other Entity");
-			decltype(auto) pos = entity.GetComponents<Cori::PositionComponent>();
-			pos.Position = glm::vec2{ 90.0f, 90.0f };
-
-		}
-
-		if (ImGui::Button("Deactivate Trigger")) {
-			auto entity = ActiveScene->GetNamedEntity("Other Entity");
-			decltype(auto) pos = entity.GetComponents<Cori::PositionComponent>();
-			pos.Position = glm::vec2{ 40.0f, 40.0f };
-		}
-
 		if (ImGui::Button("Create 'Test2' Scene")) {
 			Cori::SceneManager::CreateScene("Test2 Scene");
 		}
@@ -154,7 +111,7 @@ public:
 		ImGui::End();
 	}
 
-	void OnUpdate(const double deltaTime) override {
+	void OnUpdate(const double deltaTime, const double tickAlpha) override {
 
 
 	}

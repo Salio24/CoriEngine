@@ -36,7 +36,7 @@
 #include <glm/glm.hpp>
 #include <imgui.h>
 #include "../include/Macros.hpp"
-#include "../src/CoriCore/Logger.hpp"
-#include "../src/CoriCore/Profiling/TimeProfiler.hpp"
+#include "../src/Core/Logger.hpp"
+#include "../src/Profiling/TimeProfiler.hpp"
 
 #endif

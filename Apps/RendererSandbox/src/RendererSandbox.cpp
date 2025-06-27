@@ -184,7 +184,7 @@ public:
 		ImGui::End();
 	}
 
-	void OnUpdate(const double deltaTime) override {
+	void OnUpdate(const double deltaTime, const double tickAlpha) override {
 		CORI_PROFILE_FUNCTION();
 		Cori::GraphicsCall::SetClearColor({ 0.875f, 0.6875f, 1.0f, 1.0f });
 		Cori::GraphicsCall::ClearFramebuffer();
@@ -199,8 +199,6 @@ public:
 			for (int y = 0; y < m_QuadColumns; y++) {
 				//Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset , i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetTexture2D(Cori::Texture2Ds::TestBrickTexture));
 				Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset, i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::test), 23);
-				
-				//Cori::Renderer2D::DrawTile(testTile);
 			}
 		}
 
@@ -241,8 +239,6 @@ public:
 	int m_QuadRows{ 1 };
 
 	Cori::OrthoCamera m_Camera;
-
-	std::shared_ptr<Cori::Tile> testTile = Cori::Tile::Create(glm::vec2(30.0f), glm::vec2(500.0f), Cori::SpriteAtlases::test, 23);
 
 	float m_CameraMoveSpeed = 10.0f;
 
