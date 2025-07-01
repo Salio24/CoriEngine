@@ -3,13 +3,9 @@
 #include "Engine.hpp"
 
 namespace Cori {
-	void Engine::Start() {
+	void Engine::Start(bool asyncLogging) {
 
-#ifdef CORI_ASYNC_LOGGING
-		Logger::Init(true);
-#else
-		Logger::Init(false);
-#endif
+		Logger::Init(asyncLogging);
 
 		bool SDL_verify = SDL_Init(SDL_INIT_VIDEO);
 		CORI_CORE_ASSERT_FATAL(SDL_verify, "SDL3 failed to initialized! SDL_Error: {}", std::string(SDL_GetError()));

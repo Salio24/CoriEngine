@@ -1,10 +1,15 @@
 #pragma once
-#include "EngineEntry.hpp"
+#include "Engine.hpp"
 
 extern Cori::Application* Cori::CreateApplication();
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
-	EngineEntry engineEntry;
+
+#ifdef CORI_ASYNC_LOGGING
+	Cori::Engine::Start(true);
+#else 
+	Cori::Engine::Start(false);
+#endif
 
 	Cori::Application* app = Cori::CreateApplication();
 
@@ -15,4 +20,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
 	else {
 		return -1;
 	}
+
+	Cori::Engine::Stop();
 }
