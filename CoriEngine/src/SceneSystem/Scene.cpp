@@ -1,6 +1,7 @@
 #include "Scene.hpp"
 #include "Renderer/Renderer2D.hpp"
 #include "Renderer/CameraController.hpp"
+#include "Physics/Triggers/Trigger.hpp"
 
 namespace Cori {
 
@@ -54,11 +55,14 @@ namespace Cori {
 		Renderer2D::BeginBatch(GetContextComponent<Components::Scene::Camera>().m_ViewProjectionMatrix);
 
 		auto renderGroup = m_Registry.group<Components::Entity::Render, Components::Entity::Sprite>();
-		
+		auto& camera = GetContextComponent<Components::Scene::Camera>();
+
 		for (auto entity : renderGroup) {
 			auto [renderComp, spriteComp] = renderGroup.get<Components::Entity::Render, Components::Entity::Sprite>(entity);
 			if (renderComp.m_Visible) {
-				Renderer2D::DrawQuad(renderComp.m_Position, renderComp.m_Size, spriteComp.m_Texture, spriteComp.m_UVs, renderComp.m_Flipped);
+				if ((camera.m_CameraMinBound.x <= renderComp.m_Position.x + renderComp.m_Size.x && camera.m_CameraMaxBound.x >= renderComp.m_Position.x) && (camera.m_CameraMinBound.x <= renderComp.m_Position.y + renderComp.m_Size.y && camera.m_CameraMaxBound.y >= renderComp.m_Position.y)) {
+					Renderer2D::DrawQuad(renderComp.m_Position, renderComp.m_Size, spriteComp.m_Texture, spriteComp.m_UVs, renderComp.m_Layer, renderComp.m_Flipped);
+				}
 			}
 		}
 		Renderer2D::EndBatch();		
@@ -68,12 +72,44 @@ namespace Cori {
 	void Scene::OnTickUpdate(const float timeStep) {
 		PhysicsWorld.Step(timeStep, 4);
 
-		auto view = m_Registry.view<Components::Entity::StateMachine>();
+		auto fsmv = m_Registry.view<Components::Entity::StateMachine>();
 
-		for (auto entity : view) {
-			auto& fsm = view.get<Components::Entity::StateMachine>(entity);
+		for (auto entity : fsmv) {
+			auto& fsm = fsmv.get<Components::Entity::StateMachine>(entity);
 			fsm.Update(timeStep);
 		}
+
+		auto trigv = m_Registry.view<Components::Entity::Trigger>();
+
+		// order is not enforced
+		for (auto entity : trigv) {
+			trigv.get<Components::Entity::Trigger>(entity).OnTickUpdate(timeStep);
+		}
+
+		b2SensorEvents sEvents = PhysicsWorld.GetSensorEvents();
+
+		for (int i = 0; i < sEvents.beginCount; ++i)
+		{
+			b2SensorBeginTouchEvent* beginTouch = sEvents.beginEvents + i;
+
+			Entity& visitor = static_cast<Physics::BodyUserData*>(static_cast<Physics::ShapeRef>(beginTouch->visitorShapeId).GetBody().GetUserData())->m_Entity;
+
+			Entity& trigger = static_cast<Physics::BodyUserData*>(static_cast<Physics::ShapeRef>(beginTouch->sensorShapeId).GetBody().GetUserData())->m_Entity;
+
+			trigger.GetComponents<Components::Entity::Trigger>().OnEnter(visitor);
+		}
+
+		for (int i = 0; i < sEvents.endCount; ++i)
+		{
+			b2SensorEndTouchEvent* endTouch = sEvents.endEvents + i;
+
+			Entity& visitor = static_cast<Physics::BodyUserData*>(static_cast<Physics::ShapeRef>(endTouch->visitorShapeId).GetBody().GetUserData())->m_Entity;
+
+			Entity& trigger = static_cast<Physics::BodyUserData*>(static_cast<Physics::ShapeRef>(endTouch->sensorShapeId).GetBody().GetUserData())->m_Entity;
+
+			trigger.GetComponents<Components::Entity::Trigger>().OnExit(visitor);
+		}
+
 	}
 
 	bool Scene::OnBind(const EventCallbackFn& callback) {

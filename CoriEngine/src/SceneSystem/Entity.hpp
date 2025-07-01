@@ -90,6 +90,10 @@ namespace Cori {
 			return entt::to_version(m_EntityHandle.entity());
 		}
 
+		inline uint64_t GetUID() {
+			return (static_cast<uint64_t>(GetEntityID()) << 32) | GetVersion();
+		}
+
 		inline std::string GetDebuggingUID() {
 			return "(Entity ID: " + std::to_string(GetEntityID()) + ", Version: " + std::to_string(GetVersion()) + ")";
 		}

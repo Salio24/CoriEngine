@@ -70,7 +70,7 @@ namespace Cori {
 				duplicateName = (l->GetName() == layer->GetName());
 			}
 		}
-		if (CORI_CORE_ASSERT_ERROR(!duplicateName, "Trying to push a layer, but the layer with the specified debug name already in the LayerStack. Name: '{}'.", layer->GetName())) { return; }
+		if (CORI_CORE_ASSERT_ERROR(!duplicateName, "Trying to push a layer, but the layer with the specified debug name already in the LayerStack. Name: '{}'.", layer->GetName())) { delete layer; return; }
 #endif
 
 		m_Layers.emplace(m_Layers.begin() + m_LayerInsertIndex, layer);

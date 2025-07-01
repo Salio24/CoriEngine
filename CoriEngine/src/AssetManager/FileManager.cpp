@@ -64,7 +64,7 @@ namespace Cori {
 			return false;
 		}
 
-		CORI_CORE_DEBUG("FileManager: Successfully read '{0}' as string");
+		CORI_CORE_DEBUG("FileManager: Successfully read '{0}' as string", filepath);
 		return true;
 	}
 

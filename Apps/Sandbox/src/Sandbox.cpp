@@ -1,3 +1,4 @@
+#define CORI_ASYNC_LOGGING
 #include <Cori.hpp>
 #include <CoriEntry.hpp>
 
@@ -105,20 +106,59 @@ public:
 		}
 
 		if (ImGui::Button("Assert")) {
-			CORI_CORE_ASSERT_DEBUG(false, "Message: {0}", std::string("test"));
+			CORI_CORE_TRACE_TAGGED({ "Renderer", "DX12" }, "Submitting command list {0}.", 5);
+			CORI_CORE_DEBUG_TAGGED({ "Renderer", "DX12" }, "Submitting command list {0}.", 5);
+			CORI_CORE_INFO_TAGGED({ "Renderer", "DX12" }, "Submitting command list {0}.", 5);
+			CORI_CORE_WARN_TAGGED({ "Renderer", "DX12" }, "Submitting command list {0}.", 5);
+			CORI_CORE_ERROR_TAGGED({ "Renderer", "DX12" }, "Submitting command list {0}.", 5);
+			CORI_CORE_FATAL_TAGGED({ "Renderer", "DX12" }, "Submitting command list {0}.", 5);
 		}
+
+		if (ImGui::Button("color")) {
+			Cori::Logger::SampleColors();
+		}
+
+		ImGui::Text("FPS: %.2f", fps);
+		ImGui::Text("FPS 10s avg: %.2f", fps10);
+
 
 		ImGui::End();
 	}
 
 	void OnUpdate(const double deltaTime, const double tickAlpha) override {
+		accum++;
 
 
+		for (int i = 0; i < 20; i++) {
+			//CORI_CORE_DEBUGT("Pidor {0}", 5);
+			//std::cout << "Loh" << std::endl;
+			//CORI_CORE_TRACE_TAGGED({ "Renderer", "DX12" }, "Submitting command list {0}.", 5);
+		}
 	}
 
 	virtual void OnTickUpdate(const float timeStep) override {
-		
+		static uint8_t tic = 0;
+		tic++;
+		static uint8_t tic10 = 0;
+		if (tic == 60) {
+			fps = (float)accum;
+			accum10+= accum;
+			accum = 0.0f;
+			tic = 0;
+			tic10++;
+		}
+		if (tic10 == 10) {
+			fps10 = (float)accum10 / 10.0f;
+			accum10 = 0.0f;
+			tic10 = 0;
+		}
+
 	}
+
+	float fps;
+	float fps10;
+	uint32_t accum{ 0 };
+	uint32_t accum10{ 0 };
 
 };
 

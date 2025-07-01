@@ -33,6 +33,7 @@
 #include "../src/SceneSystem/SceneManager.hpp"
 
 #include "../src/Physics/Physics.hpp"
+#include "../src/Physics/Triggers/Trigger.hpp"
 
 #include "../src/Math/Math.hpp"
 

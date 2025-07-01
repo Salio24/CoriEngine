@@ -55,22 +55,22 @@ namespace Cori {
 			for (size_t i = 0; i < 3; i++) {
 				CORI_CORE_WARN("(WARNING DEBUG MODE IS ENABLED AND MAY LEED TO PERFORMACNE ISSUES)\n");
 			}
-			CORI_CORE_WARN("|" + dashes + "|");
+			CORI_CORE_WARN("|{}|", dashes);
 			FistLineBoilerplate = false;
 		}
 
 		switch (severity) {
 		case GL_DEBUG_SEVERITY_HIGH:
-			CORI_CORE_ERROR(output + "|" + dashes + "|");
+			CORI_CORE_ERROR("{}|{}|", output, dashes);
 			break;
 		case GL_DEBUG_SEVERITY_MEDIUM:
-			CORI_CORE_WARN(output + "|" + dashes + "|");
+			CORI_CORE_WARN("{}|{}|", output, dashes);
 			break;
 		case GL_DEBUG_SEVERITY_LOW:
-			CORI_CORE_INFO(output + "|" + dashes + "|");
+			CORI_CORE_INFO("{}|{}|", output, dashes);
 			break;
 		case GL_DEBUG_SEVERITY_NOTIFICATION:
-			CORI_CORE_TRACE(output + "|" + dashes + "|");
+			CORI_CORE_TRACE("{}|{}|", output, dashes);
 			break;
 		default:
 			break;
@@ -90,8 +90,8 @@ namespace Cori {
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 		glFrontFace(GL_CCW);
-		//glEnable(GL_DEPTH_TEST);
-		//glDepthFunc(GL_LESS);
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
 	}
 
 	void OpenGLGraphicsAPI::SetViewport(int x, int y, int width, int height) {

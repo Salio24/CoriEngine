@@ -4,7 +4,12 @@
 
 namespace Cori {
 	void Engine::Start() {
-		Logger::Init();
+
+#ifdef CORI_ASYNC_LOGGING
+		Logger::Init(true);
+#else
+		Logger::Init(false);
+#endif
 
 		bool SDL_verify = SDL_Init(SDL_INIT_VIDEO);
 		CORI_CORE_ASSERT_FATAL(SDL_verify, "SDL3 failed to initialized! SDL_Error: {}", std::string(SDL_GetError()));
@@ -17,5 +22,6 @@ namespace Cori {
 
 		CORI_CORE_INFO("Cori Engine stopped");
 		CORI_CORE_INFO("Bye");
+		spdlog::shutdown();
 	}
 }

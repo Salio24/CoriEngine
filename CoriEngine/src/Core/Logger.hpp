@@ -1,13 +1,15 @@
 ﻿#pragma once
 #include <spdlog/spdlog.h>
+#include <spdlog/async.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/fmt/fmt.h>
 #include <spdlog/fmt/bundled/color.h>
+#include <spdlog/fmt/bundled/base.h>
+#include <spdlog/fmt/bundled/format.h>
 
 namespace Cori {
-
 	enum class LogLevel {
 		TRACE,
 		DEBUG,
@@ -17,11 +19,9 @@ namespace Cori {
 		FATAL
 	};
 
-	// add tagging to logging (Renderer: blablabla, FSM: bla bla bla)
-
 	class Logger {
 	public:
-		static void Init();
+		static void Init(bool async);
 
 		inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
 		inline static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
@@ -47,6 +47,579 @@ namespace Cori {
 				return "False";
 			}
 		}
+
+		static void EnableCoreTag(std::string_view tag);
+		static void EnableCoreTags(std::initializer_list<const char*> tags);
+
+
+		static void DisableCoreTag(std::string_view tag);
+		static void DisableCoreTags(std::initializer_list<const char*> tags);
+
+		static bool IsCoreTagEnabled(std::string_view tag);
+		static void ClearCoreTagFilters();
+		static std::vector<std::string> GetCoreActiveTags();
+
+
+		static void EnableClientTag(std::string_view tag);
+		static void EnableClientTags(std::initializer_list<const char*> tags);
+
+
+		static void DisableClientTag(std::string_view tag);
+		static void DisableClientTags(std::initializer_list<const char*> tags);
+
+		static bool IsClientTagEnabled(std::string_view tag);
+		static void ClearClientTagFilters();
+		static std::vector<std::string> GetClientActiveTags();
+
+		template<typename... Args>
+		static void CoreLogTraceTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+			if (ShouldCoreLog(tags)) {
+
+				fmt::memory_buffer buffer;
+
+				for (const char* tag : tags) {
+					fmt::format_to(std::back_inserter(buffer), "{}", fmt::styled(fmt::format("[{}]", tag), fmt::fg(fmt::color::thistle)));
+				}
+
+				buffer.push_back(' ');
+
+				const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::light_cyan)));
+				const auto start_code_end = styled_dummy.find(' ');
+
+				const auto end_code_start = start_code_end + 1;
+				const std::string_view start_code(styled_dummy.data(), start_code_end);
+				const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+				buffer.append(start_code);
+				fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+				buffer.append(end_code);
+
+				s_CoreLogger->trace(std::string_view(buffer.data(), buffer.size()));
+			}
+		}
+
+		template<typename... Args>
+		static void CoreLogDebugTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+			if (ShouldCoreLog(tags)) {
+
+				fmt::memory_buffer buffer;
+
+				for (const char* tag : tags) {
+					fmt::format_to(std::back_inserter(buffer), "{}", fmt::styled(fmt::format("[{}]", tag), fmt::fg(fmt::color::cyan)));
+				}
+
+				buffer.push_back(' ');
+
+				const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::royal_blue)));
+				const auto start_code_end = styled_dummy.find(' ');
+
+				const auto end_code_start = start_code_end + 1;
+				const std::string_view start_code(styled_dummy.data(), start_code_end);
+				const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+				buffer.append(start_code);
+				fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+				buffer.append(end_code);
+
+				s_CoreLogger->debug(std::string_view(buffer.data(), buffer.size()));
+			}
+		}
+
+		template<typename... Args>
+		static void CoreLogInfoTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+			if (ShouldCoreLog(tags)) {
+
+				fmt::memory_buffer buffer;
+
+				for (const char* tag : tags) {
+					fmt::format_to(std::back_inserter(buffer), "{}", fmt::styled(fmt::format("[{}]", tag), fmt::fg(fmt::color::lime)));
+				}
+
+				buffer.push_back(' ');
+
+				const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::green_yellow)));
+				const auto start_code_end = styled_dummy.find(' ');
+
+				const auto end_code_start = start_code_end + 1;
+				const std::string_view start_code(styled_dummy.data(), start_code_end);
+				const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+				buffer.append(start_code);
+				fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+				buffer.append(end_code);
+
+				s_CoreLogger->info(std::string_view(buffer.data(), buffer.size()));
+			}
+		}
+
+		template<typename... Args>
+		static void CoreLogWarnTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+			if (ShouldCoreLog(tags)) {
+
+				fmt::memory_buffer buffer;
+
+				for (const char* tag : tags) {
+					fmt::format_to(std::back_inserter(buffer), "{}", fmt::styled(fmt::format("[{}]", tag), fmt::fg(fmt::color::yellow)));
+				}
+
+				buffer.push_back(' ');
+
+				const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::orange)));
+				const auto start_code_end = styled_dummy.find(' ');
+
+				const auto end_code_start = start_code_end + 1;
+				const std::string_view start_code(styled_dummy.data(), start_code_end);
+				const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+				buffer.append(start_code);
+				fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+				buffer.append(end_code);
+
+				s_CoreLogger->warn(std::string_view(buffer.data(), buffer.size()));
+			}
+		}
+
+		template<typename... Args>
+		static void CoreLogErrorTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+			if (ShouldCoreLog(tags)) {
+
+				fmt::memory_buffer buffer;
+
+				for (const char* tag : tags) {
+					fmt::format_to(std::back_inserter(buffer), "{}", fmt::styled(fmt::format("[{}]", tag), fmt::fg(fmt::color::magenta)));
+				}
+
+				buffer.push_back(' ');
+
+				const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::crimson)));
+				const auto start_code_end = styled_dummy.find(' ');
+
+				const auto end_code_start = start_code_end + 1;
+				const std::string_view start_code(styled_dummy.data(), start_code_end);
+				const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+				buffer.append(start_code);
+				fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+				buffer.append(end_code);
+
+				s_CoreLogger->error(std::string_view(buffer.data(), buffer.size()));
+			}
+		}
+
+		template<typename... Args>
+		static void CoreLogFatalTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+			if (ShouldCoreLog(tags)) {
+
+				fmt::memory_buffer buffer;
+
+				for (const char* tag : tags) {
+					fmt::format_to(std::back_inserter(buffer), "{}", fmt::styled(fmt::format("[{}]", tag), fmt::bg(fmt::color::red)));
+				}
+
+				buffer.push_back(' ');
+
+				const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::bg(fmt::color::red)));
+				const auto start_code_end = styled_dummy.find(' ');
+
+				const auto end_code_start = start_code_end + 1;
+				const std::string_view start_code(styled_dummy.data(), start_code_end);
+				const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+				buffer.append(start_code);
+				fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+				buffer.append(end_code);
+
+				s_CoreLogger->critical(std::string_view(buffer.data(), buffer.size()));
+			}
+		}
+
+
+
+		template<typename... Args>
+		static void ClientLogTraceTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+			if (ShouldClientLog(tags)) {
+
+				fmt::memory_buffer buffer;
+
+				for (const char* tag : tags) {
+					fmt::format_to(std::back_inserter(buffer), "{}", fmt::styled(fmt::format("[{}]", tag), fmt::fg(fmt::color::thistle)));
+				}
+
+				buffer.push_back(' ');
+
+				const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::light_cyan)));
+				const auto start_code_end = styled_dummy.find(' ');
+
+				const auto end_code_start = start_code_end + 1;
+				const std::string_view start_code(styled_dummy.data(), start_code_end);
+				const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+				buffer.append(start_code);
+				fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+				buffer.append(end_code);
+
+				s_ClientLogger->trace(std::string_view(buffer.data(), buffer.size()));
+			}
+		}
+
+		template<typename... Args>
+		static void ClientLogDebugTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+			if (ShouldClientLog(tags)) {
+
+				fmt::memory_buffer buffer;
+
+				for (const char* tag : tags) {
+					fmt::format_to(std::back_inserter(buffer), "{}", fmt::styled(fmt::format("[{}]", tag), fmt::fg(fmt::color::cyan)));
+				}
+
+				buffer.push_back(' ');
+
+				const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::royal_blue)));
+				const auto start_code_end = styled_dummy.find(' ');
+
+				const auto end_code_start = start_code_end + 1;
+				const std::string_view start_code(styled_dummy.data(), start_code_end);
+				const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+				buffer.append(start_code);
+				fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+				buffer.append(end_code);
+
+				s_ClientLogger->debug(std::string_view(buffer.data(), buffer.size()));
+			}
+		}
+
+		template<typename... Args>
+		static void ClientLogInfoTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+			if (ShouldClientLog(tags)) {
+
+				fmt::memory_buffer buffer;
+
+				for (const char* tag : tags) {
+					fmt::format_to(std::back_inserter(buffer), "{}", fmt::styled(fmt::format("[{}]", tag), fmt::fg(fmt::color::lime)));
+				}
+
+				buffer.push_back(' ');
+
+				const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::green_yellow)));
+				const auto start_code_end = styled_dummy.find(' ');
+
+				const auto end_code_start = start_code_end + 1;
+				const std::string_view start_code(styled_dummy.data(), start_code_end);
+				const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+				buffer.append(start_code);
+				fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+				buffer.append(end_code);
+
+				s_ClientLogger->info(std::string_view(buffer.data(), buffer.size()));
+			}
+		}
+
+		template<typename... Args>
+		static void ClientLogWarnTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+			if (ShouldClientLog(tags)) {
+
+				fmt::memory_buffer buffer;
+
+				for (const char* tag : tags) {
+					fmt::format_to(std::back_inserter(buffer), "{}", fmt::styled(fmt::format("[{}]", tag), fmt::fg(fmt::color::yellow)));
+				}
+
+				buffer.push_back(' ');
+
+				const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::orange)));
+				const auto start_code_end = styled_dummy.find(' ');
+
+				const auto end_code_start = start_code_end + 1;
+				const std::string_view start_code(styled_dummy.data(), start_code_end);
+				const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+				buffer.append(start_code);
+				fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+				buffer.append(end_code);
+
+				s_ClientLogger->warn(std::string_view(buffer.data(), buffer.size()));
+			}
+		}
+
+		template<typename... Args>
+		static void ClientLogErrorTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+			if (ShouldClientLog(tags)) {
+
+				fmt::memory_buffer buffer;
+
+				for (const char* tag : tags) {
+					fmt::format_to(std::back_inserter(buffer), "{}", fmt::styled(fmt::format("[{}]", tag), fmt::fg(fmt::color::magenta)));
+				}
+
+				buffer.push_back(' ');
+
+				const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::crimson)));
+				const auto start_code_end = styled_dummy.find(' ');
+
+				const auto end_code_start = start_code_end + 1;
+				const std::string_view start_code(styled_dummy.data(), start_code_end);
+				const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+				buffer.append(start_code);
+				fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+				buffer.append(end_code);
+
+				s_ClientLogger->error(std::string_view(buffer.data(), buffer.size()));
+			}
+		}
+
+		template<typename... Args>
+		static void ClientLogFatalTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+			if (ShouldClientLog(tags)) {
+
+				fmt::memory_buffer buffer;
+
+				for (const char* tag : tags) {
+					fmt::format_to(std::back_inserter(buffer), "{}", fmt::styled(fmt::format("[{}]", tag), fmt::bg(fmt::color::red)));
+				}
+
+				buffer.push_back(' ');
+
+				const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::bg(fmt::color::red)));
+				const auto start_code_end = styled_dummy.find(' ');
+
+				const auto end_code_start = start_code_end + 1;
+				const std::string_view start_code(styled_dummy.data(), start_code_end);
+				const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+				buffer.append(start_code);
+				fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+				buffer.append(end_code);
+
+				s_ClientLogger->critical(std::string_view(buffer.data(), buffer.size()));
+			}
+		}
+
+
+
+		template<typename... Args>
+		static void CoreLogTrace(const fmt::format_string<Args...>& fmt, Args&&... args) {
+			fmt::memory_buffer buffer;
+
+			const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::light_cyan)));
+			const auto start_code_end = styled_dummy.find(' ');
+
+			const auto end_code_start = start_code_end + 1;
+			const std::string_view start_code(styled_dummy.data(), start_code_end);
+			const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+			buffer.append(start_code);
+			fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+			buffer.append(end_code);
+
+			s_CoreLogger->trace(std::string_view(buffer.data(), buffer.size()));
+
+		}
+
+		template<typename... Args>
+		static void CoreLogDebug(const fmt::format_string<Args...>& fmt, Args&&... args) {
+			fmt::memory_buffer buffer;
+
+			const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::royal_blue)));
+			const auto start_code_end = styled_dummy.find(' ');
+
+			const auto end_code_start = start_code_end + 1;
+			const std::string_view start_code(styled_dummy.data(), start_code_end);
+			const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+			buffer.append(start_code);
+			fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+			buffer.append(end_code);
+
+			s_CoreLogger->debug(std::string_view(buffer.data(), buffer.size()));
+
+		}
+
+		template<typename... Args>
+		static void CoreLogInfo(const fmt::format_string<Args...>& fmt, Args&&... args) {
+			fmt::memory_buffer buffer;
+
+			const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::green_yellow)));
+			const auto start_code_end = styled_dummy.find(' ');
+
+			const auto end_code_start = start_code_end + 1;
+			const std::string_view start_code(styled_dummy.data(), start_code_end);
+			const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+			buffer.append(start_code);
+			fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+			buffer.append(end_code);
+
+			s_CoreLogger->info(std::string_view(buffer.data(), buffer.size()));
+
+		}
+
+		template<typename... Args>
+		static void CoreLogWarn(const fmt::format_string<Args...>& fmt, Args&&... args) {
+			fmt::memory_buffer buffer;
+
+			const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::orange)));
+			const auto start_code_end = styled_dummy.find(' ');
+
+			const auto end_code_start = start_code_end + 1;
+			const std::string_view start_code(styled_dummy.data(), start_code_end);
+			const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+			buffer.append(start_code);
+			fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+			buffer.append(end_code);
+
+			s_CoreLogger->warn(std::string_view(buffer.data(), buffer.size()));
+		}
+
+		template<typename... Args>
+		static void CoreLogError(const fmt::format_string<Args...>& fmt, Args&&... args) {
+			fmt::memory_buffer buffer;
+
+			const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::crimson)));
+			const auto start_code_end = styled_dummy.find(' ');
+
+			const auto end_code_start = start_code_end + 1;
+			const std::string_view start_code(styled_dummy.data(), start_code_end);
+			const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+			buffer.append(start_code);
+			fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+			buffer.append(end_code);
+
+			s_CoreLogger->error(std::string_view(buffer.data(), buffer.size()));
+		}
+
+		template<typename... Args>
+		static void CoreLogFatal(const fmt::format_string<Args...>& fmt, Args&&... args) {
+			fmt::memory_buffer buffer;
+
+			const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::bg(fmt::color::red)));
+			const auto start_code_end = styled_dummy.find(' ');
+
+			const auto end_code_start = start_code_end + 1;
+			const std::string_view start_code(styled_dummy.data(), start_code_end);
+			const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+			buffer.append(start_code);
+			fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+			buffer.append(end_code);
+
+			s_CoreLogger->critical(std::string_view(buffer.data(), buffer.size()));
+		}
+
+
+
+		template<typename... Args>
+		static void ClientLogTrace(const fmt::format_string<Args...>& fmt, Args&&... args) {
+			fmt::memory_buffer buffer;
+
+			const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::light_cyan)));
+			const auto start_code_end = styled_dummy.find(' ');
+
+			const auto end_code_start = start_code_end + 1;
+			const std::string_view start_code(styled_dummy.data(), start_code_end);
+			const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+			buffer.append(start_code);
+			fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+			buffer.append(end_code);
+
+			s_ClientLogger->trace(std::string_view(buffer.data(), buffer.size()));
+		}
+
+		template<typename... Args>
+		static void ClientLogDebug(const fmt::format_string<Args...>& fmt, Args&&... args) {
+			fmt::memory_buffer buffer;
+
+			const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::royal_blue)));
+			const auto start_code_end = styled_dummy.find(' ');
+
+			const auto end_code_start = start_code_end + 1;
+			const std::string_view start_code(styled_dummy.data(), start_code_end);
+			const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+			buffer.append(start_code);
+			fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+			buffer.append(end_code);
+
+			s_ClientLogger->debug(std::string_view(buffer.data(), buffer.size()));
+		}
+
+		template<typename... Args>
+		static void ClientLogInfo(const fmt::format_string<Args...>& fmt, Args&&... args) {
+			fmt::memory_buffer buffer;
+
+			const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::green_yellow)));
+			const auto start_code_end = styled_dummy.find(' ');
+
+			const auto end_code_start = start_code_end + 1;
+			const std::string_view start_code(styled_dummy.data(), start_code_end);
+			const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+			buffer.append(start_code);
+			fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+			buffer.append(end_code);
+
+			s_ClientLogger->info(std::string_view(buffer.data(), buffer.size()));
+		}
+
+		template<typename... Args>
+		static void ClientLogWarn(const fmt::format_string<Args...>& fmt, Args&&... args) {
+			fmt::memory_buffer buffer;
+
+			const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::orange)));
+			const auto start_code_end = styled_dummy.find(' ');
+
+			const auto end_code_start = start_code_end + 1;
+			const std::string_view start_code(styled_dummy.data(), start_code_end);
+			const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+			buffer.append(start_code);
+			fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+			buffer.append(end_code);
+
+			s_ClientLogger->warn(std::string_view(buffer.data(), buffer.size()));
+		}
+
+		template<typename... Args>
+		static void ClientLogError(const fmt::format_string<Args...>& fmt, Args&&... args) {
+			fmt::memory_buffer buffer;
+
+			const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::crimson)));
+			const auto start_code_end = styled_dummy.find(' ');
+
+			const auto end_code_start = start_code_end + 1;
+			const std::string_view start_code(styled_dummy.data(), start_code_end);
+			const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+			buffer.append(start_code);
+			fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+			buffer.append(end_code);
+
+			s_ClientLogger->error(std::string_view(buffer.data(), buffer.size()));
+		}
+
+		template<typename... Args>
+		static void ClientLogFatal(const fmt::format_string<Args...>& fmt, Args&&... args) {
+			fmt::memory_buffer buffer;
+
+			const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::bg(fmt::color::red)));
+			const auto start_code_end = styled_dummy.find(' ');
+
+			const auto end_code_start = start_code_end + 1;
+			const std::string_view start_code(styled_dummy.data(), start_code_end);
+			const std::string_view end_code(styled_dummy.data() + end_code_start, styled_dummy.size() - end_code_start);
+
+			buffer.append(start_code);
+			fmt::vformat_to(std::back_inserter(buffer), fmt, fmt::make_format_args(args...));
+			buffer.append(end_code);
+
+			s_ClientLogger->critical(std::string_view(buffer.data(), buffer.size()));
+		}
+
 
 		static void SampleColors() {
 			GetCoreLogger()->debug("Sample Text Start Here!!!!!!!!!!!!!!!!!!!!");
@@ -191,11 +764,29 @@ namespace Cori {
 			GetCoreLogger()->debug("{}", ColoredText("Sample Text color: white_smoke", fmt::color::white_smoke));
 			GetCoreLogger()->debug("{}", ColoredText("Sample Text color: yellow", fmt::color::yellow));
 			GetCoreLogger()->debug("{}", ColoredText("Sample Text color: yellow_green", fmt::color::yellow_green));
-}
+		}
 
 	private:
+		static bool ShouldCoreLog(std::initializer_list<const char*> tags);
+		static bool ShouldClientLog(std::initializer_list<const char*> tags);
+
+		struct StringHash {
+			using is_transparent = void;
+			[[nodiscard]] size_t operator()(const char* txt) const {
+				return std::hash<std::string_view>{}(txt);
+			}
+			[[nodiscard]] size_t operator()(std::string_view txt) const {
+				return std::hash<std::string_view>{}(txt);
+			}
+			[[nodiscard]] size_t operator()(const std::string& txt) const {
+				return std::hash<std::string_view>{}(txt);
+			}
+		};
+
 		static std::shared_ptr<spdlog::logger> s_CoreLogger;
 		static std::shared_ptr<spdlog::logger> s_ClientLogger;
+		static std::unordered_set<std::string, StringHash, std::equal_to<>> s_CoreActiveTags;
+		static std::unordered_set<std::string, StringHash, std::equal_to<>> s_ClientActiveTags;
 	};
 }
 
@@ -203,30 +794,28 @@ const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') + "]: ";
 
 #ifdef DEBUG_BUILD
 
-#define CORI_CORE_TRACE(...) ::Cori::Logger::GetCoreLogger()->trace(__VA_ARGS__)
-#define CORI_CORE_DEBUG(...) ::Cori::Logger::GetCoreLogger()->debug(__VA_ARGS__)
-#define CORI_CORE_INFO(...)  ::Cori::Logger::GetCoreLogger()->info(__VA_ARGS__)
+#define CORI_CORE_TRACE(...) ::Cori::Logger::CoreLogTrace(__VA_ARGS__)
+#define CORI_CORE_DEBUG(...) ::Cori::Logger::CoreLogDebug(__VA_ARGS__)
+#define CORI_CORE_INFO(...)  ::Cori::Logger::CoreLogInfo(__VA_ARGS__)
 
-#else 
+#else
 
 #define CORI_CORE_TRACE(...)
 #define CORI_CORE_DEBUG(...)
 #define CORI_CORE_INFO(...)
 
-#endif 
+#endif
 
-#define CORI_CORE_WARN(...)  ::Cori::Logger::GetCoreLogger()->warn(__VA_ARGS__)
-#define CORI_CORE_ERROR(...) ::Cori::Logger::GetCoreLogger()->error(__VA_ARGS__)
-#define CORI_CORE_FATAL(...) ::Cori::Logger::GetCoreLogger()->critical(__VA_ARGS__)
+#define CORI_CORE_WARN(...)  ::Cori::Logger::CoreLogWarn(__VA_ARGS__)
+#define CORI_CORE_ERROR(...) ::Cori::Logger::CoreLogWarn(__VA_ARGS__)
+#define CORI_CORE_FATAL(...) ::Cori::Logger::CoreLogWarn(__VA_ARGS__)
 
-#define CORI_TRACE(...)      ::Cori::Logger::GetClientLogger()->trace(__VA_ARGS__)
-#define CORI_DEBUG(...)      ::Cori::Logger::GetClientLogger()->debug(__VA_ARGS__)
-#define CORI_INFO(...)       ::Cori::Logger::GetClientLogger()->info(__VA_ARGS__)
-#define CORI_WARN(...)       ::Cori::Logger::GetClientLogger()->warn(__VA_ARGS__)
-#define CORI_ERROR(...)      ::Cori::Logger::GetClientLogger()->error(__VA_ARGS__)
-#define CORI_FATAL(...)      ::Cori::Logger::GetClientLogger()->critical(__VA_ARGS__)
-
-// TODO: utilize pretty_function in asserts and verfies
+#define CORI_TRACE(...)      ::Cori::Logger::ClientLogTrace(__VA_ARGS__)
+#define CORI_DEBUG(...)      ::Cori::Logger::ClientLogDebug(__VA_ARGS__)
+#define CORI_INFO(...)       ::Cori::Logger::ClientLogInfo(__VA_ARGS__)
+#define CORI_WARN(...)       ::Cori::Logger::ClientLogWarn(__VA_ARGS__)
+#define CORI_ERROR(...)      ::Cori::Logger::ClientLogError(__VA_ARGS__)
+#define CORI_FATAL(...)      ::Cori::Logger::ClientLogFatal(__VA_ARGS__)
 
 #ifdef DEBUG_BUILD
 
@@ -236,18 +825,11 @@ const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') + "]: ";
 #define CORI_CORE_ASSERT_ERROR(x, ...) (!(x) ? (CORI_CORE_ERROR("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_ERROR("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
 #define CORI_CORE_ASSERT_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_FATAL("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), __builtin_debugtrap(), true) : false)
 
-//#define CORI_CORE_ASSERT_DEBUG(x, message, ...) ((!(x)) ? (CORI_CORE_DEBUG("Assertion '{}' failed in function '{}' (Line {}). Message: " message, #x, __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__), true) : false)
-//#define CORI_CORE_ASSERT_INFO(x, message, ...) ((!(x)) ? (CORI_CORE_INFO("Assertion '{}' failed in function '{}' (Line {}). Message: " message, #x, __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__), true) : false)
-//#define CORI_CORE_ASSERT_WARN(x, message, ...) ((!(x)) ? (CORI_CORE_WARN("Assertion '{}' failed in function '{}' (Line {}). Message: " message, #x, __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__), true) : false)
-//#define CORI_CORE_ASSERT_ERROR(x, message, ...) ((!(x)) ? (CORI_CORE_ERROR("Assertion '{}' failed in function '{}' (Line {}). Message: " message, #x, __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__), true) : false)
-//#define CORI_CORE_ASSERT_FATAL(x, message, ...) ((!(x)) ? (CORI_CORE_FATAL("Assertion '{}' failed in function '{}' (Line {}). Message: " message, #x, __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__), __builtin_debugtrap(), true) : false)
-
-
-#define CORI_CORE_VERIFY_DEBUG(x, ...) (!(x) ? (CORI_CORE_DEBUG("Verify Failed: " __VA_ARGS__), true) : false)
-#define CORI_CORE_VERIFY_INFO(x, ...)  (!(x) ? (CORI_CORE_INFO("Verify Failed: " __VA_ARGS__), true) : false)
-#define CORI_CORE_VERIFY_WARN(x, ...)  (!(x) ? (CORI_CORE_WARN("Verify Failed: " __VA_ARGS__), true) : false)
-#define CORI_CORE_VERIFY_ERROR(x, ...) (!(x) ? (CORI_CORE_ERROR("Verify Failed: " __VA_ARGS__), true) : false)
-#define CORI_CORE_VERIFY_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Verify Failed: " __VA_ARGS__), __builtin_debugtrap(), true) : false)
+#define CORI_CORE_VERIFY_DEBUG(x, ...) (!(x) ? (CORI_CORE_DEBUG("Verify Failed, message: " __VA_ARGS__), CORI_CORE_DEBUG("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
+#define CORI_CORE_VERIFY_INFO(x, ...)  (!(x) ? (CORI_CORE_INFO("Verify Failed, message: " __VA_ARGS__), CORI_CORE_INFO("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
+#define CORI_CORE_VERIFY_WARN(x, ...)  (!(x) ? (CORI_CORE_WARN("Verify Failed, message: " __VA_ARGS__), CORI_CORE_WARN("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
+#define CORI_CORE_VERIFY_ERROR(x, ...) (!(x) ? (CORI_CORE_ERROR("Verify Failed, message: " __VA_ARGS__), CORI_CORE_ERROR("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
+#define CORI_CORE_VERIFY_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Verify Failed, message: " __VA_ARGS__), CORI_CORE_FATAL("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), __builtin_debugtrap(), true) : false)
 
 #else
 
@@ -265,8 +847,22 @@ const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') + "]: ";
 
 #endif
 
-#define CORI_ASSERT_DEBUG(x, ...) (!(x) ? (CORI_DEBUG("Assertion Failed: " __VA_ARGS__), true) : false)
-#define CORI_ASSERT_INFO(x, ...)  (!(x) ? (CORI_INFO("Assertion Failed: " __VA_ARGS__), true) : false)
-#define CORI_ASSERT_WARN(x, ...)  (!(x) ? (CORI_WARN("Assertion Failed: " __VA_ARGS__), true) : false)
-#define CORI_ASSERT_ERROR(x, ...) (!(x) ? (CORI_ERROR("Assertion Failed: " __VA_ARGS__), true) : false)
-#define CORI_ASSERT_FATAL(x, ...) (!(x) ? (CORI_FATAL("Assertion Failed: " __VA_ARGS__), __builtin_debugtrap(), true) : false)
+#define CORI_ASSERT_DEBUG(x, ...) (!(x) ? (CORI_DEBUG("Assertion Failed, message: " __VA_ARGS__), CORI_DEBUG("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
+#define CORI_ASSERT_INFO(x, ...)  (!(x) ? (CORI_INFO("Assertion Failed, message: " __VA_ARGS__), CORI_INFO("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
+#define CORI_ASSERT_WARN(x, ...)  (!(x) ? (CORI_WARN("Assertion Failed, message: " __VA_ARGS__), CORI_WARN("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
+#define CORI_ASSERT_ERROR(x, ...) (!(x) ? (CORI_ERROR("Assertion Failed, message: " __VA_ARGS__), CORI_ERROR("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
+#define CORI_ASSERT_FATAL(x, ...) (!(x) ? (CORI_FATAL("Assertion Failed, message: " __VA_ARGS__), CORI_FATAL("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), __builtin_debugtrap(), true) : false)
+
+#define CORI_CORE_TRACE_TAGGED(...) ::Cori::Logger::CoreLogTraceTagged(__VA_ARGS__)
+#define CORI_CORE_DEBUG_TAGGED(...) ::Cori::Logger::CoreLogDebugTagged(__VA_ARGS__)
+#define CORI_CORE_INFO_TAGGED(...)  ::Cori::Logger::CoreLogInfoTagged(__VA_ARGS__)
+#define CORI_CORE_WARN_TAGGED(...)  ::Cori::Logger::CoreLogWarnTagged(__VA_ARGS__)
+#define CORI_CORE_ERROR_TAGGED(...) ::Cori::Logger::CoreLogErrorTagged(__VA_ARGS__)
+#define CORI_CORE_FATAL_TAGGED(...) ::Cori::Logger::CoreLogFatalTagged(__VA_ARGS__)
+
+#define CORI_TRACE_TAGGED(...) ::Cori::Logger::ClientLogTraceTagged(__VA_ARGS__)
+#define CORI_DEBUG_TAGGED(...) ::Cori::Logger::ClientLogDebugTagged(__VA_ARGS__)
+#define CORI_INFO_TAGGED(...)  ::Cori::Logger::ClientLogInfoTagged(__VA_ARGS__)
+#define CORI_WARN_TAGGED(...)  ::Cori::Logger::ClientLogWarnTagged(__VA_ARGS__)
+#define CORI_ERROR_TAGGED(...) ::Cori::Logger::ClientLogErrorTagged(__VA_ARGS__)
+#define CORI_FATAL_TAGGED(...) ::Cori::Logger::ClientLogFatalTagged(__VA_ARGS__)

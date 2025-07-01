@@ -3,9 +3,14 @@
 #include <glm/ext/matrix_transform.hpp>
 
 namespace Cori {
-	void CameraController::CreateOrthoCamera(float left, float right, float bottom, float top, float zNear /*= -1.0f*/, float zFar /*= 1.0f*/) {
+	void CameraController::CreateOrthoCamera(float left, float right, float bottom, float top, float zNear /*= -10.0f*/, float zFar /*= 0.0f*/) {
 		m_CurrentCameraComponent->m_ProjectionMatrix = glm::ortho(left, right, bottom, top, zNear, zFar);
 		m_CurrentCameraComponent->m_ViewProjectionMatrix = m_CurrentCameraComponent->m_ProjectionMatrix;
+		m_CurrentCameraComponent->m_InitialCameraMinBound = { left, bottom };
+		m_CurrentCameraComponent->m_InitialCameraMaxBound = { right, top };
+		m_CurrentCameraComponent->m_CameraMinBound = { left, bottom };
+		m_CurrentCameraComponent->m_CameraMaxBound = { right, top };
+
 		CORI_CORE_DEBUG("Created orthographic camera with properties - (left: {}, right: {}, bottom: {}, top: {}, zNear: {}, zFar: {})", left, right, bottom, top, zNear, zFar);
 	}
 
@@ -32,6 +37,10 @@ namespace Cori {
 
 		m_CurrentCameraComponent->m_ViewProjectionMatrix = m_CurrentCameraComponent->m_ProjectionMatrix * view;
 
+		// idk maybe add rotation support?
+		// but rotation looks awful with pixelart
+		m_CurrentCameraComponent->m_CameraMinBound = { (m_CurrentCameraComponent->m_InitialCameraMinBound.x + m_CurrentCameraComponent->m_CameraPosition.x) * m_CurrentCameraComponent->m_CameraZoomFactor, (m_CurrentCameraComponent->m_InitialCameraMinBound.y + m_CurrentCameraComponent->m_CameraPosition.y) * m_CurrentCameraComponent->m_CameraZoomFactor };
+		m_CurrentCameraComponent->m_CameraMaxBound = { (m_CurrentCameraComponent->m_InitialCameraMaxBound.x + m_CurrentCameraComponent->m_CameraPosition.x) * m_CurrentCameraComponent->m_CameraZoomFactor, (m_CurrentCameraComponent->m_InitialCameraMaxBound.y + m_CurrentCameraComponent->m_CameraPosition.y) * m_CurrentCameraComponent->m_CameraZoomFactor };
 	}
 
 

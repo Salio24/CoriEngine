@@ -17,8 +17,6 @@ namespace Cori {
 		if (CORI_CORE_ASSERT_ERROR(!name.empty(), "Scene name cannot be empty!")) { return; }
 		if (CORI_CORE_ASSERT_ERROR(m_Scenes.contains(name), "Can't destroy scene, scene '{0}' does not exist!", name)) { return; }
 
-
-
 		CORI_CORE_INFO("SceneManager: Destroying scene '{0}'", name);
 
 		if (m_Scenes.at(name).use_count() == 1) {

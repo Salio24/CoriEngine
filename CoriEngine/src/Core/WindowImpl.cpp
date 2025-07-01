@@ -32,7 +32,7 @@ namespace Cori {
 			break;
 		case GraphicsAPIs::OpenGL:
 			m_Window = SDL_CreateWindow(m_Data.Title.c_str(), m_Data.Width, m_Data.Height, SDL_WINDOW_OPENGL);
-			CORI_CORE_ASSERT_FATAL(!!m_Window, "Window could not be created! SDL_Error: " + std::string(SDL_GetError()));
+			CORI_CORE_ASSERT_FATAL(m_Window, "Window could not be created! SDL_Error: {}", std::string(SDL_GetError()));
 			break;
 		case GraphicsAPIs::Vulkan:
 			CORI_CORE_ASSERT_FATAL(false ,"Vulkan is not supported yet");
@@ -53,13 +53,13 @@ namespace Cori {
 
 		m_Context->Init(m_Window);
 
-		CORI_CORE_INFO('"' + m_Data.Title + '"' + " Window Created");
+		CORI_CORE_INFO(" '{}'' Window Created", m_Data.Title);
 	}
 
 	void WindowImpl::Shutdown() {
 		SDL_DestroyWindow(m_Window);
 
-		CORI_CORE_INFO('"' + m_Data.Title + '"' + " Window Destroyed");
+		CORI_CORE_INFO(" '{}'' Window Destroyed", m_Data.Title);
 	}
 
 	void WindowImpl::OnUpdate() {

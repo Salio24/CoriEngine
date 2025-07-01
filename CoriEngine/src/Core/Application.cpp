@@ -81,8 +81,6 @@ namespace Cori {
 		Get().m_LayerStack.PushOverlayToQueue(layer);
 	}
 
-
-
 	void Application::Run() {
 		while(m_Running) {
 			CORI_PROFILER_FRAME_START();

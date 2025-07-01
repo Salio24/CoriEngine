@@ -101,7 +101,8 @@ namespace Cori {
 		s_VertexBuffer_TexturedQuad = VertexBuffer::Create();
 		s_VertexBuffer_TexturedQuad->SetLayout({
 			{ ShaderDataType::Vec2, "a_Position" },
-			{ ShaderDataType::Vec2, "a_TexturePosition" }
+			{ ShaderDataType::Vec2, "a_TexturePosition" },
+			{ ShaderDataType::Float, "a_Layer" }
 		});
 
 		s_VertexBuffer_TexturedQuad->Init(nullptr, s_MaxVertexCount * s_VertexBuffer_TexturedQuad->GetLayout().GetStrinde(), DRAW_TYPE::DYNAMIC);
@@ -112,7 +113,7 @@ namespace Cori {
 
 		s_VertexDataBuffer_TexturedQuad = new TexturedQuadVertexSetup[static_cast<size_t>(s_MaxIndexCount)];
 
-		CORI_CORE_INFO("Renderer2D: Initialization has been successfully");
+		CORI_CORE_INFO("Renderer2D: Initialization has been successful");
 
 	}
 
@@ -261,7 +262,7 @@ namespace Cori {
 		//s_CurrentTexture_TexturedQuad.reset();
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const glm::vec2 UVmin, const glm::vec2 UVmax) {
+	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const glm::vec2 UVmin, const glm::vec2 UVmax, const float layer) {
 
 		if (CORI_CORE_ASSERT_ERROR(s_BatchActive, "You're trying to call DrawQuad, but you have not started a batch, it will not work.")) { return; }
 		if (CORI_CORE_ASSERT_ERROR(texture, "Texture is nullptr, trying to avoid read access violation")) { return; }
@@ -291,25 +292,29 @@ namespace Cori {
 
 		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x, position.y };
 		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { UVmin.x, UVmin.y };
+		s_VertexDataBufferPtr_TexturedQuad->Layer = layer;
 		s_VertexDataBufferPtr_TexturedQuad++;
 
 		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x + size.x, position.y };
 		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { UVmax.x, UVmin.y };
+		s_VertexDataBufferPtr_TexturedQuad->Layer = layer;
 		s_VertexDataBufferPtr_TexturedQuad++;
 
 		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x + size.x, position.y + size.y };
 		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { UVmax.x, UVmax.y };
+		s_VertexDataBufferPtr_TexturedQuad->Layer = layer;
 		s_VertexDataBufferPtr_TexturedQuad++;
 
 		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x, position.y + size.y };
 		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { UVmin.x, UVmax.y };
+		s_VertexDataBufferPtr_TexturedQuad->Layer = layer;
 		s_VertexDataBufferPtr_TexturedQuad++;
 
 		s_IndexCount_TexturedQuad += 6;
 
 	}
 
-	void Renderer2D::DrawQuadFlipped(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const glm::vec2 UVmin, const glm::vec2 UVmax) {
+	void Renderer2D::DrawQuadFlipped(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const glm::vec2 UVmin, const glm::vec2 UVmax, const float layer) {
 
 		if (CORI_CORE_ASSERT_ERROR(s_BatchActive, "You're trying to call DrawQuad, but you have not started a batch, it will not work.")) { return; }
 		if (CORI_CORE_ASSERT_ERROR(texture, "Texture is nullptr, trying to avoid read access violation")) { return; }
@@ -339,30 +344,34 @@ namespace Cori {
 
 		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x, position.y };
 		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { UVmax.x, UVmin.y };
+		s_VertexDataBufferPtr_TexturedQuad->Layer = layer;
 		s_VertexDataBufferPtr_TexturedQuad++;
 
 		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x + size.x, position.y };
 		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { UVmin.x, UVmin.y };
+		s_VertexDataBufferPtr_TexturedQuad->Layer = layer;
 		s_VertexDataBufferPtr_TexturedQuad++;
 
 		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x + size.x, position.y + size.y };
 		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { UVmin.x, UVmax.y };
+		s_VertexDataBufferPtr_TexturedQuad->Layer = layer;
 		s_VertexDataBufferPtr_TexturedQuad++;
 
 		s_VertexDataBufferPtr_TexturedQuad->Position = { position.x, position.y + size.y };
 		s_VertexDataBufferPtr_TexturedQuad->TexturePosition = { UVmax.x, UVmax.y };
+		s_VertexDataBufferPtr_TexturedQuad->Layer = layer;
 		s_VertexDataBufferPtr_TexturedQuad++;
 
 		s_IndexCount_TexturedQuad += 6;
 
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const UVs& uvs, bool flipped) {
+	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const UVs& uvs, const float layer, bool flipped) {
 		if (flipped) {
-			DrawQuadFlipped(position, size, texture, uvs.UVmin, uvs.UVmax);
+			DrawQuadFlipped(position, size, texture, uvs.UVmin, uvs.UVmax, layer);
 		}
 		else {
-			DrawQuad(position, size, texture, uvs.UVmin, uvs.UVmax);
+			DrawQuad(position, size, texture, uvs.UVmin, uvs.UVmax, layer);
 		}
 
 	}
@@ -370,11 +379,11 @@ namespace Cori {
 
 
 	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<SpriteAtlas>& atlas, uint32_t index) {
-		DrawQuad(position, size, atlas->GetTexture(), atlas->GetSpriteUVsAtIndex(index));
+		DrawQuad(position, size, atlas->GetTexture(), atlas->GetSpriteUVsAtIndex(index), 5.0f);
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Sprite>& sprite) {
-		DrawQuad(position, size, sprite->GetTexture(), sprite->GetUVs());
+		DrawQuad(position, size, sprite->GetTexture(), sprite->GetUVs(), 5.0f);
 	}
 
 }

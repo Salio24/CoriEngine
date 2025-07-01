@@ -18,6 +18,7 @@ namespace Cori {
 	struct TexturedQuadVertexSetup {
 		glm::vec2 Position{ 0.0f };
 		glm::vec2 TexturePosition{ 0.0f };
+		float Layer{ 0.0f };
 	};
 
 	enum class BatchDrawType {
@@ -44,11 +45,11 @@ namespace Cori {
 
 		static void DrawQuad(const glm::vec2 position, const glm::vec2 size, const glm::vec4& color);
 
-		static void DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const glm::vec2 UVmin = glm::vec2(0.0f), const glm::vec2 UVmax = glm::vec2(1.0f));
+		static void DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const glm::vec2 UVmin = glm::vec2(0.0f), const glm::vec2 UVmax = glm::vec2(1.0f), const float layer = 5.0f);
 
-		static void DrawQuadFlipped(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const glm::vec2 UVmin = glm::vec2(0.0f), const glm::vec2 UVmax = glm::vec2(1.0f));
+		static void DrawQuadFlipped(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const glm::vec2 UVmin = glm::vec2(0.0f), const glm::vec2 UVmax = glm::vec2(1.0f), const float layer = 5.0f);
 
-		static void DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const UVs& uvs, bool flipped = false);
+		static void DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const UVs& uvs, const float layer, bool flipped = false);
 		
 		static void DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<SpriteAtlas>& atlas, uint32_t index);
 

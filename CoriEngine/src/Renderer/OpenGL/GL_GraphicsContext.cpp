@@ -30,7 +30,7 @@ namespace Cori {
 
 	void OpenGLContext::Init(SDL_Window* window) {
 		m_Context = SDL_GL_CreateContext(window);
-		CORI_CORE_ASSERT_FATAL(!!m_Context, "OpenGL context could not be created! SDL_Error: " + std::string(SDL_GetError()));
+		CORI_CORE_ASSERT_FATAL(m_Context, "OpenGL context could not be created! SDL_Error: {}", std::string(SDL_GetError()));
 
 		int glad_version = gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress);
 		CORI_CORE_ASSERT_FATAL(glad_version != 0, "Failed to initialize GLAD");

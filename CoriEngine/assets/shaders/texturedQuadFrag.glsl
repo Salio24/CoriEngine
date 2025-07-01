@@ -7,5 +7,9 @@ in vec2 v_TexturePosition;
 uniform sampler2D u_Texture;
 
 void main() {
-	color = texture(u_Texture, v_TexturePosition);
+	vec4 color_ = texture(u_Texture, v_TexturePosition);
+	if (color_.a == 0.0) {
+		discard;
+	}
+	color = color_;
 }

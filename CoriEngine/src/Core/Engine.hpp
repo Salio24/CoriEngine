@@ -1,4 +1,5 @@
 #pragma once
+#include <UserDefines.hpp>
 
 namespace Cori {
 
