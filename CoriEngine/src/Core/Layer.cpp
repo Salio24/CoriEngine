@@ -3,6 +3,7 @@
 #include "Layer.hpp"
 #include "SceneSystem/SceneManager.hpp"
 
+
 namespace Cori {
 	
 	Layer::Layer(const std::string& name) : m_DebugName(name) {
@@ -25,7 +26,7 @@ namespace Cori {
 		if (CORI_CORE_ASSERT_ERROR(!name.empty(), "Scene name cannot be empty!")) { return; }
 
 		CORI_CORE_DEBUG("Layer: Binding scene '{0}'", name);
-		std::shared_ptr<Scene> scene = SceneManager::Get().GetScene(name);
+		std::shared_ptr<Scene> scene = SceneManager::GetScene(name);
 		
 		bool success = scene->OnBind(CORI_BIND_EVENT_FN(Layer::OnEvent, CORI_PLACEHOLDERS(1)));
 

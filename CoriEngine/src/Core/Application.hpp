@@ -9,6 +9,7 @@
 #include "Renderer/VertexArray.hpp"
 #include "Renderer/ShaderProgram.hpp"
 #include "AssetManager/AssetManager.hpp"
+#include "SceneSystem/SceneManager.hpp"
 #include "Time.hpp"
 
 namespace Cori {
@@ -29,12 +30,26 @@ namespace Cori {
 		inline static GameTimer& GetGameTimer() { return Get().m_GameTimer; }
 
 		inline static GraphicsAPIs GetCurrentAPI() { return GetWindow().GetAPI(); }
-
+		
+		
+		
+		
 		inline static uint64_t GetTest() { return Get().test123; }
 
 		uint64_t test123{ 0 };
 
+	protected:
+
+		friend class AssetManager;
+		friend class SceneManager;
+
+		inline static AssetManager* GetAssetManager() { return &(*s_Instance).m_AssetManager; }
+
+		inline static SceneManager* GetSceneManager() { return &(*s_Instance).m_SceneManager; }
+
 	private: 
+
+		
 
 		// idk if i even need this Get func
 		inline static Application& Get() { return *s_Instance; }
@@ -47,9 +62,13 @@ namespace Cori {
 
 		std::unique_ptr<Window> m_Window;
 
+
+		AssetManager m_AssetManager;
+
 		ImGuiLayer* m_ImGuiLayer;
 
 		LayerStack m_LayerStack;
+		SceneManager m_SceneManager;
 
 		GameTimer m_GameTimer;
 

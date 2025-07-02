@@ -6,8 +6,8 @@ namespace Cori {
 	std::shared_ptr<spdlog::logger> Logger::s_CoreLogger;
 	std::shared_ptr<spdlog::logger> Logger::s_ClientLogger;
 
-	std::unordered_set<std::string, Logger::StringHash, std::equal_to<>> Logger::s_CoreActiveTags;
-	std::unordered_set<std::string, Logger::StringHash, std::equal_to<>> Logger::s_ClientActiveTags;
+	std::unordered_set<std::string, Logger::StringHash, std::equal_to<>> Logger::s_CoreInactiveTags;
+	std::unordered_set<std::string, Logger::StringHash, std::equal_to<>> Logger::s_ClientInactiveTags;
 
 	static std::mutex s_CoreTagMutex;
 	static std::mutex s_ClientTagMutex;
@@ -119,106 +119,114 @@ namespace Cori {
 
 	void Logger::EnableCoreTag(std::string_view tag) {
 		std::lock_guard<std::mutex> lock(s_CoreTagMutex);
-		s_CoreActiveTags.insert(std::string(tag));
+		s_CoreInactiveTags.erase(std::string(tag));
 	}
 
 	void Logger::EnableCoreTags(std::initializer_list<const char*> tags) {
 		std::lock_guard<std::mutex> lock(s_CoreTagMutex);
 		for (const char* tag : tags) {
-			s_CoreActiveTags.insert(tag);
+			s_CoreInactiveTags.erase(tag);
 		}
 	}
 
 	void Logger::DisableCoreTag(std::string_view tag) {
 		std::lock_guard<std::mutex> lock(s_CoreTagMutex);
-		s_CoreActiveTags.erase(std::string(tag));
+		s_CoreInactiveTags.insert(std::string(tag));
 	}
 
 	void Logger::DisableCoreTags(std::initializer_list<const char*> tags) {
 		std::lock_guard<std::mutex> lock(s_CoreTagMutex);
-		if (!s_CoreActiveTags.empty()) {
-			for (const char* tag : tags) {
-				if (IsCoreTagEnabled(tag)) {
-					s_CoreActiveTags.erase(tag);
-				}
-			}
+		for (const char* tag : tags) {
+			s_CoreInactiveTags.insert(tag);
 		}
 	}
 
-	bool Logger::IsCoreTagEnabled(std::string_view tag) {
+	bool Logger::IsCoreTagDisabled(std::string_view tag) {
 		std::lock_guard<std::mutex> lock(s_CoreTagMutex);
-		return s_CoreActiveTags.contains(tag);
+		return s_CoreInactiveTags.contains(tag);
 	}
 
-	void Logger::ClearCoreTagFilters() {
+	void Logger::ClearCoreTagFilter() {
 		std::lock_guard<std::mutex> lock(s_CoreTagMutex);
-		s_CoreActiveTags.clear();
+		s_CoreInactiveTags.clear();
 	}
 
+
+	std::vector<std::string> Logger::GetCoreInactiveTags() {
+		std::vector<std::string> result;
+		result.reserve(s_CoreInactiveTags.size());
+		result.insert(result.end(), s_CoreInactiveTags.begin(), s_CoreInactiveTags.end());
+		return result;
+	}
 
 	void Logger::EnableClientTag(std::string_view tag) {
 		std::lock_guard<std::mutex> lock(s_ClientTagMutex);
-		s_ClientActiveTags.insert(std::string(tag));
+		s_ClientInactiveTags.erase(std::string(tag));
 	}
 
 	void Logger::EnableClientTags(std::initializer_list<const char*> tags) {
 		std::lock_guard<std::mutex> lock(s_ClientTagMutex);
 		for (const char* tag : tags) {
-			s_ClientActiveTags.insert(tag);
+			s_ClientInactiveTags.erase(tag);
 		}
 	}
 
 	void Logger::DisableClientTag(std::string_view tag) {
 		std::lock_guard<std::mutex> lock(s_ClientTagMutex);
-		s_ClientActiveTags.erase(std::string(tag));
+		s_ClientInactiveTags.insert(std::string(tag));
 	}
 
 	void Logger::DisableClientTags(std::initializer_list<const char*> tags) {
 		std::lock_guard<std::mutex> lock(s_ClientTagMutex);
-		if (!s_ClientActiveTags.empty()) {
+		if (!s_ClientInactiveTags.empty()) {
 			for (const char* tag : tags) {
-				if (s_ClientActiveTags.contains(tag)) {
-					s_ClientActiveTags.erase(tag);
-				}
+				s_ClientInactiveTags.insert(tag);
 			}
 		}
 	}
 
-	bool Logger::IsClientTagEnabled(std::string_view tag) {
+	bool Logger::IsClientTagDisabled(std::string_view tag) {
 		std::lock_guard<std::mutex> lock(s_ClientTagMutex);
-		return s_ClientActiveTags.contains(tag);
+		return s_ClientInactiveTags.contains(tag);
 	}
 
-	void Logger::ClearClientTagFilters() {
+	void Logger::ClearClientTagFilter() {
 		std::lock_guard<std::mutex> lock(s_ClientTagMutex);
-		s_ClientActiveTags.clear();
+		s_ClientInactiveTags.clear();
 	}
 
+
+	std::vector<std::string> Logger::GetClientInactiveTags() {
+		std::vector<std::string> result;
+		result.reserve(s_ClientInactiveTags.size());
+		result.insert(result.end(), s_ClientInactiveTags.begin(), s_ClientInactiveTags.end());
+		return result;
+	}
 
 	bool Logger::ShouldCoreLog(std::initializer_list<const char*> tags) {
 		std::lock_guard<std::mutex> lock(s_CoreTagMutex);
-		if (s_CoreActiveTags.empty()) {
+		if (s_CoreInactiveTags.empty()) {
 			return true;
 		}
 		for (const char* tag : tags) {
-			if (s_CoreActiveTags.contains(tag)) {
-				return true;
+			if (s_CoreInactiveTags.contains(tag)) {
+				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 
 	bool Logger::ShouldClientLog(std::initializer_list<const char*> tags) {
 		std::lock_guard<std::mutex> lock(s_ClientTagMutex);
-		if (s_ClientActiveTags.empty()) {
+		if (s_ClientInactiveTags.empty()) {
 			return true;
 		}
 		for (const char* tag : tags) {
-			if (s_ClientActiveTags.contains(tag)) {
-				return true;
+			if (s_ClientInactiveTags.contains(tag)) {
+				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 
 }

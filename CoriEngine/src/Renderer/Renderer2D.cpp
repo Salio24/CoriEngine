@@ -1,5 +1,6 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+// TODO: add a global path tracker / manager, spitting hardcoded paths all over cpp and hpp files is kind-of a bad idea, want to have all my paths specified in one place
 #include "Renderer2D.hpp"
 #include "GraphicsCall.hpp"
 #include "Core/Time.hpp"
@@ -47,7 +48,6 @@ namespace Cori {
 
 
 	void Renderer2D::Init() {
-		// TODO: add a global path tracker / manager, spitting hardcoded paths all over cpp and hpp files is kind-of a bad idea, want to have all my paths specified in one place
 
 		//AssetManager::PreloadShaders({
 		//	Shaders::FlatColorQuad,
@@ -83,7 +83,7 @@ namespace Cori {
 			{ ShaderDataType::Vec4, "a_Color" }
 		});
 
-		s_VertexBuffer_FlatColorQuad->Init(nullptr, s_MaxVertexCount * s_VertexBuffer_FlatColorQuad->GetLayout().GetStrinde(), DRAW_TYPE::DYNAMIC);
+		s_VertexBuffer_FlatColorQuad->Init(nullptr, s_MaxVertexCount * s_VertexBuffer_FlatColorQuad->GetLayout().GetStride(), DRAW_TYPE::DYNAMIC);
 
 		s_VertexArray_FlatColorQuad->AddVertexBuffer(s_VertexBuffer_FlatColorQuad);
 
@@ -105,7 +105,7 @@ namespace Cori {
 			{ ShaderDataType::Float, "a_Layer" }
 		});
 
-		s_VertexBuffer_TexturedQuad->Init(nullptr, s_MaxVertexCount * s_VertexBuffer_TexturedQuad->GetLayout().GetStrinde(), DRAW_TYPE::DYNAMIC);
+		s_VertexBuffer_TexturedQuad->Init(nullptr, s_MaxVertexCount * s_VertexBuffer_TexturedQuad->GetLayout().GetStride(), DRAW_TYPE::DYNAMIC);
 		s_VertexArray_TexturedQuad->AddVertexBuffer(s_VertexBuffer_TexturedQuad);
 
 		s_IndexBuffer_TexturedQuad = IndexBuffer::Create(indicesBatch, sizeof(indicesBatch));
@@ -156,7 +156,7 @@ namespace Cori {
 		return s_DrawCallCount;
 	}
 
-	// dangerous, dont use
+	// VERY dangerous, dont use
 	void Renderer2D::SetQuadsPerDraw(const uint32_t count) {
 		s_MaxQuadCount = count;
 		s_MaxVertexCount = s_MaxQuadCount * 4;

@@ -4,6 +4,7 @@
 #include "EventSystem/Event.hpp"
 #include "Renderer/Texture.hpp"
 #include "StateSystem/StateMachine.hpp"
+#include "Renderer/CameraComponent.hpp"
 
 namespace Cori {
 	namespace Physics {
@@ -36,6 +37,10 @@ namespace Cori {
 				bool m_Textured{ true };
 				bool m_Visible{ true };
 				bool m_Flipped{ false };
+				bool m_SemiTransparency{ false };
+				glm::vec4 m_TintColor{ 1.0f, 1.0f, 1.0f, 1.0f }; // default white color
+				std::shared_ptr<Texture2D> m_Texture{ nullptr };
+				UVs m_UVs{};
 
 				Render() = default;
 				Render(const glm::vec2& position, const glm::vec2& size, float layer = 5.0f, bool textured = true, bool visible = true)
@@ -110,25 +115,6 @@ namespace Cori {
 
 			private:
 				Cori::StateMachine m_StateMachine;
-			};
-		}
-
-		namespace Scene {
-			struct Camera {
-				static constexpr auto in_place_delete = true;
-
-				glm::mat4 m_ProjectionMatrix{ 1.0f };
-				glm::mat4 m_ViewProjectionMatrix{ 1.0f };
-				glm::vec2 m_CameraPosition{ 0.0f };
-				float m_CameraRotation{ 0.0f };
-				float m_CameraZoomFactor{ 1.0f };
-				glm::vec2 m_InitialCameraMinBound{ 0.0f };
-				glm::vec2 m_InitialCameraMaxBound{ 0.0f };
-				glm::vec2 m_CameraMaxBound{ 0.0f };
-				glm::vec2 m_CameraMinBound{ 0.0f };
-				Camera() = default;
-				Camera(const glm::mat4& projectionMatrix, glm::mat4& viewProjectionMatrix, const glm::vec2& cameraPosition, float cameraRotation, float cameraZoomFactor)
-					: m_ProjectionMatrix(projectionMatrix), m_ViewProjectionMatrix(viewProjectionMatrix), m_CameraPosition(cameraPosition), m_CameraRotation(cameraRotation), m_CameraZoomFactor(cameraZoomFactor) {}
 			};
 		}
 	}

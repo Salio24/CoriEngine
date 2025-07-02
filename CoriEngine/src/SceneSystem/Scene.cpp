@@ -5,7 +5,7 @@
 
 namespace Cori {
 
-	Scene::Scene(const std::string& name) : m_Name(name){
+	Scene::Scene(const std::string& name) : m_Name(name) {
 		AddContextComponent<Components::Scene::Camera>();
 		ActiveCamera.BindCameraComponent(&GetContextComponent<Components::Scene::Camera>());
 		CORI_CORE_DEBUG("Scene: '{0}' created.", m_Name);
@@ -65,7 +65,7 @@ namespace Cori {
 				}
 			}
 		}
-		Renderer2D::EndBatch();		
+		Renderer2D::EndBatch();
 		
 	}
 

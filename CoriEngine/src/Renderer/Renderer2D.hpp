@@ -2,7 +2,6 @@
 #include "Buffers.hpp"
 #include "VertexArray.hpp"
 #include "ShaderProgram.hpp"
-#include "Camera.hpp"
 #include "PipelineProgram.hpp"
 #include "Texture.hpp"
 #include "SpriteAtlas.hpp"

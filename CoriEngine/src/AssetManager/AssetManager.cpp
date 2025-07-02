@@ -1,10 +1,78 @@
 #include "AssetManager.hpp"
+#include "Core/Application.hpp"
 
 namespace Cori {
 
-	AssetManager& AssetManager::Get() {
-		static AssetManager instance;
-		return instance;
+	std::shared_ptr<Cori::ShaderProgram> AssetManager::GetShader(const ShaderProgramDescriptor& descriptor) {
+		return Application::GetAssetManager()->GetShaderImpl(descriptor);
+	}
+
+	std::shared_ptr<Cori::Texture2D> AssetManager::GetTexture2D(const Texture2DDescriptor& descriptor) {
+		return Application::GetAssetManager()->GetTexture2DImpl(descriptor);
+	}
+
+	std::shared_ptr<Cori::SpriteAtlas> AssetManager::GetSpriteAtlas(const SpriteAtlasDescriptor& descriptor) {
+		return Application::GetAssetManager()->GetSpriteAtlasImpl(descriptor);
+	}
+
+	std::shared_ptr<Cori::ShaderProgram> AssetManager::GetShaderOwning(const ShaderProgramDescriptor& descriptor) {
+		return Application::GetAssetManager()->GetShaderOwningImpl(descriptor);
+	}
+
+	std::shared_ptr<Cori::Texture2D> AssetManager::GetTexture2DOwning(const Texture2DDescriptor& descriptor) {
+		return Application::GetAssetManager()->GetTexture2DOwningImpl(descriptor);
+	}
+
+	std::shared_ptr<Cori::SpriteAtlas> AssetManager::GetSpriteAtlasOwning(const SpriteAtlasDescriptor& descriptor) {
+		return Application::GetAssetManager()->GetSpriteAtlasOwningImpl(descriptor);
+	}
+
+	void AssetManager::PreloadShaders(std::initializer_list<ShaderProgramDescriptor> descriptors) {
+		Application::GetAssetManager()->PreloadShadersImpl(descriptors);
+	}
+
+	void AssetManager::PreloadTexture2Ds(std::initializer_list<Texture2DDescriptor> descriptors) {
+		Application::GetAssetManager()->PreloadTexture2DsImpl(descriptors);
+	}
+
+	void AssetManager::PreloadSpriteAtlases(std::initializer_list<SpriteAtlasDescriptor> descriptors) {
+		Application::GetAssetManager()->PreloadSpriteAtlasesImpl(descriptors);
+	}
+
+	void AssetManager::UnloadShader(const ShaderProgramDescriptor& descriptor) {
+		Application::GetAssetManager()->UnloadShaderImpl(descriptor);
+	}
+
+	void AssetManager::UnloadTexture2D(const Texture2DDescriptor& descriptor) {
+		Application::GetAssetManager()->UnloadTexture2DImpl(descriptor);
+	}
+
+	void AssetManager::UnloadSpriteAtlas(const SpriteAtlasDescriptor& descriptor) {
+		Application::GetAssetManager()->UnloadSpriteAtlasImpl(descriptor);
+	}
+
+	void AssetManager::UnloadShaders(std::initializer_list<ShaderProgramDescriptor> descriptors) {
+		Application::GetAssetManager()->UnloadShadersImpl(descriptors);
+	}
+
+	void AssetManager::UnloadTexture2Ds(std::initializer_list<Texture2DDescriptor> descriptors) {
+		Application::GetAssetManager()->UnloadTexture2DsImpl(descriptors);
+	}
+
+	void AssetManager::UnloadSpriteAtlases(std::initializer_list<SpriteAtlasDescriptor> descriptors) {
+		Application::GetAssetManager()->UnloadSpriteAtlasesImpl(descriptors);
+	}
+
+	void AssetManager::ClearShaderCache() {
+		Application::GetAssetManager()->ClearShaderCacheImpl();
+	}
+
+	void AssetManager::ClearTexture2DCache() {
+		Application::GetAssetManager()->ClearTexture2DCacheImpl();
+	}
+
+	void AssetManager::ClearSpriteAtlasCache() {
+		Application::GetAssetManager()->ClearSpriteAtlasCacheImpl();
 	}
 
 	void AssetManager::PreloadShadersImpl(std::initializer_list<ShaderProgramDescriptor> descriptors) {
@@ -80,10 +148,23 @@ namespace Cori {
 		try {
 			std::shared_ptr<SpriteAtlas> newSpriteAtlas = SpriteAtlas::Create(descriptor);
 			m_SpriteAtlasCache[descriptor.GetRuntimeID()] = newSpriteAtlas;
-			return newSpriteAtlas;
+			return SpriteAtlas::Create(descriptor);
 		}
 		catch (const std::exception& e) {
 			CORI_CORE_ERROR("AssetManager: Error loading SpriteAtlas '{0}': {1}", descriptor.GetDebugName(), e.what());
+			return nullptr;
+		}
+	}
+
+	std::shared_ptr<Cori::ShaderProgram> AssetManager::GetShaderOwningImpl(const ShaderProgramDescriptor& descriptor) {
+		CORI_PROFILE_FUNCTION();
+
+		CORI_CORE_DEBUG("AssetManager: Loading Texture2D '{0}' with manual ownership (RuntimeID: {1}).", descriptor.GetDebugName(), descriptor.GetRuntimeID());
+		try {
+			return ShaderProgram::Create(descriptor);
+		}
+		catch (const std::exception& e) {
+			CORI_CORE_ERROR("AssetManager: Error loading Texture2D '{0}' with manual ownership: {1}", descriptor.GetDebugName(), e.what());
 			return nullptr;
 		}
 	}
@@ -93,9 +174,7 @@ namespace Cori {
 
 		CORI_CORE_DEBUG("AssetManager: Loading Texture2D '{0}' with manual ownership (RuntimeID: {1}).", descriptor.GetDebugName(), descriptor.GetRuntimeID());
 		try {
-			std::shared_ptr<Texture2D> newTexture2D = Texture2D::Create(descriptor);
-			m_Texture2DCache[descriptor.GetRuntimeID()] = newTexture2D;
-			return newTexture2D;
+			return Texture2D::Create(descriptor);
 		}
 		catch (const std::exception& e) {
 			CORI_CORE_ERROR("AssetManager: Error loading Texture2D '{0}' with manual ownership: {1}", descriptor.GetDebugName(), e.what());
@@ -108,9 +187,7 @@ namespace Cori {
 
 		CORI_CORE_DEBUG("AssetManager: Loading SpriteAtlas '{0}' with manual ownership (RuntimeID: {1}).", descriptor.GetDebugName(), descriptor.GetRuntimeID());
 		try {
-			std::shared_ptr<SpriteAtlas> newSpriteAtlas = SpriteAtlas::Create(descriptor);
-			m_SpriteAtlasCache[descriptor.GetRuntimeID()] = newSpriteAtlas;
-			return newSpriteAtlas;
+			return SpriteAtlas::Create(descriptor);
 		}
 		catch (const std::exception& e) {
 			CORI_CORE_ERROR("AssetManager: Error loading SpriteAtlas '{0}' with manual ownership: {1}", descriptor.GetDebugName(), e.what());

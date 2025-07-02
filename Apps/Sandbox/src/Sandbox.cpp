@@ -114,6 +114,14 @@ public:
 			CORI_CORE_FATAL_TAGGED({ "Renderer", "DX12" }, "Submitting command list {0}.", 5);
 		}
 
+		if (ImGui::Button("tag d")) {
+			Cori::Logger::DisableCoreTags({ "Renderer", "phys" });
+		}
+
+		if (ImGui::Button("tag e")) {
+			Cori::Logger::EnableCoreTags({ "Renderer", "phys" });
+		}
+
 		if (ImGui::Button("color")) {
 			Cori::Logger::SampleColors();
 		}

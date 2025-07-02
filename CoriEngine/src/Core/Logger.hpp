@@ -9,6 +9,16 @@
 #include <spdlog/fmt/bundled/base.h>
 #include <spdlog/fmt/bundled/format.h>
 
+// TODO: adapt tagging everywhere in engine logging
+
+/*
+Existing tags hint:
+
+
+
+*/
+
+
 namespace Cori {
 	enum class LogLevel {
 		TRACE,
@@ -55,9 +65,9 @@ namespace Cori {
 		static void DisableCoreTag(std::string_view tag);
 		static void DisableCoreTags(std::initializer_list<const char*> tags);
 
-		static bool IsCoreTagEnabled(std::string_view tag);
-		static void ClearCoreTagFilters();
-		static std::vector<std::string> GetCoreActiveTags();
+		static bool IsCoreTagDisabled(std::string_view tag);
+		static void ClearCoreTagFilter();
+		static std::vector<std::string> GetCoreInactiveTags();
 
 
 		static void EnableClientTag(std::string_view tag);
@@ -67,9 +77,9 @@ namespace Cori {
 		static void DisableClientTag(std::string_view tag);
 		static void DisableClientTags(std::initializer_list<const char*> tags);
 
-		static bool IsClientTagEnabled(std::string_view tag);
-		static void ClearClientTagFilters();
-		static std::vector<std::string> GetClientActiveTags();
+		static bool IsClientTagDisabled(std::string_view tag);
+		static void ClearClientTagFilter();
+		static std::vector<std::string> GetClientInactiveTags();
 
 		template<typename... Args>
 		static void CoreLogTraceTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
@@ -785,8 +795,8 @@ namespace Cori {
 
 		static std::shared_ptr<spdlog::logger> s_CoreLogger;
 		static std::shared_ptr<spdlog::logger> s_ClientLogger;
-		static std::unordered_set<std::string, StringHash, std::equal_to<>> s_CoreActiveTags;
-		static std::unordered_set<std::string, StringHash, std::equal_to<>> s_ClientActiveTags;
+		static std::unordered_set<std::string, StringHash, std::equal_to<>> s_CoreInactiveTags;
+		static std::unordered_set<std::string, StringHash, std::equal_to<>> s_ClientInactiveTags;
 	};
 }
 

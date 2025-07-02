@@ -184,7 +184,7 @@ namespace Cori {
 			return *this;
 		}
 
-		inline uint32_t GetStrinde() const { return m_Stride; }
+		inline uint32_t GetStride() const { return m_Stride; }
 		inline const std::vector<VBElement>& GetElements() const { return m_Elements; }
 		
 		inline VBElement& front() { return m_Elements.front(); }
