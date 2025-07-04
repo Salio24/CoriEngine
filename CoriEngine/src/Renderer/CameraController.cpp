@@ -19,6 +19,18 @@ namespace Cori {
 		//RecalculateVP();
 	}
 
+	glm::vec2 CameraController::GetPosition() const {
+		return m_CurrentCameraComponent->m_CameraPosition;
+	}
+
+	float CameraController::GetRotation() const {
+		return m_CurrentCameraComponent->m_CameraRotation;
+	}
+
+	float CameraController::GetZoomLevel() const {
+		return m_CurrentCameraComponent->m_CameraZoomFactor;
+	}
+
 	void CameraController::SetRotation(const float angle) {
 		m_CurrentCameraComponent->m_CameraRotation = angle;
 		//RecalculateVP();

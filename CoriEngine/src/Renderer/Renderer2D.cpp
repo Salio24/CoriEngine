@@ -88,7 +88,7 @@ namespace Cori {
 		s_VertexArray_FlatColorQuad->AddVertexBuffer(s_VertexBuffer_FlatColorQuad);
 
 
-		s_IndexBuffer_FlatColorQuad = IndexBuffer::Create(indicesBatch, sizeof(indicesBatch));
+		s_IndexBuffer_FlatColorQuad = IndexBuffer::Create(indicesBatch, s_MaxIndexCount);
 		s_VertexArray_FlatColorQuad->AddIndexBuffer(s_IndexBuffer_FlatColorQuad);
 
 		s_VertexDataBuffer_FlatColorQuad = new QuadBatchVertexSetup[static_cast<size_t>(s_MaxIndexCount)];
@@ -108,7 +108,7 @@ namespace Cori {
 		s_VertexBuffer_TexturedQuad->Init(nullptr, s_MaxVertexCount * s_VertexBuffer_TexturedQuad->GetLayout().GetStride(), DRAW_TYPE::DYNAMIC);
 		s_VertexArray_TexturedQuad->AddVertexBuffer(s_VertexBuffer_TexturedQuad);
 
-		s_IndexBuffer_TexturedQuad = IndexBuffer::Create(indicesBatch, sizeof(indicesBatch));
+		s_IndexBuffer_TexturedQuad = IndexBuffer::Create(indicesBatch, s_MaxIndexCount);
 		s_VertexArray_TexturedQuad->AddIndexBuffer(s_IndexBuffer_TexturedQuad);
 
 		s_VertexDataBuffer_TexturedQuad = new TexturedQuadVertexSetup[static_cast<size_t>(s_MaxIndexCount)];

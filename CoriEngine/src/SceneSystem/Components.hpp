@@ -38,7 +38,7 @@ namespace Cori {
 				bool m_Visible{ true };
 				bool m_Flipped{ false };
 				bool m_SemiTransparency{ false };
-				glm::vec4 m_TintColor{ 1.0f, 1.0f, 1.0f, 1.0f }; // default white color
+				glm::vec4 m_TintColor{ 1.0f, 1.0f, 1.0f, 1.0f };
 				std::shared_ptr<Texture2D> m_Texture{ nullptr };
 				UVs m_UVs{};
 

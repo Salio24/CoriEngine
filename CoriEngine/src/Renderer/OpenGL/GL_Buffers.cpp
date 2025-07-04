@@ -48,7 +48,9 @@ namespace Cori {
 		for (const auto& element : m_Layout) {
 			std::string element_layout = CORI_SECOND_LINE_SPACING + "Location: '" + std::to_string(index) +
 				"' | Type: '" + static_cast<std::string>(magic_enum::enum_name(element.m_Type)) +
-				"' | Name: '" + element.m_Name + "'";
+				"' | Name: '" + element.m_Name + "'" +
+				"' | Divisor: '" + std::to_string(element.m_Divisor) + "'" +
+				"' | Normalized: '" + Logger::BoolAlpha(element.m_Normalized) + "'";
 
 			layoutText.append(element_layout);
 			if (element != m_Layout.back()) {
@@ -94,7 +96,7 @@ namespace Cori {
 		CORI_PROFILE_FUNCTION();
 		glCreateBuffers(1, &m_ID);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(count), indices, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(count * sizeof(uint32_t)), indices, GL_STATIC_DRAW);
 
 		CORI_CORE_TRACE("GL_IndexBuffer (GL_RuntimeID: {0}): IBO with size {1}, and type STATIC_DRAW, was created successfully", m_ID, count);
 

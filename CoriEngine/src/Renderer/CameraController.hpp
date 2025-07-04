@@ -15,6 +15,12 @@ namespace Cori {
 
 		void SetZoomLevel(const float factor);
 
+		glm::vec2 GetPosition() const;
+
+		float GetRotation() const;
+
+		float GetZoomLevel() const;
+
 		void RecalculateVP();
 
 		void BindCameraComponent(Components::Scene::Camera* camera) {

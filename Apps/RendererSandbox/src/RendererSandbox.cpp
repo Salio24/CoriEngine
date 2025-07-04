@@ -35,7 +35,11 @@ namespace Cori {
 class ExampleLayer : public Cori::Layer {
 public:
 	ExampleLayer() : Layer("Example") { 
-		m_Camera.SetCameraSize(0, 7680, 0, 4320);
+		Cori::GraphicsCall::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
+
+		Cori::SceneManager::CreateScene("Test Scene");
+		BindScene("Test Scene");
+		ActiveScene->ActiveCamera.CreateOrthoCamera(0, 640, 0, 360);
 
 		// can also preload assets like this vvv
 		Cori::AssetManager::PreloadTexture2Ds({
@@ -47,7 +51,7 @@ public:
 		// if the asset is not preloaded it will be loaded the first time it is requested via appropriate
 		// Get function from the Asset Manager
 		Cori::GraphicsCall::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
-
+		Cori::Logger::DisableCoreTags({ "Graphics" });
 	}
 
 	virtual void OnEvent(Cori::Event& event) override {
@@ -57,7 +61,8 @@ public:
 
 		Cori::EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<Cori::MouseScrolledEvent>([this](const Cori::MouseScrolledEvent& e) -> bool {
-			m_Camera.ZoomVP(std::clamp((m_Camera.GetZoomFactor() + e.GetYOffset() * 0.0625f), 0.0625f, 1000.0f));
+			ActiveScene->ActiveCamera.SetZoomLevel(std::clamp((ActiveScene->ActiveCamera.GetZoomLevel() + e.GetYOffset() * 0.0625f), 0.0625f, 1000.0f));
+			ActiveScene->ActiveCamera.RecalculateVP();
 			return true;
 		});
 	}
@@ -164,15 +169,6 @@ public:
 		ImGui::DragInt("Number of rows", &m_QuadRows, 1, 1, 2000, "%d", ImGuiSliderFlags_AlwaysClamp);
 		ImGui::DragInt("Number of columns", &m_QuadColumns, 1, 1, 2000, "%d", ImGuiSliderFlags_AlwaysClamp);
 
-		// vvv this is for debugging DONT TOUCH THAT
-		//static int i0 = 2500;
-		//ImGui::InputInt("input int", &i0);
-		//
-		//if (ImGui::Button("Button")) {
-		//	Cori::Renderer2D::SetQuadsPerDraw(i0);
-		//	Cori::Renderer2D::Init();
-		//}
-
 		ImGui::End();
 		ImGui::Begin("Some Notes");
 
@@ -184,25 +180,74 @@ public:
 		ImGui::End();
 	}
 
+//#define OLD
+
 	void OnUpdate(const double deltaTime, const double tickAlpha) override {
 		CORI_PROFILE_FUNCTION();
-		Cori::GraphicsCall::SetClearColor({ 0.875f, 0.6875f, 1.0f, 1.0f });
-		Cori::GraphicsCall::ClearFramebuffer();
+		//Cori::GraphicsCall::SetClearColor({ 0.875f, 0.6875f, 1.0f, 1.0f });
+		//Cori::GraphicsCall::ClearFramebuffer();
+
+#ifdef OLD
 
 		Cori::Renderer2D::ResetDebugStats();
 
-		Cori::Renderer2D::BeginBatch(m_Camera.GetViewProjectionMatrix());
+		Cori::Renderer2D::BeginBatch(ActiveScene->GetContextComponent<Cori::Components::Scene::Camera>().m_ViewProjectionMatrix);
 
 		float offset = 5.0f;
+
+		auto atlas = Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::test);
+
 
 		for (int i = 0; i < m_QuadRows; i++) {
 			for (int y = 0; y < m_QuadColumns; y++) {
 				//Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset , i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetTexture2D(Cori::Texture2Ds::TestBrickTexture));
-				Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset, i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::test), 23);
+				Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset, i * 30.0f + offset), glm::vec2(25.0f, 25.0f), atlas, 23);
 			}
 		}
 
 		Cori::Renderer2D::EndBatch();
+
+#else 
+		Cori::Test::Renderer2D::BeginScene(ActiveScene->GetContextComponent<Cori::Components::Scene::Camera>());
+
+		float offset = 5.0f;
+
+		auto atlas = Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::test);
+
+		auto text = atlas->GetTexture().get();
+
+		auto uvs = atlas->GetSpriteUVsAtIndex(23);
+
+		{
+			CORI_PROFILE_SCOPE("Quad Submit");
+			for (int i = 0; i < m_QuadRows; i++) {
+				for (int y = 0; y < m_QuadColumns; y++) {
+					Cori::Test::Renderer2D::SubmitOpaqueQuad(glm::vec2(y * 30.0f + offset, i * 30.0f + offset), glm::vec2(25.0f, 25.0f), 1, text, uvs, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 0, false);
+					//Cori::Test::Renderer2D::s_Data->OpaqueQuadQueue.emplace_back(glm::vec2(y * 30.0f + offset, i * 30.0f + offset), glm::vec2(25.0f, 25.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), text, uvs, 0, 1);
+				}
+			}
+		}
+
+
+					//const glm::vec4 finalColor = tintColor.a < 1.0f ? glm::vec4{ tintColor.x, tintColor.y, tintColor.y, 1.0f } : tintColor;
+					//Texture2D* finalTexture = texture ? texture : s_Data->WhiteTexture.get();
+					//const UVs finalUVs = flipped ? UVs{ {uvs.UVmax.x, uvs.UVmin.y}, {uvs.UVmin.x, uvs.UVmax.y} } : uvs;
+
+
+					//Cori::Test::Renderer2D::s_Data->OpaqueQuadQueue.emplace_back(Cori::Test::Renderer2D::Quad{
+					//	.position = glm::vec2(y * 30.0f + offset, i * 30.0f + offset),
+					//	.size = glm::vec2(25.0f, 25.0f),
+					//	.tintColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
+					//	.texture = atlas->GetTexture().get(),
+					//	.uvs = atlas->GetSpriteUVsAtIndex(23),
+					//	.rotation = 0,
+					//	.layer = 1
+					//});
+
+		Cori::Test::Renderer2D::EndScene();
+#endif
+
+
 	}
 
 	virtual void OnTickUpdate(const float timeStep) override {
@@ -218,27 +263,26 @@ public:
 		glm::vec2 cameraPosDelta = glm::vec2(0.0f);
 
 		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_W)) {
-			cameraPosDelta.y += m_CameraMoveSpeed * m_Camera.GetZoomFactor();
+			cameraPosDelta.y += m_CameraMoveSpeed * ActiveScene->ActiveCamera.GetZoomLevel();
 		}
 		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_S)) {
-			cameraPosDelta.y -= m_CameraMoveSpeed * m_Camera.GetZoomFactor();
+			cameraPosDelta.y -= m_CameraMoveSpeed * ActiveScene->ActiveCamera.GetZoomLevel();
 		}
 		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_A)) {
-			cameraPosDelta.x -= m_CameraMoveSpeed * m_Camera.GetZoomFactor();
+			cameraPosDelta.x -= m_CameraMoveSpeed * ActiveScene->ActiveCamera.GetZoomLevel();
 		}
 		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_D)) {
-			cameraPosDelta.x += m_CameraMoveSpeed * m_Camera.GetZoomFactor();
+			cameraPosDelta.x += m_CameraMoveSpeed * ActiveScene->ActiveCamera.GetZoomLevel();
 		}
 
 		if (cameraPosDelta != glm::vec2(0.0f)) {
-			m_Camera.TranslateVP(m_Camera.GetPosition() + cameraPosDelta);
+			ActiveScene->ActiveCamera.SetPosition(ActiveScene->ActiveCamera.GetPosition() + cameraPosDelta);
+			ActiveScene->ActiveCamera.RecalculateVP();
 		}
 	}
 
-	int m_QuadColumns{ 1 };
-	int m_QuadRows{ 1 };
-
-	Cori::OrthoCamera m_Camera;
+	int m_QuadColumns{ 1000 };
+	int m_QuadRows{ 100 };
 
 	float m_CameraMoveSpeed = 10.0f;
 

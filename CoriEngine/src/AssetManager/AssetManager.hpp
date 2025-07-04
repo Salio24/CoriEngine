@@ -22,21 +22,21 @@ namespace Cori {
 		static std::shared_ptr<Texture2D> GetTexture2DOwning(const Texture2DDescriptor& descriptor);
 		static std::shared_ptr<SpriteAtlas> GetSpriteAtlasOwning(const SpriteAtlasDescriptor& descriptor);
 
-		inline static void PreloadShaders(std::initializer_list<ShaderProgramDescriptor> descriptors);
-		inline static void PreloadTexture2Ds(std::initializer_list<Texture2DDescriptor> descriptors);
-		inline static void PreloadSpriteAtlases(std::initializer_list<SpriteAtlasDescriptor> descriptors);
+		static void PreloadShaders(std::initializer_list<ShaderProgramDescriptor> descriptors);
+		static void PreloadTexture2Ds(std::initializer_list<Texture2DDescriptor> descriptors);
+		static void PreloadSpriteAtlases(std::initializer_list<SpriteAtlasDescriptor> descriptors);
 
-		inline static void UnloadShader(const ShaderProgramDescriptor& descriptor);
-		inline static void UnloadTexture2D(const Texture2DDescriptor& descriptor);
-		inline static void UnloadSpriteAtlas(const SpriteAtlasDescriptor& descriptor);
+		static void UnloadShader(const ShaderProgramDescriptor& descriptor);
+		static void UnloadTexture2D(const Texture2DDescriptor& descriptor);
+		static void UnloadSpriteAtlas(const SpriteAtlasDescriptor& descriptor);
 
-		inline static void UnloadShaders(std::initializer_list<ShaderProgramDescriptor> descriptors);
-		inline static void UnloadTexture2Ds(std::initializer_list<Texture2DDescriptor> descriptors);
-		inline static void UnloadSpriteAtlases(std::initializer_list<SpriteAtlasDescriptor> descriptors);
+		static void UnloadShaders(std::initializer_list<ShaderProgramDescriptor> descriptors);
+		static void UnloadTexture2Ds(std::initializer_list<Texture2DDescriptor> descriptors);
+		static void UnloadSpriteAtlases(std::initializer_list<SpriteAtlasDescriptor> descriptors);
 
-		inline static void ClearShaderCache();
-		inline static void ClearTexture2DCache();
-		inline static void ClearSpriteAtlasCache();
+		static void ClearShaderCache();
+		static void ClearTexture2DCache();
+		static void ClearSpriteAtlasCache();
 
 	private:
 

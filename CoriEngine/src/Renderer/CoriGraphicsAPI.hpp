@@ -16,6 +16,13 @@ namespace Cori {
 
 		virtual void DrawElements(const std::shared_ptr<VertexArray>& vertexArray, const uint32_t elementCount) = 0;
 
+		virtual void EnableDepthTest() = 0;
+		virtual void DisableDepthTest() = 0;
+
+		virtual void EnableBlending() = 0;
+		virtual void DisableBlending() = 0;
+
+
 		static std::unique_ptr<CoriGraphicsAPI> Create();
 	};
 }

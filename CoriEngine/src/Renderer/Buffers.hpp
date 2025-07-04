@@ -79,11 +79,12 @@ namespace Cori {
 
 	class VBElement { 
 	public:
-		VBElement(ShaderDataType type, const std::string& name, const bool normalized = false) : m_Name(name), m_Type(type), m_Normalized(normalized), m_Size(ShaderDataTypeSize(type)), m_RuntimeID(s_NextRuntimeID.fetch_add(1, std::memory_order_relaxed)) {}
+		VBElement(ShaderDataType type, const std::string& name, const uint32_t divisor = 0, const bool normalized = false) : m_Name(name), m_Type(type), m_Divisor(divisor), m_Normalized(normalized), m_Size(ShaderDataTypeSize(type)), m_RuntimeID(s_NextRuntimeID.fetch_add(1, std::memory_order_relaxed)) {}
 
 		std::string m_Name;
 		ShaderDataType m_Type;
-		bool m_Normalized{ false };
+		uint32_t m_Divisor;
+		bool m_Normalized;
 		uint32_t m_Size;
 		uint32_t m_Offset{ 0 };
 
@@ -100,6 +101,7 @@ namespace Cori {
 		VBElement(const VBElement& other)
 			: m_Name(other.m_Name),
 			m_Type(other.m_Type),
+			m_Divisor(other.m_Divisor),
 			m_Normalized(other.m_Normalized),
 			m_Size(other.m_Size),
 			m_Offset(other.m_Offset),
@@ -109,6 +111,7 @@ namespace Cori {
 		VBElement(VBElement&& other) noexcept
 			: m_Name(std::move(other.m_Name)),
 			m_Type(other.m_Type),
+			m_Divisor(other.m_Divisor),
 			m_Normalized(other.m_Normalized),
 			m_Size(other.m_Size),
 			m_Offset(other.m_Offset),
@@ -119,6 +122,7 @@ namespace Cori {
 			if (this != &other) {
 				m_Name = std::move(other.m_Name);
 				m_Type = other.m_Type;
+				m_Divisor = other.m_Divisor;
 				m_Normalized = other.m_Normalized;
 				m_Size = other.m_Size;
 				m_Offset = other.m_Offset;

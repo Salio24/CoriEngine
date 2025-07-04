@@ -106,20 +106,20 @@ public:
 		}
 
 		if (ImGui::Button("Assert")) {
-			CORI_CORE_TRACE_TAGGED({ "Renderer", "DX12" }, "Submitting command list {0}.", 5);
-			CORI_CORE_DEBUG_TAGGED({ "Renderer", "DX12" }, "Submitting command list {0}.", 5);
-			CORI_CORE_INFO_TAGGED({ "Renderer", "DX12" }, "Submitting command list {0}.", 5);
+			CORI_CORE_TRACE_TAGGED({ "Graphics", "API" }, "Submitting command list {0}.", 5);
+			CORI_CORE_DEBUG_TAGGED({ "Graphics", "API" }, "Submitting command list {0}.", 5);
+			CORI_CORE_INFO_TAGGED({ "Graphics", "API" }, "Submitting command list {0}.", 5);
 			CORI_CORE_WARN_TAGGED({ "Renderer", "DX12" }, "Submitting command list {0}.", 5);
 			CORI_CORE_ERROR_TAGGED({ "Renderer", "DX12" }, "Submitting command list {0}.", 5);
 			CORI_CORE_FATAL_TAGGED({ "Renderer", "DX12" }, "Submitting command list {0}.", 5);
 		}
 
 		if (ImGui::Button("tag d")) {
-			Cori::Logger::DisableCoreTags({ "Renderer", "phys" });
+			Cori::Logger::DisableCoreTags({ "API" });
 		}
 
 		if (ImGui::Button("tag e")) {
-			Cori::Logger::EnableCoreTags({ "Renderer", "phys" });
+			Cori::Logger::EnableCoreTags({ "API"});
 		}
 
 		if (ImGui::Button("color")) {
@@ -135,13 +135,6 @@ public:
 
 	void OnUpdate(const double deltaTime, const double tickAlpha) override {
 		accum++;
-
-
-		for (int i = 0; i < 20; i++) {
-			//CORI_CORE_DEBUGT("Pidor {0}", 5);
-			//std::cout << "Loh" << std::endl;
-			//CORI_CORE_TRACE_TAGGED({ "Renderer", "DX12" }, "Submitting command list {0}.", 5);
-		}
 	}
 
 	virtual void OnTickUpdate(const float timeStep) override {

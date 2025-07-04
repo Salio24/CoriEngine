@@ -24,6 +24,23 @@ namespace Cori {
 			s_GraphicsAPI->DrawElements(vertexArray, elementCount);
 		}
 
+		static void EnableDepthTest() {
+			s_GraphicsAPI->EnableDepthTest();
+		}
+
+		static void DisableDepthTest() {
+			s_GraphicsAPI->DisableDepthTest();
+		}
+
+		static void EnableBlending() {
+			s_GraphicsAPI->EnableBlending();
+		}
+
+		static void DisableBlending() {
+			s_GraphicsAPI->DisableBlending();
+		}
+
+
 	private:
 		static std::unique_ptr<CoriGraphicsAPI> s_GraphicsAPI;
 	};

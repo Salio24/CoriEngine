@@ -18,6 +18,13 @@ namespace Cori {
 		
 		virtual void DrawElements(const std::shared_ptr<VertexArray>& vertexArray, const uint32_t elementCount) override;
 
+
+		virtual void EnableDepthTest() override;
+		virtual void DisableDepthTest() override;
+
+		virtual void EnableBlending() override;
+		virtual void DisableBlending() override;
+
 		CORI_REGISTERED_FACTORY_INIT;
 	};
 }

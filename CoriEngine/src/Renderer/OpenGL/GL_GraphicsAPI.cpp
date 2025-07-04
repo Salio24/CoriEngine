@@ -112,7 +112,30 @@ namespace Cori {
 		vertexArray->GetIndexBuffer()->Bind();
 
 		glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(elementCount), GL_UNSIGNED_INT, nullptr);
-		vertexArray->Unbind();
+	}
+
+
+
+	void OpenGLGraphicsAPI::EnableDepthTest() {
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
+		CORI_CORE_TRACE_TAGGED({ "Graphics", "API" }, "Depth test was enabled");
+	}
+
+	void OpenGLGraphicsAPI::DisableDepthTest() {
+		glDisable(GL_DEPTH_TEST);
+		CORI_CORE_TRACE_TAGGED({ "Graphics", "API" }, "Depth test was disabled");
+	}
+
+	void OpenGLGraphicsAPI::EnableBlending() {
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		CORI_CORE_TRACE_TAGGED({ "Graphics", "API" }, "Blending was enabled");
+	}
+
+	void OpenGLGraphicsAPI::DisableBlending() {
+		glDisable(GL_BLEND);
+		CORI_CORE_TRACE_TAGGED({ "Graphics", "API" }, "Blending was disabled");
 	}
 
 	OpenGLGraphicsAPI::OpenGLGraphicsAPI() {

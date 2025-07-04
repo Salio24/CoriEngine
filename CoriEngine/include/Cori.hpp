@@ -18,14 +18,15 @@
 #include "../src/Renderer/VertexArray.hpp"
 #include "../src/Renderer/ShaderProgram.hpp"
 #include "../src/Renderer/PipelineProgram.hpp"
-#include "../src/Renderer/Camera.hpp"
 #include "../src/Renderer/Texture.hpp"
 #include "../src/Renderer/Image.hpp"
-#include "../src/Renderer/Camera.hpp"
 #include "../src/Renderer/CameraController.hpp"
 #include "../src/Renderer/Animator/Animator.hpp"
+#include "../src/Renderer/Renderer2DNew.hpp"
 
 #include "../src/AssetManager/AssetDefinitions.hpp"
+
+#include "../src/FileManagment/JsonSerializer.hpp"
 
 #include "../src/Profiling/TimeProfiler.hpp"
 

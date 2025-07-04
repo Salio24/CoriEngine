@@ -6,6 +6,7 @@
 #include "Input.hpp"
 #include <imgui.h>
 #include "Renderer/Buffers.hpp"
+#include "Renderer/Renderer2DNew.hpp"
 #include "Renderer/GraphicsCall.hpp"
 #include "AssetManager/AssetDefinitions.hpp"
 #include "SceneSystem/SceneManager.hpp"
@@ -34,10 +35,14 @@ namespace Cori {
 
 		m_GameTimer.SetTickrate(60);
 		m_GameTimer.SetTickrateUpdateFunc(CORI_BIND_EVENT_FN(Application::TickrateUpdate, CORI_PLACEHOLDERS(1)));
+
+		Test::Renderer2D::Init();
 	}
 
 	Application::~Application() {
 		GraphicsCall::ShutdownRenderers();
+		Test::Renderer2D::Shutdown();
+
 	}
 
 	void Application::OnEvent(Event& e) {

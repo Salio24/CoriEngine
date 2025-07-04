@@ -12,7 +12,7 @@ namespace Cori {
 
 		static std::shared_ptr<Scene> GetScene(const std::string& name);
 
-		inline static void DestroyScene(const std::string& name);
+		static void DestroyScene(const std::string& name);
 
 	private:
 
