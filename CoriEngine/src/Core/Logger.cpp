@@ -1,6 +1,10 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "Logger.hpp"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 namespace Cori {
 
 	std::shared_ptr<spdlog::logger> Logger::s_CoreLogger;
@@ -11,6 +15,26 @@ namespace Cori {
 
 	static std::mutex s_CoreTagMutex;
 	static std::mutex s_ClientTagMutex;
+
+	void Logger::EnableVirtualTerminalProcessing() {
+#ifdef _WIN32
+		HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+		if (hOut == INVALID_HANDLE_VALUE) {
+			return;
+		}
+
+		DWORD dwMode = 0;
+		if (!GetConsoleMode(hOut, &dwMode)) {
+			return;
+		}
+
+		dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+
+		if (!SetConsoleMode(hOut, dwMode)) {
+			return;
+		}
+#endif
+	}
 
 	void Logger::Init(bool async) {
 		if (async) {
@@ -61,27 +85,27 @@ namespace Cori {
 
 	void Logger::SetClientLogLevel(LogLevel level) {
 		switch (level) {
-		case Cori::LogLevel::TRACE:
+		case Cori::LogLevel::CORI_TRACE:
 			CORI_CORE_INFO("Client log level is set to TRACE");
 			s_ClientLogger->set_level(spdlog::level::trace);
 			break;
-		case Cori::LogLevel::DEBUG:
+		case Cori::LogLevel::CORI_DEBUG:
 			CORI_CORE_INFO("Client log level is set to DEBUG");
 			s_ClientLogger->set_level(spdlog::level::debug);
 			break;
-		case Cori::LogLevel::INFO:
+		case Cori::LogLevel::CORI_INFO:
 			CORI_CORE_INFO("Client log level is set to INFO");
 			s_ClientLogger->set_level(spdlog::level::info);
 			break;
-		case Cori::LogLevel::WARN:
+		case Cori::LogLevel::CORI_WARN:
 			CORI_CORE_INFO("Client log level is set to WARN");
 			s_ClientLogger->set_level(spdlog::level::warn);
 			break;
-		case Cori::LogLevel::ERROR:
+		case Cori::LogLevel::CORI_ERROR:
 			CORI_CORE_INFO("Client log level is set to ERROR");
 			s_ClientLogger->set_level(spdlog::level::err);
 			break;
-		case Cori::LogLevel::FATAL:
+		case Cori::LogLevel::CORI_FATAL:
 			CORI_CORE_INFO("Client log level is set to FATAL");
 			s_ClientLogger->set_level(spdlog::level::critical);
 			break;
@@ -90,27 +114,27 @@ namespace Cori {
 
 	void Logger::SetCoreLogLevel(LogLevel level) {
 		switch (level) {
-		case Cori::LogLevel::TRACE:
+		case Cori::LogLevel::CORI_TRACE:
 			CORI_CORE_INFO("Core log level is set to TRACE");
 			s_CoreLogger->set_level(spdlog::level::trace);
 			break;
-		case Cori::LogLevel::DEBUG:
+		case Cori::LogLevel::CORI_DEBUG:
 			CORI_CORE_INFO("Core log level is set to DEBUG");
 			s_CoreLogger->set_level(spdlog::level::debug);
 			break;
-		case Cori::LogLevel::INFO:
+		case Cori::LogLevel::CORI_INFO:
 			CORI_CORE_INFO("Core log level is set to INFO");
 			s_CoreLogger->set_level(spdlog::level::info);
 			break;
-		case Cori::LogLevel::WARN:
+		case Cori::LogLevel::CORI_WARN:
 			CORI_CORE_INFO("Core log level is set to WARN");
 			s_CoreLogger->set_level(spdlog::level::warn);
 			break;
-		case Cori::LogLevel::ERROR:
+		case Cori::LogLevel::CORI_ERROR:
 			CORI_CORE_INFO("Core log level is set to ERROR");
 			s_CoreLogger->set_level(spdlog::level::err);
 			break;
-		case Cori::LogLevel::FATAL:
+		case Cori::LogLevel::CORI_FATAL:
 			CORI_CORE_INFO("Core log level is set to FATAL");
 			s_CoreLogger->set_level(spdlog::level::critical);
 			break;

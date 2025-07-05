@@ -21,16 +21,18 @@ Existing tags hint:
 
 namespace Cori {
 	enum class LogLevel {
-		TRACE,
-		DEBUG,
-		INFO,
-		WARN,
-		ERROR,
-		FATAL
+		CORI_TRACE,
+		CORI_DEBUG,
+		CORI_INFO,
+		CORI_WARN,
+		CORI_ERROR,
+		CORI_FATAL
 	};
 
 	class Logger {
 	public:
+		static void EnableVirtualTerminalProcessing();
+
 		static void Init(bool async);
 
 		inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
@@ -148,6 +150,7 @@ namespace Cori {
 				buffer.push_back(' ');
 
 				const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::green_yellow)));
+
 				const auto start_code_end = styled_dummy.find(' ');
 
 				const auto end_code_start = start_code_end + 1;

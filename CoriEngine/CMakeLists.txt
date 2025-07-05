@@ -20,6 +20,9 @@ project(CoriEngine)
 
     # SDL3
     set(SDL_SHARED OFF)
+    if (CORI_CLANG_TIDY)
+        set(SDL_CLANG_TIDY ON CACHE BOOL "")
+    endif()
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/SDL3 EXCLUDE_FROM_ALL)
 
     # SDL_mixer
@@ -80,6 +83,9 @@ project(CoriEngine)
 
     # spdlog
     set(SPDLOG_BUILD_SHARED OFF CACHE BOOL "")
+    if (CORI_CLANG_TIDY)
+        set(SPDLOG_TIDY ON CACHE BOOL "")
+    endif()
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/spdlog EXCLUDE_FROM_ALL)
 
 
@@ -92,6 +98,9 @@ project(CoriEngine)
     set(ENTT_INCLUDE_HEADERS ON CACHE BOOL "")
     set(ENTT_INCLUDE_TOOLS ON CACHE BOOL "")
     set(ENTT_INSTALL OFF CACHE BOOL "")
+    if (CORI_CLANG_TIDY)
+        set(ENTT_USE_CLANG_TIDY ON CACHE BOOL "")
+    endif()
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/entt EXCLUDE_FROM_ALL)
 
     #box2d

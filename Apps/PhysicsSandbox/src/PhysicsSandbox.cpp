@@ -94,7 +94,7 @@ public:
 			bp.type = b2_dynamicBody;
 			bp.position = { 4.0f, 4.0f };
 
-			auto& rb = ent.AddComponent<Cori::Components::Entity::Rigidbody>(ActiveScene->PhysicsWorld, bp);
+			auto& rb = ent.AddComponent<Cori::Components::Entity::Rigidbody>(ActiveScene->PhysicsWorld, bp, ent);
 			
 			Cori::Physics::Shape::Params sp;
 
@@ -108,7 +108,7 @@ public:
 			bp.type = b2_staticBody;
 			bp.position = { 0.0f, 0.0f };
 
-			auto& rb = ent.AddComponent<Cori::Components::Entity::Rigidbody>(ActiveScene->PhysicsWorld, bp);
+			auto& rb = ent.AddComponent<Cori::Components::Entity::Rigidbody>(ActiveScene->PhysicsWorld, bp, ent);
 
 			Cori::Physics::Shape::Params sp;
 

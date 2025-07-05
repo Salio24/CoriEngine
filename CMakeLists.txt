@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
 
 set(PVS_STUDIO_ACTIVE OFF)
+set(CORI_CLANG_TIDY OFF)
 
 if(PVS_STUDIO_ACTIVE)
     include(FetchContent)

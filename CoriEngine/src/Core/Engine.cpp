@@ -5,6 +5,8 @@
 namespace Cori {
 	void Engine::Start(bool asyncLogging) {
 
+		Logger::EnableVirtualTerminalProcessing();
+
 		Logger::Init(asyncLogging);
 
 		bool SDL_verify = SDL_Init(SDL_INIT_VIDEO);

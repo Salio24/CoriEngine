@@ -27,4 +27,4 @@ namespace Cori {
 	#define PLACEHOLDER_IMPL_18 std::placeholders::_18
 	#define PLACEHOLDER_IMPL_19 std::placeholders::_19
 
-	#define CORI_BIND_EVENT_FN(x, ...) std::bind(&x, this, __VA_ARGS__)
+	#define CORI_BIND_EVENT_FN(x, ...) std::bind(&x, this __VA_OPT__(,) __VA_ARGS__)
