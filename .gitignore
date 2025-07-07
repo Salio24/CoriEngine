@@ -4,6 +4,12 @@
 
 /.vs
 
+# i have sold my soul to the devil xD
+/.idea
+/.cmake-build-debug-mingw_llvm
+/.cmake-build-release-mingw_llvm
+/.cmake-build-relwithdebinfo-mingw_llvm
+
 # build directories 
 */bin/*
 

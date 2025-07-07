@@ -31,6 +31,18 @@ namespace Cori {
 			}
 		}
 
+		Uint8* pixels = (Uint8*)static_cast<SDL_Surface*>(m_Surface)->pixels;
+		for (int y = 0; y < static_cast<SDL_Surface*>(m_Surface)->h; ++y) {
+			Uint8* row = pixels + (y * static_cast<SDL_Surface*>(m_Surface)->pitch);
+			for (int x = 0; x < static_cast<SDL_Surface*>(m_Surface)->w; ++x) {
+				Uint8 alpha = row[x * 4 + 3];
+				if (alpha < 255 && alpha != 0) {
+					m_HasSemiTransparency = true;
+					break;
+				}
+			}
+		}
+
 		if (m_Status) {
 			CORI_CORE_TRACE("Image: Loaded image '{0}' successfully", path);
 		}
@@ -55,6 +67,10 @@ namespace Cori {
 
 	uint32_t Image::GetHeight() const {
 		return static_cast<SDL_Surface*>(m_Surface)->h;
+	}
+
+	bool Image::HasSemiTransparency() const {
+		return m_HasSemiTransparency;
 	}
 
 	void Image::FlipVertically() {

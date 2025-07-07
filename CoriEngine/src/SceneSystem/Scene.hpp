@@ -86,7 +86,9 @@ namespace Cori {
 		std::string m_Name;
 
 	protected:
-		Scene(const std::string& name);
+		friend class Components::Entity::StateMachine;
+
+		explicit Scene(const std::string& name);
 	private:
 
 		std::unordered_map<std::string, entt::handle> m_NamedEntities;

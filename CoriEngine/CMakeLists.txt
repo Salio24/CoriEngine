@@ -138,7 +138,7 @@ if(PVS_STUDIO_ACTIVE)
         ALL                         # run on every build of ALL
         ANALYZE ${ENGINE_LIBRARY_NAME}               # which target to analyze
         MODE 
-            GA:1,2,3     # General Analysis, levels 1–3
+            GA:1,2,3     # General Analysis, levels 1ï¿½3
             64:1,2,3     # 64-bit issues
             OP:1,2,3     # Micro-optimizations
             CS:1,2,3     # Customer-specific

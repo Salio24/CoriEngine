@@ -13,7 +13,8 @@ namespace Cori {
 		void* GetPixelData() const;
 		uint32_t GetWidth() const;
 		uint32_t GetHeight() const;
-		inline bool GetSuccessStatus() const {
+		bool HasSemiTransparency() const;
+		bool GetSuccessStatus() const {
 			return m_Status;
 		}
 
@@ -23,6 +24,8 @@ namespace Cori {
 		Image(const Image&) = delete;
 		Image& operator=(const Image&) = delete;
 	private:
+		bool m_HasSemiTransparency = false;
+
 		bool m_Status{ false };
 		void* m_Surface;
 	};

@@ -39,7 +39,7 @@ public:
 
 		Cori::SceneManager::CreateScene("Test Scene");
 		BindScene("Test Scene");
-		ActiveScene->ActiveCamera.CreateOrthoCamera(0, 640, 0, 360);
+		ActiveScene->ActiveCamera.CreateOrthoCamera(0, 640, 0, 360, -10, 10);
 
 		// can also preload assets like this vvv
 		Cori::AssetManager::PreloadTexture2Ds({
@@ -51,7 +51,9 @@ public:
 		// if the asset is not preloaded it will be loaded the first time it is requested via appropriate
 		// Get function from the Asset Manager
 		Cori::GraphicsCall::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
-		Cori::Logger::DisableCoreTags({ "Graphics" });
+		//Cori::Logger::DisableCoreTags({ "Graphics" });
+
+		Cori::GraphicsCall::EnableBlending();
 	}
 
 	virtual void OnEvent(Cori::Event& event) override {
@@ -217,16 +219,45 @@ public:
 		auto text = atlas->GetTexture().get();
 
 		auto uvs = atlas->GetSpriteUVsAtIndex(23);
+		auto uvs1 = atlas->GetSpriteUVsAtIndex(26);
+
+
 
 		{
 			CORI_PROFILE_SCOPE("Quad Submit");
 			for (int i = 0; i < m_QuadRows; i++) {
 				for (int y = 0; y < m_QuadColumns; y++) {
-					Cori::Test::Renderer2D::SubmitOpaqueQuad(glm::vec2(y * 30.0f + offset, i * 30.0f + offset), glm::vec2(25.0f, 25.0f), 1, text, uvs, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 0, false);
+					//Cori::Test::Renderer2D::SubmitOpaqueQuad(glm::vec2(y * 30.0f + offset, i * 30.0f + offset), glm::vec2(25.0f, 25.0f), 1, text, uvs, glm::vec4(1.0f, 1.0f, 1.0f, 0.5f), 0, false);
 					//Cori::Test::Renderer2D::s_Data->OpaqueQuadQueue.emplace_back(glm::vec2(y * 30.0f + offset, i * 30.0f + offset), glm::vec2(25.0f, 25.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), text, uvs, 0, 1);
 				}
 			}
 		}
+
+		Cori::GraphicsCall::DisableBlending();
+		Cori::GraphicsCall::EnableDepthTest();
+		Cori::GraphicsCall::SetDepthMask(true);
+
+
+
+		Cori::Test::Renderer2D::SubmitOpaqueQuad(glm::vec2(30.0f, 30.0f), glm::vec2(25.0f, 25.0f), 5, text, uvs, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 0, false);
+
+		Cori::Test::Renderer2D::EndScene();
+
+
+		Cori::Test::Renderer2D::BeginScene(ActiveScene->GetContextComponent<Cori::Components::Scene::Camera>());
+
+		Cori::GraphicsCall::EnableBlending();
+		Cori::GraphicsCall::SetDepthMask(false);
+
+
+		Cori::Test::Renderer2D::SubmitOpaqueQuad(glm::vec2(10.0f, 30.0f), glm::vec2(25.0f, 25.0f), 2, text, uvs1, glm::vec4(1.0f, 1.0f, 1.0f, 0.7f), 0, false);
+		Cori::Test::Renderer2D::SubmitOpaqueQuad(glm::vec2(50.0f, 30.0f), glm::vec2(25.0f, 25.0f), 8, text, uvs1, glm::vec4(1.0f, 1.0f, 1.0f, 0.7f), 0, false);
+
+
+		Cori::Test::Renderer2D::EndScene();
+		Cori::GraphicsCall::SetDepthMask(true);
+
+
 
 
 					//const glm::vec4 finalColor = tintColor.a < 1.0f ? glm::vec4{ tintColor.x, tintColor.y, tintColor.y, 1.0f } : tintColor;
@@ -244,7 +275,6 @@ public:
 					//	.layer = 1
 					//});
 
-		Cori::Test::Renderer2D::EndScene();
 #endif
 
 

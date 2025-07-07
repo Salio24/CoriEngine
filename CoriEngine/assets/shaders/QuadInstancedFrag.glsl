@@ -10,7 +10,7 @@ uniform sampler2D u_Texture;
 void main() {
     vec4 textureColor = texture(u_Texture, v_TexCoord);
     
-    if (textureColor.a < 0.1) {
+    if (textureColor.a < 0.01) {
         discard;
     }
 

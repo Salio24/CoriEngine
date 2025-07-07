@@ -22,6 +22,7 @@ namespace Cori {
 		virtual void EnableBlending() = 0;
 		virtual void DisableBlending() = 0;
 
+		virtual void SetDepthMask(bool mode) = 0;
 
 		static std::unique_ptr<CoriGraphicsAPI> Create();
 	};

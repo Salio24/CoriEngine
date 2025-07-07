@@ -29,9 +29,11 @@ namespace Cori {
 					return;
 				}
 
+				std::string atlasPath = (jsonPath.parent_path() / std::string(data["meta"]["image"])).string();
+
 				const Cori::Texture2DDescriptor texture{
-					std::string(animatorName) + std::string(" Atlas "),
-					(jsonPath.parent_path() / std::string(data["meta"]["image"])).string()
+					std::string(animatorName) + std::string(" Atlas"),
+					atlasPath
 				};
 
 				m_Atlas = Cori::AssetManager::GetTexture2DOwning(texture);
@@ -107,8 +109,6 @@ namespace Cori {
 						}
 					}
 				}
-
-				CORI_CORE_DEBUG("AAA");
 			}
 
 			void Animator::UpdateSequence() {

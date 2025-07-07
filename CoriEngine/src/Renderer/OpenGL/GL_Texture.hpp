@@ -16,10 +16,13 @@ namespace Cori {
 		virtual uint32_t GetWidth() const override { return m_Width; }
 		virtual uint32_t GetHeight() const override { return m_Height; }
 
+		virtual bool HasSemiTransparency() const override;
+
 	private:
 		uint32_t m_ID{ 0 };
 		uint32_t m_Width{ 0 };
 		uint32_t m_Height{ 0 };
+		bool m_HasSemiTransparency{ false };
 
 		CORI_REGISTERED_FACTORY_INIT;
 	};

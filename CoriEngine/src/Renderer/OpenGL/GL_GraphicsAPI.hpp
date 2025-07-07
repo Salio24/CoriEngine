@@ -25,6 +25,8 @@ namespace Cori {
 		virtual void EnableBlending() override;
 		virtual void DisableBlending() override;
 
+		virtual void SetDepthMask(bool mode) override;
+
 		CORI_REGISTERED_FACTORY_INIT;
 	};
 }

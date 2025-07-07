@@ -40,6 +40,9 @@ namespace Cori {
 			s_GraphicsAPI->DisableBlending();
 		}
 
+		static void SetDepthMask(bool mode) {
+			s_GraphicsAPI->SetDepthMask(mode);
+		}
 
 	private:
 		static std::unique_ptr<CoriGraphicsAPI> s_GraphicsAPI;

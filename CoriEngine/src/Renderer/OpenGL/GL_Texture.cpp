@@ -14,6 +14,7 @@ namespace Cori {
 		std::unique_ptr<Image> image = std::make_unique<Image>(path);
 		m_Width = image->GetWidth();
 		m_Height = image->GetHeight();
+		m_HasSemiTransparency = image->HasSemiTransparency();
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_ID);
 
@@ -45,4 +46,7 @@ namespace Cori {
 		glBindTextureUnit(slot, m_ID);
 	}
 
+	bool OpenGLTexture2D::HasSemiTransparency() const {
+		return m_HasSemiTransparency;
+	}
 }

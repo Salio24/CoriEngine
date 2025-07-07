@@ -138,6 +138,10 @@ namespace Cori {
 		CORI_CORE_TRACE_TAGGED({ "Graphics", "API" }, "Blending was disabled");
 	}
 
+	void OpenGLGraphicsAPI::SetDepthMask(bool mode) {
+		glDepthMask(mode);
+	}
+
 	OpenGLGraphicsAPI::OpenGLGraphicsAPI() {
 	
 	} 

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
 
 set(PVS_STUDIO_ACTIVE OFF)
-set(CORI_CLANG_TIDY OFF)
+set(CORI_CLANG_TIDY ON)
 
 if(PVS_STUDIO_ACTIVE)
     include(FetchContent)
@@ -14,13 +14,27 @@ if(PVS_STUDIO_ACTIVE)
     include("${pvs_cmakemodule_SOURCE_DIR}/PVS-Studio.cmake")
 endif()
 
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:RelWithDebInfo>:Debug>")
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:>")
+if(CMAKE_CXX_COMPILER MATCHES "/msys[36][24]/")
+    set(CLANG_VARIANT "MSYS2" CACHE STRING "The detected Clang variant (MSYS2)")
+else()
+    set(CLANG_VARIANT "LLVM" CACHE STRING "The detected Clang variant (LLVM)")
+endif()
+
+if(CLANG_VARIANT STREQUAL "LLVM")
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:RelWithDebInfo>:Debug>")
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:>")
+endif ()
 
 set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
 
 project(main)
+
+if(CLANG_VARIANT STREQUAL "MSYS2")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-Bstatic -lc++ -lc++abi -Wl,-Bdynamic")
+endif ()
+
     if (NOT (
             (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/freetype/CMakeLists.txt") AND 
             (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/glad2/cmake/CMakeLists.txt") AND 
