@@ -14,13 +14,17 @@ if(PVS_STUDIO_ACTIVE)
     include("${pvs_cmakemodule_SOURCE_DIR}/PVS-Studio.cmake")
 endif()
 
-if(CMAKE_CXX_COMPILER MATCHES "/msys[36][24]/")
-    set(CLANG_VARIANT "MSYS2" CACHE STRING "The detected Clang variant (MSYS2)")
-else()
-    set(CLANG_VARIANT "LLVM" CACHE STRING "The detected Clang variant (LLVM)")
+if(MSVC)
+    message(FATAL_ERROR "MSVC Compiler frontend is not supported, use GCC or Clang (not clang-cl it has MSVC frontend)")
 endif()
 
-if(CLANG_VARIANT STREQUAL "LLVM")
+if(CMAKE_CXX_COMPILER MATCHES "/msys[36][24]/")
+    set(CLANG_VARIANT "MSYS2" CACHE STRING "Detected MSYS2 environment")
+else()
+    set(CLANG_VARIANT "OTHER" CACHE STRING "Not MSYS2 environment")
+endif()
+
+if(CLANG_VARIANT STREQUAL "OTHER" AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:RelWithDebInfo>:Debug>")
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:>")
@@ -31,8 +35,13 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
 project(main)
 
 if(CLANG_VARIANT STREQUAL "MSYS2")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-Bstatic -lc++ -lc++abi -Wl,-Bdynamic")
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-Bstatic -lc++ -lc++abi -Wl,-Bdynamic")
+    endif()
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc")
+    endif()
 endif ()
 
     if (NOT (
@@ -51,14 +60,6 @@ endif ()
         message(FATAL_ERROR "CoriEngine thirdparty dependencies not found. Are you sure you cloned the repo recursively? Try running 'git submodule update --init --recursive' to download dependencies.")
     endif()
     set(CMAKE_CXX_STANDARD 23)
-
-    if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        message(FATAL_ERROR "Only Clang/LLVM compiler is supported")
-    endif()
-
-    if(MSVC)
-        message(FATAL_ERROR "MSVC Compiler frontend is not supported, use Clang/LLVM with posix frontend")
-    endif()
 
     add_compile_options(-mavx2)
     

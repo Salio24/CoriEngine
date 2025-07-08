@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TIMEPROFILER_H
+#define TIMEPROFILER_H
 
 namespace Cori {
 	namespace Profiling {
@@ -98,4 +99,6 @@ namespace Cori {
 #define CORI_PROFILE_REQUEST_NEXT_FRAME()
 #define CORI_PROFILER_FRAME_START()
 #define CORI_PROFILER_FRAME_END()
+#endif
+
 #endif

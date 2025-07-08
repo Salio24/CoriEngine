@@ -13,6 +13,16 @@
 namespace Cori {
 	namespace Test {
 
+		template<typename T, uint32_t n>
+		class Test {
+		public:
+			Test(int i) {
+				int a = n;
+			}
+		};
+
+
+
 		class Renderer2D {
 		public:
 			struct Quad {
@@ -120,6 +130,7 @@ namespace Cori {
 				glm::mat4 CurrentUIViewProjectionMatrix{ 1.0f };
 
 			};
+
 
 			static RendererData* s_Data;
 

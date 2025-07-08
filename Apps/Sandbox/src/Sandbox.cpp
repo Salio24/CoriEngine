@@ -69,62 +69,45 @@ public:
 
 		static int a = 0;
 
-		if (ImGui::Button("Create 'Test2' Scene")) {
-			Cori::SceneManager::CreateScene("Test2 Scene");
-		}
+		static Cori::Entity ent;
 
-		if (ImGui::Button("Create 'Test' Scene")) {
+		if (ImGui::Button("Setup Scene")) {
 			Cori::SceneManager::CreateScene("Test Scene");
-		}
-
-		if (ImGui::Button("Set Camera")) {
+			BindScene("Test Scene");
 			ActiveScene->ActiveCamera.CreateOrthoCamera(0, 7680, 0, 4320);
 		}
 
-		if (ImGui::Button("Destroy Test2")) {
-			Cori::SceneManager::DestroyScene("Test2 Scene");
+
+		if (ImGui::Button("Create Ent")) {
+			ent = ActiveScene->CreateEntity("Test");
+			auto& rend = ent.AddComponent<Cori::Components::Entity::RenderGroup>(ActiveScene.get(), ent);
+			rend.SetWorldPosition({50.0f, 50.0f});
 		}
 
-		if (ImGui::Button("Destroy Test")) {
-			Cori::SceneManager::DestroyScene("Test Scene");
+
+		if (ImGui::Button("Add Primitive")) {
+			auto& rend = ent.GetComponents<Cori::Components::Entity::RenderGroup>();
+
+			a++;
+
+
+			Cori::Graphics::QuadPrimitive::Descriptor desc;
+			desc.localPosition = {5.0f, 5.0f};
+			desc.size = {1, 1};
+			desc.layer = a;
+
+			rend.AddPrimitive<Cori::Graphics::QuadPrimitive>(desc, "TestPrim"_hs);
 		}
 
-		if (ImGui::Button("Unbind Scene")) {
-			UnbindScene();
-		}
 
-		if (ImGui::Button("Test2 bind")) {
-			BindScene("Test2 Scene");
-		}
 
-		if (ImGui::Button("Test bind")) {
-			BindScene("Test Scene");
-		}
 
-		if (ImGui::Button("Crash")) {
-			ActiveScene->GetNamedEntity("Crash Entity");
-		}
 
-		if (ImGui::Button("Assert")) {
-			CORI_CORE_TRACE_TAGGED({ "Graphics", "API" }, "Submitting command list {0}.", 5);
-			CORI_CORE_DEBUG_TAGGED({ "Graphics", "API" }, "Submitting command list {0}.", 5);
-			CORI_CORE_INFO_TAGGED({ "Graphics", "API" }, "Submitting command list {0}.", 5);
-			CORI_CORE_WARN_TAGGED({ "Renderer", "DX12" }, "Submitting command list {0}.", 5);
-			CORI_CORE_ERROR_TAGGED({ "Renderer", "DX12" }, "Submitting command list {0}.", 5);
-			CORI_CORE_FATAL_TAGGED({ "Renderer", "DX12" }, "Submitting command list {0}.", 5);
-		}
 
-		if (ImGui::Button("tag d")) {
-			Cori::Logger::DisableCoreTags({ "API" });
-		}
 
-		if (ImGui::Button("tag e")) {
-			Cori::Logger::EnableCoreTags({ "API"});
-		}
 
-		if (ImGui::Button("color")) {
-			Cori::Logger::SampleColors();
-		}
+
+
 
 		ImGui::Text("FPS: %.2f", fps);
 		ImGui::Text("FPS 10s avg: %.2f", fps10);

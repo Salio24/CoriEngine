@@ -1,11 +1,15 @@
 #pragma once
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include <box2cpp/box2cpp.h>
 #include "Entity.hpp"
 #include "EventSystem/Event.hpp"
+#include "glm/gtx/type_trait.hpp"
 #include "Renderer/Texture.hpp"
 #include "StateSystem/StateMachine.hpp"
 #include "Renderer/CameraComponent.hpp"
 #include "Renderer/PrimitivePool.hpp"
+#include "Core/Utility/TemplateUtils.hpp"
 
 namespace Cori {
 	namespace Physics {
@@ -46,24 +50,6 @@ namespace Cori {
 				Render() = default;
 				Render(const glm::vec2& position, const glm::vec2& size, float layer = 5.0f, bool textured = true, bool visible = true)
 					: m_Position(position), m_Size(size), m_Layer(layer), m_Textured(textured), m_Visible(visible) {}
-
-
-				void AddPrimitive() {
-
-				}
-				void SetWorldPosition(const glm::vec2 position) {
-					// update primitives in pool
-					m_WorldPosition = position;
-				}
-
-				glm::vec2 GetWorldPosition() const {
-					return m_WorldPosition;
-				}
-
-
-			private:
-				glm::vec2 m_WorldPosition{ 0.0f };
-				std::unordered_map<Graphics::PrimitiveID, uint32_t> m_NamedPrimitives;
 			};
 
 			struct Sprite {

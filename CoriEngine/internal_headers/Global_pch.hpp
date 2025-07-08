@@ -33,6 +33,8 @@
 #include <ostream>
 #include <thread>
 #include <fstream>
+#include <concepts>
+#include <numeric>
 #include <glm/glm.hpp>
 #include <imgui.h>
 #include "../include/Macros.hpp"

@@ -5,13 +5,5 @@
 namespace Cori {
 	namespace Graphics {
 
-		PrimitivePool::PrimitivePool() {
-			m_PrimitivePool.reserve(4096);
-		}
-
-
-		PrimitivePool::~PrimitivePool() {
-
-		}
 	}
 }

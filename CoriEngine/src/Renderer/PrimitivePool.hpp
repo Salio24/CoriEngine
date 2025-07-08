@@ -1,6 +1,6 @@
 #pragma once
-#include "Renderer/Texture.hpp"
-#include "SceneSystem/Entity.hpp"
+#include "Core/Utility/TemplateUtils.hpp"
+#include "Renderer/Primitives.hpp"
 
 namespace Cori {
 	namespace Components {
@@ -10,60 +10,62 @@ namespace Cori {
 	}
 
 	namespace Graphics {
-		struct QuadPrimitive {
-			glm::vec2 worldPosition; // add , SetWorldPos method to render component, and update this in it
-			glm::vec2 localPosition;
-			glm::vec2 size;
-			glm::vec4 tintColor;
-			UVs uvs;
-			Entity owner;
-			float rotation;
-			uint8_t layer;
-			bool hasSemiTransparency;
-
-			void SetTexture(const std::shared_ptr<Texture2D>& t) {
-				hasSemiTransparency = t->HasSemiTransparency();
-				texture = t;
-			}
-		private:
-			std::shared_ptr<Texture2D> texture;
-
-		};
-
-
-		using PrimitiveID = uint32_t;
-		consteval PrimitiveID operator""_pid(const char* str, size_t) {
-			return entt::hashed_string(str).value();
-		}
-
-		struct Primitive {
-
-
-		};
-
+		template<typename Primitive> requires Utils::OneOf<Primitive, QuadPrimitive>
 		class PrimitivePool {
 		public:
-			~PrimitivePool();
-			PrimitivePool();
+			PrimitivePool(uint32_t initialCapacity, Cori::Scene* scene) : ParentScene(scene) {
+				m_PrimitivePool.resize(initialCapacity);
+				m_InvalidIndexes.reserve(initialCapacity);
 
-			uint32_t GetAvailableIndex();
+				m_AvailableIndexes.resize(initialCapacity);
+				std::iota(m_AvailableIndexes.rbegin(), m_AvailableIndexes.rend(), 0);
+			}
+			~PrimitivePool() {}
 
-			void FreeIndex(uint32_t index);
+			uint32_t GetAvailableIndex() {
+				if (m_AvailableIndexes.empty()) {
+					uint32_t oldPoolSize = m_AvailableIndexes.size();
+					m_PrimitivePool.resize(oldPoolSize * m_PoolGrowthFactor);
+					m_AvailableIndexes.reserve(oldPoolSize * m_PoolGrowthFactor);
+					m_InvalidIndexes.reserve(oldPoolSize * m_PoolGrowthFactor);
 
-			std::pair<QuadPrimitive&, uint32_t> AddPrimitive(const QuadPrimitive& quad, PrimitiveID id, const Components::Entity::Render* ownerComponent, const Entity& ownerEntity);
+					uint32_t oldAvailableIndexesSize = m_AvailableIndexes.size();
 
-			void RemovePrimitive(const Components::Entity::Render* ownerComponent, PrimitiveID id);
+					m_AvailableIndexes.resize(oldAvailableIndexesSize + oldPoolSize * (m_PoolGrowthFactor - 1));
 
-			// this is wrong, i need some general class "Primitive" that can describe several types primitives. so use union
-			// or stop fooling around and use templates like any sane person (in c++? lol)
-			QuadPrimitive& GetPrimitive(const Components::Entity::Render* ownerComponent, PrimitiveID id);
+					std::iota(m_AvailableIndexes.begin() + oldAvailableIndexesSize, m_AvailableIndexes.end(), oldPoolSize);
+
+					return oldPoolSize;
+				}
+
+				uint32_t index = m_AvailableIndexes.back();
+				m_AvailableIndexes.pop_back();
+				return index;
+			}
+
+			void InvalidateIndex(uint32_t index) {
+				if (index < m_PrimitivePool.size()) {
+					m_PrimitivePool[index].SetValidity(false);
+					m_InvalidIndexes.push_back(index);
+					return;
+				}
+				CORI_CORE_WARN_TAGGED({"Primitive Pool"}, "Pool Type: {}, can invalidate index '{}', index out of bounds", typeid(Primitive).name(), index);
+			}
+
+
+			std::pair<Primitive*, uint32_t> AddPrimitive(Primitive primitive) {
+				uint32_t index = GetAvailableIndex();
+				m_PrimitivePool[index] = std::move(primitive);
+
+				return {&m_PrimitivePool[index], index};
+			}
+
+			//Well, templates it is, then.
+			Primitive* GetPrimitive(uint32_t index) {
+				return &m_PrimitivePool[index];
+			}
 
 			void SortPoolByTexture();
-
-
-
-
-
 
 
 
@@ -76,12 +78,12 @@ namespace Cori {
 		private:
 			std::vector<Primitive> m_PrimitivePool;
 			std::vector<uint32_t> m_AvailableIndexes;
+			std::vector<uint32_t> m_InvalidIndexes;
 
 			uint32_t m_InterstitialIndexesCount;
+
+			static constexpr uint8_t m_PoolGrowthFactor = 3;
 		};
 
 	}
 }
-
-
-

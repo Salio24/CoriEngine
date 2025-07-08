@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef LOGGER
+#define LOGGER
 #include <spdlog/spdlog.h>
 #include <spdlog/async.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -8,6 +9,16 @@
 #include <spdlog/fmt/bundled/color.h>
 #include <spdlog/fmt/bundled/base.h>
 #include <spdlog/fmt/bundled/format.h>
+
+
+#if defined(__clang__)
+#define BUGTRAP __builtin_debugtrap()
+#elif defined(__GNUC__)
+#define BUGTRAP __builtin_trap()
+#else
+#include <cstdlib>
+#define BUGTRAP std::abort()
+#endif
 
 // TODO: adapt tagging everywhere in engine logging
 
@@ -807,7 +818,7 @@ struct Test {
 	};
 }
 
-const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') + "]: ";
+inline const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') + "]: ";
 
 #ifdef DEBUG_BUILD
 
@@ -840,13 +851,13 @@ const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') + "]: ";
 #define CORI_CORE_ASSERT_INFO(x, ...)  (!(x) ? (CORI_CORE_INFO("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_INFO("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
 #define CORI_CORE_ASSERT_WARN(x, ...)  (!(x) ? (CORI_CORE_WARN("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_WARN("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
 #define CORI_CORE_ASSERT_ERROR(x, ...) (!(x) ? (CORI_CORE_ERROR("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_ERROR("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
-#define CORI_CORE_ASSERT_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_FATAL("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), __builtin_debugtrap(), true) : false)
+#define CORI_CORE_ASSERT_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_FATAL("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), BUGTRAP, true) : false)
 
 #define CORI_CORE_VERIFY_DEBUG(x, ...) (!(x) ? (CORI_CORE_DEBUG("Verify Failed, message: " __VA_ARGS__), CORI_CORE_DEBUG("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
 #define CORI_CORE_VERIFY_INFO(x, ...)  (!(x) ? (CORI_CORE_INFO("Verify Failed, message: " __VA_ARGS__), CORI_CORE_INFO("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
 #define CORI_CORE_VERIFY_WARN(x, ...)  (!(x) ? (CORI_CORE_WARN("Verify Failed, message: " __VA_ARGS__), CORI_CORE_WARN("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
 #define CORI_CORE_VERIFY_ERROR(x, ...) (!(x) ? (CORI_CORE_ERROR("Verify Failed, message: " __VA_ARGS__), CORI_CORE_ERROR("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
-#define CORI_CORE_VERIFY_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Verify Failed, message: " __VA_ARGS__), CORI_CORE_FATAL("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), __builtin_debugtrap(), true) : false)
+#define CORI_CORE_VERIFY_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Verify Failed, message: " __VA_ARGS__), CORI_CORE_FATAL("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), BUGTRAP, true) : false)
 
 #else
 
@@ -868,7 +879,7 @@ const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') + "]: ";
 #define CORI_ASSERT_INFO(x, ...)  (!(x) ? (CORI_INFO("Assertion Failed, message: " __VA_ARGS__), CORI_INFO("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
 #define CORI_ASSERT_WARN(x, ...)  (!(x) ? (CORI_WARN("Assertion Failed, message: " __VA_ARGS__), CORI_WARN("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
 #define CORI_ASSERT_ERROR(x, ...) (!(x) ? (CORI_ERROR("Assertion Failed, message: " __VA_ARGS__), CORI_ERROR("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
-#define CORI_ASSERT_FATAL(x, ...) (!(x) ? (CORI_FATAL("Assertion Failed, message: " __VA_ARGS__), CORI_FATAL("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), __builtin_debugtrap(), true) : false)
+#define CORI_ASSERT_FATAL(x, ...) (!(x) ? (CORI_FATAL("Assertion Failed, message: " __VA_ARGS__), CORI_FATAL("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), BUGTRAP, true) : false)
 
 #define CORI_CORE_TRACE_TAGGED(...) ::Cori::Logger::CoreLogTraceTagged(__VA_ARGS__)
 #define CORI_CORE_DEBUG_TAGGED(...) ::Cori::Logger::CoreLogDebugTagged(__VA_ARGS__)
@@ -883,3 +894,5 @@ const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') + "]: ";
 #define CORI_WARN_TAGGED(...)  ::Cori::Logger::ClientLogWarnTagged(__VA_ARGS__)
 #define CORI_ERROR_TAGGED(...) ::Cori::Logger::ClientLogErrorTagged(__VA_ARGS__)
 #define CORI_FATAL_TAGGED(...) ::Cori::Logger::ClientLogFatalTagged(__VA_ARGS__)
+
+#endif

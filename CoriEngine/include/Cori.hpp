@@ -23,6 +23,9 @@
 #include "../src/Renderer/CameraController.hpp"
 #include "../src/Renderer/Animator/Animator.hpp"
 #include "../src/Renderer/Renderer2DNew.hpp"
+#include "../src/Renderer/RenderGroupComponent.hpp"
+
+#include "../src/Core/Utility/StringHash.hpp"
 
 #include "../src/AssetManager/AssetDefinitions.hpp"
 

@@ -233,29 +233,7 @@ public:
 			}
 		}
 
-		Cori::GraphicsCall::DisableBlending();
-		Cori::GraphicsCall::EnableDepthTest();
-		Cori::GraphicsCall::SetDepthMask(true);
 
-
-
-		Cori::Test::Renderer2D::SubmitOpaqueQuad(glm::vec2(30.0f, 30.0f), glm::vec2(25.0f, 25.0f), 5, text, uvs, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 0, false);
-
-		Cori::Test::Renderer2D::EndScene();
-
-
-		Cori::Test::Renderer2D::BeginScene(ActiveScene->GetContextComponent<Cori::Components::Scene::Camera>());
-
-		Cori::GraphicsCall::EnableBlending();
-		Cori::GraphicsCall::SetDepthMask(false);
-
-
-		Cori::Test::Renderer2D::SubmitOpaqueQuad(glm::vec2(10.0f, 30.0f), glm::vec2(25.0f, 25.0f), 2, text, uvs1, glm::vec4(1.0f, 1.0f, 1.0f, 0.7f), 0, false);
-		Cori::Test::Renderer2D::SubmitOpaqueQuad(glm::vec2(50.0f, 30.0f), glm::vec2(25.0f, 25.0f), 8, text, uvs1, glm::vec4(1.0f, 1.0f, 1.0f, 0.7f), 0, false);
-
-
-		Cori::Test::Renderer2D::EndScene();
-		Cori::GraphicsCall::SetDepthMask(true);
 
 
 

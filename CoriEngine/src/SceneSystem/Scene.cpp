@@ -5,7 +5,7 @@
 
 namespace Cori {
 
-	Scene::Scene(const std::string& name) : m_Name(name) {
+	Scene::Scene(const std::string& name) : m_Name(name), m_PrimitivePools(Graphics::PrimitivePool<Graphics::QuadPrimitive>(1024, this)) {
 		AddContextComponent<Components::Scene::Camera>();
 		ActiveCamera.BindCameraComponent(&GetContextComponent<Components::Scene::Camera>());
 		CORI_CORE_DEBUG("Scene: '{0}' created.", m_Name);

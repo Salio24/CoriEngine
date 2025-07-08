@@ -6,8 +6,16 @@
 #include "EventSystem/Event.hpp"
 #include "Physics/Physics.hpp"
 #include "StateSystem/StateMachine.hpp"
+#include "Renderer/PrimitivePool.hpp"
 
 namespace Cori {
+
+	namespace Components {
+		namespace Entity {
+			struct RenderGroup;
+		}
+	}
+
 
 	template<typename... T>
 	inline constexpr auto& Exclude = entt::exclude<T...>;
@@ -87,6 +95,17 @@ namespace Cori {
 
 	protected:
 		friend class Components::Entity::StateMachine;
+
+		friend struct Components::Entity::RenderGroup;
+
+		std::tuple<
+		Graphics::PrimitivePool<Graphics::QuadPrimitive>
+		> m_PrimitivePools;
+
+		template<typename T>
+		Graphics::PrimitivePool<T>& GetPoolForType() {
+			return std::get<Graphics::PrimitivePool<T>>(m_PrimitivePools);
+		}
 
 		explicit Scene(const std::string& name);
 	private:
