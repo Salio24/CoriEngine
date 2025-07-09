@@ -29,7 +29,7 @@ namespace Cori {
 				}
 
 			private:
-				PackedArray<Cori::Entity, uint8_t, CORI_MAX_TRIGGER_VISITORS> m_VisitorBuffer;
+				PackedArray<Cori::Entity, uint32_t, CORI_MAX_TRIGGER_VISITORS> m_VisitorBuffer;
 
 				std::unique_ptr<Cori::Physics::TriggerBehaviour> m_Behavior{ nullptr };
 			};

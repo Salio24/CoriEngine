@@ -12,8 +12,8 @@ namespace Cori {
 			m_RuntimeID(s_NextRuntimeID.fetch_add(1, std::memory_order_relaxed))
 		{ }
 
-		inline uint32_t GetRuntimeID() const { return m_RuntimeID; }
-		inline std::string_view GetDebugName() const { return m_DebugName; }
+		[[nodiscard]] uint32_t GetRuntimeID() const { return m_RuntimeID; }
+		[[nodiscard]] std::string_view GetDebugName() const { return m_DebugName; }
 
 		constexpr auto operator<=>(const SpriteAtlasDescriptor& other) const noexcept {
 			return m_RuntimeID <=> other.m_RuntimeID;

@@ -90,7 +90,25 @@ namespace Cori {
 		}
 
 		void Renderer2D::EndInstancedSet() {
-			FlushInstancedQuads();
+			if (s_Data->QuadInstanceCount != 0) {
+				if (s_Data->CurrentVertexArray != s_Data->QuadInstanceVertexArray.get()) {
+					s_Data->QuadInstanceVertexArray->Bind();
+					s_Data->CurrentVertexArray = s_Data->QuadInstanceVertexArray.get();
+				}
+				if (s_Data->CurrentVertexBuffer != s_Data->QuadInstanceVertexBuffer.get()) {
+					s_Data->QuadInstanceVertexBuffer->Bind();
+					s_Data->CurrentVertexBuffer = s_Data->QuadInstanceVertexBuffer.get();
+				}
+				if (s_Data->CurrentIndexBuffer != s_Data->QuadInstanceIndexBuffer.get()) {
+					s_Data->QuadInstanceIndexBuffer->Bind();
+					s_Data->CurrentIndexBuffer = s_Data->QuadInstanceIndexBuffer.get();
+				}
+				if (s_Data->CurrentShader != s_Data->QuadInstanceShader.get()) {
+					s_Data->QuadInstanceShader->Bind();
+					s_Data->CurrentShader = s_Data->QuadInstanceShader.get();
+				}
+				FlushInstancedQuads();
+			}
 		}
 
 
@@ -100,60 +118,103 @@ namespace Cori {
 		}
 
 		void Renderer2D::SubmitTransparentQuad(glm::vec2 position, glm::vec2 size, uint8_t layer, Texture2D* texture, const UVs& uvs, const glm::vec4& tintColor, float rotation, bool flipped) {
-			s_Data->TransparentQuadQueue.emplace_back(position, size, tintColor, texture ? texture : s_Data->WhiteTexture.get(), flipped ? UVs{ {uvs.UVmax.x, uvs.UVmin.y}, {uvs.UVmin.x, uvs.UVmax.y} } : uvs, rotation, layer);
+			//s_Data->TransparentQuadQueue.emplace_back(position, size, tintColor, texture ? texture : s_Data->WhiteTexture.get(), flipped ? UVs{ {uvs.UVmax.x, uvs.UVmin.y}, {uvs.UVmin.x, uvs.UVmax.y} } : uvs, rotation, layer);
 		}
 
-		// maybe add tiling factor????
-		// maybe tiling factor should be n in 2^n?? and an int??, so pixelart would look nice
 
-		void Renderer2D::DrawQuadInstanced(const Quad& quad) {
-			if (CORI_CORE_ASSERT_ERROR(quad.texture, "Texture is nullptr, trying to avoid read access violation")) { return; }
+
+		void Renderer2D::SubmitTransparentQuad(const Graphics::QuadPrimitive& quad) {
+			s_Data->TransparentQuadQueue.emplace_back(
+				quad.worldOrigin + quad.localPosition,
+				quad.size,
+				quad.tintColor,
+				quad.IsFlatColored() ? s_Data->WhiteTexture.get() : quad.texture.get(),
+				quad.IsFlipped() ? UVs{ {quad.uvs.UVmax.x, quad.uvs.UVmin.y}, {quad.uvs.UVmin.x, quad.uvs.UVmax.y} } : quad.uvs,
+				quad.rotation,
+				quad.layer
+			);
+		}
+
+		void Renderer2D::DrawQuadInstanced(const Graphics::QuadPrimitive& quad) {
+			Texture2D* texture = quad.IsFlatColored() ? s_Data->WhiteTexture.get() : quad.texture.get();
+			if (CORI_CORE_ASSERT_ERROR(texture, "Texture is nullptr, trying to avoid read access violation")) { return; }
 			if (s_Data->QuadInstanceCount >= s_Data->MaxInstanceCount) {
 				StartNewInstancedSet();
 			}
 
-			if (s_Data->NecessaryTexture != quad.texture) {
+			if (s_Data->NecessaryTexture != texture) {
 				if (!s_Data->NecessaryTexture) {
-					s_Data->NecessaryTexture = quad.texture;
+					s_Data->NecessaryTexture = texture;
 				}
 				else {
 					StartNewInstancedSet();
-					s_Data->NecessaryTexture = quad.texture;
+					s_Data->NecessaryTexture = texture;
 				}
 			}
 
-			s_Data->QuadInstanceBufferPtr->WorldPosition = quad.position;
+			s_Data->QuadInstanceBufferPtr->WorldPosition = quad.worldOrigin + quad.localPosition;
 			s_Data->QuadInstanceBufferPtr->LocalPosition = { 1.0f, 1.0f };
-			s_Data->QuadInstanceBufferPtr->TexturePosition = { quad.uvs.UVmin, quad.uvs.UVmax };
+			s_Data->QuadInstanceBufferPtr->TexturePosition = quad.IsFlipped() ? glm::vec4{ quad.uvs.UVmax.x, quad.uvs.UVmin.y, quad.uvs.UVmin.x, quad.uvs.UVmax.y } : glm::vec4{quad.uvs.UVmin, quad.uvs.UVmax};
 			s_Data->QuadInstanceBufferPtr->Size = quad.size;
 			s_Data->QuadInstanceBufferPtr->TintColor = quad.tintColor;
 			s_Data->QuadInstanceBufferPtr->Layer = quad.layer;
 			s_Data->QuadInstanceBufferPtr->Rotation = glm::radians(quad.rotation);
 			s_Data->QuadInstanceBufferPtr++;
 
+			s_Data->QuadInstanceCount++;
+
+			s_Data->Stats.QuadCount++;
+		}
+
+		// maybe add tiling factor????
+		// maybe tiling factor should be n in 2^n?? and an int??, so pixelart would look nice
+
+		void Renderer2D::DrawQuadInstanced(const Quad& quad) {
+			if (CORI_CORE_ASSERT_ERROR(quad.m_Texture, "Texture is nullptr, trying to avoid read access violation")) { return; }
+			if (s_Data->QuadInstanceCount >= s_Data->MaxInstanceCount) {
+				StartNewInstancedSet();
+			}
+
+			if (s_Data->NecessaryTexture != quad.m_Texture) {
+				if (!s_Data->NecessaryTexture) {
+					s_Data->NecessaryTexture = quad.m_Texture;
+				}
+				else {
+					StartNewInstancedSet();
+					s_Data->NecessaryTexture = quad.m_Texture;
+				}
+			}
+
+			s_Data->QuadInstanceBufferPtr->WorldPosition = quad.m_Position;
+			s_Data->QuadInstanceBufferPtr->LocalPosition = { 1.0f, 1.0f };
+			s_Data->QuadInstanceBufferPtr->TexturePosition = { quad.m_UVs.UVmin, quad.m_UVs.UVmax };
+			s_Data->QuadInstanceBufferPtr->Size = quad.m_Size;
+			s_Data->QuadInstanceBufferPtr->TintColor = quad.m_TintColor;
+			s_Data->QuadInstanceBufferPtr->Layer = quad.m_Layer;
+			s_Data->QuadInstanceBufferPtr->Rotation = glm::radians(quad.m_Rotation);
+			s_Data->QuadInstanceBufferPtr++;
+
 
 			s_Data->QuadInstanceCount++;
 
 			s_Data->Stats.QuadCount++;
-
 		}
-
 
 
 		void Renderer2D::DrawTransparentInstancedQuads() {
 			CORI_PROFILE_FUNCTION();
 			if (s_Data->TransparentQuadQueue.empty()) { return; }
 
-			{
-				CORI_PROFILE_SCOPE("Opaque sort inst");
-				ska_sort(
-					s_Data->TransparentQuadQueue.begin(),
-					s_Data->TransparentQuadQueue.end(),
-					[](const Quad& quad) -> uint8_t {
-						return quad.layer;
-					}
-				);
-			}
+			//{
+			//	CORI_PROFILE_SCOPE("Opaque sort inst");
+			//	ska_sort(
+			//		s_Data->TransparentQuadQueue.begin(),
+			//		s_Data->TransparentQuadQueue.end(),
+			//		[](const Quad& quad) -> uint8_t {
+			//			return quad.layer;
+			//		}
+			//	);
+			//}
 
 
 		}

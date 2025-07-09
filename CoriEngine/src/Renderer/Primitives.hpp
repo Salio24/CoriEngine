@@ -3,7 +3,18 @@
 #include "Renderer/Texture.hpp"
 
 namespace Cori {
+	class Scene;
+
+	namespace Test {
+		class Renderer2D;
+	}
+
 	namespace Graphics {
+		struct QuadPrimitive;
+
+		template<typename Primitive> requires Utils::OneOf<Primitive, QuadPrimitive>
+		class PrimitivePool;
+
 		enum PrimitiveType : uint8_t {
 			Quad = 1 << 0,
 			Circle = 1 << 1,
@@ -16,12 +27,15 @@ namespace Cori {
 		};
 
 		struct QuadPrimitive {
-			static constexpr uint8_t SemiTransparencyMask = 1 << 0;
-			static constexpr uint8_t VisibilityMask = 1 << 1;
-			static constexpr uint8_t ValidityMask = 1 << 2;
-			static constexpr uint8_t FlippedMask = 1 << 3;
+			enum Options : uint8_t {
+				SemiTransparent = 1 << 0,
+				Visible = 1 << 1,
+				Valid = 1 << 2,
+				Flipped = 1 << 3,
+				FlatColored = 1 << 4,
+			};
 
-			glm::vec2 worldPosition; // add , SetWorldPos method to render component, and update this in it
+			glm::vec2 worldOrigin;
 			glm::vec2 localPosition;
 			glm::vec2 size;
 			glm::vec4 tintColor;
@@ -30,59 +44,71 @@ namespace Cori {
 			float rotation;
 			uint8_t layer;
 
-			void SetTexture(const std::shared_ptr<Texture2D>& t) {
-				if (t) {
-					SetSemiTransparency(t->HasSemiTransparency());
+			void SetTexture(const std::shared_ptr<Texture2D>& tex) {
+				if (!states & SemiTransparent) {
+					SetSemiTransparency(tex->HasSemiTransparency());
 				}
-				texture = t;
+				texture = tex;
 			}
 
 			void SetSemiTransparency(const bool b) {
 				if (b) {
-					states = states | SemiTransparencyMask;
+					states = states | SemiTransparent;
 				} else {
-					states = states & ~SemiTransparencyMask;
+					states = states & ~SemiTransparent;
 				}
 			}
 
-			bool GetSemiTransparency() const {
-				return states & SemiTransparencyMask;
+			bool IsSemiTransparent() const {
+				return states & SemiTransparent;
 			}
 
 			void SetVisibility(const bool b) {
 				if (b) {
-					states = states | VisibilityMask;
+					states = states | Visible;
 				} else {
-					states = states & ~VisibilityMask;
+					states = states & ~Visible;
 				}
 			}
 
-			bool GetVisibility() const {
-				return states & VisibilityMask;
+			bool IsVisible() const {
+				return states & Visible;
 			}
 
 			void SetValidity(const bool b) {
 				if (b) {
-					states = states | ValidityMask;
+					states = states | Valid;
 				} else {
-					states = states & ~ValidityMask;
+					states = states & ~Valid;
 				}
 			}
 
-			bool GetValidity() const {
-				return states & ValidityMask;
+			bool IsValid() const {
+				return states & Valid;
 			}
 
 			void SetFlipped(const bool b) {
 				if (b) {
-					states = states | FlippedMask;
+					states = states | Flipped;
 				} else {
-					states = states & ~FlippedMask;
+					states = states & ~Flipped;
 				}
 			}
 
-			bool GetFlipped() const {
-				return states & FlippedMask;
+			bool IsFlipped() const {
+				return states & Flipped;
+			}
+
+			void SetFlatColored(const bool b) {
+				if (b) {
+					states = states | FlatColored;
+				} else {
+					states = states & ~FlatColored;
+				}
+			}
+
+			bool IsFlatColored() const {
+				return states & FlatColored;
 			}
 
 			struct Descriptor {
@@ -94,9 +120,14 @@ namespace Cori {
 				float rotation{ 0 };
 				uint8_t layer;
 			};
+			protected:
+			friend class Cori::Scene;
+			friend class Cori::Test::Renderer2D;
+			friend class PrimitivePool<QuadPrimitive>;
 
-		private:
 			uint8_t states{0};
+
+
 			std::shared_ptr<Texture2D> texture{nullptr};
 
 		};
@@ -109,6 +140,6 @@ namespace Cori {
 			static constexpr PrimitiveType type = PrimitiveType::Quad;
 			static constexpr const char* name = "Quad";
 		};
-
+		// add the rest of typetraits later
 	}
 }

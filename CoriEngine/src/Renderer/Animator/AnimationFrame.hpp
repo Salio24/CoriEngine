@@ -4,6 +4,6 @@
 namespace Cori {
 	struct AnimationFrame {
 		UVs m_UVs;
-		uint8_t m_TickDuration;
+		uint32_t m_TickDuration;
 	};
 }

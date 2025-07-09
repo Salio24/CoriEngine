@@ -9,35 +9,24 @@
 #include "CameraComponent.hpp"
 #include "AssetManager/AssetManager.hpp"
 #include "GraphicsCall.hpp"
+#include "PrimitivePool.hpp"
 
 namespace Cori {
 	namespace Test {
-
-		template<typename T, uint32_t n>
-		class Test {
-		public:
-			Test(int i) {
-				int a = n;
-			}
-		};
-
-
-
 		class Renderer2D {
-		public:
 			struct Quad {
-				glm::vec2 position;
-				glm::vec2 size;
-				glm::vec4 tintColor;
-				Texture2D* texture;
-				UVs uvs;
-				float rotation;
-				uint8_t layer;
+				glm::vec2 m_Position;
+				glm::vec2 m_Size;
+				glm::vec4 m_TintColor;
+				Texture2D* m_Texture;
+				UVs m_UVs;
+				float m_Rotation;
+				uint32_t m_Layer;
 
-				Quad(const glm::vec2& pos, const glm::vec2& sz, const glm::vec4& color, Texture2D* tex, const UVs& texCoords, float rot, uint8_t lyr)
-					: position(pos), size(sz), tintColor(color), texture(tex), uvs(texCoords), rotation(rot), layer(lyr) {
-				}
+				Quad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, Texture2D* texture, const UVs& uvs, float rotation, uint32_t layer)
+					: m_Position(position), m_Size(size), m_TintColor(color), m_Texture(texture), m_UVs(uvs), m_Rotation(rotation), m_Layer(layer) {}
 			};
+		public:
 
 			static void Init();
 			static void Shutdown();
@@ -47,7 +36,14 @@ namespace Cori {
 
 			static void SubmitTransparentQuad(glm::vec2 position, glm::vec2 size, uint8_t layer, Texture2D* texture, const UVs& uvs, const glm::vec4& tintColor, float rotation, bool flipped);
 
+			static void SubmitTransparentQuad(const Graphics::QuadPrimitive& quad);
+
 			static void DrawQuadInstanced(const Quad& quad);
+
+			static void DrawQuadInstanced(const Graphics::QuadPrimitive& quad);
+
+			//static void DrawQuadInstanced(glm::vec2 position, );
+
 			// void DrawCircle(...);
 			// void DrawLine(...);
 
@@ -71,10 +67,13 @@ namespace Cori {
 				then create a draw overloads 
 			*/
 
+			static void BeginInstancedSet();
+			static void EndInstancedSet();
 
 
 
 		private:
+
 
 			struct QuadInstanace {
 				glm::vec2 WorldPosition{ 0.0f };
@@ -88,8 +87,7 @@ namespace Cori {
 				QuadInstanace() = default;
 
 				QuadInstanace(const glm::vec2& pos, const glm::vec2& lpos, const glm::vec4& uvs, glm::vec2 sz, const glm::vec4& color, float layer, float rot)
-					: WorldPosition(pos), LocalPosition(lpos), TexturePosition(uvs), Size(sz), TintColor(color), Layer(layer), Rotation(rot) {
-				}
+					: WorldPosition(pos), LocalPosition(lpos), TexturePosition(uvs), Size(sz), TintColor(color), Layer(layer), Rotation(rot) {}
 			};
 
 
@@ -134,8 +132,7 @@ namespace Cori {
 
 			static RendererData* s_Data;
 
-			static void BeginInstancedSet();
-			static void EndInstancedSet();
+
 			static void StartNewInstancedSet();
 
 			static void DrawTransparentInstancedQuads();

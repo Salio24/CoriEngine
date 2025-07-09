@@ -1,6 +1,5 @@
 #pragma once
 #define GLM_ENABLE_EXPERIMENTAL
-
 #include <box2cpp/box2cpp.h>
 #include "Entity.hpp"
 #include "EventSystem/Event.hpp"
@@ -31,7 +30,6 @@ namespace Cori {
 				Name() = default;
 				explicit Name(const std::string& name) : m_Name(name) {}
 			};
-
 
 			// add an ability to add multiple plains to an entity
 			// combing sprite and render component into one

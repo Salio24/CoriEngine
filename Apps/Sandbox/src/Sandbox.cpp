@@ -90,24 +90,35 @@ public:
 
 			a++;
 
+			auto atlas = Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::Atlas);
+
+			auto uvs = atlas->GetSpriteUVsAtIndex(23 + a);
 
 			Cori::Graphics::QuadPrimitive::Descriptor desc;
-			desc.localPosition = {5.0f, 5.0f};
-			desc.size = {1, 1};
-			desc.layer = a;
+			desc.localPosition = {50.0f * a, 50.0f * a};
+			desc.size = {100, 100};
+			desc.layer = 3;
+			desc.texture = atlas->GetTexture();
+			desc.uvs = uvs;
 
-			rend.AddPrimitive<Cori::Graphics::QuadPrimitive>(desc, "TestPrim"_hs);
+			rend.AddPrimitive<Cori::Graphics::QuadPrimitive>(desc);
 		}
 
+		if (ImGui::Button("Invalidate")) {
+			auto& pool = ActiveScene->GetPoolForType<Cori::Graphics::QuadPrimitive>();
+			pool.InvalidatePrimitive(2);
+			pool.InvalidatePrimitive(5);
+			pool.InvalidatePrimitive(11);
+			pool.InvalidatePrimitive(9);
+			pool.InvalidatePrimitive(8);
+			pool.InvalidatePrimitive(3);
+			pool.InvalidatePrimitive(6);
+		}
 
-
-
-
-
-
-
-
-
+		if (ImGui::Button("Defrag")) {
+			auto& pool = ActiveScene->GetPoolForType<Cori::Graphics::QuadPrimitive>();
+			pool.Defragment();
+		}
 
 		ImGui::Text("FPS: %.2f", fps);
 		ImGui::Text("FPS 10s avg: %.2f", fps10);

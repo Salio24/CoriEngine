@@ -7,7 +7,7 @@ namespace Cori {
 		Animation( const std::vector<AnimationFrame>& frames) : m_Frames(std::move(frames)) {}
 
 		std::vector<AnimationFrame> m_Frames;
-		uint8_t m_CurrentFrame{ 0 };
-		uint8_t m_CurrentFrameTick{ 0 };
+		uint32_t m_CurrentFrame{ 0 };
+		uint32_t m_CurrentFrameTick{ 0 };
 	};
 }

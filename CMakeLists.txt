@@ -32,7 +32,7 @@ endif ()
 
 set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
 
-project(main)
+set(THREADS_PREFER_STATIC_FLAG ON)
 
 if(CLANG_VARIANT STREQUAL "MSYS2")
     if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -40,9 +40,12 @@ if(CLANG_VARIANT STREQUAL "MSYS2")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-Bstatic -lc++ -lc++abi -Wl,-Bdynamic")
     endif()
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc -static")
     endif()
 endif ()
+
+project(main)
+
 
     if (NOT (
             (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/freetype/CMakeLists.txt") AND 

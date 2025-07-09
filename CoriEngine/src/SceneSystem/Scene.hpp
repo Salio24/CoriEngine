@@ -7,6 +7,7 @@
 #include "Physics/Physics.hpp"
 #include "StateSystem/StateMachine.hpp"
 #include "Renderer/PrimitivePool.hpp"
+#include "Renderer/Renderer2DNew.hpp"
 
 namespace Cori {
 
@@ -93,7 +94,6 @@ namespace Cori {
 
 		std::string m_Name;
 
-	protected:
 		friend class Components::Entity::StateMachine;
 
 		friend struct Components::Entity::RenderGroup;
@@ -108,6 +108,7 @@ namespace Cori {
 		}
 
 		explicit Scene(const std::string& name);
+	protected:
 	private:
 
 		std::unordered_map<std::string, entt::handle> m_NamedEntities;

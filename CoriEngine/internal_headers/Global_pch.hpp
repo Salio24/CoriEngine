@@ -35,6 +35,7 @@
 #include <fstream>
 #include <concepts>
 #include <numeric>
+#include <bit>
 #include <glm/glm.hpp>
 #include <imgui.h>
 #include "../include/Macros.hpp"

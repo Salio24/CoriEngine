@@ -5,7 +5,7 @@
 
 namespace Cori {
 
-	Scene::Scene(const std::string& name) : m_Name(name), m_PrimitivePools(Graphics::PrimitivePool<Graphics::QuadPrimitive>(1024, this)) {
+	Scene::Scene(const std::string& name) : m_Name(name), m_PrimitivePools(Graphics::PrimitivePool<Graphics::QuadPrimitive>(CORI_GRAPHICS_QUAD_POOL_INITIAL_SIZE, this)) {
 		AddContextComponent<Components::Scene::Camera>();
 		ActiveCamera.BindCameraComponent(&GetContextComponent<Components::Scene::Camera>());
 		CORI_CORE_DEBUG("Scene: '{0}' created.", m_Name);
@@ -66,7 +66,27 @@ namespace Cori {
 			}
 		}
 		Renderer2D::EndBatch();
-		
+
+		Test::Renderer2D::BeginScene(GetContextComponent<Components::Scene::Camera>());
+
+		Test::Renderer2D::BeginInstancedSet();
+
+
+
+		// move to renderer method: drawscene
+		for (auto& quad : GetPoolForType<Graphics::QuadPrimitive>()) {
+			if ((quad.states & (Graphics::QuadPrimitive::Options::Visible | Graphics::QuadPrimitive::Options::Valid)) == (Graphics::QuadPrimitive::Options::Visible | Graphics::QuadPrimitive::Options::Valid)) {
+				if (quad.IsSemiTransparent()) {
+					Test::Renderer2D::SubmitTransparentQuad(quad);
+					continue;
+				}
+				Test::Renderer2D::DrawQuadInstanced(quad);
+			}
+		}
+
+		Test::Renderer2D::EndInstancedSet();
+
+		Test::Renderer2D::EndScene();
 	}
 
 	void Scene::OnTickUpdate(const float timeStep) {

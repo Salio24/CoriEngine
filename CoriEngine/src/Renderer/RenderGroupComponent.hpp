@@ -3,6 +3,7 @@
 #include "SceneSystem/Entity.hpp"
 #include "Renderer/PrimitivePool.hpp"
 #include "Core/Utility/StringHash.hpp"
+#include "Core/Utility/Random.hpp"
 
 namespace Cori {
 	namespace Components {
@@ -13,14 +14,26 @@ namespace Cori {
 
 				RenderGroup() = default;
 				RenderGroup(Cori::Scene* scene, Cori::Entity entity) : m_ParentScene(scene), m_ParentEntity(entity) {}
-
+				~RenderGroup() {
+					auto& quadPool = m_ParentScene->GetPoolForType<Graphics::QuadPrimitive>();
+					for (auto& [index, type] : m_NamedPrimitives | std::views::values) {
+						switch (type) {
+						case Graphics::Quad:
+							quadPool.InvalidatePrimitive(index);
+							break;
+						default: // add cases for other primitives later
+							break;
+						}
+					}
+				}
 
 				template <typename T> requires Utils::OneOf<T, Graphics::QuadPrimitive>
-				std::expected<T*, const char*> AddPrimitive(const typename T::Descriptor& descriptor, const Utils::StringHash id) {
+				std::expected<T*, const char*> AddPrimitive(const typename T::Descriptor& descriptor, const Utils::StringHash id = Utils::RandomUint32::Gen()) {
 					if (m_NamedPrimitives.contains(id)) { return std::unexpected("Error: Primitive the specified name already exists in the hash map"); }
 
 					T primitive;
-					primitive.worldPosition = m_WorldPosition;
+					// constexpr branch here for other primitive types
+					primitive.worldOrigin = m_WorldPosition;
 					primitive.localPosition = descriptor.localPosition;
 					primitive.size = descriptor.size;
 					primitive.tintColor = descriptor.tintColor;
@@ -31,6 +44,8 @@ namespace Cori {
 					primitive.SetTexture(descriptor.texture);
 
 					auto [primPtr, index] = m_ParentScene->GetPoolForType<T>().AddPrimitive(primitive);
+					primPtr->SetValidity(true);
+					primPtr->SetVisibility(true);
 
 					m_NamedPrimitives.insert({id, {index, Graphics::PrimitiveTypeTraits<T>::type}});
 
@@ -44,7 +59,6 @@ namespace Cori {
 						if (Graphics::PrimitiveTypeTraits<T>::IsValid(type) != type) {
 							return std::unexpected("Error: Specified primitive type doesnt match the type at the specified id.");
 						}
-
 						return m_ParentScene->GetPoolForType<T>().GetPrimitive(index);
 					}
 					return std::unexpected("Error: No primitive with the specified id found in the hashmap.");
@@ -52,14 +66,19 @@ namespace Cori {
 
 				void SetWorldPosition(glm::vec2 position) {
 					if (!m_NamedPrimitives.empty()) {
-						auto& pool = m_ParentScene->GetPoolForType<Graphics::QuadPrimitive>();
-						for (auto& pos : m_NamedPrimitives) {
-							pool.GetPrimitive(pos.second.index)->worldPosition = position;
+						auto& quadPool = m_ParentScene->GetPoolForType<Graphics::QuadPrimitive>();
+						for (auto& [index, type] : m_NamedPrimitives | std::views::values) {
+							switch (type) {
+							case Graphics::Quad:
+								quadPool.GetPrimitive(index)->worldOrigin = position;
+								break;
+							default: // add cases for other primitives later
+								break;
+							}
 						}
 					}
 					m_WorldPosition = position;
 				}
-
 
 				glm::vec2 GetWorldPosition() const {
 					return m_WorldPosition;
