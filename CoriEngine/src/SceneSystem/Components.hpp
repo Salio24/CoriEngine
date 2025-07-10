@@ -7,7 +7,6 @@
 #include "Renderer/Texture.hpp"
 #include "StateSystem/StateMachine.hpp"
 #include "Renderer/CameraComponent.hpp"
-#include "Renderer/PrimitivePool.hpp"
 #include "Core/Utility/TemplateUtils.hpp"
 
 namespace Cori {

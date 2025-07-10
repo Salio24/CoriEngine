@@ -8,6 +8,7 @@ namespace Cori {
 	public:
 
 		// add const variants
+		// add check to validation of entity validity in methods
 		Entity() = default;
 
 		Entity(entt::handle handle) : m_EntityHandle(handle) {}

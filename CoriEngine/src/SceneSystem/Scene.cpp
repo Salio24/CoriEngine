@@ -2,15 +2,33 @@
 #include "Renderer/Renderer2D.hpp"
 #include "Renderer/CameraController.hpp"
 #include "Physics/Triggers/Trigger.hpp"
+#include "Renderer/Renderer2DNew.hpp"
 
 namespace Cori {
 
-	Scene::Scene(const std::string& name) : m_Name(name), m_PrimitivePools(Graphics::PrimitivePool<Graphics::QuadPrimitive>(CORI_GRAPHICS_QUAD_POOL_INITIAL_SIZE, this)) {
+	struct PoolStorage {
+		std::tuple<
+			Graphics::PrimitivePool<Graphics::QuadPrimitive>
+		> m_PrimitivePools;
+
+		PoolStorage(Scene* parentScene) : m_PrimitivePools(
+				Graphics::PrimitivePool<Graphics::QuadPrimitive>(CORI_GRAPHICS_QUAD_POOL_INITIAL_SIZE, parentScene)
+			)
+		{}
+	};
+
+	//Scene::Scene(const std::string& name) : m_Name(name), m_PrimitivePools(Graphics::PrimitivePool<Graphics::QuadPrimitive>(CORI_GRAPHICS_QUAD_POOL_INITIAL_SIZE, this)) {
+	Scene::Scene(const std::string& name) : m_Name(name), m_pImpl(std::make_unique<PoolStorage>(this)) {
 		AddContextComponent<Components::Scene::Camera>();
 		ActiveCamera.BindCameraComponent(&GetContextComponent<Components::Scene::Camera>());
 		CORI_CORE_DEBUG("Scene: '{0}' created.", m_Name);
 		auto renderGroup = m_Registry.group<Components::Entity::Render, Components::Entity::Sprite>();
 
+	}
+
+	template<typename Primitive>
+	Graphics::PrimitivePool<Primitive>& Scene::GetPoolForType() {
+		return std::get<Graphics::PrimitivePool<Primitive>>(m_pImpl->m_PrimitivePools);
 	}
 
 	Scene::~Scene() {
@@ -75,7 +93,7 @@ namespace Cori {
 
 		// move to renderer method: drawscene
 		for (auto& quad : GetPoolForType<Graphics::QuadPrimitive>()) {
-			if ((quad.states & (Graphics::QuadPrimitive::Options::Visible | Graphics::QuadPrimitive::Options::Valid)) == (Graphics::QuadPrimitive::Options::Visible | Graphics::QuadPrimitive::Options::Valid)) {
+			if ((quad.m_States & (Graphics::QuadPrimitive::Options::Visible | Graphics::QuadPrimitive::Options::Valid)) == (Graphics::QuadPrimitive::Options::Visible | Graphics::QuadPrimitive::Options::Valid)) {
 				if (quad.IsSemiTransparent()) {
 					Test::Renderer2D::SubmitTransparentQuad(quad);
 					continue;
@@ -142,4 +160,6 @@ namespace Cori {
 		return true;
 	}
 
+	// temporary need to use c++20 modules
+	template Graphics::PrimitivePool<Graphics::QuadPrimitive>& Scene::GetPoolForType<Graphics::QuadPrimitive>();
 }

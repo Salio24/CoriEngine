@@ -1,6 +1,7 @@
 #pragma once
 #include "SceneSystem/Entity.hpp"
 #include "Renderer/Texture.hpp"
+#include "Core/Utility/StringHash.hpp"
 
 namespace Cori {
 	class Scene;
@@ -11,9 +12,6 @@ namespace Cori {
 
 	namespace Graphics {
 		struct QuadPrimitive;
-
-		template<typename Primitive> requires Utils::OneOf<Primitive, QuadPrimitive>
-		class PrimitivePool;
 
 		enum PrimitiveType : uint8_t {
 			Quad = 1 << 0,
@@ -33,82 +31,95 @@ namespace Cori {
 				Valid = 1 << 2,
 				Flipped = 1 << 3,
 				FlatColored = 1 << 4,
+				AnimatorBound = 1 << 5,
 			};
 
-			glm::vec2 worldOrigin;
-			glm::vec2 localPosition;
-			glm::vec2 size;
-			glm::vec4 tintColor;
-			Entity owner;
-			UVs uvs{};
-			float rotation;
-			uint8_t layer;
+			glm::vec2 m_WorldOrigin;
+			glm::vec2 m_LocalPosition;
+			glm::vec2 m_Size;
+			glm::vec4 m_TintColor;
+			Entity m_Owner;
+			float m_Rotation;
+			uint8_t m_Layer;
+			Utils::StringHash m_ID;
 
 			void SetTexture(const std::shared_ptr<Texture2D>& tex) {
-				if (!states & SemiTransparent) {
-					SetSemiTransparency(tex->HasSemiTransparency());
+				if ((m_States & AnimatorBound) != AnimatorBound) {
+					if (!m_States & SemiTransparent) {
+						SetSemiTransparency(tex->HasSemiTransparency());
+					}
+					m_Texture = tex;
+				} else {
+					CORI_CORE_WARN("Can't change a texture of a QuadPrimitive because an Animator is currently bound to that primitive.");
 				}
-				texture = tex;
 			}
 
 			void SetSemiTransparency(const bool b) {
 				if (b) {
-					states = states | SemiTransparent;
+					m_States = m_States | SemiTransparent;
 				} else {
-					states = states & ~SemiTransparent;
+					m_States = m_States & ~SemiTransparent;
 				}
 			}
 
 			bool IsSemiTransparent() const {
-				return states & SemiTransparent;
+				return m_States & SemiTransparent;
 			}
 
 			void SetVisibility(const bool b) {
 				if (b) {
-					states = states | Visible;
+					m_States = m_States | Visible;
 				} else {
-					states = states & ~Visible;
+					m_States = m_States & ~Visible;
 				}
 			}
 
 			bool IsVisible() const {
-				return states & Visible;
+				return m_States & Visible;
 			}
 
 			void SetValidity(const bool b) {
 				if (b) {
-					states = states | Valid;
+					m_States = m_States | Valid;
 				} else {
-					states = states & ~Valid;
+					m_States = m_States & ~Valid;
 				}
 			}
 
 			bool IsValid() const {
-				return states & Valid;
+				return m_States & Valid;
 			}
 
 			void SetFlipped(const bool b) {
 				if (b) {
-					states = states | Flipped;
+					m_States = m_States | Flipped;
 				} else {
-					states = states & ~Flipped;
+					m_States = m_States & ~Flipped;
 				}
 			}
 
 			bool IsFlipped() const {
-				return states & Flipped;
+				return m_States & Flipped;
 			}
 
 			void SetFlatColored(const bool b) {
 				if (b) {
-					states = states | FlatColored;
+					m_States = m_States | FlatColored;
 				} else {
-					states = states & ~FlatColored;
+					m_States = m_States & ~FlatColored;
 				}
 			}
 
 			bool IsFlatColored() const {
-				return states & FlatColored;
+				return m_States & FlatColored;
+			}
+
+			void SetUVs(const UVs& uvs) {
+				if ((m_States & AnimatorBound) != AnimatorBound) {
+					m_UVs = uvs;
+				} else {
+					CORI_CORE_WARN("Can't change UVs of a QuadPrimitive because an Animator is currently bound to that primitive.");
+				}
 			}
 
 			struct Descriptor {
@@ -123,12 +134,15 @@ namespace Cori {
 			protected:
 			friend class Cori::Scene;
 			friend class Cori::Test::Renderer2D;
-			friend class PrimitivePool<QuadPrimitive>;
-
-			uint8_t states{0};
 
 
-			std::shared_ptr<Texture2D> texture{nullptr};
+			template<typename Primitive> requires Utils::OneOf<Primitive, QuadPrimitive>
+			friend class PrimitivePool;
+
+			UVs m_UVs{};
+			uint8_t m_States{0};
+
+			std::shared_ptr<Texture2D> m_Texture{nullptr};
 
 		};
 

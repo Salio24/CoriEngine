@@ -84,40 +84,54 @@ public:
 			rend.SetWorldPosition({50.0f, 50.0f});
 		}
 
-
-		if (ImGui::Button("Add Primitive")) {
+		if (ImGui::Button("Add Primitives")) {
 			auto& rend = ent.GetComponents<Cori::Components::Entity::RenderGroup>();
-
-			a++;
 
 			auto atlas = Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::Atlas);
 
-			auto uvs = atlas->GetSpriteUVsAtIndex(23 + a);
+			auto uvs = atlas->GetSpriteUVsAtIndex(23);
 
-			Cori::Graphics::QuadPrimitive::Descriptor desc;
-			desc.localPosition = {50.0f * a, 50.0f * a};
-			desc.size = {100, 100};
-			desc.layer = 3;
-			desc.texture = atlas->GetTexture();
-			desc.uvs = uvs;
+			auto text = atlas->GetTexture();
 
-			rend.AddPrimitive<Cori::Graphics::QuadPrimitive>(desc);
+			for (int i = 0; i < 300; i++) {
+				for (int j = 0; j < 300; j++) {
+					Cori::Graphics::QuadPrimitive::Descriptor desc;
+					desc.localPosition = {12.0f * i, 12.0f * j};
+					desc.size = {10, 10};
+					desc.layer = 3;
+					desc.texture = text;
+					desc.uvs = uvs;
+					static int al = 0;
+
+					rend.AddPrimitive<Cori::Graphics::QuadPrimitive>(desc, al);
+					al++;
+				}
+			}
 		}
 
 		if (ImGui::Button("Invalidate")) {
+			auto& rend = ent.GetComponents<Cori::Components::Entity::RenderGroup>();
+			for (int i = 0; i < 90000; i++) {
+				if (!(i % 2)) {
+					rend.InvalidatePrimitive(i);
+				}
+			}
+		}
+
+
+		static bool ale = false;
+
+		if (ale) {
 			auto& pool = ActiveScene->GetPoolForType<Cori::Graphics::QuadPrimitive>();
-			pool.InvalidatePrimitive(2);
-			pool.InvalidatePrimitive(5);
-			pool.InvalidatePrimitive(11);
-			pool.InvalidatePrimitive(9);
-			pool.InvalidatePrimitive(8);
-			pool.InvalidatePrimitive(3);
-			pool.InvalidatePrimitive(6);
+			pool.Defragment();
+			//pool.SortByTexture();
+			ale = false;
+
 		}
 
 		if (ImGui::Button("Defrag")) {
-			auto& pool = ActiveScene->GetPoolForType<Cori::Graphics::QuadPrimitive>();
-			pool.Defragment();
+			CORI_PROFILE_REQUEST_NEXT_FRAME();
+			ale = true;
 		}
 
 		ImGui::Text("FPS: %.2f", fps);

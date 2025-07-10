@@ -20,7 +20,7 @@ namespace Cori {
 		}
 
 		long long TimeProfiler::GetMicroseconds() {
-			TimeProfiler& self = TimeProfiler::Get();
+			TimeProfiler& self = Get();
 			return static_cast<long long>(static_cast<double>(SDL_GetPerformanceCounter() - self.m_InitialTimestamp) / static_cast<double>(self.m_Frequency) * 1000000.0f);
 		}
 

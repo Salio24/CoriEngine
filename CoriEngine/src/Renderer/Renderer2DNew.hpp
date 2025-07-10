@@ -21,7 +21,7 @@ namespace Cori {
 				Texture2D* m_Texture;
 				UVs m_UVs;
 				float m_Rotation;
-				uint32_t m_Layer;
+				uint8_t m_Layer;
 
 				Quad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, Texture2D* texture, const UVs& uvs, float rotation, uint32_t layer)
 					: m_Position(position), m_Size(size), m_TintColor(color), m_Texture(texture), m_UVs(uvs), m_Rotation(rotation), m_Layer(layer) {}
@@ -34,8 +34,6 @@ namespace Cori {
 			static void BeginScene(const Components::Scene::Camera& camera);
 			static void EndScene();
 
-			static void SubmitTransparentQuad(glm::vec2 position, glm::vec2 size, uint8_t layer, Texture2D* texture, const UVs& uvs, const glm::vec4& tintColor, float rotation, bool flipped);
-
 			static void SubmitTransparentQuad(const Graphics::QuadPrimitive& quad);
 
 			static void DrawQuadInstanced(const Quad& quad);
@@ -46,26 +44,6 @@ namespace Cori {
 
 			// void DrawCircle(...);
 			// void DrawLine(...);
-
-			/*
-				if  will decide to support circle/segment/line rendering
-				add several "custom properties" here, and an enum that will decide, if this object is a circle/quad/segment/line
-				for example i have custom fields: glm::vec2 property1, glm::vec2 property2, float property3, ShapeEnum shapeType
-				if ShapeType == Quad then for example
-				property1 is size, property2 and 3 are not used
-				if ShapeType == Circle then for example
-				property1 is center in local coordinates, property2 is unused, property3 is radius
-				if ShapeType == Segment then for example
-				property1 is center1 in local coordinates, property2 is center2 in local coordinates, property3 is radius
-				if ShapeType == Line then for example
-				property1 is start in local coordinates, property2 is end in local coordinates, property3 is thickness 
-				and so on
-
-				then in flush function for transparent, sort the queue according to layer then according to shapeType, then according to textureptr
-				for opaque sort according to shapeType, then according to textureptr
-
-				then create a draw overloads 
-			*/
 
 			static void BeginInstancedSet();
 			static void EndInstancedSet();
@@ -97,7 +75,7 @@ namespace Cori {
 			};
 
 			struct RendererData {
-				static constexpr uint32_t TransparentQuadQueueSize{ 3000 };
+				static constexpr uint32_t TransparentQuadQueueSize{ 1024 };
 
 				static constexpr uint32_t MaxInstanceCount{ 6144 };
 
@@ -105,7 +83,6 @@ namespace Cori {
 				std::shared_ptr<VertexBuffer> QuadInstanceVertexBuffer;
 				std::shared_ptr<IndexBuffer> QuadInstanceIndexBuffer;
 				std::shared_ptr<ShaderProgram> QuadInstanceShader;
-
 
 				uint32_t QuadInstanceCount{ 0 };
 				QuadInstanace* QuadInstanceBufferBase{ nullptr };
@@ -137,7 +114,6 @@ namespace Cori {
 
 			static void DrawTransparentInstancedQuads();
 
-			static void FlushOpaqueInstancedQuads();
 			static void FlushInstancedQuads();
 		};
 	}

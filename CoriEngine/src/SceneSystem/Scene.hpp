@@ -5,11 +5,13 @@
 #include "Renderer/CameraController.hpp"
 #include "EventSystem/Event.hpp"
 #include "Physics/Physics.hpp"
-#include "StateSystem/StateMachine.hpp"
-#include "Renderer/PrimitivePool.hpp"
-#include "Renderer/Renderer2DNew.hpp"
 
 namespace Cori {
+	namespace Graphics {
+		struct QuadPrimitive;
+		template<typename Primitive> requires  Utils::OneOf<Primitive, Cori::Graphics::QuadPrimitive>
+		class PrimitivePool;
+	}
 
 	namespace Components {
 		namespace Entity {
@@ -17,6 +19,7 @@ namespace Cori {
 		}
 	}
 
+	struct PoolStorage;
 
 	template<typename... T>
 	inline constexpr auto& Exclude = entt::exclude<T...>;
@@ -98,14 +101,19 @@ namespace Cori {
 
 		friend struct Components::Entity::RenderGroup;
 
-		std::tuple<
-		Graphics::PrimitivePool<Graphics::QuadPrimitive>
-		> m_PrimitivePools;
+		std::unique_ptr<PoolStorage> m_pImpl;
 
-		template<typename T>
-		Graphics::PrimitivePool<T>& GetPoolForType() {
-			return std::get<Graphics::PrimitivePool<T>>(m_PrimitivePools);
-		}
+		template<typename Primitive>
+		Graphics::PrimitivePool<Primitive>& GetPoolForType();
+
+		//std::tuple<
+		//Graphics::PrimitivePool<Graphics::QuadPrimitive>
+		//> m_PrimitivePools;
+
+		//template<typename T>
+		//Graphics::PrimitivePool<T>& GetPoolForType() {
+		//	return std::get<Graphics::PrimitivePool<T>>(m_PrimitivePools);
+		//}
 
 		explicit Scene(const std::string& name);
 	protected:
@@ -118,4 +126,5 @@ namespace Cori {
 
 		friend class Entity;
 	};
+
 }
