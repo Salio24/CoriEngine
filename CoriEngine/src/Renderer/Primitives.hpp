@@ -41,6 +41,7 @@ namespace Cori {
 			Entity m_Owner;
 			float m_Rotation;
 			uint8_t m_Layer;
+			//uint32_t m_UID;
 			Utils::StringHash m_ID;
 
 			void SetTexture(const std::shared_ptr<Texture2D>& tex) {
@@ -134,7 +135,6 @@ namespace Cori {
 			protected:
 			friend class Cori::Scene;
 			friend class Cori::Test::Renderer2D;
-
 
 			template<typename Primitive> requires Utils::OneOf<Primitive, QuadPrimitive>
 			friend class PrimitivePool;

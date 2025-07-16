@@ -89,8 +89,6 @@ namespace Cori {
 
 		Test::Renderer2D::BeginInstancedSet();
 
-
-
 		// move to renderer method: drawscene
 		for (auto& quad : GetPoolForType<Graphics::QuadPrimitive>()) {
 			if ((quad.m_States & (Graphics::QuadPrimitive::Options::Visible | Graphics::QuadPrimitive::Options::Valid)) == (Graphics::QuadPrimitive::Options::Visible | Graphics::QuadPrimitive::Options::Valid)) {

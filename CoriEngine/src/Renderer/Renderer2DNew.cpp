@@ -73,8 +73,8 @@ namespace Cori {
 			s_Data->Stats.DrawCalls = 0;
 			s_Data->Stats.QuadCount = 0;
 
-		}
 
+		}
 		void Renderer2D::EndScene() {
 			CORI_PROFILE_FUNCTION();
 
