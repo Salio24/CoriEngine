@@ -48,3 +48,6 @@
 [submodule "CoriEngine/thirdparty/box2d"]
 	path = CoriEngine/thirdparty/box2d
 	url = https://github.com/erincatto/box2d.git
+[submodule "CoriEngine/thirdparty/stduuid"]
+	path = CoriEngine/thirdparty/stduuid
+	url = https://github.com/mariusbancila/stduuid
