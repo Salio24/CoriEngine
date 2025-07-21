@@ -89,19 +89,19 @@ namespace Cori {
 			return bool(m_EntityHandle);
 		}
 
-		[[nodiscard]] uint32_t GetEntityID() {
+		[[nodiscard]] uint32_t GetEntityID() const {
 			return entt::to_integral(m_EntityHandle.entity());
 		}
 
-		[[nodiscard]] uint32_t GetVersion() {
+		[[nodiscard]] uint32_t GetVersion() const {
 			return entt::to_version(m_EntityHandle.entity());
 		}
 
-		[[nodiscard]] uint64_t GetUID() {
+		[[nodiscard]] uint64_t GetUID() const {
 			return (static_cast<uint64_t>(GetEntityID()) << 32) | GetVersion();
 		}
 
-		[[nodiscard]] std::string GetDebuggingUID() {
+		[[nodiscard]] std::string GetDebuggingUID() const {
 			return "(Entity ID: " + std::to_string(GetEntityID()) + ", Version: " + std::to_string(GetVersion()) + ")";
 		}
 
@@ -111,11 +111,15 @@ namespace Cori {
 
 		[[nodiscard]] std::expected<std::vector<Entity>, const char*> GetChildren() const;
 
-		[[nodiscard]] std::expected<Entity, const char*> FindChildByName(Utils::StringHash64 name) const;
+		[[nodiscard]] std::expected<Entity, const char*> FindChildByName(const std::string& name) const;
 
 		[[nodiscard]] entt::entity GetHandle() const { return m_EntityHandle.entity(); }
 
 		void PrintHierarchy();
+
+		std::string GetName();
+
+		void SetName(const std::string& name);
 	private:
 		void UnlinkFromParent();
 		void LinkToParent(Entity parent);

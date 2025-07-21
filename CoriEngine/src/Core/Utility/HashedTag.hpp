@@ -4,17 +4,16 @@
 namespace Cori {
 	namespace Utils {
 		struct HashedTag64 {
+			const char* GetDebugName() const {
+				return m_DebugName;
+			}
+
+
 			StringHash64 m_Hash{ 0 };
-
-
-#ifdef DEBUG_BUILD
-			std::string m_DebugName;
-#endif
+			const char* m_DebugName;
 		};
 	}
 }
-
-#define CORI_CHECK_TAG_COLLISION
 
 #ifdef DEBUG_BUILD
 	#ifdef CORI_CHECK_TAG_COLLISION
@@ -37,16 +36,16 @@ namespace Cori {
 	#define CONCAT_IMPL(a, b) a##b
 	#define CONCAT(a, b) CONCAT_IMPL(a, b)
 
-	#define CORI_DECLARE_TAG(tag) inline constexpr Cori::Utils::StringHash64 tag = #tag##_hs64; \
+	#define CORI_DECLARE_TAG(tag) inline constexpr Cori::Utils::HashedTag64 tag{#tag##_hs64, #tag} \
 		static const bool CONCAT(RegisterTagForCheck, __LINE__) = [](){ \
 			Cori::Utils::Internal::CheckGlobalTag64Collision(#tag##_hs64, #tag); \
 			return true; \
 		}();
 
 	#else
-		#define CORI_DECLARE_TAG(tag) inline constexpr Cori::Utils::HashedTag64 tag{#tag##_hs64, #tag};
+	#define CORI_DECLARE_TAG(tag) inline constexpr Cori::Utils::HashedTag64 tag{#tag##_hs64, #tag};
 	#endif
 #else
-	#define CORI_DECLARE_TAG(tag) inline constexpr Cori::Utils::HashedTag64 tag{#tag##_hs64};
+	#define CORI_DECLARE_TAG(tag) inline constexpr Cori::Utils::HashedTag64 tag{#tag##_hs64, #tag};
 #endif
 

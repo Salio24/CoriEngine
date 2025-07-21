@@ -27,9 +27,11 @@ namespace Cori {
 	namespace Components {
 		namespace Entity {
 			struct Name {
-				std::string m_Name;
 				Name() = default;
 				explicit Name(const std::string& name) : m_Name(name) {}
+			//private:
+				friend class Cori::Entity;
+				std::string m_Name;
 			};
 
 			struct TagComponent {
@@ -117,7 +119,7 @@ namespace Cori {
 
 			struct ChildCacheComponent {
 				ChildCacheComponent() = default;
-				std::unordered_map<Utils::StringHash64, entt::entity> m_Children;
+				std::unordered_map<std::string, entt::entity> m_Children;
 			};
 
 

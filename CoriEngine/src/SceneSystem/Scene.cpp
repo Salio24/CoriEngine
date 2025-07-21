@@ -24,7 +24,6 @@ namespace Cori {
 		CORI_CORE_DEBUG("Scene: '{0}' created.", m_Name);
 		m_Registry.on_destroy<Components::Entity::HierarchyComponent>().connect<&Scene::OnHierarchyComponentDestroyed>(this);
 		//auto renderGroup = m_Registry.group<Components::Entity::Render, Components::Entity::Sprite>();
-
 	}
 
 	template<typename Primitive>
@@ -54,7 +53,7 @@ namespace Cori {
 		if (CORI_CORE_ASSERT_ERROR(!m_NamedEntities.contains(name), "Trying to create a named entity, but the specified name already exists in a hashmap, this is not permited, named entities should have exclusive names. Name: '{}'. Invalid entity returned.", name)) { return Entity{}; }
 		CORI_CORE_DEBUG("");
 		entt::entity entity = m_Registry.create();
-		m_Registry.emplace<Components::Entity::Name>(entity, name);
+		//m_Registry.emplace<Components::Entity::Name>(entity, name);
 		m_NamedEntities.insert({ name, entt::handle{m_Registry, entity} });
 		CORI_CORE_TRACE("Created Named Entity With ID: {0}, Version: {1}, Name: {2}",entt::to_integral(entity), entt::to_version(entity), name);
 		return Entity{ {m_Registry, entity} };

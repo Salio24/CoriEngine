@@ -35,13 +35,6 @@ namespace Cori {
 	std::expected<void, const char*> Entity::SetParent(Entity parent) {
 		GetOrAddComponent<Components::Entity::HierarchyComponent>();
 
-		if (!HasComponents<Components::Entity::TagComponent>()) {
-			return std::unexpected("Error: Setting a parent for the entity and thus making it a child is not allowed if entity doesn't have Cori::Components::Entity::TagComponent.");
-		}
-		if (GetComponents<Components::Entity::TagComponent>().m_Tag.m_Hash == 0) {
-			return std::unexpected("Error: Cori::Components::Entity::TagComponent of the entity is invalid. (m_Tag.m_Hash == 0)");
-		}
-
 		UnlinkFromParent();
 
 		if (parent.IsValid()) {
@@ -73,20 +66,19 @@ namespace Cori {
 	}
 
 	// change to tag not stringhash
-	std::expected<Entity, const char*> Entity::FindChildByName(Utils::StringHash64 tag) const {
+	std::expected<Entity, const char*> Entity::FindChildByName(const std::string& name) const {
 
 		const auto& cache = GetComponents<Components::Entity::ChildCacheComponent>();
 
-		if (cache.m_Children.contains(tag)) {
-			entt::entity childID = cache.m_Children.at(tag);
+		if (cache.m_Children.contains(name)) {
+			entt::entity childID = cache.m_Children.at(name);
 			return Entity{{*m_EntityHandle.registry(), childID}};
 		}
 		return std::unexpected("Error: No children found with the specified tag.");
 	}
 
 	void Entity::PrintHierarchy() {
-#ifdef DEBUG_BUILD
-		CORI_CORE_DEBUG_TAGGED({"ECS", "Entity", "Hirarchy"}, "Printing full hierarchy tree of '{}'", GetComponents<Components::Entity::TagComponent>().m_Tag.m_DebugName);
+		CORI_CORE_DEBUG_TAGGED({"ECS", "Entity", "Hirarchy"}, "Printing full hierarchy tree of '{}'", GetComponents<Components::Entity::Name>().m_Name);
 		entt::entity rootID = GetHandle();
 		entt::entity currentParentID = GetComponents<Components::Entity::HierarchyComponent>().m_Parent;
 		while (m_EntityHandle.registry()->valid(currentParentID)) {
@@ -96,7 +88,7 @@ namespace Cori {
 
 		Entity root{entt::handle{*m_EntityHandle.registry(), rootID}};
 
-		std::string rootName = root.GetComponents<Components::Entity::TagComponent>().m_Tag.m_DebugName;
+		std::string rootName = root.GetComponents<Components::Entity::Name>().m_Name;
 		CORI_CORE_DEBUG_TAGGED({"ECS", "Entity", "Hirarchy"}, "Hierarchy top level root/parent '{}'", rootName);
 
 		CORI_CORE_TRACE_TAGGED({"ECS", "Entity", "Hirarchy"}, "{}", rootName);
@@ -109,8 +101,29 @@ namespace Cori {
 			}
 		}
 		CORI_CORE_DEBUG_TAGGED({"ECS", "Entity", "Hirarchy"}, "Finished");
-#endif
 	}
+
+	std::string Entity::GetName() {
+		return GetComponents<Components::Entity::Name>().m_Name;
+	}
+	void Entity::SetName(const std::string& name) {
+		auto& nameComponent = GetComponents<Components::Entity::Name>();
+		if (nameComponent.m_Name == name) {
+			return;
+		}
+
+		if (HasComponents<Components::Entity::HierarchyComponent>()) {
+			auto& hierarchy = GetComponents<Components::Entity::HierarchyComponent>();
+			entt::registry* registry = m_EntityHandle.registry();
+			if (registry->valid(hierarchy.m_Parent)) {
+				entt::entity parentID = hierarchy.m_Parent;
+				auto& cache = registry->get<Components::Entity::ChildCacheComponent>(parentID);
+				cache.m_Children.erase(nameComponent.m_Name);
+				cache.m_Children.emplace(name, m_EntityHandle.entity());
+			}
+		}
+	}
+
 
 	void Entity::UnlinkFromParent() {
 		entt::registry* registry = m_EntityHandle.registry();
@@ -120,7 +133,7 @@ namespace Cori {
 
 
 		auto& cache = registry->get<Components::Entity::ChildCacheComponent>(parentID);
-		cache.m_Children.erase(GetComponents<Components::Entity::TagComponent>().m_Tag.m_Hash);
+		cache.m_Children.erase(GetComponents<Components::Entity::Name>().m_Name);
 
 		auto& parentHierarchy = registry->get<Components::Entity::HierarchyComponent>(parentID);
 		entt::entity previousSiblingID = parentHierarchy.m_PreviousSibling;
@@ -148,7 +161,7 @@ namespace Cori {
 		hierarchy.m_Parent = parent.GetHandle();
 
 		auto& cache = parent.GetOrAddComponent<Components::Entity::ChildCacheComponent>();
-		cache.m_Children.insert({GetComponents<Components::Entity::TagComponent>().m_Tag.m_Hash, m_EntityHandle.entity()});
+		cache.m_Children.emplace(GetComponents<Components::Entity::Name>().m_Name, m_EntityHandle.entity());
 
 		auto& parentHierarchy = parent.GetOrAddComponent<Components::Entity::HierarchyComponent>();
 		entt::entity firstChildID = parentHierarchy.m_FirstChild;
@@ -162,8 +175,7 @@ namespace Cori {
 	}
 
 	void Entity::DrawHierarchyRecursive(Entity entity, const std::string& prefix, bool isLast) {
-#ifdef DEBUG_BUILD
-		std::string entityName = entity.GetComponents<Components::Entity::TagComponent>().m_Tag.m_DebugName;
+		std::string entityName = entity.GetComponents<Components::Entity::Name>().m_Name;
 
 		CORI_CORE_TRACE_TAGGED({"ECS", "Entity", "Hirarchy"}, "{}{}{}", prefix, isLast ? "└─" : "├─", entityName);
 
@@ -177,7 +189,6 @@ namespace Cori {
 				DrawHierarchyRecursive(child, childPrefix, isLastChild);
 			}
 		}
-#endif
 	}
 
 	void Entity::SetViewScene(Scene* ptr) {
