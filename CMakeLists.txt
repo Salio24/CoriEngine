@@ -1,18 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 
-set(PVS_STUDIO_ACTIVE OFF)
 set(CORI_CLANG_TIDY ON)
-
-if(PVS_STUDIO_ACTIVE)
-    include(FetchContent)
-    FetchContent_Declare(
-        PVS_CMakeModule
-        GIT_REPOSITORY "https://github.com/viva64/pvs-studio-cmake-module.git"
-        GIT_TAG        "master"
-    )
-    FetchContent_MakeAvailable(PVS_CMakeModule)
-    include("${pvs_cmakemodule_SOURCE_DIR}/PVS-Studio.cmake")
-endif()
 
 if(MSVC)
     message(FATAL_ERROR "MSVC Compiler frontend is not supported, use GCC or Clang (not clang-cl it has MSVC frontend)")
@@ -66,10 +54,17 @@ project(main)
     set(CMAKE_CXX_STANDARD 23)
 
     add_compile_options(-mavx2)
+    add_compile_options(-Wall -Wextra -Wpedantic)
+    #add_compile_options(-Wno-unused-variable)
+    #add_compile_options(-Wno-unused-parameter)
+    #add_compile_options(-Wno-sign-compare)
+    add_compile_options(-fdiagnostics-color=always)
     
     add_subdirectory(${PROJECT_SOURCE_DIR}/CoriEngine)
     add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/Sandbox)
     add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/RendererSandbox)
     add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/PhysicsSandbox)
+
+add_compile_options(-Wall -Wextra)
 
 

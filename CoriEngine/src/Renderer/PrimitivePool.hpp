@@ -32,7 +32,7 @@ namespace Cori {
 						if (writeIndex != readIndex) {
 							m_PrimitivePool[writeIndex] = std::move(m_PrimitivePool[readIndex]);
 							Primitive& primitive = m_PrimitivePool[writeIndex];
-							primitive.owner.template GetComponents<Cori::Components::Entity::RenderGroup>().UpdatePrimitiveIndex(primitive.id, writeIndex);
+							primitive.m_Owner.template GetComponents<Cori::Components::Entity::RenderGroup>().UpdatePrimitiveIndex(primitive.m_ID, writeIndex);
 						}
 						writeIndex++;
 					} else {
@@ -90,7 +90,7 @@ namespace Cori {
 				CORI_CORE_WARN_TAGGED({"Primitive Pool"}, "Pool Type: {}, can invalidate index '{}', index out of bounds", typeid(Primitive).name(), index);
 			}
 
-			friend class Components::Entity::RenderGroup;
+			friend struct Components::Entity::RenderGroup;
 			friend class Cori::Scene;
 
 			Cori::Scene* ParentScene;

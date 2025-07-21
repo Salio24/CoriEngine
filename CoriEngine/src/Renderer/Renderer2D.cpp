@@ -60,7 +60,7 @@ namespace Cori {
 		// global
 		uint32_t indicesBatch[s_MaxIndexCount];
 		uint32_t offset = 0;
-		for (int i = 0; i < s_MaxIndexCount; i += 6) {
+		for (uint32_t i = 0; i < s_MaxIndexCount; i += 6) {
 			indicesBatch[i + 0] = 0 + offset;
 			indicesBatch[i + 1] = 1 + offset;
 			indicesBatch[i + 2] = 2 + offset;
@@ -382,8 +382,5 @@ namespace Cori {
 		DrawQuad(position, size, atlas->GetTexture(), atlas->GetSpriteUVsAtIndex(index), 5.0f);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Sprite>& sprite) {
-		DrawQuad(position, size, sprite->GetTexture(), sprite->GetUVs(), 5.0f);
-	}
 
 }

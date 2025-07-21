@@ -22,7 +22,8 @@ namespace Cori {
 		AddContextComponent<Components::Scene::Camera>();
 		ActiveCamera.BindCameraComponent(&GetContextComponent<Components::Scene::Camera>());
 		CORI_CORE_DEBUG("Scene: '{0}' created.", m_Name);
-		auto renderGroup = m_Registry.group<Components::Entity::Render, Components::Entity::Sprite>();
+		m_Registry.on_destroy<Components::Entity::HierarchyComponent>().connect<&Scene::OnHierarchyComponentDestroyed>(this);
+		//auto renderGroup = m_Registry.group<Components::Entity::Render, Components::Entity::Sprite>();
 
 	}
 
@@ -37,9 +38,21 @@ namespace Cori {
 	}
 
 	Entity Scene::CreateEntity(const std::string& name) {
-		CORI_CORE_ASSERT_FATAL(this != nullptr, "Called scene instance is null (instance pointer = nullptr), this causes undefined behavior, and this assert also relies on this undefined behavior and is not guarantied.");
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wtautological-undefined-compare"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wtautological-undefined-compare"
+#endif
+		CORI_CORE_ASSERT_FATAL(this != nullptr, "Called scene instance is null (instance pointer == nullptr), this causes undefined behavior, and this assert also relies on this undefined behavior and is not guarantied.");
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 		if (CORI_CORE_ASSERT_ERROR(!m_NamedEntities.contains(name), "Trying to create a named entity, but the specified name already exists in a hashmap, this is not permited, named entities should have exclusive names. Name: '{}'. Invalid entity returned.", name)) { return Entity{}; }
-
+		CORI_CORE_DEBUG("");
 		entt::entity entity = m_Registry.create();
 		m_Registry.emplace<Components::Entity::Name>(entity, name);
 		m_NamedEntities.insert({ name, entt::handle{m_Registry, entity} });
@@ -52,6 +65,22 @@ namespace Cori {
 		//CORI_CORE_TRACE("Created Unnamed Entity With ID: {0}, Version: {1}", entt::to_integral(entity), entt::to_version(entity));
 		return Entity{ {m_Registry, entity} };
 
+	}
+
+	std::expected<void, const char*> Scene::AddEntityToCache(Entity entity) {
+
+	}
+
+	void Scene::GetEntityFromCache(const Utils::HashedTag64& tag) {
+
+	}
+
+	void Scene::DestroyEntity(Entity entity) {
+		if (!entity.IsValid()) { return; }
+		if (entity.HasComponents<Components::Entity::HierarchyComponent>()) {
+			entity.UnlinkFromParent();
+		}
+		m_Registry.destroy(entity.GetHandle());
 	}
 
 	Entity Scene::GetNamedEntity(const std::string& name) {
@@ -67,7 +96,7 @@ namespace Cori {
 		});
 	}
 
-	void Scene::OnUpdate(const double deltaTime) {
+	void Scene::OnUpdate([[maybe_unused]] const double deltaTime) {
 		CORI_PROFILE_FUNCTION();
 
 		Renderer2D::BeginBatch(GetContextComponent<Components::Scene::Camera>().m_ViewProjectionMatrix);
@@ -156,6 +185,48 @@ namespace Cori {
 	bool Scene::OnUnbind() {
 		m_TriggerEventCallback = EventCallbackFn();
 		return true;
+	}
+
+	void Scene::UpdateTransform() {
+		auto view = m_Registry.view<Components::Entity::TransformComponent, Components::Entity::HierarchyComponent>();
+		for (auto entity : view) {
+			const auto& hierarchy = view.get<Components::Entity::HierarchyComponent>(entity);
+			if (!m_Registry.valid(hierarchy.m_Parent)) {
+				UpdateTransformRecursive(entity, glm::mat3(1.0f), 1, false, false);
+			}
+		}
+	}
+	void Scene::UpdateTransformRecursive(entt::entity entity, const glm::mat3& parentTransform, uint8_t parentLayer, bool parentTransformDirty, bool parentLayerDirty) {
+		auto& transform = m_Registry.get<Components::Entity::TransformComponent>(entity);
+		const bool transformDirty = transform.m_DirtyTransform || parentTransformDirty;
+		const bool layerDirty = transform.m_DirtyLayer || parentLayerDirty;
+
+		if (transformDirty) {
+			transform.m_WorldTransform = parentTransform * transform.GetLocalTransform();
+			transform.m_DirtyTransform = false;
+		}
+		if (layerDirty) {
+			transform.m_WorldLayer = parentLayer + transform.GetLocalLayer();
+			transform.m_DirtyLayer = false;
+		}
+
+		const auto& hierarchy = m_Registry.get<Components::Entity::HierarchyComponent>(entity);
+		entt::entity currentChildID = hierarchy.m_FirstChild;
+		while (m_Registry.valid(currentChildID)) {
+			UpdateTransformRecursive(currentChildID, transform.m_WorldTransform, transform.m_WorldLayer, transformDirty, layerDirty);
+			currentChildID = m_Registry.get<Components::Entity::HierarchyComponent>(currentChildID).m_NextSibling;
+		}
+	}
+
+	void Scene::OnHierarchyComponentDestroyed(entt::registry& registry, entt::entity entity) {
+		const auto& hierarchy = registry.get<Components::Entity::HierarchyComponent>(entity);
+		entt::entity currentChildID = hierarchy.m_FirstChild;
+		while (registry.valid(currentChildID)) {
+			entt::entity nextChildID = registry.get<Components::Entity::HierarchyComponent>(currentChildID).m_NextSibling;
+			registry.destroy(currentChildID); // This triggers a recursive call for grandchildren.
+			currentChildID = nextChildID;
+		}
+
 	}
 
 	// temporary need to use c++20 modules

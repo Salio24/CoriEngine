@@ -8,12 +8,12 @@ namespace Cori {
 	public:
 		virtual ~State() = default;
 
-		virtual void OnEnter(Entity& owner, StateMachine* fsm) {}
+		virtual void OnEnter([[maybe_unused]] Entity& owner, [[maybe_unused]] StateMachine* fsm) {}
 
 		// rename to ontick
-		virtual void OnUpdate(Entity& owner, StateMachine* fsm, float timestep) {}
+		virtual void OnUpdate([[maybe_unused]] Entity& owner, [[maybe_unused]] StateMachine* fsm, [[maybe_unused]] float timestep) {}
 
-		virtual void OnExit(Entity& owner, StateMachine* fsm) {}
+		virtual void OnExit([[maybe_unused]] Entity& owner, [[maybe_unused]] StateMachine* fsm) {}
 
 		virtual const char* GetDebugName() const { return "Unnamed State"; }
 

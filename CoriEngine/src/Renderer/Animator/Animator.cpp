@@ -51,11 +51,11 @@ namespace Cori {
 					frameValuesArray.push_back(frameData);
 				}
 
-				for (size_t i = 0; i < frameValuesArray.size(); ++i) {
-					const json& frameData = frameValuesArray[i];
-				}
+				//for (size_t i = 0; i < frameValuesArray.size(); ++i) {
+				//	const json& frameData = frameValuesArray[i];
+				//}
 
-				std::vector<std::pair<int, json>> sortedFrameItems;
+				std::vector<std::pair<uint32_t, json>> sortedFrameItems;
 
 				for (const auto& [keyStr, frameData] : framesObject.items()) {
 					int frameNum = ExtractFrameNumber(keyStr);

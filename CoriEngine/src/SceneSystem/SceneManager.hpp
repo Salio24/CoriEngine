@@ -1,6 +1,5 @@
 #pragma once
 #include "Scene.hpp"
-#include "TriggerManager.hpp"
 
 namespace Cori {
 	class SceneManager {

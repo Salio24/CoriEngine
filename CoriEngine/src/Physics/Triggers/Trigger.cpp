@@ -1,4 +1,3 @@
-#pragma once
 #include "Trigger.hpp"
 
 namespace Cori {

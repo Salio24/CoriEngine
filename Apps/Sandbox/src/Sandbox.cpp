@@ -134,6 +134,80 @@ public:
 			ale = true;
 		}
 
+		if (ImGui::Button("Create tree")) {
+			auto player = ActiveScene->CreateEntity("Player");
+			player.AddComponent<Cori::Components::Entity::TagComponent>(Cori::Utils::HashedTag64{10, "player"});
+
+
+			auto player_sprite = ActiveScene->CreateEntity("Sprite");
+			player_sprite.AddComponent<Cori::Components::Entity::TagComponent>(Cori::Utils::HashedTag64{1, "player_sprite"});
+			player_sprite.SetParent(player);
+
+			auto weapon_root = ActiveScene->CreateEntity("Weapon");
+			weapon_root.AddComponent<Cori::Components::Entity::TagComponent>(Cori::Utils::HashedTag64{2, "weapon_root"});
+			weapon_root.SetParent(player);
+
+
+			auto gun_sprite = ActiveScene->CreateEntity("GunSprite");
+			gun_sprite.AddComponent<Cori::Components::Entity::TagComponent>(Cori::Utils::HashedTag64{3, "gun_sprite"});
+			gun_sprite.SetParent(weapon_root);
+
+			auto muzzle_flash = ActiveScene->CreateEntity("MuzzleFlash");
+			muzzle_flash.AddComponent<Cori::Components::Entity::TagComponent>(Cori::Utils::HashedTag64{4, "muzzle_flash"});
+			muzzle_flash.SetParent(weapon_root);
+
+			auto ui_canvas = ActiveScene->CreateEntity("UI_Canvas");
+			ui_canvas.AddComponent<Cori::Components::Entity::TagComponent>(Cori::Utils::HashedTag64{12, "ui_canvas"});
+
+			auto main_panel = ActiveScene->CreateEntity("MainPanel");
+			main_panel.AddComponent<Cori::Components::Entity::TagComponent>(Cori::Utils::HashedTag64{5, "main_panel"});
+			main_panel.SetParent(ui_canvas);
+
+			auto ok_button = ActiveScene->CreateEntity("OkButton");
+			ok_button.AddComponent<Cori::Components::Entity::TagComponent>(Cori::Utils::HashedTag64{6, "ok_button"});
+			ok_button.SetParent(main_panel);
+
+			auto cancel_button = ActiveScene->CreateEntity("CancelButton");
+			cancel_button.AddComponent<Cori::Components::Entity::TagComponent>(Cori::Utils::HashedTag64{7, "cancel_button"});
+			cancel_button.SetParent(main_panel);
+
+			auto other_panel = ActiveScene->CreateEntity("OtherPanel");
+			other_panel.AddComponent<Cori::Components::Entity::TagComponent>(Cori::Utils::HashedTag64{17, "other_panel"});
+			other_panel.SetParent(ui_canvas);\
+
+			auto other_button = ActiveScene->CreateEntity("OtherButton");
+			other_button.AddComponent<Cori::Components::Entity::TagComponent>(Cori::Utils::HashedTag64{178, "OtherButton"});
+			other_button.SetParent(other_panel);
+
+			auto some_button = ActiveScene->CreateEntity("SomeButton");
+			some_button.AddComponent<Cori::Components::Entity::TagComponent>(Cori::Utils::HashedTag64{1781, "some_button"});
+			some_button.SetParent(other_button);
+
+			auto some_other_button = ActiveScene->CreateEntity("SomeOtherButton");
+			some_other_button.AddComponent<Cori::Components::Entity::TagComponent>(Cori::Utils::HashedTag64{1783, "some_other_button"});
+			some_other_button.SetParent(some_button);
+		}
+
+		if (ImGui::Button("Draw hier")) {
+			auto player = ActiveScene->GetNamedEntity("Player");
+			auto weapon = player.FindChildByName(2);
+			if (weapon) {
+				weapon.value().PrintHierarchy();
+			}
+				player.PrintHierarchy();
+			auto canvas = ActiveScene->GetNamedEntity("UI_Canvas");
+			canvas.PrintHierarchy();
+
+			auto& cahce = player.GetComponents<Cori::Components::Entity::ChildCacheComponent>();
+
+			CORI_CORE_DEBUG("AA");
+		}
+
+		if (ImGui::Button("test")) {
+		}
+			Cori::Core::UUID uuid;
+			//CORI_CORE_DEBUG("AA: {}", uuid.GetSerializationString());
+
 		ImGui::Text("FPS: %.2f", fps);
 		ImGui::Text("FPS 10s avg: %.2f", fps10);
 

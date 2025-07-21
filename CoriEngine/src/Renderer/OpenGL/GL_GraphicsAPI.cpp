@@ -7,8 +7,8 @@
 namespace Cori {
 
 	static void GLAPIENTRY GLDebugMessageCallback(GLenum source, GLenum type, GLuint id,
-		GLenum severity, GLsizei length,
-		const GLchar* message, const void* param) {
+		GLenum severity, [[maybe_unused]] GLsizei length,
+		const GLchar* message, [[maybe_unused]] const void* param) {
 		const char* source_, * type_, * severity_;
 
 		switch (source)

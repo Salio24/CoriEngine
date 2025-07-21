@@ -42,6 +42,7 @@ namespace Cori {
 	}
 
 	double GameTimer::GetSeconds() const {
+		return m_Time;
 	}
 
 	double GameTimer::GetMinutes() const {

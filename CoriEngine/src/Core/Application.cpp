@@ -10,7 +10,6 @@
 #include "Renderer/GraphicsCall.hpp"
 #include "AssetManager/AssetDefinitions.hpp"
 #include "SceneSystem/SceneManager.hpp"
-#include "SceneSystem/TriggerManager.hpp"
 #include "SceneSystem/Components.hpp"
 #include "EventSystem/GameEvents.hpp"
 
@@ -24,8 +23,7 @@ namespace Cori {
 		m_Window = Window::Create();
 
 		m_Window->SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent, CORI_PLACEHOLDERS(1)));
-
-		TriggerManager::Get().SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent, CORI_PLACEHOLDERS(1)));
+		m_Window->SetVSync(false);
 
 		m_ImGuiLayer = new ImGuiLayer();
 
@@ -51,7 +49,7 @@ namespace Cori {
 
 
 #ifdef DEBUG_BUILD
-		dispatcher.Dispatch<KeyReleasedEvent>([this](const KeyReleasedEvent& e) -> bool {
+		dispatcher.Dispatch<KeyReleasedEvent>([](const KeyReleasedEvent& e) -> bool {
 			if (e.GetKeyCode() == Cori::CORI_KEY_F8) {
 				CORI_PROFILE_REQUEST_NEXT_FRAME();
 			}
@@ -101,9 +99,6 @@ namespace Cori {
 				}
 
 				m_ImGuiLayer->StartFrame();
-
-				int te = 0;
-					te++;
 
 				if (m_RenderImGui) {
 					for (Layer* layer : m_LayerStack) {

@@ -2,7 +2,7 @@
 #include "AssetManager/AssetManager.hpp"
 
 namespace Cori {
-	bool SpriteAtlas::PreCreateHook(const SpriteAtlasDescriptor& descriptor) {
+	bool SpriteAtlas::PreCreateHook([[maybe_unused]] const SpriteAtlasDescriptor& descriptor) {
 
 		return true;
 	}
@@ -38,7 +38,7 @@ namespace Cori {
 		return m_SpriteUVs[index];
 	}
 
-	const UVs& SpriteAtlas::GetSpriteUVsAtPosition(glm::ivec2 pos) const  {
+	const UVs& SpriteAtlas::GetSpriteUVsAtPosition(glm::uvec2 pos) const  {
 		if (CORI_CORE_ASSERT_ERROR(pos.x * pos.y <= m_SpriteAtlasSize, "Requested a sprite UVs from ({0}) at invalid position: ({1}, {2}) : returned data from position: (0, 0)", m_DebugName, pos.x, pos.y)) { return m_SpriteUVs[0]; }
 		return m_SpriteUVs[pos.x * pos.y - 1];
 	}

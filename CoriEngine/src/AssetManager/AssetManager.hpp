@@ -4,7 +4,6 @@
 #include "Renderer/ShaderProgram.hpp"
 #include "Renderer/Texture.hpp"
 #include "Renderer/SpriteAtlas.hpp"
-#include "Renderer/Sprite.hpp"
 #include "SpriteAtlasDescriptor.hpp"
 
 namespace Cori {

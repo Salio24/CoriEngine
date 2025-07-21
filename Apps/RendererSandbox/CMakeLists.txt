@@ -18,7 +18,7 @@ project(RendererSandbox)
 
     add_executable(${EXECUTABLE_NAME} ${MY_SOURCES})
 
-    target_compile_options(${EXECUTABLE_NAME} PRIVATE -Wall -Wextra)
+    target_compile_options(${EXECUTABLE_NAME} PRIVATE -w)
 
     target_compile_definitions(${EXECUTABLE_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG_BUILD>

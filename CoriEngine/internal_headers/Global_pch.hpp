@@ -41,5 +41,6 @@
 #include "../include/Macros.hpp"
 #include "../src/Core/Logger.hpp"
 #include "../src/Profiling/TimeProfiler.hpp"
+#include "../src/Core/Uuid.hpp"
 
 #endif

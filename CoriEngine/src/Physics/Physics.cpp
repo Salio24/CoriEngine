@@ -134,13 +134,12 @@ namespace Cori {
 			switch (order) {
 			case WindingOrder::COLLINEAR:
 				return "Collinear";
-				break;
 			case WindingOrder::CLOCKWISE:
 				return "Clockwise (CW)";
-				break;
 			case WindingOrder::COUNTER_CLOCKWISE:
 				return "Counter-Clockwise (CCW)";
-				break;
+			default:
+				return "Unknown";
 			}
 		}
 

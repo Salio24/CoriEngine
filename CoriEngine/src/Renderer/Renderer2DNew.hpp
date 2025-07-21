@@ -5,7 +5,6 @@
 #include "PipelineProgram.hpp"
 #include "Texture.hpp"
 #include "SpriteAtlas.hpp"
-#include "Sprite.hpp"
 #include "CameraComponent.hpp"
 #include "AssetManager/AssetManager.hpp"
 #include "GraphicsCall.hpp"

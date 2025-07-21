@@ -6,7 +6,7 @@
 
 namespace Cori {
 
-	bool OpenGLShaderProgram::PreCreateHook(const std::string_view debugName, const std::string_view vertexPath, const std::string_view fragmentPath, const std::string_view geometryPath) {
+	bool OpenGLShaderProgram::PreCreateHook([[maybe_unused]] const std::string_view debugName, [[maybe_unused]] const std::string_view vertexPath, [[maybe_unused]] const std::string_view fragmentPath, [[maybe_unused]] const std::string_view geometryPath) {
 		return true;
 	}
 

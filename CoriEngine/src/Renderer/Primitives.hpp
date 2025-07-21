@@ -42,11 +42,11 @@ namespace Cori {
 			float m_Rotation;
 			uint8_t m_Layer;
 			//uint32_t m_UID;
-			Utils::StringHash m_ID;
+			Utils::StringHash32 m_ID;
 
 			void SetTexture(const std::shared_ptr<Texture2D>& tex) {
 				if ((m_States & AnimatorBound) != AnimatorBound) {
-					if (!m_States & SemiTransparent) {
+					if (!(m_States & SemiTransparent)) {
 						SetSemiTransparency(tex->HasSemiTransparency());
 					}
 					m_Texture = tex;

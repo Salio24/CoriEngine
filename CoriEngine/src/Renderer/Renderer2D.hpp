@@ -5,7 +5,6 @@
 #include "PipelineProgram.hpp"
 #include "Texture.hpp"
 #include "SpriteAtlas.hpp"
-#include "Sprite.hpp"
 
 namespace Cori {
 
@@ -51,8 +50,6 @@ namespace Cori {
 		static void DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const UVs& uvs, const float layer, bool flipped = false);
 		
 		static void DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<SpriteAtlas>& atlas, uint32_t index);
-
-		static void DrawQuad(const glm::vec2 position, const glm::vec2 size, const std::shared_ptr<Sprite>& sprite);
 
 	private:
 

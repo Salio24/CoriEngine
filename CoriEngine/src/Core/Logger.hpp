@@ -867,11 +867,11 @@ inline const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') +
 #define CORI_CORE_ASSERT_ERROR(x, ...) false
 #define CORI_CORE_ASSERT_FATAL(x, ...) false
 
-#define CORI_CORE_VERIFY_DEBUG(x, ...) (x && false)
-#define CORI_CORE_VERIFY_INFO(x, ...)  (x && false)
-#define CORI_CORE_VERIFY_WARN(x, ...)  (x && false)
-#define CORI_CORE_VERIFY_ERROR(x, ...) (x && false)
-#define CORI_CORE_VERIFY_FATAL(x, ...) (x && false)
+#define CORI_CORE_VERIFY_DEBUG(x, ...) (!x)
+#define CORI_CORE_VERIFY_INFO(x, ...)  (!x)
+#define CORI_CORE_VERIFY_WARN(x, ...)  (!x)
+#define CORI_CORE_VERIFY_ERROR(x, ...) (!x)
+#define CORI_CORE_VERIFY_FATAL(x, ...) (!x)
 
 #endif
 

@@ -40,6 +40,12 @@ namespace Cori {
 		Entity CreateEntity(const std::string& name);
 		Entity CreateEntity();
 
+		std::expected<void, const char*> AddEntityToCache(Entity entity);
+
+		void GetEntityFromCache(const Utils::HashedTag64& tag);
+
+		void DestroyEntity(Entity entity);
+
 		Entity GetNamedEntity(const std::string& name);
 
 		void SortRenderGroup();
@@ -98,7 +104,7 @@ namespace Cori {
 
 		std::string m_Name;
 
-		friend class Components::Entity::StateMachine;
+		friend struct Components::Entity::StateMachine;
 
 		friend struct Components::Entity::RenderGroup;
 
@@ -119,6 +125,12 @@ namespace Cori {
 		explicit Scene(const std::string& name);
 	protected:
 	private:
+
+		void UpdateTransform();
+
+		void UpdateTransformRecursive(entt::entity entity, const glm::mat3& parentTransform, uint8_t parentLayer, bool parentTransformDirty, bool parentLayerDirty);
+
+		void OnHierarchyComponentDestroyed(entt::registry& registry, entt::entity entity);
 
 		std::unordered_map<std::string, entt::handle> m_NamedEntities;
 

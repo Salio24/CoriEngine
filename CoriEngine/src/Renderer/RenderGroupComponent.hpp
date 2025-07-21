@@ -11,7 +11,7 @@ namespace Cori {
 			/**
 			 * @brief It's basicaly a uint32_t internaly and can be treated as one
 			 */
-			using PrimitiveID = Utils::StringHash;
+			using PrimitiveID = Utils::StringHash32;
 
 			struct RenderGroup {
 				RenderGroup() = default;

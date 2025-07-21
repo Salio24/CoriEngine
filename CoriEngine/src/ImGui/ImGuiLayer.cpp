@@ -41,7 +41,7 @@ namespace Cori {
 		
 		ImGui_ImplSDL3_InitForOpenGL(static_cast<SDL_Window*>(Application::GetWindow().GetNativeWindow()), static_cast<OpenGLContext*>(Application::GetWindow().GetNativeContext()));
 		// do an assert
-		bool test = ImGui_ImplOpenGL3_Init("#version 460");
+		[[maybe_unused]] bool test = ImGui_ImplOpenGL3_Init("#version 460");
 
 		created = true;
 		CORI_CORE_DEBUG("ImGuiLayer attached");
@@ -55,8 +55,7 @@ namespace Cori {
 		CORI_CORE_DEBUG("ImGuiLayer detached");
 	}
 
-	void ImGuiLayer::OnImGuiRender(const double deltaTime) {
-		static bool show = true;
+	void ImGuiLayer::OnImGuiRender([[maybe_unused]] const double deltaTime) {
 		static bool show_ui = true;
 		
 		if (ImGui::IsKeyPressed(ImGuiKey_F1)) {
@@ -90,7 +89,8 @@ namespace Cori {
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		ImGuiIO& io = ImGui::GetIO();
+		(void)io;
 
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
@@ -99,6 +99,7 @@ namespace Cori {
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
 			SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
+			CORI_CORE_DEBUG("ImGuiLayer rendering");
 		}
 	}
 

@@ -7,11 +7,11 @@ namespace Cori {
 		public:
 			virtual ~TriggerBehaviour() = default;
 
-			virtual void OnEnter(Entity& visitor) {}
+			virtual void OnEnter([[maybe_unused]] Entity& visitor) {}
 
-			virtual void OnTickUpdate(Entity& visitor, float timestep) {}
+			virtual void OnTickUpdate([[maybe_unused]] Entity& visitor, [[maybe_unused]] float timestep) {}
 
-			virtual void OnExit(Entity& visitor) {}
+			virtual void OnExit([[maybe_unused]] Entity& visitor) {}
 
 			virtual const char* GetDebugName() const { return "Unnamed Trigger"; }
 

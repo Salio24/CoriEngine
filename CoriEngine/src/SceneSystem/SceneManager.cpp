@@ -24,7 +24,7 @@ namespace Cori {
 
 	std::shared_ptr<Scene> SceneManager::CreateSceneImpl(const std::string& name) {
 		if (CORI_CORE_ASSERT_ERROR(!name.empty(), "Scene name cannot be empty!")) { return nullptr; }
-		if (CORI_CORE_ASSERT_ERROR(!m_Scenes.contains(name), "Scene '{0}' already exists!", name)) { return nullptr; }
+		if (CORI_CORE_VERIFY_ERROR(!m_Scenes.contains(name), "Scene '{0}' already exists!", name)) { return nullptr; }
 
 		CORI_CORE_INFO("SceneManager: Creating scene '{0}'", name);
 

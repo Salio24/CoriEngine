@@ -3,7 +3,6 @@
 #include "EventSystem/Event.hpp"
 #include "Profiling/TimeProfiler.hpp"
 #include "SceneSystem/Scene.hpp"
-#include "SceneSystem/TriggerManager.hpp"
 
 namespace Cori {
 
@@ -32,7 +31,6 @@ namespace Cori {
 
 		void SceneUpdate(const double deltaTime) {
 			if (ActiveScene != nullptr) {
-				TriggerManager::Get().OnUpdate(deltaTime, ActiveScene);
 				ActiveScene->OnUpdate(deltaTime);
 			}
 		}

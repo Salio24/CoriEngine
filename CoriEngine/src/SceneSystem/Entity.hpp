@@ -1,5 +1,6 @@
 #pragma once 
 #include <entt/entt.hpp>
+#include "Core/Utility/StringHash.hpp"
 
 namespace Cori {
 	class Scene;
@@ -55,6 +56,11 @@ namespace Cori {
 			return m_EntityHandle.get<const T...>();
 		}
 
+		template<typename... T, typename... Args>
+		decltype(auto) GetOrAddComponent(Args&&... args) {
+			return m_EntityHandle.get_or_emplace<T...>(std::forward<Args>(args)...);
+		}
+
 		template<typename... T>
 		bool HasComponents() const {
 			return m_EntityHandle.all_of<T...>();
@@ -79,33 +85,50 @@ namespace Cori {
 			return m_EntityHandle != other.m_EntityHandle;
 		}
 
-		inline bool IsValid() const {
-			return bool(this);
+		[[nodiscard]] bool IsValid() const {
+			return bool(m_EntityHandle);
 		}
 
-		inline uint32_t GetEntityID() {
+		[[nodiscard]] uint32_t GetEntityID() {
 			return entt::to_integral(m_EntityHandle.entity());
 		}
 
-		inline uint32_t GetVersion() {
+		[[nodiscard]] uint32_t GetVersion() {
 			return entt::to_version(m_EntityHandle.entity());
 		}
 
-		inline uint64_t GetUID() {
+		[[nodiscard]] uint64_t GetUID() {
 			return (static_cast<uint64_t>(GetEntityID()) << 32) | GetVersion();
 		}
 
-		inline std::string GetDebuggingUID() {
+		[[nodiscard]] std::string GetDebuggingUID() {
 			return "(Entity ID: " + std::to_string(GetEntityID()) + ", Version: " + std::to_string(GetVersion()) + ")";
 		}
 
+		[[nodiscard]] std::expected<void, const char*>  SetParent(Entity parent);
+
+		[[nodiscard]] std::expected<Entity, const char*> GetParent() const;
+
+		[[nodiscard]] std::expected<std::vector<Entity>, const char*> GetChildren() const;
+
+		[[nodiscard]] std::expected<Entity, const char*> FindChildByName(Utils::StringHash64 name) const;
+
+		[[nodiscard]] entt::entity GetHandle() const { return m_EntityHandle.entity(); }
+
+		void PrintHierarchy();
 	private:
+		void UnlinkFromParent();
+		void LinkToParent(Entity parent);
+
+		void DrawHierarchyRecursive(Entity entity, const std::string& prefix, bool isLast);
+
 		entt::handle m_EntityHandle;
 
 		friend class Scene;
 
 		//for internal use ONLY
 		static void SetViewScene(Scene* ptr);
+		// dafuq?
 
 	};
 }

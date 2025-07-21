@@ -1,4 +1,5 @@
 #pragma once
+
 #include "../src/Core/Application.hpp"
 #include "../src/Core/Layer.hpp"
 #include "../src/Core/Logger.hpp"
@@ -26,8 +27,8 @@
 #include "../src/Renderer/RenderGroupComponent.hpp"
 
 #include "../src/Core//Utility/Random.hpp"
-
 #include "../src/Core/Utility/StringHash.hpp"
+#include "../src/Core/Utility/HashedTag.hpp"
 
 #include "../src/AssetManager/AssetDefinitions.hpp"
 

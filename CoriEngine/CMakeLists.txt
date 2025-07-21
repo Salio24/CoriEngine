@@ -8,15 +8,6 @@ project(CoriEngine)
 
     #jinja2
     find_package(Python 3.9 REQUIRED COMPONENTS Interpreter)
-	
-	execute_process(
-		COMMAND ${Python_EXECUTABLE} -m pip install Jinja2
-		RESULT_VARIABLE PIP_RESULT
-	)
-	
-	if(NOT PIP_RESULT EQUAL 0)
-		message(FATAL_ERROR "Failed to execute: pip install Jinja2")
-	endif()
 
     # SDL3
     set(SDL_SHARED OFF)
@@ -108,6 +99,11 @@ project(CoriEngine)
     set(BOX2D_DOCS ON CACHE BOOL "")
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/box2d EXCLUDE_FROM_ALL)
 
+    #stduuid
+    #set(UUID_SYSTEM_GENERATOR ON CACHE BOOL "")
+    add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/stduuid EXCLUDE_FROM_ALL)
+
+
 # project's binary setup vvv
 
     # varible sets
@@ -130,29 +126,10 @@ project(CoriEngine)
     endif()
 
     # my shared lib
-    add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES})
-
-if(PVS_STUDIO_ACTIVE)
-    pvs_studio_add_target(
-        TARGET ${ENGINE_LIBRARY_NAME}.analyze
-        ALL                         # run on every build of ALL
-        ANALYZE ${ENGINE_LIBRARY_NAME}               # which target to analyze
-        MODE 
-            GA:1,2,3     # General Analysis, levels 1�3
-            64:1,2,3     # 64-bit issues
-            OP:1,2,3     # Micro-optimizations
-            CS:1,2,3     # Customer-specific
-            MISRA:1,2,3  # MISRA C/C++
-            OWASP:1,2,3  # OWASP ASVS rules
-            AUTOSAR:1,2,3
-        OUTPUT FORMAT json          # produce JSON
-        LOG pvs.json                 # log file name
-        ARGS 
-            -e "${PROJECT_SOURCE_DIR}/thirdparty"
-            -e "*gl.h"
-            -e "*khrplatform.h"
+    add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES}
+            src/Core/Utility/HashedTag.hpp
+            src/Core/Utility/Error.hpp
     )
-endif()
 
     target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
@@ -198,7 +175,7 @@ endif()
         target_compile_options(SDL3_mixer-static PRIVATE -w)
         target_compile_options(SDL3_image-static PRIVATE -w)
         target_compile_options(glm PRIVATE -w)
-        target_compile_options(nlohmann_json INTERFACE -w)
+        #target_compile_options(nlohmann_json INTERFACE -w)
         target_compile_options(tmxlite PRIVATE -w)
         target_compile_options(imgui PRIVATE -w)
         target_compile_options(freetype PRIVATE -w)
@@ -213,10 +190,13 @@ endif()
         target_compile_options(spdlog PRIVATE -w)
     endif()
 
+    #target_compile_options(${ENGINE_LIBRARY_NAME} PRIVATE -Wno-unused-variable)
+    #target_compile_options(${ENGINE_LIBRARY_NAME} PRIVATE -Wno-unused-parameter)
+
     # lib linking
 
     # should be public
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm tmxlite nlohmann_json::nlohmann_json box2d::box2d)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm tmxlite nlohmann_json::nlohmann_json box2d::box2d stduuid)
 
     # can be private 
     target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static freetype glad_gl_core_46)

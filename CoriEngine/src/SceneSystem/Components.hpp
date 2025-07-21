@@ -8,6 +8,8 @@
 #include "StateSystem/StateMachine.hpp"
 #include "Renderer/CameraComponent.hpp"
 #include "Core/Utility/TemplateUtils.hpp"
+#include <glm/gtx/matrix_transform_2d.hpp>
+#include "Core/Utility/HashedTag.hpp"
 
 namespace Cori {
 	namespace Physics {
@@ -29,6 +31,95 @@ namespace Cori {
 				Name() = default;
 				explicit Name(const std::string& name) : m_Name(name) {}
 			};
+
+			struct TagComponent {
+				TagComponent() = default;
+				explicit TagComponent(const Utils::HashedTag64& tag) : m_Tag(tag) {}
+
+				Utils::HashedTag64 m_Tag;
+			};
+
+			struct UUIDComponent {
+				UUIDComponent() = default;
+				explicit UUIDComponent(const Core::UUID& uuid) : m_UUID(uuid) {}
+				explicit UUIDComponent(const std::string& uuid_str) : m_UUID(uuid_str) {}
+
+				const Core::UUID m_UUID{};
+			};
+
+			struct HierarchyComponent {
+				HierarchyComponent() = default;
+				entt::entity m_Parent {entt::null};
+				entt::entity m_FirstChild {entt::null};
+				entt::entity m_NextSibling {entt::null};
+				entt::entity m_PreviousSibling {entt::null};
+			};
+
+			struct TransformComponent {
+				TransformComponent() = default;
+				TransformComponent(const glm::vec2 localPosition, const uint8_t localLayer) : m_LocalPosition(localPosition), m_LocalLayer(localLayer) {}
+
+				void SetLocalPosition(const glm::vec2 localPosition) {
+					m_LocalPosition = localPosition;
+					m_DirtyTransform = true;
+				}
+
+				void SetLocalRotation(const float localRotation) {
+					m_LocalRotation = localRotation;
+					m_DirtyTransform = true;
+				}
+
+				void SetLocalScale(const glm::vec2 localScale) {
+					m_LocalScale = localScale;
+					m_DirtyTransform = true;
+				}
+
+				void SetLocalLayer(const uint8_t localLayer) {
+					m_LocalLayer = localLayer;
+					m_DirtyLayer = true;
+				}
+
+				[[nodiscard]] glm::vec2 GetLocalPosition() const {
+					return m_LocalPosition;
+				}
+
+				[[nodiscard]] glm::vec2 GetLocalScale() const {
+					return m_LocalScale;
+				}
+
+				[[nodiscard]] float GetLocalRotation() const {
+					return m_LocalRotation;
+				}
+
+				[[nodiscard]] uint8_t GetLocalLayer() const {
+					return m_LocalLayer;
+				}
+
+				[[nodiscard]] glm::mat3 GetLocalTransform() const {
+					return glm::translate(glm::mat3(1.0f), m_LocalPosition) *
+							glm::rotate(glm::mat3(1.0f), glm::radians(m_LocalRotation)) *
+								glm::scale(glm::mat3(1.0f), m_LocalScale);
+				}
+
+			private:
+				friend class Cori::Scene;
+				glm::vec2 m_LocalPosition{ 0.0f, 0.0f };
+				glm::vec2 m_LocalScale{ 1.0f, 1.0f };
+				float m_LocalRotation{ 0.0f };
+			public:
+				glm::mat3 m_WorldTransform{ 1.0f };
+				uint8_t m_WorldLayer{ 1 };
+			private:
+				uint8_t m_LocalLayer{ 0 };
+				bool m_DirtyTransform{ true };
+				bool m_DirtyLayer{ true };
+			};
+
+			struct ChildCacheComponent {
+				ChildCacheComponent() = default;
+				std::unordered_map<Utils::StringHash64, entt::entity> m_Children;
+			};
+
 
 			// add an ability to add multiple plains to an entity
 			// combing sprite and render component into one

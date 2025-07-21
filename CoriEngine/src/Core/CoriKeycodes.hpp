@@ -388,7 +388,7 @@ namespace Cori {
 
 	} CoriKeycode;
 
-	static std::string_view CoriGetKeyName(CoriKeycode code) {
+	[[maybe_unused]] static std::string_view CoriGetKeyName(CoriKeycode code) {
 		std::string_view name = magic_enum::enum_name(code);
 		constexpr std::string_view prefix = "CORI_";
 		if (name.starts_with(prefix)) {

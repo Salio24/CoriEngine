@@ -80,14 +80,14 @@ namespace Cori {
 
 						if (isFinished) {
 							size_t nextIndex = m_CurrentAnimationIndex + 1;
-							bool willLoop = false;
+							//bool willLoop = false;
 
 							if (nextIndex < m_AnimationQueue.size()) {
 								m_CurrentAnimationIndex = nextIndex;
 							}
-							else if (m_LoopStartIndex != -1) {
+							else if (m_LoopStartIndex != 0xFFFFFFFF) {
 								m_CurrentAnimationIndex = m_LoopStartIndex;
-								willLoop = true;
+								//willLoop = true;
 							}
 							else {
 								return;
@@ -111,7 +111,7 @@ namespace Cori {
 				}
 
 				size_t m_CurrentAnimationIndex = 0;
-				size_t m_LoopStartIndex = -1;
+				size_t m_LoopStartIndex = 0xFFFFFFFF;
 				glm::vec2 m_FrameSize{ 0.0f, 0.0f };
 
 			private:

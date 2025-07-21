@@ -88,7 +88,7 @@ namespace Cori {
 		m_Layout = layout;
 	}
 
-	bool OpenGLIndexBuffer::PreCreateHook(uint32_t* indices, uint32_t count) {
+	bool OpenGLIndexBuffer::PreCreateHook([[maybe_unused]] uint32_t* indices, [[maybe_unused]] uint32_t count) {
 		return true;
 	}
 

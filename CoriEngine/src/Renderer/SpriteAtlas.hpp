@@ -1,6 +1,5 @@
 #pragma once
 #include "AssetManager/SpriteAtlasDescriptor.hpp"
-#include "Sprite.hpp"
 #include "Texture.hpp"
 #include "Profiling/Trackable.hpp"
 #include "Core/SelfFactory.hpp"
@@ -16,7 +15,7 @@ namespace Cori {
 
 		const UVs& GetSpriteUVsAtIndex(uint32_t index) const;
 
-		const UVs& GetSpriteUVsAtPosition(glm::ivec2 pos) const;
+		const UVs& GetSpriteUVsAtPosition(glm::uvec2 pos) const;
 
 	protected: 
 		SpriteAtlas(const SpriteAtlasDescriptor& descriptor); 

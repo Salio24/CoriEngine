@@ -5,7 +5,7 @@
 #include <glad/gl.h>
 
 namespace Cori {
-	bool OpenGLTexture2D::PreCreateHook(const std::string& path) {
+	bool OpenGLTexture2D::PreCreateHook([[maybe_unused]] const std::string& path) {
 		return true;
 	}
 
