@@ -5,6 +5,8 @@ namespace Cori {
 	struct UVs {
 		glm::vec2 UVmin{ 0.0f, 0.0f };
 		glm::vec2 UVmax{ 1.0f, 1.0f };
+
+		explicit operator glm::vec4() const { return {UVmin, UVmax}; }
 	};
 
 	class Texture {

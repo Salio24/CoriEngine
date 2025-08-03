@@ -36,7 +36,7 @@ namespace Cori {
 #endif
 	}
 
-	void Logger::Init(bool async) {
+	void Logger::Init(bool async, bool fileWrite) {
 		if (async) {
 			spdlog::init_thread_pool(8192, 1);
 		}
@@ -44,17 +44,19 @@ namespace Cori {
 		int max_size = 1048576 * 20;
 		int max_files = 5;
 		auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("logs/cori_log.txt", max_size, max_files);
-		file_sink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-6n] [%-8l]: %v%$");
-
+		file_sink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-6n] [%-8l]: %v%$ %@");
 		std::vector<spdlog::sink_ptr> core_sinks;
-		core_sinks.push_back(file_sink);
-
 		std::vector<spdlog::sink_ptr> client_sinks;
-		client_sinks.push_back(file_sink);
+
+		if (fileWrite) {
+			core_sinks.push_back(file_sink);
+
+			client_sinks.push_back(file_sink);
+		}
 
 #ifdef DEBUG_BUILD
 		auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-		console_sink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-6n] [%-8l]: %v%$");
+		console_sink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-6n] [%-8l]: %v%$ %@");
 
 		core_sinks.push_back(console_sink);
 		client_sinks.push_back(console_sink);
@@ -80,6 +82,8 @@ namespace Cori {
 
 		CORI_CORE_INFO("------------- NEW LOG SESSION -------------");
 		CORI_CORE_INFO("|  Logger initialized. Mode: {} |", async ? "Asynchronous" : "Synchronous ");
+		CORI_CORE_INFO("-------------------------------------------");
+		CORI_CORE_INFO("|     File logging is: {} |    ", fileWrite ? "Enabled" : "Disabled");
 		CORI_CORE_INFO("-------------------------------------------");
 	}
 

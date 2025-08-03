@@ -1,5 +1,3 @@
-// This is a personal academic project. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "GL_VertexArray.hpp"
 #include <glad/gl.h>
 #include "GL_Buffers.hpp"
@@ -73,16 +71,41 @@ namespace Cori {
 		uint32_t index = 0;
 		const VBLayout& layout = vertexBuffer->GetLayout();
 		for (const auto& element : layout) {
-			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(index, static_cast<GLint>(element.GetComponentCount()), ShaderDataTypeToGLDataType(element.m_Type), element.m_Normalized ? GL_TRUE : GL_FALSE, static_cast<GLsizei>(layout.GetStride()), reinterpret_cast<const void*>(element.m_Offset));
+			if (element.m_Type == ShaderDataType::Mat3) {
+				for (int i = 0; i < element.GetComponentCount(); i++) {
+					glEnableVertexAttribArray(index);
+					glVertexAttribPointer(index, static_cast<GLint>(element.GetComponentCount()), ShaderDataTypeToGLDataType(element.m_Type), element.m_Normalized ? GL_TRUE : GL_FALSE, static_cast<GLsizei>(layout.GetStride()), reinterpret_cast<const void*>(element.m_Offset + sizeof(float) * element.GetComponentCount() * i));
 
-			if (element.m_Divisor > 0) {
-				glVertexAttribDivisor(index, element.m_Divisor);
+					if (element.m_Divisor > 0) {
+						glVertexAttribDivisor(index, element.m_Divisor);
+					}
+
+					index++;
+				}
 			}
+			else if (element.m_Type == ShaderDataType::Mat4) {
+				for (int i = 0; i < element.GetComponentCount(); i++) {
+					glEnableVertexAttribArray(index);
+					glVertexAttribPointer(index, static_cast<GLint>(element.GetComponentCount()), ShaderDataTypeToGLDataType(element.m_Type), element.m_Normalized ? GL_TRUE : GL_FALSE, static_cast<GLsizei>(layout.GetStride()), reinterpret_cast<const void*>(element.m_Offset + sizeof(float) * element.GetComponentCount() * i));
 
-			index++;
+					if (element.m_Divisor > 0) {
+						glVertexAttribDivisor(index, element.m_Divisor);
+					}
+
+					index++;
+				}
+			}
+			else {
+				glEnableVertexAttribArray(index);
+				glVertexAttribPointer(index, static_cast<GLint>(element.GetComponentCount()), ShaderDataTypeToGLDataType(element.m_Type), element.m_Normalized ? GL_TRUE : GL_FALSE, static_cast<GLsizei>(layout.GetStride()), reinterpret_cast<const void*>(element.m_Offset));
+
+				if (element.m_Divisor > 0) {
+					glVertexAttribDivisor(index, element.m_Divisor);
+				}
+
+				index++;
+			}
 		}
-		vertexBuffer->Unbind();
 
 		m_VertexBuffers.push_back(vertexBuffer);
 		CORI_CORE_TRACE("GL_VertexArray (GL_RuntimeID: {0}): VertexBuffer with GL_RuntimeID: {1} was added to successfully", m_ID ,std::static_pointer_cast<OpenGLVertexBuffer>(vertexBuffer)->m_ID);

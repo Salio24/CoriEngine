@@ -1,5 +1,3 @@
-// This is a personal academic project. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "GL_Buffers.hpp"
 #include <glad/gl.h>
 #include <magic_enum/magic_enum.hpp>
@@ -57,7 +55,14 @@ namespace Cori {
 				layoutText.append("\n");
 			}
 
-			index++;
+			if (element.m_Type == ShaderDataType::Mat3) {
+				index+=3;
+			} else if (element.m_Type == ShaderDataType::Mat4) {
+				index+=4;
+			} else {
+				index++;
+			}
+
 		}
 
 		CORI_CORE_TRACE("GL_VertexBuffer (GL_RuntimeID: {0}): VBO has the following Attribute Layout: \n{1}", m_ID, layoutText);

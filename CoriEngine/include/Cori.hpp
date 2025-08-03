@@ -15,16 +15,14 @@
 
 #include "../src/Renderer/Buffers.hpp"
 #include "../src/Renderer/GraphicsCall.hpp"
-#include "../src/Renderer/Renderer2D.hpp"
 #include "../src/Renderer/VertexArray.hpp"
 #include "../src/Renderer/ShaderProgram.hpp"
 #include "../src/Renderer/PipelineProgram.hpp"
 #include "../src/Renderer/Texture.hpp"
 #include "../src/Renderer/Image.hpp"
 #include "../src/Renderer/CameraController.hpp"
-#include "../src/Renderer/Animator/Animator.hpp"
-#include "../src/Renderer/Renderer2DNew.hpp"
-#include "../src/Renderer/RenderGroupComponent.hpp"
+#include "../src/Renderer/Animator/QuadAnimator.hpp"
+#include "../src/Renderer/Renderer2D.hpp"
 
 #include "../src/Core//Utility/Random.hpp"
 #include "../src/Core/Utility/StringHash.hpp"

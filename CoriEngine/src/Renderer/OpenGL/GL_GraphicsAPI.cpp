@@ -1,5 +1,3 @@
-// This is a personal academic project. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "GL_GraphicsAPI.hpp"
 #include <glad/gl.h>
 
@@ -107,14 +105,13 @@ namespace Cori {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	void OpenGLGraphicsAPI::DrawElements(const std::shared_ptr<VertexArray>& vertexArray, const uint32_t elementCount) {
-		vertexArray->Bind();
-		vertexArray->GetIndexBuffer()->Bind();
-
+	void OpenGLGraphicsAPI::DrawElementsTriangles(const uint32_t elementCount) {
 		glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(elementCount), GL_UNSIGNED_INT, nullptr);
 	}
 
-
+	void OpenGLGraphicsAPI::DrawElementsInstancedTriangles(const uint32_t instanceCount) {
+		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, instanceCount);
+	}
 
 	void OpenGLGraphicsAPI::EnableDepthTest() {
 		glEnable(GL_DEPTH_TEST);

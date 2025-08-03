@@ -20,8 +20,12 @@ namespace Cori {
 			s_GraphicsAPI->ClearFramebuffer();
 		}
 
-		static void DrawElements(const std::shared_ptr<VertexArray>& vertexArray, const uint32_t elementCount) {
-			s_GraphicsAPI->DrawElements(vertexArray, elementCount);
+		static void DrawElementsTriangles(const uint32_t elementCount) {
+			s_GraphicsAPI->DrawElementsTriangles(elementCount);
+		}
+
+		static void DrawElementsInstancedTriangles(const uint32_t instanceCount) {
+			s_GraphicsAPI->DrawElementsInstancedTriangles(instanceCount);
 		}
 
 		static void EnableDepthTest() {

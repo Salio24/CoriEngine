@@ -1,5 +1,3 @@
-// This is a personal academic project. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "Layer.hpp"
 #include "SceneSystem/SceneManager.hpp"
 
@@ -28,24 +26,22 @@ namespace Cori {
 		CORI_CORE_DEBUG("Layer: Binding scene '{0}'", name);
 		std::shared_ptr<Scene> scene = SceneManager::GetScene(name);
 		
-		bool success = scene->OnBind(CORI_BIND_EVENT_FN(Layer::OnEvent, CORI_PLACEHOLDERS(1)));
-
+		bool success = scene->OnBind();
 		if (CORI_CORE_ASSERT_ERROR(success, "Failed to bind scene '{0}'!", name)) { return; }
 		
-		ActiveScene = scene;
-
+		ActiveScene.m_SceneRaw = scene;
 		CORI_CORE_TRACE("Layer: Scene '{0}' bound successfully", name);
 	}
 
 	void Layer::UnbindScene() {
-		if (CORI_CORE_ASSERT_WARN(ActiveScene != nullptr, "No active scene to deactivate!")) { return; }
+		if (CORI_CORE_ASSERT_WARN(ActiveScene.IsValid(), "No active scene to deactivate!")) { return; }
 
-		CORI_CORE_DEBUG("Layer: Unbinding scene '{0}'", ActiveScene->m_Name);
-		bool success = ActiveScene->OnUnbind();
-		if (CORI_CORE_ASSERT_ERROR(success, "Failed to unbind scene '{0}'!", ActiveScene->m_Name)) { return; }
+		CORI_CORE_DEBUG("Layer: Unbinding scene '{0}'", ActiveScene.GetName());
 
-		CORI_CORE_TRACE("Layer: Scene '{0}' unbound successfully", ActiveScene->m_Name);
-		ActiveScene = nullptr;
+		bool success = ActiveScene.OnUnbind();
+		if (CORI_CORE_ASSERT_ERROR(success, "Failed to unbind scene '{0}'!", GetName())) { return; }
+
+		CORI_CORE_TRACE("Layer: Scene '{0}' unbound successfully", ActiveScene.GetName());
+		ActiveScene.m_SceneRaw = nullptr;
 	}
-
 }

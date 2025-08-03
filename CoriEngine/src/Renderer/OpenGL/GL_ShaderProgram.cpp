@@ -1,5 +1,3 @@
-// This is a personal academic project. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "GL_ShaderProgram.hpp"
 #include <glad/gl.h>
 #include "AssetManager/FileManager.hpp"

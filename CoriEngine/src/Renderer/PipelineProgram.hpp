@@ -1,4 +1,5 @@
 #pragma once
+#ifdef NOT_USED
 #include "ShaderProgram.hpp"
 
 namespace Cori {
@@ -15,3 +16,4 @@ namespace Cori {
 	};
 
 }
+#endif

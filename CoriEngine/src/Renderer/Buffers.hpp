@@ -53,8 +53,8 @@ namespace Cori {
 			2,            // Vec2
 			3,            // Vec3
 			4,            // Vec4
-			3 * 3,        // Mat3
-			4 * 4,        // Mat4
+			3,            // Mat3
+			4,            // Mat4
 			1,            // Int
 			2,            // Int2
 			3,            // Int3

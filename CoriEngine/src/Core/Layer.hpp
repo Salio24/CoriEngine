@@ -3,6 +3,7 @@
 #include "EventSystem/Event.hpp"
 #include "Profiling/TimeProfiler.hpp"
 #include "SceneSystem/Scene.hpp"
+#include "SceneSystem/SceneHandle.hpp"
 
 namespace Cori {
 
@@ -30,18 +31,14 @@ namespace Cori {
 		void UnbindScene();
 
 		void SceneUpdate(const double deltaTime) {
-			if (ActiveScene != nullptr) {
-				ActiveScene->OnUpdate(deltaTime);
-			}
+			ActiveScene.OnUpdate(deltaTime);
 		}
 
 		void SceneTickrateUpdate(const float timeStep) {
-			if (ActiveScene != nullptr) {
-				ActiveScene->OnTickUpdate(timeStep);
-			}
+			ActiveScene.OnTickUpdate(timeStep);
 		}
 
-		std::shared_ptr<Scene> ActiveScene{ nullptr };
+		SceneHandle ActiveScene;
 
 		inline static Physics::DebugImguiRenderer debug_renderer;
 

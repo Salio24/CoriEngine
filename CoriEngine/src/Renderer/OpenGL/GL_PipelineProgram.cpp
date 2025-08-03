@@ -1,5 +1,4 @@
-// This is a personal academic project. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+#ifdef NOTUSED
 #include "GL_PipelineProgram.hpp"
 #include <glad/gl.h>
 
@@ -28,3 +27,4 @@ namespace Cori {
 		glUseProgramStages(m_ID, GL_ALL_SHADER_BITS, 0);
 	}
 }
+#endif

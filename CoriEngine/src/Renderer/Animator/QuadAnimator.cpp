@@ -1,12 +1,14 @@
-#include "Animator.hpp"
+#include "QuadAnimator.hpp"
+#include "AssetManager/AssetManager.hpp"
 
 namespace Cori {
 	namespace Components {
 		namespace Entity {
-			Animator::Animator(std::filesystem::path jsonPath, Cori::Entity entity, const float timeStep, const char* animatorName) : m_Entity(entity) {
+			QuadAnimator::QuadAnimator(std::filesystem::path jsonPath, Cori::Entity entity, const float timeStep, const char* animatorName) : m_Entity(entity) {
 				std::ifstream f(jsonPath);
 				m_AnimatorName = animatorName;
 
+				CORI_CORE_ASSERT(m_Entity.HasComponents<QuadRenderer>(), "Can't add QuadAnimator to an entity: ({}) that doens't have QuadRenderer.", m_Entity.GetDebugData());
 				CORI_CORE_ASSERT_FATAL(f.is_open(), "Failed to open JSON file '{0}'", jsonPath.string());
 
 				json data;
@@ -36,7 +38,7 @@ namespace Cori {
 					atlasPath
 				};
 
-				m_Atlas = Cori::AssetManager::GetTexture2DOwning(texture);
+				m_Atlas = AssetManager::GetTexture2DOwning(texture);
 
 				glm::vec2 atlasSize;
 				glm::vec2 frameUVSize{ 0.0f, 0.0f };
@@ -109,16 +111,19 @@ namespace Cori {
 						}
 					}
 				}
+				auto& renderer = m_Entity.GetComponents<QuadRenderer>();
+				renderer.m_HalfSize = m_FrameSize / 2.0f;
+				renderer.SetTexture(m_Atlas);
 			}
 
-			void Animator::UpdateSequence() {
+			void QuadAnimator::UpdateSequence() {
 				if (m_AnimationQueue.empty() || m_CurrentAnimationIndex >= m_AnimationQueue.size()) {
 					return;
 				}
 				m_AnimationQueue[m_CurrentAnimationIndex].Player();
 			}
 
-			int Animator::ExtractFrameNumber(const std::string& key_str) {
+			int QuadAnimator::ExtractFrameNumber(const std::string& key_str) {
 				size_t start_pos = key_str.find(' ');
 				size_t end_pos = key_str.find('.');
 				if (start_pos != std::string::npos && end_pos != std::string::npos && end_pos > start_pos) {

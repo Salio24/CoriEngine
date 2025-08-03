@@ -1,6 +1,9 @@
 #define CORI_ASYNC_LOGGING
+#define CORI_NO_FILE_LOGGING
 #include <Cori.hpp>
 #include <CoriEntry.hpp>
+
+CORI_DECLARE_TAG(Test);
 
 namespace Cori {
 	namespace Texture2Ds {
@@ -43,6 +46,10 @@ class ExampleLayer : public Cori::Layer {
 public:
 	ExampleLayer() : Layer("Example") { 
 		Cori::GraphicsCall::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
+
+		Cori::SceneManager::CreateScene("Test Scene");
+		BindScene("Test Scene");
+		ActiveScene.GetActiveCamera().CreateOrthoCamera(0, 1920, 0, 1080);
 	}
 
 	~ExampleLayer() {
@@ -64,6 +71,13 @@ public:
 		}
 	}
 
+	template<typename T>
+	void TestAsser() {
+		T def{};
+		CORI_CORE_ASSERT(false, "test", def);
+		//CORI_CORE_ASSERT_DEBUG(false, "lol {}", def);
+	}
+
 	virtual void OnImGuiRender(const double deltaTime) override {
 		ImGui::Begin("Test");
 
@@ -71,142 +85,112 @@ public:
 
 		static Cori::Entity ent;
 
-		if (ImGui::Button("Setup Scene")) {
-			Cori::SceneManager::CreateScene("Test Scene");
-			BindScene("Test Scene");
-			ActiveScene->ActiveCamera.CreateOrthoCamera(0, 7680, 0, 4320);
-		}
-
-
-		if (ImGui::Button("Create Ent")) {
-			ent = ActiveScene->CreateEntity("Test");
-			auto& rend = ent.AddComponent<Cori::Components::Entity::RenderGroup>(ActiveScene.get(), ent);
-			rend.SetWorldPosition({50.0f, 50.0f});
-		}
-
-		if (ImGui::Button("Add Primitives")) {
-			auto& rend = ent.GetComponents<Cori::Components::Entity::RenderGroup>();
-
-			auto atlas = Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::Atlas);
-
-			auto uvs = atlas->GetSpriteUVsAtIndex(23);
-
-			auto text = atlas->GetTexture();
-
-			for (int i = 0; i < 300; i++) {
-				for (int j = 0; j < 300; j++) {
-					Cori::Graphics::QuadPrimitive::Descriptor desc;
-					desc.localPosition = {12.0f * i, 12.0f * j};
-					desc.size = {10, 10};
-					desc.layer = 3;
-					desc.texture = text;
-					desc.uvs = uvs;
-					static int al = 0;
-
-					rend.AddPrimitive<Cori::Graphics::QuadPrimitive>(desc, al);
-					al++;
-				}
-			}
-		}
-
-		if (ImGui::Button("Invalidate")) {
-			auto& rend = ent.GetComponents<Cori::Components::Entity::RenderGroup>();
-			for (int i = 0; i < 90000; i++) {
-				if (!(i % 2)) {
-					rend.InvalidatePrimitive(i);
-				}
-			}
-		}
-
-
 		static bool ale = false;
 
 		if (ale) {
-			auto& pool = ActiveScene->GetPoolForType<Cori::Graphics::QuadPrimitive>();
-			pool.Defragment();
-			//pool.SortByTexture();
-			ale = false;
 
+			ale = false;
 		}
 
-		if (ImGui::Button("Defrag")) {
+		if (ImGui::Button("Trace")) {
 			CORI_PROFILE_REQUEST_NEXT_FRAME();
 			ale = true;
 		}
 
 		if (ImGui::Button("Create tree")) {
-			auto player = ActiveScene->CreateEntity("Player");
-			player.AddComponent<Cori::Components::Entity::Name>("player");
+			auto atlas = Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::Atlas);
+
+			auto text = atlas->GetTexture();
+
+			auto uvs = atlas->GetSpriteUVsAtIndex(23);
+			auto uvs1 = atlas->GetSpriteUVsAtIndex(26);
+			auto uvs2 = atlas->GetSpriteUVsAtIndex(1);
+			auto uvs3 = atlas->GetSpriteUVsAtIndex(22);
+			auto uvs4 = atlas->GetSpriteUVsAtIndex(27);
 
 
-			auto player_sprite = ActiveScene->CreateEntity("Sprite");
-			player_sprite.AddComponent<Cori::Components::Entity::Name>("player_sprite");
+			auto player = ActiveScene.CreateEntity("Player", Test);
+			auto& transform = player.GetComponents<Cori::Components::Entity::Transform>();
+			transform.SetLocalDepth(2);
+			transform.SetLocalPosition({100.0f, 100.0f});
+			auto& renderer = player.AddComponent<Cori::Components::Entity::QuadRenderer>(glm::vec2(50.0f), text, uvs);
+			renderer.SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+			ActiveScene.AddEntityToCache(player, "player"_hs32);
+
+			auto player_sprite = ActiveScene.CreateEntity("Sprite", Test);
+			auto& transform1 = player_sprite.GetComponents<Cori::Components::Entity::Transform>();
+			transform1.SetLocalPosition({100.0f, 100.0f});
+			auto& renderer1 = player_sprite.AddComponent<Cori::Components::Entity::QuadRenderer>(glm::vec2(50.0f), text, uvs1);
+			renderer1.SetColor({0.5f, 1.0f, 1.0f, 1.0f});
 			player_sprite.SetParent(player);
 
-			auto weapon_root = ActiveScene->CreateEntity("Weapon");
-			weapon_root.AddComponent<Cori::Components::Entity::Name>("weapon_root");
+			auto weapon_root = ActiveScene.CreateEntity("Weapon", Test);
+			auto& transform2 = weapon_root.GetComponents<Cori::Components::Entity::Transform>();
+			transform2.SetLocalPosition({50.0f, 200.0f});
+			auto& renderer2 = weapon_root.AddComponent<Cori::Components::Entity::QuadRenderer>(glm::vec2(50.0f), text, uvs2);
+			renderer2.SetColor({1.0f, 0.5f, 1.0f, 1.0f});
 			weapon_root.SetParent(player);
+			ActiveScene.AddEntityToCache(weapon_root, "weapon"_hs32);
 
-
-			auto gun_sprite = ActiveScene->CreateEntity("GunSprite");
-			gun_sprite.AddComponent<Cori::Components::Entity::Name>("gun_sprite");
+			auto gun_sprite = ActiveScene.CreateEntity("GunSprite", Test);
+			auto& transform3 = gun_sprite.GetComponents<Cori::Components::Entity::Transform>();
+			transform3.SetLocalPosition({10.0f, 300.0f});
+			auto& renderer3 = gun_sprite.AddComponent<Cori::Components::Entity::QuadRenderer>(glm::vec2(50.0f), text, uvs3);
+			renderer3.SetColor({1.0f, 1.0f, 0.5f, 1.0f});
 			gun_sprite.SetParent(weapon_root);
 
-			auto muzzle_flash = ActiveScene->CreateEntity("MuzzleFlash");
-			muzzle_flash.AddComponent<Cori::Components::Entity::Name>("muzzle_flash");
+			auto muzzle_flash = ActiveScene.CreateEntity("MuzzleFlash", Test);
+			auto& transform4 = muzzle_flash.GetComponents<Cori::Components::Entity::Transform>();
+			transform4.SetLocalPosition({30.0f, 400.0f});
+			auto& renderer4 = muzzle_flash.AddComponent<Cori::Components::Entity::QuadRenderer>(glm::vec2(50.0f), text, uvs4);
+			renderer4.SetColor({1.0f, 0.0f, 1.0f, 1.0f});
 			muzzle_flash.SetParent(weapon_root);
-
-			auto ui_canvas = ActiveScene->CreateEntity("UI_Canvas");
-			ui_canvas.AddComponent<Cori::Components::Entity::Name>("ui_canvas");
-
-			auto main_panel = ActiveScene->CreateEntity("MainPanel");
-			main_panel.AddComponent<Cori::Components::Entity::Name>("main_panel");
-			main_panel.SetParent(ui_canvas);
-
-			auto ok_button = ActiveScene->CreateEntity("OkButton");
-			ok_button.AddComponent<Cori::Components::Entity::Name>("ok_button");
-			ok_button.SetParent(main_panel);
-
-			auto cancel_button = ActiveScene->CreateEntity("CancelButton");
-			cancel_button.AddComponent<Cori::Components::Entity::Name>("cancel_button");
-			cancel_button.SetParent(main_panel);
-
-			auto other_panel = ActiveScene->CreateEntity("OtherPanel");
-			other_panel.AddComponent<Cori::Components::Entity::Name>("other_panel");
-			other_panel.SetParent(ui_canvas);\
-
-			auto other_button = ActiveScene->CreateEntity("OtherButton");
-			other_button.AddComponent<Cori::Components::Entity::Name>("OtherButton");
-			other_button.SetParent(other_panel);
-
-			auto some_button = ActiveScene->CreateEntity("SomeButton");
-			some_button.AddComponent<Cori::Components::Entity::Name>("some_button");
-			some_button.SetParent(other_button);
-
-			auto some_other_button = ActiveScene->CreateEntity("SomeOtherButton");
-			some_other_button.AddComponent<Cori::Components::Entity::Name>("some_other_button");
-			some_other_button.SetParent(some_button);
 		}
 
 		if (ImGui::Button("Draw hier")) {
-			auto player = ActiveScene->GetNamedEntity("Player");
-			auto weapon = player.FindChildByName("player_sprite");
-			if (weapon) {
-				weapon.value().PrintHierarchy();
+			auto player = ActiveScene.GetEntityFromCache("player"_hs32);
+			if (player) {
+				player.value().PrintHierarchy();
 			}
-				player.PrintHierarchy();
-			auto canvas = ActiveScene->GetNamedEntity("UI_Canvas");
-			canvas.PrintHierarchy();
-
-			auto& cahce = player.GetComponents<Cori::Components::Entity::ChildCacheComponent>();
-
-			CORI_CORE_DEBUG("AA");
 		}
 
-		if (ImGui::Button("test")) {
+		auto player = ActiveScene.GetEntityFromCache("player"_hs32);
+		if (player) {
+			auto& transform = player.value().GetComponents<Cori::Components::Entity::Transform>();
+			auto curpos = transform.GetLocalPosition();
+			auto currot = transform.GetLocalRotation();
+			auto curscale = transform.GetLocalScale();
+			if (ImGui::DragFloat("Player Pos", &curpos.x, 1, 1, 1000, "%f", ImGuiSliderFlags_AlwaysClamp)) {
+				transform.SetLocalPosition(curpos);
+			}
+			if (ImGui::DragFloat("Player Rot", &currot, 1.0f, -720.0f, 720.0f, "%f", ImGuiSliderFlags_AlwaysClamp)) {
+				transform.SetLocalRotation(currot);
+			}
+			if (ImGui::DragFloat("Player Scale", &curscale.x, 0.1f, -3.0f, 3, "%f", ImGuiSliderFlags_AlwaysClamp)) {
+				transform.SetLocalScale({curscale.x, curscale.x});
+			}
 		}
-			Cori::Core::UUID uuid;
-			//CORI_CORE_DEBUG("AA: {}", uuid.GetSerializationString());
+
+		auto weapon = ActiveScene.GetEntityFromCache("weapon"_hs32);
+		if (weapon) {
+			auto& transform = weapon.value().GetComponents<Cori::Components::Entity::Transform>();
+			auto curpos = transform.GetLocalPosition();
+			auto currot = transform.GetLocalRotation();
+			auto curscale = transform.GetLocalScale();
+			if (ImGui::DragFloat("weapon Pos", &curpos.x, 1, 1, 1000, "%f", ImGuiSliderFlags_AlwaysClamp)) {
+				transform.SetLocalPosition(curpos);
+			}
+			if (ImGui::DragFloat("weapon Rot", &currot, 1.0f, -720.0f, 720.0f, "%f", ImGuiSliderFlags_AlwaysClamp)) {
+				transform.SetLocalRotation(currot);
+			}
+			if (ImGui::DragFloat("weapon Scale", &curscale.x, 0.1f, -3.0f, 3, "%f", ImGuiSliderFlags_AlwaysClamp)) {
+				transform.SetLocalScale({curscale.x, curscale.x});
+			}
+		}
+
+
+
+
 
 		ImGui::Text("FPS: %.2f", fps);
 		ImGui::Text("FPS 10s avg: %.2f", fps10);

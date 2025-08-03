@@ -4,17 +4,15 @@
 #include "AnimationHandle.hpp"
 #include "SceneSystem/Entity.hpp"
 #include "SceneSystem/Components.hpp"
-#include "AssetManager/AssetManager.hpp"
-
 using json = nlohmann::json;
 
 namespace Cori {
 	namespace Components {
 		namespace Entity {
 
-			class Animator {
+			class QuadAnimator {
 			public:
-				Animator(std::filesystem::path jsonPath, Cori::Entity entity, const float timeStep, const char* animatorName);
+				QuadAnimator(std::filesystem::path jsonPath, Cori::Entity entity, const float timeStep, const char* animatorName);
 				void UpdateSequence();
 
 				template<IsAnimationHandle Handle>
@@ -26,9 +24,9 @@ namespace Cori {
 				template<IsAnimationHandle Handle>
 				void UpdateSingle() {
 					Animation& anim = m_Animations[Handle::m_Index];
-					auto& sprite = m_Entity.GetComponents<Components::Entity::Sprite>();
-					sprite.m_Texture = m_Atlas;
-					sprite.m_UVs = anim.m_Frames[anim.m_CurrentFrame].m_UVs;
+					auto& quad = m_Entity.GetComponents<Components::Entity::QuadRenderer>();
+					quad.m_Texture = m_Atlas;
+					quad.m_UVs = anim.m_Frames[anim.m_CurrentFrame].m_UVs;
 					if ((anim.m_CurrentFrame == anim.m_Frames.size() - 1) && anim.m_CurrentFrameTick == anim.m_Frames[anim.m_CurrentFrame].m_TickDuration) {
 						if (Handle::m_Looped) {
 							anim.m_CurrentFrame = 0;
@@ -71,9 +69,9 @@ namespace Cori {
 						uint16_t handleIndex = m_AnimationQueue[m_CurrentAnimationIndex].HandleIndex;
 						Animation& anim = m_Animations[handleIndex];
 
-						auto& sprite = m_Entity.GetComponents<Components::Entity::Sprite>();
-						sprite.m_Texture = m_Atlas;
-						sprite.m_UVs = anim.m_Frames[anim.m_CurrentFrame].m_UVs;
+						auto& quad = m_Entity.GetComponents<Components::Entity::QuadRenderer>();
+						quad.m_Texture = m_Atlas;
+						quad.m_UVs = anim.m_Frames[anim.m_CurrentFrame].m_UVs;
 
 						bool isFinished = (anim.m_CurrentFrame == anim.m_Frames.size() - 1) &&
 							(anim.m_CurrentFrameTick >= anim.m_Frames[anim.m_CurrentFrame].m_TickDuration);

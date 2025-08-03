@@ -10,6 +10,7 @@
 #include "Core/Utility/TemplateUtils.hpp"
 #include <glm/gtx/matrix_transform_2d.hpp>
 #include "Core/Utility/HashedTag.hpp"
+#include "Renderer/Animator/Animation.hpp"
 
 namespace Cori {
 	namespace Physics {
@@ -29,56 +30,65 @@ namespace Cori {
 			struct Name {
 				Name() = default;
 				explicit Name(const std::string& name) : m_Name(name) {}
-			//private:
+			private:
 				friend class Cori::Entity;
+				friend class Cori::Scene;
 				std::string m_Name;
 			};
 
-			struct TagComponent {
-				TagComponent() = default;
-				explicit TagComponent(const Utils::HashedTag64& tag) : m_Tag(tag) {}
+			struct Tag {
+				Tag() = default;
+				explicit Tag(const Utils::HashedTag64& tag) : m_Tag(tag) {}
 
 				Utils::HashedTag64 m_Tag;
 			};
 
-			struct UUIDComponent {
-				UUIDComponent() = default;
-				explicit UUIDComponent(const Core::UUID& uuid) : m_UUID(uuid) {}
-				explicit UUIDComponent(const std::string& uuid_str) : m_UUID(uuid_str) {}
+			struct UUID {
+				UUID() = default;
+				explicit UUID(const Core::UUID& uuid) : m_UUID(uuid) {}
+				explicit UUID(const std::string& uuid_str) : m_UUID(uuid_str) {}
 
 				const Core::UUID m_UUID{};
 			};
 
-			struct HierarchyComponent {
-				HierarchyComponent() = default;
+			struct Hierarchy {
+				Hierarchy() = default;
 				entt::entity m_Parent {entt::null};
 				entt::entity m_FirstChild {entt::null};
 				entt::entity m_NextSibling {entt::null};
 				entt::entity m_PreviousSibling {entt::null};
 			};
 
-			struct TransformComponent {
-				TransformComponent() = default;
-				TransformComponent(const glm::vec2 localPosition, const uint8_t localLayer) : m_LocalPosition(localPosition), m_LocalLayer(localLayer) {}
+			struct Transform {
+				Transform() = default;
+				Transform(const glm::vec2 localPosition, const uint8_t localLayer) : m_LocalPosition(localPosition), m_LocalDepthOffset(localLayer) {}
 
 				void SetLocalPosition(const glm::vec2 localPosition) {
-					m_LocalPosition = localPosition;
-					m_DirtyTransform = true;
+					if (m_LocalPosition != localPosition) {
+						m_LocalPosition = localPosition;
+						m_DirtyTransform = true;
+					}
 				}
 
 				void SetLocalRotation(const float localRotation) {
-					m_LocalRotation = localRotation;
-					m_DirtyTransform = true;
+					if (m_LocalRotation != localRotation) {
+						m_LocalRotation = localRotation;
+						m_DirtyTransform = true;
+					}
 				}
 
 				void SetLocalScale(const glm::vec2 localScale) {
-					m_LocalScale = localScale;
-					m_DirtyTransform = true;
+					if (m_LocalScale != localScale) {
+						m_LocalScale = localScale;
+						m_DirtyTransform = true;
+					}
 				}
 
-				void SetLocalLayer(const uint8_t localLayer) {
-					m_LocalLayer = localLayer;
-					m_DirtyLayer = true;
+				void SetLocalDepth(const uint8_t localDepth) {
+					if (m_LocalDepthOffset != localDepth) {
+						m_LocalDepthOffset = localDepth;
+						m_DirtyDepth = true;
+					}
 				}
 
 				[[nodiscard]] glm::vec2 GetLocalPosition() const {
@@ -93,8 +103,8 @@ namespace Cori {
 					return m_LocalRotation;
 				}
 
-				[[nodiscard]] uint8_t GetLocalLayer() const {
-					return m_LocalLayer;
+				[[nodiscard]] uint8_t GetLocalDepthOffset() const {
+					return m_LocalDepthOffset;
 				}
 
 				[[nodiscard]] glm::mat3 GetLocalTransform() const {
@@ -110,46 +120,126 @@ namespace Cori {
 				float m_LocalRotation{ 0.0f };
 			public:
 				glm::mat3 m_WorldTransform{ 1.0f };
-				uint8_t m_WorldLayer{ 1 };
+				uint8_t m_WorldDepth{ 1 };
 			private:
-				uint8_t m_LocalLayer{ 0 };
+				uint8_t m_LocalDepthOffset{ 0 };
 				bool m_DirtyTransform{ true };
-				bool m_DirtyLayer{ true };
+				bool m_DirtyDepth{ true };
 			};
 
-			struct ChildCacheComponent {
-				ChildCacheComponent() = default;
+			struct ChildCache {
+				ChildCache() = default;
 				std::unordered_map<std::string, entt::entity> m_Children;
 			};
 
-
-			// add an ability to add multiple plains to an entity
-			// combing sprite and render component into one
-			struct Render {
-				glm::vec2 m_Position{ 0.0f, 0.0f };
-				glm::vec2 m_Size{ 0.0f, 0.0f };
-				float m_Layer{ 0.0f };
-				bool m_Textured{ true };
-				bool m_Visible{ true };
-				bool m_Flipped{ false };
-				bool m_SemiTransparency{ false };
-				glm::vec4 m_TintColor{ 1.0f, 1.0f, 1.0f, 1.0f };
-				std::shared_ptr<Texture2D> m_Texture{ nullptr };
-				UVs m_UVs{};
-
-				Render() = default;
-				Render(const glm::vec2& position, const glm::vec2& size, float layer = 5.0f, bool textured = true, bool visible = true)
-					: m_Position(position), m_Size(size), m_Layer(layer), m_Textured(textured), m_Visible(visible) {}
+			struct InactiveLocallyFlag {
+				InactiveLocallyFlag() = default;
+			private:
+				// entt cant create fully empty components
+				[[maybe_unused]] uint8_t placeholder{ 0 };
 			};
 
-			struct Sprite {
-				std::shared_ptr<Texture2D> m_Texture{ nullptr };
-				UVs m_UVs;
+			struct InactiveGloballyFlag {
+				InactiveGloballyFlag() = default;
+			private:
+				// entt cant create fully empty components
+				[[maybe_unused]] uint8_t placeholder{ 0 };
+			};
 
-				Sprite() = default;
-				Sprite(const std::shared_ptr<Texture2D>& texture, const UVs& uvs = {})
-					: m_Texture(texture), m_UVs(uvs) {
+			struct QuadRenderer {
+				QuadRenderer() = default;
+
+				QuadRenderer(const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const UVs& uvs) : m_HalfSize(size), m_UVs(uvs) {
+					SetTexture(texture);
 				}
+
+				QuadRenderer(const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const UVs& uvs, const glm::vec4& tintColor) : m_HalfSize(size), m_UVs(uvs) {
+					SetColor(tintColor);
+					SetTexture(texture);
+				}
+
+				QuadRenderer(const glm::vec2 size, const glm::vec4& color) : m_HalfSize(size), m_FlatColored(true) {
+					SetColor(color);
+				}
+
+				void SetTexture(const std::shared_ptr<Texture2D>& texture) {
+					if (!m_AnimatorBound) {
+						if (m_HasSemiTransparency && m_Color.a != 1.0f) {
+							m_Texture = texture;
+							return;
+						}
+						m_HasSemiTransparency = texture->HasSemiTransparency();
+						m_Texture = texture;
+						return;
+					}
+					CORI_CORE_WARN_TAGGED({"World", "Entity", "Components"}, "Can't set texture for QuadRenderer because an animator is currently bound.");
+				}
+
+				std::shared_ptr<Texture2D> GetTexture() const {
+					return m_Texture;
+				}
+
+				void SetColor(const glm::vec4& color) {
+					if (m_HasSemiTransparency && (m_Texture ? m_Texture->HasSemiTransparency() : false)) {
+						m_Color = color;
+						return;
+					}
+					m_Color = color;
+					if (m_Color.a != 1.0f) {
+						m_HasSemiTransparency = true;
+					} else {
+						m_HasSemiTransparency = false;
+					}
+				}
+
+				[[nodiscard]] const glm::vec4& GetColor() const {
+					return m_Color;
+				}
+
+				void SetUVs(const UVs& uvs) {
+					if (!m_AnimatorBound) {
+						m_UVs = uvs;
+						return;
+					}
+					CORI_CORE_WARN_TAGGED({"World", "Entity", "Components"}, "Can't set UVs for QuadRenderer because an animator is currently bound.");
+				}
+
+				[[nodiscard]] UVs GetUVs() const {
+					return m_UVs;
+				}
+
+				//void SetSize(const glm::vec2& size) {
+				//	if (!m_AnimatorBound) {
+				//		m_Size = size;
+				//		return;
+				//	}
+				//	CORI_CORE_WARN_TAGGED({"World", "Entity", "Components"}, "Can't set size for QuadRenderer because an animator is currently bound.");
+				//}
+
+				//glm::vec2 GetSize() const {
+				//	return m_Size;
+				//}
+
+				bool GetSemiTransparencyState() const {
+					return m_HasSemiTransparency;
+				}
+
+				glm::vec2 m_HalfSize{ 0.0f };
+
+			protected:
+				friend class QuadAnimator;
+				UVs m_UVs{};
+				std::shared_ptr<Texture2D> m_Texture{ nullptr };
+			private:
+				glm::vec4 m_Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+			public:
+				bool m_Visible{ true };
+				bool m_FlatColored{ false };
+				bool m_FlipX{ false };
+				bool m_FlipY{ false };
+			private:
+				bool m_HasSemiTransparency{ false };
+				bool m_AnimatorBound{ false };
 			};
 
 			struct Rigidbody : public Physics::BodyRef {

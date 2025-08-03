@@ -5,60 +5,42 @@
 #include "Renderer/CameraController.hpp"
 #include "EventSystem/Event.hpp"
 #include "Physics/Physics.hpp"
-#include "Renderer/Animator/AnimatorPool.hpp"
+#include "EntityView.hpp"
 
 namespace Cori {
-	namespace Graphics {
-		struct QuadPrimitive;
-		template<typename Primitive> requires  Utils::OneOf<Primitive, Cori::Graphics::QuadPrimitive>
-		class PrimitivePool;
-	}
-
-	namespace Components {
-		namespace Entity {
-			struct RenderGroup;
-		}
-	}
-
-	struct PoolStorage;
-
-	template<typename... T>
-	inline constexpr auto& Exclude = entt::exclude<T...>;
-
 	class Scene : public Profiling::Trackable<Scene>, public SharedSeflFactory<Scene> {
 	public:
 		static bool PreCreateHook([[maybe_unused]] const std::string& name) { return true; }
+		explicit Scene(const std::string& name);
 		~Scene();
 
-		bool OnBind(const EventCallbackFn& callback);
+		bool OnBind();
 		bool OnUnbind();
 
 		void OnUpdate(const double deltaTime);
 
 		void OnTickUpdate(const float timeStep);
 
-		Entity CreateEntity(const std::string& name);
-		Entity CreateEntity();
-
-		std::expected<void, const char*> AddEntityToCache(Entity entity);
-
-		void GetEntityFromCache(const Utils::HashedTag64& tag);
-
+		Entity CreateEntity(const std::string& name, const Utils::HashedTag64& tag);
 		void DestroyEntity(Entity entity);
 
-		Entity GetNamedEntity(const std::string& name);
+		std::expected<void, const char*> AddEntityToCache(Entity entity, const Utils::StringHash32 tag);
+		std::expected<Entity, const char*> GetEntityFromCache(const Utils::StringHash32 tag);
+		void RemoveEntityFromCache(const Utils::StringHash32 key);
 
-		void SortRenderGroup();
+		std::expected<Entity, const char*> FindEntity(const std::string& name);
+		std::expected<Entity, const char*> FindEntity(const std::string& name, const Utils::HashedTag64& tag);
 
-		Entity EntityFromEnTT(const entt::entity& entity) {
-			return Entity{ entt::handle{m_Registry, entity} };
+		template<typename... Component>
+		auto View() {
+			auto view = m_Registry.view<Component...>();
+			return EntityView(view, m_Registry);
 		}
 
-		// and const variants
-		template<typename... T, typename... Args>
-		auto View(Args&& ... args) {
-			Entity::SetViewScene(this);
-			return m_Registry.view<T...>(std::forward<Args>(args)...);
+		template<typename... T, typename... ExcludeT>
+		auto View(Exclude<ExcludeT...>) {
+			auto view = m_Registry.view<T...>(entt::exclude<ExcludeT...>);
+			return EntityView(view, m_Registry);
 		}
 
 		template<typename... T, typename Func>
@@ -96,46 +78,23 @@ namespace Cori {
 			m_Registry.ctx().erase<T>();
 		}
 
-		CameraController ActiveCamera;
-		
-		Physics::PhysicsWorld PhysicsWorld;
+		CameraController m_ActiveCamera;
 
-		EventCallbackFn m_TriggerEventCallback;
+		Physics::PhysicsWorld m_PhysicsWorld;
 
 		std::string m_Name;
 
-		friend struct Components::Entity::StateMachine;
-
-		friend struct Components::Entity::RenderGroup;
-
-		std::unique_ptr<PoolStorage> m_pImpl;
-
-		template<typename Primitive>
-		Graphics::PrimitivePool<Primitive>& GetPoolForType();
-
-		//std::tuple<
-		//Graphics::PrimitivePool<Graphics::QuadPrimitive>
-		//> m_PrimitivePools;
-
-		//template<typename T>
-		//Graphics::PrimitivePool<T>& GetPoolForType() {
-		//	return std::get<Graphics::PrimitivePool<T>>(m_PrimitivePools);
-		//}
-
-		explicit Scene(const std::string& name);
-	protected:
+		//friend struct Components::Entity::StateMachine;
 	private:
+		entt::registry m_Registry;
 
 		void UpdateTransform();
-
 		void UpdateTransformRecursive(entt::entity entity, const glm::mat3& parentTransform, uint8_t parentLayer, bool parentTransformDirty, bool parentLayerDirty);
 
 		void OnHierarchyComponentDestroyed(entt::registry& registry, entt::entity entity);
 
-		std::unordered_map<std::string, entt::handle> m_NamedEntities;
-
-
-		entt::registry m_Registry;
+		std::unordered_map<Core::UUID, entt::entity> m_UUIDToEntity;
+		std::unordered_map<Utils::StringHash32, entt::entity> m_EntityCache;
 
 		friend class Entity;
 	};

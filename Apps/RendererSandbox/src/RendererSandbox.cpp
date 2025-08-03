@@ -210,7 +210,7 @@ public:
 		Cori::Renderer2D::EndBatch();
 
 #else 
-		Cori::Test::Renderer2D::BeginScene(ActiveScene->GetContextComponent<Cori::Components::Scene::Camera>());
+		Cori::Test::Renderer2D::BeginScene(ActiveScene.GetContextComponent<Cori::Components::Scene::Camera>());
 
 		float offset = 5.0f;
 

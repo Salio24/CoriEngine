@@ -44,7 +44,7 @@ namespace Cori {
 	public:
 		static void EnableVirtualTerminalProcessing();
 
-		static void Init(bool async);
+		static void Init(bool async, bool fileWrite);
 
 		static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
 		static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
@@ -835,8 +835,8 @@ inline const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') +
 #endif
 
 #define CORI_CORE_WARN(...)  ::Cori::Logger::CoreLogWarn(__VA_ARGS__)
-#define CORI_CORE_ERROR(...) ::Cori::Logger::CoreLogWarn(__VA_ARGS__)
-#define CORI_CORE_FATAL(...) ::Cori::Logger::CoreLogWarn(__VA_ARGS__)
+#define CORI_CORE_ERROR(...) ::Cori::Logger::CoreLogError(__VA_ARGS__)
+#define CORI_CORE_FATAL(...) ::Cori::Logger::CoreLogFatal(__VA_ARGS__)
 
 #define CORI_TRACE(...)      ::Cori::Logger::ClientLogTrace(__VA_ARGS__)
 #define CORI_DEBUG(...)      ::Cori::Logger::ClientLogDebug(__VA_ARGS__)
@@ -853,6 +853,8 @@ inline const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') +
 #define CORI_CORE_ASSERT_ERROR(x, ...) (!(x) ? (CORI_CORE_ERROR("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_ERROR("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
 #define CORI_CORE_ASSERT_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_FATAL("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), BUGTRAP, true) : false)
 
+#define CORI_CORE_ASSERT(x, ...) (!(x) ? (SPDLOG_LOGGER_CRITICAL(::Cori::Logger::GetCoreLogger(), "Assertion '"#x"' Failed. Message: " __VA_ARGS__), ::Cori::Logger::GetCoreLogger()->critical("    Function: {}", __PRETTY_FUNCTION__), spdlog::shutdown(), BUGTRAP, true) : false)
+
 #define CORI_CORE_VERIFY_DEBUG(x, ...) (!(x) ? (CORI_CORE_DEBUG("Verify Failed, message: " __VA_ARGS__), CORI_CORE_DEBUG("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
 #define CORI_CORE_VERIFY_INFO(x, ...)  (!(x) ? (CORI_CORE_INFO("Verify Failed, message: " __VA_ARGS__), CORI_CORE_INFO("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
 #define CORI_CORE_VERIFY_WARN(x, ...)  (!(x) ? (CORI_CORE_WARN("Verify Failed, message: " __VA_ARGS__), CORI_CORE_WARN("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
@@ -867,6 +869,8 @@ inline const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') +
 #define CORI_CORE_ASSERT_ERROR(x, ...) false
 #define CORI_CORE_ASSERT_FATAL(x, ...) false
 
+#define CORI_CORE_ASSERT(x, ...) false
+
 #define CORI_CORE_VERIFY_DEBUG(x, ...) (!x)
 #define CORI_CORE_VERIFY_INFO(x, ...)  (!x)
 #define CORI_CORE_VERIFY_WARN(x, ...)  (!x)
@@ -880,6 +884,8 @@ inline const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') +
 #define CORI_ASSERT_WARN(x, ...)  (!(x) ? (CORI_WARN("Assertion Failed, message: " __VA_ARGS__), CORI_WARN("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
 #define CORI_ASSERT_ERROR(x, ...) (!(x) ? (CORI_ERROR("Assertion Failed, message: " __VA_ARGS__), CORI_ERROR("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
 #define CORI_ASSERT_FATAL(x, ...) (!(x) ? (CORI_FATAL("Assertion Failed, message: " __VA_ARGS__), CORI_FATAL("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), BUGTRAP, true) : false)
+
+#define CORI_ASSERT(x, ...) (!(x) ? (SPDLOG_LOGGER_CRITICAL(::Cori::Logger::GetClientLogger(), "Assertion '"#x"' Failed. Message: " __VA_ARGS__), ::Cori::Logger::GetClientLogger()->critical("    Function: {}", __PRETTY_FUNCTION__), spdlog::shutdown(), BUGTRAP, true) : false)
 
 #define CORI_CORE_TRACE_TAGGED(...) ::Cori::Logger::CoreLogTraceTagged(__VA_ARGS__)
 #define CORI_CORE_DEBUG_TAGGED(...) ::Cori::Logger::CoreLogDebugTagged(__VA_ARGS__)

@@ -165,22 +165,16 @@ namespace Cori {
 
 			Polygon(const b2Polygon& polygon) : b2Polygon(polygon) {}
 
-			static Polygon CreateBox(Vec2 size, float radius = 0.0f) {
-				size.x /= 2.0f;
-				size.y /= 2.0f;
-				return b2MakeOffsetRoundedBox(size.x, size.y, size, Rot{ 1, 0 }, radius);
+			static Polygon CreateBox(Vec2 halfSize, Vec2 offset, Rot rotation = Rot{ 1, 0 }, float radius = 0.0f) {
+				return b2MakeOffsetRoundedBox(halfSize.x, halfSize.y, offset, rotation, radius);
 			}
 
-			static Polygon CreateBox(Vec2 size, Vec2 offset, Rot rotation = Rot{ 1, 0 }, float radius = 0.0f) {
-				return b2MakeOffsetRoundedBox(size.x / 2.0f, size.y / 2.0f, offset, rotation, radius);
+			static Polygon CreateBox(Vec2 halfSize) {
+				return b2MakeBox(halfSize.x, halfSize.y);
 			}
 
-			static Polygon CreateBoxCentered(Vec2 size) {
-				return b2MakeBox(size.x / 2.0f, size.y / 2.0f);
-			}
-
-			static Polygon CreateBoxCentered(Vec2 size, float radius) {
-				return b2MakeRoundedBox(size.x / 2.0f, size.y / 2.0f, radius);
+			static Polygon CreateBox(Vec2 halfSize, float radius) {
+				return b2MakeRoundedBox(halfSize.x, halfSize.y, radius);
 			}
 
 			static Polygon CreatePolygon(const ConvexHull& hull, float radius = 0.0f) {

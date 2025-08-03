@@ -14,7 +14,7 @@ namespace Cori {
 			void Trigger::OnEnter(Cori::Entity& entity) {
 				if (m_Behavior) {
 					CORI_CORE_ASSERT_WARN(m_VisitorBuffer.size() < CORI_MAX_TRIGGER_VISITORS, "Trigger '{0}': Exceeded maximum number of visitors ({1}).", m_Behavior->GetDebugName(), CORI_MAX_TRIGGER_VISITORS);
-					CORI_CORE_TRACE("Trigger '{0}': Entity '{1}' has entered.", m_Behavior->GetDebugName(), entity.GetDebuggingUID());
+					CORI_CORE_TRACE("Trigger '{0}': Entity '{1}' has entered.", m_Behavior->GetDebugName(), entity.GetDebugData());
 					m_Behavior->OnEnter(entity);
 					m_VisitorBuffer.add(entity);
 				}
@@ -31,7 +31,7 @@ namespace Cori {
 
 			void Trigger::OnExit(Cori::Entity& entity) {
 				if (m_Behavior) {
-					CORI_CORE_TRACE("Trigger '{0}': Entity '{1}' has exited.", m_Behavior->GetDebugName(), entity.GetDebuggingUID());
+					CORI_CORE_TRACE("Trigger '{0}': Entity '{1}' has exited.", m_Behavior->GetDebugName(), entity.GetDebugData());
 					m_Behavior->OnExit(entity);
 					m_VisitorBuffer.remove(entity);
 				}

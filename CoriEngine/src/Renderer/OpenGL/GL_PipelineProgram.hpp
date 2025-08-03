@@ -1,4 +1,5 @@
 #pragma once
+#ifdef NOTUSED
 #include "../PipelineProgram.hpp"
 
 namespace Cori {
@@ -17,3 +18,4 @@ namespace Cori {
 		uint32_t m_ID;
 	};
 }
+#endif

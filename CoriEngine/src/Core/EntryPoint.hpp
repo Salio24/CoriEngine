@@ -6,9 +6,17 @@ extern Cori::Application* Cori::CreateApplication();
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
 
 #ifdef CORI_ASYNC_LOGGING
-	Cori::Engine::Start(true);
+#ifndef CORI_NO_FILE_LOGGING
+	Cori::Engine::Start(true, true);
+#else
+	Cori::Engine::Start(true, false);
+#endif
 #else 
-	Cori::Engine::Start(false);
+#ifndef CORI_NO_FILE_LOGGING
+	Cori::Engine::Start(false, true);
+#else
+	Cori::Engine::Start(false, false);
+#endif
 #endif
 
 	Cori::Application* app = Cori::CreateApplication();
