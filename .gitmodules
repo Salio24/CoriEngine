@@ -22,10 +22,6 @@
 	path = CoriEngine/thirdparty/tmxlite
 	url = https://github.com/fallahn/tmxlite.git
 	branch = master
-[submodule "CoriEngine/thirdparty/freetype"]
-	path = CoriEngine/thirdparty/freetype
-	url = https://github.com/freetype/freetype.git
-	branch = master
 [submodule "CoriEngine/thirdparty/glad2"]
 	path = CoriEngine/thirdparty/glad2
 	url = https://github.com/Dav1dde/glad.git
