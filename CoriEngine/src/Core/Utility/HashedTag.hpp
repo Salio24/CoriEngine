@@ -24,8 +24,8 @@ namespace Cori {
 	namespace Cori {
 		namespace Utils {
 			namespace Internal {
-				inline void CheckGlobalTag64Collision(Utils::StringHash64 tag, const char* name) {
-					static std::unordered_map<Utils::StringHash64, const char*> globalTag64CollisionMap;
+				inline void CheckGlobalTag64Collision(Utility::StringHash64 tag, const char* name) {
+					static std::unordered_map<Utility::StringHash64, const char*> globalTag64CollisionMap;
 					if (globalTag64CollisionMap.contains(tag)) {
 						std::cout << "Tag hash64 collision: '" << name << "'and: '" << globalTag64CollisionMap.at(tag) << "' , both hash to: 0x" << std::hex << tag << std::dec << "\n";
 					} else {
