@@ -39,7 +39,7 @@ public:
 
 		Cori::SceneManager::CreateScene("Test Scene");
 		BindScene("Test Scene");
-		ActiveScene->ActiveCamera.CreateOrthoCamera(0, 640, 0, 360, -10, 10);
+		ActiveScene.GetActiveCamera().CreateOrthoCamera(0, 640, 0, 360, -10, 10);
 
 		// can also preload assets like this vvv
 		Cori::AssetManager::PreloadTexture2Ds({

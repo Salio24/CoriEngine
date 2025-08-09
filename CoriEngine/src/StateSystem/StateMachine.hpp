@@ -1,7 +1,7 @@
 #pragma once
 
 #include "State.hpp"
-#include "SceneSystem/Entity.hpp"
+#include "WorldSystem/Entity.hpp"
 
 namespace Cori {
 	class StateMachine {
@@ -35,7 +35,7 @@ namespace Cori {
 
 		template<typename StateType>
 		void ChangeState() {
-			static_assert(std::is_base_of<State, StateType>::value, "StateType must derive from State");
+			static_assert(std::is_base_of_v<State, StateType>, "StateType must derive from State");
 			std::type_index next_state_id(typeid(StateType));
 			auto it = m_States.find(next_state_id);
 

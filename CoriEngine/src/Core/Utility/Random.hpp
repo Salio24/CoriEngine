@@ -1,7 +1,7 @@
 #pragma once
 
 namespace Cori {
-	namespace Utils {
+	namespace Utility {
 		class RandomUint32 {
 		public:
 			static uint32_t Gen() {

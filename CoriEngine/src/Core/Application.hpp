@@ -9,7 +9,7 @@
 #include "Renderer/VertexArray.hpp"
 #include "Renderer/ShaderProgram.hpp"
 #include "AssetManager/AssetManager.hpp"
-#include "SceneSystem/SceneManager.hpp"
+#include "WorldSystem/SceneManager.hpp"
 #include "Time.hpp"
 
 namespace Cori {
@@ -36,11 +36,7 @@ namespace Cori {
 		uint64_t test123{ 0 };
 
 	protected:
-
-		friend class AssetManager;
 		friend class SceneManager;
-
-		inline static AssetManager* GetAssetManager() { return &(*s_Instance).m_AssetManager; }
 
 		inline static SceneManager* GetSceneManager() { return &(*s_Instance).m_SceneManager; }
 

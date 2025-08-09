@@ -1,5 +1,5 @@
 #pragma once
-#include "SceneSystem/Components.hpp"
+#include "WorldSystem/Components.hpp"
 
 namespace Cori {
 	class CameraController {

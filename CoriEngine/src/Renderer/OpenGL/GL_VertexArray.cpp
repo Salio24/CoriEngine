@@ -72,7 +72,7 @@ namespace Cori {
 		const VBLayout& layout = vertexBuffer->GetLayout();
 		for (const auto& element : layout) {
 			if (element.m_Type == ShaderDataType::Mat3) {
-				for (int i = 0; i < element.GetComponentCount(); i++) {
+				for (size_t i = 0; i < element.GetComponentCount(); i++) {
 					glEnableVertexAttribArray(index);
 					glVertexAttribPointer(index, static_cast<GLint>(element.GetComponentCount()), ShaderDataTypeToGLDataType(element.m_Type), element.m_Normalized ? GL_TRUE : GL_FALSE, static_cast<GLsizei>(layout.GetStride()), reinterpret_cast<const void*>(element.m_Offset + sizeof(float) * element.GetComponentCount() * i));
 

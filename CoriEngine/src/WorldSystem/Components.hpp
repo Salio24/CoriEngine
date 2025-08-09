@@ -11,6 +11,8 @@
 #include <glm/gtx/matrix_transform_2d.hpp>
 #include "Core/Utility/HashedTag.hpp"
 #include "Renderer/Animator/Animation.hpp"
+#include "Audio/Sound.hpp"
+#include "Audio/Track.hpp"
 
 namespace Cori {
 	namespace Physics {
@@ -38,9 +40,9 @@ namespace Cori {
 
 			struct Tag {
 				Tag() = default;
-				explicit Tag(const Utils::HashedTag64& tag) : m_Tag(tag) {}
+				explicit Tag(const Utility::HashedTag64& tag) : m_Tag(tag) {}
 
-				Utils::HashedTag64 m_Tag;
+				Utility::HashedTag64 m_Tag;
 			};
 
 			struct UUID {
@@ -240,6 +242,29 @@ namespace Cori {
 			private:
 				bool m_HasSemiTransparency{ false };
 				bool m_AnimatorBound{ false };
+			};
+
+			struct AudioSource {
+				AudioSource() = default;
+
+				void AddTrack(const std::string& name) {
+					std::shared_ptr<Audio::Track> track = Audio::Track::Create(name);
+					m_AudioTracks.insert({name, track});
+				}
+
+				void RemoveTrack(const std::string& name) {
+					if (m_AudioTracks.contains(name)) {
+						m_AudioTracks.erase(name);
+					}
+				}
+
+				// use expected
+				std::weak_ptr<Audio::Track> GetTrack(const std::string& name) {
+					return m_AudioTracks.at(name);
+				}
+
+			private:
+				std::unordered_map<std::string, std::shared_ptr<Audio::Track>> m_AudioTracks;
 			};
 
 			struct Rigidbody : public Physics::BodyRef {

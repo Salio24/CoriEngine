@@ -16,7 +16,8 @@ namespace Cori {
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 #ifdef DEBUG_BUILD
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
-#endif	
+#endif
+
 	} 
 	
 

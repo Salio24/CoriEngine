@@ -47,3 +47,6 @@
 [submodule "CoriEngine/thirdparty/stduuid"]
 	path = CoriEngine/thirdparty/stduuid
 	url = https://github.com/mariusbancila/stduuid
+[submodule "CoriEngine/thirdparty/msdf-atlas-gen"]
+	path = CoriEngine/thirdparty/msdf-atlas-gen
+	url = https://github.com/Chlumsky/msdf-atlas-gen

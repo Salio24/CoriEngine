@@ -21,6 +21,23 @@ namespace Cori {
 		};
 
 	}
+
+	namespace Sounds {
+		inline const SoundDescriptor TestSound1{
+			"Test1",
+			"assets/engine/sounds/coin.wav"
+		};
+
+		inline const SoundDescriptor TestSound2{
+			"Test2",
+			"assets/engine/sounds/power_up.wav"
+		};
+
+		inline const SoundDescriptor TestMusic{
+			"TestMusic",
+			"assets/engine/sounds/Try and Solve This Loop.wav"
+		};
+	}
 }
 
 class CustomEvent : public Cori::Event {
@@ -31,7 +48,7 @@ public:
 		return "UDE";
 	}
 
-	inline std::string& GetData() {
+	std::string& GetData() {
 		return m_Data;
 	}
 
@@ -50,6 +67,7 @@ public:
 		Cori::SceneManager::CreateScene("Test Scene");
 		BindScene("Test Scene");
 		ActiveScene.GetActiveCamera().CreateOrthoCamera(0, 1920, 0, 1080);
+		track = Cori::Audio::Track::Create("Test");
 	}
 
 	~ExampleLayer() {
@@ -188,6 +206,27 @@ public:
 			}
 		}
 
+		if (ImGui::Button("Play")) {
+			CORI_DEBUG("Play {}", track->Play());
+		}
+
+
+		if (ImGui::Button("Test1")) {
+			CORI_DEBUG("test1 {}", track->SetSound(Cori::AssetManager::GetSound(Cori::Sounds::TestSound1)));
+		}
+
+		if (ImGui::Button("Test2")) {
+			CORI_DEBUG("test2 {}", track->SetSound(Cori::AssetManager::GetSound(Cori::Sounds::TestSound2)));
+		}
+
+		if (ImGui::Button("TestMusic")) {
+			CORI_DEBUG("TestMusic {}", track->SetSound(Cori::AssetManager::GetSound(Cori::Sounds::TestMusic)));
+		}
+
+		if (ImGui::Button("Stop")) {
+			CORI_DEBUG("stop {}", track->Stop(300));
+		}
+
 
 
 
@@ -221,6 +260,8 @@ public:
 		}
 
 	}
+
+	std::shared_ptr<Cori::Audio::Track> track;
 
 	float fps;
 	float fps10;

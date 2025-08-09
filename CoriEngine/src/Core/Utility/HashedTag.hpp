@@ -2,7 +2,7 @@
 #include "StringHash.hpp"
 
 namespace Cori {
-	namespace Utils {
+	namespace Utility {
 		struct HashedTag64 {
 			const char* GetDebugName() const {
 				return m_DebugName;
@@ -47,9 +47,9 @@ namespace Cori {
 		}();
 
 	#else
-	#define CORI_DECLARE_TAG(tag) inline constexpr Cori::Utils::HashedTag64 tag{#tag##_hs64, #tag};
+	#define CORI_DECLARE_TAG(tag) inline constexpr Cori::Utility::HashedTag64 tag{#tag##_hs64, #tag};
 	#endif
 #else
-	#define CORI_DECLARE_TAG(tag) inline constexpr Cori::Utils::HashedTag64 tag{#tag##_hs64, #tag};
+	#define CORI_DECLARE_TAG(tag) inline constexpr Cori::Utility::HashedTag64 tag{#tag##_hs64, #tag};
 #endif
 

@@ -17,17 +17,17 @@ project(CoriEngine)
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/SDL3 EXCLUDE_FROM_ALL)
 
     # SDL_mixer
-    set(SDLMIXER_MIDI_NATIVE OFF)
-    set(SDLMIXER_GME OFF)    
-    set(SDLMIXER_MOD OFF)
+    set(SDLMIXER_GME OFF)
+    set(SDLMIXER_MOD_XMP OFF)
     set(SDLMIXER_OPUS OFF)
-    set(SDLMIXER_VENDORED ON)
+    set(SDLMIXER_DEPS_SHARED OFF)
+    #find_package(Threads REQUIRED)
+    #set(SDLMIXER_VENDORED ON)
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/SDL3_mixer EXCLUDE_FROM_ALL)
 
     # SDL_image
     set(SDLIMAGE_VENDORED ON)
     set(SDLIMAGE_AVIF OFF)
-    set(SDLIMAGE_BMP OFF)
     set(SDLIMAGE_JPEG OFF)
     set(SDLIMAGE_WEBP OFF)
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/SDL3_image EXCLUDE_FROM_ALL)
@@ -48,8 +48,8 @@ project(CoriEngine)
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/tmxlite/tmxlite EXCLUDE_FROM_ALL)
 
     # freetype
-    set(FT_ENABLE_ERROR_STRINGS ON CACHE BOOL "")
-    add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/freetype EXCLUDE_FROM_ALL)
+    #set(FT_ENABLE_ERROR_STRINGS ON CACHE BOOL "")
+    #add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/freetype EXCLUDE_FROM_ALL)
 
     # dear imgui
     add_library(imgui STATIC
@@ -77,6 +77,7 @@ project(CoriEngine)
     if (CORI_CLANG_TIDY)
         set(SPDLOG_TIDY ON CACHE BOOL "")
     endif()
+    set(SPDLOG_USE_STD_FORMAT OFF CACHE BOOL "")
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/spdlog EXCLUDE_FROM_ALL)
 
 
@@ -128,7 +129,7 @@ project(CoriEngine)
     # my shared lib
     add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES}
             src/Core/Utility/HashedTag.hpp
-            src/Core/Utility/Error.hpp
+            src/Core/Error.hpp
     )
 
     target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
@@ -178,7 +179,6 @@ project(CoriEngine)
         #target_compile_options(nlohmann_json INTERFACE -w)
         target_compile_options(tmxlite PRIVATE -w)
         target_compile_options(imgui PRIVATE -w)
-        target_compile_options(freetype PRIVATE -w)
         target_compile_options(glad_gl_core_46 PRIVATE -w)
         if(TARGET TIFF::tiff)
             set(SDLIMAGE_TIF_TARGET "tiff")
@@ -186,7 +186,6 @@ project(CoriEngine)
             set(SDLIMAGE_TIF_TARGET "TIFF")
         endif()
         target_compile_options(${SDLIMAGE_TIF_TARGET} PRIVATE -w)
-        target_compile_options(wavpack PRIVATE -w)
         target_compile_options(spdlog PRIVATE -w)
     endif()
 
@@ -199,4 +198,4 @@ project(CoriEngine)
     target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm tmxlite nlohmann_json::nlohmann_json box2d::box2d stduuid)
 
     # can be private 
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static freetype glad_gl_core_46)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static glad_gl_core_46)

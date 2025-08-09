@@ -1,7 +1,7 @@
 #pragma once
 
 namespace Cori {
-	namespace Utils {
+	namespace Utility {
 		struct AABB {
 			glm::vec2 m_Min;
 			glm::vec2 m_Max;

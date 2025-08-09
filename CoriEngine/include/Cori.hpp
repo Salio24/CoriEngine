@@ -5,6 +5,7 @@
 #include "../src/Core/Logger.hpp"
 #include "../src/Core/CoriMouseCodes.hpp"
 #include "../src/Core/CoriKeycodes.hpp"
+#include "../src/Core/Error.hpp"
 
 #include "../src/ImGui/ImGuiLayer.hpp"
 
@@ -34,8 +35,8 @@
 
 #include "../src/Profiling/TimeProfiler.hpp"
 
-#include "../src/SceneSystem/Scene.hpp"
-#include "../src/SceneSystem/SceneManager.hpp"
+#include "../src/WorldSystem/Scene.hpp"
+#include "../src/WorldSystem/SceneManager.hpp"
 
 #include "../src/Physics/Physics.hpp"
 #include "../src/Physics/Triggers/Trigger.hpp"

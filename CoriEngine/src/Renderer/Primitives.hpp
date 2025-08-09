@@ -1,5 +1,5 @@
 #pragma once
-#include "SceneSystem/Entity.hpp"
+#include "WorldSystem/Entity.hpp"
 #include "Renderer/Texture.hpp"
 #include "Core/Utility/StringHash.hpp"
 

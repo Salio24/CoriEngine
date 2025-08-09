@@ -7,9 +7,10 @@
 #include "Renderer/Renderer2D.hpp"
 #include "Renderer/GraphicsCall.hpp"
 #include "AssetManager/AssetDefinitions.hpp"
-#include "SceneSystem/SceneManager.hpp"
-#include "SceneSystem/Components.hpp"
+#include "WorldSystem/SceneManager.hpp"
+#include "WorldSystem/Components.hpp"
 #include "EventSystem/GameEvents.hpp"
+#include "Audio/Mixer.hpp"
 
 namespace Cori {
 	Application* Application::s_Instance = nullptr;
@@ -28,6 +29,7 @@ namespace Cori {
 		m_LayerStack.PushOverlay(m_ImGuiLayer);
 
 		GraphicsCall::InitRenderers();
+		Audio::Mixer::Init();
 
 		m_GameTimer.SetTickrate(60);
 		m_GameTimer.SetTickrateUpdateFunc(CORI_BIND_EVENT_FN(Application::TickrateUpdate, CORI_PLACEHOLDERS(1)));
@@ -35,6 +37,7 @@ namespace Cori {
 
 	Application::~Application() {
 		GraphicsCall::ShutdownRenderers();
+		Audio::Mixer::Shutdown();
 	}
 
 	void Application::OnEvent(Event& e) {

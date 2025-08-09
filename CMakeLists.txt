@@ -27,6 +27,8 @@ if(CLANG_VARIANT STREQUAL "MSYS2")
     endif()
 endif ()
 
+option(CORI_BUILD_SANDBOX_APPS   "Build sandbox apps. (can break the compilation if enabled)" OFF)
+
 project(main)
     if(CLANG_VARIANT STREQUAL "OTHER" AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_SYSTEM_NAME STREQUAL "Windows")
         set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -36,7 +38,6 @@ project(main)
 
 
     if (NOT (
-            (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/freetype/CMakeLists.txt") AND 
             (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/glad2/cmake/CMakeLists.txt") AND 
             (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/glm/CMakeLists.txt") AND 
             (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/nlohmann_json/CMakeLists.txt") AND 
@@ -58,11 +59,14 @@ project(main)
     #add_compile_options(-Wno-unused-parameter)
     #add_compile_options(-Wno-sign-compare)
     add_compile_options(-fdiagnostics-color=always)
-    
+
     add_subdirectory(${PROJECT_SOURCE_DIR}/CoriEngine)
-    add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/Sandbox)
-    add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/RendererSandbox)
-    add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/PhysicsSandbox)
+
+    if (CORI_BUILD_SANDBOX_APPS)
+        add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/Sandbox)
+        add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/RendererSandbox)
+        add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/PhysicsSandbox)
+    endif ()
 
 add_compile_options(-Wall -Wextra)
 

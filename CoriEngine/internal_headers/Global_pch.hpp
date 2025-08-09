@@ -36,11 +36,15 @@
 #include <concepts>
 #include <numeric>
 #include <bit>
+#include <any>
+#include <variant>
+#include <ranges>
 #include <glm/glm.hpp>
 #include <imgui.h>
 #include "../include/Macros.hpp"
 #include "../src/Core/Logger.hpp"
 #include "../src/Profiling/TimeProfiler.hpp"
 #include "../src/Core/Uuid.hpp"
+#include "../src/Core/Error.hpp"
 
 #endif

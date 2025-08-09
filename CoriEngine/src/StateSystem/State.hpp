@@ -1,5 +1,5 @@
 #pragma once
-#include "SceneSystem/Entity.hpp"
+#include "WorldSystem/Entity.hpp"
 
 namespace Cori {
 	class StateMachine;

@@ -8,7 +8,7 @@
 #include "EntityView.hpp"
 
 namespace Cori {
-	class Scene : public Profiling::Trackable<Scene>, public SharedSeflFactory<Scene> {
+	class Scene : public Profiling::Trackable<Scene>, public SharedSelfFactory<Scene> {
 	public:
 		static bool PreCreateHook([[maybe_unused]] const std::string& name) { return true; }
 		explicit Scene(const std::string& name);
@@ -21,15 +21,15 @@ namespace Cori {
 
 		void OnTickUpdate(const float timeStep);
 
-		Entity CreateEntity(const std::string& name, const Utils::HashedTag64& tag);
+		Entity CreateEntity(const std::string& name, const Utility::HashedTag64& tag);
 		void DestroyEntity(Entity entity);
 
-		std::expected<void, const char*> AddEntityToCache(Entity entity, const Utils::StringHash32 tag);
-		std::expected<Entity, const char*> GetEntityFromCache(const Utils::StringHash32 tag);
-		void RemoveEntityFromCache(const Utils::StringHash32 key);
+		std::expected<void, const char*> AddEntityToCache(Entity entity, const Utility::StringHash32 tag);
+		std::expected<Entity, const char*> GetEntityFromCache(const Utility::StringHash32 tag);
+		void RemoveEntityFromCache(const Utility::StringHash32 key);
 
 		std::expected<Entity, const char*> FindEntity(const std::string& name);
-		std::expected<Entity, const char*> FindEntity(const std::string& name, const Utils::HashedTag64& tag);
+		std::expected<Entity, const char*> FindEntity(const std::string& name, const Utility::HashedTag64& tag);
 
 		template<typename... Component>
 		auto View() {
@@ -94,7 +94,7 @@ namespace Cori {
 		void OnHierarchyComponentDestroyed(entt::registry& registry, entt::entity entity);
 
 		std::unordered_map<Core::UUID, entt::entity> m_UUIDToEntity;
-		std::unordered_map<Utils::StringHash32, entt::entity> m_EntityCache;
+		std::unordered_map<Utility::StringHash32, entt::entity> m_EntityCache;
 
 		friend class Entity;
 	};

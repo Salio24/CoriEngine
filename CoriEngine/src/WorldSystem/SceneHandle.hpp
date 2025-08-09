@@ -19,7 +19,7 @@ namespace Cori {
 			}
 		}
 
-		Entity CreateEntity(const std::string& name, const Utils::HashedTag64& tag) {
+		Entity CreateEntity(const std::string& name, const Utility::HashedTag64& tag) {
 			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
 			return m_SceneRaw->CreateEntity(name, tag);
 		}
@@ -29,17 +29,17 @@ namespace Cori {
 			m_SceneRaw->DestroyEntity(entity);
 		}
 
-		std::expected<void, const char*> AddEntityToCache(Entity entity, const Utils::StringHash32 tag) {
+		std::expected<void, const char*> AddEntityToCache(Entity entity, const Utility::StringHash32 tag) {
 			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
 			return m_SceneRaw->AddEntityToCache(entity, tag);
 		}
 
-		std::expected<Entity, const char*> GetEntityFromCache(const Utils::StringHash32 tag) {
+		std::expected<Entity, const char*> GetEntityFromCache(const Utility::StringHash32 tag) {
 			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
 			return m_SceneRaw->GetEntityFromCache(tag);
 		}
 
-		void RemoveEntityFromCache(const Utils::StringHash32 key) {
+		void RemoveEntityFromCache(const Utility::StringHash32 key) {
 			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
 			m_SceneRaw->RemoveEntityFromCache(key);
 		}
@@ -49,7 +49,7 @@ namespace Cori {
 			return m_SceneRaw->FindEntity(name);
 		}
 
-		std::expected<Entity, const char*> FindEntity(const std::string& name, const Utils::HashedTag64& tag) {
+		std::expected<Entity, const char*> FindEntity(const std::string& name, const Utility::HashedTag64& tag) {
 			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
 			return m_SceneRaw->FindEntity(name, tag);
 		}

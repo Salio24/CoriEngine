@@ -2,8 +2,8 @@
 #include <box2cpp/debug_imgui_renderer.h>
 #include "EventSystem/Event.hpp"
 #include "Profiling/TimeProfiler.hpp"
-#include "SceneSystem/Scene.hpp"
-#include "SceneSystem/SceneHandle.hpp"
+#include "WorldSystem/Scene.hpp"
+#include "WorldSystem/SceneHandle.hpp"
 
 namespace Cori {
 

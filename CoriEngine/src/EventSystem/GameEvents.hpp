@@ -1,3 +1,3 @@
 #pragma once
 #include "Event.hpp"
-#include "SceneSystem/Entity.hpp"
+#include "WorldSystem/Entity.hpp"

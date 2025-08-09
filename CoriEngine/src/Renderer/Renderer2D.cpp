@@ -85,14 +85,14 @@ namespace Cori {
 		{
 			CORI_PROFILE_SCOPE("Quad Submission");
 			auto& camera = scene->GetContextComponent<Components::Scene::Camera>();
-			Utils::AABB cameraBounds = { camera.m_CameraMinBound, camera.m_CameraMaxBound };
+			Utility::AABB cameraBounds = { camera.m_CameraMinBound, camera.m_CameraMaxBound };
 			EntityView view = scene->View<Components::Entity::QuadRenderer, Components::Entity::Transform>(Exclude<Components::Entity::InactiveLocallyFlag>());
 			for (auto entity : view) {
 				auto& renderer = view.Get<Components::Entity::QuadRenderer>(entity);
 				if (renderer.m_Visible) {
 					auto& transform = view.Get<Components::Entity::Transform>(entity);
-					Utils::AABB entityBounds = Utils::CalculateAABB(transform.m_WorldTransform, renderer.m_HalfSize);
-					if (Utils::AABBOverlapCheck(cameraBounds, entityBounds)) {
+					Utility::AABB entityBounds = Utility::CalculateAABB(transform.m_WorldTransform, renderer.m_HalfSize);
+					if (Utility::AABBOverlapCheck(cameraBounds, entityBounds)) {
 						if (renderer.GetSemiTransparencyState()) {
 							SubmitTransparentQuad(transform.m_WorldTransform, renderer.m_HalfSize, renderer.GetColor(), renderer.GetTexture().get(), renderer.GetUVs(), transform.m_WorldDepth, renderer.m_FlipX, renderer.m_FlipY, renderer.m_FlatColored);
 							continue;

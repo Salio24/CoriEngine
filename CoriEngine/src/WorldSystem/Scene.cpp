@@ -18,7 +18,7 @@ namespace Cori {
 		CORI_CORE_DEBUG("Scene: '{0}' destroyed.", m_Name);
 	}
 
-	Entity Scene::CreateEntity(const std::string& name, const Utils::HashedTag64& tag) {
+	Entity Scene::CreateEntity(const std::string& name, const Utility::HashedTag64& tag) {
 		entt::entity entity = m_Registry.create();
 		m_Registry.emplace<Components::Entity::Name>(entity, name);
 		m_Registry.emplace<Components::Entity::Tag>(entity, tag);
@@ -30,7 +30,7 @@ namespace Cori {
 		return Entity{ {m_Registry, entity} };
 	}
 
-	std::expected<void, const char*> Scene::AddEntityToCache(Entity entity, const Utils::StringHash32 key) {
+	std::expected<void, const char*> Scene::AddEntityToCache(Entity entity, const Utility::StringHash32 key) {
 		if (m_EntityCache.contains(key)) {
 			return std::unexpected("Entry with the given key already exists, make sure you're not reusing the key. It's also possible (but very unlikely), that you got a hash collision, try to change the key a bit.");
 		}
@@ -39,7 +39,7 @@ namespace Cori {
 		return{};
 	}
 
-	std::expected<Entity, const char*> Scene::GetEntityFromCache(const Utils::StringHash32 key) {
+	std::expected<Entity, const char*> Scene::GetEntityFromCache(const Utility::StringHash32 key) {
 		if (!m_EntityCache.contains(key)) {
 			return std::unexpected("No entity with the specified key found in scene local cache.");
 		}
@@ -50,7 +50,7 @@ namespace Cori {
 		return Entity{{m_Registry, m_EntityCache.at(key)}};
 	}
 
-	void Scene::RemoveEntityFromCache(const Utils::StringHash32 key) {
+	void Scene::RemoveEntityFromCache(const Utility::StringHash32 key) {
 		if (m_EntityCache.contains(key)) {
 			Entity entity = entt::handle{m_Registry, m_EntityCache.at(key)};
 			m_EntityCache.erase(key);
@@ -69,7 +69,7 @@ namespace Cori {
 		}
 		return std::unexpected("No entity found with the specified name.");
 	}
-	std::expected<Entity, const char*> Scene::FindEntity(const std::string& name, const Utils::HashedTag64& tag) {
+	std::expected<Entity, const char*> Scene::FindEntity(const std::string& name, const Utility::HashedTag64& tag) {
 		CORI_CORE_WARN_TAGGED({"World", "Scene"}, "Performing slow scene-wide search for entity with tag: '{}', named: '{}'. Consider caching it. This shouldn't be called every frame! Be aware.", tag.GetDebugName(), name);
 		auto group = m_Registry.group<Components::Entity::Name, Components::Entity::Tag>();
 		for (auto entity : group) {

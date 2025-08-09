@@ -1,6 +1,6 @@
 #pragma once
 #include "TriggerBehaviour.hpp"
-#include "SceneSystem/Components.hpp"
+#include "WorldSystem/Components.hpp"
 #include "Core/DataStructures/PackedArray.hpp"
 
 #ifndef CORI_MAX_TRIGGER_VISITORS

@@ -2,8 +2,8 @@
 #include <nlohmann/json.hpp>
 #include "Animation.hpp"
 #include "AnimationHandle.hpp"
-#include "SceneSystem/Entity.hpp"
-#include "SceneSystem/Components.hpp"
+#include "WorldSystem/Entity.hpp"
+#include "WorldSystem/Components.hpp"
 using json = nlohmann::json;
 
 namespace Cori {

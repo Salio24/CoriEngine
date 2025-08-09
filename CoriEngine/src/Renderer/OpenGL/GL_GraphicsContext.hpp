@@ -8,10 +8,10 @@ namespace Cori {
 	public:
 		static bool PreCreateHook();
 		OpenGLContext();
-		virtual ~OpenGLContext();
-		virtual void Init(SDL_Window* window) override;
-		virtual void SwapBuffers() override;
-		virtual inline void* GetNativeContext() const override { return static_cast<void*>(m_Context); }
+		~OpenGLContext() override;
+		void Init(SDL_Window* window) override;
+		void SwapBuffers() override;
+		[[nodiscard]] void* GetNativeContext() const override { return m_Context; }
 	private:
 		SDL_GLContext m_Context{ nullptr };
 

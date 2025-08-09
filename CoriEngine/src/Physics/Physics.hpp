@@ -1,7 +1,7 @@
 #pragma once
 #include <box2cpp/box2cpp.h>
 #include <tmxlite/Map.hpp>
-#include "SceneSystem/Entity.hpp"
+#include "WorldSystem/Entity.hpp"
 
 #ifndef CORI_PIXELS_PER_METER
 	#define CORI_PIXELS_PER_METER 16

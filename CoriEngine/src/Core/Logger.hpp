@@ -10,7 +10,6 @@
 #include <spdlog/fmt/bundled/base.h>
 #include <spdlog/fmt/bundled/format.h>
 
-
 #if defined(__clang__)
 #define BUGTRAP __builtin_debugtrap()
 #elif defined(__GNUC__)
@@ -861,6 +860,10 @@ inline const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') +
 #define CORI_CORE_VERIFY_ERROR(x, ...) (!(x) ? (CORI_CORE_ERROR("Verify Failed, message: " __VA_ARGS__), CORI_CORE_ERROR("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
 #define CORI_CORE_VERIFY_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Verify Failed, message: " __VA_ARGS__), CORI_CORE_FATAL("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), BUGTRAP, true) : false)
 
+#define CORI_CORE_VERIFY(x, ...) (!(x) ? (SPDLOG_LOGGER_ERROR(::Cori::Logger::GetCoreLogger(), "Verify '"#x"' Failed. Message: " __VA_ARGS__), ::Cori::Logger::GetCoreLogger()->error("    Function: {}", __PRETTY_FUNCTION__), false) : true)
+
+#define CORI_CORE_VERIFY_EXPECTED(x) CORI_CORE_VERIFY(x, "std::expecter returned an error, message: {}", static_cast<std::string>(x.error()))
+
 #else
 
 #define CORI_CORE_ASSERT_DEBUG(x, ...) false
@@ -877,6 +880,10 @@ inline const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') +
 #define CORI_CORE_VERIFY_ERROR(x, ...) (!x)
 #define CORI_CORE_VERIFY_FATAL(x, ...) (!x)
 
+#define CORI_CORE_VERIFY(x, ...) (!x)
+
+#define CORI_CORE_VERIFY_EXPECTED(x) x
+
 #endif
 
 #define CORI_ASSERT_DEBUG(x, ...) (!(x) ? (CORI_DEBUG("Assertion Failed, message: " __VA_ARGS__), CORI_DEBUG("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
@@ -886,6 +893,9 @@ inline const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') +
 #define CORI_ASSERT_FATAL(x, ...) (!(x) ? (CORI_FATAL("Assertion Failed, message: " __VA_ARGS__), CORI_FATAL("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), BUGTRAP, true) : false)
 
 #define CORI_ASSERT(x, ...) (!(x) ? (SPDLOG_LOGGER_CRITICAL(::Cori::Logger::GetClientLogger(), "Assertion '"#x"' Failed. Message: " __VA_ARGS__), ::Cori::Logger::GetClientLogger()->critical("    Function: {}", __PRETTY_FUNCTION__), spdlog::shutdown(), BUGTRAP, true) : false)
+#define CORI_VERIFY(x, ...) (!(x) ? (SPDLOG_LOGGER_ERROR(::Cori::Logger::GetClientLogger(), "Verify '"#x"' Failed. Message: " __VA_ARGS__), ::Cori::Logger::GetClientLogger()->error("    Function: {}", __PRETTY_FUNCTION__), false) : true)
+
+#define CORI_VERIFY_EXPECTED(x) CORI_VERIFY(x, "std::expecter returned an error, message: {}", static_cast<std::string>(x.error()))
 
 #define CORI_CORE_TRACE_TAGGED(...) ::Cori::Logger::CoreLogTraceTagged(__VA_ARGS__)
 #define CORI_CORE_DEBUG_TAGGED(...) ::Cori::Logger::CoreLogDebugTagged(__VA_ARGS__)
