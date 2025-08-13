@@ -6,6 +6,7 @@
 #include "../src/Core/CoriMouseCodes.hpp"
 #include "../src/Core/CoriKeycodes.hpp"
 #include "../src/Core/Error.hpp"
+#include "../src/Core/Utility/AABB.hpp"
 
 #include "../src/ImGui/ImGuiLayer.hpp"
 

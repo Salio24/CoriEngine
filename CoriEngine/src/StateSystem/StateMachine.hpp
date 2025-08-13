@@ -36,12 +36,12 @@ namespace Cori {
 		template<typename StateType>
 		void ChangeState() {
 			static_assert(std::is_base_of_v<State, StateType>, "StateType must derive from State");
-			std::type_index next_state_id(typeid(StateType));
-			auto it = m_States.find(next_state_id);
+			std::type_index nextStateID(typeid(StateType));
 
-			if (CORI_CORE_ASSERT_ERROR(it != m_States.end(), "StateMachine for Entity - {0}: Attempted to change to unregistered state type '{1}'.", m_Owner.GetDebugData(), typeid(StateType).name())) { return; }
+			// verify here
+			if (CORI_CORE_ASSERT_ERROR(m_States.contains(nextStateID), "StateMachine for Entity - {0}: Attempted to change to unregistered state type '{1}'.", m_Owner.GetDebugData(), typeid(StateType).name())) { return; }
 
-			State* nextStateRawPtr = it->second.get();
+			State* nextStateRawPtr = m_States.at(nextStateID).get();
 
 			if (m_CurrentState == nextStateRawPtr) {
 				return;
@@ -58,8 +58,7 @@ namespace Cori {
 		}
 
 		void Update(float timeStep) {
-
-			if (CORI_CORE_ASSERT_WARN(m_Owner.IsValid(), "Update called on an FSM with an invalid owner Entity {0}. Disabling FSM.", m_Owner.GetDebugData())) { m_CurrentState = nullptr; return; }
+			if (CORI_CORE_ASSERT_WARN(m_Owner.IsValid(), "Update called on an FSM with an invalid owner Entity. Disabling FSM.")) { m_CurrentState = nullptr; return; }
 
 			if (m_CurrentState) {
 				m_CurrentState->OnUpdate(m_Owner, this, timeStep);

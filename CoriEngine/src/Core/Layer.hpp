@@ -1,5 +1,6 @@
 #pragma once
 #include <box2cpp/debug_imgui_renderer.h>
+#include "Time.hpp"
 #include "EventSystem/Event.hpp"
 #include "Profiling/TimeProfiler.hpp"
 #include "WorldSystem/Scene.hpp"
@@ -17,7 +18,7 @@ namespace Cori {
 
 		virtual void OnAttach();
 		virtual void OnDetach();
-		virtual void OnUpdate([[maybe_unused]] const double deltaTime, [[maybe_unused]] const double tickAlpha) {}
+		virtual void OnUpdate([[maybe_unused]] const Cori::GameTimer& gameTimer) {}
 		virtual void OnTickUpdate([[maybe_unused]] const float timeStep) {}
 		virtual void OnImGuiRender([[maybe_unused]] const double deltaTime) { }
 		virtual void OnEvent([[maybe_unused]] Event& event) {}

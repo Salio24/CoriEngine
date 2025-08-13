@@ -143,6 +143,7 @@ namespace Cori {
 			}
 		}
 
+		// camera space "pixels" not screen space pixels
 		glm::vec2 ToPixels(const Vec2 vec) {
 			return { vec.x * CORI_PIXELS_PER_METER, vec.y * CORI_PIXELS_PER_METER };
 		}

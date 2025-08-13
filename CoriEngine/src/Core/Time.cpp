@@ -32,23 +32,7 @@ namespace Cori {
 
 	void GameTimer::SetTickrate(uint16_t tickrate) {
 		m_Tickrate = tickrate;
-		m_Timestep = 1.0f / (float)tickrate;
-	}
-
-	double GameTimer::GetMiliseconds() const {
-		return m_Time * 1000.0f;
-	}
-
-	double GameTimer::GetSeconds() const {
-		return m_Time;
-	}
-
-	double GameTimer::GetMinutes() const {
-		return m_Time / 60.0f;
-	}
-
-	double GameTimer::GetHours() const {
-		return m_Time / 3600.0f;
+		m_Timestep = 1.0f / static_cast<float>(tickrate);
 	}
 
 	void ManualTimer::Start() {

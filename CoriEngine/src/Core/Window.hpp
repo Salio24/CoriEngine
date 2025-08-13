@@ -14,9 +14,13 @@ namespace Cori {
 		}
 
 		std::string Title;
-		unsigned int Width;
-		unsigned int Height;
+		uint32_t Width;
+		uint32_t Height;
 		GraphicsAPIs API;
+
+	};
+
+	struct ScreenMode {
 
 	};
 

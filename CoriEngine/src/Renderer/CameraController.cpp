@@ -3,13 +3,14 @@
 #include <glm/ext/matrix_transform.hpp>
 
 namespace Cori {
-	void CameraController::CreateOrthoCamera(float left, float right, float bottom, float top, float zNear /*= -10.0f*/, float zFar /*= 0.0f*/) {
+	void CameraController::CreateOrthoCamera(float left, float right, float bottom, float top, float zNear /*= -50.0f*/, float zFar /*= 0.0f*/) {
 		m_CurrentCameraComponent->m_ProjectionMatrix = glm::ortho(left, right, bottom, top, zNear, zFar);
 		m_CurrentCameraComponent->m_ViewProjectionMatrix = m_CurrentCameraComponent->m_ProjectionMatrix;
 		m_CurrentCameraComponent->m_InitialCameraMinBound = { left, bottom };
 		m_CurrentCameraComponent->m_InitialCameraMaxBound = { right, top };
-		m_CurrentCameraComponent->m_CameraMinBound = { left, bottom };
-		m_CurrentCameraComponent->m_CameraMaxBound = { right, top };
+		//m_CurrentCameraComponent->m_CameraMinBound = { left, bottom };
+		//m_CurrentCameraComponent->m_CameraMaxBound = { right, top };
+		m_CurrentCameraComponent->m_CameraSize = { std::abs(right - left), std::abs(top - bottom) };
 
 		CORI_CORE_DEBUG("Created orthographic camera with properties - (left: {}, right: {}, bottom: {}, top: {}, zNear: {}, zFar: {})", left, right, bottom, top, zNear, zFar);
 	}
@@ -31,6 +32,10 @@ namespace Cori {
 		return m_CurrentCameraComponent->m_CameraZoomFactor;
 	}
 
+	glm::vec2 CameraController::GetSize() const {
+		return m_CurrentCameraComponent->m_CameraSize;
+	}
+
 	void CameraController::SetRotation(const float angle) {
 		m_CurrentCameraComponent->m_CameraRotation = angle;
 		//RecalculateVP();
@@ -43,16 +48,20 @@ namespace Cori {
 	}
 
 	void CameraController::RecalculateVP() {
-		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-m_CurrentCameraComponent->m_CameraPosition, 0.0f)) *
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(m_CurrentCameraComponent->m_CameraSize / 2.0f, 0.0f)) *
 			glm::rotate(glm::mat4(1.0f), glm::radians(m_CurrentCameraComponent->m_CameraRotation), glm::vec3(0.0f, 0.0f, 1.0f)) *
-			glm::scale(glm::mat4(1.0f), glm::vec3(m_CurrentCameraComponent->m_CameraZoomFactor, m_CurrentCameraComponent->m_CameraZoomFactor, 1.0f));
+			glm::scale(glm::mat4(1.0f), glm::vec3(m_CurrentCameraComponent->m_CameraZoomFactor, m_CurrentCameraComponent->m_CameraZoomFactor, 1.0f)) *
+				glm::translate(glm::mat4(1.0f), glm::vec3(-(m_CurrentCameraComponent->m_CameraSize / 2.0f + m_CurrentCameraComponent->m_CameraPosition), 0.0f));
 
 		m_CurrentCameraComponent->m_ViewProjectionMatrix = m_CurrentCameraComponent->m_ProjectionMatrix * view;
 
-		// idk maybe add rotation support?
-		// but rotation looks awful with pixelart
-		m_CurrentCameraComponent->m_CameraMinBound = { (m_CurrentCameraComponent->m_InitialCameraMinBound.x + m_CurrentCameraComponent->m_CameraPosition.x) * m_CurrentCameraComponent->m_CameraZoomFactor, (m_CurrentCameraComponent->m_InitialCameraMinBound.y + m_CurrentCameraComponent->m_CameraPosition.y) * m_CurrentCameraComponent->m_CameraZoomFactor };
-		m_CurrentCameraComponent->m_CameraMaxBound = { (m_CurrentCameraComponent->m_InitialCameraMaxBound.x + m_CurrentCameraComponent->m_CameraPosition.x) * m_CurrentCameraComponent->m_CameraZoomFactor, (m_CurrentCameraComponent->m_InitialCameraMaxBound.y + m_CurrentCameraComponent->m_CameraPosition.y) * m_CurrentCameraComponent->m_CameraZoomFactor };
+		glm::mat3 translation;
+		translation[0] = glm::vec3(view[0].x, view[0].y, view[0].w);
+		translation[1] = glm::vec3(view[1].x, view[1].y, view[1].w);
+		translation[2] = glm::vec3(view[3].x, view[3].y, view[3].w);
+		translation = glm::inverse(translation) * glm::translate(glm::mat3(1.0f), glm::vec2(m_CurrentCameraComponent->m_CameraSize / 2.0f));
+
+		m_CurrentCameraComponent->m_CameraBounds = Utility::CalculateAABB(translation, m_CurrentCameraComponent->m_CameraSize / 2.0f);
 	}
 
 

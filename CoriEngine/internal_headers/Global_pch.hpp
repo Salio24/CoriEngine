@@ -39,6 +39,7 @@
 #include <any>
 #include <variant>
 #include <ranges>
+#include <limits>
 #include <glm/glm.hpp>
 #include <imgui.h>
 #include "../include/Macros.hpp"

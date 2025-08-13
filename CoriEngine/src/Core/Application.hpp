@@ -25,27 +25,21 @@ namespace Cori {
 		static void PushLayer(Layer* layer);
 		static void PushOverlay(Layer* layer);
 		
-		inline static Window& GetWindow() { return *Get().m_Window; }
+		static Window& GetWindow() { return *Get().m_Window; }
 
-		inline static GameTimer& GetGameTimer() { return Get().m_GameTimer; }
+		static GameTimer& GetGameTimer() { return Get().m_GameTimer; }
 
-		inline static GraphicsAPIs GetCurrentAPI() { return GetWindow().GetAPI(); }
-		
-		inline static uint64_t GetTest() { return Get().test123; }
-
-		uint64_t test123{ 0 };
+		static GraphicsAPIs GetCurrentAPI() { return GetWindow().GetAPI(); }
 
 	protected:
 		friend class SceneManager;
 
-		inline static SceneManager* GetSceneManager() { return &(*s_Instance).m_SceneManager; }
+		static SceneManager* GetSceneManager() { return &s_Instance->m_SceneManager; }
 
-	private: 
-
-		
+	private:
 
 		// idk if i even need this Get func
-		inline static Application& Get() { return *s_Instance; }
+		static Application& Get() { return *s_Instance; }
 
 		void TickrateUpdate(const float timeStep);
 
@@ -54,9 +48,6 @@ namespace Cori {
 		bool m_RenderImGui{ true };
 
 		std::unique_ptr<Window> m_Window;
-
-
-		AssetManager m_AssetManager;
 
 		ImGuiLayer* m_ImGuiLayer;
 

@@ -26,7 +26,6 @@ namespace Cori {
 		class Mixer {
 		public:
 
-
 			static bool PauseAllTracks();
 
 			static bool ResumeAllTracks();
@@ -80,6 +79,10 @@ namespace Cori {
 			static bool TagTrack(uint32_t track, const char* tag);
 
 			static void UntagTrack(uint32_t track, const char* tag);
+		private:
+			struct Data;
+			static Data* s_Data;
+
 		};
 	}
 }

@@ -30,13 +30,30 @@ namespace Cori {
 		};
 
 		static void BeginScene(const Components::Scene::Camera& camera);
+
+		static void BeginWorldPass();
+
+		static void BeginScreenSpacePass();
+
 		static void EndScene();
 
 		static void DrawScene(Scene* scene);
 
-		static void SubmitTransparentQuad(const glm::mat3& transform, const glm::vec2& size, const glm::vec4& tintColor, Texture2D* texture, const UVs& uvs, uint8_t depth, bool flipX, bool flipY, bool flatColored);
+		static void FlushRenderQueues();
 
-		static void SubmitOpaqueQuad(const glm::mat3& transform, const glm::vec2& size, const glm::vec4& tintColor, Texture2D* texture, const UVs& uvs, uint8_t depth, bool flipX, bool flipY, bool flatColored);
+		static void SubmitWorldSpaceTransparentQuad(const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor, Texture2D* texture, const UVs& uvs, uint8_t depth, bool flipX, bool flipY, bool flatColored);
+
+		static void SubmitWorldSpaceOpaqueQuad(const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor, Texture2D* texture, const UVs& uvs, uint8_t depth, bool flipX, bool flipY, bool flatColored);
+
+		static void SubmitScreenSpaceTransparentQuad(const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor, Texture2D* texture, const UVs& uvs, uint8_t depth, bool flipX, bool flipY, bool flatColored);
+
+		static void SubmitScreenSpaceOpaqueQuad(const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor, Texture2D* texture, const UVs& uvs, uint8_t depth, bool flipX, bool flipY, bool flatColored);
+
+		static void SubmitScreenSpaceColoredQuad(const glm::vec2 position, glm::vec2 halfSize, const glm::vec3& color);
+
+		static void SubmitWorldSpaceColoredQuad(const glm::vec2 position, glm::vec2 halfSize, const glm::vec3& color);
+
+		static void SubmitAABB(const Utility::AABB& aabb, float lineThickness, const glm::vec3& color);
 
 		static Statistics GetStatistics();
 
@@ -75,7 +92,11 @@ namespace Cori {
 			std::shared_ptr<IndexBuffer> QuadInstanceIndexBuffer;
 			std::shared_ptr<ShaderProgram> QuadInstanceShader;
 
-			uint32_t QuadInstanceCount{0};
+			std::shared_ptr<VertexArray> LineVertexArray;
+			std::shared_ptr<VertexBuffer> LineVertexBuffer;
+			std::shared_ptr<ShaderProgram> LineShader;
+
+			uint32_t QuadInstanceCount{ 0 };
 			Quad* QuadInstanceBufferBase{nullptr};
 			Quad* QuadInstanceBufferPtr{nullptr};
 
@@ -90,11 +111,15 @@ namespace Cori {
 
 			Statistics Stats;
 
-			std::vector<QuadInstance> TransparentQuadQueue;
-			std::vector<QuadInstance> OpaqueQuadQueue;
+			std::vector<QuadInstance> WorldSpaceTransparentQuadQueue;
+			std::vector<QuadInstance> WorldSpaceOpaqueQuadQueue;
+
+			std::vector<QuadInstance> ScreenSpaceTransparentQuadQueue;
+			std::vector<QuadInstance> ScreenSpaceOpaqueQuadQueue;
 
 			glm::mat4 CurrentViewProjectionMatrix{ 1.0f };
-			glm::mat4 CurrentUIViewProjectionMatrix{ 1.0f };
+			glm::mat4 WorldViewProjectionMatrix{ 1.0f };
+			glm::mat4 ScreenSpaceViewProjectionMatrix{ 1.0f };
 		};
 
 		static RendererData* s_Data;
@@ -103,7 +128,9 @@ namespace Cori {
 
 		static void StartNewInstancedSet();
 
-		static void FlushQueues();
+		static void FlushWorldQueues();
+
+		static void FlushScreenSpaceQueues();
 
 		static void FlushInstancedQuads();
 	};

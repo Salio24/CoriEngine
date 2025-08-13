@@ -6,7 +6,7 @@
 #include "Core/Utility/AABB.hpp"
 
 namespace Cori {
-	Renderer2D::RendererData* Renderer2D::s_Data{nullptr};
+	Renderer2D::RendererData* Renderer2D::s_Data{ nullptr };
 
 	void Renderer2D::Init() {
 		CORI_CORE_INFO_TAGGED({ "Graphics", "Renderer2D" }, "Initializing Renderer2D.");
@@ -32,9 +32,7 @@ namespace Cori {
 				{ShaderDataType::Float, "a_Layer", 1},
 			});
 
-		s_Data->QuadInstanceVertexBuffer->Init(
-			nullptr, s_Data->MaxInstanceCount * s_Data->QuadInstanceVertexBuffer->GetLayout().GetStride(),
-			DRAW_TYPE::DYNAMIC);
+		s_Data->QuadInstanceVertexBuffer->Init(nullptr, s_Data->MaxInstanceCount * s_Data->QuadInstanceVertexBuffer->GetLayout().GetStride(), DRAW_TYPE::DYNAMIC);
 		s_Data->QuadInstanceVertexArray->AddVertexBuffer(s_Data->QuadInstanceVertexBuffer);
 
 		uint32_t quadIndices[6] = {0, 1, 2, 2, 3, 0};
@@ -51,6 +49,15 @@ namespace Cori {
 
 		s_Data->QuadInstanceShader = AssetManager::GetShaderOwning(shader1);
 
+		//s_Data->LineVertexArray = VertexArray::Create();
+		//s_Data->LineVertexBuffer = VertexBuffer::Create();
+		//s_Data->LineVertexBuffer->SetLayout({
+		//	{ShaderDataType::Vec3, "a_Position"}
+		//});
+//
+		//s_Data->LineVertexArray->Init()
+		//s_Data->LineVertexArray->AddVertexBuffer(s_Data->LineVertexBuffer);
+
 		CORI_CORE_INFO_TAGGED({ "Graphics", "Renderer2D" }, "Renderer2D Initialized successfully.");
 	}
 
@@ -65,12 +72,19 @@ namespace Cori {
 	void Renderer2D::BeginScene(const Components::Scene::Camera& camera) {
 		CORI_PROFILE_FUNCTION();
 
-		s_Data->CurrentViewProjectionMatrix = camera.m_ViewProjectionMatrix;
+		s_Data->WorldViewProjectionMatrix = camera.m_ViewProjectionMatrix;
+		s_Data->ScreenSpaceViewProjectionMatrix = camera.m_ProjectionMatrix;
 
-		// later
-		//s_Data->CurrentUIViewProjectionMatrix = camera.m_UIViewProjectionMatrix;
 		s_Data->Stats.DrawCalls = 0;
 		s_Data->Stats.QuadCount = 0;
+	}
+
+	void Renderer2D::BeginWorldPass() {
+		s_Data->CurrentViewProjectionMatrix = s_Data->WorldViewProjectionMatrix;
+	}
+
+	void Renderer2D::BeginScreenSpacePass() {
+		s_Data->CurrentViewProjectionMatrix = s_Data->ScreenSpaceViewProjectionMatrix;
 	}
 
 	void Renderer2D::EndScene() {
@@ -80,32 +94,35 @@ namespace Cori {
 	void Renderer2D::DrawScene(Scene* scene) {
 		CORI_PROFILE_FUNCTION();
 
-		BeginScene(scene->GetContextComponent<Components::Scene::Camera>());
-
 		{
 			CORI_PROFILE_SCOPE("Quad Submission");
 			auto& camera = scene->GetContextComponent<Components::Scene::Camera>();
-			Utility::AABB cameraBounds = { camera.m_CameraMinBound, camera.m_CameraMaxBound };
+			//Utility::AABB cameraBounds = { camera.m_CameraMinBound, camera.m_CameraMaxBound };
 			EntityView view = scene->View<Components::Entity::QuadRenderer, Components::Entity::Transform>(Exclude<Components::Entity::InactiveLocallyFlag>());
 			for (auto entity : view) {
 				auto& renderer = view.Get<Components::Entity::QuadRenderer>(entity);
 				if (renderer.m_Visible) {
 					auto& transform = view.Get<Components::Entity::Transform>(entity);
 					Utility::AABB entityBounds = Utility::CalculateAABB(transform.m_WorldTransform, renderer.m_HalfSize);
-					if (Utility::AABBOverlapCheck(cameraBounds, entityBounds)) {
+					//SubmitAABB(camera.m_CameraBounds, 0.2f, {0.0f, 1.0f, 0.0f});
+					if (AABBOverlapCheck(camera.m_CameraBounds, entityBounds)) {
+						//SubmitAABB(entityBounds, 0.2f, {1.0f, 0.0f, 1.0f});
 						if (renderer.GetSemiTransparencyState()) {
-							SubmitTransparentQuad(transform.m_WorldTransform, renderer.m_HalfSize, renderer.GetColor(), renderer.GetTexture().get(), renderer.GetUVs(), transform.m_WorldDepth, renderer.m_FlipX, renderer.m_FlipY, renderer.m_FlatColored);
+							SubmitWorldSpaceTransparentQuad(transform.m_WorldTransform, renderer.m_HalfSize, renderer.GetColor(), renderer.GetTexture().get(), renderer.GetUVs(), transform.m_WorldDepth, renderer.m_FlipX, renderer.m_FlipY, renderer.m_FlatColored);
 							continue;
 						}
-						SubmitOpaqueQuad(transform.m_WorldTransform, renderer.m_HalfSize, renderer.GetColor(), renderer.GetTexture().get(), renderer.GetUVs(), transform.m_WorldDepth, renderer.m_FlipX, renderer.m_FlipY, renderer.m_FlatColored);
+						SubmitWorldSpaceOpaqueQuad(transform.m_WorldTransform, renderer.m_HalfSize, renderer.GetColor(), renderer.GetTexture().get(), renderer.GetUVs(), transform.m_WorldDepth, renderer.m_FlipX, renderer.m_FlipY, renderer.m_FlatColored);
 					}
 				}
 			}
 		}
+	}
 
-		FlushQueues();
-
-		EndScene();
+	void Renderer2D::FlushRenderQueues() {
+		BeginWorldPass();
+		FlushWorldQueues();
+		BeginScreenSpacePass();
+		FlushScreenSpaceQueues();
 	}
 
 
@@ -138,13 +155,11 @@ namespace Cori {
 		}
 	}
 
-	void Renderer2D::SubmitTransparentQuad(const glm::mat3& transform, const glm::vec2& size,
-	                                       const glm::vec4& tintColor, Texture2D* texture, const UVs& uvs,
-	                                       uint8_t depth, bool flipX, bool flipY, bool flatColored) {
+	void Renderer2D::SubmitWorldSpaceTransparentQuad(const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor, Texture2D* texture, const UVs& uvs, uint8_t depth, bool flipX, bool flipY, bool flatColored) {
 		if (!flipX && !flipY) {
-			s_Data->TransparentQuadQueue.emplace_back(
+			s_Data->WorldSpaceTransparentQuadQueue.emplace_back(
 				transform,
-				size,
+				halfSize,
 				tintColor,
 				flatColored ? s_Data->WhiteTexture.get() : texture,
 				static_cast<glm::vec4>(uvs),
@@ -152,9 +167,9 @@ namespace Cori {
 			);
 		}
 		else if (flipX && !flipY) {
-			s_Data->TransparentQuadQueue.emplace_back(
+			s_Data->WorldSpaceTransparentQuadQueue.emplace_back(
 				transform,
-				size,
+				halfSize,
 				tintColor,
 				flatColored ? s_Data->WhiteTexture.get() : texture,
 				glm::vec4{uvs.UVmax.x, uvs.UVmin.y, uvs.UVmin.x, uvs.UVmax.y},
@@ -162,9 +177,9 @@ namespace Cori {
 			);
 		}
 		else if (!flipX) {
-			s_Data->TransparentQuadQueue.emplace_back(
+			s_Data->WorldSpaceTransparentQuadQueue.emplace_back(
 				transform,
-				size,
+				halfSize,
 				tintColor,
 				flatColored ? s_Data->WhiteTexture.get() : texture,
 				glm::vec4{uvs.UVmin.x, uvs.UVmax.y, uvs.UVmax.x, uvs.UVmin.y},
@@ -172,9 +187,9 @@ namespace Cori {
 			);
 		}
 		else {
-			s_Data->TransparentQuadQueue.emplace_back(
+			s_Data->WorldSpaceTransparentQuadQueue.emplace_back(
 				transform,
-				size,
+				halfSize,
 				tintColor,
 				flatColored ? s_Data->WhiteTexture.get() : texture,
 				glm::vec4{uvs.UVmax.x, uvs.UVmax.y, uvs.UVmin.x, uvs.UVmin.y},
@@ -183,13 +198,11 @@ namespace Cori {
 		}
 	}
 
-	void Renderer2D::SubmitOpaqueQuad(const glm::mat3& transform, const glm::vec2& size, const glm::vec4& tintColor,
-	                                  Texture2D* texture, const UVs& uvs, uint8_t depth, bool flipX, bool flipY,
-	                                  bool flatColored) {
+	void Renderer2D::SubmitWorldSpaceOpaqueQuad(const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor, Texture2D* texture, const UVs& uvs, uint8_t depth, bool flipX, bool flipY, bool flatColored) {
 		if (!flipX && !flipY) {
-			s_Data->OpaqueQuadQueue.emplace_back(
+			s_Data->WorldSpaceOpaqueQuadQueue.emplace_back(
 				transform,
-				size,
+				halfSize,
 				tintColor,
 				flatColored ? s_Data->WhiteTexture.get() : texture,
 				static_cast<glm::vec4>(uvs),
@@ -197,9 +210,9 @@ namespace Cori {
 			);
 		}
 		else if (flipX && !flipY) {
-			s_Data->OpaqueQuadQueue.emplace_back(
+			s_Data->WorldSpaceOpaqueQuadQueue.emplace_back(
 				transform,
-				size,
+				halfSize,
 				tintColor,
 				flatColored ? s_Data->WhiteTexture.get() : texture,
 				glm::vec4{uvs.UVmax.x, uvs.UVmin.y, uvs.UVmin.x, uvs.UVmax.y},
@@ -207,9 +220,9 @@ namespace Cori {
 			);
 		}
 		else if (!flipX) {
-			s_Data->OpaqueQuadQueue.emplace_back(
+			s_Data->WorldSpaceOpaqueQuadQueue.emplace_back(
 				transform,
-				size,
+				halfSize,
 				tintColor,
 				flatColored ? s_Data->WhiteTexture.get() : texture,
 				glm::vec4{uvs.UVmin.x, uvs.UVmax.y, uvs.UVmax.x, uvs.UVmin.y},
@@ -217,15 +230,122 @@ namespace Cori {
 			);
 		}
 		else {
-			s_Data->OpaqueQuadQueue.emplace_back(
+			s_Data->WorldSpaceOpaqueQuadQueue.emplace_back(
 				transform,
-				size,
+				halfSize,
 				tintColor,
 				flatColored ? s_Data->WhiteTexture.get() : texture,
 				glm::vec4{uvs.UVmax.x, uvs.UVmax.y, uvs.UVmin.x, uvs.UVmin.y},
 				depth
 			);
 		}
+	}
+
+	void Renderer2D::SubmitScreenSpaceTransparentQuad(const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor, Texture2D* texture, const UVs& uvs, uint8_t depth, bool flipX, bool flipY, bool flatColored) {
+		if (!flipX && !flipY) {
+			s_Data->ScreenSpaceTransparentQuadQueue.emplace_back(
+				transform,
+				halfSize,
+				tintColor,
+				flatColored ? s_Data->WhiteTexture.get() : texture,
+				static_cast<glm::vec4>(uvs),
+				depth
+			);
+		}
+		else if (flipX && !flipY) {
+			s_Data->ScreenSpaceTransparentQuadQueue.emplace_back(
+				transform,
+				halfSize,
+				tintColor,
+				flatColored ? s_Data->WhiteTexture.get() : texture,
+				glm::vec4{uvs.UVmax.x, uvs.UVmin.y, uvs.UVmin.x, uvs.UVmax.y},
+				depth
+			);
+		}
+		else if (!flipX) {
+			s_Data->ScreenSpaceTransparentQuadQueue.emplace_back(
+				transform,
+				halfSize,
+				tintColor,
+				flatColored ? s_Data->WhiteTexture.get() : texture,
+				glm::vec4{uvs.UVmin.x, uvs.UVmax.y, uvs.UVmax.x, uvs.UVmin.y},
+				depth
+			);
+		}
+		else {
+			s_Data->ScreenSpaceTransparentQuadQueue.emplace_back(
+				transform,
+				halfSize,
+				tintColor,
+				flatColored ? s_Data->WhiteTexture.get() : texture,
+				glm::vec4{uvs.UVmax.x, uvs.UVmax.y, uvs.UVmin.x, uvs.UVmin.y},
+				depth
+			);
+		}
+	}
+
+	void Renderer2D::SubmitScreenSpaceOpaqueQuad(const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor, Texture2D* texture, const UVs& uvs, uint8_t depth, bool flipX, bool flipY, bool flatColored) {
+		if (!flipX && !flipY) {
+			s_Data->ScreenSpaceOpaqueQuadQueue.emplace_back(
+				transform,
+				halfSize,
+				tintColor,
+				flatColored ? s_Data->WhiteTexture.get() : texture,
+				static_cast<glm::vec4>(uvs),
+				depth
+			);
+		}
+		else if (flipX && !flipY) {
+			s_Data->ScreenSpaceOpaqueQuadQueue.emplace_back(
+				transform,
+				halfSize,
+				tintColor,
+				flatColored ? s_Data->WhiteTexture.get() : texture,
+				glm::vec4{uvs.UVmax.x, uvs.UVmin.y, uvs.UVmin.x, uvs.UVmax.y},
+				depth
+			);
+		}
+		else if (!flipX) {
+			s_Data->ScreenSpaceOpaqueQuadQueue.emplace_back(
+				transform,
+				halfSize,
+				tintColor,
+				flatColored ? s_Data->WhiteTexture.get() : texture,
+				glm::vec4{uvs.UVmin.x, uvs.UVmax.y, uvs.UVmax.x, uvs.UVmin.y},
+				depth
+			);
+		}
+		else {
+			s_Data->ScreenSpaceOpaqueQuadQueue.emplace_back(
+				transform,
+				halfSize,
+				tintColor,
+				flatColored ? s_Data->WhiteTexture.get() : texture,
+				glm::vec4{uvs.UVmax.x, uvs.UVmax.y, uvs.UVmin.x, uvs.UVmin.y},
+				depth
+			);
+		}
+	}
+
+	void Renderer2D::SubmitScreenSpaceColoredQuad(const glm::vec2 position, glm::vec2 halfSize, const glm::vec3& color) {
+		glm::mat3 transform = glm::translate(glm::mat3(1.0f), position);
+		SubmitScreenSpaceOpaqueQuad(transform, halfSize, glm::vec4(color, 1.0f), nullptr, {}, 30, false, false, true);
+	}
+
+	void Renderer2D::SubmitWorldSpaceColoredQuad(const glm::vec2 position, glm::vec2 halfSize, const glm::vec3& color) {
+		glm::mat3 transform = glm::translate(glm::mat3(1.0f), position);
+		SubmitWorldSpaceOpaqueQuad(transform, halfSize, glm::vec4(color, 1.0f), nullptr, {}, 30, false, false, true);
+	}
+
+	void Renderer2D::SubmitAABB(const Utility::AABB& aabb, float lineThickness, const glm::vec3& color) {
+		glm::vec2 size = {aabb.m_Max.x - aabb.m_Min.x, aabb.m_Max.y - aabb.m_Min.y};
+		SubmitWorldSpaceColoredQuad({aabb.m_Min.x, aabb.m_Max.y - size.y / 2.0f}, {lineThickness, size.y / 2.0f}, color);
+		SubmitWorldSpaceColoredQuad({aabb.m_Max.x, aabb.m_Max.y - size.y / 2.0f}, {lineThickness, size.y / 2.0f}, color);
+
+
+		SubmitWorldSpaceColoredQuad({aabb.m_Max.x - size.x / 2.0f, aabb.m_Min.y}, {size.x / 2.0f - lineThickness, lineThickness}, color);
+		SubmitWorldSpaceColoredQuad({aabb.m_Max.x - size.x / 2.0f, aabb.m_Max.y}, {size.x / 2.0f - lineThickness, lineThickness}, color);
+
 	}
 
 	Renderer2D::Statistics Renderer2D::GetStatistics() {
@@ -270,17 +390,17 @@ namespace Cori {
 	}
 
 
-	void Renderer2D::FlushQueues() {
+	void Renderer2D::FlushWorldQueues() {
 		CORI_PROFILE_FUNCTION();
 
-		if (!s_Data->OpaqueQuadQueue.empty()) {
+		if (!s_Data->WorldSpaceOpaqueQuadQueue.empty()) {
 			CORI_PROFILE_SCOPE("Opaque instanced quad flush");
 
 			{
 				CORI_PROFILE_SCOPE("Opaque instanced quad texture sort");
 				ska_sort(
-					s_Data->OpaqueQuadQueue.begin(),
-					s_Data->OpaqueQuadQueue.end(),
+					s_Data->WorldSpaceOpaqueQuadQueue.begin(),
+					s_Data->WorldSpaceOpaqueQuadQueue.end(),
 					[](const QuadInstance& quad) -> uint64_t {
 						return reinterpret_cast<uint64_t>(quad.m_Texture);
 					}
@@ -291,24 +411,24 @@ namespace Cori {
 				CORI_PROFILE_SCOPE("Opaque instanced quad draw");
 				BeginInstancedSet();
 
-				for (const auto& quad : s_Data->OpaqueQuadQueue) {
+				for (const auto& quad : s_Data->WorldSpaceOpaqueQuadQueue) {
 					DrawQuadInstanced(quad);
 				}
 
 				EndInstancedSet();
 			}
 
-			s_Data->OpaqueQuadQueue.clear();
+			s_Data->WorldSpaceOpaqueQuadQueue.clear();
 		}
 
-		if (!s_Data->TransparentQuadQueue.empty()) {
+		if (!s_Data->WorldSpaceTransparentQuadQueue.empty()) {
 			CORI_PROFILE_SCOPE("Transparent instanced quad flush");
 
 			{
 				CORI_PROFILE_SCOPE("Transparent instanced quad layer sort");
 				ska_sort(
-					s_Data->TransparentQuadQueue.begin(),
-					s_Data->TransparentQuadQueue.end(),
+					s_Data->WorldSpaceTransparentQuadQueue.begin(),
+					s_Data->WorldSpaceTransparentQuadQueue.end(),
 					[](const QuadInstance& quad) -> uint8_t {
 						return quad.m_Layer;
 					}
@@ -318,8 +438,8 @@ namespace Cori {
 			{
 				CORI_PROFILE_SCOPE("Transparent instanced quad texture sort");
 				ska_sort(
-					s_Data->TransparentQuadQueue.begin(),
-					s_Data->TransparentQuadQueue.end(),
+					s_Data->WorldSpaceTransparentQuadQueue.begin(),
+					s_Data->WorldSpaceTransparentQuadQueue.end(),
 					[](const QuadInstance& quad) -> uint64_t {
 						return reinterpret_cast<uint64_t>(quad.m_Texture);
 					}
@@ -333,7 +453,7 @@ namespace Cori {
 				CORI_PROFILE_SCOPE("Transparent instanced quad draw");
 				BeginInstancedSet();
 
-				for (const auto& quad : s_Data->TransparentQuadQueue) {
+				for (const auto& quad : s_Data->WorldSpaceTransparentQuadQueue) {
 					DrawQuadInstanced(quad);
 				}
 
@@ -343,9 +463,87 @@ namespace Cori {
 			GraphicsCall::SetDepthMask(true);
 			GraphicsCall::DisableBlending();
 
-			s_Data->TransparentQuadQueue.clear();
+			s_Data->WorldSpaceTransparentQuadQueue.clear();
 		}
 	}
+
+	void Renderer2D::FlushScreenSpaceQueues() {
+		CORI_PROFILE_FUNCTION();
+
+		if (!s_Data->ScreenSpaceOpaqueQuadQueue.empty()) {
+			CORI_PROFILE_SCOPE("Opaque screen space instanced quad flush");
+
+			{
+				CORI_PROFILE_SCOPE("Opaque screen space instanced quad texture sort");
+				ska_sort(
+					s_Data->ScreenSpaceOpaqueQuadQueue.begin(),
+					s_Data->ScreenSpaceOpaqueQuadQueue.end(),
+					[](const QuadInstance& quad) -> uint64_t {
+						return reinterpret_cast<uint64_t>(quad.m_Texture);
+					}
+				);
+			}
+
+			{
+				CORI_PROFILE_SCOPE("Opaque screen space instanced quad draw");
+				BeginInstancedSet();
+
+				for (const auto& quad : s_Data->ScreenSpaceOpaqueQuadQueue) {
+					DrawQuadInstanced(quad);
+				}
+
+				EndInstancedSet();
+			}
+
+			s_Data->ScreenSpaceOpaqueQuadQueue.clear();
+		}
+
+		if (!s_Data->ScreenSpaceTransparentQuadQueue.empty()) {
+			CORI_PROFILE_SCOPE("Transparent screen space instanced quad flush");
+
+			{
+				CORI_PROFILE_SCOPE("Transparent screen space instanced quad layer sort");
+				ska_sort(
+					s_Data->ScreenSpaceTransparentQuadQueue.begin(),
+					s_Data->ScreenSpaceTransparentQuadQueue.end(),
+					[](const QuadInstance& quad) -> uint8_t {
+						return quad.m_Layer;
+					}
+				);
+			}
+
+			{
+				CORI_PROFILE_SCOPE("Transparent screen space instanced quad texture sort");
+				ska_sort(
+					s_Data->ScreenSpaceTransparentQuadQueue.begin(),
+					s_Data->ScreenSpaceTransparentQuadQueue.end(),
+					[](const QuadInstance& quad) -> uint64_t {
+						return reinterpret_cast<uint64_t>(quad.m_Texture);
+					}
+				);
+			}
+
+			GraphicsCall::EnableBlending();
+			GraphicsCall::SetDepthMask(false);
+
+			{
+				CORI_PROFILE_SCOPE("Transparent screen space instanced quad draw");
+				BeginInstancedSet();
+
+				for (const auto& quad : s_Data->ScreenSpaceTransparentQuadQueue) {
+					DrawQuadInstanced(quad);
+				}
+
+				EndInstancedSet();
+			}
+
+			GraphicsCall::SetDepthMask(true);
+			GraphicsCall::DisableBlending();
+
+			s_Data->ScreenSpaceTransparentQuadQueue.clear();
+		}
+	}
+
 
 	void Renderer2D::FlushInstancedQuads() {
 		CORI_PROFILE_FUNCTION();

@@ -7,9 +7,10 @@ namespace Cori {
 	}
 
 	LayerStack::~LayerStack() {
-		for (Layer* layer : m_Layers) {
-			layer->OnDetach();
-			delete layer;
+		while (!m_Layers.empty()) {
+			m_Layers.back()->OnDetach();
+			delete m_Layers.back();
+			m_Layers.pop_back();
 		}
 		CORI_CORE_INFO("LayerStack destroyed");
 	}
@@ -58,6 +59,16 @@ namespace Cori {
 			}
 			m_OverlayPopQueue.clear();
 		}
+	}
+
+	void LayerStack::ClearStack() {
+		CORI_CORE_INFO("Clearing LayerStack");
+		while (!m_Layers.empty()) {
+			m_Layers.back()->OnDetach();
+			delete m_Layers.back();
+			m_Layers.pop_back();
+		}
+		CORI_CORE_INFO("LayerStack cleared");
 	}
 
 	void LayerStack::PushLayer(Layer* layer) {

@@ -17,13 +17,13 @@ namespace Cori {
 
 		void OnUpdate() override;
 
-		inline unsigned int GetWidth() const override { return m_Data.Width; }
-		inline unsigned int GetHeight() const override { return m_Data.Height; }
-		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
-		inline GraphicsAPIs GetAPI() const override { return m_Data.API; }
+		uint32_t GetWidth() const override { return m_Data.Width; }
+		uint32_t GetHeight() const override { return m_Data.Height; }
+		void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
+		GraphicsAPIs GetAPI() const override { return m_Data.API; }
 
-		inline virtual void* GetNativeContext() const override { return m_Context->GetNativeContext(); }
-		inline virtual void* GetNativeWindow() const override { return m_Window; }
+		void* GetNativeContext() const override { return m_Context->GetNativeContext(); }
+		void* GetNativeWindow() const override { return m_Window; }
 
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;

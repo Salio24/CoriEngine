@@ -14,7 +14,6 @@ namespace Cori {
 		static void DestroyScene(const std::string& name);
 
 	private:
-
 		std::shared_ptr<Scene> GetSceneImpl(const std::string& name);
 		std::shared_ptr<Scene> CreateSceneImpl(const std::string& name);
 

@@ -13,7 +13,7 @@
 #include "Audio/Mixer.hpp"
 
 namespace Cori {
-	Application* Application::s_Instance = nullptr;
+	Application* Application::s_Instance{ nullptr };
 
 	Application::Application() {
 		CORI_CORE_ASSERT_FATAL(!s_Instance, "Trying to construct application for the second time. Application already exists!");
@@ -36,6 +36,7 @@ namespace Cori {
 	}
 
 	Application::~Application() {
+		m_LayerStack.ClearStack();
 		GraphicsCall::ShutdownRenderers();
 		Audio::Mixer::Shutdown();
 	}
@@ -88,8 +89,8 @@ namespace Cori {
 				GraphicsCall::ClearFramebuffer();
 
 				for (Layer* layer : m_LayerStack) {
-					layer->OnUpdate(m_GameTimer.m_DeltaTime, m_GameTimer.m_TickAlpha);
-					layer->SceneUpdate(m_GameTimer.m_DeltaTime);
+					layer->OnUpdate(m_GameTimer);
+					layer->SceneUpdate(m_GameTimer.GetDeltaTime());
 					if (layer->IsModal()) {
 						break;
 					}
@@ -99,7 +100,7 @@ namespace Cori {
 
 				if (m_RenderImGui) {
 					for (Layer* layer : m_LayerStack) {
-						layer->OnImGuiRender(m_GameTimer.m_DeltaTime);
+						layer->OnImGuiRender(m_GameTimer.GetDeltaTime());
 						
 					}
 				}
@@ -116,7 +117,6 @@ namespace Cori {
 	}
 
 	void Application::TickrateUpdate(const float timeStep) {
-			test123++;
 		for (Layer* layer : m_LayerStack) {
 			layer->SceneTickrateUpdate(timeStep);
 			layer->OnTickUpdate(timeStep);

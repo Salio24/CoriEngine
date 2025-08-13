@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/Utility/AABB.hpp"
 
 namespace Cori {
 	namespace Components {
@@ -13,10 +14,10 @@ namespace Cori {
 				float m_CameraZoomFactor{ 1.0f };
 				glm::vec2 m_InitialCameraMinBound{ 0.0f };
 				glm::vec2 m_InitialCameraMaxBound{ 0.0f };
-				glm::vec2 m_CameraMaxBound{ 0.0f };
-				glm::vec2 m_CameraMinBound{ 0.0f };
+				Utility::AABB m_CameraBounds{};
+				glm::vec2 m_CameraSize{ 0.0f };
 				Camera() = default;
-				Camera(const glm::mat4& projectionMatrix, glm::mat4& viewProjectionMatrix, const glm::vec2& cameraPosition, float cameraRotation, float cameraZoomFactor)
+				Camera(const glm::mat4& projectionMatrix, const glm::mat4& viewProjectionMatrix, const glm::vec2& cameraPosition, float cameraRotation, float cameraZoomFactor)
 					: m_ProjectionMatrix(projectionMatrix), m_ViewProjectionMatrix(viewProjectionMatrix), m_CameraPosition(cameraPosition), m_CameraRotation(cameraRotation), m_CameraZoomFactor(cameraZoomFactor) {
 				}
 			};

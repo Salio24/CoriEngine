@@ -8,21 +8,19 @@ namespace Cori {
 		void Update();
 		void SetTickrate(uint16_t tickrate);
 
-		// method GetDeltaTime can be used to retrieve deltatime 
-		// also casting this class instance to double will return the deltatime
-		double GetDeltaTime() { return m_DeltaTime; };
+		double GetDeltaTime() const { return m_DeltaTime; }
+		double GetTickAlpha() const { return m_TickAlpha; }
 
-		inline double GetMiliseconds() const;
-		inline double GetSeconds() const;
-		inline double GetMinutes() const;
-		inline double GetHours() const;
+		double GetMilliseconds() const { return m_Time * 1000.0f; }
+		double GetSeconds() const { return m_Time; }
+		double GetMinutes() const { return m_Time / 60.0f; }
+		double GetHours() const { return m_Time / 3600.0f; }
 
-		inline void SetTickrateUpdateFunc(const std::function<void(const float)>& func) { m_TickrateUpdateFunc = func; }
-		
-		double m_DeltaTime{ 0 };
-		double m_TickAlpha{ 0 };
+		void SetTickrateUpdateFunc(const std::function<void(const float)>& func) { m_TickrateUpdateFunc = func; }
 
 	private:
+		double m_DeltaTime{ 0 };
+		double m_TickAlpha{ 0 };
 
 		float m_Timestep{ 0 };
 		double m_Accumulator{ 0 };

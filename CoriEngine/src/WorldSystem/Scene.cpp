@@ -99,7 +99,10 @@ namespace Cori {
 			UpdateTransform();
 		}
 
+		Renderer2D::BeginScene(GetContextComponent<Components::Scene::Camera>());
 		Renderer2D::DrawScene(this);
+		Renderer2D::FlushRenderQueues();
+		Renderer2D::EndScene();
 	}
 
 	void Scene::OnTickUpdate(const float timeStep) {

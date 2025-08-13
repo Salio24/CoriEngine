@@ -132,13 +132,14 @@ namespace Cori::Physics
 		DebugImguiRenderer(const DebugImguiRenderer& other) : callbacks(other.callbacks) { callbacks.context = this; }
 		DebugImguiRenderer& operator=(const DebugImguiRenderer& other) { callbacks = other.callbacks; callbacks.context = this; return *this; }
 
-		void ViewportCalc(const glm::vec2 cameraBounds, const int pixelsPerMeter) {
+		void ViewportCalc(const glm::vec2 cameraBounds, const int pixelsPerMeter, const glm::vec2 cameraPos) {
 
 			const ImVec2 viewportSize = ImGui::GetMainViewport()->WorkSize;
 			camera_scale = viewportSize.y / (cameraBounds.y / pixelsPerMeter);
-			
-			camera_pos.x = viewportSize.x / (camera_scale * 2);
-			camera_pos.y = viewportSize.y / (camera_scale * 2);
+			float viewport_scale = viewportSize.y / cameraBounds.y;
+
+			camera_pos.x = (viewportSize.x + cameraPos.x * viewport_scale * 2.0f) / (camera_scale * 2);
+			camera_pos.y = (viewportSize.y + cameraPos.y * viewport_scale * 2.0f) / (camera_scale * 2);
 
 		}
 

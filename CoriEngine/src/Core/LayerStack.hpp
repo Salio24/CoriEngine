@@ -20,6 +20,8 @@ namespace Cori {
 
 		void ProcessQueue();
 
+		void ClearStack();
+
 		std::vector<Layer*>::iterator begin() { return m_Layers.begin(); }
 		std::vector<Layer*>::iterator end() { return m_Layers.end(); }
 		std::vector<Layer*>::reverse_iterator rbegin() { return m_Layers.rbegin(); }
@@ -35,7 +37,7 @@ namespace Cori {
 		std::vector<Layer*> m_OverlayPopQueue;
 
 
-		unsigned int m_LayerInsertIndex{ 0 };
+		uint32_t m_LayerInsertIndex{ 0 };
 
 		std::vector<Layer*>::iterator m_LayerInsert{ m_Layers.begin() };
 	};
