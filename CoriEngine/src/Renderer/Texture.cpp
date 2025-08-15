@@ -6,8 +6,8 @@ namespace Cori {
 	std::shared_ptr<Texture2D> Texture2D::Create(const Texture2DDescriptor& descriptor) {
 
 
-		std::shared_ptr<Texture2D> texture = Factory<Texture2D, GraphicsAPIs, const std::string&>::CreateShared(Application::GetCurrentAPI(), (std::string)descriptor.imagePath);
-		CORI_CORE_ASSERT_FATAL(texture, "Failed to create Texture2D for API: {0}. Check registrations and API validity.", static_cast<int>(Application::GetCurrentAPI())); // output api as a string
+		std::shared_ptr<Texture2D> texture = Factory<Texture2D, GraphicsAPIs, const std::string&>::CreateShared(Window::GetAPI(), static_cast<std::string>(descriptor.imagePath));
+		CORI_CORE_ASSERT_FATAL(texture, "Failed to create Texture2D for API: {0}. Check registrations and API validity.", static_cast<int>(Window::GetAPI())); // output api as a string
 		return texture;
 	}
 

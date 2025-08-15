@@ -2,7 +2,6 @@
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_sdl3.h>
-#include "Core/WindowImpl.hpp"
 #include "Core/Application.hpp"
 #include "Renderer/OpenGL/GL_GraphicsContext.hpp"
 
@@ -27,6 +26,7 @@ namespace Cori {
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls 
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // Enable docking
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable multi-viewport
+		// f-ing wayland
 
 		ImGui::StyleColorsDark();
 

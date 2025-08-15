@@ -505,7 +505,7 @@ struct Test {
 		static void CoreLogError(const fmt::format_string<Args...>& fmt, Args&&... args) {
 			fmt::memory_buffer buffer;
 
-			const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::crimson)));
+			const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::violet)));
 			const auto start_code_end = styled_dummy.find(' ');
 
 			const auto end_code_start = start_code_end + 1;
@@ -615,7 +615,7 @@ struct Test {
 		static void ClientLogError(const fmt::format_string<Args...>& fmt, Args&&... args) {
 			fmt::memory_buffer buffer;
 
-			const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::crimson)));
+			const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::violet)));
 			const auto start_code_end = styled_dummy.find(' ');
 
 			const auto end_code_start = start_code_end + 1;

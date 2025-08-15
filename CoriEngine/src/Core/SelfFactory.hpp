@@ -4,8 +4,11 @@ namespace Cori {
 
 	//TODO: adopt std::expected
 
-	template <typename DerivedType>
-	class SharedSelfFactory {
+	template<typename...>
+	class SharedSelfFactory;
+
+	template <typename Type>
+	class SharedSelfFactory<Type> {
 	protected:
 		SharedSelfFactory() = default;
 		~SharedSelfFactory() = default;
@@ -17,24 +20,54 @@ namespace Cori {
 		SharedSelfFactory& operator=(SharedSelfFactory&&) = delete;
 
 		template <typename... CtorArgs>
-		static std::shared_ptr<DerivedType> Create(CtorArgs&&... ctorArgs) {
-			if (DerivedType::PreCreateHook(std::forward<CtorArgs>(ctorArgs)...)) {
-				class DerivedTypeProxy : public DerivedType {
+		static std::shared_ptr<Type> Create(CtorArgs&&... ctorArgs) {
+			if (Type::PreCreateHook(std::forward<CtorArgs>(ctorArgs)...)) {
+				class TypeProxy : public Type {
 				public:
-					explicit DerivedTypeProxy(CtorArgs&&... proxyCtorArgs)
-						: DerivedType(std::forward<CtorArgs>(proxyCtorArgs)...) {
+					explicit TypeProxy(CtorArgs&&... proxyCtorArgs)
+						: Type(std::forward<CtorArgs>(proxyCtorArgs)...) {
 					}
 				};
 
-				return std::make_shared<DerivedTypeProxy>(std::forward<CtorArgs>(ctorArgs)...);
+				return std::make_shared<TypeProxy>(std::forward<CtorArgs>(ctorArgs)...);
 			}
-			CORI_CORE_ERROR("SharedSelfFactory: PreCreateHook failed for shared factory with type: {0}, nullptr returned", typeid(DerivedType).name());
+			CORI_CORE_ERROR("SharedSelfFactory: PreCreateHook failed for shared factory with type: {0}, nullptr returned", typeid(Type).name());
 			return nullptr;
 		}
 	};
 
-	template <typename DerivedType>
-	class UniqueSelfFactory {
+	template <typename Type, typename ErrorType>
+	class SharedSelfFactory<Type, ErrorType> {
+	protected:
+		SharedSelfFactory() = default;
+		~SharedSelfFactory() = default;
+
+	public:
+		SharedSelfFactory(const SharedSelfFactory&) = delete;
+		SharedSelfFactory& operator=(const SharedSelfFactory&) = delete;
+		SharedSelfFactory(SharedSelfFactory&&) = delete;
+		SharedSelfFactory& operator=(SharedSelfFactory&&) = delete;
+
+
+		template <typename... CtorArgs>
+		static std::expected<std::shared_ptr<Type>, ErrorType> Create(CtorArgs&&... ctorArgs) {
+			return std::move(Type::PreCreateHook(std::forward<CtorArgs>(ctorArgs)...)).transform([...ctorArgs = std::forward<CtorArgs>(ctorArgs)](auto&& ) {
+				class TypeProxy : public Type {
+				public:
+					explicit TypeProxy(CtorArgs&&... proxyCtorArgs)
+						: Type(std::forward<CtorArgs>(proxyCtorArgs)...) {}
+				};
+
+				return std::make_shared<TypeProxy>(std::forward<CtorArgs>(ctorArgs)...);
+			});
+		}
+	};
+
+	template<typename...>
+	class UniqueSelfFactory;
+
+	template <typename Type>
+	class UniqueSelfFactory<Type> {
 	protected:
 		UniqueSelfFactory() = default;
 		~UniqueSelfFactory() = default;
@@ -46,19 +79,45 @@ namespace Cori {
 		UniqueSelfFactory& operator=(UniqueSelfFactory&&) = delete;
 
 		template <typename... CtorArgs>
-		static std::unique_ptr<DerivedType> Create(CtorArgs&&... ctorArgs) {
-			if (DerivedType::PreCreateHook(std::forward<CtorArgs>(ctorArgs)...)) {
-				class DerivedTypeProxy : public DerivedType {
+		static std::unique_ptr<Type> Create(CtorArgs&&... ctorArgs) {
+			if (Type::PreCreateHook(std::forward<CtorArgs>(ctorArgs)...)) {
+				class TypeProxy : public Type {
 				public:
-					explicit DerivedTypeProxy(CtorArgs&&... proxyCtorArgs)
-						: DerivedType(std::forward<CtorArgs>(proxyCtorArgs)...) {
+					explicit TypeProxy(CtorArgs&&... proxyCtorArgs)
+						: Type(std::forward<CtorArgs>(proxyCtorArgs)...) {
 					}
 				};
 
-				return std::make_unique<DerivedTypeProxy>(std::forward<CtorArgs>(ctorArgs)...);
+				return std::make_unique<TypeProxy>(std::forward<CtorArgs>(ctorArgs)...);
 			}
-			CORI_CORE_ERROR("UniqueSelfFactory: PreCreateHook failed for unique factory with type: {0}, nullptr returned", typeid(DerivedType).name());
+			CORI_CORE_ERROR("UniqueSelfFactory: PreCreateHook failed for unique factory with type: {0}, nullptr returned", typeid(Type).name());
 			return nullptr;
+		}
+	};
+
+	template <typename Type, typename ErrorType>
+	class UniqueSelfFactory<Type, ErrorType> {
+	protected:
+		UniqueSelfFactory() = default;
+		~UniqueSelfFactory() = default;
+
+	public:
+		UniqueSelfFactory(const UniqueSelfFactory&) = delete;
+		UniqueSelfFactory& operator=(const UniqueSelfFactory&) = delete;
+		UniqueSelfFactory(UniqueSelfFactory&&) = delete;
+		UniqueSelfFactory& operator=(UniqueSelfFactory&&) = delete;
+
+		template <typename... CtorArgs>
+		static std::expected<std::unique_ptr<Type>, ErrorType> Create(CtorArgs&&... ctorArgs) {
+			return std::move(Type::PreCreateHook(std::forward<CtorArgs>(ctorArgs)...)).transform([...ctorArgs = std::forward<CtorArgs>(ctorArgs)](auto&& ) {
+				class TypeProxy : public Type {
+				public:
+					explicit TypeProxy(CtorArgs&&... proxyCtorArgs)
+						: Type(std::forward<CtorArgs>(proxyCtorArgs)...) {}
+				};
+
+				return std::make_unique<TypeProxy>(std::forward<CtorArgs>(ctorArgs)...);
+			});
 		}
 	};
 }

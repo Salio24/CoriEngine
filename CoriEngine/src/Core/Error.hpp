@@ -115,6 +115,16 @@ namespace Cori {
 			}
 		}
 
+		PossibleErrors(const PossibleErrors& other) = default;
+
+		PossibleErrors& operator=(const PossibleErrors& other) = default;
+
+		PossibleErrors(PossibleErrors&& other) noexcept : m_Variant(std::move(other.m_Variant)), m_ErrorHandled(other.m_ErrorHandled) {
+			other.m_ErrorHandled = true;
+		}
+
+		PossibleErrors& operator=(PossibleErrors&& other) noexcept = default;
+
 		[[nodiscard]] const std::exception* GetRaw() const {
 			m_ErrorHandled = true;
 			return std::visit([](const auto& e) -> const std::exception* {
@@ -154,8 +164,12 @@ namespace Cori {
 			return std::move(*this);
 		}
 
-		void JustLog() {
+		void JustLog() const {
 			CORI_CORE_ERROR("Logging an error inside of PossibleErrors. Error: '{}'", GetRaw()->what());
+		}
+
+		const char* GetWhat() const {
+			return GetRaw()->what();
 		}
 
 	private:

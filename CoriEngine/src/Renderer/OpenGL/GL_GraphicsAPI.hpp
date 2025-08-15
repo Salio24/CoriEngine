@@ -9,24 +9,24 @@ namespace Cori {
 		static bool PreCreateHook(); 
 		OpenGLGraphicsAPI();
 
-		virtual void Init() override;
+		void Init() override;
 
-		virtual void SetViewport(int x, int y, int width, int height) override;
+		void SetViewport(int x, int y, int width, int height) override;
 
-		virtual void SetClearColor(const glm::vec4& color) override;
-		virtual void ClearFramebuffer() override;
+		void SetClearColor(const glm::vec4& color) override;
+		void ClearFramebuffer() override;
 		
-		virtual void DrawElementsTriangles(const uint32_t elementCount) override;
+		void DrawElementsTriangles(const uint32_t elementCount) override;
 
-		virtual void DrawElementsInstancedTriangles(const uint32_t instanceCount) override;
+		void DrawElementsInstancedTriangles(const uint32_t instanceCount) override;
 
-		virtual void EnableDepthTest() override;
-		virtual void DisableDepthTest() override;
+		void EnableDepthTest() override;
+		void DisableDepthTest() override;
 
-		virtual void EnableBlending() override;
-		virtual void DisableBlending() override;
+		void EnableBlending() override;
+		void DisableBlending() override;
 
-		virtual void SetDepthMask(bool mode) override;
+		void SetDepthMask(bool mode) override;
 
 		CORI_REGISTERED_FACTORY_INIT;
 	};

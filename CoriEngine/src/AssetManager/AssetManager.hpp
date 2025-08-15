@@ -44,5 +44,8 @@ namespace Cori {
 		static void ClearTexture2DCache();
 		static void ClearSpriteAtlasCache();
 		static void ClearSoundCache();
+	private:
+		struct Cache;
+		static Cache* s_Cache;
 	};
 }

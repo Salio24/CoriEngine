@@ -1,51 +1,64 @@
 #pragma once
 #include "EventSystem/Event.hpp"
 #include "Renderer/GraphicsAPIs.hpp"
+#include "Profiling/Trackable.hpp"
+#include "Core/SelfFactory.hpp"
 
 namespace Cori {
+	struct ScreenMode {
+		int m_Width;
+		int m_Height;
+		float m_RefreshRate;
+		std::string m_ModeName;
 
-	struct WindowProperties {
-		WindowProperties(const std::string& title = "Cori",
-			unsigned int width = 1920,
-			unsigned int height = 1080,
-			GraphicsAPIs api = GraphicsAPIs::OpenGL
-			)
-			: Title(title), Width(width), Height(height), API(api) {
+	protected:
+		friend class Window;
+		ScreenMode() = default;
+
+		ScreenMode(int width, int height, float refreshRate, uint32_t modeIndex)
+			: m_Width(width), m_Height(height), m_RefreshRate(refreshRate), m_ModeIndex(modeIndex) {
+			m_ModeName = std::to_string(m_Width) + "x" + std::to_string(m_Height) + " " + std::to_string(m_RefreshRate) + " Hz";
 		}
 
-		std::string Title;
-		uint32_t Width;
-		uint32_t Height;
-		GraphicsAPIs API;
-
+		uint32_t m_ModeIndex{ 1000 }; //impossible initial number
 	};
 
-	struct ScreenMode {
-
+	enum class WindowMode {
+		WINDOWED = 0,
+		BORDERLESS_WINDOWED = 1,
+		EXCLUSIVE_FULLSCREEN = 2
 	};
 
-	class Window {
-
+	class Window : public Profiling::Trackable<Window>, public UniqueSelfFactory<Window> {
 	public:
+		static bool PreCreateHook([[maybe_unused]] std::string title, [[maybe_unused]] bool vsync = false) { return true; }
+		Window(const std::string& title, bool vsync = false);
+		~Window();
 
-		virtual ~Window() {}
+		void OnUpdate();
 
-		virtual void OnUpdate() = 0;
+		int GetWidth() const;
+		int GetHeight() const;
 
-		virtual unsigned int GetWidth() const = 0;
-		virtual unsigned int GetHeight() const = 0;
-		
-		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
-		virtual GraphicsAPIs GetAPI() const = 0;
+		void SetEventCallback(const EventCallbackFn& callback);
 
-		virtual void SetVSync(bool enabled) = 0;
-		virtual bool IsVSync() const = 0;
+		static GraphicsAPIs GetAPI() { return s_API; }
 
-		virtual void* GetNativeContext() const = 0;
-		virtual void* GetNativeWindow() const = 0;
-		
-		static std::unique_ptr<Window> Create(const WindowProperties& props = WindowProperties());
+		void SetVSync(bool enabled);
+		bool IsVSync() const;
+
+		void* GetNativeContext() const;
+		void* GetNativeWindow() const;
+
+		std::vector<ScreenMode> GetScreenModes() const;
+		bool SetScreenMode(const ScreenMode& mode);
+
+		WindowMode GetWindowMode() const;
+		bool SetWindowMode(WindowMode mode);
+
+	private:
+		inline static GraphicsAPIs s_API = GraphicsAPIs::OpenGL;
+		struct Data;
+		Data* m_Data{nullptr};
 	};
-
-
 }

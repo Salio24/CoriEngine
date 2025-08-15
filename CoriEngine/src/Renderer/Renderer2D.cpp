@@ -1,9 +1,8 @@
 #include "Renderer2D.hpp"
 #include <ska_sort.hpp>
-#include <glm/ext/matrix_clip_space.hpp>
-#include <glm/ext/matrix_transform.hpp>
 #include <glad/gl.h>
 #include "Core/Utility/AABB.hpp"
+#include "AssetManager/AssetManager.hpp"
 
 namespace Cori {
 	Renderer2D::RendererData* Renderer2D::s_Data{ nullptr };
@@ -20,7 +19,7 @@ namespace Cori {
 				"assets/engine/textures/white1x1.png"
 			};
 
-		s_Data->WhiteTexture = AssetManager::GetTexture2DOwning(wt);
+		s_Data->WhiteTexture = AssetManager::GetTexture2DOwning(wt); // FIXME: add a way to directly create a owning texture etc
 
 		s_Data->QuadInstanceVertexArray = VertexArray::Create();
 		s_Data->QuadInstanceVertexBuffer = VertexBuffer::Create();

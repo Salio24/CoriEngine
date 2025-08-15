@@ -1,16 +1,12 @@
 #include "Application.hpp"
-#include "Engine.hpp"
-#include "WindowImpl.hpp"
 #include "Input.hpp"
-#include <imgui.h>
-#include "Renderer/Buffers.hpp"
-#include "Renderer/Renderer2D.hpp"
 #include "Renderer/GraphicsCall.hpp"
-#include "AssetManager/AssetDefinitions.hpp"
 #include "WorldSystem/SceneManager.hpp"
 #include "WorldSystem/Components.hpp"
-#include "EventSystem/GameEvents.hpp"
-#include "Audio/Mixer.hpp"
+#include "AssetManager/AssetManager.hpp"
+#include "EventSystem/Event.hpp"
+#include "EventSystem/AppEvent.hpp"
+#include "EventSystem/KeyEvent.hpp"
 
 namespace Cori {
 	Application* Application::s_Instance{ nullptr };
@@ -19,7 +15,8 @@ namespace Cori {
 		CORI_CORE_ASSERT_FATAL(!s_Instance, "Trying to construct application for the second time. Application already exists!");
 		s_Instance = this;
 
-		m_Window = Window::Create();
+		//m_Window = Window::Create();
+		m_Window = Window::Create("test", false);
 
 		m_Window->SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent, CORI_PLACEHOLDERS(1)));
 		m_Window->SetVSync(false);
@@ -28,6 +25,8 @@ namespace Cori {
 
 		m_LayerStack.PushOverlay(m_ImGuiLayer);
 
+		AssetManager::Init();
+		SceneManager::Init();
 		GraphicsCall::InitRenderers();
 		Audio::Mixer::Init();
 
@@ -37,6 +36,8 @@ namespace Cori {
 
 	Application::~Application() {
 		m_LayerStack.ClearStack();
+		AssetManager::Shutdown();
+		SceneManager::Shutdown();
 		GraphicsCall::ShutdownRenderers();
 		Audio::Mixer::Shutdown();
 	}
@@ -60,6 +61,10 @@ namespace Cori {
 			}
 			return false;
 		});
+		dispatcher.Dispatch<WindowResizeEvent>([](const WindowResizeEvent& e) -> bool {
+			GraphicsCall::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
+			return false;
+		});
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
 			--it;
@@ -71,11 +76,11 @@ namespace Cori {
 	}
 
 	void Application::PushLayer(Layer* layer) {
-		Get().m_LayerStack.PushLayerToQueue(layer);
+		s_Instance->m_LayerStack.PushLayerToQueue(layer);
 	}
 
 	void Application::PushOverlay(Layer* layer) {
-		Get().m_LayerStack.PushOverlayToQueue(layer);
+		s_Instance->m_LayerStack.PushOverlayToQueue(layer);
 	}
 
 	void Application::Run() {

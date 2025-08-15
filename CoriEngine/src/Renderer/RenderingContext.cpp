@@ -7,7 +7,7 @@ namespace Cori {
 
 
 		std::unique_ptr<RenderingContext> context = Factory<RenderingContext, GraphicsAPIs>::CreateUnique(api);
-		CORI_CORE_ASSERT_FATAL(context, "Failed to create RenderingContext for API: {0}. Check registrations and API validity.", static_cast<int>(Application::GetCurrentAPI())); // output api as a string
+		CORI_CORE_ASSERT_FATAL(context, "Failed to create RenderingContext for API: {0}. Check registrations and API validity.", static_cast<int>(Window::GetAPI())); // output api as a string
 		return context;
 	}
 }
