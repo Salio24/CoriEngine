@@ -2,8 +2,7 @@
 #include "Entity.hpp"
 #include "Core/SelfFactory.hpp"
 #include "Profiling/Trackable.hpp"
-#include "Renderer/CameraController.hpp"
-#include "EventSystem/Event.hpp"
+#include "Graphics/CameraController.hpp"
 #include "Physics/Physics.hpp"
 #include "EntityView.hpp"
 
@@ -11,11 +10,10 @@ namespace Cori {
 	class Scene : public Profiling::Trackable<Scene>, public SharedSelfFactory<Scene> {
 	public:
 		static bool PreCreateHook([[maybe_unused]] const std::string& name) { return true; }
-		explicit Scene(const std::string& name);
 		~Scene();
 
-		bool OnBind();
-		bool OnUnbind();
+		[[nodiscard]] bool OnBind();
+		[[nodiscard]] bool OnUnbind();
 
 		void OnUpdate(const double deltaTime);
 
@@ -24,29 +22,30 @@ namespace Cori {
 		Entity CreateEntity(const std::string& name, const Utility::HashedTag64& tag);
 		void DestroyEntity(Entity entity);
 
-		std::expected<void, const char*> AddEntityToCache(Entity entity, const Utility::StringHash32 tag);
-		std::expected<Entity, const char*> GetEntityFromCache(const Utility::StringHash32 tag);
+		[[nodiscard]] std::expected<void, CoriError<>> AddEntityToCache(const Entity entity, const Utility::StringHash32 key);
+		[[nodiscard]] std::expected<Entity, CoriError<>> GetEntityFromCache(const Utility::StringHash32 key);
 		void RemoveEntityFromCache(const Utility::StringHash32 key);
 
-		std::expected<Entity, const char*> FindEntity(const std::string& name);
-		std::expected<Entity, const char*> FindEntity(const std::string& name, const Utility::HashedTag64& tag);
+		[[nodiscard]] std::expected<Entity, CoriError<>> FindEntity(const std::string& name);
+		[[nodiscard]] std::expected<Entity, CoriError<>> FindEntity(const std::string& name, const Utility::HashedTag64& tag);
 
 		template<typename... Component>
-		auto View() {
+		[[nodiscard]] auto View() {
 			auto view = m_Registry.view<Component...>();
 			return EntityView(view, m_Registry);
 		}
 
 		template<typename... T, typename... ExcludeT>
-		auto View(Exclude<ExcludeT...>) {
+		[[nodiscard]] auto View(Exclude<ExcludeT...>) {
 			auto view = m_Registry.view<T...>(entt::exclude<ExcludeT...>);
 			return EntityView(view, m_Registry);
 		}
 
-		template<typename... T, typename Func>
-		void ForEach(Func func) {
-			m_Registry.view<T...>().each(func);
-		}
+		// untested and unused for now
+		//template<typename... T, typename Func>
+		//void ForEach(Func func) {
+		//	m_Registry.view<T...>().each(func);
+		//}
 
 		template<typename T, typename... Args>
 		T& AddContextComponent(Args&&... args) {
@@ -59,17 +58,17 @@ namespace Cori {
 		}
 
 		template<typename T>
-		T& GetContextComponent() {
+		[[nodiscard]] T& GetContextComponent() {
 			return m_Registry.ctx().get<T>();
 		}
 
 		template<typename T>
-		const T& GetContextComponent() const {
+		[[nodiscard]] const T& GetContextComponent() const {
 			return m_Registry.ctx().get<const T>();
 		}
 
 		template<typename T>
-		bool HasContextComponent() const {
+		[[nodiscard]] bool HasContextComponent() const {
 			return m_Registry.ctx().contains<T>();
 		}
 
@@ -83,13 +82,13 @@ namespace Cori {
 		Physics::PhysicsWorld m_PhysicsWorld;
 
 		std::string m_Name;
-
-		//friend struct Components::Entity::StateMachine;
+	protected:
+		explicit Scene(const std::string& name);
 	private:
 		entt::registry m_Registry;
 
 		void UpdateTransform();
-		void UpdateTransformRecursive(entt::entity entity, const glm::mat3& parentTransform, uint8_t parentLayer, bool parentTransformDirty, bool parentLayerDirty);
+		void UpdateTransformRecursive(entt::entity entity, const glm::mat3& parentTransform, const uint8_t parentDepth, const bool parentTransformDirty, const bool parentDepthDirty);
 
 		void OnHierarchyComponentDestroyed(entt::registry& registry, entt::entity entity);
 

@@ -2,10 +2,10 @@
 #include "Core/Layer.hpp"
 
 namespace Cori {
-	class ImGuiLayer : public Layer {
+	class ImGuiLayer final : public Layer {
 	public:
 		ImGuiLayer();
-		~ImGuiLayer();
+		~ImGuiLayer() override;
 		void OnAttach() override;
 		void OnDetach() override;
 		void OnImGuiRender(const double deltaTime) override;

@@ -1,8 +1,7 @@
 #pragma once
 
 namespace Cori {
-	template<typename T, std::unsigned_integral SizeT, SizeT MaxSize>
-		requires std::equality_comparable<T> && std::movable<T>
+	template<typename T, std::unsigned_integral SizeT, SizeT MaxSize> requires std::equality_comparable<T> && std::movable<T>
 	class PackedArray {
 	public:
 		using iterator = typename std::array<T, MaxSize>::iterator;
@@ -15,12 +14,11 @@ namespace Cori {
 				return false;
 			}
 			m_Data[m_Size] = value;
-			m_Size++;
+			++m_Size;
 			return true;
 		}
 
-		template<typename... Args>
-			requires std::constructible_from<T, Args...>
+		template<typename... Args> requires std::constructible_from<T, Args...>
 		T& emplace(Args&&... args) {
 			if (full()) {
 				throw std::length_error("Cannot emplace into a full PackedArray");
@@ -36,7 +34,7 @@ namespace Cori {
 				return false;
 			}
 
-			auto it = std::find(begin(), end(), value);
+			T* it = std::find(begin(), end(), value);
 			if (it == end()) {
 				return false;
 			}
@@ -45,7 +43,7 @@ namespace Cori {
 				*it = std::move(m_Data[m_Size - 1]);
 			}
 
-			m_Size--;
+			--m_Size;
 
 			if constexpr (!std::is_trivially_destructible_v<T>) {
 				std::destroy_at(&m_Data[m_Size]);
@@ -64,6 +62,7 @@ namespace Cori {
 			return m_Size;
 		}
 
+		// ReSharper disable once CppMemberFunctionMayBeStatic
 		constexpr SizeT capacity() const {
 			return MaxSize;
 		}

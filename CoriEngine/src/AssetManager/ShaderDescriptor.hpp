@@ -4,20 +4,15 @@ namespace Cori {
 	class ShaderProgramDescriptor {
 	public:
 
-		constexpr ShaderProgramDescriptor(std::string_view name, std::string_view vertPath, std::string_view fragPath, std::string_view geomPath = "") noexcept
-			: m_VertexPath(vertPath),
-			m_FragmentPath(fragPath),
-			m_GeometryPath(geomPath),
-			m_DebugName(name),
+		constexpr ShaderProgramDescriptor(std::string name, const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath, const std::filesystem::path& geometryPath = {}) noexcept
+			: m_VertexPath(vertexPath),
+			m_FragmentPath(fragmentPath),
+			m_GeometryPath(geometryPath),
+			m_Name(std::move(name)),
 			m_RuntimeID(s_NextRuntimeID.fetch_add(1, std::memory_order_relaxed))
 		{ }
 
-		inline uint32_t GetRuntimeID() const { return m_RuntimeID; }
-		inline std::string_view GetDebugName() const { return m_DebugName; }
-
-		constexpr auto operator<=>(const ShaderProgramDescriptor& other) const noexcept {
-			return m_RuntimeID <=> other.m_RuntimeID;
-		}
+		uint32_t GetRuntimeID() const { return m_RuntimeID; }
 
 		constexpr bool operator==(const ShaderProgramDescriptor& other) const noexcept {
 			return m_RuntimeID == other.m_RuntimeID;
@@ -29,13 +24,12 @@ namespace Cori {
 			}
 		};
 
-		const std::string_view m_VertexPath;
-		const std::string_view m_FragmentPath;
-		const std::string_view m_GeometryPath;
+		const std::filesystem::path m_VertexPath;
+		const std::filesystem::path m_FragmentPath;
+		const std::filesystem::path m_GeometryPath;
+		const std::string m_Name;
 
 	private:
-
-		const std::string_view m_DebugName;
 		const uint32_t m_RuntimeID{ 0 };
 		inline static std::atomic<uint32_t> s_NextRuntimeID{ 1 };
 	};

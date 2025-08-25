@@ -1,40 +1,59 @@
 #include "Mixer.hpp"
 #include <SDL3_mixer/SDL_mixer.h>
-
 #include "Track.hpp"
+
+#include "entt/core/type_traits.hpp"
 
 namespace Cori {
 	namespace Audio {
+		namespace {
+			void TrackStopCallback(void* userdata, [[maybe_unused]] MIX_Track* track) {
+				const auto* coriTrack = static_cast<Track*>(userdata);
+				CORI_CORE_TRACE_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "Track '{} (ID: {})' stopped playing.", coriTrack->m_Name, coriTrack->m_ID);
+			}
+		}
 		Mixer::Data* Mixer::s_Data{ nullptr };
 
 		struct Mixer::Data {
 			MIX_Mixer* m_Mixer{ nullptr };
-			std::unordered_map<uint32_t, MIX_Audio*> m_SDLAudios;
-			std::unordered_map<uint32_t, MIX_Track*> m_SDLTracks;
+			std::unordered_map<SoundID, MIX_Audio*> m_SDLAudios;
+			std::unordered_map<TrackID, MIX_Track*> m_SDLTracks;
 		};
 
-		// use expected
-		bool Mixer::PauseAllTracks() {
-			return MIX_PauseAllTracks(s_Data->m_Mixer);
+		std::expected<void, CoriError<>> Mixer::PauseAllTracks() {
+			const bool success = MIX_PauseAllTracks(s_Data->m_Mixer);
+			if (!success) {
+				return std::unexpected(CoriError(std::format("Failed to pause all tracks. SDL_Error: {}", SDL_GetError())));
+			}
+			CORI_CORE_TRACE_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Mixer }, "Pausing all tracks.");
+			return {};
 		}
 
-		// use expected
-		bool Mixer::ResumeAllTracks() {
-			return MIX_ResumeAllTracks(s_Data->m_Mixer);
+		std::expected<void, CoriError<>> Mixer::ResumeAllTracks() {
+			const bool success = MIX_ResumeAllTracks(s_Data->m_Mixer);
+			if (!success) {
+				return std::unexpected(CoriError(std::format("Failed to resume all tracks. SDL_Error: {}", SDL_GetError())));
+			}
+			CORI_CORE_TRACE_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Mixer }, "Resuming all tracks.");
+			return {};
 		}
 
-		// use expected
-		bool Mixer::SetMasterGain(float gain) {
-			return MIX_SetMasterGain(s_Data->m_Mixer, gain);
+		std::expected<void, CoriError<>> Mixer::SetMasterGain(const float gain) {
+			const bool success = MIX_SetMasterGain(s_Data->m_Mixer, gain);
+			if (!success) {
+				return std::unexpected(CoriError<>(std::format("Failed to set master gain. SDL_Error: {}", SDL_GetError())));
+			}
+			CORI_CORE_TRACE_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Mixer }, "Master gain set to: {}", gain);
+			return {};
 		}
 
-		// use expected
 		float Mixer::GetMasterGain() {
 			return MIX_GetMasterGain(s_Data->m_Mixer);
 		}
 
 		// use expected
-		bool Mixer::PlayTag(const char* tag, const PlayParams& params) {
+		std::expected<void, CoriError<>> Mixer::PlayTag(const char* tag, const PlayParams& params) {
+			// ReSharper disable once CppLocalVariableMayBeConst
 			SDL_PropertiesID props = SDL_CreateProperties();
 			SDL_SetNumberProperty(props, MIX_PROP_PLAY_LOOPS_NUMBER, params.Loops);
 			if (params.MaxFrames != -1) {
@@ -67,77 +86,107 @@ namespace Cori {
 				SDL_SetNumberProperty(props, MIX_PROP_PLAY_APPEND_SILENCE_MILLISECONDS_NUMBER, params.AppendSilenceMilliseconds);
 			}
 
-			bool success = MIX_PlayTag(s_Data->m_Mixer, tag, props);
+			const bool success = MIX_PlayTag(s_Data->m_Mixer, tag, props);
 			if (!success) {
-				CORI_CORE_ERROR("Failed to play tag: {} {}", SDL_GetError(), tag);
+				return std::unexpected(CoriError(std::format("Failed to play mixer Tag '{}'. SDL_Error: {}", tag, SDL_GetError())));
 			}
-			return success;
+			CORI_CORE_TRACE_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Mixer }, "Tag '{}' is set to play.", tag);
+			return {};
 		}
 
-		// use expected
-		bool Mixer::StopTag(const char* tag, uint32_t fadeOutMS) {
-			return MIX_StopTag(s_Data->m_Mixer, tag, fadeOutMS);
+		std::expected<void, CoriError<>> Mixer::StopTag(const char* tag, const int64_t fadeOutMS) {
+			const bool success = MIX_StopTag(s_Data->m_Mixer, tag, fadeOutMS);
+			if (!success) {
+				return std::unexpected(CoriError(std::format("Failed to stop mixer Tag '{}'. SDL_Error: {}", tag, SDL_GetError())));
+			}
+			CORI_CORE_TRACE_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Mixer }, "Tag '{}' stopped.", tag);
+			return {};
 		}
 
-		// use expected
-		bool Mixer::PauseTag(const char* tag) {
-			return MIX_PauseTag(s_Data->m_Mixer, tag);
+		std::expected<void, CoriError<>> Mixer::PauseTag(const char* tag) {
+			const bool success = MIX_PauseTag(s_Data->m_Mixer, tag);
+			if (!success) {
+				return std::unexpected(CoriError(std::format("Failed to pause mixer Tag '{}'. SDL_Error: {}", tag, SDL_GetError())));
+			}
+			CORI_CORE_TRACE_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Mixer }, "Tag '{}' paused.", tag);
+			return {};
 		}
 
-		// use expected
-		bool Mixer::ResumeTag(const char* tag) {
-			return MIX_ResumeTag(s_Data->m_Mixer, tag);
+		std::expected<void, CoriError<>> Mixer::ResumeTag(const char* tag) {
+			const bool success = MIX_ResumeTag(s_Data->m_Mixer, tag);
+			if (!success) {
+				return std::unexpected(CoriError(std::format("Failed to resume mixer Tag '{}'. SDL_Error: {}", tag, SDL_GetError())));
+			}
+			CORI_CORE_TRACE_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Mixer }, "Tag '{}' resumed.", tag);
+			return {};
 		}
+
+		std::expected<void, CoriError<>> Mixer::SetTagGain(const char* tag, const float gain) {
+			const bool success = MIX_SetTagGain(s_Data->m_Mixer, tag, gain);
+			if (!success) {
+				return std::unexpected(CoriError(std::format("Failed to set Tag '{}' gain. SDL_Error: {}", tag,  SDL_GetError())));
+			}
+			CORI_CORE_TRACE_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Mixer }, "Tag '{}' gain set to: {}", tag, gain);
+			return {};
+		}
+
 
 		// use expected in protected methods as well and check it in track/sound class
 		void Mixer::Init() {
-			if (CORI_CORE_VERIFY(MIX_Init(), "Failed to initialize SDL_Mixer! Error: {}", SDL_GetError())) {
-				CORI_CORE_INFO_TAGGED({"Sound"}, "SDL_Mixer initialized successfully.");
-			}
+			if (CORI_CORE_VERIFY(MIX_Init(), "Failed to initialize SDL_Mixer! SDL_Error: {}", SDL_GetError())) {}
+
+			CORI_CORE_INFO_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Mixer }, "SDL3_Mixer initialized successfully.");
 
 			s_Data = new Data();
 
 			s_Data->m_Mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
 		}
+
 		void Mixer::Shutdown() {
 			delete s_Data;
 			MIX_Quit();
 		}
 
-		void Mixer::LoadSound(const std::filesystem::path& path, bool preDecode, uint32_t index) {
-			auto result = MIX_LoadAudio(s_Data->m_Mixer, path.c_str(), preDecode);
+		std::expected<void, CoriError<std::filesystem::path>> Mixer::LoadSound(const std::filesystem::path& path, const bool preDecode, const SoundID soundID) {
+			const auto result = MIX_LoadAudio(s_Data->m_Mixer, path.c_str(), preDecode);
 			if (!result) {
-				CORI_CORE_ERROR("loadsound error {}", SDL_GetError());
-				return;
-
+				return std::unexpected(CoriError<std::filesystem::path>(std::format("Failed to load Sound. SDL_Error: {}", SDL_GetError()), "Path", path));
 			}
-			s_Data->m_SDLAudios.insert({index, MIX_LoadAudio(s_Data->m_Mixer, path.c_str(), preDecode)});
+
+			s_Data->m_SDLAudios.insert({ soundID, result });
+			return {};
 		}
 
-		void Mixer::UnloadSound(uint32_t index) {
-			MIX_DestroyAudio(s_Data->m_SDLAudios.at(index));
+		void Mixer::UnloadSound(const SoundID soundID) {
+			MIX_DestroyAudio(s_Data->m_SDLAudios.at(soundID));
 		}
 
-		void Mixer::CreateTrack(uint32_t index, Track* trackPtr) {
-			s_Data->m_SDLTracks.insert({index, MIX_CreateTrack(s_Data->m_Mixer)});
-			MIX_SetTrackStoppedCallback(s_Data->m_SDLTracks.at(index), Track::TrackStopCallback, trackPtr);
+		std::expected<void, CoriError<>> Mixer::CreateTrack(Track* track) {
+			const auto result = MIX_CreateTrack(s_Data->m_Mixer);
+			if (!result) {
+				return std::unexpected(CoriError(std::format("Failed to create Track. SDL_Error: {}", SDL_GetError())));
+			}
+
+			MIX_SetTrackStoppedCallback(result, TrackStopCallback, track);
+			s_Data->m_SDLTracks.insert({ track->m_ID, result });
+			return {};
 		}
 
-		void Mixer::DestroyTrack(uint32_t index) {
-			MIX_DestroyTrack(s_Data->m_SDLTracks.at(index));
+		void Mixer::DestroyTrack(const TrackID trackID) {
+			MIX_DestroyTrack(s_Data->m_SDLTracks.at(trackID));
 		}
 
-		bool Mixer::SetTrackSound(uint32_t track, uint32_t sound) {
-			bool success = MIX_SetTrackAudio(s_Data->m_SDLTracks.at(track), s_Data->m_SDLAudios.at(sound));
+		std::expected<void, CoriError<>> Mixer::SetTrackSound(const Track* track, const Sound* sound) {
+			const bool success = MIX_SetTrackAudio(s_Data->m_SDLTracks.at(track->m_ID), s_Data->m_SDLAudios.at(sound->m_ID));
 			if (!success) {
-				CORI_CORE_ERROR("Failed to set track: {} {}", SDL_GetError(), track, sound);
+				return std::unexpected(CoriError(std::format("Failed to assign Sound '{} (SoundID: {})' to Track '{} (TrackID: {})'. SDL_Error: {}", sound->m_Name, sound->m_ID, track->m_Name, track->m_ID, SDL_GetError())));
 			}
-			CORI_CORE_TRACE("settrack {} {}", track, sound);
 
-			return success;
+			return {};
 		}
 
-		bool Mixer::PlayTrack(uint32_t track, const PlayParams& params) {
+		std::expected<void, CoriError<>> Mixer::PlayTrack(const Track* track, const PlayParams& params) {
+			// ReSharper disable once CppLocalVariableMayBeConst
 			SDL_PropertiesID props = SDL_CreateProperties();
 			SDL_SetNumberProperty(props, MIX_PROP_PLAY_LOOPS_NUMBER, params.Loops);
 			if (params.MaxFrames != -1) {
@@ -169,47 +218,68 @@ namespace Cori {
 			} else {
 				SDL_SetNumberProperty(props, MIX_PROP_PLAY_APPEND_SILENCE_MILLISECONDS_NUMBER, params.AppendSilenceMilliseconds);
 			}
-
-			bool success = MIX_PlayTrack(s_Data->m_SDLTracks.at(track), props);
+			const bool success = MIX_PlayTrack(s_Data->m_SDLTracks.at(track->m_ID), props);
 			if (!success) {
-				CORI_CORE_ERROR("Failed to play track: {} {}", SDL_GetError(), track);
+				return std::unexpected(CoriError(std::format("Failed to play Track '{} (TrackID: {})'. SDL_Error: {}", track->m_Name, track->m_ID, SDL_GetError())));
 			}
-			return success;
+			return {};
 		}
 
-		bool Mixer::StopTrack(uint32_t track, uint32_t fadeOutMS) {
-			return MIX_StopTrack(s_Data->m_SDLTracks.at(track), MIX_TrackMSToFrames(s_Data->m_SDLTracks.at(track), fadeOutMS));
+		std::expected<void, CoriError<>> Mixer::StopTrack(const Track* track, const int64_t fadeOutMS) {
+			const bool success = MIX_StopTrack(s_Data->m_SDLTracks.at(track->m_ID), MIX_TrackMSToFrames(s_Data->m_SDLTracks.at(track->m_ID), fadeOutMS));
+			if (!success) {
+				return std::unexpected(CoriError(std::format("Failed to stop Track '{} (TrackID: {})'. SDL_Error: '{}'", track->m_Name, track->m_ID, SDL_GetError())));
+			}
+			return {};
 		}
 
-		bool Mixer::PauseTrack(uint32_t track) {
-			return MIX_PauseTrack(s_Data->m_SDLTracks.at(track));
+		std::expected<void, CoriError<>> Mixer::PauseTrack(const Track* track) {
+			const bool success =  MIX_PauseTrack(s_Data->m_SDLTracks.at(track->m_ID));
+			if (!success) {
+				return std::unexpected(CoriError(std::format("Failed to pause Track '{} (TrackID: {})'. SDL_Error: {}", track->m_Name, track->m_ID, SDL_GetError())));
+			}
+			return {};
 		}
 
-		bool Mixer::ResumeTrack(uint32_t track) {
-			return MIX_ResumeTrack(s_Data->m_SDLTracks.at(track));
+		std::expected<void, CoriError<>> Mixer::ResumeTrack(const Track* track) {
+			const bool success = MIX_ResumeTrack(s_Data->m_SDLTracks.at(track->m_ID));
+			if (!success) {
+				return std::unexpected(CoriError(std::format("Failed to pause Track '{} (TrackID: {})'. SDL_Error: {}", track->m_Name, track->m_ID, SDL_GetError())));
+			}
+			return {};
 		}
-		bool Mixer::IsTrackPaused(uint32_t track) {
-			return MIX_TrackPaused(s_Data->m_SDLTracks.at(track));
-		}
-
-		bool Mixer::IsTrackPlaying(uint32_t track) {
-			return MIX_TrackPlaying(s_Data->m_SDLTracks.at(track));
-		}
-
-		bool Mixer::SetTrackGain(uint32_t track, float gain) {
-			return MIX_SetTrackGain(s_Data->m_SDLTracks.at(track), gain);
+		bool Mixer::IsTrackPaused(const TrackID trackID) {
+			return MIX_TrackPaused(s_Data->m_SDLTracks.at(trackID));
 		}
 
-		float Mixer::GetTrackGain(uint32_t track) {
-			return MIX_GetTrackGain(s_Data->m_SDLTracks.at(track));
+		bool Mixer::IsTrackPlaying(const TrackID trackID) {
+			return MIX_TrackPlaying(s_Data->m_SDLTracks.at(trackID));
 		}
 
-		bool Mixer::TagTrack(uint32_t track, const char* tag) {
-			return MIX_TagTrack(s_Data->m_SDLTracks.at(track), tag);
+		std::expected<void, CoriError<>> Mixer::SetTrackGain(const Track* track, const float gain) {
+			const bool success = MIX_SetTrackGain(s_Data->m_SDLTracks.at(track->m_ID), gain);
+			if (!success) {
+				return std::unexpected(CoriError(std::format("Failed to set Track '{} (TrackID: {})' gain. SDL_Error: {}", track->m_Name, track->m_ID, SDL_GetError())));
+			}
+
+			return {};
 		}
 
-		void Mixer::UntagTrack(uint32_t track, const char* tag) {
-			MIX_UntagTrack(s_Data->m_SDLTracks.at(track), tag);
+		float Mixer::GetTrackGain(const TrackID trackID) {
+			return MIX_GetTrackGain(s_Data->m_SDLTracks.at(trackID));
+		}
+
+		std::expected<void, CoriError<>> Mixer::TagTrack(const Track* track, const char* tag) {
+			const bool success = MIX_TagTrack(s_Data->m_SDLTracks.at(track->m_ID), tag);
+			if (!success) {
+				return std::unexpected(CoriError(std::format("Failed to assign the tag the Track '{} (TrackID: {}'. SDL_Error: {}", track->m_Name, track->m_ID, SDL_GetError())));
+			}
+
+			return {};
+		}
+
+		void Mixer::UntagTrack(const TrackID trackID, const char* tag) {
+			MIX_UntagTrack(s_Data->m_SDLTracks.at(trackID), tag);
 		}
 	}
 }

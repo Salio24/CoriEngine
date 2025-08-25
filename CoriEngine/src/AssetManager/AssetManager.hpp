@@ -1,9 +1,9 @@
 #pragma once
 #include "ShaderDescriptor.hpp"
 #include "Texture2DDescriptor.hpp"
-#include "Renderer/ShaderProgram.hpp"
-#include "Renderer/Texture.hpp"
-#include "Renderer/SpriteAtlas.hpp"
+#include "Graphics/ShaderProgram.hpp"
+#include "Graphics/Texture.hpp"
+#include "Graphics/SpriteAtlas.hpp"
 #include "SpriteAtlasDescriptor.hpp"
 #include "Audio/Sound.hpp"
 #include "SoundDescriptor.hpp"
@@ -16,14 +16,10 @@ namespace Cori {
 
 		static void Shutdown();
 
-		static std::shared_ptr<ShaderProgram> GetShader(const ShaderProgramDescriptor& descriptor);
-		static std::shared_ptr<Texture2D> GetTexture2D(const Texture2DDescriptor& descriptor);
-		static std::shared_ptr<SpriteAtlas> GetSpriteAtlas(const SpriteAtlasDescriptor& descriptor);
-		static std::shared_ptr<Audio::Sound> GetSound(const SoundDescriptor& descriptor);
-
-		static std::shared_ptr<ShaderProgram> GetShaderOwning(const ShaderProgramDescriptor& descriptor);
-		static std::shared_ptr<Texture2D> GetTexture2DOwning(const Texture2DDescriptor& descriptor);
-		static std::shared_ptr<SpriteAtlas> GetSpriteAtlasOwning(const SpriteAtlasDescriptor& descriptor);
+		[[nodiscard]] static std::shared_ptr<ShaderProgram> GetShader(const ShaderProgramDescriptor& descriptor);
+		[[nodiscard]] static std::shared_ptr<Texture2D> GetTexture2D(const Texture2DDescriptor& descriptor);
+		[[nodiscard]] static std::expected<std::shared_ptr<SpriteAtlas>, CoriError<>> GetSpriteAtlas(const SpriteAtlasDescriptor& descriptor);
+		[[nodiscard]] static std::shared_ptr<Audio::Sound> GetSound(const SoundDescriptor& descriptor);
 
 		static void PreloadShaders(const std::initializer_list<ShaderProgramDescriptor> descriptors);
 		static void PreloadTexture2Ds(const std::initializer_list<Texture2DDescriptor> descriptors);

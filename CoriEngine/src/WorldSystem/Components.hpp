@@ -2,15 +2,11 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <box2cpp/box2cpp.h>
 #include "Entity.hpp"
-#include "EventSystem/Event.hpp"
-#include "glm/gtx/type_trait.hpp"
-#include "Renderer/Texture.hpp"
+#include "Graphics/Texture.hpp"
 #include "StateSystem/StateMachine.hpp"
-#include "Renderer/CameraComponent.hpp"
-#include "Core/Utility/TemplateUtils.hpp"
 #include <glm/gtx/matrix_transform_2d.hpp>
+#include <utility>
 #include "Core/Utility/HashedTag.hpp"
-#include "Renderer/Animator/Animation.hpp"
 #include "Audio/Sound.hpp"
 #include "Audio/Track.hpp"
 
@@ -31,8 +27,7 @@ namespace Cori {
 		namespace Entity {
 			struct Name {
 				Name() = default;
-				explicit Name(const std::string& name) : m_Name(name) {}
-			private:
+			protected:
 				friend class Cori::Entity;
 				friend class Cori::Scene;
 				std::string m_Name;
@@ -47,7 +42,7 @@ namespace Cori {
 
 			struct UUID {
 				UUID() = default;
-				explicit UUID(const Core::UUID& uuid) : m_UUID(uuid) {}
+				explicit UUID(Core::UUID  uuid) : m_UUID(std::move(uuid)) {}
 				explicit UUID(const std::string& uuid_str) : m_UUID(uuid_str) {}
 
 				const Core::UUID m_UUID{};
@@ -55,10 +50,10 @@ namespace Cori {
 
 			struct Hierarchy {
 				Hierarchy() = default;
-				entt::entity m_Parent {entt::null};
-				entt::entity m_FirstChild {entt::null};
-				entt::entity m_NextSibling {entt::null};
-				entt::entity m_PreviousSibling {entt::null};
+				entt::entity m_Parent { entt::null };
+				entt::entity m_FirstChild { entt::null };
+				entt::entity m_NextSibling { entt::null };
+				entt::entity m_PreviousSibling { entt::null };
 			};
 
 			struct Transform {
@@ -152,32 +147,39 @@ namespace Cori {
 				QuadRenderer() = default;
 
 				QuadRenderer(const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const UVs& uvs) : m_HalfSize(size), m_UVs(uvs) {
-					SetTexture(texture);
+					const auto result = SetTexture(texture);
+					if (!result) {
+						CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadRenderer }, "Failed to fully recreate QuadAnimator. Details: '{}'", result.error().what());
+					}
 				}
 
 				QuadRenderer(const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const UVs& uvs, const glm::vec4& tintColor) : m_HalfSize(size), m_UVs(uvs) {
+					const auto result = SetTexture(texture);
+					if (!result) {
+						CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadRenderer }, "Failed to fully recreate QuadAnimator. Details: '{}'", result.error().what());
+					}
 					SetColor(tintColor);
-					SetTexture(texture);
 				}
 
 				QuadRenderer(const glm::vec2 size, const glm::vec4& color) : m_HalfSize(size), m_FlatColored(true) {
 					SetColor(color);
 				}
 
-				void SetTexture(const std::shared_ptr<Texture2D>& texture) {
+				[[nodiscard]] std::expected<void, CoriError<>> SetTexture(const std::shared_ptr<Texture2D>& texture) {
 					if (!m_AnimatorBound) {
 						if (m_HasSemiTransparency && m_Color.a != 1.0f) {
 							m_Texture = texture;
-							return;
+							return {};
 						}
 						m_HasSemiTransparency = texture->HasSemiTransparency();
 						m_Texture = texture;
-						return;
+						return {};
 					}
-					CORI_CORE_WARN_TAGGED({"World", "Entity", "Components"}, "Can't set texture for QuadRenderer because an animator is currently bound.");
+
+					return std::unexpected(CoriError("Can't set Texture2D because QuadAnimator is currently bound."));
 				}
 
-				std::shared_ptr<Texture2D> GetTexture() const {
+				[[nodiscard]] std::shared_ptr<Texture2D> GetTexture() const {
 					return m_Texture;
 				}
 
@@ -198,38 +200,38 @@ namespace Cori {
 					return m_Color;
 				}
 
-				void SetUVs(const UVs& uvs) {
+				[[nodiscard]] std::expected<void, CoriError<>> SetUVs(const UVs& uvs) {
 					if (!m_AnimatorBound) {
 						m_UVs = uvs;
-						return;
+						return {};
 					}
-					CORI_CORE_WARN_TAGGED({"World", "Entity", "Components"}, "Can't set UVs for QuadRenderer because an animator is currently bound.");
+
+					return std::unexpected(CoriError("Can't set UVs because QuadAnimator is currently bound."));
 				}
 
 				[[nodiscard]] UVs GetUVs() const {
 					return m_UVs;
 				}
 
-				//void SetSize(const glm::vec2& size) {
-				//	if (!m_AnimatorBound) {
-				//		m_Size = size;
-				//		return;
-				//	}
-				//	CORI_CORE_WARN_TAGGED({"World", "Entity", "Components"}, "Can't set size for QuadRenderer because an animator is currently bound.");
-				//}
+				[[nodiscard]] std::expected<void, CoriError<>> SetHalfSize(const glm::vec2 halfSize) {
+					if (!m_AnimatorBound) {
+						m_HalfSize = halfSize;
+						return {};
+					}
+					return std::unexpected(CoriError("Can't set HalfSize because QuadAnimator is currently bound."));
+				}
 
-				//glm::vec2 GetSize() const {
-				//	return m_Size;
-				//}
+				[[nodiscard]] glm::vec2 GetHalfSize() const {
+					return m_HalfSize;
+				}
 
-				bool GetSemiTransparencyState() const {
+				[[nodiscard]] bool GetSemiTransparencyState() const {
 					return m_HasSemiTransparency;
 				}
 
-				glm::vec2 m_HalfSize{ 0.0f };
-
 			protected:
 				friend class QuadAnimator;
+				glm::vec2 m_HalfSize{ 0.0f };
 				UVs m_UVs{};
 				std::shared_ptr<Texture2D> m_Texture{ nullptr };
 			private:
@@ -241,6 +243,7 @@ namespace Cori {
 				bool m_FlipY{ false };
 			private:
 				bool m_HasSemiTransparency{ false };
+			protected:
 				bool m_AnimatorBound{ false };
 			};
 
@@ -284,48 +287,6 @@ namespace Cori {
 				explicit Spawnpoint(const glm::vec2& point)
 					: m_Spawnpoint(point) {}
 				glm::vec2 m_Spawnpoint{ 0.0f, 0.0f };
-			};
-
-			struct StateMachine {
-				explicit StateMachine(Cori::Entity owner) : m_StateMachine(owner) {}
-
-				template<typename S, typename ... Args>
-				void Register(Args&&... args) {
-					m_StateMachine.RegisterState<S>(std::forward<Args>(args)...);
-				}
-
-				template<typename S>
-				void SetState() {
-					m_StateMachine.ChangeState<S>();
-				}
-
-				template<typename S>
-				void SetStateIfNotInState() {
-					if (!m_StateMachine.IsInState<S>()) {
-						m_StateMachine.ChangeState<S>();
-					}
-				}
-
-				template<typename S>
-				[[nodiscard]] bool IsInState() const {
-					return m_StateMachine.IsInState<S>();
-				}
-
-				[[nodiscard]] State* GetCurrentState() const {
-					return m_StateMachine.GetCurrentState();
-				}
-
-
-			protected:
-				friend class Cori::Scene;
-
-				void Update(float timeStep) {
-					m_StateMachine.Update(timeStep);
-				}
-
-
-			private:
-				Cori::StateMachine m_StateMachine;
 			};
 		}
 	}

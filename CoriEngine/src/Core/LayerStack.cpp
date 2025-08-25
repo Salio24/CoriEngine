@@ -3,7 +3,7 @@
 namespace Cori {
 	
 	LayerStack::LayerStack() {
-		CORI_CORE_INFO("LayerStack created");
+		CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "LayerStack created.");
 	}
 
 	LayerStack::~LayerStack() {
@@ -12,23 +12,76 @@ namespace Cori {
 			delete m_Layers.back();
 			m_Layers.pop_back();
 		}
-		CORI_CORE_INFO("LayerStack destroyed");
+		CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "LayerStack destroyed.");
 	}
 
-	void LayerStack::PushLayerToQueue(Layer* layer) {
-		m_LayerPushQueue.push_back(layer);
+	std::expected<void, CoriError<>> LayerStack::PushLayerToQueue(Layer* layer) {
+		if (layer) {
+			bool nameCollision = false;
+			for (const Layer* l : m_Layers) {
+				if (!nameCollision) {
+					nameCollision = l->GetName() == layer->GetName();
+				} else {
+					break;
+				}
+			}
+			if (nameCollision) {
+				return std::unexpected{CoriError(std::format("Layer with name '{}' already exist in the LayerStack. Layers can't have duplicate names.", layer->GetName()))};
+			}
+
+			m_LayerPushQueue.push_back(layer);
+			return {};
+		}
+
+		return std::unexpected(CoriError("Trying to push a null Layer."));
 	}
 
-	void LayerStack::PushOverlayToQueue(Layer* overlay) {
-		m_OverlayPushQueue.push_back(overlay);
+	std::expected<void, CoriError<>> LayerStack::PushOverlayToQueue(Layer* overlay) {
+		if (overlay) {
+			bool nameCollision = false;
+			for (const Layer* l : m_Layers) {
+				if (!nameCollision) {
+					nameCollision = l->GetName() == overlay->GetName();
+				} else {
+					break;
+				}
+			}
+			if (nameCollision) {
+				return std::unexpected{CoriError(std::format("Layer with name '{}' already exist in the LayerStack. Layers can't have duplicate names.", overlay->GetName()))};
+			}
+
+			m_OverlayPushQueue.push_back(overlay);
+			return {};
+		}
+
+		return std::unexpected(CoriError("Trying to push a null Overlay Layer."));
 	}
 
 	void LayerStack::PopLayerToQueue(Layer* layer) {
-		m_LayerPopQueue.push_back(layer);
+		if (layer) {
+			const auto it = std::ranges::find(m_Layers, layer);
+			if (it != m_Layers.end()) {
+				m_LayerPopQueue.push_back(layer);
+				return;
+			}
+
+			CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Layer '{}' is not in the LayerStack, nothing to pop.", layer->GetName());
+		}
+
+		CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Trying to pop a null Layer.");
 	}
 
 	void LayerStack::PopOverlayToQueue(Layer* overlay) {
-		m_OverlayPopQueue.push_back(overlay);
+		if (overlay) {
+			const auto it = std::ranges::find(m_Layers, overlay);
+			if (it != m_Layers.end()) {
+				m_LayerPopQueue.push_back(overlay);
+				return;
+			}
+			CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Overlay Layer '{}' is not in the LayerStack, nothing to pop.", overlay->GetName());
+		}
+
+		CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Trying to pop a null Overlay Layer.");
 	}
 
 	void LayerStack::ProcessQueue() {
@@ -62,48 +115,38 @@ namespace Cori {
 	}
 
 	void LayerStack::ClearStack() {
-		CORI_CORE_INFO("Clearing LayerStack");
+		CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Clearing LayerStack.");
 		while (!m_Layers.empty()) {
 			m_Layers.back()->OnDetach();
 			delete m_Layers.back();
 			m_Layers.pop_back();
 		}
-		CORI_CORE_INFO("LayerStack cleared");
+		CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "LayerStack cleared.");
 	}
 
 	void LayerStack::PushLayer(Layer* layer) {
-		bool duplicateName = false;
-		for (Layer* l : m_Layers) {
-			if (!duplicateName) {
-				duplicateName = l->GetName() == layer->GetName();
-			}
-		}
-		if (CORI_CORE_VERIFY_ERROR(!duplicateName, "Trying to push a layer, but the layer with the specified debug name already in the LayerStack. Name: '{}'.", layer->GetName())) { delete layer; return; }
-
 		m_Layers.emplace(m_Layers.begin() + m_LayerInsertIndex, layer);
 		layer->OnAttach();
-		m_LayerInsertIndex++; 
+		m_LayerInsertIndex++;
+		CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Pushed Layer '{}' to LayerStack.", layer->GetName());
 	}
 
 	void LayerStack::PushOverlay(Layer* overlay) {
 		m_Layers.emplace_back(overlay);
 		overlay->OnAttach();
+		CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Pushed Overlay Layer '{}' to LayerStack.", overlay->GetName());
 	}
 
 	void LayerStack::PopLayer(Layer* layer) {
-		auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
-		if (it != m_Layers.end()) {
-			layer->OnDetach();
-			m_Layers.erase(it);
-			m_LayerInsertIndex--;
-		}
+		layer->OnDetach();
+		m_Layers.erase(std::ranges::find(m_Layers, layer));
+		m_LayerInsertIndex--;
+		CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Popped Layer '{}' from LayerStack.", layer->GetName());
 	}
 
 	void LayerStack::PopOverlay(Layer* overlay) {
-		auto it = std::find(m_Layers.begin(), m_Layers.end(), overlay);
-		if (it != m_Layers.end()) {
-			overlay->OnDetach();
-			m_Layers.erase(it);
-		}
+		overlay->OnDetach();
+		m_Layers.erase(std::ranges::find(m_Layers, overlay));
+		CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Popped Overlay Layer '{}' from LayerStack.", overlay->GetName());
 	}
 }

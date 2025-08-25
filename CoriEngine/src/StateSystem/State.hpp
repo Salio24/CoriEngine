@@ -2,18 +2,21 @@
 #include "WorldSystem/Entity.hpp"
 
 namespace Cori {
-	class StateMachine;
+	namespace Components {
+		namespace Entity {
+			class StateMachine;
+		}
+	}
 
 	class State {
 	public:
 		virtual ~State() = default;
 
-		virtual void OnEnter([[maybe_unused]] Entity& owner, [[maybe_unused]] StateMachine* fsm) {}
+		virtual void OnEnter([[maybe_unused]] Entity& owner, [[maybe_unused]] Components::Entity::StateMachine* fsm) {}
 
-		// rename to ontick
-		virtual void OnUpdate([[maybe_unused]] Entity& owner, [[maybe_unused]] StateMachine* fsm, [[maybe_unused]] float timestep) {}
+		virtual void OnTickUpdate([[maybe_unused]] Entity& owner, [[maybe_unused]] Components::Entity::StateMachine* fsm, [[maybe_unused]] float timestep) {}
 
-		virtual void OnExit([[maybe_unused]] Entity& owner, [[maybe_unused]] StateMachine* fsm) {}
+		virtual void OnExit([[maybe_unused]] Entity& owner, [[maybe_unused]] Components::Entity::StateMachine* fsm) {}
 
 		virtual const char* GetDebugName() const { return "Unnamed State"; }
 

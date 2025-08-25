@@ -2,19 +2,16 @@
 #include "Event.hpp"
 
 namespace Cori {
-	class WindowResizeEvent : public Event {
+	class WindowResizeEvent final : public Event {
 	public:
-
-		WindowResizeEvent(unsigned int width, unsigned int height)
+		WindowResizeEvent(const uint32_t width, const uint32_t height)
 			: m_Width(width), m_Height(height) {}
 
-		uint32_t GetWidth() const { return m_Width; }
-		uint32_t GetHeight() const { return m_Height; }
+		[[nodiscard]] uint32_t GetWidth() const { return m_Width; }
+		[[nodiscard]] uint32_t GetHeight() const { return m_Height; }
 
-		std::string ToString() const override {
-			std::stringstream ss;
-			ss << "WindowResizeEvent: " << m_Width << ", " << m_Height;
-			return ss.str();
+		[[nodiscard]] std::string ToString() const override {
+			return std::string("WindowResizeEvent: (") + std::to_string(m_Width) + ", " + std::to_string(m_Height) + std::string(")");
 		}
 
 		EVENT_CLASS_TYPE(WindowResize)
@@ -24,11 +21,11 @@ namespace Cori {
 		uint32_t m_Height{ 0 };
 	};
 
-	class WindowCloseEvent : public Event {
+	class WindowCloseEvent final : public Event {
 	public:
 		WindowCloseEvent() = default;
 
-		std::string ToString() const override {
+		[[nodiscard]] std::string ToString() const override {
 			return "WindowCloseEvent";
 		}
 
@@ -36,11 +33,11 @@ namespace Cori {
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 	
-	class AppTickEvent : public Event {
+	class AppTickEvent final : public Event {
 	public:
 		AppTickEvent() = default;
 
-		std::string ToString() const override {
+		[[nodiscard]] std::string ToString() const override {
 			return "AppTickEvent";
 		}
 
@@ -48,11 +45,11 @@ namespace Cori {
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	}; 
 
-	class AppUpdateEvent : public Event {
+	class AppUpdateEvent final : public Event {
 	public:
 		AppUpdateEvent() = default;
 
-		std::string ToString() const override {
+		[[nodiscard]] std::string ToString() const override {
 			return "AppUpdateEvent";
 		}
 
@@ -60,11 +57,11 @@ namespace Cori {
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class AppRenderEvent : public Event {
+	class AppRenderEvent final : public Event {
 	public:
 		AppRenderEvent() = default;
 
-		std::string ToString() const override {
+		[[nodiscard]] std::string ToString() const override {
 			return "AppRenderEvent";
 		}
 

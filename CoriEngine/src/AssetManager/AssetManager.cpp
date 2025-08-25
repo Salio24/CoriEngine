@@ -21,205 +21,155 @@ namespace Cori {
 
 	std::shared_ptr<ShaderProgram> AssetManager::GetShader(const ShaderProgramDescriptor& descriptor) {
 		CORI_PROFILE_FUNCTION();
-		auto it = s_Cache->m_ShaderCache.find(descriptor.GetRuntimeID());
-		if (it != s_Cache->m_ShaderCache.end()) {
-			return it->second;
+		if (s_Cache->m_ShaderCache.contains(descriptor.GetRuntimeID())) {
+			return s_Cache->m_ShaderCache[descriptor.GetRuntimeID()];
 		}
 
-		CORI_CORE_DEBUG("AssetManager: Shader cache miss for '{0}' (RuntimeID: {1}). Loading...", descriptor.GetDebugName(), descriptor.GetRuntimeID());
-		try {
-			std::shared_ptr<ShaderProgram> newShader = ShaderProgram::Create(descriptor);
-			s_Cache->m_ShaderCache[descriptor.GetRuntimeID()] = newShader;
-			return newShader;
-		}
-		catch (const std::exception& e) {
-			CORI_CORE_ERROR("AssetManager: Error loading shaders '{0}': {1}", descriptor.GetDebugName(), e.what());
-			return nullptr;
-		}
+		CORI_CORE_DEBUG_TAGGED({Logger::Tags::AssetManager::Self}, "Shader cache miss for '{}' (RuntimeID: {}). Loading...", descriptor.m_Name, descriptor.GetRuntimeID());
+		std::shared_ptr<ShaderProgram> newShader = ShaderProgram::Create(descriptor.m_VertexPath, descriptor.m_FragmentPath, descriptor.m_GeometryPath);
+		s_Cache->m_ShaderCache[descriptor.GetRuntimeID()] = newShader;
+		return newShader;
 	}
 
 	std::shared_ptr<Texture2D> AssetManager::GetTexture2D(const Texture2DDescriptor& descriptor) {
 		CORI_PROFILE_FUNCTION();
-		auto it = s_Cache->m_Texture2DCache.find(descriptor.GetRuntimeID());
-		if (it != s_Cache->m_Texture2DCache.end()) {
-			return it->second;
+		if (s_Cache->m_Texture2DCache.contains(descriptor.GetRuntimeID())) {
+			return s_Cache->m_Texture2DCache[descriptor.GetRuntimeID()];
 		}
 
-		CORI_CORE_DEBUG("AssetManager: Texture2D cache miss for '{0}' (RuntimeID: {1}). Loading...", descriptor.GetDebugName(), descriptor.GetRuntimeID());
-		try {
-			std::shared_ptr<Texture2D> newTexture2D = Texture2D::Create(descriptor);
-			s_Cache->m_Texture2DCache[descriptor.GetRuntimeID()] = newTexture2D;
-			return newTexture2D;
-		}
-		catch (const std::exception& e) {
-			CORI_CORE_ERROR("AssetManager: Error loading Texture2D '{0}': {1}", descriptor.GetDebugName(), e.what());
-			return nullptr;
-		}
+		CORI_CORE_DEBUG_TAGGED({Logger::Tags::AssetManager::Self}, "Texture2D cache miss for '{}' (RuntimeID: {}). Loading...", descriptor.m_Name, descriptor.GetRuntimeID());
+		std::shared_ptr<Texture2D> newTexture2D = Texture2D::Create(descriptor.m_ImagePath);
+		s_Cache->m_Texture2DCache[descriptor.GetRuntimeID()] = newTexture2D;
+		return newTexture2D;
 	}
 
-	std::shared_ptr<SpriteAtlas> AssetManager::GetSpriteAtlas(const SpriteAtlasDescriptor& descriptor) {
+	std::expected<std::shared_ptr<SpriteAtlas>, CoriError<>> AssetManager::GetSpriteAtlas(const SpriteAtlasDescriptor& descriptor) {
 		CORI_PROFILE_FUNCTION();
-		auto it = s_Cache->m_SpriteAtlasCache.find(descriptor.GetRuntimeID());
-		if (it != s_Cache->m_SpriteAtlasCache.end()) {
-			return it->second;
+		if (s_Cache->m_SpriteAtlasCache.contains(descriptor.GetRuntimeID())) {
+			return s_Cache->m_SpriteAtlasCache[descriptor.GetRuntimeID()];
 		}
 
-		CORI_CORE_DEBUG("AssetManager: SpriteAtlas cache miss for '{0}' (RuntimeID: {1}). Loading...", descriptor.GetDebugName(), descriptor.GetRuntimeID());
-		try {
-			std::shared_ptr<SpriteAtlas> newSpriteAtlas = SpriteAtlas::Create(descriptor);
-			s_Cache->m_SpriteAtlasCache[descriptor.GetRuntimeID()] = newSpriteAtlas;
-			return newSpriteAtlas;
-		}
-		catch (const std::exception& e) {
-			CORI_CORE_ERROR("AssetManager: Error loading SpriteAtlas '{0}': {1}", descriptor.GetDebugName(), e.what());
-			return nullptr;
-		}
+		CORI_CORE_DEBUG_TAGGED({Logger::Tags::AssetManager::Self}, "SpriteAtlas cache miss for '{}' (RuntimeID: {}). Loading...", descriptor.m_Name, descriptor.GetRuntimeID());
+		std::shared_ptr<Texture2D> texture = Texture2D::Create(descriptor.m_TextureDescriptor.m_ImagePath);
+		return std::move(SpriteAtlas::Create(descriptor.m_Name, texture, descriptor.m_SpriteResolution)).transform([descriptor](auto&& atlas) {
+			s_Cache->m_SpriteAtlasCache[descriptor.GetRuntimeID()] = atlas;
+			return atlas;
+		});
 	}
 
 	std::shared_ptr<Audio::Sound> AssetManager::GetSound(const SoundDescriptor& descriptor) {
 		CORI_PROFILE_FUNCTION();
-		auto it = s_Cache->m_SoundCache.find(descriptor.GetRuntimeID());
-		if (it != s_Cache->m_SoundCache.end()) {
-			return it->second;
+		if (s_Cache->m_SoundCache.contains(descriptor.GetRuntimeID())) {
+			return s_Cache->m_SoundCache[descriptor.GetRuntimeID()];
 		}
 
-		CORI_CORE_DEBUG("AssetManager: Sound cache miss for '{0}' (RuntimeID: {1}). Loading...", descriptor.m_Name, descriptor.GetRuntimeID());
-		try {
-			std::shared_ptr<Audio::Sound> newSound = Audio::Sound::Create(descriptor.m_Name, descriptor.m_Path, descriptor.m_PreDecode);
-			s_Cache->m_SoundCache[descriptor.GetRuntimeID()] = newSound;
-			return newSound;
-		}
-		catch (const std::exception& e) {
-			CORI_CORE_ERROR("AssetManager: Error loading Sound '{0}': {1}", descriptor.m_Name, e.what());
-			return nullptr;
-		}
+		CORI_CORE_DEBUG_TAGGED({Logger::Tags::AssetManager::Self}, "Sound cache miss for '{}' (RuntimeID: {}). Loading...", descriptor.m_Name, descriptor.GetRuntimeID());
+		std::shared_ptr<Audio::Sound> newSound = Audio::Sound::Create(descriptor.m_Name, descriptor.m_Path, descriptor.m_PreDecode);
+		s_Cache->m_SoundCache[descriptor.GetRuntimeID()] = newSound;
+		return newSound;
 	}
 
 	void AssetManager::PreloadShaders(const std::initializer_list<ShaderProgramDescriptor> descriptors) {
-		CORI_CORE_INFO("AssetManager: Preloading {0} shader(s)", descriptors.size());
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Preloading {} shader(s)", descriptors.size());
 		for (const auto& descriptor : descriptors) {
-			GetShader(descriptor);
+			static_cast<void>(GetShader(descriptor)); // explicitly ignoring result
 		}
-		CORI_CORE_INFO("AssetManager: Preloaded {0} shader(s)", descriptors.size());
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Preloaded {} shader(s)", descriptors.size());
 	}
 
 	void AssetManager::PreloadTexture2Ds(const std::initializer_list<Texture2DDescriptor> descriptors) {
-		CORI_CORE_INFO("AssetManager: Preloading {0} Texture2D(s)", descriptors.size());
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Preloading {} Texture2D(s)", descriptors.size());
 		for (const auto& descriptor : descriptors) {
-			GetTexture2D(descriptor);
+			static_cast<void>(GetTexture2D(descriptor));  // explicitly ignoring result
 		}
-		CORI_CORE_INFO("AssetManager: Preloaded {0} Texture2D(s)", descriptors.size());
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Preloaded {} Texture2D(s)", descriptors.size());
 	}
 
 	void AssetManager::PreloadSpriteAtlases(const std::initializer_list<SpriteAtlasDescriptor> descriptors) {
-		CORI_CORE_INFO("AssetManager: Preloading {0} SpriteAtlas(es)", descriptors.size());
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Preloading {} SpriteAtlas(es)", descriptors.size());
 		for (const auto& descriptor : descriptors) {
-			GetSpriteAtlas(descriptor);
+			GetSpriteAtlas(descriptor).transform_error([](auto&& error) {
+				CORI_CORE_ERROR_TAGGED({Logger::Tags::AssetManager::Self}, "Failed to preload SpriteAtlas. Error: '{}'", error.what());
+				return error;
+			});
 		}
-		CORI_CORE_INFO("AssetManager: Preloaded {0} SpriteAtlas(es)", descriptors.size());
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Preloaded {} SpriteAtlas(es)", descriptors.size());
 	}
 
 	void AssetManager::PreloadSounds(const std::initializer_list<SoundDescriptor> descriptors) {
-		CORI_CORE_INFO("AssetManager: Preloading {0} Sound(s)", descriptors.size());
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Preloading {} Sound(s)", descriptors.size());
 		for (const auto& descriptor : descriptors) {
-			GetSound(descriptor);
+			static_cast<void>(GetSound(descriptor));  // explicitly ignoring result
 		}
-		CORI_CORE_INFO("AssetManager: Preloaded {0} Sound(es)", descriptors.size());
-	}
-
-	std::shared_ptr<ShaderProgram> AssetManager::GetShaderOwning(const ShaderProgramDescriptor& descriptor) {
-		CORI_PROFILE_FUNCTION();
-
-		CORI_CORE_DEBUG("AssetManager: Loading Texture2D '{0}' with manual ownership (RuntimeID: {1}).", descriptor.GetDebugName(), descriptor.GetRuntimeID());
-		try {
-			return ShaderProgram::Create(descriptor);
-		}
-		catch (const std::exception& e) {
-			CORI_CORE_ERROR("AssetManager: Error loading Texture2D '{0}' with manual ownership: {1}", descriptor.GetDebugName(), e.what());
-			return nullptr;
-		}
-	}
-
-	std::shared_ptr<Texture2D> AssetManager::GetTexture2DOwning(const Texture2DDescriptor& descriptor) {
-		CORI_PROFILE_FUNCTION();
-
-		CORI_CORE_DEBUG("AssetManager: Loading Texture2D '{0}' with manual ownership (RuntimeID: {1}).", descriptor.GetDebugName(), descriptor.GetRuntimeID());
-		try {
-			return Texture2D::Create(descriptor);
-		}
-		catch (const std::exception& e) {
-			CORI_CORE_ERROR("AssetManager: Error loading Texture2D '{0}' with manual ownership: {1}", descriptor.GetDebugName(), e.what());
-			return nullptr;
-		}
-	}
-
-	std::shared_ptr<SpriteAtlas> AssetManager::GetSpriteAtlasOwning(const SpriteAtlasDescriptor& descriptor) {
-		CORI_PROFILE_FUNCTION();
-
-		CORI_CORE_DEBUG("AssetManager: Loading SpriteAtlas '{0}' with manual ownership (RuntimeID: {1}).", descriptor.GetDebugName(), descriptor.GetRuntimeID());
-		try {
-			return SpriteAtlas::Create(descriptor);
-		}
-		catch (const std::exception& e) {
-			CORI_CORE_ERROR("AssetManager: Error loading SpriteAtlas '{0}' with manual ownership: {1}", descriptor.GetDebugName(), e.what());
-			return nullptr;
-		}
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Preloaded {} Sound(es)", descriptors.size());
 	}
 
 	void AssetManager::UnloadShader(const ShaderProgramDescriptor& descriptor) {
-		if (CORI_CORE_ASSERT_WARN(s_Cache->m_ShaderCache.contains(descriptor.GetRuntimeID()), "Trying to unload a Shader that doesn't exist, name '{0}',  (RuntimeID: {1})", descriptor.GetDebugName(), descriptor.GetRuntimeID())) { return; }
+		if (!s_Cache->m_ShaderCache.contains(descriptor.GetRuntimeID())) {
+			CORI_CORE_WARN_TAGGED({Logger::Tags::AssetManager::Self}, "Trying to unload Shader that doesn't exist, name '{}', (RuntimeID: {})", descriptor.m_Name, descriptor.GetRuntimeID());
+			return;
+		}
 		s_Cache->m_ShaderCache.erase(descriptor.GetRuntimeID());
-		CORI_CORE_DEBUG("AssetManager: Unloaded Shader '{0}' (RuntimeID: {1}).", descriptor.GetDebugName(), descriptor.GetRuntimeID());
+		CORI_CORE_DEBUG_TAGGED({Logger::Tags::AssetManager::Self}, "Unloaded Shader '{}' (RuntimeID: {}).", descriptor.m_Name, descriptor.GetRuntimeID());
 	}
 
 	void AssetManager::UnloadTexture2D(const Texture2DDescriptor& descriptor) {
-		if (CORI_CORE_ASSERT_WARN(s_Cache->m_Texture2DCache.contains(descriptor.GetRuntimeID()), "Trying to unload a Texture2D that doesn't exist, name '{0}',  (RuntimeID: {1})", descriptor.GetDebugName(), descriptor.GetRuntimeID())) { return; }
+		if (!s_Cache->m_Texture2DCache.contains(descriptor.GetRuntimeID())) {
+			CORI_CORE_WARN_TAGGED({Logger::Tags::AssetManager::Self}, "Trying to unload Texture2D that doesn't exist, name '{}',  (RuntimeID: {})", descriptor.m_Name, descriptor.GetRuntimeID());
+			return;
+		}
 		s_Cache->m_Texture2DCache.erase(descriptor.GetRuntimeID());
-		CORI_CORE_DEBUG("AssetManager: Unloaded Texture2D '{0}' (RuntimeID: {1}).", descriptor.GetDebugName(), descriptor.GetRuntimeID());
+		CORI_CORE_DEBUG_TAGGED({Logger::Tags::AssetManager::Self}, "Unloaded Texture2D '{}' (RuntimeID: {}).", descriptor.m_Name, descriptor.GetRuntimeID());
 	}
 
 	void AssetManager::UnloadSpriteAtlas(const SpriteAtlasDescriptor& descriptor) {
-		if (CORI_CORE_ASSERT_WARN(s_Cache->m_SpriteAtlasCache.contains(descriptor.GetRuntimeID()), "Trying to unload a SpriteAtlas that doesn't exist, name '{0}',  (RuntimeID: {1})", descriptor.GetDebugName(), descriptor.GetRuntimeID())) { return; }
+		if (!s_Cache->m_SpriteAtlasCache.contains(descriptor.GetRuntimeID())) {
+			CORI_CORE_WARN_TAGGED({Logger::Tags::AssetManager::Self}, "Trying to unload SpriteAtlas that doesn't exist, name '{}', (RuntimeID: {})", descriptor.m_Name, descriptor.GetRuntimeID());
+			return;
+		}
 		s_Cache->m_SpriteAtlasCache.erase(descriptor.GetRuntimeID());
-		CORI_CORE_DEBUG("AssetManager: Unloaded SpriteAtlas '{0}' (RuntimeID: {1}).", descriptor.GetDebugName(), descriptor.GetRuntimeID());
+		CORI_CORE_DEBUG_TAGGED({Logger::Tags::AssetManager::Self}, "Unloaded SpriteAtlas '{}' (RuntimeID: {}).", descriptor.m_Name, descriptor.GetRuntimeID());
 	}
 
 	void AssetManager::UnloadSound(const SoundDescriptor& descriptor) {
-		if (CORI_CORE_ASSERT_WARN(s_Cache->m_SpriteAtlasCache.contains(descriptor.GetRuntimeID()), "Trying to unload a SpriteAtlas that doesn't exist, name '{0}',  (RuntimeID: {1})", descriptor.m_Name, descriptor.GetRuntimeID())) { return; }
+		if (!s_Cache->m_SoundCache.contains(descriptor.GetRuntimeID())) {
+			CORI_CORE_WARN_TAGGED({Logger::Tags::AssetManager::Self}, "Trying to unload Sound that doesn't exist, name '{}', (RuntimeID: {})", descriptor.m_Name, descriptor.GetRuntimeID());
+			return;
+		}
 		s_Cache->m_SpriteAtlasCache.erase(descriptor.GetRuntimeID());
-		CORI_CORE_DEBUG("AssetManager: Unloaded Sound '{0}' (RuntimeID: {1}).", descriptor.m_Name, descriptor.GetRuntimeID());
+		CORI_CORE_DEBUG_TAGGED({Logger::Tags::AssetManager::Self}, "Unloaded Sound '{}' (RuntimeID: {}).", descriptor.m_Name, descriptor.GetRuntimeID());
 	}
 
 	void AssetManager::UnloadShaders(const std::initializer_list<ShaderProgramDescriptor> descriptors) {
-		CORI_CORE_INFO("AssetManager: Unloading {0} shader(s)", descriptors.size());
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Unloading {} shader(s)", descriptors.size());
 		for (const auto& descriptor : descriptors) {
 			UnloadShader(descriptor);
 		}
-		CORI_CORE_INFO("AssetManager: Unloaded {0} shader(s)", descriptors.size());
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Unloaded {} shader(s)", descriptors.size());
 	}
 
 	void AssetManager::UnloadTexture2Ds(const std::initializer_list<Texture2DDescriptor> descriptors) {
-		CORI_CORE_INFO("AssetManager: Unloading {0} Texture2D(s)", descriptors.size());
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Unloading {} Texture2D(s)", descriptors.size());
 		for (const auto& descriptor : descriptors) {
 			UnloadTexture2D(descriptor);
 		}
-		CORI_CORE_INFO("AssetManager: Unloaded {0} Texture2D(s)", descriptors.size());
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Unloaded {} Texture2D(s)", descriptors.size());
 	}
 
 	void AssetManager::UnloadSpriteAtlases(const std::initializer_list<SpriteAtlasDescriptor> descriptors) {
-		CORI_CORE_INFO("AssetManager: Unloading {0} SpriteAtlas(es)", descriptors.size());
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Unloading {} SpriteAtlas(es)", descriptors.size());
 		for (const auto& descriptor : descriptors) {
 			UnloadSpriteAtlas(descriptor);
 		}
-		CORI_CORE_INFO("AssetManager: Unloaded {0} SpriteAtlas(es)", descriptors.size());
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Unloaded {} SpriteAtlas(es)", descriptors.size());
 	}
 
 	void AssetManager::UnloadSounds(const std::initializer_list<SoundDescriptor> descriptors) {
-		CORI_CORE_INFO("AssetManager: Unloading {0} Sound(s)", descriptors.size());
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Unloading {} Sound(s)", descriptors.size());
 		for (const auto& descriptor : descriptors) {
 			UnloadSound(descriptor);
 		}
-		CORI_CORE_INFO("AssetManager: Unloaded {0} Sound(s)", descriptors.size());
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Unloaded {} Sound(s)", descriptors.size());
 	}
 
 	void AssetManager::ClearShaderCache() {

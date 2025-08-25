@@ -2,13 +2,12 @@
 #define LOGGER
 #include <spdlog/spdlog.h>
 #include <spdlog/async.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/fmt/ostr.h>
-#include <spdlog/fmt/fmt.h>
 #include <spdlog/fmt/bundled/color.h>
 #include <spdlog/fmt/bundled/base.h>
 #include <spdlog/fmt/bundled/format.h>
+#include "Core/Utility/CleanTypeName.hpp"
 
 #if defined(__clang__)
 #define BUGTRAP __builtin_debugtrap()
@@ -18,15 +17,6 @@
 #include <cstdlib>
 #define BUGTRAP std::abort()
 #endif
-
-// TODO: adapt tagging everywhere in engine logging
-
-/*
-Existing tags hint:
-
-
-
-*/
 
 
 namespace Cori {
@@ -41,6 +31,98 @@ namespace Cori {
 
 	class Logger {
 	public:
+		struct Tags {
+			struct AssetManager {
+				static constexpr char Self[] = "Asset Manager";
+			};
+
+			struct Graphics {
+				static constexpr char Self[] = "Graphics";
+
+				static constexpr char OpenGL[] = "OpenGL";
+				static constexpr char Vulkan[] = "Vulkan"; // unused for now
+
+				// API Tags
+				// Only used like this: [OpenGL] or [Vulkan] then [Tag]
+				// vvv
+
+				static constexpr char ShaderProgram[] = "Shader Program";
+				static constexpr char VertexBuffer[] = "Vertex Buffer";
+				static constexpr char IndexBuffer[] = "Index Buffer";
+				static constexpr char VertexArray[] = "Vertex Array";
+				static constexpr char Texture2D[] = "Texture2D";
+				static constexpr char GraphicsContext[] = "Graphics Context";
+
+				// Generic Tags
+				// vvv
+
+				static constexpr char Renderer2D[] = "Renderer2D";
+				static constexpr char Image[] = "Image";
+				static constexpr char SpriteAtlas[] = "Sprite Atlas";
+				static constexpr char Camera[] = "Camera";
+			};
+
+			struct Audio {
+				static constexpr char Self[] = "Audio";
+
+				static constexpr char Sound[] = "Sound";
+				static constexpr char Track[] = "Track";
+				static constexpr char Mixer[] = "Mixer";
+			};
+
+			struct Core {
+				static constexpr char Self[] = "Core";
+				struct Factory {
+					static constexpr char Self[] = "Factory";
+
+					static constexpr char SelfFactory[] = "Self Factory";
+					static constexpr char Register[] = "Register";
+					static constexpr char Shared[] = "Shared";
+					static constexpr char Unique[] = "Unique";
+				};
+
+				static constexpr char Logger[] = "Logger";
+				static constexpr char Layer[] = "Layer";
+				static constexpr char LayerStack[] = "LayerStack";
+				static constexpr char GameTimer[] = "GameTimer";
+				static constexpr char Window[] = "Window";
+				static constexpr char ImGui[] = "ImGui";
+				static constexpr char UUID[] = "UUID";
+				static constexpr char SceneManager[] = "Scene Manager";
+
+			};
+
+			struct World {
+				static constexpr char Self[] = "World";
+
+				struct Scene {
+					static constexpr char Self[] = "Scene";
+
+				};
+
+				struct Entity {
+					static constexpr char Self[] = "Entity";
+
+					static constexpr char Trigger[] = "Trigger";
+					static constexpr char StateMachine[] = "State Machine";
+					static constexpr char QuadRenderer[] = "Quad Renderer";
+					static constexpr char QuadAnimator[] = "Quad Animator";
+
+				};
+			};
+
+			struct Profiler {
+				static constexpr char Self[] = "Profiler";
+
+				static constexpr char InstanceMetrics[] = "Instance Metrics";
+			};
+
+
+
+			// Ungrouped tags
+			static constexpr char UnusedError[] = "Unused Error";
+		};
+
 		static void EnableVirtualTerminalProcessing();
 
 		static void Init(bool async, bool fileWrite);
@@ -52,53 +134,45 @@ namespace Cori {
 		static void SetClientLogLevel(LogLevel level);
 
 		template<typename T>
-		static auto ColoredText(const T& text, fmt::color c, fmt::text_style s = fmt::text_style{}) {
+		static auto ColoredText(const T& text, const fmt::color c, const fmt::text_style s = fmt::text_style{}) {
 			return fmt::styled(text, fmt::fg(c) | s);
 		}
 
 		template<typename T>
-		static auto HighlitedText(const T& text, fmt::color c, fmt::text_style s = fmt::text_style{}) {
+		static auto HighlightedText(const T& text, const fmt::color c, const fmt::text_style s = fmt::text_style{}) {
 			return fmt::styled(text, fmt::bg(c) | s);
 		}
 
-struct Test {
-			uint32_t t1;
-			uint64_t t2;
-			uint32_t t3;
-		};
-
-		static std::string BoolAlpha(bool b) {
+		static std::string BoolAlpha(const bool b) {
 			if (b) {
 				return "True";
 			}
 			return "False";
 		}
 
-		static void EnableCoreTag(std::string_view tag);
-		static void EnableCoreTags(std::initializer_list<const char*> tags);
+		static void EnableCoreTag(const char* tag);
+		static void EnableCoreTags(const std::initializer_list<const char*> tags);
 
+		static void DisableCoreTag(const char* tag);
+		static void DisableCoreTags(const std::initializer_list<const char*> tags);
 
-		static void DisableCoreTag(std::string_view tag);
-		static void DisableCoreTags(std::initializer_list<const char*> tags);
-
-		static bool IsCoreTagDisabled(std::string_view tag);
+		static bool IsCoreTagDisabled(const char* tag);
 		static void ClearCoreTagFilter();
 		static std::vector<std::string> GetCoreInactiveTags();
 
+		static void EnableClientTag(const char* tag);
+		static void EnableClientTags(const std::initializer_list<const char*> tags);
 
-		static void EnableClientTag(std::string_view tag);
-		static void EnableClientTags(std::initializer_list<const char*> tags);
 
+		static void DisableClientTag(const char* tag);
+		static void DisableClientTags(const std::initializer_list<const char*> tags);
 
-		static void DisableClientTag(std::string_view tag);
-		static void DisableClientTags(std::initializer_list<const char*> tags);
-
-		static bool IsClientTagDisabled(std::string_view tag);
+		static bool IsClientTagDisabled(const char* tag);
 		static void ClearClientTagFilter();
 		static std::vector<std::string> GetClientInactiveTags();
 
 		template<typename... Args>
-		static void CoreLogTraceTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+		static void CoreLogTraceTagged(const std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
 			if (ShouldCoreLog(tags)) {
 
 				fmt::memory_buffer buffer;
@@ -125,7 +199,7 @@ struct Test {
 		}
 
 		template<typename... Args>
-		static void CoreLogDebugTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+		static void CoreLogDebugTagged(const std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
 			if (ShouldCoreLog(tags)) {
 
 				fmt::memory_buffer buffer;
@@ -152,7 +226,7 @@ struct Test {
 		}
 
 		template<typename... Args>
-		static void CoreLogInfoTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+		static void CoreLogInfoTagged(const std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
 			if (ShouldCoreLog(tags)) {
 
 				fmt::memory_buffer buffer;
@@ -180,7 +254,7 @@ struct Test {
 		}
 
 		template<typename... Args>
-		static void CoreLogWarnTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+		static void CoreLogWarnTagged(const std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
 			if (ShouldCoreLog(tags)) {
 
 				fmt::memory_buffer buffer;
@@ -207,18 +281,18 @@ struct Test {
 		}
 
 		template<typename... Args>
-		static void CoreLogErrorTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+		static void CoreLogErrorTagged(const std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
 			if (ShouldCoreLog(tags)) {
 
 				fmt::memory_buffer buffer;
 
 				for (const char* tag : tags) {
-					fmt::format_to(std::back_inserter(buffer), "{}", fmt::styled(fmt::format("[{}]", tag), fmt::fg(fmt::color::magenta)));
+					fmt::format_to(std::back_inserter(buffer), "{}", fmt::styled(fmt::format("[{}]", tag), fmt::fg(fmt::color::hot_pink)));
 				}
 
 				buffer.push_back(' ');
 
-				const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::crimson)));
+				const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::violet)));
 				const auto start_code_end = styled_dummy.find(' ');
 
 				const auto end_code_start = start_code_end + 1;
@@ -234,7 +308,7 @@ struct Test {
 		}
 
 		template<typename... Args>
-		static void CoreLogFatalTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+		static void CoreLogFatalTagged(const std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
 			if (ShouldCoreLog(tags)) {
 
 				fmt::memory_buffer buffer;
@@ -263,7 +337,7 @@ struct Test {
 
 
 		template<typename... Args>
-		static void ClientLogTraceTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+		static void ClientLogTraceTagged(const std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
 			if (ShouldClientLog(tags)) {
 
 				fmt::memory_buffer buffer;
@@ -290,7 +364,7 @@ struct Test {
 		}
 
 		template<typename... Args>
-		static void ClientLogDebugTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+		static void ClientLogDebugTagged(const std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
 			if (ShouldClientLog(tags)) {
 
 				fmt::memory_buffer buffer;
@@ -317,7 +391,7 @@ struct Test {
 		}
 
 		template<typename... Args>
-		static void ClientLogInfoTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+		static void ClientLogInfoTagged(const std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
 			if (ShouldClientLog(tags)) {
 
 				fmt::memory_buffer buffer;
@@ -344,7 +418,7 @@ struct Test {
 		}
 
 		template<typename... Args>
-		static void ClientLogWarnTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+		static void ClientLogWarnTagged(const std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
 			if (ShouldClientLog(tags)) {
 
 				fmt::memory_buffer buffer;
@@ -371,18 +445,18 @@ struct Test {
 		}
 
 		template<typename... Args>
-		static void ClientLogErrorTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+		static void ClientLogErrorTagged(const std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
 			if (ShouldClientLog(tags)) {
 
 				fmt::memory_buffer buffer;
 
 				for (const char* tag : tags) {
-					fmt::format_to(std::back_inserter(buffer), "{}", fmt::styled(fmt::format("[{}]", tag), fmt::fg(fmt::color::magenta)));
+					fmt::format_to(std::back_inserter(buffer), "{}", fmt::styled(fmt::format("[{}]", tag), fmt::fg(fmt::color::hot_pink)));
 				}
 
 				buffer.push_back(' ');
 
-				const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::crimson)));
+				const auto styled_dummy = fmt::format("{}", fmt::styled(" ", fmt::fg(fmt::color::violet)));
 				const auto start_code_end = styled_dummy.find(' ');
 
 				const auto end_code_start = start_code_end + 1;
@@ -398,7 +472,7 @@ struct Test {
 		}
 
 		template<typename... Args>
-		static void ClientLogFatalTagged(std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
+		static void ClientLogFatalTagged(const std::initializer_list<const char*> tags, const fmt::format_string<Args...>& fmt, Args&&... args) {
 			if (ShouldClientLog(tags)) {
 
 				fmt::memory_buffer buffer;
@@ -802,7 +876,7 @@ struct Test {
 			[[nodiscard]] size_t operator()(const char* txt) const {
 				return std::hash<std::string_view>{}(txt);
 			}
-			[[nodiscard]] size_t operator()(std::string_view txt) const {
+			[[nodiscard]] size_t operator()(const std::string_view txt) const {
 				return std::hash<std::string_view>{}(txt);
 			}
 			[[nodiscard]] size_t operator()(const std::string& txt) const {
@@ -819,17 +893,33 @@ struct Test {
 
 inline const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') + "]: ";
 
+// vvv Engine Side
+
 #ifdef DEBUG_BUILD
 
-#define CORI_CORE_TRACE(...) ::Cori::Logger::CoreLogTrace(__VA_ARGS__)
-#define CORI_CORE_DEBUG(...) ::Cori::Logger::CoreLogDebug(__VA_ARGS__)
-#define CORI_CORE_INFO(...)  ::Cori::Logger::CoreLogInfo(__VA_ARGS__)
+	#define CORI_CORE_TRACE(...) ::Cori::Logger::CoreLogTrace(__VA_ARGS__)
+	#define CORI_CORE_DEBUG(...) ::Cori::Logger::CoreLogDebug(__VA_ARGS__)
+	#define CORI_CORE_INFO(...)  ::Cori::Logger::CoreLogInfo(__VA_ARGS__)
+
+	#define CORI_CORE_TRACE_TAGGED(...) ::Cori::Logger::CoreLogTraceTagged(__VA_ARGS__)
+	#define CORI_CORE_DEBUG_TAGGED(...) ::Cori::Logger::CoreLogDebugTagged(__VA_ARGS__)
+	#define CORI_CORE_INFO_TAGGED(...)  ::Cori::Logger::CoreLogInfoTagged(__VA_ARGS__)
+
+	#define CORI_CORE_ASSERT(x, ...) if (!(x)) { (SPDLOG_LOGGER_CRITICAL(::Cori::Logger::GetCoreLogger(), "Assertion '"#x"' Failed. Message: " __VA_ARGS__), ::Cori::Logger::GetCoreLogger()->critical("    Function: {}", __PRETTY_FUNCTION__), spdlog::shutdown(), BUGTRAP); }
+	#define CORI_CORE_VERIFY(x, ...) (!(x) ? (SPDLOG_LOGGER_CRITICAL(::Cori::Logger::GetCoreLogger(), "Verify '"#x"' Failed. Message: " __VA_ARGS__), ::Cori::Logger::GetCoreLogger()->critical("    Function: {}", __PRETTY_FUNCTION__), true) : false)
 
 #else
 
-#define CORI_CORE_TRACE(...)
-#define CORI_CORE_DEBUG(...)
-#define CORI_CORE_INFO(...)
+	#define CORI_CORE_TRACE(...)
+	#define CORI_CORE_DEBUG(...)
+	#define CORI_CORE_INFO(...)
+
+	#define CORI_CORE_TRACE_TAGGED(...)
+	#define CORI_CORE_DEBUG_TAGGED(...)
+	#define CORI_CORE_INFO_TAGGED(...)
+
+	#define CORI_CORE_ASSERT(x, ...)
+	#define CORI_CORE_VERIFY(x, ...) (!x)
 
 #endif
 
@@ -837,72 +927,26 @@ inline const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') +
 #define CORI_CORE_ERROR(...) ::Cori::Logger::CoreLogError(__VA_ARGS__)
 #define CORI_CORE_FATAL(...) ::Cori::Logger::CoreLogFatal(__VA_ARGS__)
 
+#define CORI_CORE_WARN_TAGGED(...)  ::Cori::Logger::CoreLogWarnTagged(__VA_ARGS__)
+#define CORI_CORE_ERROR_TAGGED(...) ::Cori::Logger::CoreLogErrorTagged(__VA_ARGS__)
+#define CORI_CORE_FATAL_TAGGED(...) ::Cori::Logger::CoreLogFatalTagged(__VA_ARGS__)
+
+#define CORI_CORE_CHECK(x, ...) (!(x) ? (SPDLOG_LOGGER_ERROR(::Cori::Logger::GetCoreLogger(), "Check '"#x"' Failed. Message: " __VA_ARGS__), ::Cori::Logger::GetCoreLogger()->error("    Function: {}", __PRETTY_FUNCTION__), true) : false)
+#define CORI_CORE_CHECK_EXPECTED(x) CORI_CORE_CHECK(x, "std::expected returned an error, message: {}", x.error().what())
+
+// vvv User Side
+
+#define CORI_ASSERT(x, ...) if (!(x)) { (SPDLOG_LOGGER_CRITICAL(::Cori::Logger::GetClientLogger(), "Assertion '"#x"' Failed. Message: " __VA_ARGS__), ::Cori::Logger::GetClientLogger()->critical("    Function: {}", __PRETTY_FUNCTION__), spdlog::shutdown(), BUGTRAP); }
+#define CORI_VERIFY(x, ...) (!(x) ? (SPDLOG_LOGGER_CRITICAL(::Cori::Logger::GetClientLogger(), "Verify '"#x"' Failed. Message: " __VA_ARGS__), ::Cori::Logger::GetClientLogger()->critical("    Function: {}", __PRETTY_FUNCTION__), true) : false)
+#define CORI_CHECK(x, ...) (!(x) ? (SPDLOG_LOGGER_ERROR(::Cori::Logger::GetClientLogger(), "Check '"#x"' Failed. Message: " __VA_ARGS__), ::Cori::Logger::GetClientLogger()->error("    Function: {}", __PRETTY_FUNCTION__), true) : false)
+#define CORI_CHECK_EXPECTED(x) CORI_CHECK(x, "std::expected returned an error, message: {}", x.error().what())
+
 #define CORI_TRACE(...)      ::Cori::Logger::ClientLogTrace(__VA_ARGS__)
 #define CORI_DEBUG(...)      ::Cori::Logger::ClientLogDebug(__VA_ARGS__)
 #define CORI_INFO(...)       ::Cori::Logger::ClientLogInfo(__VA_ARGS__)
 #define CORI_WARN(...)       ::Cori::Logger::ClientLogWarn(__VA_ARGS__)
 #define CORI_ERROR(...)      ::Cori::Logger::ClientLogError(__VA_ARGS__)
 #define CORI_FATAL(...)      ::Cori::Logger::ClientLogFatal(__VA_ARGS__)
-
-#ifdef DEBUG_BUILD
-
-#define CORI_CORE_ASSERT_DEBUG(x, ...) (!(x) ? (CORI_CORE_DEBUG("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_DEBUG("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
-#define CORI_CORE_ASSERT_INFO(x, ...)  (!(x) ? (CORI_CORE_INFO("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_INFO("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
-#define CORI_CORE_ASSERT_WARN(x, ...)  (!(x) ? (CORI_CORE_WARN("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_WARN("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
-#define CORI_CORE_ASSERT_ERROR(x, ...) (!(x) ? (CORI_CORE_ERROR("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_ERROR("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
-#define CORI_CORE_ASSERT_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Assertion Failed, message: " __VA_ARGS__), CORI_CORE_FATAL("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), BUGTRAP, true) : false)
-
-#define CORI_CORE_ASSERT(x, ...) (!(x) ? (SPDLOG_LOGGER_CRITICAL(::Cori::Logger::GetCoreLogger(), "Assertion '"#x"' Failed. Message: " __VA_ARGS__), ::Cori::Logger::GetCoreLogger()->critical("    Function: {}", __PRETTY_FUNCTION__), spdlog::shutdown(), BUGTRAP, true) : false)
-
-#define CORI_CORE_VERIFY_DEBUG(x, ...) (!(x) ? (CORI_CORE_DEBUG("Verify Failed, message: " __VA_ARGS__), CORI_CORE_DEBUG("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
-#define CORI_CORE_VERIFY_INFO(x, ...)  (!(x) ? (CORI_CORE_INFO("Verify Failed, message: " __VA_ARGS__), CORI_CORE_INFO("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
-#define CORI_CORE_VERIFY_WARN(x, ...)  (!(x) ? (CORI_CORE_WARN("Verify Failed, message: " __VA_ARGS__), CORI_CORE_WARN("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
-#define CORI_CORE_VERIFY_ERROR(x, ...) (!(x) ? (CORI_CORE_ERROR("Verify Failed, message: " __VA_ARGS__), CORI_CORE_ERROR("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
-#define CORI_CORE_VERIFY_FATAL(x, ...) (!(x) ? (CORI_CORE_FATAL("Verify Failed, message: " __VA_ARGS__), CORI_CORE_FATAL("    Details - (Verify: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), BUGTRAP, true) : false)
-
-#define CORI_CORE_VERIFY(x, ...) (!(x) ? (SPDLOG_LOGGER_ERROR(::Cori::Logger::GetCoreLogger(), "Verify '"#x"' Failed. Message: " __VA_ARGS__), ::Cori::Logger::GetCoreLogger()->error("    Function: {}", __PRETTY_FUNCTION__), false) : true)
-
-#define CORI_CORE_VERIFY_EXPECTED(x) CORI_CORE_VERIFY(x, "std::expecter returned an error, message: {}", static_cast<std::string>(x.error()))
-
-#else
-
-#define CORI_CORE_ASSERT_DEBUG(x, ...) false
-#define CORI_CORE_ASSERT_INFO(x, ...) false
-#define CORI_CORE_ASSERT_WARN(x, ...) false
-#define CORI_CORE_ASSERT_ERROR(x, ...) false
-#define CORI_CORE_ASSERT_FATAL(x, ...) false
-
-#define CORI_CORE_ASSERT(x, ...) false
-
-#define CORI_CORE_VERIFY_DEBUG(x, ...) (!x)
-#define CORI_CORE_VERIFY_INFO(x, ...)  (!x)
-#define CORI_CORE_VERIFY_WARN(x, ...)  (!x)
-#define CORI_CORE_VERIFY_ERROR(x, ...) (!x)
-#define CORI_CORE_VERIFY_FATAL(x, ...) (!x)
-
-#define CORI_CORE_VERIFY(x, ...) (!x)
-
-#define CORI_CORE_VERIFY_EXPECTED(x) x
-
-#endif
-
-#define CORI_ASSERT_DEBUG(x, ...) (!(x) ? (CORI_DEBUG("Assertion Failed, message: " __VA_ARGS__), CORI_DEBUG("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
-#define CORI_ASSERT_INFO(x, ...)  (!(x) ? (CORI_INFO("Assertion Failed, message: " __VA_ARGS__), CORI_INFO("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
-#define CORI_ASSERT_WARN(x, ...)  (!(x) ? (CORI_WARN("Assertion Failed, message: " __VA_ARGS__), CORI_WARN("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
-#define CORI_ASSERT_ERROR(x, ...) (!(x) ? (CORI_ERROR("Assertion Failed, message: " __VA_ARGS__), CORI_ERROR("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), true) : false)
-#define CORI_ASSERT_FATAL(x, ...) (!(x) ? (CORI_FATAL("Assertion Failed, message: " __VA_ARGS__), CORI_FATAL("    Details - (Assert: '{}', Function: '{}', Line: '{}')", #x, __PRETTY_FUNCTION__, __LINE__), BUGTRAP, true) : false)
-
-#define CORI_ASSERT(x, ...) (!(x) ? (SPDLOG_LOGGER_CRITICAL(::Cori::Logger::GetClientLogger(), "Assertion '"#x"' Failed. Message: " __VA_ARGS__), ::Cori::Logger::GetClientLogger()->critical("    Function: {}", __PRETTY_FUNCTION__), spdlog::shutdown(), BUGTRAP, true) : false)
-#define CORI_VERIFY(x, ...) (!(x) ? (SPDLOG_LOGGER_ERROR(::Cori::Logger::GetClientLogger(), "Verify '"#x"' Failed. Message: " __VA_ARGS__), ::Cori::Logger::GetClientLogger()->error("    Function: {}", __PRETTY_FUNCTION__), false) : true)
-
-#define CORI_VERIFY_EXPECTED(x) CORI_VERIFY(x, "std::expecter returned an error, message: {}", static_cast<std::string>(x.error()))
-
-#define CORI_CORE_TRACE_TAGGED(...) ::Cori::Logger::CoreLogTraceTagged(__VA_ARGS__)
-#define CORI_CORE_DEBUG_TAGGED(...) ::Cori::Logger::CoreLogDebugTagged(__VA_ARGS__)
-#define CORI_CORE_INFO_TAGGED(...)  ::Cori::Logger::CoreLogInfoTagged(__VA_ARGS__)
-#define CORI_CORE_WARN_TAGGED(...)  ::Cori::Logger::CoreLogWarnTagged(__VA_ARGS__)
-#define CORI_CORE_ERROR_TAGGED(...) ::Cori::Logger::CoreLogErrorTagged(__VA_ARGS__)
-#define CORI_CORE_FATAL_TAGGED(...) ::Cori::Logger::CoreLogFatalTagged(__VA_ARGS__)
 
 #define CORI_TRACE_TAGGED(...) ::Cori::Logger::ClientLogTraceTagged(__VA_ARGS__)
 #define CORI_DEBUG_TAGGED(...) ::Cori::Logger::ClientLogDebugTagged(__VA_ARGS__)

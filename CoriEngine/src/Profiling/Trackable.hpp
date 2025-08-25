@@ -5,6 +5,12 @@ namespace Cori {
 	namespace Profiling {
 		template <typename DerivedType, typename BaseType = DerivedType>
 		class Trackable {
+		public:
+			Trackable(const Trackable&) = delete;
+			Trackable& operator=(const Trackable&) = delete;
+			Trackable(Trackable&&) = delete;
+			Trackable& operator=(Trackable&&) = delete;
+
 		protected:
 			Trackable() {
 				InstanceMetrics<DerivedType>::Increment();
@@ -14,11 +20,6 @@ namespace Cori {
 			~Trackable() {
 				InstanceMetrics<DerivedType>::Decrement();
 			}
-
-			Trackable(const Trackable&) = delete;
-			Trackable& operator=(const Trackable&) = delete;
-			Trackable(Trackable&&) = delete;
-			Trackable& operator=(Trackable&&) = delete;
 
 		private:
 			struct ReporterRegistrar {
@@ -30,8 +31,8 @@ namespace Cori {
 							}
 						);
 						InstanceMetrics<BaseType>::RegisterDerivedMetricsProvider(
-							std::type_index(typeid(DerivedType)), []() -> std::pair<long, long> {
-								return {InstanceMetrics<DerivedType>::GetDirectAliveCount(), InstanceMetrics<DerivedType>::GetDirectTotalCreatedCount()};
+							std::type_index(typeid(DerivedType)), []() -> std::pair<int64_t, int64_t> {
+								return { InstanceMetrics<DerivedType>::GetDirectAliveCount(), InstanceMetrics<DerivedType>::GetDirectTotalCreatedCount() };
 							}
 						);
 					}

@@ -4,7 +4,7 @@ namespace Cori {
 
 	class Engine {
 	public:
-		static void Start(bool asyncLogging, bool fileLogging);
+		static void Start(const bool asyncLogging, const bool fileLogging);
 		static void Stop();
 	};
 }

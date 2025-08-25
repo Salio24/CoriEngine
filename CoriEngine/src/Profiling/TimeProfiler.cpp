@@ -170,7 +170,7 @@ namespace Cori {
 			jsonEventCounter++;
 		}
 
-		void TimeProfiler::RecordRawEvent(RawEventType type, const char* name, int line) {
+		void TimeProfiler::RecordRawEvent(RawEventType type, const char* name, int32_t line) {
 			if (!m_FrameCaptureActive) return;
 
 			uint32_t index = m_RawEventIndex.fetch_add(1, std::memory_order_acquire);
@@ -189,7 +189,7 @@ namespace Cori {
 			}
 		}
 
-		ScopedTimer::ScopedTimer(const char* name, int line)
+		ScopedTimer::ScopedTimer(const char* name, int32_t line)
 			: m_Name(name), m_Line(line) {
 			TimeProfiler::Get().RecordRawEvent(RawEventType::ScopeBegin, m_Name, m_Line);
 		}

@@ -8,7 +8,7 @@ namespace Cori {
 				return Get().GenImpl();
 			}
 
-			static uint32_t Gen(uint32_t min, uint32_t max) {
+			static uint32_t Gen(const uint32_t min, const uint32_t max) {
 				return Get().GenImpl(min, max);
 			}
 
@@ -21,7 +21,7 @@ namespace Cori {
 				return (*dist_full_range)(gen);
 			}
 
-			uint32_t GenImpl(uint32_t min, uint32_t max) {
+			uint32_t GenImpl(const uint32_t min, const uint32_t max) {
 				std::uniform_int_distribution dist(min, max);
 				return dist(gen);
 			}

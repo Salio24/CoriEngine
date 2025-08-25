@@ -1,6 +1,5 @@
 #include "Application.hpp"
-#include "Input.hpp"
-#include "Renderer/GraphicsCall.hpp"
+#include "Graphics/API.hpp"
 #include "WorldSystem/SceneManager.hpp"
 #include "WorldSystem/Components.hpp"
 #include "AssetManager/AssetManager.hpp"
@@ -11,12 +10,11 @@
 namespace Cori {
 	Application* Application::s_Instance{ nullptr };
 
-	Application::Application() {
-		CORI_CORE_ASSERT_FATAL(!s_Instance, "Trying to construct application for the second time. Application already exists!");
+	Application::Application(const char* windowName) {
+		CORI_CORE_ASSERT(!s_Instance, "Trying to construct application for the second time. Application already exists!");
 		s_Instance = this;
 
-		//m_Window = Window::Create();
-		m_Window = Window::Create("test", false);
+		m_Window = Window::Create(windowName, false);
 
 		m_Window->SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent, CORI_PLACEHOLDERS(1)));
 		m_Window->SetVSync(false);
@@ -27,23 +25,24 @@ namespace Cori {
 
 		AssetManager::Init();
 		SceneManager::Init();
-		GraphicsCall::InitRenderers();
+		API::Init();
 		Audio::Mixer::Init();
 
 		m_GameTimer.SetTickrate(60);
 		m_GameTimer.SetTickrateUpdateFunc(CORI_BIND_EVENT_FN(Application::TickrateUpdate, CORI_PLACEHOLDERS(1)));
+		CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self }, "Cori Engine started.");
 	}
 
 	Application::~Application() {
 		m_LayerStack.ClearStack();
 		AssetManager::Shutdown();
 		SceneManager::Shutdown();
-		GraphicsCall::ShutdownRenderers();
+		API::Shutdown();
 		Audio::Mixer::Shutdown();
 	}
 
-	void Application::OnEvent(Event& e) {
-		EventDispatcher dispatcher(e);
+	void Application::OnEvent(Event& event) {
+		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<WindowCloseEvent>(CORI_BIND_EVENT_FN(Application::OnWindowClose));
 
 
@@ -62,25 +61,33 @@ namespace Cori {
 			return false;
 		});
 		dispatcher.Dispatch<WindowResizeEvent>([](const WindowResizeEvent& e) -> bool {
-			GraphicsCall::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
+			API::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
 			return false;
 		});
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
 			--it;
-			(*it)->OnEvent(e);
-			if (e.m_Handeled || (*it)->IsModal()) {
+			(*it)->OnEvent(event);
+			if (event.m_Handled || (*it)->IsModal()) {
 				break;
 			}
 		}
 	}
 
-	void Application::PushLayer(Layer* layer) {
-		s_Instance->m_LayerStack.PushLayerToQueue(layer);
+	std::expected<void, CoriError<>> Application::PushLayer(Layer* layer) {
+		return s_Instance->m_LayerStack.PushLayerToQueue(layer);
 	}
 
-	void Application::PushOverlay(Layer* layer) {
-		s_Instance->m_LayerStack.PushOverlayToQueue(layer);
+	std::expected<void, CoriError<>> Application::PushOverlay(Layer* overlay) {
+		return s_Instance->m_LayerStack.PushOverlayToQueue(overlay);
+	}
+
+	void Application::PopLayer(Layer* layer) {
+		s_Instance->m_LayerStack.PopLayerToQueue(layer);
+	}
+
+	void Application::PopOverlay(Layer* overlay) {
+		s_Instance->m_LayerStack.PopOverlayToQueue(overlay);
 	}
 
 	void Application::Run() {
@@ -90,8 +97,8 @@ namespace Cori {
 				CORI_PROFILE_SCOPE("Cori Engine Global Update");
 				m_GameTimer.Update();
 
-				GraphicsCall::SetClearColor({ 0.5f, 0.5f, 0.0f, 1.0f });
-				GraphicsCall::ClearFramebuffer();
+				API::SetClearColor({ 0.5f, 0.5f, 0.0f, 1.0f });
+				API::ClearFramebuffer();
 
 				for (Layer* layer : m_LayerStack) {
 					layer->OnUpdate(m_GameTimer);
@@ -106,7 +113,6 @@ namespace Cori {
 				if (m_RenderImGui) {
 					for (Layer* layer : m_LayerStack) {
 						layer->OnImGuiRender(m_GameTimer.GetDeltaTime());
-						
 					}
 				}
 
@@ -115,7 +121,6 @@ namespace Cori {
 				m_Window->OnUpdate();
 
 				m_LayerStack.ProcessQueue();
-
 			}
 			CORI_PROFILER_FRAME_END();
 		}

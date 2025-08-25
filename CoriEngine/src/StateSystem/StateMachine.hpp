@@ -1,92 +1,96 @@
 #pragma once
-
 #include "State.hpp"
 #include "WorldSystem/Entity.hpp"
 
 namespace Cori {
-	class StateMachine {
-	public:
-		StateMachine(Entity owner) : m_Owner(owner), m_CurrentState(nullptr) {
-			CORI_CORE_ASSERT_ERROR(m_Owner.IsValid(), "StateMachine owner Entity is not valid!");
+	namespace Components {
+		namespace Entity {
+			class StateMachine {
+			public:
+				// ReSharper disable once CppParameterMayBeConst
+				explicit StateMachine(Cori::Entity owner) : m_Owner(owner), m_CurrentState(nullptr) {
+					CORI_CORE_ASSERT(m_Owner.IsValid(), "StateMachine owner Entity is not valid!");
+				}
+
+				~StateMachine() {
+					if (m_CurrentState) {
+						m_CurrentState->OnExit(m_Owner, this);
+					}
+				}
+
+				StateMachine(const StateMachine&) = delete;
+				StateMachine& operator=(const StateMachine&) = delete;
+
+				template<typename StateType, typename... Args>
+				void Register(Args&&... args) {
+					const std::type_index stateID(typeid(StateType));
+
+					if (m_States.contains(stateID)) {
+						CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::StateMachine }, "StateMachine for Entity - {}: State type '{}' already registered.", m_Owner.GetDebugData(), CORI_CLEAN_TYPE_NAME(*m_CurrentState));
+						return;
+					}
+
+					m_States[stateID] = std::make_unique<StateType>(std::forward<Args>(args)...);
+					CORI_CORE_TRACE_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::StateMachine }, "StateMachine for Entity - {}: Registered state '{}'", m_Owner.GetDebugData(), CORI_CLEAN_TYPE_NAME(StateType));
+				}
+
+				template<std::derived_from<State> StateType>
+				void SetState() {
+					const std::type_index nextStateID(typeid(StateType));
+
+					if (CORI_CORE_CHECK(m_States.contains(nextStateID), "StateMachine for Entity - {}: Attempted to change to unregistered state type '{}', register the State first!", m_Owner.GetDebugData(), CORI_CLEAN_TYPE_NAME(StateType))) { return; }
+
+					State* nextStateRawPtr = m_States.at(nextStateID).get();
+
+					if (m_CurrentState == nextStateRawPtr) {
+						return;
+					}
+
+					if (m_CurrentState) {
+						CORI_CORE_TRACE_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::StateMachine }, "StateMachine for Entity - {}: Exiting state '{}'", m_Owner.GetDebugData(), CORI_CLEAN_TYPE_NAME(*m_CurrentState));
+						m_CurrentState->OnExit(m_Owner, this);
+					}
+
+					m_CurrentState = nextStateRawPtr;
+					CORI_CORE_TRACE_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::StateMachine }, "StateMachine for Entity - {}: Entering state '{}'", m_Owner.GetDebugData(), CORI_CLEAN_TYPE_NAME(*m_CurrentState));
+					m_CurrentState->OnEnter(m_Owner, this);
+				}
+
+				void OnTickUpdate(const float timeStep) {
+					if (m_CurrentState) {
+						m_CurrentState->OnTickUpdate(m_Owner, this, timeStep);
+					}
+				}
+
+				template<std::derived_from<State> StateType>
+				bool IsInState() const {
+					if (!m_CurrentState) {
+						return false;
+					}
+
+					return typeid(StateType) == typeid(*m_CurrentState);
+				}
+
+				template<std::derived_from<State> StateType>
+				void SetStateIfNotInState() {
+					if (!IsInState<StateType>()) {
+						return SetState<StateType>();
+					}
+				}
+
+				State* GetCurrentState() const {
+					return m_CurrentState;
+				}
+
+				Cori::Entity GetOwner() const {
+					return m_Owner;
+				}
+
+			private:
+				Cori::Entity m_Owner;
+				State* m_CurrentState;
+				std::unordered_map<std::type_index, std::unique_ptr<State>> m_States;
+			};
 		}
-
-		~StateMachine() {
-			if (m_CurrentState) {
-				m_CurrentState->OnExit(m_Owner, this);
-			}
-		}
-
-		StateMachine(const StateMachine&) = delete;
-		StateMachine& operator=(const StateMachine&) = delete;
-		StateMachine(StateMachine&&) = default;
-		StateMachine& operator=(StateMachine&&) = default;
-
-		// should states even have ctor args?
-		template<typename StateType, typename... Args>
-		void RegisterState(Args&&... args) {
-			static_assert(std::is_base_of_v<State, StateType>, "StateType must derive from State");
-			std::type_index state_id(typeid(StateType));
-
-			if (CORI_CORE_ASSERT_WARN(!m_States.contains(state_id), "StateMachine for Entity - {0}: State type '{1}' already registered.", m_Owner.GetDebugData(), typeid(StateType).name())) { return; }
-
-			m_States[state_id] = std::make_unique<StateType>(std::forward<Args>(args)...);
-			CORI_CORE_TRACE("StateMachine for Entity - {0}: Registered state '{1}'.", m_Owner.GetDebugData(), typeid(StateType).name());
-		}
-
-		template<typename StateType>
-		void ChangeState() {
-			static_assert(std::is_base_of_v<State, StateType>, "StateType must derive from State");
-			std::type_index nextStateID(typeid(StateType));
-
-			// verify here
-			if (CORI_CORE_ASSERT_ERROR(m_States.contains(nextStateID), "StateMachine for Entity - {0}: Attempted to change to unregistered state type '{1}'.", m_Owner.GetDebugData(), typeid(StateType).name())) { return; }
-
-			State* nextStateRawPtr = m_States.at(nextStateID).get();
-
-			if (m_CurrentState == nextStateRawPtr) {
-				return;
-			}
-
-			if (m_CurrentState) {
-				CORI_CORE_TRACE("StateMachine for Entity - {0}: Exiting state '{1}'.", m_Owner.GetDebugData(), typeid(*m_CurrentState).name());
-				m_CurrentState->OnExit(m_Owner, this);
-			}
-
-			m_CurrentState = nextStateRawPtr;
-			CORI_CORE_TRACE("StateMachine for Entity - {0}: Entering state '{1}'.", m_Owner.GetDebugData(), typeid(*m_CurrentState).name());
-			m_CurrentState->OnEnter(m_Owner, this);
-		}
-
-		void Update(float timeStep) {
-			if (CORI_CORE_ASSERT_WARN(m_Owner.IsValid(), "Update called on an FSM with an invalid owner Entity. Disabling FSM.")) { m_CurrentState = nullptr; return; }
-
-			if (m_CurrentState) {
-				m_CurrentState->OnUpdate(m_Owner, this, timeStep);
-			}
-		}
-
-		template<typename StateType>
-		bool IsInState() const {
-			static_assert(std::is_base_of_v<State, StateType>, "StateType must derive from State");
-
-			if (!m_CurrentState) {
-				return false;
-			}
-
-			return typeid(StateType) == typeid(*m_CurrentState);
-		}
-
-		State* GetCurrentState() const {
-			return m_CurrentState;
-		}
-
-		Entity GetOwner() const {
-			return m_Owner;
-		}
-
-	private:
-		Entity m_Owner;
-		State* m_CurrentState;
-		std::unordered_map<std::type_index, std::unique_ptr<State>> m_States;
-	};
+	}
 }

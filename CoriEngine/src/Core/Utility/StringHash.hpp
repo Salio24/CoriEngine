@@ -3,7 +3,7 @@
 
 namespace Cori {
 	namespace Utility {
-		constexpr std::uint64_t fnv1a64(const char *str, std::size_t len) {
+		constexpr std::uint64_t fnv1a64(const char *str, const std::size_t len) {
 			std::uint64_t hash = 0xcbf29ce484222325ULL; // offset basis
 			for (std::size_t i = 0; i < len; ++i) {
 				hash ^= static_cast<unsigned char>(str[i]);
@@ -29,6 +29,6 @@ namespace Cori {
 	return entt::hashed_string(str).value();
 }
 
-[[nodiscard]] consteval Cori::Utility::StringHash64 operator""_hs64(const char* str, size_t len) {
+[[nodiscard]] consteval Cori::Utility::StringHash64 operator""_hs64(const char* str, const size_t len) {
 	return Cori::Utility::fnv1a64(str, len);
 }

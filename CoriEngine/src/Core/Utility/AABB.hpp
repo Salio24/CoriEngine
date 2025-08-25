@@ -8,18 +8,15 @@ namespace Cori {
 		};
 
 		[[nodiscard]] inline AABB CalculateAABB(const glm::mat3& transform, const glm::vec2 halfSize) {
-			glm::vec2 corners[4]{
+			const glm::vec2 corners[4]{
 					{transform * glm::vec3{-halfSize.x, -halfSize.y, 1.0f}},
 					{transform * glm::vec3{halfSize.x, -halfSize.y, 1.0f}},
 					{transform * glm::vec3{halfSize.x, halfSize.y, 1.0f}},
 					{transform * glm::vec3{-halfSize.x, halfSize.y, 1.0f}},
 				};
-			AABB bounds;
+			AABB bounds { corners[0], corners[0] };
 
-			bounds.m_Max = corners[0];
-			bounds.m_Min = corners[0];
-
-			for (int i = 1; i < 4; ++i) {
+			for (int32_t i = 1; i < 4; ++i) {
 				bounds.m_Min.x = std::min(bounds.m_Min.x, corners[i].x);
 				bounds.m_Min.y = std::min(bounds.m_Min.y, corners[i].y);
 				bounds.m_Max.x = std::max(bounds.m_Max.x, corners[i].x);

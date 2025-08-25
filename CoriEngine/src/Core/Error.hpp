@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ERROR_H
+#define ERROR_H
+#include "Logger.hpp"
 #include "Core/Utility/TemplateUtils.hpp"
 
 namespace Cori {
@@ -9,55 +11,53 @@ namespace Cori {
 	class CoriError final : public std::exception {
 	public:
 		template <typename... Args>
-		explicit CoriError(std::string message, Args&&... args) : m_ErrorMessage(std::move(message)) {
+		explicit CoriError(const std::string& message, Args&&... args) {
 			static_assert(sizeof...(Args) == 2 * sizeof...(DeclaredTypes), "Incorrect number of arguments provided. Expected a description and a value for each declared type.");
 
-			m_Descriptions.reserve(sizeof...(DeclaredTypes));
 			m_Payloads.reserve(sizeof...(DeclaredTypes));
 
-			ProcessArgs<DeclaredTypes...>(std::forward<Args>(args)...);
+			std::stringstream ss;
+			ss << message;
+
+			if constexpr (sizeof...(Args) > 0) {
+				ss << " | Additional data: (";
+				ProcessArgs<DeclaredTypes...>(ss, std::forward<Args>(args)...);
+				ss << ") |";
+			}
+
+			m_Message = ss.str();
 		}
 
 		~CoriError() override {
 			if (!m_Seen) {
-				CORI_CORE_ERROR_TAGGED({"Unlogged Error"}, "A CoriError was never logged, logging it now. Error: '{}'", what());
+				CORI_CORE_ERROR_TAGGED({ Logger::Tags::UnusedError }, "A CoriError was never logged, logging it now. Error: '{}'", what());
 			}
 		}
 
+		CoriError(const CoriError& other) noexcept : m_Payloads(other.m_Payloads), m_Message(other.m_Message), m_Seen(other.m_Seen) {
+			other.m_Seen = true;
+		}
+
+		CoriError(CoriError&& other) noexcept : m_Payloads(std::move(other.m_Payloads)), m_Message(std::move(other.m_Message)), m_Seen(other.m_Seen)  {
+			other.m_Seen = true;
+		}
+
+		CoriError& operator=(const CoriError& other) = delete;
+		CoriError& operator=(CoriError&& other) noexcept = delete;
+
 		const char* what() const noexcept override {
 			if (!m_Seen) {
-				std::stringstream ss;
-				ss << m_ErrorMessage;
-
-				if (!m_Payloads.empty()) {
-					ss << " | additional data: (";
-					bool first = true;
-
-					for (auto&& [description, payload] : std::views::zip(m_Descriptions, m_Payloads)) {
-						if (!first) { ss << ", "; }
-						ss << description << ": ";
-						payload.print(ss, payload.m_Value);
-						first = false;
-					}
-
-					ss << ")";
-				}
-				m_WhatMessage = ss.str();
-				m_Descriptions.clear();
-				m_ErrorMessage.clear();
-				m_Descriptions.shrink_to_fit();
-				m_ErrorMessage.shrink_to_fit();
 				m_Seen = true;
 			}
-			return m_WhatMessage.c_str();
+			return m_Message.c_str();
 		}
 
 		template <typename T>
 		T Get() const {
 			static_assert(Utility::IsInPack<T, DeclaredTypes...>, "Error: Attempting to Get<T> a type T that was not declared in the CoriError<TypeIsAnalogInPacks...> specialization.");
 			for (const auto& payload : m_Payloads) {
-				if (payload.m_Value.type() == typeid(T)) {
-					return std::any_cast<T>(payload.m_Value);
+				if (payload.type() == typeid(T)) {
+					return std::any_cast<T>(payload);
 				}
 			}
 
@@ -72,33 +72,33 @@ namespace Cori {
 	private:
 		static_assert(!Utility::HasDuplicates<DeclaredTypes...>, "CoriError cannot be instantiated with duplicate types in its template parameter list. Each retrievable type must be unique.");
 
-		struct DataPayload {
-			std::any m_Value;
-			void (*print)(std::ostream&, const std::any&){};
-		};
+		mutable std::vector<std::any> m_Payloads;
+		mutable std::string m_Message;
+		mutable bool m_Seen{ false };
 
-		mutable std::string m_ErrorMessage{};
-		mutable std::vector<DataPayload> m_Payloads;
-		mutable std::vector<std::string> m_Descriptions;
-		mutable std::string m_WhatMessage{};
-		mutable bool m_Seen{false};
+		// ReSharper disable once CppMemberFunctionMayBeStatic
+		void ProcessArgs([[maybe_unused]] std::stringstream& ss) {}
+
+		template <typename...>
+		// ReSharper disable once CppMemberFunctionMayBeStatic
+		void ProcessArgs([[maybe_unused]] std::stringstream& ss) {}
 
 		template <typename DeclaredT, typename... RestT, typename ValT, typename... RestArgs>
-		void ProcessArgs(const std::string& description, ValT&& value, RestArgs&&... restArgs) {
+		void ProcessArgs(std::stringstream& ss, const std::string& description, ValT&& value, RestArgs&&... restArgs) {
 			static_assert(std::is_constructible_v<DeclaredT, ValT>, "A declared error type cannot be constructed from its provided value.");
 
-			m_Descriptions.emplace_back(description);
-			m_Payloads.emplace_back(DataPayload{
-					DeclaredT(std::forward<ValT>(value)),
-					[](std::ostream& os, const std::any& a) { os << std::any_cast<const DeclaredT&>(a); }
-				});
+			ss << description << "(" << CORI_CLEAN_TYPE_NAME(DeclaredT) << "): '" << value << "'";
+
+			if constexpr (sizeof...(RestArgs) > 0) {
+				ss << ", ";
+			}
+
+			m_Payloads.emplace_back(DeclaredT(std::forward<ValT>(value)));
 
 			if constexpr (sizeof...(RestT) > 0) {
-				ProcessArgs<RestT...>(std::forward<RestArgs>(restArgs)...);
+				ProcessArgs<RestT...>(ss, std::forward<RestArgs>(restArgs)...);
 			}
 		}
-
-		void ProcessArgs() {}
 	};
 
 	template <typename... Errors> requires AllAreExceptions<Errors...>
@@ -110,20 +110,21 @@ namespace Cori {
 		~PossibleErrors() {
 			if (!m_ErrorHandled) {
 				std::visit([](const auto& e) {
-					CORI_CORE_ERROR_TAGGED({"Unused Error"}, "An error inside PossibleErrors was never used, logging it now. Error: '{}'", e.what());
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::UnusedError }, "An error inside PossibleErrors was never used, logging it now. Error: '{}'", e.what());
 				}, m_Variant);
 			}
 		}
 
-		PossibleErrors(const PossibleErrors& other) = default;
-
-		PossibleErrors& operator=(const PossibleErrors& other) = default;
+		PossibleErrors(const PossibleErrors& other) noexcept : m_Variant(other.m_Variant), m_ErrorHandled(other.m_ErrorHandled) {
+			other.m_ErrorHandled = true;
+		}
 
 		PossibleErrors(PossibleErrors&& other) noexcept : m_Variant(std::move(other.m_Variant)), m_ErrorHandled(other.m_ErrorHandled) {
 			other.m_ErrorHandled = true;
 		}
 
-		PossibleErrors& operator=(PossibleErrors&& other) noexcept = default;
+		PossibleErrors& operator=(const PossibleErrors& other) = delete;
+		PossibleErrors& operator=(PossibleErrors&& other) noexcept = delete;
 
 		[[nodiscard]] const std::exception* GetRaw() const {
 			m_ErrorHandled = true;
@@ -177,3 +178,5 @@ namespace Cori {
 		mutable bool m_ErrorHandled{false};
 	};
 }
+
+#endif

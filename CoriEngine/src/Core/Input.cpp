@@ -2,26 +2,26 @@
 
 namespace Cori {
 
-	bool Input::IsKeyPressed(CoriKeycode keycode) {
-		auto state = SDL_GetKeyboardState(nullptr);
-		return (state[keycode] == 1);
+	bool Input::IsKeyPressed(const CoriKeycode keycode) {
+		const auto state = SDL_GetKeyboardState(nullptr);
+		return state[keycode] == 1;
 	}
 
-	bool Input::IsMouseKeyPressed(CoriMouseCode button) {
-		auto state = SDL_GetMouseState(nullptr, nullptr);
+	bool Input::IsMouseKeyPressed(const CoriMouseCode button) {
+		const auto state = SDL_GetMouseState(nullptr, nullptr);
 		return (state & SDL_BUTTON_MASK(button)) != 0;
 	}
 
-	int Input::GetMouseX() {
+	int32_t Input::GetMouseX() {
 		float x;
 		SDL_GetMouseState(&x, nullptr);
-		return static_cast<int>(x);
+		return static_cast<int32_t>(x);
 	}
 
-	int Input::GetMouseY() {
+	int32_t Input::GetMouseY() {
 		float y;
 		SDL_GetMouseState(nullptr, &y);
-		return static_cast<int>(y);
+		return static_cast<int32_t>(y);
 	}
 
 }

@@ -4,79 +4,74 @@
 
 namespace Cori {
 
-	class MouseMovedEvent : public Event {
+	class MouseMovedEvent final : public Event {
 	public:
-		MouseMovedEvent(int x, int y)
+		MouseMovedEvent(const int32_t x, const int32_t y)
 			: m_MouseX(x), m_MouseY(y) {
 		}
 
-		inline int GetX() const { return m_MouseX; }
-		inline int GetY() const { return m_MouseY; }
+		[[nodiscard]] int32_t GetX() const { return m_MouseX; }
+		[[nodiscard]] int32_t GetY() const { return m_MouseY; }
 
-		std::string ToString() const override {
-			std::stringstream ss;
-			ss << "MouseMovedEvent: " << "(" << m_MouseX << ", " << m_MouseY << ")";
-			return ss.str();
+		[[nodiscard]] std::string ToString() const override {
+			return std::string("MouseMovedEvent: (") + std::to_string(m_MouseX) + std::string(", ") + std::to_string(m_MouseY) + std::string(")");
 		}
 
 		EVENT_CLASS_TYPE(MouseMoved)
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 	private:
-		int m_MouseX{ 0 }, m_MouseY{ 0 };
+		int32_t m_MouseX{ 0 };
+		int32_t m_MouseY{ 0 };
 	};
 
-	class MouseScrolledEvent : public Event {
+	class MouseScrolledEvent final : public Event {
 	public:
-		MouseScrolledEvent(short xDirection, short yDirection)
+		MouseScrolledEvent(const int16_t xDirection, const int16_t yDirection)
 			: m_xDirection(xDirection), m_yDirection(yDirection) {}
 
-		inline short GetXOffset() const { return m_xDirection; }
-		inline short GetYOffset() const { return m_yDirection; }
+		int16_t GetXOffset() const { return m_xDirection; }
+		int16_t GetYOffset() const { return m_yDirection; }
 
 		std::string ToString() const override {
-			std::stringstream ss;
-			ss << "MouseScrolledEvent: " << "(" << m_xDirection << ", " << m_yDirection << ")";
-			return ss.str();
+			return std::string("MouseScrolledEvent: (") + std::to_string(m_xDirection) + std::string(", ") + std::to_string(m_yDirection) + std::string(")");
 		}
 		EVENT_CLASS_TYPE(MouseScrolled)
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 	private:
-		short m_xDirection{ 0 }, m_yDirection{ 0 };
+		int16_t m_xDirection{ 0 };
+		int16_t m_yDirection{ 0 };
 	};
 
 	class MouseButtonEvent : public Event {
 	public:
-		inline CoriMouseCode GetMouseButton() const { return m_Button; }
+		CoriMouseCode GetMouseButton() const { return m_Button; }
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryMouseButton | EventCategoryInput)
 	protected:
-		MouseButtonEvent(CoriMouseCode button)
+		explicit MouseButtonEvent(const CoriMouseCode button)
 			: m_Button(button) {}
 
 		CoriMouseCode m_Button{ CORI_MOUSEBUTTON_UNKNOWN };
 	};
 
-	class MouseButtonPressedEvent : public MouseButtonEvent {
+	class MouseButtonPressedEvent final : public MouseButtonEvent {
 	public:
-		MouseButtonPressedEvent(CoriMouseCode button)
+		explicit MouseButtonPressedEvent(const CoriMouseCode button)
 			: MouseButtonEvent(button) {}
 
 		std::string ToString() const override {
-			std::stringstream ss;
-			ss << "MouseButtonPressedEvent: " << CoriGetKeyName(m_Button);
-			return ss.str();
+			return std::string("MouseButtonPressedEvent: ") + CoriGetKeyName(m_Button);
 		}
 		EVENT_CLASS_TYPE(MouseButtonPressed)
 	};
 
-	class MouseButtonReleasedEvent : public MouseButtonEvent {
+	class MouseButtonReleasedEvent final : public MouseButtonEvent {
 	public:
-		MouseButtonReleasedEvent(CoriMouseCode button)
+		explicit MouseButtonReleasedEvent(const CoriMouseCode button)
 			: MouseButtonEvent(button) {}
 
 		std::string ToString() const override {
-			std::stringstream ss;
-			ss << "MouseButtonReleasedEvent: " << CoriGetKeyName(m_Button);
-			return ss.str();
+			return std::string("MouseButtonReleasedEvent: ") + CoriGetKeyName(m_Button);
+
 		}
 		EVENT_CLASS_TYPE(MouseButtonReleased)
 	};

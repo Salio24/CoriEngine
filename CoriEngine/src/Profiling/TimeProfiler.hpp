@@ -11,7 +11,7 @@ namespace Cori {
 		struct RawProfileEvent {
 			uint64_t RawTimestamp;
 			const char* Name;
-			int Line;
+			int32_t Line;
 			RawEventType Type;
 		};
 
@@ -21,7 +21,7 @@ namespace Cori {
 			long long StartTimeMicros;
 			long long EndTimeMicros;
 			uint32_t ThreadID;
-			int Line;
+			int32_t Line;
 		};
 
 		inline constexpr size_t MAX_PROFILE_EVENTS_PER_FRAME = 100000;
@@ -41,7 +41,7 @@ namespace Cori {
 
 			long long GetMicroseconds();
 
-			void RecordRawEvent(RawEventType type, const char* name, int line);
+			void RecordRawEvent(RawEventType type, const char* name, int32_t line);
 
 		private:
 			TimeProfiler();
@@ -52,7 +52,7 @@ namespace Cori {
 			void ProcessAndWriteFrameData(uint64_t frameIDBeingProcessed, uint32_t rawEventCount);
 			void WriteJsonEvent(std::ostream& out, const ProfileResult& result, size_t& jsonEventCounter);
 
-			std::array<RawProfileEvent, MAX_PROFILE_EVENTS_PER_FRAME> m_RawEvents;
+			std::array<RawProfileEvent, MAX_PROFILE_EVENTS_PER_FRAME> m_RawEvents{};
 			std::atomic<uint32_t> m_RawEventIndex{ 0 };
 
 			std::ofstream m_FrameOutputStream;
@@ -68,7 +68,7 @@ namespace Cori {
 
 		class ScopedTimer {
 		public:
-			ScopedTimer(const char* name, int line);
+			ScopedTimer(const char* name, int32_t line);
 			~ScopedTimer();
 
 			ScopedTimer(const ScopedTimer&) = delete;
@@ -78,7 +78,7 @@ namespace Cori {
 
 		private:
 			const char* m_Name;
-			int m_Line;
+			int32_t m_Line;
 		};
 
 	}

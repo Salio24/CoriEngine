@@ -3,7 +3,8 @@
 
 extern Cori::Application* Cori::CreateApplication();
 
-int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
+// ReSharper disable once CppNonInlineFunctionDefinitionInHeaderFile
+int32_t main([[maybe_unused]] int32_t argc, [[maybe_unused]] char** argv) {
 
 #ifdef CORI_ASYNC_LOGGING
 #ifndef CORI_NO_FILE_LOGGING

@@ -4,9 +4,10 @@ namespace Cori {
 	class GameTimer {
 	public:
 		GameTimer();
+		~GameTimer() = default;
 
 		void Update();
-		void SetTickrate(uint16_t tickrate);
+		void SetTickrate(const uint16_t tickrate);
 
 		double GetDeltaTime() const { return m_DeltaTime; }
 		double GetTickAlpha() const { return m_TickAlpha; }
@@ -41,9 +42,8 @@ namespace Cori {
 		~ManualTimer() = default;
 
 		void Start();
-		double End();
+		double End() const;
 	private:
 		uint64_t m_Start{ 0 };
-
 	};
 }

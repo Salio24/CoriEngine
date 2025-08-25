@@ -1,5 +1,4 @@
-#pragma once 
-#include <spdlog/spdlog.h>
+#pragma once
 
 namespace Cori {
 	enum class EventType {
@@ -24,32 +23,34 @@ namespace Cori {
 	class Event {
 		friend class EventDispatcher;
 	public:
-		virtual EventType GetEventType() const = 0;
-		virtual const char* GetName() const = 0;
-		virtual int GetCategoryFlags() const = 0;
-		virtual std::string ToString() const { return GetName(); }
+		virtual ~Event() = default;
+		[[nodiscard]] virtual EventType GetEventType() const = 0;
+		[[nodiscard]] virtual const char* GetName() const = 0;
+		[[nodiscard]] virtual int32_t GetCategoryFlags() const = 0;
+		[[nodiscard]] virtual std::string ToString() const { return GetName(); }
 
-		inline bool IsInCategory(EventCategory category) {
+		[[nodiscard]] bool IsInCategory(const EventCategory category) const {
 			return GetCategoryFlags() & category;
 		}
-		inline bool IsOfType(EventType type) {
+
+		[[nodiscard]] bool IsOfType(const EventType type) const {
 			return GetEventType() == type;
 		}
-		bool m_Handeled = false;
+		bool m_Handled = false;
 	};
 
 	class EventDispatcher {
 		template<typename T>
 		using EventFn = std::function<bool(T&)>;
 	public:
-		EventDispatcher(Event& event)
+		explicit EventDispatcher(Event& event)
 			: m_Event(event) {
 		}
 
 		template<typename T>
 		bool Dispatch(EventFn<T> func) {
 			if (m_Event.GetEventType() == T::GetStaticType()) {
-				m_Event.m_Handeled = func(*(T*)&m_Event);
+				m_Event.m_Handled = func(*static_cast<T*>(&m_Event));
 				return true;
 			}
 			return false;
@@ -74,4 +75,4 @@ namespace Cori {
 								virtual ::Cori::EventType GetEventType() const override { return GetStaticType(); }\
 								virtual const char* GetName() const override { return #type; }
 
-#define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
+#define EVENT_CLASS_CATEGORY(category) virtual int32_t GetCategoryFlags() const override { return category; }

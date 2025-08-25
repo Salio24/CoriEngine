@@ -1,4 +1,5 @@
-#pragma once
+#ifndef UUID_H
+#define UUID_H
 #include <uuid.h>
 
 namespace Cori {
@@ -26,9 +27,9 @@ namespace Cori {
 	}
 }
 
-namespace std {
-	template<>
-	struct hash<Cori::Core::UUID> {
-		std::size_t operator()(const Cori::Core::UUID& uuid) const noexcept { return hash<uuids::uuid>{}(static_cast<uuids::uuid>(uuid)); }
-	};
-}
+template<>
+struct std::hash<Cori::Core::UUID> {
+	std::size_t operator()(const Cori::Core::UUID& uuid) const noexcept { return hash<uuids::uuid>{}(static_cast<uuids::uuid>(uuid)); }
+};
+
+#endif

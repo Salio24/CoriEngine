@@ -3,30 +3,18 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_sdl3.h>
 #include "Core/Application.hpp"
-#include "Renderer/OpenGL/GL_GraphicsContext.hpp"
 
 namespace Cori {
 	ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {
-		
-	}
-
-	ImGuiLayer::~ImGuiLayer() {
-		
-	}
-
-	void ImGuiLayer::OnAttach() {
-		static bool created = false;
-		if (CORI_CORE_ASSERT_ERROR(!created, "ImGui context already created")) { return; }
-
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls 
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // Enable docking
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable multi-viewport
-		// f-ing wayland
+		// big L wayland
 
 		ImGui::StyleColorsDark();
 
@@ -36,13 +24,20 @@ namespace Cori {
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
 
-		
 		ImGui_ImplSDL3_InitForOpenGL(static_cast<SDL_Window*>(Application::GetWindow().GetNativeWindow()), Application::GetWindow().GetNativeContext());
-		// do an assert
-		[[maybe_unused]] bool test = ImGui_ImplOpenGL3_Init("#version 460");
 
-		created = true;
-		CORI_CORE_DEBUG("ImGuiLayer attached");
+		const bool success = ImGui_ImplOpenGL3_Init("#version 460");
+		CORI_CORE_ASSERT(success, "Failed to initialize ImGui with OpenGL.");
+
+		CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::ImGui }, "ImGuiLayer created");
+	}
+
+	ImGuiLayer::~ImGuiLayer() {
+		CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::ImGui }, "ImGuiLayer destroyed");
+	}
+
+	void ImGuiLayer::OnAttach() {
+		CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::ImGui }, "ImGuiLayer attached");
 	}
 
 	void ImGuiLayer::OnDetach() {
@@ -50,31 +45,25 @@ namespace Cori {
 		ImGui_ImplSDL3_Shutdown();
 		ImGui::DestroyContext();
 
-		CORI_CORE_DEBUG("ImGuiLayer detached");
+		CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::ImGui }, "ImGuiLayer detached");
 	}
 
 	void ImGuiLayer::OnImGuiRender([[maybe_unused]] const double deltaTime) {
-		static bool show_ui = true;
-		
-		if (ImGui::IsKeyPressed(ImGuiKey_F1)) {
-			show_ui = !show_ui;
+
+	}
+
+	void ImGuiLayer::OnEvent(Event& event) {
+		const ImGuiIO& io = ImGui::GetIO();
+
+		if (event.IsInCategory(EventCategoryMouse) && io.WantCaptureMouse) {
+			event.m_Handled = true;
 		}
-		if (show_ui) {
-			//ImGui::ShowDemoWindow(&show);
+		else if (event.IsInCategory(EventCategoryKeyboard) && io.WantCaptureKeyboard) {
+			event.m_Handled = true;
 		}
 	}
 
-	void ImGuiLayer::OnEvent(Event& e) {
-		ImGuiIO& io = ImGui::GetIO();
-
-		if (e.IsInCategory(EventCategoryMouse) && io.WantCaptureMouse) {
-			e.m_Handeled = true;
-		}
-		else if (e.IsInCategory(EventCategoryKeyboard) && io.WantCaptureKeyboard) {
-			e.m_Handeled = true;
-		}
-	}
-
+	// ReSharper disable once CppMemberFunctionMayBeStatic
 	void ImGuiLayer::StartFrame() {
 		CORI_PROFILE_FUNCTION();
 		ImGui_ImplOpenGL3_NewFrame();
@@ -82,18 +71,19 @@ namespace Cori {
 		ImGui::NewFrame();
 	}
 
+	// ReSharper disable once CppMemberFunctionMayBeStatic
 	void ImGuiLayer::EndFrame() {
 		CORI_PROFILE_FUNCTION();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-		ImGuiIO& io = ImGui::GetIO();
+		const ImGuiIO& io = ImGui::GetIO();
 		(void)io;
 
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
 			SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
-			SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
+			const SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
 			SDL_GL_MakeCurrent(backup_current_window, backup_current_context);

@@ -8,11 +8,11 @@ namespace Cori {
 
 		static void Shutdown();
 
-		static std::shared_ptr<Scene> CreateScene(const std::string& name);
+		[[nodiscard]] static std::expected<std::shared_ptr<Scene>, CoriError<>> CreateScene(const std::string& name);
 
-		static std::shared_ptr<Scene> GetScene(const std::string& name);
+		[[nodiscard]] static std::expected<std::shared_ptr<Scene>, CoriError<>> GetScene(const std::string& name);
 
-		static void DestroyScene(const std::string& name);
+		[[nodiscard]] static std::expected<void, CoriError<>> DestroyScene(const std::string& name);
 
 	private:
 		struct Data;

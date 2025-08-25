@@ -1,16 +1,19 @@
 #include "SceneManager.hpp"
-#include "Renderer/CameraController.hpp"
+#include "Graphics/CameraController.hpp"
 #include "Core/Application.hpp"
 
 namespace Cori {
-	SceneManager::Data* SceneManager::s_Data{nullptr};
+	SceneManager::Data* SceneManager::s_Data{ nullptr };
 
 	struct SceneManager::Data {
 		std::unordered_map<std::string, std::shared_ptr<Scene>> m_Scenes;
 	};
 
-	std::shared_ptr<Scene> SceneManager::GetScene(const std::string& name) {
-		CORI_CORE_ASSERT_FATAL(s_Data->m_Scenes.contains(name), "No scene with name '{}' exists", name);
+	std::expected<std::shared_ptr<Scene>, CoriError<>> SceneManager::GetScene(const std::string& name) {
+		if (!s_Data->m_Scenes.contains(name)) {
+			return std::unexpected(CoriError(std::format("No Scene with name '{}' exists.", name)));
+		}
+
 		return s_Data->m_Scenes.at(name);
 	}
 
@@ -22,29 +25,39 @@ namespace Cori {
 		delete s_Data;
 	}
 
-	std::shared_ptr<Scene> SceneManager::CreateScene(const std::string& name) {
-		if (CORI_CORE_ASSERT_ERROR(!name.empty(), "Scene name cannot be empty!")) { return nullptr; }
-		if (CORI_CORE_VERIFY_ERROR(!s_Data->m_Scenes.contains(name), "Scene '{0}' already exists!", name)) { return nullptr; }
+	std::expected<std::shared_ptr<Scene>, CoriError<>> SceneManager::CreateScene(const std::string& name) {
+		if (name.empty()) {
+			return std::unexpected(CoriError("Scene name cannot be empty!"));
+		}
 
-		CORI_CORE_INFO("SceneManager: Creating scene '{0}'", name);
+		if (s_Data->m_Scenes.contains(name)) {
+			return std::unexpected(CoriError(std::format("Scene with name '{}' already exists.", name)));
+		}
+
+		CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::SceneManager }, "Creating Scene '{}'", name);
 
 		std::shared_ptr<Scene> scene = Scene::Create(name);
 		s_Data->m_Scenes.insert({ name, scene });
 		return scene;
 	}
 
-	void SceneManager::DestroyScene(const std::string& name) {
-		if (CORI_CORE_ASSERT_ERROR(!name.empty(), "Scene name cannot be empty!")) { return; }
-		if (CORI_CORE_ASSERT_ERROR(s_Data->m_Scenes.contains(name), "Can't destroy scene, scene '{0}' does not exist!", name)) { return; }
+	std::expected<void, CoriError<>> SceneManager::DestroyScene(const std::string& name) {
+		if (name.empty()) {
+			return std::unexpected(CoriError("Scene name cannot be empty!"));
+		}
 
-		CORI_CORE_INFO("SceneManager: Destroying scene '{0}'", name);
+		if (!s_Data->m_Scenes.contains(name)) {
+			return std::unexpected(CoriError(std::format("No Scene with name '{}' exists.", name)));
+		}
+
+		CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::SceneManager }, "Destroying Scene '{}'", name);
 
 		if (s_Data->m_Scenes.at(name).use_count() == 1) {
 			s_Data->m_Scenes.erase(name);
+			return {};
 		}
-		else {
-			CORI_CORE_WARN("SceneManager: Failed to destroy scene '{0}', this scene is active in some layer. (ref count is > 1)", name);
-		}
+
+		return std::unexpected(CoriError(std::format("Failed to destroy Scene '{}', this scene is active in some layer. (ref count is > 1", name)));
 	}
 
 }

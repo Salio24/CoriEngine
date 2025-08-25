@@ -1,7 +1,7 @@
-// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "Logger.hpp"
+#include <spdlog/sinks/stdout_color_sinks.h>
 
-#ifdef _WIN32
+#ifdef PLATFORM_WINDOWS
 #include <windows.h>
 #endif
 
@@ -17,7 +17,7 @@ namespace Cori {
 	static std::mutex s_ClientTagMutex;
 
 	void Logger::EnableVirtualTerminalProcessing() {
-#ifdef _WIN32
+#ifdef PLATFORM_WINDOWS
 		HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 		if (hOut == INVALID_HANDLE_VALUE) {
 			return;
@@ -36,39 +36,39 @@ namespace Cori {
 #endif
 	}
 
-	void Logger::Init(bool async, bool fileWrite) {
+	void Logger::Init(const bool async, const  bool fileWrite) {
 		if (async) {
 			spdlog::init_thread_pool(8192, 1);
 		}
 
-		int max_size = 1048576 * 20;
-		int max_files = 5;
-		auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("logs/cori_log.txt", max_size, max_files);
-		file_sink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-6n] [%-8l]: %v%$ %@");
-		std::vector<spdlog::sink_ptr> core_sinks;
-		std::vector<spdlog::sink_ptr> client_sinks;
+		int32_t maxSize = 1048576 * 20;
+		int32_t maxFiles = 5;
+		const auto fileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("logs/cori_log.txt", maxSize, maxFiles);
+		fileSink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-6n] [%-8l]: %v%$ %@");
+		std::vector<spdlog::sink_ptr> coreSinks;
+		std::vector<spdlog::sink_ptr> clientSinks;
 
 		if (fileWrite) {
-			core_sinks.push_back(file_sink);
+			coreSinks.push_back(fileSink);
 
-			client_sinks.push_back(file_sink);
+			clientSinks.push_back(fileSink);
 		}
 
 #ifdef DEBUG_BUILD
-		auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-		console_sink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-6n] [%-8l]: %v%$ %@");
+		const auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+		consoleSink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-6n] [%-8l]: %v%$ %@");
 
-		core_sinks.push_back(console_sink);
-		client_sinks.push_back(console_sink);
+		coreSinks.push_back(consoleSink);
+		clientSinks.push_back(consoleSink);
 #endif
 
 		if (async) {
-			s_CoreLogger = std::make_shared<spdlog::async_logger>("ENGINE", core_sinks.begin(), core_sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
-			s_ClientLogger = std::make_shared<spdlog::async_logger>("APP", client_sinks.begin(), client_sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+			s_CoreLogger = std::make_shared<spdlog::async_logger>("ENGINE", coreSinks.begin(), coreSinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+			s_ClientLogger = std::make_shared<spdlog::async_logger>("APP", clientSinks.begin(), clientSinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
 		}
 		else {
-			s_CoreLogger = std::make_shared<spdlog::logger>("ENGINE", core_sinks.begin(), core_sinks.end());
-			s_ClientLogger = std::make_shared<spdlog::logger>("APP", client_sinks.begin(), client_sinks.end());
+			s_CoreLogger = std::make_shared<spdlog::logger>("ENGINE", coreSinks.begin(), coreSinks.end());
+			s_ClientLogger = std::make_shared<spdlog::logger>("APP", clientSinks.begin(), clientSinks.end());
 		}
 
 		spdlog::register_logger(s_CoreLogger);
@@ -80,96 +80,96 @@ namespace Cori {
 		s_ClientLogger->flush_on(spdlog::level::warn);
 
 
-		CORI_CORE_INFO("------------- NEW LOG SESSION -------------");
-		CORI_CORE_INFO("|  Logger initialized. Mode: {} |", async ? "Asynchronous" : "Synchronous ");
-		CORI_CORE_INFO("-------------------------------------------");
-		CORI_CORE_INFO("|     File logging is: {} |    ", fileWrite ? "Enabled" : "Disabled");
-		CORI_CORE_INFO("-------------------------------------------");
+		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "------------- NEW LOG SESSION -------------");
+		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "|  Logger initialized. Mode: {} |", async ? "Asynchronous" : "Synchronous ");
+		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "-------------------------------------------");
+		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "|     File logging is: {}           |", fileWrite ? "Enabled " : "Disabled");
+		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "-------------------------------------------");
 	}
 
-	void Logger::SetClientLogLevel(LogLevel level) {
+	void Logger::SetClientLogLevel(const LogLevel level) {
 		switch (level) {
 		case Cori::LogLevel::CORI_TRACE:
-			CORI_CORE_INFO("Client log level is set to TRACE");
+			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Client log level is set to TRACE");
 			s_ClientLogger->set_level(spdlog::level::trace);
 			break;
 		case Cori::LogLevel::CORI_DEBUG:
-			CORI_CORE_INFO("Client log level is set to DEBUG");
+			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Client log level is set to DEBUG");
 			s_ClientLogger->set_level(spdlog::level::debug);
 			break;
 		case Cori::LogLevel::CORI_INFO:
-			CORI_CORE_INFO("Client log level is set to INFO");
+			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Client log level is set to INFO");
 			s_ClientLogger->set_level(spdlog::level::info);
 			break;
 		case Cori::LogLevel::CORI_WARN:
-			CORI_CORE_INFO("Client log level is set to WARN");
+			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Client log level is set to WARN");
 			s_ClientLogger->set_level(spdlog::level::warn);
 			break;
 		case Cori::LogLevel::CORI_ERROR:
-			CORI_CORE_INFO("Client log level is set to ERROR");
+			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Client log level is set to ERROR");
 			s_ClientLogger->set_level(spdlog::level::err);
 			break;
 		case Cori::LogLevel::CORI_FATAL:
-			CORI_CORE_INFO("Client log level is set to FATAL");
+			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Client log level is set to FATAL");
 			s_ClientLogger->set_level(spdlog::level::critical);
 			break;
 		}
 	}
 
-	void Logger::SetCoreLogLevel(LogLevel level) {
+	void Logger::SetCoreLogLevel(const LogLevel level) {
 		switch (level) {
 		case Cori::LogLevel::CORI_TRACE:
-			CORI_CORE_INFO("Core log level is set to TRACE");
+			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Core log level is set to TRACE");
 			s_CoreLogger->set_level(spdlog::level::trace);
 			break;
 		case Cori::LogLevel::CORI_DEBUG:
-			CORI_CORE_INFO("Core log level is set to DEBUG");
+			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Core log level is set to DEBUG");
 			s_CoreLogger->set_level(spdlog::level::debug);
 			break;
 		case Cori::LogLevel::CORI_INFO:
-			CORI_CORE_INFO("Core log level is set to INFO");
+			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Core log level is set to INFO");
 			s_CoreLogger->set_level(spdlog::level::info);
 			break;
 		case Cori::LogLevel::CORI_WARN:
-			CORI_CORE_INFO("Core log level is set to WARN");
+			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Core log level is set to WARN");
 			s_CoreLogger->set_level(spdlog::level::warn);
 			break;
 		case Cori::LogLevel::CORI_ERROR:
-			CORI_CORE_INFO("Core log level is set to ERROR");
+			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Core log level is set to ERROR");
 			s_CoreLogger->set_level(spdlog::level::err);
 			break;
 		case Cori::LogLevel::CORI_FATAL:
-			CORI_CORE_INFO("Core log level is set to FATAL");
+			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Core log level is set to FATAL");
 			s_CoreLogger->set_level(spdlog::level::critical);
 			break;
 		}
 	}
 
-	void Logger::EnableCoreTag(std::string_view tag) {
+	void Logger::EnableCoreTag(const char* tag) {
 		std::lock_guard<std::mutex> lock(s_CoreTagMutex);
 		s_CoreInactiveTags.erase(std::string(tag));
 	}
 
-	void Logger::EnableCoreTags(std::initializer_list<const char*> tags) {
+	void Logger::EnableCoreTags(const std::initializer_list<const char*> tags) {
 		std::lock_guard<std::mutex> lock(s_CoreTagMutex);
 		for (const char* tag : tags) {
 			s_CoreInactiveTags.erase(tag);
 		}
 	}
 
-	void Logger::DisableCoreTag(std::string_view tag) {
+	void Logger::DisableCoreTag(const char* tag) {
 		std::lock_guard<std::mutex> lock(s_CoreTagMutex);
 		s_CoreInactiveTags.insert(std::string(tag));
 	}
 
-	void Logger::DisableCoreTags(std::initializer_list<const char*> tags) {
+	void Logger::DisableCoreTags(const std::initializer_list<const char*> tags) {
 		std::lock_guard<std::mutex> lock(s_CoreTagMutex);
 		for (const char* tag : tags) {
 			s_CoreInactiveTags.insert(tag);
 		}
 	}
 
-	bool Logger::IsCoreTagDisabled(std::string_view tag) {
+	bool Logger::IsCoreTagDisabled(const char* tag) {
 		std::lock_guard<std::mutex> lock(s_CoreTagMutex);
 		return s_CoreInactiveTags.contains(tag);
 	}
@@ -187,24 +187,24 @@ namespace Cori {
 		return result;
 	}
 
-	void Logger::EnableClientTag(std::string_view tag) {
+	void Logger::EnableClientTag(const char* tag) {
 		std::lock_guard<std::mutex> lock(s_ClientTagMutex);
 		s_ClientInactiveTags.erase(std::string(tag));
 	}
 
-	void Logger::EnableClientTags(std::initializer_list<const char*> tags) {
+	void Logger::EnableClientTags(const std::initializer_list<const char*> tags) {
 		std::lock_guard<std::mutex> lock(s_ClientTagMutex);
 		for (const char* tag : tags) {
 			s_ClientInactiveTags.erase(tag);
 		}
 	}
 
-	void Logger::DisableClientTag(std::string_view tag) {
+	void Logger::DisableClientTag(const char* tag) {
 		std::lock_guard<std::mutex> lock(s_ClientTagMutex);
 		s_ClientInactiveTags.insert(std::string(tag));
 	}
 
-	void Logger::DisableClientTags(std::initializer_list<const char*> tags) {
+	void Logger::DisableClientTags(const std::initializer_list<const char*> tags) {
 		std::lock_guard<std::mutex> lock(s_ClientTagMutex);
 		if (!s_ClientInactiveTags.empty()) {
 			for (const char* tag : tags) {
@@ -213,7 +213,7 @@ namespace Cori {
 		}
 	}
 
-	bool Logger::IsClientTagDisabled(std::string_view tag) {
+	bool Logger::IsClientTagDisabled(const char* tag) {
 		std::lock_guard<std::mutex> lock(s_ClientTagMutex);
 		return s_ClientInactiveTags.contains(tag);
 	}
@@ -231,7 +231,7 @@ namespace Cori {
 		return result;
 	}
 
-	bool Logger::ShouldCoreLog(std::initializer_list<const char*> tags) {
+	bool Logger::ShouldCoreLog(const std::initializer_list<const char*> tags) {
 		std::lock_guard<std::mutex> lock(s_CoreTagMutex);
 		if (s_CoreInactiveTags.empty()) {
 			return true;
@@ -244,7 +244,7 @@ namespace Cori {
 		return true;
 	}
 
-	bool Logger::ShouldClientLog(std::initializer_list<const char*> tags) {
+	bool Logger::ShouldClientLog(const std::initializer_list<const char*> tags) {
 		std::lock_guard<std::mutex> lock(s_ClientTagMutex);
 		if (s_ClientInactiveTags.empty()) {
 			return true;

@@ -2,8 +2,6 @@
 
 namespace Cori {
 
-	//TODO: adopt std::expected
-
 	template<typename...>
 	class SharedSelfFactory;
 
@@ -31,7 +29,7 @@ namespace Cori {
 
 				return std::make_shared<TypeProxy>(std::forward<CtorArgs>(ctorArgs)...);
 			}
-			CORI_CORE_ERROR("SharedSelfFactory: PreCreateHook failed for shared factory with type: {0}, nullptr returned", typeid(Type).name());
+			CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Factory::SelfFactory, Logger::Tags::Core::Factory::Shared }, "PreCreateHook failed for shared factory with type: {}, nullptr returned", CORI_CLEAN_TYPE_NAME(Type));
 			return nullptr;
 		}
 	};
@@ -51,7 +49,7 @@ namespace Cori {
 
 		template <typename... CtorArgs>
 		static std::expected<std::shared_ptr<Type>, ErrorType> Create(CtorArgs&&... ctorArgs) {
-			return std::move(Type::PreCreateHook(std::forward<CtorArgs>(ctorArgs)...)).transform([...ctorArgs = std::forward<CtorArgs>(ctorArgs)](auto&& ) {
+			return std::move(Type::PreCreateHook(std::forward<CtorArgs>(ctorArgs)...)).transform([...ctorArgs = std::forward<CtorArgs>(ctorArgs)]() mutable {
 				class TypeProxy : public Type {
 				public:
 					explicit TypeProxy(CtorArgs&&... proxyCtorArgs)
@@ -90,7 +88,7 @@ namespace Cori {
 
 				return std::make_unique<TypeProxy>(std::forward<CtorArgs>(ctorArgs)...);
 			}
-			CORI_CORE_ERROR("UniqueSelfFactory: PreCreateHook failed for unique factory with type: {0}, nullptr returned", typeid(Type).name());
+			CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Factory::SelfFactory, Logger::Tags::Core::Factory::Unique }, "UniqueSelfFactory: PreCreateHook failed for unique factory with type: {}, nullptr returned", CORI_CLEAN_TYPE_NAME(Type));
 			return nullptr;
 		}
 	};
@@ -109,7 +107,7 @@ namespace Cori {
 
 		template <typename... CtorArgs>
 		static std::expected<std::unique_ptr<Type>, ErrorType> Create(CtorArgs&&... ctorArgs) {
-			return std::move(Type::PreCreateHook(std::forward<CtorArgs>(ctorArgs)...)).transform([...ctorArgs = std::forward<CtorArgs>(ctorArgs)](auto&& ) {
+			return std::move(Type::PreCreateHook(std::forward<CtorArgs>(ctorArgs)...)).transform([...ctorArgs = std::forward<CtorArgs>(ctorArgs)]() mutable {
 				class TypeProxy : public Type {
 				public:
 					explicit TypeProxy(CtorArgs&&... proxyCtorArgs)

@@ -13,7 +13,7 @@ namespace Cori {
 			class Trigger {
 			public:
 				Trigger() = default;
-				Trigger(Cori::Entity& trigger);
+				explicit Trigger(Cori::Entity& trigger);
 
 				void OnEnter(Cori::Entity& entity);
 
@@ -23,7 +23,7 @@ namespace Cori {
 
 				template<typename Behavior>
 				void SetBehavior() {
-					static_assert(std::is_base_of_v<Cori::Physics::TriggerBehaviour, Behavior>, "Behavior must inherit from TriggerBehaviour");
+					static_assert(std::is_base_of_v<Physics::TriggerBehaviour, Behavior>, "Behavior must inherit from TriggerBehaviour");
 					m_Behavior = std::make_unique<Behavior>();
 					m_VisitorBuffer.clear();
 				}
@@ -31,7 +31,7 @@ namespace Cori {
 			private:
 				PackedArray<Cori::Entity, uint32_t, CORI_MAX_TRIGGER_VISITORS> m_VisitorBuffer;
 
-				std::unique_ptr<Cori::Physics::TriggerBehaviour> m_Behavior{ nullptr };
+				std::unique_ptr<Physics::TriggerBehaviour> m_Behavior{ nullptr };
 			};
 		}
 	}

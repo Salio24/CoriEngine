@@ -19,7 +19,7 @@ namespace Cori {
 			}
 		}
 
-		Entity CreateEntity(const std::string& name, const Utility::HashedTag64& tag) {
+		[[nodiscard]] Entity CreateEntity(const std::string& name, const Utility::HashedTag64& tag) {
 			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
 			return m_SceneRaw->CreateEntity(name, tag);
 		}
@@ -29,12 +29,12 @@ namespace Cori {
 			m_SceneRaw->DestroyEntity(entity);
 		}
 
-		std::expected<void, const char*> AddEntityToCache(Entity entity, const Utility::StringHash32 tag) {
+		[[nodiscard]] std::expected<void, CoriError<>> AddEntityToCache(Entity entity, const Utility::StringHash32 tag) {
 			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
 			return m_SceneRaw->AddEntityToCache(entity, tag);
 		}
 
-		std::expected<Entity, const char*> GetEntityFromCache(const Utility::StringHash32 tag) {
+		[[nodiscard]] std::expected<Entity, CoriError<>> GetEntityFromCache(const Utility::StringHash32 tag) {
 			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
 			return m_SceneRaw->GetEntityFromCache(tag);
 		}
@@ -44,33 +44,33 @@ namespace Cori {
 			m_SceneRaw->RemoveEntityFromCache(key);
 		}
 
-		std::expected<Entity, const char*> FindEntity(const std::string& name) {
+		[[nodiscard]] std::expected<Entity, CoriError<>> FindEntity(const std::string& name) {
 			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
 			return m_SceneRaw->FindEntity(name);
 		}
 
-		std::expected<Entity, const char*> FindEntity(const std::string& name, const Utility::HashedTag64& tag) {
+		[[nodiscard]] std::expected<Entity, CoriError<>> FindEntity(const std::string& name, const Utility::HashedTag64& tag) {
 			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
 			return m_SceneRaw->FindEntity(name, tag);
 		}
 
 		template<typename... T>
-		auto View() {
+		[[nodiscard]] auto View() {
 			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
 			return m_SceneRaw->View<T...>();
 		}
 
 		template<typename... T, typename... ExcludeT>
-		auto View(Exclude<ExcludeT...> exclude_list) {
+		[[nodiscard]] auto View(Exclude<ExcludeT...> exclude_list) {
 			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
 			return m_SceneRaw->View<T...>(exclude_list);
 		}
 
-		template<typename... T, typename Func>
-		void ForEach(Func func) {
-			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-			m_SceneRaw->ForEach<T...>(func);
-		}
+		//template<typename... T, typename Func>
+		//void ForEach(Func func) {
+		//	CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
+		//	m_SceneRaw->ForEach<T...>(func);
+		//}
 
 		template<typename T, typename... Args>
 		T& AddContextComponent(Args&&... args) {
@@ -85,19 +85,19 @@ namespace Cori {
 		}
 
 		template<typename T>
-		T& GetContextComponent() {
+		[[nodiscard]] T& GetContextComponent() {
 			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
 			return m_SceneRaw->GetContextComponent<T>();
 		}
 
 		template<typename T>
-		const T&GetContextComponent() const {
+		[[nodiscard]] const T& GetContextComponent() const {
 			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
 			return m_SceneRaw->GetContextComponent<T>();
 		}
 
 		template<typename T>
-		bool HasContextComponent() const {
+		[[nodiscard]] bool HasContextComponent() const {
 			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
 			return m_SceneRaw->HasContextComponent<T>();
 		}
@@ -108,12 +108,22 @@ namespace Cori {
 			m_SceneRaw->RemoveContextComponent<T>();
 		}
 
-		CameraController& GetActiveCamera() {
+		[[nodiscard]] CameraController& GetActiveCamera() {
 			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
 			return m_SceneRaw->m_ActiveCamera;
 		}
 
-		Physics::PhysicsWorld& GetPhysicsWorld() {
+		[[nodiscard]] const CameraController& GetActiveCamera() const {
+			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
+			return m_SceneRaw->m_ActiveCamera;
+		}
+
+		[[nodiscard]] Physics::PhysicsWorld& GetPhysicsWorld() {
+			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
+			return m_SceneRaw->m_PhysicsWorld;
+		}
+
+		[[nodiscard]] const Physics::PhysicsWorld& GetPhysicsWorld() const {
 			CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
 			return m_SceneRaw->m_PhysicsWorld;
 		}
@@ -123,13 +133,13 @@ namespace Cori {
 			return m_SceneRaw->m_Name;
 		}
 
-		bool IsValid() {
+		[[nodiscard]] bool IsValid() const {
 			return m_SceneRaw != nullptr;
 		}
 
 	protected:
 		friend class Layer;
-		bool OnUnbind() {
+		[[nodiscard]] bool OnUnbind() {
 			return m_SceneRaw->OnUnbind();
 		}
 

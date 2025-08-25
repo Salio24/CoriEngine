@@ -13,8 +13,8 @@ namespace Cori {
 		void PopLayer(Layer* layer);
 		void PopOverlay(Layer* overlay);
 		
-		void PushLayerToQueue(Layer* layer);
-		void PushOverlayToQueue(Layer* overlay);
+		std::expected<void, CoriError<>> PushLayerToQueue(Layer* layer);
+		std::expected<void, CoriError<>> PushOverlayToQueue(Layer* overlay);
 		void PopLayerToQueue(Layer* layer);
 		void PopOverlayToQueue(Layer* overlay);
 

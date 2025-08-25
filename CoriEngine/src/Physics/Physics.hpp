@@ -95,7 +95,7 @@ namespace Cori {
 		struct ShapeUserData {
 			ShapeUserData() = default;
 
-			ShapeUserData(const Entity& entity) : m_Entity(entity) {}
+			explicit ShapeUserData(const Entity& entity) : m_Entity(entity) {}
 
 			Entity m_Entity{};
 		};
@@ -112,8 +112,6 @@ namespace Cori {
 
 		// maybe remove them? do i even need those? idk
 		bool PointVsRect(const glm::vec2& point, const glm::vec2& boxSize, const glm::vec2& boxPos);
-		bool RectVsRect(const glm::vec2 rect1Pos, const glm::vec2 rect1Size, const glm::vec2 rect2Pos, const glm::vec2 rect2Size);
-		bool RayVsRect(const glm::vec2 rayOrigin, const glm::vec2 rayDirection, const glm::vec2 targetPos, const glm::vec2 targetSize, glm::vec2& contactPoint, glm::vec2& contactNormal, float& hitTimeNear);
 
 		WindingOrder GetPolygonWindingOrder(const std::vector<Vec2>& polygon);
 		WindingOrder GetPolygonWindingOrder(const std::vector<tmx::Vector2f>& polygon);
@@ -128,17 +126,17 @@ namespace Cori {
 		public:
 			ConvexHull() = default;
 
-			ConvexHull(const b2Hull& hull) : m_Hull(hull) {}
+			ConvexHull(const b2Hull& hull) : m_Hull(hull) {} // NOLINT
 
 			ConvexHull Create(const std::vector<Vec2>& vertices) {
 #ifdef DEBUG_BUILD
 				m_Hull = b2ComputeHull(vertices.data(), vertices.size());
 				if (m_Hull.count == 0) {
 					std::string str_vertices;
-					for (Vec2 val : vertices) {
-						str_vertices += "(" + std::to_string(val.x) + ", " + std::to_string(val.x) + ")";
+					for (auto [x, y] : vertices) {
+						str_vertices += "(" + std::to_string(x) + ", " + std::to_string(x) + ")";
 					}
-					CORI_CORE_ASSERT_ERROR(m_Hull.count != 0, "Failed to create ConvexHull. Vertices: {}", str_vertices);
+					CORI_CORE_CHECK(m_Hull.count != 0, "Failed to create ConvexHull. Vertices: {}", str_vertices);
 				}
 				return m_Hull;
 #endif
@@ -147,11 +145,11 @@ namespace Cori {
 #endif
 			}
 
-			operator b2Hull& () {
+			operator b2Hull& () { // NOLINT
 				return m_Hull;
 			}
 
-			operator const b2Hull* () const {
+			operator const b2Hull* () const { // NOLINT
 				return &m_Hull;
 			}
 
@@ -163,25 +161,25 @@ namespace Cori {
 		public:
 			Polygon() = default;
 
-			Polygon(const b2Polygon& polygon) : b2Polygon(polygon) {}
+			Polygon(const b2Polygon& polygon) : b2Polygon(polygon) {} // NOLINT
 
-			static Polygon CreateBox(Vec2 halfSize, Vec2 offset, Rot rotation = Rot{ 1, 0 }, float radius = 0.0f) {
+			static Polygon CreateBox(const Vec2 halfSize, const Vec2 offset, const Rot rotation = Rot{ 1, 0 }, const float radius = 0.0f) {
 				return b2MakeOffsetRoundedBox(halfSize.x, halfSize.y, offset, rotation, radius);
 			}
 
-			static Polygon CreateBox(Vec2 halfSize) {
+			static Polygon CreateBox(const Vec2 halfSize) {
 				return b2MakeBox(halfSize.x, halfSize.y);
 			}
 
-			static Polygon CreateBox(Vec2 halfSize, float radius) {
+			static Polygon CreateBox(const Vec2 halfSize, const float radius) {
 				return b2MakeRoundedBox(halfSize.x, halfSize.y, radius);
 			}
 
-			static Polygon CreatePolygon(const ConvexHull& hull, float radius = 0.0f) {
+			static Polygon CreatePolygon(const ConvexHull& hull, const float radius = 0.0f) {
 				return b2MakePolygon(hull, radius);
 			}
 
-			static Polygon CreatePolygon(const ConvexHull& hull, Vec2 offset, Rot rotation = Rot{ 1, 0 }, float radius = 0.0f) {
+			static Polygon CreatePolygon(const ConvexHull& hull, const Vec2 offset, const Rot rotation = Rot{ 1, 0 }, const float radius = 0.0f) {
 				return b2MakeOffsetRoundedPolygon(hull, offset, rotation, radius);
 			}
 		};
@@ -190,8 +188,8 @@ namespace Cori {
 		public:
 			Circle() = default;
 
-			Circle(const b2Circle& circle) : b2Circle(circle) {}
-			Circle(Vec2 center, float radius) : b2Circle{center, radius} {}
+			Circle(const b2Circle& circle) : b2Circle(circle) {} // NOLINT
+			Circle(const Vec2 center, const float radius) : b2Circle{center, radius} {}
 
 			static Circle Create(Vec2 center, float radius) {
 				return { center, radius };
@@ -202,8 +200,8 @@ namespace Cori {
 		public:
 			Capsule() = default;
 
-			Capsule(const b2Capsule& capsule) : b2Capsule(capsule) {}
-			Capsule(Vec2 center1, Vec2 center2, float radius) : b2Capsule{ center1, center2, radius } {}
+			Capsule(const b2Capsule& capsule) : b2Capsule(capsule) {} // NOLINT
+			Capsule(const Vec2 center1, const Vec2 center2, const float radius) : b2Capsule{ center1, center2, radius } {}
 
 			static Capsule Create(Vec2 center1, Vec2 center2, float radius) {
 				return { center1, center2, radius };
@@ -214,8 +212,8 @@ namespace Cori {
 		public:
 			Segment() = default;
 
-			Segment(const b2Segment& segment) : b2Segment(segment) {}
-			Segment(Vec2 point1, Vec2 point2) : b2Segment{ point1, point2 } {}
+			Segment(const b2Segment& segment) : b2Segment(segment) {} // NOLINT
+			Segment(const Vec2 point1, const Vec2 point2) : b2Segment{ point1, point2 } {}
 
 			static Segment Create(Vec2 point1, Vec2 point2) {
 				return { point1, point2 };
@@ -224,7 +222,7 @@ namespace Cori {
 
 		class PhysicsWorld : public World {
 		public:
-			PhysicsWorld() : World{ World::Params{} } {
+			PhysicsWorld() : World{ Params{} } {
 			}
 		};
 	}

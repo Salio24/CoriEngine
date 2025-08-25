@@ -40,9 +40,12 @@
 #include <variant>
 #include <ranges>
 #include <limits>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
+#include <glm/gtx/io.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include <imgui.h>
-#include "../include/Macros.hpp"
+#include "../src/Core/Utility/Macros.hpp"
 #include "../src/Core/Logger.hpp"
 #include "../src/Profiling/TimeProfiler.hpp"
 #include "../src/Core/Uuid.hpp"

@@ -19,10 +19,12 @@ namespace Cori {
 	}
 }
 
+//#define CORI_CHECK_TAG_COLLISION
+
 #ifdef DEBUG_BUILD
 	#ifdef CORI_CHECK_TAG_COLLISION
 	namespace Cori {
-		namespace Utils {
+		namespace Utility {
 			namespace Internal {
 				inline void CheckGlobalTag64Collision(Utility::StringHash64 tag, const char* name) {
 					static std::unordered_map<Utility::StringHash64, const char*> globalTag64CollisionMap;
@@ -40,11 +42,11 @@ namespace Cori {
 	#define CONCAT_IMPL(a, b) a##b
 	#define CONCAT(a, b) CONCAT_IMPL(a, b)
 
-	#define CORI_DECLARE_TAG(tag) inline constexpr Cori::Utils::HashedTag64 tag{#tag##_hs64, #tag} \
+	#define CORI_DECLARE_TAG(tag) inline constexpr Cori::Utility::HashedTag64 tag{#tag##_hs64, #tag}; \
 		static const bool CONCAT(RegisterTagForCheck, __LINE__) = [](){ \
-			Cori::Utils::Internal::CheckGlobalTag64Collision(#tag##_hs64, #tag); \
+			Cori::Utility::Internal::CheckGlobalTag64Collision(#tag##_hs64, #tag); \
 			return true; \
-		}();
+		}
 
 	#else
 	#define CORI_DECLARE_TAG(tag) inline constexpr Cori::Utility::HashedTag64 tag{#tag##_hs64, #tag};

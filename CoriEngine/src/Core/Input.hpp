@@ -6,11 +6,11 @@ namespace Cori {
 
 	class Input {
 	public:
-		static bool IsKeyPressed(CoriKeycode keycode);
+		static bool IsKeyPressed(const CoriKeycode keycode);
 
-		static bool IsMouseKeyPressed(CoriMouseCode button);
+		static bool IsMouseKeyPressed(const CoriMouseCode button);
 
-		static int GetMouseX();
-		static int GetMouseY();
+		static int32_t GetMouseX();
+		static int32_t GetMouseY();
 	};
 }

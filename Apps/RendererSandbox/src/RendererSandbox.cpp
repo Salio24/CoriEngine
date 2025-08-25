@@ -35,7 +35,7 @@ namespace Cori {
 class ExampleLayer : public Cori::Layer {
 public:
 	ExampleLayer() : Layer("Example") { 
-		Cori::GraphicsCall::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
+		Cori::API::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
 
 		Cori::SceneManager::CreateScene("Test Scene");
 		BindScene("Test Scene");
@@ -50,10 +50,10 @@ public:
 
 		// if the asset is not preloaded it will be loaded the first time it is requested via appropriate
 		// Get function from the Asset Manager
-		Cori::GraphicsCall::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
+		Cori::API::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
 		//Cori::Logger::DisableCoreTags({ "Graphics" });
 
-		Cori::GraphicsCall::EnableBlending();
+		Cori::API::EnableBlending();
 	}
 
 	virtual void OnEvent(Cori::Event& event) override {

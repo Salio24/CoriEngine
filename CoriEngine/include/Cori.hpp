@@ -18,22 +18,20 @@
 #include "../src/EventSystem/MouseEvent.hpp"
 #include "../src/EventSystem/AppEvent.hpp"
 #include "../src/EventSystem/KeyEvent.hpp"
-#include "../src/EventSystem/GameEvents.hpp"
 
-#include "../src/Renderer/Buffers.hpp"
-#include "../src/Renderer/GraphicsCall.hpp"
-#include "../src/Renderer/VertexArray.hpp"
-#include "../src/Renderer/ShaderProgram.hpp"
-#include "../src/Renderer/PipelineProgram.hpp"
-#include "../src/Renderer/Texture.hpp"
-#include "../src/Renderer/Image.hpp"
-#include "../src/Renderer/CameraController.hpp"
-#include "../src/Renderer/Animator/QuadAnimator.hpp"
-#include "../src/Renderer/Renderer2D.hpp"
+#include "../src/Graphics/Buffers.hpp"
+#include "../src/Graphics/API.hpp"
+#include "../src/Graphics/VertexArray.hpp"
+#include "../src/Graphics/ShaderProgram.hpp"
+#include "../src/Graphics/Texture.hpp"
+#include "../src/Graphics/Image.hpp"
+#include "../src/Graphics/CameraController.hpp"
+#include "../src/Graphics/Animator/QuadAnimator.hpp"
+#include "../src/Graphics/Renderer2D.hpp"
 
 #include "../src/AssetManager/AssetManager.hpp"
 
-#include "../src/FileManagment/JsonSerializer.hpp"
+#include "../src/FileSystem/JsonSerializer.hpp"
 
 #include "../src/Profiling/TimeProfiler.hpp"
 

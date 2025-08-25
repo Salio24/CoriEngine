@@ -10,15 +10,18 @@
 namespace Cori {
 	class Application {
 	public:
-		Application();
+		explicit Application(const char* windowName);
 		virtual ~Application();
 
 		void Run();
 
-		void OnEvent(Event& e);
+		void OnEvent(Event& event);
 
-		static void PushLayer(Layer* layer);
-		static void PushOverlay(Layer* layer);
+		[[nodiscard]] static std::expected<void, CoriError<>> PushLayer(Layer* layer);
+		[[nodiscard]] static std::expected<void, CoriError<>> PushOverlay(Layer* overlay);
+		static void PopLayer(Layer* layer);
+		static void PopOverlay(Layer* overlay);
+
 
 		static Window& GetWindow() { return *s_Instance->m_Window; }
 

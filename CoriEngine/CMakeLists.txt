@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.28)
 
 project(CoriEngine)
     # hides all compiler warnings caused by subprojects
-    set(HIDE_DEPENDANCY_WARNINGS ON CACHE BOOL "")
+    set(HIDE_DEPENDENCY_WARNINGS ON CACHE BOOL "")
     
     set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "") 
 
@@ -104,7 +104,6 @@ project(CoriEngine)
     #set(UUID_SYSTEM_GENERATOR ON CACHE BOOL "")
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/stduuid EXCLUDE_FROM_ALL)
 
-
 # project's binary setup vvv
 
     # varible sets
@@ -128,9 +127,7 @@ project(CoriEngine)
 
     # my shared lib
     add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES}
-            src/Core/Utility/HashedTag.hpp
-            src/Core/Error.hpp
-    )
+            src/Core/Utility/CleanTypeName.hpp)
 
     target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
@@ -156,6 +153,7 @@ project(CoriEngine)
     # includes
     target_include_directories(${ENGINE_LIBRARY_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/thirdparty/box2cpp/include
+    ${PROJECT_SOURCE_DIR}/thirdparty/LLVM_demangle
     ${PROJECT_SOURCE_DIR}/thirdparty/ska_sort
     ${PROJECT_SOURCE_DIR}/src
     ${CORI_INCLUDE_DIR}
@@ -171,7 +169,7 @@ project(CoriEngine)
 
     # disable compilation warnings from thirdparty libs
 
-    if(HIDE_DEPENDANCY_WARNINGS)
+    if(HIDE_DEPENDENCY_WARNINGS)
         target_compile_options(SDL3-static PRIVATE -w)
         target_compile_options(SDL3_mixer-static PRIVATE -w)
         target_compile_options(SDL3_image-static PRIVATE -w)
