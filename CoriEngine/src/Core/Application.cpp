@@ -90,6 +90,10 @@ namespace Cori {
 		s_Instance->m_LayerStack.PopOverlayToQueue(overlay);
 	}
 
+	void Application::SetBackgroundColor(const glm::vec4& color) {
+		s_Instance->m_BackgroundColor = color;
+	}
+
 	void Application::Run() {
 		while(m_Running) {
 			CORI_PROFILER_FRAME_START();
@@ -97,7 +101,7 @@ namespace Cori {
 				CORI_PROFILE_SCOPE("Cori Engine Global Update");
 				m_GameTimer.Update();
 
-				API::SetClearColor({ 0.5f, 0.5f, 0.0f, 1.0f });
+				API::SetClearColor(m_BackgroundColor);
 				API::ClearFramebuffer();
 
 				for (Layer* layer : m_LayerStack) {
@@ -127,10 +131,13 @@ namespace Cori {
 	}
 
 	void Application::TickrateUpdate(const float timeStep) {
+		//static uint64_t ti = 0;
+		//ti++;
 		for (Layer* layer : m_LayerStack) {
 			layer->SceneTickrateUpdate(timeStep);
 			layer->OnTickUpdate(timeStep);
 		}
+		//CORI_CORE_DEBUG("TICK {}", ti);
 	}
 
 	bool Application::OnWindowClose() {

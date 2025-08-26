@@ -66,7 +66,7 @@ public:
 
 		Cori::SceneManager::CreateScene("Test Scene");
 		BindScene("Test Scene");
-		ActiveScene.GetActiveCamera().CreateOrthoCamera(0, 1920, 0, 1080);
+		ActiveScene.GetActiveCamera().CreateOrthoCamera(0, 2560, 0, 1080, -50, 0);
 		track = Cori::Audio::Track::Create("Test");
 	}
 
@@ -116,7 +116,8 @@ public:
 		}
 
 		if (ImGui::Button("Create tree")) {
-			auto atlas = Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::Atlas);
+			auto atlas1 = Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::Atlas);
+			auto atlas = atlas1.value();
 
 			auto text = atlas->GetTexture();
 
@@ -126,11 +127,10 @@ public:
 			auto uvs3 = atlas->GetSpriteUVsAtIndex(22);
 			auto uvs4 = atlas->GetSpriteUVsAtIndex(27);
 
-
 			auto player = ActiveScene.CreateEntity("Player", Test);
 			auto& transform = player.GetComponents<Cori::Components::Entity::Transform>();
 			transform.SetLocalDepth(2);
-			transform.SetLocalPosition({100.0f, 100.0f});
+			transform.SetLocalPosition({ 100.0f, 100.0f });
 			auto& renderer = player.AddComponent<Cori::Components::Entity::QuadRenderer>(glm::vec2(50.0f), text, uvs);
 			renderer.SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 			ActiveScene.AddEntityToCache(player, "player"_hs32);
@@ -185,7 +185,7 @@ public:
 				transform.SetLocalRotation(currot);
 			}
 			if (ImGui::DragFloat("Player Scale", &curscale.x, 0.1f, -3.0f, 3, "%f", ImGuiSliderFlags_AlwaysClamp)) {
-				transform.SetLocalScale({curscale.x, curscale.x});
+				transform.SetLocalScale({curscale.x, 1.0f});
 			}
 		}
 
@@ -202,30 +202,30 @@ public:
 				transform.SetLocalRotation(currot);
 			}
 			if (ImGui::DragFloat("weapon Scale", &curscale.x, 0.1f, -3.0f, 3, "%f", ImGuiSliderFlags_AlwaysClamp)) {
-				transform.SetLocalScale({curscale.x, curscale.x});
+				transform.SetLocalScale({curscale.x, 1.0f});
 			}
 		}
 
-		if (ImGui::Button("Play")) {
-			CORI_DEBUG("Play {}", track->Play());
-		}
-
-
-		if (ImGui::Button("Test1")) {
-			CORI_DEBUG("test1 {}", track->SetSound(Cori::AssetManager::GetSound(Cori::Sounds::TestSound1)));
-		}
-
-		if (ImGui::Button("Test2")) {
-			CORI_DEBUG("test2 {}", track->SetSound(Cori::AssetManager::GetSound(Cori::Sounds::TestSound2)));
-		}
-
-		if (ImGui::Button("TestMusic")) {
-			CORI_DEBUG("TestMusic {}", track->SetSound(Cori::AssetManager::GetSound(Cori::Sounds::TestMusic)));
-		}
-
-		if (ImGui::Button("Stop")) {
-			CORI_DEBUG("stop {}", track->Stop(300));
-		}
+		//if (ImGui::Button("Play")) {
+		//	//CORI_DEBUG("Play {}", track->Play());
+		//}
+//
+//
+		//if (ImGui::Button("Test1")) {
+		//	CORI_DEBUG("test1 {}", track->SetSound(Cori::AssetManager::GetSound(Cori::Sounds::TestSound1)));
+		//}
+//
+		//if (ImGui::Button("Test2")) {
+		//	CORI_DEBUG("test2 {}", track->SetSound(Cori::AssetManager::GetSound(Cori::Sounds::TestSound2)));
+		//}
+//
+		//if (ImGui::Button("TestMusic")) {
+		//	CORI_DEBUG("TestMusic {}", track->SetSound(Cori::AssetManager::GetSound(Cori::Sounds::TestMusic)));
+		//}
+//
+		//if (ImGui::Button("Stop")) {
+		//	CORI_DEBUG("stop {}", track->Stop(300));
+		//}
 
 
 
@@ -238,7 +238,7 @@ public:
 		ImGui::End();
 	}
 
-	void OnUpdate(const double deltaTime, const double tickAlpha) override {
+	void OnUpdate(const Cori::GameTimer& gameTimer) override {
 		accum++;
 	}
 
@@ -272,7 +272,7 @@ public:
 
 class Sandbox : public Cori::Application {
 public:
-	Sandbox() {
+	Sandbox(): Application("sandbox") {
 		PushLayer(new ExampleLayer());
 
 		CORI_INFO("Sandbox application created");

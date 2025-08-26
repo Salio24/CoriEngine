@@ -8,7 +8,7 @@ namespace Cori {
 			class StateMachine {
 			public:
 				// ReSharper disable once CppParameterMayBeConst
-				explicit StateMachine(Cori::Entity owner) : m_Owner(owner), m_CurrentState(nullptr) {
+				explicit StateMachine(Cori::Entity owner) : m_Owner(owner), m_CurrentState(nullptr), m_LastState(nullptr) {
 					CORI_CORE_ASSERT(m_Owner.IsValid(), "StateMachine owner Entity is not valid!");
 				}
 
@@ -51,6 +51,12 @@ namespace Cori {
 						m_CurrentState->OnExit(m_Owner, this);
 					}
 
+					if (m_LastState) {
+						m_LastState = m_CurrentState;
+					} else {
+						m_LastState = nextStateRawPtr;
+					}
+
 					m_CurrentState = nextStateRawPtr;
 					CORI_CORE_TRACE_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::StateMachine }, "StateMachine for Entity - {}: Entering state '{}'", m_Owner.GetDebugData(), CORI_CLEAN_TYPE_NAME(*m_CurrentState));
 					m_CurrentState->OnEnter(m_Owner, this);
@@ -79,7 +85,13 @@ namespace Cori {
 				}
 
 				State* GetCurrentState() const {
+					CORI_CORE_ASSERT("Trying to retrieve current state, but current state is null. Always make sure you set some initial state before using fsm.")
 					return m_CurrentState;
+				}
+
+				State* GetLastState() const {
+					CORI_CORE_ASSERT("Trying to retrieve last state, but last state is null. Always make sure you set some initial state before using fsm.")
+					return m_LastState;
 				}
 
 				Cori::Entity GetOwner() const {
@@ -89,6 +101,8 @@ namespace Cori {
 			private:
 				Cori::Entity m_Owner;
 				State* m_CurrentState;
+				State* m_LastState;
+
 				std::unordered_map<std::type_index, std::unique_ptr<State>> m_States;
 			};
 		}

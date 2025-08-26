@@ -127,7 +127,7 @@ namespace Cori {
 		void SetName(const std::string& name);
 	private:
 		void UnlinkFromParent();
-		void LinkToParent(Entity parent);
+		std::expected<void, CoriError<>> LinkToParent(Entity parent);
 
 		static void DrawHierarchyRecursive(const Entity& entity, const std::string& prefix, const bool isLast);
 

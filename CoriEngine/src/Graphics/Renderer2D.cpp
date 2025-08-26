@@ -1,6 +1,5 @@
 #include "Renderer2D.hpp"
 #include <ska_sort.hpp>
-#include <glad/gl.h>
 #include "Core/Utility/AABB.hpp"
 #include "AssetManager/AssetManager.hpp"
 

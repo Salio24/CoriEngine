@@ -120,6 +120,7 @@ namespace Cori {
 			void QuadAnimator::StartSingle(const AnimationDescriptor& descriptor) {
 				if (!m_Valid) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadAnimator }, "Trying to use an invalid Quad Animator, name: {}", m_AnimatorName);
+					return;
 				}
 
 				if (!CheckDescriptorValidity(descriptor)) {
@@ -131,14 +132,15 @@ namespace Cori {
 				UpdateSingle(descriptor);
 			}
 
-			void QuadAnimator::UpdateSingle(const AnimationDescriptor& descriptor) {
+			bool QuadAnimator::UpdateSingle(const AnimationDescriptor& descriptor) {
 				if (!m_Valid) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadAnimator }, "Trying to use an invalid Quad Animator, name: {}", m_AnimatorName);
+					return false;
 				}
 
 				if (!CheckDescriptorValidity(descriptor)) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadAnimator }, "UpdateSingle failed, Quad Animator for Entity: '{}'", m_Entity.GetDebugData());
-					return;
+					return false;
 				}
 
 				Animation& anim = m_Animations[descriptor.m_Index];
@@ -149,30 +151,39 @@ namespace Cori {
 					if (descriptor.m_Looped) {
 						anim.m_CurrentFrame = 0;
 						anim.m_CurrentFrameTick = 1;
+						return true;
 					}
 				}
 				else {
 					if (anim.m_CurrentFrameTick == anim.m_Frames[anim.m_CurrentFrame].m_TickDuration) {
 						anim.m_CurrentFrameTick = 1;
 						++anim.m_CurrentFrame;
+						return true;
 					}
-					else {
+					if (anim.m_CurrentFrameTick < anim.m_Frames[anim.m_CurrentFrame].m_TickDuration) {
 						++anim.m_CurrentFrameTick;
+						return true;
 					}
 				}
+
+				return false;
 			}
 
-			void QuadAnimator::UpdateSequence() const {
+			void QuadAnimator::UpdateSequence() {
 				if (!m_Valid) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadAnimator }, "Trying to use an invalid Quad Animator, name: {}", m_AnimatorName);
+					return;
 				}
 
 				if (m_AnimationQueue.empty() || m_CurrentAnimationQueueIndex >= m_AnimationQueue.size()) {
 					return;
 				}
-				m_AnimationQueue[m_CurrentAnimationQueueIndex].Player();
+
+				//m_AnimationQueue[m_CurrentAnimationQueueIndex].Player();
+				GetAnimationPlayer()();
 			}
 
+			// dafuq is that?
 			std::function<void()> QuadAnimator::GetAnimationPlayer() {
 				return [this] {
 					const uint16_t index = m_AnimationQueue[m_CurrentAnimationQueueIndex].Index;

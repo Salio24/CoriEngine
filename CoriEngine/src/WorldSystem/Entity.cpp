@@ -74,7 +74,7 @@ namespace Cori {
 		UnlinkFromParent();
 
 		if (parent.IsValid()) {
-			LinkToParent(parent);
+			return LinkToParent(parent);
 		}
 		return {};
 	}
@@ -217,14 +217,18 @@ namespace Cori {
 		UpdateInactivityFlagsRecursive(m_EntityHandle.entity(), true);
 	}
 
-	void Entity::LinkToParent(Entity parent) {
+	std::expected<void, CoriError<>> Entity::LinkToParent(Entity parent) {
 		entt::registry* registry = m_EntityHandle.registry();
 		auto& hierarchy = GetComponents<Components::Entity::Hierarchy>();
 
 		hierarchy.m_Parent = parent.GetRawEntity();
 
 		auto& cache = parent.GetOrAddComponent<Components::Entity::ChildCache>();
-		cache.m_Children.emplace(GetComponents<Components::Entity::Name>().m_Name, m_EntityHandle.entity());
+		const auto& nameComp = GetComponents<Components::Entity::Name>();
+		if (cache.m_Children.contains(nameComp.m_Name)) {
+			return std::unexpected(CoriError("A parent entity can't have 2 children with the same name."));
+		}
+		cache.m_Children.emplace(nameComp.m_Name, m_EntityHandle.entity());
 
 		auto& parentHierarchy = parent.GetComponents<Components::Entity::Hierarchy>();
 		// ReSharper disable once CppLocalVariableMayBeConst
@@ -237,6 +241,7 @@ namespace Cori {
 
 		parentHierarchy.m_FirstChild = m_EntityHandle.entity();
 		UpdateInactivityFlagsRecursive(m_EntityHandle.entity(), parent.IsActiveGlobally());
+		return {};
 	}
 
 	void Entity::DrawHierarchyRecursive(const Entity& entity, const std::string& prefix, const bool isLast) {

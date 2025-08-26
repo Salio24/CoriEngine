@@ -81,7 +81,7 @@ namespace Cori {
 					}
 				}
 
-				void SetLocalDepth(const uint8_t localDepth) {
+				void SetLocalDepth(const int16_t localDepth) {
 					if (m_LocalDepthOffset != localDepth) {
 						m_LocalDepthOffset = localDepth;
 						m_DirtyDepth = true;
@@ -100,8 +100,16 @@ namespace Cori {
 					return m_LocalRotation;
 				}
 
-				[[nodiscard]] uint8_t GetLocalDepthOffset() const {
+				[[nodiscard]] int16_t GetLocalDepthOffset() const {
 					return m_LocalDepthOffset;
+				}
+
+				void SetFrozenState(const bool state) {
+					m_Frozen = state;
+				}
+
+				bool GetFrozenState() const {
+					return m_Frozen;
 				}
 
 				[[nodiscard]] glm::mat3 GetLocalTransform() const {
@@ -109,6 +117,8 @@ namespace Cori {
 							glm::rotate(glm::mat3(1.0f), glm::radians(m_LocalRotation)) *
 								glm::scale(glm::mat3(1.0f), m_LocalScale);
 				}
+
+
 
 			private:
 				friend class Cori::Scene;
@@ -119,7 +129,8 @@ namespace Cori {
 				glm::mat3 m_WorldTransform{ 1.0f };
 				uint8_t m_WorldDepth{ 1 };
 			private:
-				uint8_t m_LocalDepthOffset{ 0 };
+				int16_t m_LocalDepthOffset{ 0 };
+				bool m_Frozen{ false };
 				bool m_DirtyTransform{ true };
 				bool m_DirtyDepth{ true };
 			};

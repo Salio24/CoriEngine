@@ -17,7 +17,7 @@ namespace Cori {
 
 				void StartSingle(const AnimationDescriptor& descriptor);
 
-				void UpdateSingle(const AnimationDescriptor& descriptor);
+				bool UpdateSingle(const AnimationDescriptor& descriptor);
 
 				void StartSequence(const IsAnimationDescriptor auto&... args) {
 					if (!m_Valid) {
@@ -46,7 +46,7 @@ namespace Cori {
 					(m_AnimationQueue.push_back({ GetAnimationPlayer(), args.m_Index }), ...);
 				}
 
-				void UpdateSequence() const;
+				void UpdateSequence();
 
 				uint16_t m_CurrentAnimationQueueIndex = 0;
 				uint16_t m_LoopStartIndex = 0xFFFF;

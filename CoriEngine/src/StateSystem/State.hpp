@@ -18,7 +18,7 @@ namespace Cori {
 
 		virtual void OnExit([[maybe_unused]] Entity& owner, [[maybe_unused]] Components::Entity::StateMachine* fsm) {}
 
-		virtual const char* GetDebugName() const { return "Unnamed State"; }
+		[[nodiscard]] virtual const char* GetDebugName() const { return "Unnamed State"; }
 
 		// maybe add an onevent func 
 	};

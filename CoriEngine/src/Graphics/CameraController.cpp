@@ -11,6 +11,8 @@ namespace Cori {
 		m_CurrentCameraComponent->m_InitialCameraMaxBound = { right, top };
 		m_CurrentCameraComponent->m_CameraSize = { std::abs(right - left), std::abs(top - bottom) };
 
+		RecalculateVP();
+
 		CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Camera }, "Created orthographic camera with properties - (left: {}, right: {}, bottom: {}, top: {}, zNear: {}, zFar: {})", left, right, bottom, top, zNear, zFar);
 	}
 

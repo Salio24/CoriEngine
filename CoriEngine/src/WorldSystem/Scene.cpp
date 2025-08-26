@@ -174,12 +174,23 @@ namespace Cori {
 		const bool layerDirty = transform.m_DirtyDepth || parentDepthDirty;
 
 		if (transformDirty) {
-			transform.m_WorldTransform = parentTransform * transform.GetLocalTransform();
+			if (!transform.GetFrozenState()) {
+				transform.m_WorldTransform = parentTransform * transform.GetLocalTransform();
+			}
+
 			transform.m_DirtyTransform = false;
 		}
 		if (layerDirty) {
-			transform.m_WorldDepth = parentDepth + transform.GetLocalDepthOffset();
-			transform.m_DirtyDepth = false;
+			int16_t unclamped = parentDepth + transform.GetLocalDepthOffset();
+			if (unclamped < 0 || unclamped > 255) {
+				uint8_t clamped = static_cast<uint8_t>(std::clamp(unclamped, static_cast<int16_t>(0), static_cast<int16_t>(255)));
+				CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Final calculated depth for Entity '{}' is '{}' which is outside of allowed range [0, 255], it will be clamped to '{}'", Entity{ { m_Registry, entity } }.GetDebugData(), unclamped, clamped);
+				transform.m_WorldDepth = clamped;
+				transform.m_DirtyDepth = false;
+			} else {
+				transform.m_WorldDepth = static_cast<uint8_t>(unclamped);
+				transform.m_DirtyDepth = false;
+			}
 		}
 
 		const auto& hierarchy = m_Registry.get<Components::Entity::Hierarchy>(entity);

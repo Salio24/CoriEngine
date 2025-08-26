@@ -22,6 +22,7 @@ namespace Cori {
 		static void PopLayer(Layer* layer);
 		static void PopOverlay(Layer* overlay);
 
+		static void SetBackgroundColor(const glm::vec4& color);
 
 		static Window& GetWindow() { return *s_Instance->m_Window; }
 
@@ -43,6 +44,8 @@ namespace Cori {
 		bool m_Running{ true };
 
 		static Application* s_Instance;
+
+		glm::vec4 m_BackgroundColor{ 0.5f, 0.5f, 0.0f, 1.0f };
 	};
 
 	Application* CreateApplication();
