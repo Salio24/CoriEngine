@@ -1,5 +1,6 @@
 #pragma once
 #include "Texture.hpp"
+#include "Image.hpp"
 #include "Profiling/Trackable.hpp"
 #include "Core/SelfFactory.hpp"
 
@@ -7,8 +8,7 @@ namespace Cori {
 
 	class SpriteAtlas : public Profiling::Trackable<SpriteAtlas>, public SharedSelfFactory<SpriteAtlas, CoriError<>> {
 	public:
-
-		static std::expected<void, CoriError<>> PreCreateHook(std::string name, const std::shared_ptr<Texture2D>& texture, const glm::u16vec2 spriteResolution);
+		static std::expected<void, CoriError<>> PreCreateHook(std::string name, const std::shared_ptr<Image>& texture, const glm::u16vec2 spriteResolution);
 
 		[[nodiscard]] const UVs& GetSpriteUVsAtIndex(uint32_t index) const;
 
@@ -17,7 +17,7 @@ namespace Cori {
 		[[nodiscard]] std::shared_ptr<Texture2D> GetTexture() const;
 
 	protected:
-		explicit SpriteAtlas(std::string name, const std::shared_ptr<Texture2D>& texture, const glm::u16vec2 spriteResolution);
+		explicit SpriteAtlas(std::string name, const std::shared_ptr<Image>& texture, const glm::u16vec2 spriteResolution);
 	private:
 
 		std::string m_Name;

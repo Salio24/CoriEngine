@@ -52,6 +52,10 @@ namespace Cori {
 			return m_Message.c_str();
 		}
 
+		void ignore() const noexcept {
+			m_Seen = true;
+		}
+
 		template <typename T>
 		T Get() const {
 			static_assert(Utility::IsInPack<T, DeclaredTypes...>, "Error: Attempting to Get<T> a type T that was not declared in the CoriError<TypeIsAnalogInPacks...> specialization.");

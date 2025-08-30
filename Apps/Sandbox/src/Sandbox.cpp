@@ -169,6 +169,8 @@ public:
 			auto player = ActiveScene.GetEntityFromCache("player"_hs32);
 			if (player) {
 				player.value().PrintHierarchy();
+			} else {
+				player.error().ignore();
 			}
 		}
 
@@ -187,6 +189,8 @@ public:
 			if (ImGui::DragFloat("Player Scale", &curscale.x, 0.1f, -3.0f, 3, "%f", ImGuiSliderFlags_AlwaysClamp)) {
 				transform.SetLocalScale({curscale.x, 1.0f});
 			}
+		} else {
+			player.error().ignore();
 		}
 
 		auto weapon = ActiveScene.GetEntityFromCache("weapon"_hs32);
@@ -204,28 +208,34 @@ public:
 			if (ImGui::DragFloat("weapon Scale", &curscale.x, 0.1f, -3.0f, 3, "%f", ImGuiSliderFlags_AlwaysClamp)) {
 				transform.SetLocalScale({curscale.x, 1.0f});
 			}
+		} else {
+			weapon.error().ignore();
 		}
 
-		//if (ImGui::Button("Play")) {
-		//	//CORI_DEBUG("Play {}", track->Play());
-		//}
-//
-//
-		//if (ImGui::Button("Test1")) {
-		//	CORI_DEBUG("test1 {}", track->SetSound(Cori::AssetManager::GetSound(Cori::Sounds::TestSound1)));
-		//}
-//
-		//if (ImGui::Button("Test2")) {
-		//	CORI_DEBUG("test2 {}", track->SetSound(Cori::AssetManager::GetSound(Cori::Sounds::TestSound2)));
-		//}
-//
-		//if (ImGui::Button("TestMusic")) {
-		//	CORI_DEBUG("TestMusic {}", track->SetSound(Cori::AssetManager::GetSound(Cori::Sounds::TestMusic)));
-		//}
-//
-		//if (ImGui::Button("Stop")) {
-		//	CORI_DEBUG("stop {}", track->Stop(300));
-		//}
+		if (ImGui::Button("Play")) {
+			track->Play();
+		}
+		if (ImGui::Button("Test1")) {
+			track->SetSound(Cori::AssetManager::GetSound(Cori::Sounds::TestSound1));
+		}
+
+		if (ImGui::Button("Test2")) {
+			track->SetSound(Cori::AssetManager::GetSound(Cori::Sounds::TestSound2));
+		}
+
+		if (ImGui::Button("TestMusic")) {
+			track->SetSound(Cori::AssetManager::GetSound(Cori::Sounds::TestMusic));
+		}
+
+		if (ImGui::Button("Stop")) {
+			track->Stop(300);
+		}
+
+		if (ImGui::Button("callback")) {
+
+
+		}
+
 
 
 

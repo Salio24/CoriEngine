@@ -38,7 +38,8 @@ namespace Cori {
 		}
 
 		CORI_CORE_DEBUG_TAGGED({Logger::Tags::AssetManager::Self}, "Texture2D cache miss for '{}' (RuntimeID: {}). Loading...", descriptor.m_Name, descriptor.GetRuntimeID());
-		std::shared_ptr<Texture2D> newTexture2D = Texture2D::Create(descriptor.m_ImagePath);
+		const auto image = Image::Create(descriptor.m_ImagePath);
+		std::shared_ptr<Texture2D> newTexture2D = Texture2D::Create(image);
 		s_Cache->m_Texture2DCache[descriptor.GetRuntimeID()] = newTexture2D;
 		return newTexture2D;
 	}
@@ -50,8 +51,8 @@ namespace Cori {
 		}
 
 		CORI_CORE_DEBUG_TAGGED({Logger::Tags::AssetManager::Self}, "SpriteAtlas cache miss for '{}' (RuntimeID: {}). Loading...", descriptor.m_Name, descriptor.GetRuntimeID());
-		std::shared_ptr<Texture2D> texture = Texture2D::Create(descriptor.m_TextureDescriptor.m_ImagePath);
-		return std::move(SpriteAtlas::Create(descriptor.m_Name, texture, descriptor.m_SpriteResolution)).transform([descriptor](auto&& atlas) {
+		const auto image = Image::Create(descriptor.m_TextureDescriptor.m_ImagePath);
+		return std::move(SpriteAtlas::Create(descriptor.m_Name, image, descriptor.m_SpriteResolution)).transform([descriptor](auto&& atlas) {
 			s_Cache->m_SpriteAtlasCache[descriptor.GetRuntimeID()] = atlas;
 			return atlas;
 		});

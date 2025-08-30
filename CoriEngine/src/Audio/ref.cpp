@@ -17,7 +17,7 @@
 // ╚════██║ ██║  ██║ ██║      ██║╚██╔╝██║ ██║  ██╔██╗  ██╔══╝   ██╔══██╗
 // ██████╔╝ ██████╔╝ ███████╗ ██║ ╚═╝ ██║ ██║ ██╔╝ ██╗ ███████╗ ██║  ██║
 // ╚═════╝  ╚═════╝  ╚══════╝ ╚═╝     ╚═╝ ╚═╝ ╚═╝  ╚═╝ ╚══════╝ ╚═╝  ╚═╝
-//#define TEST
+#define TEST
 #ifdef TEST
 #include <SDL3_mixer/SDL_mixer.h>
 //#define SDL_MIXER_MAJOR_VERSION                                                                                                          // The current major version of SDL_mixer headers.

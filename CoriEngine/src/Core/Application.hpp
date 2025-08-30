@@ -24,6 +24,8 @@ namespace Cori {
 
 		static void SetBackgroundColor(const glm::vec4& color);
 
+		static void SetManualTickStep(const bool state);
+
 		static Window& GetWindow() { return *s_Instance->m_Window; }
 
 	private:
@@ -32,6 +34,7 @@ namespace Cori {
 		bool OnWindowClose();
 
 		bool m_RenderImGui{ true };
+		bool m_ManualStep{ false };
 
 		std::unique_ptr<Window> m_Window;
 

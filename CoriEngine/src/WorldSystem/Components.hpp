@@ -273,8 +273,12 @@ namespace Cori {
 				}
 
 				// use expected
-				std::weak_ptr<Audio::Track> GetTrack(const std::string& name) {
-					return m_AudioTracks.at(name);
+				std::expected<std::shared_ptr<Audio::Track>, CoriError<>> GetTrack(const std::string& name) {
+					if (m_AudioTracks.contains(name)) {
+						return m_AudioTracks.at(name);
+					}
+
+					return std::unexpected(CoriError(std::format("No audio Track is found with the specified name '{}'", name)));
 				}
 
 			private:

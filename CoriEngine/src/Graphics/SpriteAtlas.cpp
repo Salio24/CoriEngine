@@ -2,16 +2,27 @@
 #include "AssetManager/AssetManager.hpp"
 
 namespace Cori {
-	std::expected<void, CoriError<>> SpriteAtlas::PreCreateHook([[maybe_unused]] std::string name, [[maybe_unused]] const std::shared_ptr<Texture2D>& texture, [[maybe_unused]] const glm::u16vec2 spriteResolution) {
-		if (!(!(texture->GetHeight() % spriteResolution.y) && !(texture->GetWidth() % spriteResolution.x))) {
-			return std::unexpected(CoriError(std::format("Can't create SpriteAtlas '{}'. Invalid sprite resolution, sprite resolution on x and y should be divisible by texture resolution without remainder. Texture resolution: ({}, {}). Sprite resolution: ({}, {}).", std::move(name), texture->GetWidth(), texture->GetHeight(), spriteResolution.x, spriteResolution.y)));
+	std::expected<void, CoriError<>> SpriteAtlas::PreCreateHook([[maybe_unused]] std::string name, [[maybe_unused]] const std::shared_ptr<Image>& image, [[maybe_unused]] const glm::u16vec2 spriteResolution) {
+		if (!(!(image->GetHeight() % spriteResolution.y) && !(image->GetWidth() % spriteResolution.x))) {
+			return std::unexpected(CoriError(std::format("Can't create SpriteAtlas '{}'. Invalid sprite resolution, sprite resolution on x and y should be divisible by texture resolution without remainder. Texture resolution: ({}, {}). Sprite resolution: ({}, {}).", std::move(name), image->GetWidth(), image->GetHeight(), spriteResolution.x, spriteResolution.y)));
 		}
 
 		return {};
 	}
 
-	SpriteAtlas::SpriteAtlas(std::string name, const std::shared_ptr<Texture2D>& texture, const glm::u16vec2 spriteResolution) : m_Name(std::move(name)), m_Texture(texture) {
+	SpriteAtlas::SpriteAtlas(std::string name, const std::shared_ptr<Image>& image, const glm::u16vec2 spriteResolution) : m_Name(std::move(name)) {
+		int32_t padding = 0;
+		//const auto success = image->AddPadding(spriteResolution);
+		//if (success) {
+		//	padding = 1;
+		//}
+		//else {
+		//	CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::SpriteAtlas }, "Failed to add padding to a sprite atlas, Texture bleeding might occur. Error: {}", success.error().what());
+		//}
+
+		m_Texture = Texture2D::Create(image);
 		CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::SpriteAtlas }, "Creating SpriteAtlas: '{}', texture size: '{}', sprite size: '{}'", m_Name, glm::to_string(glm::uvec2(m_Texture->GetWidth(), m_Texture->GetHeight())), glm::to_string(spriteResolution));
+
 		m_GridDimensions.x = m_Texture->GetWidth() / spriteResolution.x;
 		m_GridDimensions.y = m_Texture->GetHeight() / spriteResolution.y;
 
@@ -24,8 +35,7 @@ namespace Cori {
 		const glm::vec2 scaledSpriteTextureSize = { fullSpriteTextureSize.x, fullSpriteTextureSize.y };
 		for (int32_t row = 0; row < m_GridDimensions.y; row++) {
 			for (int32_t col = 0; col < m_GridDimensions.x; col++) {
-				glm::vec2 texturePos = { fullSpriteTextureSize.x * col, 1.0f - fullSpriteTextureSize.y * (row + 1) };
-
+				glm::vec2 texturePos = { fullSpriteTextureSize.x * static_cast<float>(col), 1.0f - fullSpriteTextureSize.y * static_cast<float>(row + 1) };
 				m_SpriteUVs.emplace_back(UVs{ texturePos, texturePos + scaledSpriteTextureSize });
 			}
 		}

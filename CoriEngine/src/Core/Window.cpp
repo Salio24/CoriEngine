@@ -124,8 +124,14 @@ namespace Cori {
 						break;
 					}
 
-					WindowResizeEvent resizeEvent(m_Data->m_CurrentScreenMode.m_Width, m_Data->m_CurrentScreenMode.m_Height);
-					m_Data->m_EventCallback(resizeEvent);
+					if (m_Data->m_CurrentWindowMode != WindowMode::BORDERLESS_WINDOWED) {
+						WindowResizeEvent resizeEvent(m_Data->m_CurrentScreenMode.m_Width, m_Data->m_CurrentScreenMode.m_Height);
+						m_Data->m_EventCallback(resizeEvent);
+					} else {
+						WindowResizeEvent resizeEvent(m_Data->m_SDLModes[0]->w, m_Data->m_SDLModes[0]->h);
+						m_Data->m_EventCallback(resizeEvent);
+					}
+
 					break;
 				}
 			case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
@@ -266,10 +272,11 @@ namespace Cori {
 			}
 		case WindowMode::BORDERLESS_WINDOWED:
 			{
-				success = SDL_SetWindowPosition(m_Data->m_Window, SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID), SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID));
-				if (!success) {
-					return std::unexpected(CoriError(std::format("Failed to set window mode to 'Borderless Windowed'. SDL_Error: {}", SDL_GetError())));
+				const bool windowMoveSuccess = SDL_SetWindowPosition(m_Data->m_Window, SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID), SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID));
+				if (!windowMoveSuccess) {
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to set window position to the center of the main screen. SDL_Error: {}", SDL_GetError());
 				}
+
 				success = SDL_SetWindowFullscreen(m_Data->m_Window, true);
 				if (!success) {
 					return std::unexpected(CoriError(std::format("Failed to set window mode to 'Borderless Windowed'. SDL_Error: {}", SDL_GetError())));
@@ -278,6 +285,7 @@ namespace Cori {
 				if (!success) {
 					return std::unexpected(CoriError(std::format("Failed to set window mode to 'Borderless Windowed'. SDL_Error: {}", SDL_GetError())));
 				}
+
 				m_Data->m_CurrentWindowMode = mode;
 
 				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window set to 'Borderless Windowed' mode.");
@@ -286,9 +294,9 @@ namespace Cori {
 			}
 		case WindowMode::EXCLUSIVE_FULLSCREEN:
 			{
-				success = SDL_SetWindowPosition(m_Data->m_Window, SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID), SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID));
-				if (!success) {
-					return std::unexpected(CoriError(std::format("Failed to set window mode to 'Exclusive Fullscreen'. SDL_Error: {}", SDL_GetError())));
+				const bool windowMoveSuccess = SDL_SetWindowPosition(m_Data->m_Window, SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID), SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID));
+				if (!windowMoveSuccess) {
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to set window position to the center of the main screen. SDL_Error: {}", SDL_GetError());
 				}
 
 				const SDL_DisplayMode* sdlMode = m_Data->m_SDLModes[m_Data->m_CurrentScreenMode.m_ModeIndex];

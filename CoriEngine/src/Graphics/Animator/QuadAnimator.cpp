@@ -37,7 +37,8 @@ namespace Cori {
 
 				std::filesystem::path atlasPath = (jsonPath.parent_path() / std::string(data["meta"]["image"])).string();
 
-				m_Atlas = Texture2D::Create(atlasPath);
+				auto image = Image::Create(atlasPath);
+				m_Atlas = Texture2D::Create(image);
 
 				glm::vec2 atlasSize;
 				glm::vec2 frameUVSize{ 0.0f, 0.0f };
@@ -73,6 +74,9 @@ namespace Cori {
 				glm::vec2 oldPos;
 				glm::vec2 pos{ 0.0f, 0.0f };
 
+				// FIXME: this leads to pixelart not being pixel perfect and is a temp fix, need to add automatic padding
+				const glm::vec2 texelSize = {1.0f / static_cast<float>(m_Atlas->GetWidth()), 1.0f / static_cast<float>(m_Atlas->GetHeight())};
+
 				for (const auto& [frameNum, frameData] : sortedFrameItems) {
 					if (frameData.contains("frame") && frameData["frame"].is_object()) {
 						if (m_FrameSize.x == 0.0f && m_FrameSize.y == 0.0f) {
@@ -94,8 +98,11 @@ namespace Cori {
 						AnimationFrame frame;
 						frame.m_UVs.UVmin = { pos.x / m_FrameSize.x * frameUVSize.x, 1.0f - (pos.y / m_FrameSize.y * frameUVSize.y + frameUVSize.y) };
 						frame.m_UVs.UVmax = { pos.x / m_FrameSize.x * frameUVSize.x + frameUVSize.x, 1.0f - pos.y / m_FrameSize.y * frameUVSize.y };
-						frame.m_TickDuration = std::round(static_cast<float>(frameData["duration"]) / (timeStep * 1000.0f));
 
+						// FIXME: this leads to pixelart not being pixel perfect and is a temp fix, need to add automatic padding
+						frame.m_UVs.UVmin += texelSize * 0.5f;
+						frame.m_UVs.UVmax -= texelSize * 0.5f;
+						frame.m_TickDuration = std::round(static_cast<float>(frameData["duration"]) / (timeStep * 1000.0f));
 
 						frames.push_back(frame);
 
@@ -232,7 +239,7 @@ namespace Cori {
 			}
 
 			bool QuadAnimator::CheckDescriptorValidity(const AnimationDescriptor& descriptor) const {
-				if (std::strcmp(descriptor.m_AnimatorName, m_AnimatorName)) {
+				if (std::strcmp(descriptor.m_AnimatorName, m_AnimatorName) != 0) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadAnimator }, "Missmatch between Quad Animator name '{}' specified in Animation Descriptor and the actual Quad Animator name '{}' it is passed to.", descriptor.m_AnimatorName, m_AnimatorName);
 					return false;
 				}

@@ -1,4 +1,6 @@
 #include "Application.hpp"
+
+#include "Input.hpp"
 #include "Graphics/API.hpp"
 #include "WorldSystem/SceneManager.hpp"
 #include "WorldSystem/Components.hpp"
@@ -94,6 +96,10 @@ namespace Cori {
 		s_Instance->m_BackgroundColor = color;
 	}
 
+	void Application::SetManualTickStep(const bool state) {
+		s_Instance->m_ManualStep = state;
+	}
+
 	void Application::Run() {
 		while(m_Running) {
 			CORI_PROFILER_FRAME_START();
@@ -130,12 +136,31 @@ namespace Cori {
 		}
 	}
 
+
+
 	void Application::TickrateUpdate(const float timeStep) {
 		//static uint64_t ti = 0;
 		//ti++;
-		for (Layer* layer : m_LayerStack) {
-			layer->SceneTickrateUpdate(timeStep);
-			layer->OnTickUpdate(timeStep);
+		if (m_ManualStep) {
+			static bool oneshot = true;
+			if (Input::IsKeyPressed(Cori::CORI_KEY_K)) {
+				if (oneshot) {
+					oneshot = false;
+					for (Layer* layer : m_LayerStack) {
+						layer->SceneTickrateUpdate(timeStep);
+						layer->OnTickUpdate(timeStep);
+					}
+				}
+			}
+			else {
+				oneshot = true;
+			}
+
+		} else {
+			for (Layer* layer : m_LayerStack) {
+				layer->SceneTickrateUpdate(timeStep);
+				layer->OnTickUpdate(timeStep);
+			}
 		}
 		//CORI_CORE_DEBUG("TICK {}", ti);
 	}

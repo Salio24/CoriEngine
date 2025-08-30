@@ -12,7 +12,7 @@ namespace Cori {
 
 			class QuadAnimator {
 			public:
-				QuadAnimator(std::filesystem::path jsonPath, const Cori::Entity& entity, const float timeStep, const char* animatorName);
+			QuadAnimator(std::filesystem::path jsonPath, const Cori::Entity& entity, const float timeStep, const char* animatorName);
 				~QuadAnimator();
 
 				void StartSingle(const AnimationDescriptor& descriptor);

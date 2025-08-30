@@ -11,7 +11,8 @@ namespace Cori {
 
 		s_Data = new RendererData();
 
-		s_Data->WhiteTexture = Texture2D::Create("assets/engine/textures/white1x1.png");
+		const auto image = Image::Create("assets/engine/textures/white1x1.png");
+		s_Data->WhiteTexture = Texture2D::Create(image);
 
 		s_Data->QuadInstanceVertexArray = VertexArray::Create();
 		s_Data->QuadInstanceVertexBuffer = VertexBuffer::Create();

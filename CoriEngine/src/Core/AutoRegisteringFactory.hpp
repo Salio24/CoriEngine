@@ -12,6 +12,11 @@ namespace Cori {
 			return factory;
 		}
 
+		Factory(const Factory&) = delete;
+		Factory& operator=(const Factory&) = delete;
+		Factory(Factory&&) = delete;
+		Factory& operator=(Factory&&) = delete;
+
 		bool RegisterShared(const KeyType& key, SharedCreator creator) {
 
 			if (m_SharedCreators.count(key)) {
@@ -51,19 +56,24 @@ namespace Cori {
 
 		Factory() = default;
 		~Factory() = default;
-		Factory(const Factory&) = delete;
-		Factory& operator=(const Factory&) = delete;
-		Factory(Factory&&) = delete;
-		Factory& operator=(Factory&&) = delete;
 
 		std::unordered_map<KeyType, SharedCreator> m_SharedCreators;
 		std::unordered_map<KeyType, UniqueCreator> m_UniqueCreators;
 	};
 
-
 	// CRTP base class for self-registration
 	template <typename BaseType, typename DerivedType, typename KeyType, KeyType KeyValue, typename... CtorArgs>
 	class RegisterInFactory {
+	public:
+		RegisterInFactory() = default;
+		virtual ~RegisterInFactory() = default;
+
+		RegisterInFactory(const RegisterInFactory&) = delete;
+		RegisterInFactory& operator=(const RegisterInFactory&) = delete;
+		RegisterInFactory(RegisterInFactory&&) = delete;
+		RegisterInFactory& operator=(RegisterInFactory&&) = delete;
+
+	private:
 		static std::shared_ptr<BaseType> CreateShared(CtorArgs&&... ctorArgs) {
 			if (DerivedType::PreCreateHook(std::forward<CtorArgs>(ctorArgs)...)) {
 				return std::make_shared<DerivedType>(std::forward<CtorArgs>(ctorArgs)...);
