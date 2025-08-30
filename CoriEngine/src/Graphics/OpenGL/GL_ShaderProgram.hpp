@@ -1,4 +1,4 @@
-#pragma once RegisterInFactory
+#pragma once
 #include "../ShaderProgram.hpp"
 #include "Profiling/Trackable.hpp"
 #include "Core/AutoRegisteringFactory.hpp"
