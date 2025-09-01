@@ -9,6 +9,7 @@ namespace Cori {
 		std::unordered_map<uint32_t, std::shared_ptr<Texture2D>> m_Texture2DCache;
 		std::unordered_map<uint32_t, std::shared_ptr<SpriteAtlas>> m_SpriteAtlasCache;
 		std::unordered_map<uint32_t, std::shared_ptr<Audio::Sound>> m_SoundCache;
+		std::unordered_map<uint32_t, std::shared_ptr<Graphics::AnimationPack>> m_AnimationPackCache;
 	};
 
 	void AssetManager::Init() {
@@ -51,7 +52,7 @@ namespace Cori {
 		}
 
 		CORI_CORE_DEBUG_TAGGED({Logger::Tags::AssetManager::Self}, "SpriteAtlas cache miss for '{}' (RuntimeID: {}). Loading...", descriptor.m_Name, descriptor.GetRuntimeID());
-		const auto image = Image::Create(descriptor.m_TextureDescriptor.m_ImagePath);
+		const auto image = Image::Create(descriptor.m_TexturePath);
 		return std::move(SpriteAtlas::Create(descriptor.m_Name, image, descriptor.m_SpriteResolution)).transform([descriptor](auto&& atlas) {
 			s_Cache->m_SpriteAtlasCache[descriptor.GetRuntimeID()] = atlas;
 			return atlas;
@@ -68,6 +69,18 @@ namespace Cori {
 		std::shared_ptr<Audio::Sound> newSound = Audio::Sound::Create(descriptor.m_Name, descriptor.m_Path, descriptor.m_PreDecode);
 		s_Cache->m_SoundCache[descriptor.GetRuntimeID()] = newSound;
 		return newSound;
+	}
+
+	std::shared_ptr<Graphics::AnimationPack> AssetManager::GetAnimationPack(const AnimationPackDescriptor& descriptor) {
+		CORI_PROFILE_FUNCTION();
+		if (s_Cache->m_AnimationPackCache.contains(descriptor.GetRuntimeID())) {
+			return s_Cache->m_AnimationPackCache[descriptor.GetRuntimeID()];
+		}
+
+		CORI_CORE_DEBUG_TAGGED({Logger::Tags::AssetManager::Self}, "Animation Pack cache miss for '{}' (RuntimeID: {}). Loading...", descriptor.m_Name, descriptor.GetRuntimeID());
+		auto pack = Graphics::AnimationPack::Create(descriptor.m_JsonPath, descriptor.m_ConfigType, Application::GetGameTimer().GetTimestep(), descriptor.m_Name);
+		s_Cache->m_AnimationPackCache[descriptor.GetRuntimeID()] = pack;
+		return pack;
 	}
 
 	void AssetManager::PreloadShaders(const std::initializer_list<ShaderProgramDescriptor> descriptors) {
@@ -103,6 +116,14 @@ namespace Cori {
 			static_cast<void>(GetSound(descriptor));  // explicitly ignoring result
 		}
 		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Preloaded {} Sound(es)", descriptors.size());
+	}
+
+	void AssetManager::PreloadAnimationPacks(const std::initializer_list<AnimationPackDescriptor> descriptors) {
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Preloading {} Animation Pack(s)", descriptors.size());
+		for (const auto& descriptor : descriptors) {
+			static_cast<void>(GetAnimationPack(descriptor));  // explicitly ignoring result
+		}
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Preloaded {} Animation Pack(s)", descriptors.size());
 	}
 
 	void AssetManager::UnloadShader(const ShaderProgramDescriptor& descriptor) {
@@ -141,6 +162,15 @@ namespace Cori {
 		CORI_CORE_DEBUG_TAGGED({Logger::Tags::AssetManager::Self}, "Unloaded Sound '{}' (RuntimeID: {}).", descriptor.m_Name, descriptor.GetRuntimeID());
 	}
 
+	void AssetManager::UnloadAnimationPack(const AnimationPackDescriptor& descriptor) {
+		if (!s_Cache->m_AnimationPackCache.contains(descriptor.GetRuntimeID())) {
+			CORI_CORE_WARN_TAGGED({Logger::Tags::AssetManager::Self}, "Trying to unload Animation Pack that doesn't exist, name '{}', (RuntimeID: {})", descriptor.m_Name, descriptor.GetRuntimeID());
+			return;
+		}
+		s_Cache->m_AnimationPackCache.erase(descriptor.GetRuntimeID());
+		CORI_CORE_DEBUG_TAGGED({Logger::Tags::AssetManager::Self}, "Unloaded Animation Pack '{}' (RuntimeID: {}).", descriptor.m_Name, descriptor.GetRuntimeID());
+	}
+
 	void AssetManager::UnloadShaders(const std::initializer_list<ShaderProgramDescriptor> descriptors) {
 		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Unloading {} shader(s)", descriptors.size());
 		for (const auto& descriptor : descriptors) {
@@ -173,6 +203,15 @@ namespace Cori {
 		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Unloaded {} Sound(s)", descriptors.size());
 	}
 
+	void AssetManager::UnloadAnimationPacks(const std::initializer_list<AnimationPackDescriptor> descriptors) {
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Unloading {} Animation Pack(s)", descriptors.size());
+		for (const auto& descriptor : descriptors) {
+			UnloadAnimationPack(descriptor);
+		}
+		CORI_CORE_INFO_TAGGED({Logger::Tags::AssetManager::Self}, "Unloaded {} Animation Pack(s)", descriptors.size());
+	}
+
+
 	void AssetManager::ClearShaderCache() {
 		s_Cache->m_ShaderCache.clear();
 	}
@@ -188,4 +227,9 @@ namespace Cori {
 	void AssetManager::ClearSoundCache() {
 		s_Cache->m_SoundCache.clear();
 	}
+
+	void AssetManager::ClearAnimationPackCache() {
+		s_Cache->m_AnimationPackCache.clear();
+	}
+
 }

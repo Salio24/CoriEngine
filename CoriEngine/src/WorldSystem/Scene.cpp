@@ -2,6 +2,7 @@
 #include "Graphics/CameraController.hpp"
 #include "Physics/Triggers/Trigger.hpp"
 #include "Graphics/Renderer2D.hpp"
+#include "Graphics/Animator/QuadAnimatorNew.hpp"
 
 namespace Cori {
 
@@ -112,13 +113,17 @@ namespace Cori {
 		EntityView fsmv = View<Components::Entity::StateMachine>(Exclude<Components::Entity::InactiveLocallyFlag>());
 
 		for (const auto entity : fsmv) {
-			auto& fsm = fsmv.Get<Components::Entity::StateMachine>(entity);
-			fsm.OnTickUpdate(timeStep);
+			fsmv.Get<Components::Entity::StateMachine>(entity).OnTickUpdate(timeStep);
+		}
+
+		EntityView animv = View<Components::Entity::QuadAnimatorNew>(Exclude<Components::Entity::InactiveLocallyFlag>());
+
+		for (const auto entity : animv) {
+			animv.Get<Components::Entity::QuadAnimatorNew>(entity).OnTickUpdate();
 		}
 
 		EntityView trigv = View<Components::Entity::Trigger>(Exclude<Components::Entity::InactiveLocallyFlag>());
 
-		// order is not enforced
 		for (const auto entity : trigv) {
 			trigv.Get<Components::Entity::Trigger>(entity).OnTickUpdate(timeStep);
 		}

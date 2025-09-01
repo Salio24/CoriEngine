@@ -108,7 +108,7 @@ namespace Cori {
 					m_Frozen = state;
 				}
 
-				bool GetFrozenState() const {
+				[[nodiscard]] bool GetFrozenState() const {
 					return m_Frozen;
 				}
 
@@ -242,6 +242,8 @@ namespace Cori {
 
 			protected:
 				friend class QuadAnimator;
+				friend class QuadAnimatorNew;
+
 				glm::vec2 m_HalfSize{ 0.0f };
 				UVs m_UVs{};
 				std::shared_ptr<Texture2D> m_Texture{ nullptr };

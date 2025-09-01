@@ -2,9 +2,9 @@
 #include "AnimationFrame.hpp"
 
 namespace Cori {
-	class Animation {
+	class AnimationData {
 	public:
-		explicit Animation( const std::vector<AnimationFrame>& frames) : m_Frames(std::move(frames)) {}
+		explicit AnimationData(std::vector<AnimationFrame> frames) : m_Frames(std::move(frames)) {}
 
 		std::vector<AnimationFrame> m_Frames;
 		uint32_t m_CurrentFrame{ 0 };

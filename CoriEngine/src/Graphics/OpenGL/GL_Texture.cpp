@@ -8,7 +8,7 @@ namespace Cori {
 
 	OpenGLTexture2D::OpenGLTexture2D(const std::shared_ptr<Image>& image) {
 		CORI_PROFILE_FUNCTION();
-		CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Graphics::Self , Logger::Tags::Graphics::OpenGL, Logger::Tags::Graphics::Texture2D }, "(GL_RuntimeID; {}): Creating texture from preloaded image.", m_ID);
+		CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Graphics::Self , Logger::Tags::Graphics::OpenGL, Logger::Tags::Graphics::Texture2D }, "Creating texture from preloaded image.", m_ID);
 		m_Width = image->GetWidth();
 		m_Height = image->GetHeight();
 		m_HasSemiTransparency = image->HasSemiTransparency();

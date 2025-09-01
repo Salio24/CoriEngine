@@ -6,13 +6,21 @@
 #include "WorldSystem/Components.hpp"
 using json = nlohmann::json;
 
+/*
+ * add a separate animationpack class that will load the animation atlas and hold the relevant data
+ *
+ * remove start single and move update calls to engine side
+ * add stop
+ *
+ */
+
+
 namespace Cori {
 	namespace Components {
 		namespace Entity {
-
 			class QuadAnimator {
 			public:
-			QuadAnimator(std::filesystem::path jsonPath, const Cori::Entity& entity, const float timeStep, const char* animatorName);
+				QuadAnimator(std::filesystem::path jsonPath, const Cori::Entity& entity, const float timeStep, const char* animatorName);
 				~QuadAnimator();
 
 				void StartSingle(const AnimationDescriptor& descriptor);
@@ -70,7 +78,7 @@ namespace Cori {
 
 				const char* m_AnimatorName;
 				std::shared_ptr<Texture2D> m_Atlas;
-				std::vector<Animation> m_Animations;
+				std::vector<AnimationData> m_Animations;
 				Cori::Entity m_Entity{};
 				bool m_Valid = false;
 			};

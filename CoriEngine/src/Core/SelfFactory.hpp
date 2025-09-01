@@ -1,7 +1,6 @@
 #pragma once
 
 namespace Cori {
-
 	template<typename...>
 	class SharedSelfFactory;
 

@@ -28,6 +28,8 @@ namespace Cori {
 
 		static Window& GetWindow() { return *s_Instance->m_Window; }
 
+		static GameTimer& GetGameTimer() { return s_Instance->m_GameTimer; }
+
 	private:
 		void TickrateUpdate(const float timeStep);
 

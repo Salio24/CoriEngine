@@ -23,6 +23,7 @@ namespace Cori {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadAnimator }, "Failed to parse JSON file '{}', this will lead to Quad Animator not working at all. Error: {}", jsonPath.string(), e.what());
 					return;
 				}
+
 				f.close();
 
 				if (!data.contains("frames") || !data["frames"].is_object()) {
@@ -30,12 +31,12 @@ namespace Cori {
 					return;
 				}
 
-				if (!data.contains("meta")) {
+				if (!data.contains("meta") || !data["meta"].is_object()) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadAnimator }, "JSON missing 'meta' object. This will lead to Quad Animator not working at all.", jsonPath.string());
 					return;
 				}
 
-				std::filesystem::path atlasPath = (jsonPath.parent_path() / std::string(data["meta"]["image"])).string();
+				std::filesystem::path atlasPath = jsonPath.parent_path() / data["meta"]["image"];
 
 				auto image = Image::Create(atlasPath);
 				m_Atlas = Texture2D::Create(image);
@@ -48,6 +49,7 @@ namespace Cori {
 
 				const json& framesObject = data["frames"];
 
+				// wat? what for?
 				std::vector<json> frameValuesArray;
 				for (const auto& [key, frameData] : framesObject.items()) {
 					frameValuesArray.push_back(frameData);
@@ -74,9 +76,6 @@ namespace Cori {
 				glm::vec2 oldPos;
 				glm::vec2 pos{ 0.0f, 0.0f };
 
-				// FIXME: this leads to pixelart not being pixel perfect and is a temp fix, need to add automatic padding
-				const glm::vec2 texelSize = {1.0f / static_cast<float>(m_Atlas->GetWidth()), 1.0f / static_cast<float>(m_Atlas->GetHeight())};
-
 				for (const auto& [frameNum, frameData] : sortedFrameItems) {
 					if (frameData.contains("frame") && frameData["frame"].is_object()) {
 						if (m_FrameSize.x == 0.0f && m_FrameSize.y == 0.0f) {
@@ -90,7 +89,7 @@ namespace Cori {
 						oldPos = pos;
 						pos = { frameData["frame"]["x"], frameData["frame"]["y"] };
 						if (pos.y - oldPos.y == m_FrameSize.y) {
-							Animation anim(frames);
+							AnimationData anim(frames);
 							m_Animations.push_back(anim);
 							frames.clear();
 						}
@@ -99,15 +98,12 @@ namespace Cori {
 						frame.m_UVs.UVmin = { pos.x / m_FrameSize.x * frameUVSize.x, 1.0f - (pos.y / m_FrameSize.y * frameUVSize.y + frameUVSize.y) };
 						frame.m_UVs.UVmax = { pos.x / m_FrameSize.x * frameUVSize.x + frameUVSize.x, 1.0f - pos.y / m_FrameSize.y * frameUVSize.y };
 
-						// FIXME: this leads to pixelart not being pixel perfect and is a temp fix, need to add automatic padding
-						frame.m_UVs.UVmin += texelSize * 0.5f;
-						frame.m_UVs.UVmax -= texelSize * 0.5f;
 						frame.m_TickDuration = std::round(static_cast<float>(frameData["duration"]) / (timeStep * 1000.0f));
 
 						frames.push_back(frame);
 
 						if (frameNum + 1 == sortedFrameItems.size()) {
-							Animation anim(frames);
+							AnimationData anim(frames);
 							m_Animations.push_back(anim);
 						}
 					}
@@ -150,7 +146,7 @@ namespace Cori {
 					return false;
 				}
 
-				Animation& anim = m_Animations[descriptor.m_Index];
+				AnimationData& anim = m_Animations[descriptor.m_Index];
 				auto& quad = m_Entity.GetComponents<QuadRenderer>();
 				quad.m_Texture = m_Atlas;
 				quad.m_UVs = anim.m_Frames[anim.m_CurrentFrame].m_UVs;
@@ -194,7 +190,7 @@ namespace Cori {
 			std::function<void()> QuadAnimator::GetAnimationPlayer() {
 				return [this] {
 					const uint16_t index = m_AnimationQueue[m_CurrentAnimationQueueIndex].Index;
-					Animation& anim = m_Animations[index];
+					AnimationData& anim = m_Animations[index];
 
 					auto& quad = m_Entity.GetComponents<QuadRenderer>();
 					quad.m_Texture = m_Atlas;
@@ -216,7 +212,7 @@ namespace Cori {
 						}
 
 						const uint16_t nextIndex = m_AnimationQueue[m_CurrentAnimationQueueIndex].Index;
-						Animation& nextAnim = m_Animations[nextIndex];
+						AnimationData& nextAnim = m_Animations[nextIndex];
 						nextAnim.m_CurrentFrame = 0;
 						nextAnim.m_CurrentFrameTick = 1;
 					}
@@ -233,7 +229,7 @@ namespace Cori {
 			}
 
 			void QuadAnimator::ResetAnimationState(const AnimationDescriptor& descriptor) {
-				Animation& anim = m_Animations[descriptor.m_Index];
+				AnimationData& anim = m_Animations[descriptor.m_Index];
 				anim.m_CurrentFrame = 0;
 				anim.m_CurrentFrameTick = 1;
 			}
@@ -262,6 +258,4 @@ namespace Cori {
 			}
 		}
 	}
-
-
 }

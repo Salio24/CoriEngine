@@ -12,11 +12,11 @@ namespace Cori {
 	public:
 		virtual ~State() = default;
 
-		virtual void OnEnter([[maybe_unused]] Entity& owner, [[maybe_unused]] Components::Entity::StateMachine* fsm) {}
+		virtual void OnEnter([[maybe_unused]] Entity& owner) {}
 
-		virtual void OnTickUpdate([[maybe_unused]] Entity& owner, [[maybe_unused]] Components::Entity::StateMachine* fsm, [[maybe_unused]] float timestep) {}
+		virtual void OnTickUpdate([[maybe_unused]] Entity& owner, [[maybe_unused]] float timestep) {}
 
-		virtual void OnExit([[maybe_unused]] Entity& owner, [[maybe_unused]] Components::Entity::StateMachine* fsm) {}
+		virtual void OnExit([[maybe_unused]] Entity& owner) {}
 
 		[[nodiscard]] virtual const char* GetDebugName() const { return "Unnamed State"; }
 

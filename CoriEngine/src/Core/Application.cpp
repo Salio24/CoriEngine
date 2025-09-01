@@ -140,7 +140,6 @@ namespace Cori {
 
 	void Application::TickrateUpdate(const float timeStep) {
 		//static uint64_t ti = 0;
-		//ti++;
 		if (m_ManualStep) {
 			static bool oneshot = true;
 			if (Input::IsKeyPressed(Cori::CORI_KEY_K)) {
@@ -150,6 +149,8 @@ namespace Cori {
 						layer->SceneTickrateUpdate(timeStep);
 						layer->OnTickUpdate(timeStep);
 					}
+					//ti++;
+					//CORI_CORE_DEBUG("TICK {}", ti);
 				}
 			}
 			else {
@@ -161,8 +162,9 @@ namespace Cori {
 				layer->SceneTickrateUpdate(timeStep);
 				layer->OnTickUpdate(timeStep);
 			}
+			//ti++;
+			//CORI_CORE_DEBUG("TICK {}", ti);
 		}
-		//CORI_CORE_DEBUG("TICK {}", ti);
 	}
 
 	bool Application::OnWindowClose() {

@@ -1,11 +1,10 @@
 #pragma once
-#include "Texture2DDescriptor.hpp"
 
 namespace Cori {
 	class SpriteAtlasDescriptor {
 	public:
-		constexpr SpriteAtlasDescriptor(std::string debugName, const Texture2DDescriptor& textureDescriptor, glm::ivec2 spriteResolution) noexcept
-			: m_TextureDescriptor(textureDescriptor),
+		constexpr SpriteAtlasDescriptor(std::string debugName, const std::filesystem::path& texturePath, const glm::uvec2 spriteResolution) noexcept
+			: m_TexturePath(texturePath),
 			m_SpriteResolution(spriteResolution),
 			m_Name(std::move(debugName)),
 			m_RuntimeID(s_NextRuntimeID.fetch_add(1, std::memory_order_relaxed))
@@ -23,8 +22,8 @@ namespace Cori {
 			}
 		};
 
-		const Texture2DDescriptor m_TextureDescriptor;
-		const glm::ivec2 m_SpriteResolution;
+		const std::filesystem::path m_TexturePath;
+		const glm::uvec2 m_SpriteResolution;
 		const std::string m_Name;
 
 	private:

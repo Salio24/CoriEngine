@@ -13,7 +13,7 @@ namespace Cori {
 
 		template<typename T>
 		concept IsSoundWithParams = std::is_same_v<T, SoundWithParams>;
-		
+
 		class Track : public Profiling::Trackable<Track>, public SharedSelfFactory<Track> {
 		public:
 			static bool PreCreateHook([[maybe_unused]] std::string name) {
@@ -64,6 +64,7 @@ namespace Cori {
 				});
 			}
 
+			// FIXME: reduce the possible Play/Stop func pairs to one that will handle both sequence and simple play operations
 			std::expected<void, CoriError<>> StartSequence(const IsSoundWithParams auto&... sequence) {
 				static_assert(sizeof...(sequence) > 2, "Sequence should contain at least 2 SoundWithParams objects.");
 				if (m_Valid) {
@@ -108,9 +109,9 @@ namespace Cori {
 									}
 
 									m_ActiveSequence = false;
-									const auto success = PlaySoundWithParams(*part);
-									if (!success) {
-										CORI_CORE_ERROR_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "An error occurred when trying to play a part of sequence. Details: {}", success.error().what());
+									const auto success_ = PlaySoundWithParams(*part);
+									if (!success_) {
+										CORI_CORE_ERROR_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "An error occurred when trying to play a part of sequence. Details: {}", success_.error().what());
 									}
 									m_ActiveSequence = true;
 
@@ -148,8 +149,8 @@ namespace Cori {
 				return std::unexpected(CoriError(std::format("Failed to play sequence on Track '{} (TrackID: {})'. Track object is invalid.", m_Name, m_ID)));
 			}
 
-			// maybe add an ability to play outro seqeunce
-			// fadeoutms are applide only when abruptStop is true!
+			// maybe add an ability to play outro sequence
+			// fadeoutms are applied only when abruptStop is true!
 			std::expected<void, CoriError<>> StopSequence(const bool abruptStop, const int64_t fadeOutMS = 0) {
 				if (m_Valid) {
 					if (m_ActiveSequence) {

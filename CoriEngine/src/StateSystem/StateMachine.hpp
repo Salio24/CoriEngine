@@ -14,7 +14,7 @@ namespace Cori {
 
 				~StateMachine() {
 					if (m_CurrentState) {
-						m_CurrentState->OnExit(m_Owner, this);
+						m_CurrentState->OnExit(m_Owner);
 					}
 				}
 
@@ -48,7 +48,7 @@ namespace Cori {
 
 					if (m_CurrentState) {
 						CORI_CORE_TRACE_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::StateMachine }, "StateMachine for Entity - {}: Exiting state '{}'", m_Owner.GetDebugData(), CORI_CLEAN_TYPE_NAME(*m_CurrentState));
-						m_CurrentState->OnExit(m_Owner, this);
+						m_CurrentState->OnExit(m_Owner);
 					}
 
 					if (m_LastState) {
@@ -59,12 +59,12 @@ namespace Cori {
 
 					m_CurrentState = nextStateRawPtr;
 					CORI_CORE_TRACE_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::StateMachine }, "StateMachine for Entity - {}: Entering state '{}'", m_Owner.GetDebugData(), CORI_CLEAN_TYPE_NAME(*m_CurrentState));
-					m_CurrentState->OnEnter(m_Owner, this);
+					m_CurrentState->OnEnter(m_Owner);
 				}
 
 				void OnTickUpdate(const float timeStep) {
 					if (m_CurrentState) {
-						m_CurrentState->OnTickUpdate(m_Owner, this, timeStep);
+						m_CurrentState->OnTickUpdate(m_Owner, timeStep);
 					}
 				}
 

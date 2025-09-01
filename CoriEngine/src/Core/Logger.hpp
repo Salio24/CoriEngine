@@ -60,6 +60,8 @@ namespace Cori {
 				static constexpr char Image[] = "Image";
 				static constexpr char SpriteAtlas[] = "Sprite Atlas";
 				static constexpr char Camera[] = "Camera";
+				static constexpr char AnimationPack[] = "Animation Pack";
+
 			};
 
 			struct Audio {

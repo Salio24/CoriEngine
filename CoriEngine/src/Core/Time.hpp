@@ -11,6 +11,7 @@ namespace Cori {
 
 		double GetDeltaTime() const { return m_DeltaTime; }
 		double GetTickAlpha() const { return m_TickAlpha; }
+		float GetTimestep() const { return m_Timestep; }
 
 		double GetMilliseconds() const { return m_Time * 1000.0f; }
 		double GetSeconds() const { return m_Time; }

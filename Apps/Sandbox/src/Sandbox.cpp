@@ -11,13 +11,24 @@ namespace Cori {
 			"Test AtlasTexture",
 			"assets/engine/textures/testTileset32.png"
 		};
+
+		inline const Texture2DDescriptor UVSample{
+			"Test UV text",
+			"assets/engine/textures/uv_sample.png"
+		};
 	}
 
 	namespace SpriteAtlases {
 		inline const SpriteAtlasDescriptor Atlas{
 			"Test Atlas",
-			Texture2Ds::AtlasTexture,
+			"assets/engine/textures/testTileset32.png",
 			{32, 32}
+		};
+
+		inline const SpriteAtlasDescriptor UVsss{
+			"Test UV Atlas",
+			"assets/engine/textures/uv_sample.png",
+			{128, 128}
 		};
 
 	}
@@ -116,52 +127,55 @@ public:
 		}
 
 		if (ImGui::Button("Create tree")) {
-			auto atlas1 = Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::Atlas);
-			auto atlas = atlas1.value();
+			auto atlas1 = Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::UVsss);
+			std::shared_ptr<Cori::SpriteAtlas> atlas;
+			if (atlas1) {
+				atlas = atlas1.value();
+			}
 
 			auto text = atlas->GetTexture();
 
-			auto uvs = atlas->GetSpriteUVsAtIndex(23);
-			auto uvs1 = atlas->GetSpriteUVsAtIndex(26);
-			auto uvs2 = atlas->GetSpriteUVsAtIndex(1);
-			auto uvs3 = atlas->GetSpriteUVsAtIndex(22);
-			auto uvs4 = atlas->GetSpriteUVsAtIndex(27);
+			auto uvs = atlas->GetSpriteUVsAtIndex(0);
+			auto uvs1 = atlas->GetSpriteUVsAtIndex(7);
+			auto uvs2 = atlas->GetSpriteUVsAtIndex(56);
+			auto uvs3 = atlas->GetSpriteUVsAtIndex(63);
+			auto uvs4 = atlas->GetSpriteUVsAtIndex(4);
 
 			auto player = ActiveScene.CreateEntity("Player", Test);
 			auto& transform = player.GetComponents<Cori::Components::Entity::Transform>();
 			transform.SetLocalDepth(2);
 			transform.SetLocalPosition({ 100.0f, 100.0f });
 			auto& renderer = player.AddComponent<Cori::Components::Entity::QuadRenderer>(glm::vec2(50.0f), text, uvs);
-			renderer.SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+			//renderer.SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 			ActiveScene.AddEntityToCache(player, "player"_hs32);
 
 			auto player_sprite = ActiveScene.CreateEntity("Sprite", Test);
 			auto& transform1 = player_sprite.GetComponents<Cori::Components::Entity::Transform>();
-			transform1.SetLocalPosition({100.0f, 100.0f});
+			transform1.SetLocalPosition({0.0f, 100.0f});
 			auto& renderer1 = player_sprite.AddComponent<Cori::Components::Entity::QuadRenderer>(glm::vec2(50.0f), text, uvs1);
-			renderer1.SetColor({0.5f, 1.0f, 1.0f, 1.0f});
+			//renderer1.SetColor({0.5f, 1.0f, 1.0f, 1.0f});
 			player_sprite.SetParent(player);
 
 			auto weapon_root = ActiveScene.CreateEntity("Weapon", Test);
 			auto& transform2 = weapon_root.GetComponents<Cori::Components::Entity::Transform>();
-			transform2.SetLocalPosition({50.0f, 200.0f});
+			transform2.SetLocalPosition({0.0f, 200.0f});
 			auto& renderer2 = weapon_root.AddComponent<Cori::Components::Entity::QuadRenderer>(glm::vec2(50.0f), text, uvs2);
-			renderer2.SetColor({1.0f, 0.5f, 1.0f, 1.0f});
+			//renderer2.SetColor({1.0f, 0.5f, 1.0f, 1.0f});
 			weapon_root.SetParent(player);
 			ActiveScene.AddEntityToCache(weapon_root, "weapon"_hs32);
 
 			auto gun_sprite = ActiveScene.CreateEntity("GunSprite", Test);
 			auto& transform3 = gun_sprite.GetComponents<Cori::Components::Entity::Transform>();
-			transform3.SetLocalPosition({10.0f, 300.0f});
+			transform3.SetLocalPosition({0.0f, 300.0f});
 			auto& renderer3 = gun_sprite.AddComponent<Cori::Components::Entity::QuadRenderer>(glm::vec2(50.0f), text, uvs3);
-			renderer3.SetColor({1.0f, 1.0f, 0.5f, 1.0f});
+			//renderer3.SetColor({1.0f, 1.0f, 0.5f, 1.0f});
 			gun_sprite.SetParent(weapon_root);
 
 			auto muzzle_flash = ActiveScene.CreateEntity("MuzzleFlash", Test);
 			auto& transform4 = muzzle_flash.GetComponents<Cori::Components::Entity::Transform>();
-			transform4.SetLocalPosition({30.0f, 400.0f});
+			transform4.SetLocalPosition({0.0f, 400.0f});
 			auto& renderer4 = muzzle_flash.AddComponent<Cori::Components::Entity::QuadRenderer>(glm::vec2(50.0f), text, uvs4);
-			renderer4.SetColor({1.0f, 0.0f, 1.0f, 1.0f});
+			//renderer4.SetColor({1.0f, 0.0f, 1.0f, 1.0f});
 			muzzle_flash.SetParent(weapon_root);
 		}
 
