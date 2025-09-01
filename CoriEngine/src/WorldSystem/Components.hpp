@@ -104,12 +104,12 @@ namespace Cori {
 					return m_LocalDepthOffset;
 				}
 
-				void SetFrozenState(const bool state) {
-					m_Frozen = state;
+				void SetDetachedState(const bool state) {
+					m_Detached = state;
 				}
 
-				[[nodiscard]] bool GetFrozenState() const {
-					return m_Frozen;
+				[[nodiscard]] bool GetDetachedState() const {
+					return m_Detached;
 				}
 
 				[[nodiscard]] glm::mat3 GetLocalTransform() const {
@@ -125,12 +125,15 @@ namespace Cori {
 				glm::vec2 m_LocalPosition{ 0.0f, 0.0f };
 				glm::vec2 m_LocalScale{ 1.0f, 1.0f };
 				float m_LocalRotation{ 0.0f };
+			protected:
+				friend class Scene;
+				glm::mat3 m_LastParentTransform{ 1.0f };
 			public:
 				glm::mat3 m_WorldTransform{ 1.0f };
 				uint8_t m_WorldDepth{ 1 };
 			private:
 				int16_t m_LocalDepthOffset{ 0 };
-				bool m_Frozen{ false };
+				bool m_Detached{ false };
 				bool m_DirtyTransform{ true };
 				bool m_DirtyDepth{ true };
 			};
@@ -160,14 +163,14 @@ namespace Cori {
 				QuadRenderer(const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const UVs& uvs) : m_HalfSize(size), m_UVs(uvs) {
 					const auto result = SetTexture(texture);
 					if (!result) {
-						CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadRenderer }, "Failed to fully recreate QuadAnimator. Details: '{}'", result.error().what());
+						CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadRenderer }, "Failed to fully recreate Quad Renderer. Details: '{}'", result.error().what());
 					}
 				}
 
 				QuadRenderer(const glm::vec2 size, const std::shared_ptr<Texture2D>& texture, const UVs& uvs, const glm::vec4& tintColor) : m_HalfSize(size), m_UVs(uvs) {
 					const auto result = SetTexture(texture);
 					if (!result) {
-						CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadRenderer }, "Failed to fully recreate QuadAnimator. Details: '{}'", result.error().what());
+						CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadRenderer }, "Failed to fully recreate Quad Renderer. Details: '{}'", result.error().what());
 					}
 					SetColor(tintColor);
 				}
@@ -187,7 +190,7 @@ namespace Cori {
 						return {};
 					}
 
-					return std::unexpected(CoriError("Can't set Texture2D because QuadAnimator is currently bound."));
+					return std::unexpected(CoriError("Can't set Texture2D because Quad Animator is currently bound."));
 				}
 
 				[[nodiscard]] std::shared_ptr<Texture2D> GetTexture() const {
@@ -217,7 +220,7 @@ namespace Cori {
 						return {};
 					}
 
-					return std::unexpected(CoriError("Can't set UVs because QuadAnimator is currently bound."));
+					return std::unexpected(CoriError("Can't set UVs because Quad Animator is currently bound."));
 				}
 
 				[[nodiscard]] UVs GetUVs() const {
@@ -229,7 +232,7 @@ namespace Cori {
 						m_HalfSize = halfSize;
 						return {};
 					}
-					return std::unexpected(CoriError("Can't set HalfSize because QuadAnimator is currently bound."));
+					return std::unexpected(CoriError("Can't set HalfSize because Quad Animator is currently bound."));
 				}
 
 				[[nodiscard]] glm::vec2 GetHalfSize() const {

@@ -29,6 +29,10 @@ namespace Cori {
 			uint32_t QuadCount{ 0 };
 		};
 
+		static std::expected<uint32_t, CoriError<>> LoadFont(const std::filesystem::path& path);
+
+		static void Test();
+
 		static void BeginScene(const Components::Scene::Camera& camera);
 
 		static void BeginWorldPass();
@@ -120,6 +124,11 @@ namespace Cori {
 			glm::mat4 CurrentViewProjectionMatrix{ 1.0f };
 			glm::mat4 WorldViewProjectionMatrix{ 1.0f };
 			glm::mat4 ScreenSpaceViewProjectionMatrix{ 1.0f };
+
+
+			// temporary. for testing
+			std::vector<std::shared_ptr<Texture2D>> TextMSDFAtlas;
+
 		};
 
 		static RendererData* s_Data;

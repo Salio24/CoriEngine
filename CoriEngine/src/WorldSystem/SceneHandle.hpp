@@ -140,7 +140,10 @@ namespace Cori {
 	protected:
 		friend class Layer;
 		[[nodiscard]] bool OnUnbind() {
-			return m_SceneRaw->OnUnbind();
+			if (m_SceneRaw != nullptr) {
+				return m_SceneRaw->OnUnbind();
+			}
+			return false;
 		}
 
 	private:

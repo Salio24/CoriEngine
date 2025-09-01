@@ -2,6 +2,7 @@
 #include <ska_sort.hpp>
 #include "Core/Utility/AABB.hpp"
 #include "AssetManager/AssetManager.hpp"
+#include <msdf-atlas-gen/msdf-atlas-gen.h>
 
 namespace Cori {
 	Renderer2D::RendererData* Renderer2D::s_Data{ nullptr };
@@ -35,6 +36,8 @@ namespace Cori {
 
 		s_Data->QuadInstanceShader = ShaderProgram::Create("assets/engine/shaders/QuadInstancedVert.glsl", "assets/engine/shaders/QuadInstancedFrag.glsl");
 
+		//LoadFont("assets/engine/fonts/arial.ttf");
+
 		CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Renderer2D }, "Renderer2D Initialized successfully.");
 	}
 
@@ -44,6 +47,83 @@ namespace Cori {
 
 		delete[] s_Data->QuadInstanceBufferBase;
 		delete s_Data;
+	}
+
+	std::expected<uint32_t, CoriError<>> Renderer2D::LoadFont(const std::filesystem::path& path) {
+		int32_t index = s_Data->TextMSDFAtlas.size();
+		if (msdfgen::FreetypeHandle* ft = msdfgen::initializeFreetype()) {
+			// Load font file
+			if (msdfgen::FontHandle* font = msdfgen::loadFont(ft, path.c_str())) {
+				// Storage for glyph geometry and their coordinates in the atlas
+				std::vector<msdf_atlas::GlyphGeometry> glyphs;
+				// FontGeometry is a helper class that loads a set of glyphs from a single font.
+				// It can also be used to get additional font metrics, kerning information, etc.
+				msdf_atlas::FontGeometry fontGeometry(&glyphs);
+				// Load a set of character glyphs:
+				// The second argument can be ignored unless you mix different font sizes in one atlas.
+				// In the last argument, you can specify a charset other than ASCII.
+				// To load specific glyph indices, use loadGlyphs instead.
+				//fontGeometry.loadCharset(font, 1.0, Charset::ASCII);
+				fontGeometry.loadGlyphRange(font, 1.0, 0x0020, 0x0FFF);
+				// Apply MSDF edge coloring. See edge-coloring.h for other coloring strategies.
+				const double maxCornerAngle = 3.0;
+				for (msdf_atlas::GlyphGeometry& glyph : glyphs)
+					glyph.edgeColoring(&msdfgen::edgeColoringInkTrap, maxCornerAngle, 0);
+				// TightAtlasPacker class computes the layout of the atlas.
+				msdf_atlas::TightAtlasPacker packer;
+				// Set atlas parameters:
+				// setDimensions or setDimensionsConstraint to find the best value
+				packer.setDimensionsConstraint(msdf_atlas::DimensionsConstraint::NONE);
+				// setScale for a fixed size or setMinimumScale to use the largest that fits
+				packer.setMinimumScale(48.0);
+				packer.setSpacing(1);
+				// setPixelRange or setUnitRange
+				packer.setPixelRange(2.0);
+				packer.setMiterLimit(2.0);
+				// Compute atlas layout - pack glyphs
+				// FIXME: check for remaining glyphs is some was not packed
+				packer.pack(glyphs.data(), glyphs.size());
+				// Get final atlas dimensions
+				int width = 0, height = 0;
+				packer.getDimensions(width, height);
+				// The ImmediateAtlasGenerator class facilitates the generation of the atlas bitmap.
+				msdf_atlas::ImmediateAtlasGenerator<
+					float, // pixel type of buffer for individual glyphs depends on generator function
+					3, // number of atlas color channels
+					msdf_atlas::msdfGenerator, // function to generate bitmaps for individual glyphs
+					msdf_atlas::BitmapAtlasStorage<msdf_atlas::byte, 3> // class that stores the atlas bitmap
+					// For example, a custom atlas storage class that stores it in VRAM can be used.
+				> generator(width, height);
+				// GeneratorAttributes can be modified to change the generator's default settings.
+				msdf_atlas::GeneratorAttributes attributes;
+				attributes.scanlinePass = true;
+				generator.setAttributes(attributes);
+				int n = std::thread::hardware_concurrency();
+				generator.setThreadCount(n / 2);
+				// Generate atlas bitmap
+				generator.generate(glyphs.data(), glyphs.size());
+				// The atlas bitmap can now be retrieved via atlasStorage as a BitmapConstRef.
+				// The glyphs array (or fontGeometry) contains positioning data for typesetting text.
+				msdfgen::BitmapConstRef<msdf_atlas::byte, 3> storage = generator.atlasStorage();
+
+				auto atlas = Texture2D::Create(storage.pixels, storage.width, storage.height, false, Texture::RGB888, Texture::CLAMP_TO_EDGE, Texture::LINEAR);
+
+				s_Data->TextMSDFAtlas.push_back(atlas);
+
+				//success = my_project::submitAtlasBitmapAndLayout(generator.atlasStorage(), glyphs);
+				// Cleanup
+				msdfgen::destroyFont(font);
+				msdfgen::deinitializeFreetype(ft);
+				return index;
+			}
+			msdfgen::deinitializeFreetype(ft);
+			return std::unexpected(CoriError(std::format("Failed to load font from: {}", path.string())));
+		}
+		return std::unexpected(CoriError("Failed to initialize Freetype."));
+	}
+
+	void Renderer2D::Test() {
+		//SubmitScreenSpaceOpaqueQuad(glm::mat3(1.0f), glm::vec2(1.0f), glm::vec4(1.0f), s_Data->TextMSDFAtlas[0].get(), UVs{}, 5, false, false, false);
 	}
 
 	void Renderer2D::BeginScene(const Components::Scene::Camera& camera) {
@@ -79,16 +159,20 @@ namespace Cori {
 			for (const auto entity : view) {
 				auto& renderer = view.Get<Components::Entity::QuadRenderer>(entity);
 				if (renderer.m_Visible) {
-					auto& transform = view.Get<Components::Entity::Transform>(entity);
-					Utility::AABB entityBounds = Utility::CalculateAABB(transform.m_WorldTransform, renderer.GetHalfSize());
-					//SubmitAABB(camera.m_CameraBounds, 0.2f, {0.0f, 1.0f, 0.0f});
-					if (AABBOverlapCheck(camera.m_CameraBounds, entityBounds)) {
-						//SubmitAABB(entityBounds, 0.2f, {1.0f, 0.0f, 1.0f});
-						if (renderer.GetSemiTransparencyState()) {
-							SubmitWorldSpaceTransparentQuad(transform.m_WorldTransform, renderer.GetHalfSize(), renderer.GetColor(), renderer.GetTexture().get(), renderer.GetUVs(), transform.m_WorldDepth, renderer.m_FlipX, renderer.m_FlipY, renderer.m_FlatColored);
-							continue;
+					if (renderer.GetTexture()) {
+						auto& transform = view.Get<Components::Entity::Transform>(entity);
+						Utility::AABB entityBounds = Utility::CalculateAABB(transform.m_WorldTransform, renderer.GetHalfSize());
+						//SubmitAABB(camera.m_CameraBounds, 0.2f, {0.0f, 1.0f, 0.0f});
+						if (AABBOverlapCheck(camera.m_CameraBounds, entityBounds)) {
+							//SubmitAABB(entityBounds, 0.2f, {1.0f, 0.0f, 1.0f});
+							if (renderer.GetSemiTransparencyState()) {
+								SubmitWorldSpaceTransparentQuad(transform.m_WorldTransform, renderer.GetHalfSize(), renderer.GetColor(), renderer.GetTexture().get(), renderer.GetUVs(), transform.m_WorldDepth, renderer.m_FlipX, renderer.m_FlipY, renderer.m_FlatColored);
+								continue;
+							}
+							SubmitWorldSpaceOpaqueQuad(transform.m_WorldTransform, renderer.GetHalfSize(), renderer.GetColor(), renderer.GetTexture().get(), renderer.GetUVs(), transform.m_WorldDepth, renderer.m_FlipX, renderer.m_FlipY, renderer.m_FlatColored);
 						}
-						SubmitWorldSpaceOpaqueQuad(transform.m_WorldTransform, renderer.GetHalfSize(), renderer.GetColor(), renderer.GetTexture().get(), renderer.GetUVs(), transform.m_WorldDepth, renderer.m_FlipX, renderer.m_FlipY, renderer.m_FlatColored);
+					} else {
+						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Renderer2D }, "DrawScene: Texture inside Quad Renderer for Entity '{}', is null, skipping it.", entity.GetDebugData());
 					}
 				}
 			}
@@ -318,7 +402,6 @@ namespace Cori {
 		const glm::vec2 size = {aabb.m_Max.x - aabb.m_Min.x, aabb.m_Max.y - aabb.m_Min.y};
 		SubmitWorldSpaceColoredQuad({aabb.m_Min.x, aabb.m_Max.y - size.y / 2.0f}, {lineThickness, size.y / 2.0f}, color);
 		SubmitWorldSpaceColoredQuad({aabb.m_Max.x, aabb.m_Max.y - size.y / 2.0f}, {lineThickness, size.y / 2.0f}, color);
-
 
 		SubmitWorldSpaceColoredQuad({aabb.m_Max.x - size.x / 2.0f, aabb.m_Min.y}, {size.x / 2.0f - lineThickness, lineThickness}, color);
 		SubmitWorldSpaceColoredQuad({aabb.m_Max.x - size.x / 2.0f, aabb.m_Max.y}, {size.x / 2.0f - lineThickness, lineThickness}, color);

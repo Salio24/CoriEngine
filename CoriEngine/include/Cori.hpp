@@ -26,7 +26,6 @@
 #include "../src/Graphics/Texture.hpp"
 #include "../src/Graphics/Image.hpp"
 #include "../src/Graphics/CameraController.hpp"
-#include "../src/Graphics/Animator/QuadAnimator.hpp"
 #include "../src/Graphics/Renderer2D.hpp"
 #include "../src/Graphics/Animator/AnimationPack.hpp"
 #include "../src/Graphics/Animator/QuadAnimatorNew.hpp"

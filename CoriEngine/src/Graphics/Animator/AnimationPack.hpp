@@ -30,10 +30,8 @@ namespace Cori {
 			};
 
 			static std::shared_ptr<AnimationPack> Create(const std::filesystem::path& jsonPath, ConfigType type, const float timeStep, const std::string& name);
-			~AnimationPack();
 
 			[[nodiscard]] Animation GetAnimation(const uint32_t index);
-
 
 		private:
 			explicit AnimationPack(std::vector<AnimationData> animations, const std::shared_ptr<SpriteAtlas>& spriteAtlas, std::string name, const glm::u16vec2 frameResolution);
@@ -44,8 +42,6 @@ namespace Cori {
 			std::string m_Name;
 			glm::u16vec2 m_FrameSize{ 0, 0 };
 			bool m_Valid = false;
-
-
 		};
 	}
 }

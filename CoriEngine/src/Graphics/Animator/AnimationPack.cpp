@@ -65,8 +65,8 @@ namespace Cori {
 					std::vector<AnimationData> animations;
 					animations.reserve(initialImageResolution.y / frameResolution.y);
 
-					glm::vec2 oldPos;
-					glm::vec2 pos{ 0.0f, 0.0f };
+					glm::uvec2 oldPos;
+					glm::uvec2 pos{ 0.0f, 0.0f };
 
 					for (const auto& [frameIndex, frameData] : sortedFrameItems) {
 						glm::u16vec2 currentFrameResolution = { frameData["frame"]["w"], frameData["frame"]["h"] };
@@ -117,10 +117,6 @@ namespace Cori {
 			}
 
 			return std::shared_ptr<AnimationPack>(new AnimationPack());
-		}
-
-		AnimationPack::~AnimationPack() {
-
 		}
 
 		Animation AnimationPack::GetAnimation(const uint32_t index) {

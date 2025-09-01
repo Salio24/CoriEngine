@@ -16,7 +16,7 @@ namespace Cori {
 
 		virtual void OnTickUpdate([[maybe_unused]] Entity& owner, [[maybe_unused]] float timestep) {}
 
-		virtual void OnExit([[maybe_unused]] Entity& owner) {}
+		virtual void OnExit([[maybe_unused]] Entity& owner, [[maybe_unused]] const std::type_info& nextStateType) {}
 
 		[[nodiscard]] virtual const char* GetDebugName() const { return "Unnamed State"; }
 

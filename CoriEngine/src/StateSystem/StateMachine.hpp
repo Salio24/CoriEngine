@@ -14,7 +14,7 @@ namespace Cori {
 
 				~StateMachine() {
 					if (m_CurrentState) {
-						m_CurrentState->OnExit(m_Owner);
+						m_CurrentState->OnExit(m_Owner, typeid(nullptr));
 					}
 				}
 
@@ -48,7 +48,7 @@ namespace Cori {
 
 					if (m_CurrentState) {
 						CORI_CORE_TRACE_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::StateMachine }, "StateMachine for Entity - {}: Exiting state '{}'", m_Owner.GetDebugData(), CORI_CLEAN_TYPE_NAME(*m_CurrentState));
-						m_CurrentState->OnExit(m_Owner);
+						m_CurrentState->OnExit(m_Owner, typeid(*nextStateRawPtr));
 					}
 
 					if (m_LastState) {

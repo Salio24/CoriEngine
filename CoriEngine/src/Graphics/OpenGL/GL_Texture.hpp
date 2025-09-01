@@ -1,15 +1,14 @@
 #pragma once
-#include "Graphics/Image.hpp"
 #include "Graphics/Texture.hpp"
 #include "Graphics/GraphicsAPIs.hpp"
 #include "Profiling/Trackable.hpp"
 #include "Core/AutoRegisteringFactory.hpp"
 
 namespace Cori {
-	class OpenGLTexture2D final : public Texture2D, public Profiling::Trackable<OpenGLTexture2D, Texture2D>, public RegisterInFactory<Texture2D, OpenGLTexture2D, GraphicsAPIs, GraphicsAPIs::OpenGL, const std::shared_ptr<Image>&> {
+	class OpenGLTexture2D final : public Texture2D, public Profiling::Trackable<OpenGLTexture2D, Texture2D>, public RegisterInFactory<Texture2D, OpenGLTexture2D, GraphicsAPIs, GraphicsAPIs::OpenGL, const void*, const uint32_t, const uint32_t, const bool, const Texture::PixelFormat, const Texture::WrapMode, const Texture::Filter> {
 	public:
-		static bool PreCreateHook(const std::shared_ptr<Image>& image);
-		explicit OpenGLTexture2D(const std::shared_ptr<Image>& image);
+		static bool PreCreateHook(const void* pixelData, const uint32_t width, const uint32_t height, const bool hasSemiTransparency, const PixelFormat pixelFormat, const WrapMode wrapMode, const Filter filter);
+		explicit OpenGLTexture2D(const void* pixelData, const uint32_t width, const uint32_t height, const bool hasSemiTransparency, const PixelFormat pixelFormat, const WrapMode wrapMode, const Filter filter);
 		~OpenGLTexture2D() override;
 
 		void Bind(uint32_t slot) const override;
@@ -18,7 +17,6 @@ namespace Cori {
 		[[nodiscard]] uint32_t GetHeight() const override { return m_Height; }
 
 		[[nodiscard]] bool HasSemiTransparency() const override;
-
 
 private:
 		uint32_t m_ID{ 0 };

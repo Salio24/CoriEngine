@@ -179,8 +179,11 @@ namespace Cori {
 		const bool layerDirty = transform.m_DirtyDepth || parentDepthDirty;
 
 		if (transformDirty) {
-			if (!transform.GetFrozenState()) {
+			if (!transform.GetDetachedState()) {
 				transform.m_WorldTransform = parentTransform * transform.GetLocalTransform();
+				transform.m_LastParentTransform = parentTransform;
+			} else {
+				transform.m_WorldTransform = transform.m_LastParentTransform * transform.GetLocalTransform();
 			}
 
 			transform.m_DirtyTransform = false;

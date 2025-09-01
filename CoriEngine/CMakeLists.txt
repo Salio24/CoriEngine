@@ -104,6 +104,13 @@ project(CoriEngine)
     #set(UUID_SYSTEM_GENERATOR ON CACHE BOOL "")
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/stduuid EXCLUDE_FROM_ALL)
 
+    #msdf-atlas-gen
+    set(MSDF_ATLAS_BUILD_STANDALONE OFF CACHE BOOL "")
+    set(MSDF_ATLAS_USE_VCPKG OFF CACHE BOOL "")
+    set(MSDF_ATLAS_INSTALL ON CACHE BOOL "")
+    set(MSDF_ATLAS_USE_SKIA OFF CACHE BOOL "")
+    add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/msdf-atlas-gen EXCLUDE_FROM_ALL)
+
 # project's binary setup vvv
 
     # varible sets
@@ -174,10 +181,12 @@ project(CoriEngine)
         target_compile_options(SDL3_mixer-static PRIVATE -w)
         target_compile_options(SDL3_image-static PRIVATE -w)
         target_compile_options(glm PRIVATE -w)
-        #target_compile_options(nlohmann_json INTERFACE -w)
         target_compile_options(tmxlite PRIVATE -w)
         target_compile_options(imgui PRIVATE -w)
         target_compile_options(glad_gl_core_46 PRIVATE -w)
+        target_compile_options(msdf-atlas-gen PRIVATE -w)
+        target_compile_options(msdfgen-core PRIVATE -w)
+
         if(TARGET TIFF::tiff)
             set(SDLIMAGE_TIF_TARGET "tiff")
         else()
@@ -196,4 +205,4 @@ project(CoriEngine)
     target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm tmxlite nlohmann_json::nlohmann_json box2d::box2d stduuid)
 
     # can be private 
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static glad_gl_core_46)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static msdf-atlas-gen glad_gl_core_46)
