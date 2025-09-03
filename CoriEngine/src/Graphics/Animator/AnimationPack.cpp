@@ -23,6 +23,7 @@ namespace Cori {
 
 			if (type == ASEPRITE) {
 				try {
+					CORI_CORE_INFO_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadAnimator }, "Loading AnimationPack from: {}", jsonPath.string());
 					if (!f.good()) {
 						throw CoriError(std::format("Failed to open json file.", jsonPath.string()));
 					}

@@ -35,7 +35,7 @@ namespace Cori {
 
 		private:
 			explicit AnimationPack(std::vector<AnimationData> animations, const std::shared_ptr<SpriteAtlas>& spriteAtlas, std::string name, const glm::u16vec2 frameResolution);
-			explicit AnimationPack();
+			AnimationPack();
 
 			std::vector<AnimationData> m_Animations;
 			std::shared_ptr<SpriteAtlas> m_SpriteAtlas;

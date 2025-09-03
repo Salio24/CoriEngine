@@ -52,6 +52,7 @@ namespace Cori {
 				static constexpr char VertexArray[] = "Vertex Array";
 				static constexpr char Texture2D[] = "Texture2D";
 				static constexpr char GraphicsContext[] = "Graphics Context";
+				static constexpr char Font[] = "Font";
 
 				// Generic Tags
 				// vvv
