@@ -23,6 +23,15 @@ namespace Cori {
 			LINEAR, NEAREST
 		};
 
+		struct Params {
+			PixelFormat m_PixelFormat{ RGBA8888 };
+			WrapMode m_WrapMode{ CLAMP_TO_EDGE };
+			Filter m_Filter{ NEAREST };
+			int32_t m_UnpackAlignment{ 0 };
+			bool m_HasSemiTransparency{ false };
+
+		};
+
 		virtual ~Texture() = default;
 
 		[[nodiscard]] virtual uint32_t GetWidth() const = 0;
@@ -38,7 +47,7 @@ namespace Cori {
 
 		static std::shared_ptr<Texture2D> Create(const std::shared_ptr<Image>& image);
 
-		static std::shared_ptr<Texture2D> Create(const void* pixelData, const uint32_t width, const uint32_t height, const bool hasSemiTransparency, const PixelFormat pixelFormat, const WrapMode wrapMode, const Filter filter);
+		static std::shared_ptr<Texture2D> Create(const void* pixelData, const uint32_t width, const uint32_t height, const Params& params);
 
 	};
 }

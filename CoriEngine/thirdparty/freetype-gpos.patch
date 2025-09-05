@@ -1,0 +1,12 @@
+diff --git a/include/freetype/config/ftoption.h b/include/freetype/config/ftoption.h
+index eb4e32d80..2f77f1584 100644
+--- a/include/freetype/config/ftoption.h
++++ b/include/freetype/config/ftoption.h
+@@ -772,6 +772,7 @@ FT_BEGIN_HEADER
+    */
+ /* #define TT_CONFIG_OPTION_GPOS_KERNING */
+ 
++#define TT_CONFIG_OPTION_GPOS_KERNING
+ 
+   /*************************************************************************/
+   /*************************************************************************/

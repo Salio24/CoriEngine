@@ -104,6 +104,38 @@ project(CoriEngine)
     #set(UUID_SYSTEM_GENERATOR ON CACHE BOOL "")
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/stduuid EXCLUDE_FROM_ALL)
 
+    #freetype
+    #include(FetchContent)
+#
+    #FetchContent_Declare(
+    #        freetype
+    #        GIT_REPOSITORY https://github.com/freetype/freetype.git
+    #        GIT_TAG VER-2-13-3
+    #        PATCH_COMMAND git apply ${PROJECT_SOURCE_DIR}/thirdparty/freetype-gpos.patch
+    #)
+#
+    #FetchContent_MakeAvailable(freetype)
+
+
+    include(FetchContent)
+
+    # a hack to support gpos kerning data in msdf-atlas-gen (disabled in freetype by default)
+    get_filename_component(CORI_ENGINE_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR} ABSOLUTE)
+
+    FetchContent_Declare(
+            freetype
+            GIT_REPOSITORY https://github.com/freetype/freetype.git
+            GIT_TAG VER-2-13-3
+            PATCH_COMMAND ${CMAKE_COMMAND}
+            -DPATCH_FILE=${CORI_ENGINE_SOURCE_DIR}/thirdparty/freetype-gpos.patch
+            -DPATCH_BUILD_DIR=<BINARY_DIR>
+            -P ${CORI_ENGINE_SOURCE_DIR}/patch-freetype.cmake
+    )
+
+    FetchContent_MakeAvailable(freetype)
+
+
+
     #msdf-atlas-gen
     set(MSDF_ATLAS_BUILD_STANDALONE OFF CACHE BOOL "")
     set(MSDF_ATLAS_USE_VCPKG OFF CACHE BOOL "")
@@ -133,8 +165,7 @@ project(CoriEngine)
     endif()
 
     # my shared lib
-    add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES}
-            src/Core/Utility/CleanTypeName.hpp)
+    add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES})
 
     target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG_BUILD>

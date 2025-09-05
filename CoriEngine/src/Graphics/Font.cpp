@@ -10,13 +10,13 @@ namespace Cori {
 			CORI_CORE_ASSERT(ft, "Failed to initialize FreeType when loading Font");
 			msdfgen::FontHandle* font = msdfgen::loadFont(ft, path.c_str());
 			if (font) {
-				coriFont.reset(new Font(static_cast<void*>(font), charsets, minimalScale, miterLimit));
+				coriFont.reset(new Font(ft, static_cast<void*>(font), charsets, minimalScale, miterLimit));
 				CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Loaded Font from '{}' successfully.", path.string());
 				msdfgen::destroyFont(font);
 			} else {
 				msdfgen::FontHandle* fontPlaceholder = msdfgen::loadFont(ft, "assets/engine/fonts/unifont-16.0.04.otf");
 				CORI_CORE_ASSERT(fontPlaceholder, "Failed to load placeholder (bundled with the engine) Font. It should've been at bin/'Build Type if any'/assets/engine/fonts/unifont-16.0.04.otf");
-				coriFont.reset(new Font(static_cast<void*>(fontPlaceholder), charsets, minimalScale, miterLimit));
+				coriFont.reset(new Font(ft, static_cast<void*>(fontPlaceholder), charsets, minimalScale, miterLimit));
 				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Failed to load Font from '{}', loaded bundled placeholder font instead.", path.string());
 				msdfgen::destroyFont(fontPlaceholder);
 			}
@@ -24,8 +24,9 @@ namespace Cori {
 			return coriFont;
 		}
 
-		Font::Font(void* font, const std::initializer_list<CharsetRange>& charsets, const float minimalScale, const float miterLimit) {
+		Font::Font(void* ft, void* font, const std::initializer_list<CharsetRange>& charsets, const float minimalScale, const float miterLimit) {
 			auto font_ = static_cast<msdfgen::FontHandle*>(font);
+
 			m_Data = new FontData();
 
 			msdf_atlas::Charset charset;
@@ -38,17 +39,21 @@ namespace Cori {
 
 			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Trying to load '{}' glyphs.", charset.size());
 
-			int32_t loadedCount = m_Data->m_FontGeometry.loadCharset(font_, 1.0, charset);
+			int32_t loadedCount = m_Data->m_FontGeometry.loadCharset(font_, 1.0f, charset);
 
-			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Loaded '{}' glyphs. This number can be lower than the requested glyph count '{}' due to font not having some ones.", loadedCount, charset.size());
+			if (loadedCount > 0) {
+				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Loaded '{}' glyphs. This number can be lower than the requested glyph count '{}' due to font not having some ones.", loadedCount, charset.size());
+			} else {
+				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Failed to load charset with '{}' glyphs. loadCharset returned '{}'", charset.size(), loadedCount);
+			}
 
-			constexpr double maxCornerAngle = 3.0;
+			constexpr float angleThreshold = 3.0f;
 			for (msdf_atlas::GlyphGeometry& glyph : m_Data->m_Glyphs) {
-				glyph.edgeColoring(&msdfgen::edgeColoringInkTrap, maxCornerAngle, 0);
+				glyph.edgeColoring(&msdfgen::edgeColoringInkTrap, angleThreshold, 0);
 			}
 
 			msdf_atlas::TightAtlasPacker packer;
-			packer.setDimensionsConstraint(msdf_atlas::DimensionsConstraint::NONE);
+			packer.setDimensionsConstraint(msdf_atlas::DimensionsConstraint::SQUARE);
 			packer.setMinimumScale(minimalScale);
 			packer.setSpacing(1);
 			packer.setPixelRange(2.0);
@@ -57,6 +62,8 @@ namespace Cori {
 			if (notPackedCount > 0) {
 				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Failed to pack '{}' glyphs.", notPackedCount);
 			}
+
+			m_Data->m_FinalScale = packer.getScale();
 
 			int32_t width = 0;
 			int32_t height = 0;
@@ -74,7 +81,8 @@ namespace Cori {
 			generator.generate(m_Data->m_Glyphs.data(), m_Data->m_Glyphs.size());
 			msdfgen::BitmapConstRef<msdf_atlas::byte, 3> storage = generator.atlasStorage();
 
-			m_Data->m_Atlas = Texture2D::Create(storage.pixels, storage.width, storage.height, false, Texture::RGB888, Texture::CLAMP_TO_EDGE, Texture::LINEAR);
+			Texture::Params params { .m_PixelFormat = Texture::RGB888, .m_WrapMode = Texture::CLAMP_TO_EDGE, .m_Filter = Texture::LINEAR, .m_UnpackAlignment = 1, .m_HasSemiTransparency = false,  };
+			m_Data->m_Atlas = Texture2D::Create(storage.pixels, storage.width, storage.height, params);
 		}
 
 

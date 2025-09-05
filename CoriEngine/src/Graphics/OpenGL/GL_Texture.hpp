@@ -5,10 +5,10 @@
 #include "Core/AutoRegisteringFactory.hpp"
 
 namespace Cori {
-	class OpenGLTexture2D final : public Texture2D, public Profiling::Trackable<OpenGLTexture2D, Texture2D>, public RegisterInFactory<Texture2D, OpenGLTexture2D, GraphicsAPIs, GraphicsAPIs::OpenGL, const void*, const uint32_t, const uint32_t, const bool, const Texture::PixelFormat, const Texture::WrapMode, const Texture::Filter> {
+	class OpenGLTexture2D final : public Texture2D, public Profiling::Trackable<OpenGLTexture2D, Texture2D>, public RegisterInFactory<Texture2D, OpenGLTexture2D, GraphicsAPIs, GraphicsAPIs::OpenGL, const void*, const uint32_t, const uint32_t, const Texture::Params&> {
 	public:
-		static bool PreCreateHook(const void* pixelData, const uint32_t width, const uint32_t height, const bool hasSemiTransparency, const PixelFormat pixelFormat, const WrapMode wrapMode, const Filter filter);
-		explicit OpenGLTexture2D(const void* pixelData, const uint32_t width, const uint32_t height, const bool hasSemiTransparency, const PixelFormat pixelFormat, const WrapMode wrapMode, const Filter filter);
+		static bool PreCreateHook(const void* pixelData, const uint32_t width, const uint32_t height, const Params& params);
+		explicit OpenGLTexture2D(const void* pixelData, const uint32_t width, const uint32_t height, const Params& params);
 		~OpenGLTexture2D() override;
 
 		void Bind(uint32_t slot) const override;

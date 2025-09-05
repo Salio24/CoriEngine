@@ -24,7 +24,7 @@ namespace Cori {
 				static constexpr CharsetRange CyrillicExtendedB = { 0xA640, 0xA69F };
 			};
 
-			static std::shared_ptr<Font> Create(const std::filesystem::path& path, const std::initializer_list<CharsetRange> charsets, const float minimalScale = 48.0f, const float miterLimit = 2.0f);
+			static std::shared_ptr<Font> Create(const std::filesystem::path& path, const std::initializer_list<CharsetRange> charsets, const float minimalScale = 48.0f, const float miterLimit = 1.0f);
 			~Font();
 
 		protected:
@@ -32,7 +32,7 @@ namespace Cori {
 			FontData* GetData();
 
 		private:
-			Font(void* font, const std::initializer_list<CharsetRange>& charsets, const float minimalScale, const float miterLimit);
+			Font(void* ft, void* font, const std::initializer_list<CharsetRange>& charsets, const float minimalScale, const float miterLimit);
 			FontData* m_Data{ nullptr };
 		};
 	}

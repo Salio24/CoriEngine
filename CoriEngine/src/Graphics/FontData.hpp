@@ -8,8 +8,9 @@ namespace Cori {
 		struct FontData {
 			FontData() : m_FontGeometry(&m_Glyphs) {}
 			std::shared_ptr<Texture2D> m_Atlas;
-			msdf_atlas::FontGeometry m_FontGeometry;
 			std::vector<msdf_atlas::GlyphGeometry> m_Glyphs;
+			msdf_atlas::FontGeometry m_FontGeometry;
+			double m_FinalScale{};
 		};
 	}
 }
