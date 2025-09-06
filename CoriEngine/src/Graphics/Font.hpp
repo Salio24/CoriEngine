@@ -32,7 +32,7 @@ namespace Cori {
 			FontData* GetData();
 
 		private:
-			Font(void* ft, void* font, const std::initializer_list<CharsetRange>& charsets, const float minimalScale, const float miterLimit);
+			Font(void* font, const std::initializer_list<CharsetRange>& charsets, const float minimalScale, const float miterLimit);
 			FontData* m_Data{ nullptr };
 		};
 	}

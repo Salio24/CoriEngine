@@ -8,8 +8,11 @@ layout(location = 6) in float a_Layer;
 
 out vec4 v_Color;
 out vec2 v_TexturePosition;
+out vec2 v_UnitRange;
 
 uniform mat4 u_ViewProjection;
+uniform mat3 u_ModelMatrix;
+uniform vec2 u_UnitRange;
 
 const vec2 c_CharQuadMask[4] = vec2[](
 vec2(0.0, 0.0),
@@ -26,8 +29,9 @@ vec2(0.0, 1.0)
 );
 
 void main() {
-    gl_Position = u_ViewProjection * vec4((a_Transform * vec3(mix(a_CharQuad.xy, a_CharQuad.zw, c_CharQuadMask[gl_VertexID]), 1.0f)).xy, a_Layer, 1.0);
+    gl_Position = u_ViewProjection * vec4((a_Transform * u_ModelMatrix * vec3(mix(a_CharQuad.xy, a_CharQuad.zw, c_CharQuadMask[gl_VertexID]), 1.0f)).xy, a_Layer, 1.0);
 
     v_TexturePosition = a_TexturePosition.xy + c_TextureOffsets[gl_VertexID] * (a_TexturePosition.zw - a_TexturePosition.xy);
     v_Color = a_Color;
+    v_UnitRange = u_UnitRange;
 }

@@ -120,6 +120,12 @@ namespace Cori {
 				static constexpr char InstanceMetrics[] = "Instance Metrics";
 			};
 
+			struct Utility {
+				static constexpr char Self[] = "Utility";
+
+				static constexpr char UTF[] = "UTF";
+			};
+
 
 
 			// Ungrouped tags

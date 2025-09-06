@@ -50,3 +50,6 @@
 [submodule "CoriEngine/thirdparty/msdf-atlas-gen"]
 	path = CoriEngine/thirdparty/msdf-atlas-gen
 	url = https://github.com/Chlumsky/msdf-atlas-gen
+[submodule "CoriEngine/thirdparty/utfcpp"]
+	path = CoriEngine/thirdparty/utfcpp
+	url = https://github.com/nemtrif/utfcpp

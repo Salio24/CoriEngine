@@ -39,50 +39,50 @@ namespace Cori {
 			}
 
 			static int64_t GetAggregatedAliveCount() {
-				int64_t total_alive = GetDirectAliveCount();
+				int64_t totalAlive = GetDirectAliveCount();
 				for (const auto& val : s_DerivedMetricsProviders | std::views::values) {
-					total_alive += val().first;
+					totalAlive += val().first;
 				}
-				return total_alive;
+				return totalAlive;
 			}
 
 			static int64_t GetAggregatedTotalCreatedCount() {
-				int64_t total_created_sum = GetDirectTotalCreatedCount();
+				int64_t totalCreatedSum = GetDirectTotalCreatedCount();
 				for (const auto& val : s_DerivedMetricsProviders | std::views::values) {
-					total_created_sum += val().second;
+					totalCreatedSum += val().second;
 				}
-				return total_created_sum;
+				return totalCreatedSum;
 			}
 
 			static void RegisterDerivedReporter(const std::type_index& derivedTypeId, DerivedMetricsReporter reporter) {
 				if (!s_DerivedMetricsReporters.contains(derivedTypeId)) {
 					s_DerivedMetricsReporters.insert({ derivedTypeId, reporter });
-					CORI_CORE_INFO_TAGGED({ Logger::Tags::Profiler::Self, Logger::Tags::Profiler::InstanceMetrics }, "<{}>: Registered reporter for derived type: {}", CORI_CLEAN_TYPE_NAME(T), CORI_DEMANGLE(derivedTypeId.name()));
+					CORI_CORE_INFO_TAGGED({ Logger::Tags::Profiler::Self, Logger::Tags::Profiler::InstanceMetrics }, "<{}>: Registered reporter for derived type: <{}>", CORI_CLEAN_TYPE_NAME(T), CORI_DEMANGLE(derivedTypeId.name()));
 				}
 			}
 
 			static void Report(const std::string& indent = "") {
-				CORI_CORE_INFO_TAGGED({ Logger::Tags::Profiler::Self, Logger::Tags::Profiler::InstanceMetrics }, "{}Instance Metrics Report for: {}", indent, CORI_CLEAN_TYPE_NAME(T));
+				CORI_CORE_INFO_TAGGED({ Logger::Tags::Profiler::Self, Logger::Tags::Profiler::InstanceMetrics }, "{}Instance Metrics Report for: <{}>", indent, CORI_CLEAN_TYPE_NAME(T));
 				if (GetDirectAliveCount() != 0 || GetDirectTotalCreatedCount() != 0 || s_DerivedMetricsReporters.empty()) {
-					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Profiler::Self, Logger::Tags::Profiler::InstanceMetrics }, "{}| Directly Tracked Instances of: {}", indent, CORI_CLEAN_TYPE_NAME(T));
+					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Profiler::Self, Logger::Tags::Profiler::InstanceMetrics }, "{}| Directly Tracked Instances of: <{}>", indent, CORI_CLEAN_TYPE_NAME(T));
 					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Profiler::Self, Logger::Tags::Profiler::InstanceMetrics }, "{}|   Currently Alive: {}", indent, GetDirectAliveCount());
 					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Profiler::Self, Logger::Tags::Profiler::InstanceMetrics }, "{}|   Total Created: {}", indent, GetDirectTotalCreatedCount());
 				}
 
 				if (!s_DerivedMetricsReporters.empty()) {
-					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Profiler::Self, Logger::Tags::Profiler::InstanceMetrics }, "{}  Reporting for Registered Derived Types of: {}", indent, CORI_CLEAN_TYPE_NAME(T));
+					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Profiler::Self, Logger::Tags::Profiler::InstanceMetrics }, "{}  Reporting for Registered Derived Types of: <{}>", indent, CORI_CLEAN_TYPE_NAME(T));
 					for (const auto& val : s_DerivedMetricsReporters | std::views::values) {
 						val();
 					}
-					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Profiler::Self, Logger::Tags::Profiler::InstanceMetrics }, "{}  End of Derived Types Report for: {}", indent, CORI_CLEAN_TYPE_NAME(T));
+					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Profiler::Self, Logger::Tags::Profiler::InstanceMetrics }, "{}  End of Derived Types Report for: <{}>", indent, CORI_CLEAN_TYPE_NAME(T));
 				}
-				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Profiler::Self, Logger::Tags::Profiler::InstanceMetrics }, "{}End of Report for: {}", indent, CORI_CLEAN_TYPE_NAME(T));
+				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Profiler::Self, Logger::Tags::Profiler::InstanceMetrics }, "{}End of Report for: <{}>", indent, CORI_CLEAN_TYPE_NAME(T));
 			}
 
 			static void RegisterDerivedMetricsProvider(const std::type_index& derivedTypeId, DerivedMetricsProvider provider) {
 				if (!s_DerivedMetricsProviders.contains(derivedTypeId)) {
 					s_DerivedMetricsProviders.insert({ derivedTypeId, provider });
-					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Profiler::Self, Logger::Tags::Profiler::InstanceMetrics }, "<{}>: Registered metrics provider for derived type: {}", CORI_CLEAN_TYPE_NAME(T), CORI_DEMANGLE(derivedTypeId.name()));
+					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Profiler::Self, Logger::Tags::Profiler::InstanceMetrics }, "<{}>: Registered metrics provider for derived type: <{}>", CORI_CLEAN_TYPE_NAME(T), CORI_DEMANGLE(derivedTypeId.name()));
 				}
 			}
 

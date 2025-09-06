@@ -7,6 +7,11 @@
 #include "API.hpp"
 #include "Core/Application.hpp"
 #include "Font.hpp"
+#include "Core/Utility/UTF.hpp"
+
+#ifndef CORI_SPACES_PER_TAB
+#define CORI_SPACES_PER_TAB 4
+#endif
 
 namespace Cori {
 	namespace Graphics {
@@ -48,6 +53,9 @@ namespace Cori {
 
 				TextInstance(const TextAlignment alignment, const glm::mat3& transform, const float fontSize,const std::u32string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) :
 					m_Transform(transform), m_FontSize(fontSize), m_Text(text), m_Font(font), m_Color(color), m_LineSpacing(lineSpacing), m_Kerning(kerning), m_LimitX(limitX), m_Depth(depth), m_Alignment(alignment) {}
+
+				TextInstance(const TextAlignment alignment, const glm::mat3& transform, const float fontSize,const std::string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) :
+					m_Transform(transform), m_FontSize(fontSize), m_Text(Utility::Utf8ToUtf32(text)), m_Font(font), m_Color(color), m_LineSpacing(lineSpacing), m_Kerning(kerning), m_LimitX(limitX), m_Depth(depth), m_Alignment(alignment) {}
 			};
 
 		public:
@@ -84,6 +92,8 @@ namespace Cori {
 			static void SubmitAABB(const Utility::AABB& aabb, const float lineThickness, const glm::vec3& color);
 
 			static void SubmitText(const DrawSpace space, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::u32string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning);
+
+			static void SubmitText(const DrawSpace space, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning);
 
 			static Statistics GetStatistics();
 
@@ -192,11 +202,13 @@ namespace Cori {
 			static void EndInstancedSet();
 
 			static void BeginCharInstancedSet();
-			static void EndCharInstancedSet(Texture2D* atlas);
+			static void EndCharInstancedSet(Texture2D* atlas, const glm::mat3& modelMatrix);
 
 			static void SubmitQuadToQueue(std::vector<QuadInstance>& queue, const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor, const std::shared_ptr<Texture2D>& texture, const UVs& uvs, const uint8_t depth, const bool flipX, const bool flipY, const bool flatColored);
 
 			static void SubmitTextToQueue(std::vector<TextInstance>& queue, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::u32string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning);
+
+			static void SubmitTextToQueue(std::vector<TextInstance>& queue, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning);
 
 			static void BeginWorldSpacePass();
 
@@ -214,7 +226,7 @@ namespace Cori {
 
 			static void FlushInstancedQuads();
 
-			static void FlushInstancedChars(Texture2D* atlas);
+			static void FlushInstancedChars(Texture2D* atlas, const glm::mat3& modelMatrix);
 		};
 	}
 }

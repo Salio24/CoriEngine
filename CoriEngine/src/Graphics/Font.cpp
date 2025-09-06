@@ -10,13 +10,13 @@ namespace Cori {
 			CORI_CORE_ASSERT(ft, "Failed to initialize FreeType when loading Font");
 			msdfgen::FontHandle* font = msdfgen::loadFont(ft, path.c_str());
 			if (font) {
-				coriFont.reset(new Font(ft, static_cast<void*>(font), charsets, minimalScale, miterLimit));
+				coriFont.reset(new Font(static_cast<void*>(font), charsets, minimalScale, miterLimit));
 				CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Loaded Font from '{}' successfully.", path.string());
 				msdfgen::destroyFont(font);
 			} else {
 				msdfgen::FontHandle* fontPlaceholder = msdfgen::loadFont(ft, "assets/engine/fonts/unifont-16.0.04.otf");
 				CORI_CORE_ASSERT(fontPlaceholder, "Failed to load placeholder (bundled with the engine) Font. It should've been at bin/'Build Type if any'/assets/engine/fonts/unifont-16.0.04.otf");
-				coriFont.reset(new Font(ft, static_cast<void*>(fontPlaceholder), charsets, minimalScale, miterLimit));
+				coriFont.reset(new Font(static_cast<void*>(fontPlaceholder), charsets, minimalScale, miterLimit));
 				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Failed to load Font from '{}', loaded bundled placeholder font instead.", path.string());
 				msdfgen::destroyFont(fontPlaceholder);
 			}
@@ -24,7 +24,7 @@ namespace Cori {
 			return coriFont;
 		}
 
-		Font::Font(void* ft, void* font, const std::initializer_list<CharsetRange>& charsets, const float minimalScale, const float miterLimit) {
+		Font::Font(void* font, const std::initializer_list<CharsetRange>& charsets, const float minimalScale, const float miterLimit) {
 			auto font_ = static_cast<msdfgen::FontHandle*>(font);
 
 			m_Data = new FontData();

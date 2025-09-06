@@ -134,6 +134,8 @@ project(CoriEngine)
 
     FetchContent_MakeAvailable(freetype)
 
+    #utfcpp
+    add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/utfcpp EXCLUDE_FROM_ALL)
 
 
     #msdf-atlas-gen
@@ -233,7 +235,7 @@ project(CoriEngine)
     # lib linking
 
     # should be public
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm tmxlite nlohmann_json::nlohmann_json box2d::box2d stduuid)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm tmxlite nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp)
 
     # can be private 
     target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static msdf-atlas-gen glad_gl_core_46)

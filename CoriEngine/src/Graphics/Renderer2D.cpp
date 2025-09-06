@@ -3,7 +3,7 @@
 #include "Core/Utility/AABB.hpp"
 #include "AssetManager/AssetManager.hpp"
 #include "FontData.hpp"
-
+#include "Color.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -55,7 +55,7 @@ namespace Cori {
 					{ShaderDataType::Vec4, "a_TexturePosition", 1},
 					{ShaderDataType::Vec4, "a_CharQuad", 1},
 					{ShaderDataType::Vec4, "a_Color", 1},
-					{ShaderDataType::Float, "a_Layer", 1},
+					{ShaderDataType::Float, "a_Layer", 1}
 				});
 
 			s_Data->CharInstanceVertexBuffer->Init(nullptr, RendererData::MaxCharInstanceCount * s_Data->CharInstanceVertexBuffer->GetLayout().GetStride(), DRAW_TYPE::DYNAMIC);
@@ -206,7 +206,7 @@ namespace Cori {
 			s_Data->CharInstanceBufferPtr = s_Data->CharInstanceBufferBase;
 		}
 
-		void Renderer2D::EndCharInstancedSet(Texture2D* atlas) {
+		void Renderer2D::EndCharInstancedSet(Texture2D* atlas, const glm::mat3& modelMatrix) {
 			if (s_Data->CharInstanceCount != 0) {
 				if (s_Data->CurrentVertexArray != s_Data->CharInstanceVertexArray.get()) {
 					s_Data->CharInstanceVertexArray->Bind();
@@ -224,7 +224,7 @@ namespace Cori {
 					s_Data->CharInstanceShader->Bind();
 					s_Data->CurrentShader = s_Data->CharInstanceShader.get();
 				}
-				FlushInstancedChars(atlas);
+				FlushInstancedChars(atlas, modelMatrix);
 			}
 		}
 
@@ -301,11 +301,25 @@ namespace Cori {
 			);
 		}
 
-		void Renderer2D::Test() {
-			const glm::mat3 transform = glm::translate(glm::mat3(1.0f), glm::vec2(150.0f, 150.0f));
-			//const glm::mat3 t1 = glm::scale(transform, glm::vec2(20.0f));
+		void Renderer2D::SubmitTextToQueue(std::vector<TextInstance>& queue, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) {
+			queue.emplace_back(
+				alignment,
+				transform,
+				fontSize,
+				text,
+				color,
+				font,
+				depth,
+				limitX,
+				lineSpacing,
+				kerning
+			);
+		}
 
-			SubmitText(SCREEN_SPACE, LEFT, transform, 14, U"Aaqsomedrklfghodjngdjsanglisndgljsdbflgjksbdlfjbgesting testa wadlgk wadlkwa slkwnmal lakwndma  ", glm::vec4(1.0f), s_Data->TestFont, 15, 250.0f, 1.0f, 0.0f);
+		void Renderer2D::Test() {
+			const glm::mat3 transform = glm::translate(glm::mat3(1.0f), glm::vec2(1.0f, 250.0f));
+
+			SubmitText(SCREEN_SPACE, LEFT, transform, 36, "Aaqsomedrklfghodjngdjsanglisndgljsdbflgjksbdlfjbgesting testa wadlgk wadlkwa slkwnmal lakwndma dpkoj ghnfhndgjd ondfgl oind;lfokjg djnfg ;lokijudhnfg;o iuhjnikdf", NormalizeHexColor32(0xF5B0CBFF), s_Data->TestFont, 15, 700.0f, 0.0f, 0.0f);
 
 		}
 
@@ -318,12 +332,18 @@ namespace Cori {
 			SubmitTextToQueue(s_Data->ScreenSpaceTransparentTextQueue, alignment, transform, fontSize, text, color, font, depth, limitX, lineSpacing, kerning);
 		}
 
+		void Renderer2D::SubmitText(const DrawSpace space, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) {
+			if (space == WORLD_SPACE) {
+				SubmitTextToQueue(s_Data->WorldSpaceTransparentTextQueue, alignment, transform, fontSize, text, color, font, depth, limitX, lineSpacing, kerning);
+				return;
+			}
+
+			SubmitTextToQueue(s_Data->ScreenSpaceTransparentTextQueue, alignment, transform, fontSize, text, color, font, depth, limitX, lineSpacing, kerning);
+		}
+
 		Renderer2D::Statistics Renderer2D::GetStatistics() {
 			return s_Data->Stats;
 		}
-
-		// maybe add tiling factor????
-		// maybe tiling factor should be n in 2^n?? and an int32_t??, so pixelart would look nice
 
 		void Renderer2D::DrawQuadInstanced(const QuadInstance& quad) {
 			if (!quad.m_Texture) {
@@ -356,6 +376,7 @@ namespace Cori {
 		}
 
 		void Renderer2D::DrawTextInstanced(const TextInstance& text) {
+			CORI_PROFILE_FUNCTION();
 			if (!text.m_Font) {
 				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Renderer2D }, "DrawCharInstanced: Font is nullptr, trying to avoid read access violation");
 				return;
@@ -363,19 +384,6 @@ namespace Cori {
 
 			SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(text.m_LimitX, 0.0f)), glm::vec2(1.0f, 50.0f), glm::vec4(1.0f), nullptr, UVs{}, 15, false, false, true);
 			SubmitQuad(SCREEN_SPACE, OPAQUE, text.m_Transform, glm::vec2(0.5f, 0.5f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
-
-			/*
-			 * TODO:
-			 *  for center and right align one draw call per line of text and use a mat3 uniform as an offset to the line position
-			 *    for center, it'll probably calculate something like this: mat3 identity -> transform by (limitX - x) / 2.0f on x
-			 *    for right align similar: mat3 identity -> transform by (limitX - x) on x
-			 *      both are not perfectly ideal as i would want a draw call per text block not per line, but caching all the chars of the line and when the line ends translate every chars pos is a no-go,
-			 *      cpu will go kaboom from 1 matrix transformation per char, doesnt worth it
-			 *  also don't forget to move screenPxRange calculation from fragment to here, to be per draw call and as a vertex attribute
-			 *    add define for spacesInTab value that can be defined from the user side
-			 *    and do something with the warning coming from msdf they're annoying
-			 *    add an overload to the SubmitText with regular std::string or std::string_view and decode it into u32 utf-8
-			 */
 
 			BeginCharInstancedSet();
 
@@ -385,11 +393,14 @@ namespace Cori {
 
 			const float scale = 1.0f / (metrics.ascenderY - metrics.descenderY) * text.m_FontSize;
 			float x = 0.0f;
+
+			// maybe use something like ascender or smthg, some global font metric to center by Y
 			float y = 0.0f;
 
+			float totalLineLength = 0.0f;
 
 			const float spaceGlyphAdvance = fontGeometry.getGlyph(' ')->getAdvance() * scale;
-			constexpr uint8_t spacesInTab = 4.0f;
+			constexpr uint8_t spacesInTab = CORI_SPACES_PER_TAB;
 
 			const std::u32string_view view(text.m_Text);
 
@@ -445,10 +456,10 @@ namespace Cori {
 				return *(localView.data() + localView.size() + 1);
 			};
 
-			static auto ProcessGlyph = [&](const uint32_t index, const std::u32string_view& localView) -> bool {
+			static auto ProcessGlyph = [&](const uint32_t index, const std::u32string_view& localView) {
 				if (s_Data->CharInstanceCount > RendererData::MaxCharInstanceCount) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Renderer2D }, "Trying to render more than '{}' in one go. Aborting further rendering of this 'Text' piece.", RendererData::MaxCharInstanceCount);
-					return false;
+					return;
 				}
 
 				const char32_t c = localView[index];
@@ -459,8 +470,8 @@ namespace Cori {
 				}
 
 				if (!glyph) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Renderer2D }, "Failed to locate glyph '#' after failing to locate glyph 'UTF-8 codepoint 0x{:08X}'. Aborting further rendering of this 'Text' piece.", static_cast<uint32_t>(c));
-					return false;
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Renderer2D }, "Failed to locate glyph '#' after failing to locate glyph 'UTF-32 codepoint 0x{:08X}'. Aborting further rendering of this 'Text' piece.", static_cast<uint32_t>(c));
+					return;
 				}
 
 				double x0, y0, x1, y1;
@@ -490,9 +501,11 @@ namespace Cori {
 					double advance;
 					fontGeometry.getAdvance(advance, c, nextChar);
 					x += scale * advance + text.m_Kerning;
+					totalLineLength = x;
+				} else {
+					const float sizeX = x1 - x0;
+					totalLineLength += sizeX * scale;
 				}
-
-				return true;
 			};
 
 
@@ -512,6 +525,33 @@ namespace Cori {
 			};
 
 			static auto GoToNewLine = [&] {
+				switch (text.m_Alignment) {
+				case LEFT:
+					{
+						const float offset = totalLineLength;
+						SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
+
+						break;
+					}
+				case CENTER:
+					{
+						const float offset = -(totalLineLength / 2.0f);
+						SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
+						EndCharInstancedSet(atlas.get(), glm::translate(glm::mat3(1.0f), glm::vec2(offset, 0.0f)));
+						BeginCharInstancedSet();
+						break;
+					}
+				case RIGHT:
+					{
+						const float offset = -totalLineLength;
+						SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
+						EndCharInstancedSet(atlas.get(), glm::translate(glm::mat3(1.0f), glm::vec2(offset, 0.0f)));
+						BeginCharInstancedSet();
+						break;
+					}
+				}
+
+				totalLineLength = 0;
 				x = 0;
 				y -= scale * metrics.lineHeight + text.m_LineSpacing;
 			};
@@ -524,10 +564,24 @@ namespace Cori {
 					done = true;
 				}
 
+				bool longWord = false;
+
+				// only used for right align
+				bool ignoreSpaces = false;
+				bool globalAdvanceChanged = false;
+
+				float wordAdvance = 0.0f;
+				if (text.m_Alignment == RIGHT) {
+					wordAdvance = PreprocessWord(currentWord);
+					if (x + wordAdvance > text.m_LimitX) {
+						ignoreSpaces = true;
+					}
+				}
+
 				for (uint32_t i = 0; i < skippedPart.size(); ++i) {
 					if (skippedPart[i] == ' ') {
 						const char32_t nextChar = GetNextChar(i, view);
-						if (nextChar != '\0') {
+						if (nextChar != '\0' && !ignoreSpaces) {
 							++currentGlobalCharIndex;
 							double advance;
 							fontGeometry.getAdvance(advance, skippedPart[i], nextChar);
@@ -536,6 +590,7 @@ namespace Cori {
 								GoToNewLine();
 							} else {
 								x = nextX;
+								totalLineLength = x;
 							}
 						}
 						continue;
@@ -560,9 +615,10 @@ namespace Cori {
 						}
 						else {
 							x = nextX;
+							totalLineLength = x;
 						}
 
-
+						globalAdvanceChanged = true;
 						continue;
 					}
 
@@ -571,15 +627,40 @@ namespace Cori {
 					}
 				}
 
-				bool longWord = false;
-
-				const float wordAdvance = PreprocessWord(currentWord);
-				if (wordAdvance < text.m_LimitX) {
-					if (x + wordAdvance > text.m_LimitX) {
-						GoToNewLine();
-					}
-				} else {
-					longWord = true;
+				switch (text.m_Alignment) {
+					case LEFT:
+					case CENTER:
+						{
+							wordAdvance = PreprocessWord(currentWord);
+							if (wordAdvance < text.m_LimitX) {
+								if (x + wordAdvance > text.m_LimitX) {
+									GoToNewLine();
+								}
+							} else {
+								longWord = true;
+							}
+							break;
+						}
+					case RIGHT:
+						{
+							if (ignoreSpaces && !globalAdvanceChanged) {
+								if (wordAdvance < text.m_LimitX) {
+									GoToNewLine();
+								} else {
+									longWord = true;
+								}
+							} else {
+								wordAdvance = PreprocessWord(currentWord);
+								if (wordAdvance < text.m_LimitX) {
+									if (x + wordAdvance > text.m_LimitX) {
+										GoToNewLine();
+									}
+								} else {
+									longWord = true;
+								}
+							}
+							break;
+						}
 				}
 
 				for (uint32_t i = 0; i < currentWord.size(); ++i) {
@@ -593,11 +674,32 @@ namespace Cori {
 
 					ProcessGlyph(i, currentWord);
 				}
-
 			}
 
 
-			EndCharInstancedSet(atlas.get());
+			switch (text.m_Alignment) {
+			case LEFT:
+				{
+					const float offset = totalLineLength;
+					SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
+					EndCharInstancedSet(atlas.get(), glm::mat3(1.0f));
+					break;
+				}
+			case CENTER:
+				{
+					const float offset = -(totalLineLength / 2.0f);
+					SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
+					EndCharInstancedSet(atlas.get(), glm::translate(glm::mat3(1.0f), glm::vec2(offset, 0.0f)));
+					break;
+				}
+			case RIGHT:
+				{
+					const float offset = -totalLineLength;
+					SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
+					EndCharInstancedSet(atlas.get(), glm::translate(glm::mat3(1.0f), glm::vec2(offset, 0.0f)));
+					break;
+				}
+			}
 
 		}
 
@@ -853,14 +955,18 @@ namespace Cori {
 			s_Data->QuadInstanceCount = 0;
 		}
 
-		void Renderer2D::FlushInstancedChars(Texture2D* atlas) {
+		void Renderer2D::FlushInstancedChars(Texture2D* atlas, const glm::mat3& modelMatrix) {
 			CORI_PROFILE_FUNCTION();
 
 			const auto size = reinterpret_cast<uint8_t*>(s_Data->CharInstanceBufferPtr) - reinterpret_cast<uint8_t*>(s_Data->CharInstanceBufferBase);
 			s_Data->CharInstanceVertexBuffer->SetData(s_Data->CharInstanceBufferBase, size);
 
+			const glm::vec2 unitRange = glm::vec2(2.0f) / glm::vec2(atlas->GetWidth(), atlas->GetHeight());
+
 			s_Data->CharInstanceShader->SetMat4("u_ViewProjection", s_Data->CurrentViewProjectionMatrix);
+			s_Data->CharInstanceShader->SetMat3("u_ModelMatrix", modelMatrix);
 			s_Data->CharInstanceShader->SetInt("u_Texture", 0);
+			s_Data->CharInstanceShader->SetVec2("u_UnitRange", unitRange);
 
 			if (s_Data->CurrentTexture != atlas) {
 				atlas->Bind(0);
