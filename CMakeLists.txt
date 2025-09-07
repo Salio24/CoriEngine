@@ -27,7 +27,8 @@ if(CLANG_VARIANT STREQUAL "MSYS2")
     endif()
 endif ()
 
-option(CORI_BUILD_SANDBOX_APPS   "Build sandbox apps. (can break the compilation if enabled)" OFF)
+option(CORI_BUILD_SANDBOX_APPS "Build sandbox apps. (can break the compilation if enabled)" OFF)
+option(CORI_BUILD_DOCS "Build doxygen docs" OFF)
 
 project(main)
     if(CLANG_VARIANT STREQUAL "OTHER" AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -44,7 +45,7 @@ project(main)
             (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/SDL3/CMakeLists.txt") AND 
             (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/SDL3_image/CMakeLists.txt") AND 
             (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/SDL3_mixer/CMakeLists.txt") AND 
-            (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/spdlog/CMakeLists.txt") AND 
+            (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/spdlog/CMakeLists.txt") AND
             (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/tmxlite/tmxlite/CMakeLists.txt") AND 
             (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/entt/CMakeLists.txt") AND 
             (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/imgui/LICENSE.txt") AND
@@ -67,7 +68,5 @@ project(main)
         add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/RendererSandbox)
         add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/PhysicsSandbox)
     endif ()
-
-add_compile_options(-Wall -Wextra)
 
 
