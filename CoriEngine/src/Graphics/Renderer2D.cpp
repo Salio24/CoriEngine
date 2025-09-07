@@ -1,7 +1,6 @@
 #include "Renderer2D.hpp"
 #include <ska_sort.hpp>
 #include "Core/Utility/AABB.hpp"
-#include "AssetManager/AssetManager.hpp"
 #include "FontData.hpp"
 #include "Color.hpp"
 
@@ -72,7 +71,10 @@ namespace Cori {
 
 			s_Data->ScreenSpaceTransparentTextQueue.reserve(RendererData::ScreenSpaceTransparentTextQueueInitialSize);
 
-			s_Data->TestFont = Font::Create("assets/engine/fonts/arial.ttf", { Font::CharsetRanges::Latin }, 32);
+			//s_Data->TestFont = Font::Create("assets/engine/fonts/arial.ttf", { {0x0020, 0x0FFF} }, 32);
+
+
+			s_Data->TestFont = Font::Create("assets/engine/fonts/arial.ttf", { Font::CharsetRanges::Latin, Font::CharsetRanges::LatinExtendedA, Font::CharsetRanges::LatinExtendedB, Font::CharsetRanges::Cyrillic, Font::CharsetRanges::CyrillicExtendedA, Font::CharsetRanges::CyrillicExtendedB }, 32);
 
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Renderer2D }, "Renderer2D Initialized successfully.");
 		}
@@ -314,13 +316,6 @@ namespace Cori {
 				lineSpacing,
 				kerning
 			);
-		}
-
-		void Renderer2D::Test() {
-			const glm::mat3 transform = glm::translate(glm::mat3(1.0f), glm::vec2(1.0f, 250.0f));
-
-			SubmitText(SCREEN_SPACE, LEFT, transform, 36, "Aaqsomedrklfghodjngdjsanglisndgljsdbflgjksbdlfjbgesting testa wadlgk wadlkwa slkwnmal lakwndma dpkoj ghnfhndgjd ondfgl oind;lfokjg djnfg ;lokijudhnfg;o iuhjnikdf", NormalizeHexColor32(0xF5B0CBFF), s_Data->TestFont, 15, 700.0f, 0.0f, 0.0f);
-
 		}
 
 		void Renderer2D::SubmitText(const DrawSpace space, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::u32string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) {

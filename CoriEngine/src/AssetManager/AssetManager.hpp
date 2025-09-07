@@ -1,55 +1,88 @@
 #pragma once
-#include "ShaderDescriptor.hpp"
-#include "Texture2DDescriptor.hpp"
-#include "Graphics/ShaderProgram.hpp"
-#include "Graphics/Texture.hpp"
-#include "Graphics/SpriteAtlas.hpp"
-#include "SpriteAtlasDescriptor.hpp"
-#include "AnimationPackDescriptor.hpp"
-#include "Audio/Sound.hpp"
-#include "SoundDescriptor.hpp"
-#include "Graphics/Animator/AnimationPack.hpp"
-
 namespace Cori {
+	template <typename T>
+	concept IsDescriptor = requires(const T& a, const T& b) {
+		{ a.GetRuntimeID() } -> std::same_as<uint32_t>;
+		{ a.m_Name } -> std::convertible_to<std::string>;
+		{ a == b } -> std::convertible_to<bool>;
+		typename T::AssetType;
+		typename T::Hasher;
+	};
+
+	template <typename Descriptor>
+	concept CanBeDefaultLoaded = IsDescriptor<Descriptor> && requires(const Descriptor& d) {
+		{ Descriptor::AssetType::Create(d) } -> std::same_as<std::shared_ptr<typename Descriptor::AssetType>>;
+	};
 
 	class AssetManager {
+		struct Cache {
+			std::unordered_map<std::type_index, std::any> m_Caches;
+		};
+
 	public:
 		static void Init();
-
 		static void Shutdown();
 
-		[[nodiscard]] static std::shared_ptr<ShaderProgram> GetShader(const ShaderProgramDescriptor& descriptor);
-		[[nodiscard]] static std::shared_ptr<Texture2D> GetTexture2D(const Texture2DDescriptor& descriptor);
-		[[nodiscard]] static std::expected<std::shared_ptr<SpriteAtlas>, CoriError<>> GetSpriteAtlas(const SpriteAtlasDescriptor& descriptor);
-		[[nodiscard]] static std::shared_ptr<Audio::Sound> GetSound(const SoundDescriptor& descriptor);
-		[[nodiscard]] static std::shared_ptr<Graphics::AnimationPack> GetAnimationPack(const AnimationPackDescriptor& descriptor);
+		template <CanBeDefaultLoaded Descriptor>
+		static std::shared_ptr<typename Descriptor::AssetType> Get(const Descriptor& descriptor) {
+			CORI_PROFILE_FUNCTION();
 
-		static void PreloadShaders(const std::initializer_list<ShaderProgramDescriptor> descriptors);
-		static void PreloadTexture2Ds(const std::initializer_list<Texture2DDescriptor> descriptors);
-		static void PreloadSpriteAtlases(const std::initializer_list<SpriteAtlasDescriptor> descriptors);
-		static void PreloadSounds(const std::initializer_list<SoundDescriptor> descriptors);
-		static void PreloadAnimationPacks(const std::initializer_list<AnimationPackDescriptor> descriptors);
+			auto& cache = GetCache<typename Descriptor::AssetType>();
+			if (const auto it = cache.find(descriptor.GetRuntimeID()); it != cache.end()) {
+				return it->second;
+			}
 
-		static void UnloadShader(const ShaderProgramDescriptor& descriptor);
-		static void UnloadTexture2D(const Texture2DDescriptor& descriptor);
-		static void UnloadSpriteAtlas(const SpriteAtlasDescriptor& descriptor);
-		static void UnloadSound(const SoundDescriptor& descriptor);
-		static void UnloadAnimationPack(const AnimationPackDescriptor& descriptor);
+			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::AssetManager::Self }, "Cache miss for type <{}>, name: '{}' (RuntimeID: {}). Loading...", CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType) , descriptor.m_Name, descriptor.GetRuntimeID());
 
-		static void UnloadShaders(const std::initializer_list<ShaderProgramDescriptor> descriptors);
-		static void UnloadTexture2Ds(const std::initializer_list<Texture2DDescriptor> descriptors);
-		static void UnloadSpriteAtlases(const std::initializer_list<SpriteAtlasDescriptor> descriptors);
-		static void UnloadSounds(const std::initializer_list<SoundDescriptor> descriptors);
-		static void UnloadAnimationPacks(const std::initializer_list<AnimationPackDescriptor> descriptors);
+			std::shared_ptr<typename Descriptor::AssetType> newAsset = Descriptor::AssetType::Create(descriptor);
+			cache[descriptor.GetRuntimeID()] = newAsset;
+			return newAsset;
+		}
 
-		static void ClearShaderCache();
-		static void ClearTexture2DCache();
-		static void ClearSpriteAtlasCache();
-		static void ClearSoundCache();
-		static void ClearAnimationPackCache();
+		template <CanBeDefaultLoaded Descriptor>
+		static void Preload(const std::initializer_list<Descriptor> descriptors) {
+			CORI_CORE_INFO_TAGGED({ Logger::Tags::AssetManager::Self }, "Preloading {} <{}(s/es)>", descriptors.size(), CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType));
+			for (const auto& descriptor : descriptors) {
+				Get(descriptor);
+			}
+			CORI_CORE_INFO_TAGGED({ Logger::Tags::AssetManager::Self }, "Preloaded {} <{}(s/es)>", descriptors.size(), CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType));
+		}
+
+		template <IsDescriptor Descriptor>
+		static void Unload(const std::initializer_list<Descriptor>& descriptors) {
+			CORI_CORE_INFO_TAGGED({ Logger::Tags::AssetManager::Self }, "Unloading {} <{}(s/es)>", descriptors.size(), CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType));
+			for (const auto& descriptor : descriptors) {
+				auto& cache = GetCache<typename Descriptor::AssetType>();
+
+				if (!cache.contains(descriptor.GetRuntimeID())) {
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::AssetManager::Self }, "Trying to unload <{}> that is not loaded, name '{}', (RuntimeID: {})", CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType), descriptor.m_Name, descriptor.GetRuntimeID());
+					return;
+				}
+				cache.erase(descriptor.GetRuntimeID());
+				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::AssetManager::Self }, "Unloaded <{}>, name: '{}' (RuntimeID: {}).", CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType), descriptor.m_Name, descriptor.GetRuntimeID());
+			}
+
+			CORI_CORE_INFO_TAGGED({ Logger::Tags::AssetManager::Self }, "Unloaded {} <{}(s/es)>", descriptors.size(), CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType));
+		}
+
+		template <typename AssetType>
+		static void ClearCache() {
+			if (s_Cache->m_Caches.contains(std::type_index(typeid(AssetType)))) {
+				GetCache<AssetType>().clear();
+				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::AssetManager::Self }, "Cleared cache for type <{}>", CORI_CLEAN_TYPE_NAME(AssetType));
+			}
+		}
 
 	private:
-		struct Cache;
+		template <typename AssetType>
+		static std::unordered_map<uint32_t, std::shared_ptr<AssetType>>& GetCache() {
+			const auto typeIndex = std::type_index(typeid(AssetType));
+			if (!s_Cache->m_Caches.contains(typeIndex)) {
+				s_Cache->m_Caches[typeIndex] = std::unordered_map<uint32_t, std::shared_ptr<AssetType>>();
+			}
+			return std::any_cast<std::unordered_map<uint32_t, std::shared_ptr<AssetType>>&>(s_Cache->m_Caches.at(typeIndex));
+		}
+
 		static Cache* s_Cache;
 	};
 }

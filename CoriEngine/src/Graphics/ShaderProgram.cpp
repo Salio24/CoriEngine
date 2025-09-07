@@ -8,4 +8,8 @@ namespace Cori {
 		CORI_CORE_ASSERT(shader, "Failed to create ShaderProgram for API: {}. Check registrations and API validity.", APIEnumToName(Window::GetCurrentAPI()));
 		return shader;
 	}
+
+	std::shared_ptr<ShaderProgram> ShaderProgram::Create(const Descriptor& descriptor) {
+		return Create(descriptor.m_VertexPath, descriptor.m_FragmentPath, descriptor.m_GeometryPath);
+	}
 }

@@ -1,12 +1,9 @@
 #pragma once
 #include "Profiling/Trackable.hpp"
-#include "Core/SelfFactory.hpp"
 
 namespace Cori {
-	class Image : public Profiling::Trackable<Image>, public SharedSelfFactory<Image> {
+	class Image : public Profiling::Trackable<Image> {
 	public:
-		static bool PreCreateHook(const std::filesystem::path& path);
-
 		void FlipVertically();
 		void FlipHorizontally();
 		void Mirror();
@@ -20,10 +17,12 @@ namespace Cori {
 
 		std::expected<void, CoriError<>> AddPadding(const glm::u16vec2 spriteResolution);
 
-	protected:
-		explicit Image(const std::filesystem::path& path);
+		static std::shared_ptr<Image> Create(const std::filesystem::path& path);
+
 		~Image();
+
 	private:
+		explicit Image(const std::filesystem::path& path);
 
 		bool m_HasSemiTransparency = false;
 

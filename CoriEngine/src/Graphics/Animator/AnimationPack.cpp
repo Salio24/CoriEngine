@@ -1,4 +1,5 @@
 #include "AnimationPack.hpp"
+#include "Core/Application.hpp"
 #include "Graphics/Image.hpp"
 #include "AssetManager/AssetManager.hpp"
 #include "AssetManager/EngineAssets.hpp"
@@ -42,8 +43,8 @@ namespace Cori {
 					const glm::uvec2 initialImageResolution = { image->GetWidth(), image->GetHeight() };
 
 					auto atlas = SpriteAtlas::Create(data["meta"]["image"], image, frameResolution);
-					if (!atlas) {
-						throw atlas.error();
+					if (!atlas->GetSuccessStatus()) {
+						throw CoriError(std::format("Failed to load Sprite Atlas from: {}", atlasPath.string()));
 					}
 
 					std::vector<std::pair<uint32_t, json>> sortedFrameItems;
@@ -88,7 +89,7 @@ namespace Cori {
 
 						AnimationFrame frame;
 
-						frame.m_UVs = atlas.value()->GetSpriteUVsAtPosition({col, row});
+						frame.m_UVs = atlas->GetSpriteUVsAtPosition({col, row});
 						frame.m_TickDuration = std::round(static_cast<float>(frameData["duration"]) / (timeStep * 1000.0f));
 
 						frames.push_back(frame);
@@ -100,7 +101,7 @@ namespace Cori {
 					}
 
 					CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::AnimationPack }, "Loaded Animation Pack '{}' from ASEPRITE config: {}", name, jsonPath.string());
-					return std::shared_ptr<AnimationPack>(new AnimationPack(animations, atlas.value(), name, frameResolution));
+					return std::shared_ptr<AnimationPack>(new AnimationPack(animations, atlas, name, frameResolution));
 				}
 				catch (std::exception& e) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::AnimationPack }, "Failed to parse json file: {1}, and create the Animation Pack '{3}'. \n{0}Error: {2}. \n{0}Created a placeholder Animation Pack.", CORI_SECOND_LINE_SPACING, jsonPath.string(), e.what(), name);
@@ -120,6 +121,10 @@ namespace Cori {
 			return std::shared_ptr<AnimationPack>(new AnimationPack());
 		}
 
+		std::shared_ptr<AnimationPack> AnimationPack::Create(const Descriptor& descriptor) {
+			return Create(descriptor.m_JsonPath, descriptor.m_ConfigType, Application::GetGameTimer().GetTimestep(), descriptor.m_Name);
+		}
+
 		Animation AnimationPack::GetAnimation(const uint32_t index) {
 			if (m_Valid) {
 				if (CORI_CORE_CHECK(index + 1 <= m_Animations.size(), "Animation Pack '{}' doesn't have an animation at index '{}', returning animation at index '0'. Total animation cound '{}'", m_Name, index, m_Animations.size())) { return Animation(m_Animations[0], m_SpriteAtlas->GetTexture(), m_FrameSize); }
@@ -131,7 +136,8 @@ namespace Cori {
 			constexpr AnimationFrame frame { UVs{}, 2 };
 			frames.push_back(frame);
 			const AnimationData data(frames);
-			return Animation(data, AssetManager::GetTexture2D(AssetPlaceholders::Texture2D), glm::vec2{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max() });
+			//return Animation(data, AssetManager::GetTexture2D(AssetPlaceholders::Texture2D), glm::vec2{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max() });
+			return Animation(data, AssetManager::Get(AssetPlaceholders::Texture2D), glm::vec2{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max() });
 		}
 
 		AnimationPack::AnimationPack(std::vector<AnimationData> animations, const std::shared_ptr<SpriteAtlas>& spriteAtlas, std::string name, const glm::u16vec2 frameResolution) : m_Animations(std::move(animations)), m_SpriteAtlas(spriteAtlas), m_Name(std::move(name)), m_FrameSize(frameResolution) {

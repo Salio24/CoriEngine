@@ -24,9 +24,13 @@ namespace Cori {
 		EventCallbackFn m_EventCallback;
 	};
 
-	Window::Window(const std::string& title, const bool vsync) {
+	std::unique_ptr<Window> Window::Create(std::string name, const bool vsync) {
+		return std::unique_ptr<Window>(new Window(std::move(name), vsync));
+	}
+
+	Window::Window(std::string title, const bool vsync) {
 		m_Data = new Data();
-		m_Data->m_WindowTitle = title;
+		m_Data->m_WindowTitle = std::move(title);
 		m_Data->m_VSync = vsync;
 
 		m_Data->m_Context = RenderingContext::Create(s_API);
@@ -56,7 +60,7 @@ namespace Cori {
 			CORI_CORE_FATAL_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to get primary display bounds. SDL_Error: {}", SDL_GetError());
 		}
 
-		SDL_PropertiesID props = SDL_CreateProperties();
+		const SDL_PropertiesID props = SDL_CreateProperties();
 		SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, m_Data->m_WindowTitle.c_str());
 		SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, mode.m_Width);
 		SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, mode.m_Height);

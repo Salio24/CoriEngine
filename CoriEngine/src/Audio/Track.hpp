@@ -1,6 +1,5 @@
 #pragma once
 #include "Profiling/Trackable.hpp"
-#include "Core/SelfFactory.hpp"
 #include "Mixer.hpp"
 #include "Sound.hpp"
 
@@ -14,12 +13,8 @@ namespace Cori {
 		template<typename T>
 		concept IsSoundWithParams = std::is_same_v<T, SoundWithParams>;
 
-		class Track : public Profiling::Trackable<Track>, public SharedSelfFactory<Track> {
+		class Track : public Profiling::Trackable<Track> {
 		public:
-			static bool PreCreateHook([[maybe_unused]] std::string name) {
-				return true;
-			}
-
 			// ReSharper disable once CppMemberFunctionMayBeConst
 			std::expected<void, CoriError<>> SetSound(const std::shared_ptr<Sound>& sound) {
 				if (m_Valid) {
@@ -284,13 +279,20 @@ namespace Cori {
 				m_ClientCallBack = std::move(callback);
 			}
 
+			static std::shared_ptr<Track> Create(std::string name) {
+				return std::shared_ptr<Track>(new Track(std::move(name)));
+			}
+
+			~Track() {
+				Mixer::DestroyTrack(m_ID);
+			}
 
 			const std::string m_Name;
 			const TrackID m_ID{ 0 };
 
 			static void TrackStopCallback(void* userdata, MIX_Track* track);
 
-		protected:
+		private:
 			explicit Track(std::string name) : m_Name(std::move(name)), m_ID(s_NextIndex.fetch_add(1, std::memory_order_relaxed)) {
 				auto result = Mixer::CreateTrack(this);
 				if (!result) {
@@ -301,14 +303,8 @@ namespace Cori {
 				}
 			}
 
-			~Track() {
-				Mixer::DestroyTrack(m_ID);
-			}
-
 			TrackStopCallbackFn m_EngineCallBack;
 			TrackStopCallbackFn m_ClientCallBack;
-
-		private:
 
 			std::expected<void, CoriError<>> ProcessSequencePart(const SoundWithParams& part) {
 				m_SoundSequence.push_back(part);

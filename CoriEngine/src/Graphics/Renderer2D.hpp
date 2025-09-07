@@ -10,7 +10,7 @@
 #include "Core/Utility/UTF.hpp"
 
 #ifndef CORI_SPACES_PER_TAB
-#define CORI_SPACES_PER_TAB 4
+	#define CORI_SPACES_PER_TAB 4
 #endif
 
 namespace Cori {
@@ -74,8 +74,6 @@ namespace Cori {
 				OPAQUE,
 				SEMI_TRANSPARENT
 			};
-
-			static void Test();
 
 			static void BeginScene(const Components::Scene::Camera& camera);
 

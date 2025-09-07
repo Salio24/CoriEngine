@@ -3,7 +3,7 @@
 
 namespace {
 	[[nodiscard]] Uint32 GetPixel32(const SDL_Surface* surface, const int32_t x, const int32_t y) {
-		auto* pixels = static_cast<Uint32*>(surface->pixels);
+		const auto* pixels = static_cast<Uint32*>(surface->pixels);
 		return pixels[y * (surface->pitch / sizeof(Uint32)) + x];
 	}
 
@@ -14,27 +14,20 @@ namespace {
 }
 
 namespace Cori {
-	bool Image::PreCreateHook(const std::filesystem::path& path) {
-		if (!std::filesystem::exists(path)) {
-			CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Image }, "Could not find image at the specified path: '{}'. A placeholder will be loaded instead", path.string());
-		}
-
-		return true;
-
-	}
-
 	Image::Image(const std::filesystem::path& path) {
 		if (std::filesystem::exists(path)) {
 			m_Surface = IMG_Load(path.c_str());
 		} else {
 			CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Image }, "Could not find an image at the specified path: '{}', a placeholder will be loaded instead.", path.string());
 			m_Surface = IMG_Load("assets/engine/textures/missing_texture32.png");
+			CORI_CORE_ASSERT(m_Surface, "Failed to load a placeholder image, placeholder path: 'assets/engine/textures/missing_texture32.png'");
 		}
 
 
 		if (!m_Surface) {
 			CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Image }, "Failed to load image at path: '{}'. SDL_Error: '{}'", path.string(), SDL_GetError());
 			m_Surface = IMG_Load("assets/engine/textures/missing_texture32.png");
+			CORI_CORE_ASSERT(m_Surface, "Failed to load a placeholder image, placeholder path: 'assets/engine/textures/missing_texture32.png'");
 		}
 		else {
 			m_SuccessStatus = true;
@@ -48,6 +41,7 @@ namespace Cori {
 				if (!converted) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Image }, "Failed to convert image at path: '{}'. Loading placeholder. SDL_Error: '{}'", path.string(), SDL_GetError());
 					m_Surface = IMG_Load("assets/engine/textures/missing_texture32.png");
+					CORI_CORE_ASSERT(m_Surface, "Failed to load a placeholder image, placeholder path: 'assets/engine/textures/missing_texture32.png'");
 					SDL_DestroySurface(converted);
 					m_SuccessStatus = false;
 				}
@@ -182,6 +176,10 @@ namespace Cori {
 		CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Image }, "Successfully added padding to image.");
 
 		return {};
+	}
+
+	std::shared_ptr<Image> Image::Create(const std::filesystem::path& path) {
+		return std::shared_ptr<Image>(new Image(path));
 	}
 
 	// ReSharper disable once CppMemberFunctionMayBeConst

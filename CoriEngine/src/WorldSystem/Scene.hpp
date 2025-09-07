@@ -1,15 +1,13 @@
 #pragma once
 #include "Entity.hpp"
-#include "Core/SelfFactory.hpp"
 #include "Profiling/Trackable.hpp"
 #include "Graphics/CameraController.hpp"
 #include "Physics/Physics.hpp"
 #include "EntityView.hpp"
 
 namespace Cori {
-	class Scene : public Profiling::Trackable<Scene>, public SharedSelfFactory<Scene> {
+	class Scene : public Profiling::Trackable<Scene> {
 	public:
-		static bool PreCreateHook([[maybe_unused]] const std::string& name) { return true; }
 		~Scene();
 
 		[[nodiscard]] bool OnBind();
@@ -77,14 +75,17 @@ namespace Cori {
 			m_Registry.ctx().erase<T>();
 		}
 
+		static std::shared_ptr<Scene> Create(std::string name);
+
 		CameraController m_ActiveCamera;
 
 		Physics::PhysicsWorld m_PhysicsWorld;
 
 		std::string m_Name;
-	protected:
-		explicit Scene(const std::string& name);
+
 	private:
+		explicit Scene(std::string name);
+
 		entt::registry m_Registry;
 
 		void UpdateTransform();

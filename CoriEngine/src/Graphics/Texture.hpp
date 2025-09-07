@@ -44,10 +44,40 @@ namespace Cori {
 
 	class Texture2D : public Texture {
 	public:
+		class Descriptor {
+		public:
+			constexpr Descriptor(std::string name, std::filesystem::path imagePath)
+				: m_ImagePath(std::move(imagePath)),
+				m_Name(std::move(name)),
+				m_RuntimeID(s_NextRuntimeID.fetch_add(1, std::memory_order_relaxed))
+			{ }
+
+			using AssetType = Texture2D;
+
+			[[nodiscard]] uint32_t GetRuntimeID() const { return m_RuntimeID; }
+
+			constexpr bool operator==(const Descriptor& other) const {
+				return m_RuntimeID == other.m_RuntimeID;
+			}
+
+			struct Hasher {
+				std::size_t operator()(const Descriptor& descriptor) const {
+					return std::hash<uint32_t>{}(descriptor.m_RuntimeID);
+				}
+			};
+
+			const std::filesystem::path m_ImagePath;
+			const std::string m_Name;
+
+		private:
+			const uint32_t m_RuntimeID{ 0 };
+			inline static std::atomic<uint32_t> s_NextRuntimeID{ 1 };
+		};
 
 		static std::shared_ptr<Texture2D> Create(const std::shared_ptr<Image>& image);
 
 		static std::shared_ptr<Texture2D> Create(const void* pixelData, const uint32_t width, const uint32_t height, const Params& params);
 
+		static std::shared_ptr<Texture2D> Create(const Descriptor& descriptor);
 	};
 }

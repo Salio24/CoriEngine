@@ -5,8 +5,11 @@
 #include "Graphics/Animator/QuadAnimatorNew.hpp"
 
 namespace Cori {
+	std::shared_ptr<Scene> Scene::Create(std::string name) {
+		return std::shared_ptr<Scene>(new Scene(std::move(name)));
+	}
 
-	Scene::Scene(const std::string& name) : m_Name(name) {
+	Scene::Scene(std::string name) : m_Name(std::move(name)) {
 		AddContextComponent<Components::Scene::Camera>();
 		m_ActiveCamera.BindCameraComponent(&GetContextComponent<Components::Scene::Camera>());
 		CORI_CORE_INFO_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Scene: '{}' created.", m_Name);

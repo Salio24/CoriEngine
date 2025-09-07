@@ -16,4 +16,9 @@ namespace Cori {
 		CORI_CORE_ASSERT(texture, "Failed to create Texture2D for API: {}. Check registrations and API validity.", APIEnumToName(Window::GetCurrentAPI()));
 		return texture;
 	}
+
+	std::shared_ptr<Texture2D> Texture2D::Create(const Descriptor& descriptor) {
+		const auto image = Image::Create(descriptor.m_ImagePath);
+		return Create(image);
+	}
 }

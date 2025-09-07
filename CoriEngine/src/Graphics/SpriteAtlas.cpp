@@ -1,23 +1,14 @@
 #include "SpriteAtlas.hpp"
-#include "AssetManager/AssetManager.hpp"
 
 namespace Cori {
-	std::expected<void, CoriError<>> SpriteAtlas::PreCreateHook([[maybe_unused]] std::string name, [[maybe_unused]] const std::shared_ptr<Image>& image, [[maybe_unused]] const glm::u16vec2 spriteResolution) {
-		if (!(!(image->GetHeight() % spriteResolution.y) && !(image->GetWidth() % spriteResolution.x))) {
-			return std::unexpected(CoriError(std::format("Can't create SpriteAtlas '{}'. Invalid sprite resolution, sprite resolution on x and y should be divisible by texture resolution without remainder. Texture resolution: ({}, {}). Sprite resolution: ({}, {}).", std::move(name), image->GetWidth(), image->GetHeight(), spriteResolution.x, spriteResolution.y)));
-		}
-
-		return {};
-	}
-
-	SpriteAtlas::SpriteAtlas(std::string name, const std::shared_ptr<Image>& image, const glm::u16vec2 spriteResolution) : m_Name(std::move(name)) {
+	SpriteAtlas::SpriteAtlas(std::string name, const std::shared_ptr<Image>& image, const glm::u16vec2 spriteResolution, const bool success) : m_Name(std::move(name)), m_Success(success) {
 		int32_t padding = 0;
-		const auto success = image->AddPadding(spriteResolution);
-		if (success) {
+		const auto successPadding = image->AddPadding(spriteResolution);
+		if (successPadding) {
 			padding = 1;
 		}
 		else {
-			CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::SpriteAtlas }, "Failed to add padding to a sprite atlas, Texture bleeding might occur. Error: {}", success.error().what());
+			CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::SpriteAtlas }, "Failed to add padding to a sprite atlas, Texture bleeding might occur. Error: {}", successPadding.error().what());
 		}
 
 		m_Texture = Texture2D::Create(image);
@@ -55,8 +46,30 @@ namespace Cori {
 		return m_SpriteUVs[pos.x + m_GridDimensions.x * pos.y];
 	}
 
+	bool SpriteAtlas::GetSuccessStatus() const {
+		return m_Success;
+	}
+
 	std::shared_ptr<Texture2D> SpriteAtlas::GetTexture() const {
 		return m_Texture;
 	}
 
+	std::shared_ptr<SpriteAtlas> SpriteAtlas::Create(std::string name, const std::shared_ptr<Image>& image, const glm::u16vec2 spriteResolution) {
+		if (!(!(image->GetHeight() % spriteResolution.y) && !(image->GetWidth() % spriteResolution.x))) {
+			CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::SpriteAtlas }, "Can't create SpriteAtlas '{}'. Invalid sprite resolution, sprite resolution on x and y should be divisible by texture resolution without remainder. Texture resolution: ({}, {}). Sprite resolution: ({}, {}). Sprite Atlas will be generated with a placeholder.", std::move(name), image->GetWidth(), image->GetHeight(), spriteResolution.x, spriteResolution.y);
+			const auto placeholder = Image::Create("assets/engine/textures/missing_texture32.png");
+			return std::shared_ptr<SpriteAtlas>(new SpriteAtlas(std::move(name), placeholder, glm::u16vec2(32), false));
+		}
+
+		if (image->GetSuccessStatus()) {
+			return std::shared_ptr<SpriteAtlas>(new SpriteAtlas(std::move(name), image, spriteResolution, true));
+		}
+
+		return std::shared_ptr<SpriteAtlas>(new SpriteAtlas(std::move(name), image, glm::u16vec2(32), false));
+	}
+
+	std::shared_ptr<SpriteAtlas> SpriteAtlas::Create(const Descriptor& descriptor) {
+		const auto image = Image::Create(descriptor.m_TexturePath);
+		return Create(descriptor.m_Name, image, descriptor.m_SpriteResolution);
+	}
 }

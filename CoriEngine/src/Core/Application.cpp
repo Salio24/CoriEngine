@@ -1,5 +1,4 @@
 #include "Application.hpp"
-
 #include "Input.hpp"
 #include "Graphics/API.hpp"
 #include "WorldSystem/SceneManager.hpp"

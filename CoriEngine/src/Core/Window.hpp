@@ -2,7 +2,6 @@
 #include "EventSystem/Event.hpp"
 #include "Graphics/GraphicsAPIs.hpp"
 #include "Profiling/Trackable.hpp"
-#include "Core/SelfFactory.hpp"
 
 namespace Cori {
 	struct ScreenMode {
@@ -29,9 +28,10 @@ namespace Cori {
 		EXCLUSIVE_FULLSCREEN = 2
 	};
 
-	class Window : public Profiling::Trackable<Window>, public UniqueSelfFactory<Window> {
+	class Window : public Profiling::Trackable<Window> {
 	public:
-		static bool PreCreateHook([[maybe_unused]] const std::string& title, [[maybe_unused]] const bool vsync = false) { return true; }
+		static std::unique_ptr<Window> Create(std::string name, const bool vsync = false);
+
 		~Window();
 
 		[[nodiscard]] int32_t GetWidth() const;
@@ -49,7 +49,6 @@ namespace Cori {
 		[[nodiscard]] std::expected<void, CoriError<>> SetWindowMode(WindowMode mode);
 
 	protected:
-		explicit Window(const std::string& title, const bool vsync = false);
 
 		friend class Application;
 		void OnUpdate();
@@ -57,10 +56,12 @@ namespace Cori {
 
 		friend class ImGuiLayer;
 		friend class OpenGLContext;
-		void* GetNativeContext() const;
-		void* GetNativeWindow() const;
+		[[nodiscard]] void* GetNativeContext() const;
+		[[nodiscard]] void* GetNativeWindow() const;
 
 	private:
+		explicit Window(std::string title, const bool vsync = false);
+
 		inline static auto s_API = GraphicsAPIs::OpenGL;
 		struct Data;
 		Data* m_Data{nullptr};
