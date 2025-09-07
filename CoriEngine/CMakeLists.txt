@@ -42,9 +42,10 @@ project(CoriEngine)
     set(JSON_BuildTests OFF CACHE INTERNAL "")
     add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/nlohmann_json EXCLUDE_FROM_ALL)
 
-    # freetype
-    #set(FT_ENABLE_ERROR_STRINGS ON CACHE BOOL "")
-    #add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/freetype EXCLUDE_FROM_ALL)
+    # tmxlite
+    set(TMXLITE_STATIC_LIB ON)
+    set(PROJECT_STATIC_RUNTIME ON CACHE BOOL "")
+    add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/tmxlite/tmxlite EXCLUDE_FROM_ALL)
 
     # dear imgui
     add_library(imgui STATIC
@@ -213,7 +214,7 @@ project(CoriEngine)
         target_compile_options(glad_gl_core_46 PRIVATE -w)
         target_compile_options(msdf-atlas-gen PRIVATE -w)
         target_compile_options(msdfgen-core PRIVATE -w)
-
+        target_compile_options(tmxlite PRIVATE -w)
         if(TARGET TIFF::tiff)
             set(SDLIMAGE_TIF_TARGET "tiff")
         else()
@@ -229,7 +230,7 @@ project(CoriEngine)
     # lib linking
 
     # should be public
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite)
 
     # can be private 
     target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static msdf-atlas-gen glad_gl_core_46)
