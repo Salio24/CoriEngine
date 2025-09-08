@@ -31,13 +31,13 @@ jobs:
         uses: mattnotmitt/doxygen-action@v1.2.1
         with:
           # These are default values, but included for clarity
-          doxyfile-path: ./Doxyfile
+          doxyfile-path: Engine/docs/Doxyfile.in
           working-directory: .
       - name: Pages Deployment
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/html/
+          publish_dir: Engine/docs/html/
           enable_jekyll: false
           allow_empty_commit: false
           force_orphan: true
