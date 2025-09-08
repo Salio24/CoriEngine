@@ -1,1 +1,5 @@
 Engine/docs/html/* linguist-vendored
+
+*.html -linguist-detectable
+*.css -linguist-detectable
+*.js -linguist-detectable
