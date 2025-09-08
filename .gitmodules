@@ -18,6 +18,10 @@
 	path = CoriEngine/thirdparty/nlohmann_json
 	url = https://github.com/nlohmann/json.git
 	branch = master
+[submodule "CoriEngine/thirdparty/tmxlite"]
+	path = CoriEngine/thirdparty/tmxlite
+	url = https://github.com/fallahn/tmxlite.git
+	branch = master
 [submodule "CoriEngine/thirdparty/glad2"]
 	path = CoriEngine/thirdparty/glad2
 	url = https://github.com/Dav1dde/glad.git
