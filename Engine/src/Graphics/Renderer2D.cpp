@@ -38,7 +38,7 @@ namespace Cori {
 
 			s_Data->QuadInstanceBufferBase = new Quad[RendererData::MaxInstanceCount];
 
-			s_Data->QuadInstanceShader = ShaderProgram::Create("enignedata/shaders/QuadInstancedVert.glsl", "enignedata/shaders/QuadInstancedFrag.glsl");
+			s_Data->QuadInstanceShader = ShaderProgram::Create("enginedata/shaders/QuadInstancedVert.glsl", "enginedata/shaders/QuadInstancedFrag.glsl");
 
 			s_Data->WorldSpaceTransparentQuadQueue.reserve(RendererData::WorldSpaceTransparentQuadQueueInitialSize);
 			s_Data->WorldSpaceOpaqueQuadQueue.reserve(RendererData::WorldSpaceOpaqueQuadQueueInitialSize);
@@ -66,7 +66,7 @@ namespace Cori {
 
 			s_Data->CharInstanceBufferBase = new Char[RendererData::MaxCharInstanceCount];
 
-			s_Data->CharInstanceShader = ShaderProgram::Create("enignedata/shaders/TextInstancedVert.glsl", "enignedata/shaders/TextInstancedFrag.glsl");
+			s_Data->CharInstanceShader = ShaderProgram::Create("enginedata/shaders/TextInstancedVert.glsl", "enginedata/shaders/TextInstancedFrag.glsl");
 
 			s_Data->WorldSpaceTransparentTextQueue.reserve(RendererData::WorldSpaceTransparentTextQueueInitialSize);
 

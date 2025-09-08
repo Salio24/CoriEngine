@@ -88,7 +88,7 @@ namespace Cori {
 
 			CORI_CORE_ASSERT(m_Data->m_Window, "Failed to create Window '{}'. SDL_Error: {}", m_Data->m_WindowTitle, SDL_GetError());
 
-			const auto logoPath = "enignedata/ui/logo256.png";
+			const auto logoPath = "enginedata/ui/logo256.png";
 			SDL_Surface* logo = IMG_Load(logoPath);
 
 			if (!logo) {
