@@ -72,11 +72,6 @@ namespace Cori {
 
 			s_Data->ScreenSpaceTransparentTextQueue.reserve(RendererData::ScreenSpaceTransparentTextQueueInitialSize);
 
-			//s_Data->TestFont = Font::Create("assets/engine/fonts/arial.ttf", { {0x0020, 0x0FFF} }, 32);
-
-
-			s_Data->TestFont = Font::Create("assets/engine/fonts/arial.ttf", { Font::CharsetRanges::Latin, Font::CharsetRanges::LatinExtendedA, Font::CharsetRanges::LatinExtendedB, Font::CharsetRanges::Cyrillic, Font::CharsetRanges::CyrillicExtendedA, Font::CharsetRanges::CyrillicExtendedB }, 32);
-
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Renderer2D }, "Renderer2D Initialized successfully.");
 		}
 

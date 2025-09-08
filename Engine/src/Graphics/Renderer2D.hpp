@@ -188,10 +188,6 @@ namespace Cori {
 
 				static constexpr uint32_t ScreenSpaceTransparentTextQueueInitialSize{ 96 };
 				std::vector<TextInstance> ScreenSpaceTransparentTextQueue;
-
-				// test
-				std::shared_ptr<Font> TestFont;
-
 			};
 
 			static RendererData* s_Data;

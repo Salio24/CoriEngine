@@ -12,6 +12,7 @@
 
 # build directories 
 */bin/*
+Engine/bin
 
 # git submodules 
 /Engine/thirdparty/freetype/*
@@ -49,3 +50,5 @@ rmSub.sh
 /Sandboxes/RendererSandbox/bin/*
 /Sandboxes/PhysicsSandbox/bin/*
 /notes.txt
+
+*.a
