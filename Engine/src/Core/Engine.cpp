@@ -1,9 +1,9 @@
 #include "Engine.hpp"
+#include <SDL3_image/SDL_image.h>
 
 namespace Cori {
 	namespace Core {
 		void Engine::Start(const bool asyncLogging, const bool fileLogging) {
-
 			Logger::EnableVirtualTerminalProcessing();
 
 			Logger::Init(asyncLogging, fileLogging);

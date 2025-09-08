@@ -41,6 +41,9 @@ var annotated_dup =
         [ "WindowResizeEvent", "classCori_1_1Core_1_1WindowResizeEvent.html", "classCori_1_1Core_1_1WindowResizeEvent" ]
       ] ],
       [ "FileSystem", "namespaceCori_1_1FileSystem.html", [
+        [ "Internal", "namespaceCori_1_1FileSystem_1_1Internal.html", [
+          [ "PathDefines", "structCori_1_1FileSystem_1_1Internal_1_1PathDefines.html", "structCori_1_1FileSystem_1_1Internal_1_1PathDefines" ]
+        ] ],
         [ "FileManager", "classCori_1_1FileSystem_1_1FileManager.html", "classCori_1_1FileSystem_1_1FileManager" ],
         [ "JsonSerializer", "classCori_1_1FileSystem_1_1JsonSerializer.html", "classCori_1_1FileSystem_1_1JsonSerializer" ]
       ] ],
@@ -95,9 +98,6 @@ var annotated_dup =
         [ "Trackable", "classCori_1_1Profiling_1_1Trackable.html", "classCori_1_1Profiling_1_1Trackable" ]
       ] ],
       [ "Utility", "namespaceCori_1_1Utility.html", [
-        [ "Internal", "namespaceCori_1_1Utility_1_1Internal.html", [
-          [ "PathDefines", "structCori_1_1Utility_1_1Internal_1_1PathDefines.html", "structCori_1_1Utility_1_1Internal_1_1PathDefines" ]
-        ] ],
         [ "AABB", "structCori_1_1Utility_1_1AABB.html", "structCori_1_1Utility_1_1AABB" ],
         [ "HashedTag64", "structCori_1_1Utility_1_1HashedTag64.html", "structCori_1_1Utility_1_1HashedTag64" ],
         [ "RandomUint32", "classCori_1_1Utility_1_1RandomUint32.html", "classCori_1_1Utility_1_1RandomUint32" ]

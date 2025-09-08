@@ -2,7 +2,6 @@
 #include <ska_sort.hpp>
 #include "Utility/AABB.hpp"
 #include "FontData.hpp"
-#include "Color.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -79,6 +78,7 @@ namespace Cori {
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Renderer2D }, "Shutting down Renderer2D.");
 
 			delete[] s_Data->QuadInstanceBufferBase;
+			delete[] s_Data->CharInstanceBufferBase;
 			delete s_Data;
 		}
 

@@ -1,5 +1,5 @@
 #include "SpriteAtlas.hpp"
-#include "Utility/PathDefines.hpp"
+#include "../FileSystem/PathDefines.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -59,7 +59,7 @@ namespace Cori {
 		std::shared_ptr<SpriteAtlas> SpriteAtlas::Create(std::string name, const std::shared_ptr<Image>& image, const glm::u16vec2 spriteResolution) {
 			if (!(!(image->GetHeight() % spriteResolution.y) && !(image->GetWidth() % spriteResolution.x))) {
 				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::SpriteAtlas }, "Can't create SpriteAtlas '{}'. Invalid sprite resolution, sprite resolution on x and y should be divisible by texture resolution without remainder. Texture resolution: ({}, {}). Sprite resolution: ({}, {}). Sprite Atlas will be generated with a placeholder.", std::move(name), image->GetWidth(), image->GetHeight(), spriteResolution.x, spriteResolution.y);
-				const auto placeholder = Image::Create(Utility::Internal::PathDefines::PlaceholderTexture);
+				const auto placeholder = Image::Create(FileSystem::Internal::PathDefines::PlaceholderTexture);
 				return std::shared_ptr<SpriteAtlas>(new SpriteAtlas(std::move(name), placeholder, glm::u16vec2(32), false));
 			}
 

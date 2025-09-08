@@ -142,6 +142,7 @@ var NAVTREEINDEX11 =
 "namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416aafe781d73857e5680cb938eaf56022cea":[1,0,0,1,35,19],
 "namespaceCori_1_1Core.html#afc36a1b3e23811692c4ee44e864d7736":[1,0,0,1,32],
 "namespaceCori_1_1FileSystem.html":[1,0,0,2],
+"namespaceCori_1_1FileSystem_1_1Internal.html":[1,0,0,2,0],
 "namespaceCori_1_1Graphics.html":[1,0,0,3],
 "namespaceCori_1_1Graphics.html#a3463b4e555081bf0193c70ad975fc537":[1,0,0,3,35],
 "namespaceCori_1_1Graphics.html#a4fb51e79ba613dfcdb231d55cf1304d4":[1,0,0,3,29],
@@ -248,6 +249,5 @@ var NAVTREEINDEX11 =
 "namespaceCori_1_1Physics.html#a8047a4c99b5cdee7471cf1381a812e55aee63e9961ee80823b6055162b80791e5":[1,0,0,7,14,55],
 "namespaceCori_1_1Physics.html#a8047a4c99b5cdee7471cf1381a812e55af0ebc40585f72daf02455835d72b2b05":[1,0,0,7,14,9],
 "namespaceCori_1_1Physics.html#a8047a4c99b5cdee7471cf1381a812e55af161b822af91ad6f7c62c6f97e1de3dc":[1,0,0,7,14,47],
-"namespaceCori_1_1Physics.html#a8047a4c99b5cdee7471cf1381a812e55af524b5933be681747cfbbbd5ab3ab86f":[1,0,0,7,14,17],
-"namespaceCori_1_1Physics.html#a8047a4c99b5cdee7471cf1381a812e55af58c56c29a8632852e0d0a90e812ce21":[1,0,0,7,14,56]
+"namespaceCori_1_1Physics.html#a8047a4c99b5cdee7471cf1381a812e55af524b5933be681747cfbbbd5ab3ab86f":[1,0,0,7,14,17]
 };

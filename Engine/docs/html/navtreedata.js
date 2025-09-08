@@ -79,10 +79,10 @@ var NAVTREEINDEX =
 "classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18",
 "functions_func.html",
 "namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416aa6c4afc7856120096b880c13f93460baa",
-"namespaceCori_1_1Physics.html#a8047a4c99b5cdee7471cf1381a812e55afbe6112e221b35dca50b2ac5df64e4ee",
-"structCori_1_1Graphics_1_1Animation_1_1PlayParams.html#a20652e6315ced38eeaf6fa2a4b6d8ece",
-"structCori_1_1Profiling_1_1InstanceMetrics.html#a875c4dc67107ded0da845487144b985f",
-"structCori_1_1World_1_1Exclude.html"
+"namespaceCori_1_1Physics.html#a8047a4c99b5cdee7471cf1381a812e55af58c56c29a8632852e0d0a90e812ce21",
+"structCori_1_1Graphics_1_1AnimationFrame.html#a961f14a730f2d4668f1098dc0a44f1e2",
+"structCori_1_1Profiling_1_1InstanceMetrics.html#a179a01917fe48888a883a1c41c7d8ceb",
+"structCori_1_1World_1_1Components_1_1Scene_1_1Camera.html#ad35126a5537d298d6a59a463952e0065"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

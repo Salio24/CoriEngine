@@ -217,6 +217,12 @@ project(CoriEngine)
 
     # lib linking
 
+    if (CORI_SANITIZE)
+        target_compile_options(${ENGINE_LIBRARY_NAME} PUBLIC -fsanitize=address)
+        target_link_options(${ENGINE_LIBRARY_NAME} PUBLIC -fsanitize=address)
+    endif ()
+    #target_link_libraries()
+
     # should be public
     target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite)
 

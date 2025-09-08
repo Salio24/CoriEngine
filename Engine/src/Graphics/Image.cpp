@@ -1,5 +1,5 @@
 #include "Image.hpp"
-#include "Utility/PathDefines.hpp"
+#include "../FileSystem/PathDefines.hpp"
 #include <SDL3_image/SDL_image.h>
 
 namespace {
@@ -21,15 +21,15 @@ namespace Cori {
 				m_Surface = IMG_Load(path.c_str());
 			} else {
 				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Image }, "Could not find an image at the specified path: '{}', a placeholder will be loaded instead.", path.string());
-				m_Surface = IMG_Load(Utility::Internal::PathDefines::PlaceholderTexture);
-				CORI_CORE_ASSERT(m_Surface, "Failed to load a placeholder image, placeholder path: '{}'", Utility::Internal::PathDefines::PlaceholderTexture);
+				m_Surface = IMG_Load(FileSystem::Internal::PathDefines::PlaceholderTexture);
+				CORI_CORE_ASSERT(m_Surface, "Failed to load a placeholder image, placeholder path: '{}'", FileSystem::Internal::PathDefines::PlaceholderTexture);
 			}
 
 
 			if (!m_Surface) {
 				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Image }, "Failed to load image at path: '{}'. SDL_Error: '{}'", path.string(), SDL_GetError());
-				m_Surface = IMG_Load(Utility::Internal::PathDefines::PlaceholderTexture);
-				CORI_CORE_ASSERT(m_Surface, "Failed to load a placeholder image, placeholder path: '{}'", Utility::Internal::PathDefines::PlaceholderTexture);
+				m_Surface = IMG_Load(FileSystem::Internal::PathDefines::PlaceholderTexture);
+				CORI_CORE_ASSERT(m_Surface, "Failed to load a placeholder image, placeholder path: '{}'", FileSystem::Internal::PathDefines::PlaceholderTexture);
 			}
 			else {
 				m_SuccessStatus = true;
@@ -42,8 +42,8 @@ namespace Cori {
 					SDL_Surface* converted = SDL_ConvertSurface(static_cast<SDL_Surface*>(m_Surface), SDL_PIXELFORMAT_RGBA32);
 					if (!converted) {
 						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Image }, "Failed to convert image at path: '{}'. Loading placeholder. SDL_Error: '{}'", path.string(), SDL_GetError());
-						m_Surface = IMG_Load(Utility::Internal::PathDefines::PlaceholderTexture);
-						CORI_CORE_ASSERT(m_Surface, "Failed to load a placeholder image, placeholder path: '{}'", Utility::Internal::PathDefines::PlaceholderTexture);
+						m_Surface = IMG_Load(FileSystem::Internal::PathDefines::PlaceholderTexture);
+						CORI_CORE_ASSERT(m_Surface, "Failed to load a placeholder image, placeholder path: '{}'", FileSystem::Internal::PathDefines::PlaceholderTexture);
 						SDL_DestroySurface(converted);
 						m_SuccessStatus = false;
 					}

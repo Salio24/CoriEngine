@@ -103,13 +103,17 @@ Collaboration diagram for Cori::Core::Window::Data:</div>
 </map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:aae5afb671b6407d276ba200e678483a0" id="r_aae5afb671b6407d276ba200e678483a0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aae5afb671b6407d276ba200e678483a0">~Data</a> ()</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a64e74b52b0334310fa626988a88dd76c" id="r_a64e74b52b0334310fa626988a88dd76c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a64e74b52b0334310fa626988a88dd76c">m_CurrentScreenMode</a></td></tr>
 <tr class="memitem:a511b84a5c3bc238c6c45fc8af528f9d9" id="r_a511b84a5c3bc238c6c45fc8af528f9d9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceCori_1_1Core.html#a4058f0d1174cf6b294dfc0a31642cb95">WindowMode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a511b84a5c3bc238c6c45fc8af528f9d9">m_CurrentWindowMode</a> = <a class="el" href="namespaceCori_1_1Core.html#a4058f0d1174cf6b294dfc0a31642cb95a34c09f038d12ce37f95e247ea50e6b81">WindowMode::EXCLUSIVE_FULLSCREEN</a></td></tr>
 <tr class="memitem:a9a4171e7f1943bc736c5abda0ea077b7" id="r_a9a4171e7f1943bc736c5abda0ea077b7"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9a4171e7f1943bc736c5abda0ea077b7">m_WindowTitle</a></td></tr>
 <tr class="memitem:ae8f8af8008a4abff83f07f07808751ef" id="r_ae8f8af8008a4abff83f07f07808751ef"><td class="memItemLeft" align="right" valign="top">int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae8f8af8008a4abff83f07f07808751ef">m_DisplayModeCount</a></td></tr>
-<tr class="memitem:abd0efc0357fb7a0eaca8608f11625f48" id="r_abd0efc0357fb7a0eaca8608f11625f48"><td class="memItemLeft" align="right" valign="top">SDL_DisplayMode **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abd0efc0357fb7a0eaca8608f11625f48">m_SDLModes</a></td></tr>
+<tr class="memitem:abd0efc0357fb7a0eaca8608f11625f48" id="r_abd0efc0357fb7a0eaca8608f11625f48"><td class="memItemLeft" align="right" valign="top">SDL_DisplayMode **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abd0efc0357fb7a0eaca8608f11625f48">m_SDLModes</a> { nullptr }</td></tr>
 <tr class="memitem:a7db8c8bcac08ffb89a20053c6e322626" id="r_a7db8c8bcac08ffb89a20053c6e322626"><td class="memItemLeft" align="right" valign="top">SDL_DisplayID&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7db8c8bcac08ffb89a20053c6e322626">m_PrimaryDisplayID</a> {}</td></tr>
 <tr class="memitem:a22fa7ff083ae4ab7e46f47ad3e18495a" id="r_a22fa7ff083ae4ab7e46f47ad3e18495a"><td class="memItemLeft" align="right" valign="top">SDL_Window *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a22fa7ff083ae4ab7e46f47ad3e18495a">m_Window</a> { nullptr }</td></tr>
 <tr class="memitem:aea051b541c43b6034c33e876246801b5" id="r_aea051b541c43b6034c33e876246801b5"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classCori_1_1Graphics_1_1RenderingContext.html">Graphics::RenderingContext</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aea051b541c43b6034c33e876246801b5">m_Context</a></td></tr>
@@ -119,7 +123,35 @@ Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock">
 <p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00012">12</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
-</div><a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="aae5afb671b6407d276ba200e678483a0" name="aae5afb671b6407d276ba200e678483a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae5afb671b6407d276ba200e678483a0">&#9670;&#160;</a></span>~Data()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Cori::Core::Window::Data::~Data </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00027">27</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
 <a id="aea051b541c43b6034c33e876246801b5" name="aea051b541c43b6034c33e876246801b5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aea051b541c43b6034c33e876246801b5">&#9670;&#160;</a></span>m_Context</h2>
 
@@ -223,7 +255,7 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">SDL_DisplayMode** Cori::Core::Window::Data::m_SDLModes</td>
+          <td class="memname">SDL_DisplayMode** Cori::Core::Window::Data::m_SDLModes { nullptr }</td>
         </tr>
       </table>
 </div><div class="memdoc">

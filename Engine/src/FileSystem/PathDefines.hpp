@@ -1,7 +1,7 @@
 #pragma once
 
 namespace Cori {
-	namespace Utility {
+	namespace FileSystem {
 		namespace Internal {
 			struct PathDefines {
 				static constexpr char PlaceholderTexture[] = "enginedata/placeholders/missing_texture32.png";

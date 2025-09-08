@@ -15,7 +15,7 @@ namespace Cori {
 			std::string m_WindowTitle;
 
 			int32_t m_DisplayModeCount;
-			SDL_DisplayMode** m_SDLModes;
+			SDL_DisplayMode** m_SDLModes{ nullptr };
 			SDL_DisplayID m_PrimaryDisplayID{};
 
 			SDL_Window* m_Window{ nullptr };
@@ -23,6 +23,11 @@ namespace Cori {
 			bool m_VSync{ false };
 
 			EventCallbackFn m_EventCallback;
+
+			~Data() {
+				SDL_DestroyWindow(m_Window);
+				SDL_free(m_SDLModes);
+			}
 		};
 
 		std::unique_ptr<Window> Window::Create(std::string name, const bool vsync) {
@@ -35,6 +40,7 @@ namespace Cori {
 			m_Data->m_VSync = vsync;
 
 			m_Data->m_Context = Graphics::RenderingContext::Create(s_API);
+
 
 			const SDL_DisplayID primaryDisplayID = SDL_GetPrimaryDisplay();
 			if (primaryDisplayID == 0) {
@@ -84,6 +90,7 @@ namespace Cori {
 			}
 
 			m_Data->m_Window = SDL_CreateWindowWithProperties(props);
+
 			SDL_DestroyProperties(props);
 
 			CORI_CORE_ASSERT(m_Data->m_Window, "Failed to create Window '{}'. SDL_Error: {}", m_Data->m_WindowTitle, SDL_GetError());
@@ -107,10 +114,8 @@ namespace Cori {
 		}
 
 		Window::~Window() {
-			SDL_DestroyWindow(m_Data->m_Window);
-			SDL_free(m_Data->m_SDLModes);
-			delete m_Data;
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window '{}' Destroyed", m_Data->m_WindowTitle);
+			delete m_Data;
 		}
 
 		// ReSharper disable once CppMemberFunctionMayBeConst

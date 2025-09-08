@@ -28,6 +28,8 @@ if(CLANG_VARIANT STREQUAL "MSYS2")
 endif ()
 
 option(CORI_BUILD_SANDBOX_APPS   "Build sandbox apps. (can break the compilation if enabled)" OFF)
+option(CORI_BUILD_DOCS "Build CoriEngine documentation" OFF)
+option(CORI_SANITIZE "Enable address sanitization" OFF)
 
 project(main)
     if(CLANG_VARIANT STREQUAL "OTHER" AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_SYSTEM_NAME STREQUAL "Windows")
