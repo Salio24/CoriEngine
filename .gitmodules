@@ -1,50 +1,55 @@
-[submodule "CoriEngine/thirdparty/SDL3"]
-	path = CoriEngine/thirdparty/SDL3
+[submodule "Engine/thirdparty/SDL3"]
+	path = Engine/thirdparty/SDL3
 	url = https://github.com/libsdl-org/SDL.git
 	branch = release-3.2.x
-[submodule "CoriEngine/thirdparty/SDL3_image"]
-	path = CoriEngine/thirdparty/SDL3_image
+[submodule "Engine/thirdparty/SDL3_image"]
+	path = Engine/thirdparty/SDL3_image
 	url = https://github.com/libsdl-org/SDL_image.git
 	branch = release-3.2.x
-[submodule "CoriEngine/thirdparty/SDL3_mixer"]
-	path = CoriEngine/thirdparty/SDL3_mixer
+[submodule "Engine/thirdparty/SDL3_mixer"]
+	path = Engine/thirdparty/SDL3_mixer
 	url = https://github.com/libsdl-org/SDL_mixer.git
 	branch = main
-[submodule "CoriEngine/thirdparty/glm"]
-	path = CoriEngine/thirdparty/glm
+[submodule "Engine/thirdparty/glm"]
+	path = Engine/thirdparty/glm
 	url = https://github.com/g-truc/glm.git
 	branch = release-1.0.2
-[submodule "CoriEngine/thirdparty/nlohmann_json"]
-	path = CoriEngine/thirdparty/nlohmann_json
+[submodule "Engine/thirdparty/nlohmann_json"]
+	path = Engine/thirdparty/nlohmann_json
 	url = https://github.com/nlohmann/json.git
 	branch = master
-[submodule "CoriEngine/thirdparty/tmxlite"]
-	path = CoriEngine/thirdparty/tmxlite
+[submodule "Engine/thirdparty/tmxlite"]
+	path = Engine/thirdparty/tmxlite
 	url = https://github.com/fallahn/tmxlite.git
 	branch = master
-[submodule "CoriEngine/thirdparty/freetype"]
-	path = CoriEngine/thirdparty/freetype
-	url = https://github.com/freetype/freetype.git
-	branch = master
-[submodule "CoriEngine/thirdparty/glad2"]
-	path = CoriEngine/thirdparty/glad2
+[submodule "Engine/thirdparty/glad2"]
+	path = Engine/thirdparty/glad2
 	url = https://github.com/Dav1dde/glad.git
 	branch = glad2
-[submodule "CoriEngine/thirdparty/spdlog"]
-	path = CoriEngine/thirdparty/spdlog
+[submodule "Engine/thirdparty/spdlog"]
+	path = Engine/thirdparty/spdlog
 	url = https://github.com/gabime/spdlog.git
 	branch = v1.x
-[submodule "CoriEngine/thirdparty/magic_enum"]
-	path = CoriEngine/thirdparty/magic_enum
+[submodule "Engine/thirdparty/magic_enum"]
+	path = Engine/thirdparty/magic_enum
 	url = https://github.com/Neargye/magic_enum.git
-[submodule "CoriEngine/thirdparty/imgui"]
-	path = CoriEngine/thirdparty/imgui
+[submodule "Engine/thirdparty/imgui"]
+	path = Engine/thirdparty/imgui
 	url = https://github.com/ocornut/imgui.git
 	branch = docking
-[submodule "CoriEngine/thirdparty/entt"]
-	path = CoriEngine/thirdparty/entt
+[submodule "Engine/thirdparty/entt"]
+	path = Engine/thirdparty/entt
 	url = https://github.com/skypjack/entt.git
 	branch = master
-[submodule "CoriEngine/thirdparty/box2d"]
-	path = CoriEngine/thirdparty/box2d
+[submodule "Engine/thirdparty/box2d"]
+	path = Engine/thirdparty/box2d
 	url = https://github.com/erincatto/box2d.git
+[submodule "Engine/thirdparty/stduuid"]
+	path = Engine/thirdparty/stduuid
+	url = https://github.com/mariusbancila/stduuid
+[submodule "Engine/thirdparty/msdf-atlas-gen"]
+	path = Engine/thirdparty/msdf-atlas-gen
+	url = https://github.com/Chlumsky/msdf-atlas-gen
+[submodule "Engine/thirdparty/utfcpp"]
+	path = Engine/thirdparty/utfcpp
+	url = https://github.com/nemtrif/utfcpp

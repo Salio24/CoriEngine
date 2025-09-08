@@ -4,23 +4,31 @@
 
 /.vs
 
+# i have sold my soul to the devil xD
+/.idea
+/.cmake-build-debug-mingw_llvm
+/.cmake-build-release-mingw_llvm
+/.cmake-build-relwithdebinfo-mingw_llvm
+
 # build directories 
 */bin/*
+Engine/bin
 
 # git submodules 
-/CoriEngine/thirdparty/freetype/*
-/CoriEngine/thirdparty/glad2/*
-/CoriEngine/thirdparty/glm/*
-/CoriEngine/thirdparty/imgui/*
-/CoriEngine/thirdparty/nlohmann_json/*
-/CoriEngine/thirdparty/SDL3/*
-/CoriEngine/thirdparty/SDL3_image/*
-/CoriEngine/thirdparty/SDL3_mixer/*
-/CoriEngine/thirdparty/spdlog/*
-/CoriEngine/thirdparty/tmxlite/*
-/CoriEngine/thirdparty/magic_enum/*
-/CoriEngine/thirdparty/entt/*
-/CoriEngine/thirdparty/box2d/*
+/Engine/thirdparty/freetype/*
+/Engine/thirdparty/glad2/*
+/Engine/thirdparty/glm/*
+/Engine/thirdparty/imgui/*
+/Engine/thirdparty/nlohmann_json/*
+/Engine/thirdparty/SDL3/*
+/Engine/thirdparty/SDL3_image/*
+/Engine/thirdparty/SDL3_mixer/*
+/Engine/thirdparty/spdlog/*
+/Engine/thirdparty/tmxlite/*
+/Engine/thirdparty/magic_enum/*
+/Engine/thirdparty/entt/*
+/Engine/thirdparty/box2d/*
+/Engine/thirdparty/box2cpp/box2d/*
 
 # build directory for libs and tmp files
 /out
@@ -38,6 +46,9 @@ rmSub.sh
 *.pdb
 
 *.cori_engine_dll_copied.stamp
-/Apps/Sandbox/bin/*
-/Apps/RendererSandbox/bin/*
+/Sandboxes/Sandbox/bin/*
+/Sandboxes/RendererSandbox/bin/*
+/Sandboxes/PhysicsSandbox/bin/*
 /notes.txt
+
+*.a

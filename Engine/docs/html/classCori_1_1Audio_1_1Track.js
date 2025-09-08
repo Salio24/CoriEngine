@@ -1,0 +1,25 @@
+var classCori_1_1Audio_1_1Track =
+[
+    [ "~Track", "classCori_1_1Audio_1_1Track.html#a26fd18cfd7474f819c59f1e34847b575", null ],
+    [ "Create", "classCori_1_1Audio_1_1Track.html#abc9f56505bf062d8e57bbda93ebe7e18", null ],
+    [ "GetGain", "classCori_1_1Audio_1_1Track.html#abf9fc45231454d86af1645604ed9c53f", null ],
+    [ "GetTag", "classCori_1_1Audio_1_1Track.html#a15ed71213f112d1dcce175e0b4c88d59", null ],
+    [ "IsPaused", "classCori_1_1Audio_1_1Track.html#ad39ceb3caa1af2ffdcfec0d268f60749", null ],
+    [ "IsPlaying", "classCori_1_1Audio_1_1Track.html#af0ff237437a9a88ba5bae723ffcf884b", null ],
+    [ "IsValid", "classCori_1_1Audio_1_1Track.html#aaeb1c5a6c02d0ab9ba0d437b21203426", null ],
+    [ "Pause", "classCori_1_1Audio_1_1Track.html#ae6a746f3756299a3f0ea902edfb80e32", null ],
+    [ "Play", "classCori_1_1Audio_1_1Track.html#a25751779bed3ba7c40ca6976be8b2397", null ],
+    [ "PlaySoundWithParams", "classCori_1_1Audio_1_1Track.html#a34962cb613c369d49926ccdff6c48da3", null ],
+    [ "RemoveTag", "classCori_1_1Audio_1_1Track.html#a1ef7a6407591d7245fd5bcd2dc764c14", null ],
+    [ "Resume", "classCori_1_1Audio_1_1Track.html#aa0dbf9c5885f0b5b30e81080994670c8", null ],
+    [ "SetGain", "classCori_1_1Audio_1_1Track.html#ad529aaa92d2fb3ba70c58f9f118b72af", null ],
+    [ "SetSound", "classCori_1_1Audio_1_1Track.html#acad1c51b562b6727e9069f4a5d40c72e", null ],
+    [ "SetTag", "classCori_1_1Audio_1_1Track.html#ade1679cfdd991cfb999be17073045efc", null ],
+    [ "SetTrackStopCallback", "classCori_1_1Audio_1_1Track.html#adc314f43629a030a22f27836c452ba08", null ],
+    [ "StartSequence", "classCori_1_1Audio_1_1Track.html#a4b1d216867705ffc11bf836b88730157", null ],
+    [ "Stop", "classCori_1_1Audio_1_1Track.html#ad57b8d92d8b9968db57b5c606466a3c1", null ],
+    [ "StopSequence", "classCori_1_1Audio_1_1Track.html#a695281b80291d78d50e611fe0a2e5857", null ],
+    [ "TrackStopCallback", "classCori_1_1Audio_1_1Track.html#a38d02b0f007b1dd5c18b9ac2d1fb866f", null ],
+    [ "m_ID", "classCori_1_1Audio_1_1Track.html#ad964f7333c36165f60acdcb6f350e89f", null ],
+    [ "m_Name", "classCori_1_1Audio_1_1Track.html#a1a71c23e5bb3064fe018a5b2f05c41d0", null ]
+];

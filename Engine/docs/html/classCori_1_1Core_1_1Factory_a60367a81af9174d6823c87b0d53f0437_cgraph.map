@@ -1,0 +1,8 @@
+<map id="Cori::Core::Factory::CreateUnique" name="Cori::Core::Factory::CreateUnique">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,147,74"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1Factory.html#a30ad48765e0f34046d7054c5d3985061" title=" " alt="" coords="195,29,336,74"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,49,179,49,179,54,147,54"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1Factory.html#a924e36be422a39be61f8329c2e90cea0" title=" " alt="" coords="384,29,525,74"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="336,49,369,49,369,54,336,54"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="418,29,417,19,423,10,436,5,455,3,475,5,487,11,485,16,473,10,455,8,437,10,426,15,422,21,423,28"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="Cori::World::Entity::SetActive" name="Cori::World::Entity::SetActive">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,109,145,154"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Entity.html#a7b8dc8e2678b0b088fcbc94bad61a931" title=" " alt="" coords="197,5,336,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,107,191,60,201,55,203,60,194,65,114,111"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Entity.html#a72066bf37a511027fc3c1b6f107b1383" title=" " alt="" coords="193,75,340,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="144,116,177,110,178,116,145,122"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="197,144,336,189"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="145,142,181,148,181,154,144,147"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="388,175,527,219"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="106,152,146,178,193,198,239,207,285,211,373,207,373,213,285,216,238,213,192,204,143,183,103,157"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="337,175,373,181,372,186,336,180"/>
+</map>

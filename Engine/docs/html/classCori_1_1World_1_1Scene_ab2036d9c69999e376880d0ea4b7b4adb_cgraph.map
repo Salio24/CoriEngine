@@ -1,0 +1,17 @@
+<map id="Cori::World::Scene::OnTickUpdate" name="Cori::World::Scene::OnTickUpdate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,120,146,165"/>
+<area shape="poly" id="edge7_Node000001_Node000001" title=" " alt="" coords="33,120,32,110,39,101,54,95,76,93,99,96,113,102,111,107,98,101,75,99,55,101,42,105,37,111,39,119"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Scene.html#a614439ccac0344926adc4c0165d64060" title=" " alt="" coords="225,29,365,74"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,117,193,84,209,77,211,82,195,89,122,122"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1EntityView.html#a2bd49a7053d451969369422bc889bd7c" title=" " alt="" coords="194,98,396,126"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="146,130,178,125,178,131,146,135"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="225,149,364,194"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="146,149,210,158,209,163,146,154"/>
+<area shape="rect" id="Node000007" href="$classCori_1_1World_1_1Scene.html#a436eabfa62100263fee4edbb2c63f6e7" title=" " alt="" coords="225,219,365,263"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="116,163,195,204,211,211,209,216,193,209,114,168"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="253,29,252,19,259,10,273,5,295,3,319,5,333,12,330,17,317,10,295,8,274,10,262,15,257,21,258,28"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1World_1_1Entity.html#ac9d21daa112e64d4f43f54715aef21b2" title=" " alt="" coords="444,85,583,130"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="397,107,428,107,429,112,397,112"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="444,155,583,199"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="365,171,429,172,429,178,365,176"/>
+</map>

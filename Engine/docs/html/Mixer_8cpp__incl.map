@@ -1,0 +1,24 @@
+<map id="Mixer.cpp" name="Mixer.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="360,5,445,33"/>
+<area shape="rect" id="Node000002" href="$Mixer_8hpp.html" title=" " alt="" coords="397,232,483,260"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="416,32,432,53,445,80,452,117,454,154,448,217,443,216,448,154,447,117,440,82,428,56,412,35"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="244,81,430,109"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="393,35,361,71,357,68,389,32"/>
+<area shape="rect" id="Node000005" href="$Track_8hpp.html" title=" " alt="" coords="136,81,221,109"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="363,36,233,78,232,73,362,31"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="505,81,686,109"/>
+<area shape="poly" id="edge12_Node000001_Node000010" title=" " alt="" coords="438,31,549,73,547,78,436,36"/>
+<area shape="rect" id="Node000003" href="$IDDefs_8hpp.html" title=" " alt="" coords="393,308,486,336"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="442,261,442,292,437,292,437,261"/>
+<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="215,107,265,127,318,154,370,188,414,220,411,225,367,192,316,159,262,132,213,112"/>
+<area shape="rect" id="Node000006" href="$Trackable_8hpp.html" title=" " alt="" coords="5,232,176,260"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="173,110,108,220,104,217,169,107"/>
+<area shape="rect" id="Node000008" href="$Sound_8hpp.html" title=" " alt="" coords="215,157,304,184"/>
+<area shape="poly" id="edge8_Node000005_Node000008" title=" " alt="" coords="195,107,236,144,233,148,191,111"/>
+<area shape="rect" id="Node000007" href="$InstanceMetrics_8hpp.html" title=" " alt="" coords="14,308,167,336"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="93,261,93,292,88,292,88,261"/>
+<area shape="poly" id="edge10_Node000008_Node000002" title=" " alt="" coords="293,182,395,224,393,229,291,187"/>
+<area shape="poly" id="edge9_Node000008_Node000006" title=" " alt="" coords="231,187,135,228,133,223,229,182"/>
+<area shape="rect" id="Node000009" href="$PathDefines_8hpp.html" title=" " alt="" coords="200,232,373,260"/>
+<area shape="poly" id="edge11_Node000008_Node000009" title=" " alt="" coords="267,184,279,217,274,219,262,186"/>
+</map>

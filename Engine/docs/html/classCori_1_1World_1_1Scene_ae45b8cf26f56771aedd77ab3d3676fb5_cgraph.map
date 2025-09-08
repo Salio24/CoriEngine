@@ -1,0 +1,6 @@
+<map id="Cori::World::Scene::FindEntity" name="Cori::World::Scene::FindEntity">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,146,74"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Scene.html#a614439ccac0344926adc4c0165d64060" title=" " alt="" coords="194,29,334,74"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,49,178,49,178,54,146,54"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="227,29,226,19,232,10,245,5,264,3,284,5,296,11,294,16,282,10,264,8,246,10,236,15,231,21,233,28"/>
+</map>

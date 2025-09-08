@@ -1,0 +1,7 @@
+<map id="Cori::Audio::Mixer::StopTrack" name="Cori::Audio::Mixer::StopTrack">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,24,143,68"/>
+<area shape="rect" id="Node000002" href="$ref_8cpp.html#adf3b39e59cff4427ede8ddd6c22544e2" title=" " alt="" coords="217,5,334,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,34,201,26,202,32,144,39"/>
+<area shape="rect" id="Node000003" href="$ref_8cpp.html#abc5f2b8692ec5fa56d81f778101860cf" title=" " alt="" coords="191,57,361,85"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="144,52,175,56,175,61,143,57"/>
+</map>

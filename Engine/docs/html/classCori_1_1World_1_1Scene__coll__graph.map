@@ -1,0 +1,11 @@
+<map id="Cori::World::Scene" name="Cori::World::Scene">
+<area shape="rect" id="Node000001" title=" " alt="" coords="517,74,658,102"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Profiling_1_1Trackable.html" title=" " alt="" coords="142,5,322,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="338,32,415,41,494,54,549,71,548,76,493,60,414,46,337,37"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Graphics_1_1CameraController.html" title=" " alt="" coords="114,74,349,102"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="365,85,517,85,517,90,365,90"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1Physics_1_1PhysicsWorld.html" title=" " alt="" coords="132,130,331,158"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="346,135,419,128,493,115,548,100,549,105,494,121,420,133,347,140"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,130,65,158"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="80,141,132,141,132,146,80,146"/>
+</map>

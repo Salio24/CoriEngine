@@ -1,0 +1,11 @@
+<map id="Cori::Audio::Track::PlaySoundWithParams" name="Cori::Audio::Track::PlaySoundWithParams">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,40,182,85"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Audio_1_1Track.html#a25751779bed3ba7c40ca6976be8b2397" title=" " alt="" coords="230,5,365,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,45,214,39,215,44,182,50"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Audio_1_1Track.html#acad1c51b562b6727e9069f4a5d40c72e" title=" " alt="" coords="230,75,365,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,75,215,80,214,86,181,80"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1Audio_1_1Mixer.html#ae281ef82a21f6772ac6bfbc563eb0ced" title=" " alt="" coords="413,75,550,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="365,94,397,94,397,100,365,100"/>
+<area shape="rect" id="Node000005" href="$ref_8cpp.html#afd9934ae05d547acb775b031b657b91c" title=" " alt="" coords="598,83,745,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="551,94,583,94,583,100,551,100"/>
+</map>
