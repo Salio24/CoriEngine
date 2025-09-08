@@ -3,10 +3,11 @@
 #include "Core/Application.hpp"
 
 namespace Cori {
-	std::shared_ptr<VertexArray> VertexArray::Create() {
-		std::shared_ptr<VertexArray> vao = Factory<VertexArray, GraphicsAPIs>::CreateShared(Window::GetCurrentAPI());
-		CORI_CORE_ASSERT(vao, "Failed to create VertexArray for API: {}. Check registrations and API validity.", APIEnumToName(Window::GetCurrentAPI()));
-		return vao;
-
+	namespace Graphics {
+		std::shared_ptr<VertexArray> VertexArray::Create() {
+			std::shared_ptr<VertexArray> vao = Core::Factory<VertexArray, GraphicsAPIs>::CreateShared(Core::Window::GetCurrentAPI());
+			CORI_CORE_ASSERT(vao, "Failed to create VertexArray for API: {}. Check registrations and API validity.", APIEnumToName(Core::Window::GetCurrentAPI()));
+			return vao;
+		}
 	}
 }

@@ -1,0 +1,15 @@
+<map id="Cori::Core::Application::~Application" name="Cori::Core::Application::~Application">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,109,172,154"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1AssetManager.html#a1143bea2f5645415c6585c72568714af" title=" " alt="" coords="244,5,392,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,106,219,60,233,54,235,59,221,65,130,111"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Audio_1_1Mixer.html#a2bce53770d45e53dfe6759536051de39" title=" " alt="" coords="250,75,387,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="171,117,234,107,235,112,172,122"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1Graphics_1_1API.html#a5f311499459a478be38d5f3c764146a8" title=" " alt="" coords="248,144,389,189"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="172,142,233,151,232,156,171,147"/>
+<area shape="rect" id="Node000007" href="$classCori_1_1World_1_1SceneManager.html#ab8645a8ac17117791e29248b1ad181d6" title=" " alt="" coords="220,213,417,258"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="130,152,221,199,235,205,233,210,219,203,128,157"/>
+<area shape="rect" id="Node000004" href="$ref_8cpp.html#a7a05f0fabee4b975e0e077f8952a7f52" title=" " alt="" coords="518,83,599,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="387,94,503,94,503,100,387,100"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1Graphics_1_1Renderer2D.html#ae0c06c83c39f0fb9b43307e9e5e65758" title=" " alt="" coords="465,144,652,189"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="389,164,450,164,450,169,389,169"/>
+</map>

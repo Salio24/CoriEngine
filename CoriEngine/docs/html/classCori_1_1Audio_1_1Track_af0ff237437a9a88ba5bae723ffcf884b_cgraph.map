@@ -1,0 +1,7 @@
+<map id="Cori::Audio::Track::IsPlaying" name="Cori::Audio::Track::IsPlaying">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,141,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Audio_1_1Mixer.html#a8ef26169265a19bc722940eac4d00580" title=" " alt="" coords="189,5,326,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,25,173,25,173,30,141,30"/>
+<area shape="rect" id="Node000003" href="$ref_8cpp.html#a0e21cde25dd331317785d24f92a32be1" title=" " alt="" coords="374,14,510,42"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="326,25,359,25,359,30,326,30"/>
+</map>

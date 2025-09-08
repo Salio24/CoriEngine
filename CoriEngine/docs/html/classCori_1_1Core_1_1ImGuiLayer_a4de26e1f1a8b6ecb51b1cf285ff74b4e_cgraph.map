@@ -1,0 +1,7 @@
+<map id="Cori::Core::ImGuiLayer::ImGuiLayer" name="Cori::Core::ImGuiLayer::ImGuiLayer">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,40,174,85"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1Application.html#ab0aa424cc7dd313c6b342b4c9710a022" title=" " alt="" coords="222,5,388,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="174,46,206,41,207,46,175,51"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1Layer.html#a89ce1cc1e98e0dbd2d5dc1068780258e" title=" " alt="" coords="236,75,374,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="175,73,221,81,220,86,174,79"/>
+</map>

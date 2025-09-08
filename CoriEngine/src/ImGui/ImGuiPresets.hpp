@@ -3,7 +3,7 @@
 
 namespace Cori {
 	namespace ImGuiPresets {
-		[[maybe_unused]] static void Box2dDebugDraw(const glm::vec2 cameraBounds, const int32_t pixelsPerMeter, Layer* thisPtr, const bool mouseDrag, const glm::vec2 cameraPos, const float mouseForce = 1000.0f) {
+		[[maybe_unused]] static void Box2dDebugDraw(const glm::vec2 cameraBounds, const int32_t pixelsPerMeter, Core::Layer* thisPtr, const bool mouseDrag, const glm::vec2 cameraPos, const float mouseForce = 1000.0f) {
 			thisPtr->m_DebugImGuiRenderer.ViewportCalc(cameraBounds, pixelsPerMeter, cameraPos);
 			thisPtr->m_DebugImGuiRenderer.DrawShapes(thisPtr->ActiveScene.GetPhysicsWorld());
 			if (mouseDrag) {
@@ -19,14 +19,14 @@ namespace Cori {
 			const char* items[] = {"Windowed", "Borderless Windowed", "Exclusive Fullscreen"};
 
 			int32_t oneToDisplay = 0;
-			const WindowMode currentMode = Application::GetWindow().GetWindowMode();
-			if (currentMode == WindowMode::WINDOWED) {
+			const Core::WindowMode currentMode = Core::Application::GetWindow().GetWindowMode();
+			if (currentMode == Core::WindowMode::WINDOWED) {
 				oneToDisplay = 0;
 			}
-			else if (currentMode == WindowMode::BORDERLESS_WINDOWED) {
+			else if (currentMode == Core::WindowMode::BORDERLESS_WINDOWED) {
 				oneToDisplay = 1;
 			}
-			else if (currentMode == WindowMode::EXCLUSIVE_FULLSCREEN) {
+			else if (currentMode == Core::WindowMode::EXCLUSIVE_FULLSCREEN) {
 				oneToDisplay = 2;
 			}
 
@@ -36,24 +36,24 @@ namespace Cori {
 					const bool isSelected = oneToDisplay == i;
 					if (ImGui::Selectable(items[i], isSelected)) {
 						if (i == 0) {
-							if (currentMode != WindowMode::WINDOWED) {
-								const auto result = Application::GetWindow().SetWindowMode(WindowMode::WINDOWED);
+							if (currentMode != Core::WindowMode::WINDOWED) {
+								const auto result = Core::Application::GetWindow().SetWindowMode(Core::WindowMode::WINDOWED);
 								if (!result) {
 									CORI_ERROR("Failed to set window mode. Error: {}", result.error().what());
 								}
 							}
 						}
 						else if (i == 1) {
-							if (currentMode != WindowMode::BORDERLESS_WINDOWED) {
-								const auto result = Application::GetWindow().SetWindowMode(WindowMode::BORDERLESS_WINDOWED);
+							if (currentMode != Core::WindowMode::BORDERLESS_WINDOWED) {
+								const auto result = Core::Application::GetWindow().SetWindowMode(Core::WindowMode::BORDERLESS_WINDOWED);
 								if (!result) {
 									CORI_ERROR("Failed to set window mode. Error: {}", result.error().what());
 								}
 							}
 						}
 						else if (i == 2) {
-							if (currentMode != WindowMode::EXCLUSIVE_FULLSCREEN) {
-								const auto result = Application::GetWindow().SetWindowMode(WindowMode::EXCLUSIVE_FULLSCREEN);
+							if (currentMode != Core::WindowMode::EXCLUSIVE_FULLSCREEN) {
+								const auto result = Core::Application::GetWindow().SetWindowMode(Core::WindowMode::EXCLUSIVE_FULLSCREEN);
 								if (!result) {
 									CORI_ERROR("Failed to set window mode. Error: {}", result.error().what());
 								}
@@ -69,26 +69,26 @@ namespace Cori {
 			}
 
 
-			static std::vector<ScreenMode> screenModes;
+			static std::vector<Core::ScreenMode> screenModes;
 
 			{
 				static bool oneshot = true;
 				if (oneshot) {
-					screenModes = Application::GetWindow().GetScreenModes();
+					screenModes = Core::Application::GetWindow().GetScreenModes();
 					oneshot = false;
 				}
 			}
 
 			static int32_t resolutionDropdownIdx = 0;
 
-			ImGui::BeginDisabled(currentMode == WindowMode::BORDERLESS_WINDOWED);
+			ImGui::BeginDisabled(currentMode == Core::WindowMode::BORDERLESS_WINDOWED);
 			const char* resolutionDropdownPreview = screenModes.at(resolutionDropdownIdx).m_ModeName.c_str();
 			if (ImGui::BeginCombo("Resolution", resolutionDropdownPreview)) {
 				for (int32_t i = 0; i < screenModes.size(); i++) {
 					const bool isSelected = resolutionDropdownIdx == i;
 					if (ImGui::Selectable(screenModes[i].m_ModeName.c_str(), isSelected)) {
 						resolutionDropdownIdx = i;
-						const auto result = Application::GetWindow().SetScreenMode(screenModes[resolutionDropdownIdx]);
+						const auto result = Core::Application::GetWindow().SetScreenMode(screenModes[resolutionDropdownIdx]);
 						if (!result) {
 							CORI_ERROR("Failed to set screen mode. Error: {}", result.error().what());
 						}

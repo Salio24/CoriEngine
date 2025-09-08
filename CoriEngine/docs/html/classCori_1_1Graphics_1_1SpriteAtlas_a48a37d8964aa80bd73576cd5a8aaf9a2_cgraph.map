@@ -1,0 +1,6 @@
+<map id="Cori::Graphics::SpriteAtlas::Create" name="Cori::Graphics::SpriteAtlas::Create">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,197,74"/>
+<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="58,29,57,19,64,10,79,5,101,3,125,5,140,12,138,17,124,10,101,8,80,10,67,15,62,21,63,28"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Image.html#a8a1e6ccfa0bed29acbb6f2d1136398b5" title=" " alt="" coords="245,29,406,74"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,49,229,49,229,54,197,54"/>
+</map>

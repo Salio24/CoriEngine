@@ -1,6 +1,6 @@
 #include "Renderer2D.hpp"
 #include <ska_sort.hpp>
-#include "Core/Utility/AABB.hpp"
+#include "Utility/AABB.hpp"
 #include "FontData.hpp"
 #include "Color.hpp"
 
@@ -13,8 +13,9 @@ namespace Cori {
 
 			s_Data = new RendererData();
 
-			const auto image = Image::Create("assets/engine/textures/white1x1.png");
-			s_Data->WhiteTexture = Texture2D::Create(image);
+			constexpr auto params = Texture::Params();
+			constexpr uint32_t white[4] = { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
+			s_Data->WhiteTexture = Texture2D::Create(&white, 2, 2, params);
 
 			// quad setup
 
@@ -37,7 +38,7 @@ namespace Cori {
 
 			s_Data->QuadInstanceBufferBase = new Quad[RendererData::MaxInstanceCount];
 
-			s_Data->QuadInstanceShader = ShaderProgram::Create("assets/engine/shaders/QuadInstancedVert.glsl", "assets/engine/shaders/QuadInstancedFrag.glsl");
+			s_Data->QuadInstanceShader = ShaderProgram::Create("enignedata/shaders/QuadInstancedVert.glsl", "enignedata/shaders/QuadInstancedFrag.glsl");
 
 			s_Data->WorldSpaceTransparentQuadQueue.reserve(RendererData::WorldSpaceTransparentQuadQueueInitialSize);
 			s_Data->WorldSpaceOpaqueQuadQueue.reserve(RendererData::WorldSpaceOpaqueQuadQueueInitialSize);
@@ -65,7 +66,7 @@ namespace Cori {
 
 			s_Data->CharInstanceBufferBase = new Char[RendererData::MaxCharInstanceCount];
 
-			s_Data->CharInstanceShader = ShaderProgram::Create("assets/engine/shaders/TextInstancedVert.glsl", "assets/engine/shaders/TextInstancedFrag.glsl");
+			s_Data->CharInstanceShader = ShaderProgram::Create("enignedata/shaders/TextInstancedVert.glsl", "enignedata/shaders/TextInstancedFrag.glsl");
 
 			s_Data->WorldSpaceTransparentTextQueue.reserve(RendererData::WorldSpaceTransparentTextQueueInitialSize);
 
@@ -83,7 +84,7 @@ namespace Cori {
 
 
 
-		void Renderer2D::BeginScene(const Components::Scene::Camera& camera) {
+		void Renderer2D::BeginScene(const World::Components::Scene::Camera& camera) {
 			CORI_PROFILE_FUNCTION();
 
 			s_Data->WorldSpaceViewProjectionMatrix = camera.m_ViewProjectionMatrix;
@@ -111,19 +112,19 @@ namespace Cori {
 			CORI_PROFILE_FUNCTION();
 		}
 
-		void Renderer2D::DrawScene(Scene* scene) {
+		void Renderer2D::DrawScene(World::Scene* scene) {
 			CORI_PROFILE_FUNCTION();
 
 			{
 				CORI_PROFILE_SCOPE("Quad Submission");
-				const auto& camera = scene->GetContextComponent<Components::Scene::Camera>();
+				const auto& camera = scene->GetContextComponent<World::Components::Scene::Camera>();
 				//Utility::AABB cameraBounds = { camera.m_CameraMinBound, camera.m_CameraMaxBound };
-				EntityView view = scene->View<Components::Entity::QuadRenderer, Components::Entity::Transform>(Exclude<Components::Entity::InactiveLocallyFlag>());
+				World::EntityView view = scene->View<World::Components::Entity::QuadRenderer, World::Components::Entity::Transform>(World::Exclude<World::Components::Entity::InactiveLocallyFlag>());
 				for (const auto entity : view) {
-					auto& renderer = view.Get<Components::Entity::QuadRenderer>(entity);
+					auto& renderer = view.Get<World::Components::Entity::QuadRenderer>(entity);
 					if (renderer.m_Visible) {
 						if (renderer.GetTexture()) {
-							auto& transform = view.Get<Components::Entity::Transform>(entity);
+							auto& transform = view.Get<World::Components::Entity::Transform>(entity);
 							Utility::AABB entityBounds = Utility::CalculateAABB(transform.m_WorldTransform, renderer.GetHalfSize());
 							//SubmitAABB(camera.m_CameraBounds, 0.2f, {0.0f, 1.0f, 0.0f});
 							if (AABBOverlapCheck(camera.m_CameraBounds, entityBounds)) {

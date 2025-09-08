@@ -7,17 +7,18 @@
 #include "../src/Core/CoriKeycodes.hpp"
 #include "../src/Core/Error.hpp"
 #include "../src/Core/Input.hpp"
-#include "../src/Core/Utility/AABB.hpp"
-#include "../src/Core//Utility/Random.hpp"
-#include "../src/Core/Utility/StringHash.hpp"
-#include "../src/Core/Utility/HashedTag.hpp"
 
-#include "../src/ImGui/ImGuiLayer.hpp"
+#include "../src/Utility/AABB.hpp"
+#include "../src/Utility/Random.hpp"
+#include "../src/Utility/StringHash.hpp"
+#include "../src/Utility/HashedTag.hpp"
+
+#include "../src/Core/ImGuiLayer.hpp"
 #include "../src/ImGui/ImGuiPresets.hpp"
 
-#include "../src/EventSystem/MouseEvent.hpp"
-#include "../src/EventSystem/AppEvent.hpp"
-#include "../src/EventSystem/KeyEvent.hpp"
+#include "../src/Core/EventSystem/MouseEvent.hpp"
+#include "../src/Core/EventSystem/AppEvent.hpp"
+#include "../src/Core/EventSystem/KeyEvent.hpp"
 
 #include "../src/Graphics/Buffers.hpp"
 #include "../src/Graphics/API.hpp"

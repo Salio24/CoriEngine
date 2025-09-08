@@ -1,5 +1,6 @@
 #include "Font.hpp"
 #include "FontData.hpp"
+#include "Utility/PathDefines.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -14,8 +15,8 @@ namespace Cori {
 				CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Loaded Font from '{}' successfully.", path.string());
 				msdfgen::destroyFont(font);
 			} else {
-				msdfgen::FontHandle* fontPlaceholder = msdfgen::loadFont(ft, "assets/engine/fonts/unifont-16.0.04.otf");
-				CORI_CORE_ASSERT(fontPlaceholder, "Failed to load placeholder (bundled with the engine) Font. It should've been at bin/'Build Type if any'/assets/engine/fonts/unifont-16.0.04.otf");
+				msdfgen::FontHandle* fontPlaceholder = msdfgen::loadFont(ft, Utility::Internal::PathDefines::PlaceholderFont);
+				CORI_CORE_ASSERT(fontPlaceholder, "Failed to load placeholder (bundled with the engine) Font. It should've been at bin/'Build Type if any '{}'", Utility::Internal::PathDefines::PlaceholderFont);
 				coriFont.reset(new Font(static_cast<void*>(fontPlaceholder), charsets, path, minimalScale, miterLimit));
 				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Failed to load Font from '{}', loaded bundled placeholder font instead.", path.string());
 				msdfgen::destroyFont(fontPlaceholder);

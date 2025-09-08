@@ -1,0 +1,8 @@
+<map id="Cori::World::Entity::SetName" name="Cori::World::Entity::SetName">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,36,145,81"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="193,5,332,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,44,177,39,178,44,146,50"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="380,36,519,81"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="145,58,193,60,332,60,364,59,364,64,332,65,193,65,145,64"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="333,36,365,42,364,47,332,42"/>
+</map>

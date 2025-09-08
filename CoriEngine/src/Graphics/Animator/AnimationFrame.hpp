@@ -1,9 +1,11 @@
 #pragma once
-#include "../Texture.hpp"
+#include "Graphics/Texture.hpp"
 
 namespace Cori {
-	struct AnimationFrame {
-		UVs m_UVs;
-		uint32_t m_TickDuration;
-	};
+	namespace Graphics {
+		struct AnimationFrame {
+			UVs m_UVs;
+			uint32_t m_TickDuration;
+		};
+	}
 }

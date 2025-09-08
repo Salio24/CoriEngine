@@ -1,0 +1,35 @@
+<map id="Cori::Audio::Track::StartSequence" name="Cori::Audio::Track::StartSequence">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,144,141,189"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Audio_1_1Track.html#a34962cb613c369d49926ccdff6c48da3" title=" " alt="" coords="189,75,365,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,141,194,122,196,127,142,146"/>
+<area shape="rect" id="Node000007" href="$classCori_1_1Audio_1_1Track.html#a1ef7a6407591d7245fd5bcd2dc764c14" title=" " alt="" coords="209,144,344,189"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="141,164,194,164,194,169,141,169"/>
+<area shape="rect" id="Node000010" href="$classCori_1_1Audio_1_1Track.html#a695281b80291d78d50e611fe0a2e5857" title=" " alt="" coords="209,213,344,258"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="142,187,196,205,194,210,140,192"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Audio_1_1Track.html#a25751779bed3ba7c40ca6976be8b2397" title=" " alt="" coords="414,5,549,50"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="344,72,399,53,400,58,346,77"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1Audio_1_1Track.html#acad1c51b562b6727e9069f4a5d40c72e" title=" " alt="" coords="414,75,549,119"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="366,94,398,94,398,100,366,100"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1Audio_1_1Mixer.html#ae281ef82a21f6772ac6bfbc563eb0ced" title=" " alt="" coords="598,75,736,119"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="550,94,583,94,583,100,550,100"/>
+<area shape="rect" id="Node000006" href="$ref_8cpp.html#afd9934ae05d547acb775b031b657b91c" title=" " alt="" coords="796,83,942,111"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="736,94,780,94,780,100,736,100"/>
+<area shape="rect" id="Node000008" href="$classCori_1_1Audio_1_1Mixer.html#af4101d1bb30f0c636f57e08a398834c0" title=" " alt="" coords="413,144,550,189"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="345,164,397,164,397,169,345,169"/>
+<area shape="rect" id="Node000009" href="$ref_8cpp.html#a7bf0536933fff9d100e21bb7172fdaba" title=" " alt="" coords="603,152,731,180"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="550,164,587,164,587,169,550,169"/>
+<area shape="rect" id="Node000011" href="$classCori_1_1Audio_1_1Track.html#ade1679cfdd991cfb999be17073045efc" title=" " alt="" coords="414,213,549,258"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="345,233,398,233,398,238,345,238"/>
+<area shape="rect" id="Node000014" href="$classCori_1_1Audio_1_1Track.html#ad57b8d92d8b9968db57b5c606466a3c1" title=" " alt="" coords="414,283,549,327"/>
+<area shape="poly" id="edge13_Node000010_Node000014" title=" " alt="" coords="346,256,400,275,399,280,344,261"/>
+<area shape="rect" id="Node000012" href="$classCori_1_1Audio_1_1Mixer.html#ada545a39fb214e638684442c47da4f45" title=" " alt="" coords="598,213,736,258"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="550,233,583,233,583,238,550,238"/>
+<area shape="rect" id="Node000013" href="$ref_8cpp.html#aca9a9b1a9dc337f548fc6d1f0d3f0717" title=" " alt="" coords="814,222,924,250"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="736,233,799,233,799,238,736,238"/>
+<area shape="rect" id="Node000015" href="$classCori_1_1Audio_1_1Mixer.html#a3688550f215cd3dff57f568b8d51370d" title=" " alt="" coords="598,283,736,327"/>
+<area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="550,302,583,302,583,308,550,308"/>
+<area shape="rect" id="Node000016" href="$ref_8cpp.html#adf3b39e59cff4427ede8ddd6c22544e2" title=" " alt="" coords="810,282,928,310"/>
+<area shape="poly" id="edge15_Node000015_Node000016" title=" " alt="" coords="736,299,795,296,795,302,736,304"/>
+<area shape="rect" id="Node000017" href="$ref_8cpp.html#abc5f2b8692ec5fa56d81f778101860cf" title=" " alt="" coords="784,334,954,362"/>
+<area shape="poly" id="edge16_Node000015_Node000017" title=" " alt="" coords="737,317,786,327,785,333,736,322"/>
+</map>

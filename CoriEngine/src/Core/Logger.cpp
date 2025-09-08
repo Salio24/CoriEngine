@@ -5,6 +5,11 @@
 #include <windows.h>
 #endif
 
+namespace {
+	std::mutex s_CoreTagMutex;
+	std::mutex s_ClientTagMutex;
+}
+
 namespace Cori {
 
 	std::shared_ptr<spdlog::logger> Logger::s_CoreLogger;
@@ -12,9 +17,6 @@ namespace Cori {
 
 	std::unordered_set<std::string, Logger::StringHash, std::equal_to<>> Logger::s_CoreInactiveTags;
 	std::unordered_set<std::string, Logger::StringHash, std::equal_to<>> Logger::s_ClientInactiveTags;
-
-	static std::mutex s_CoreTagMutex;
-	static std::mutex s_ClientTagMutex;
 
 	void Logger::EnableVirtualTerminalProcessing() {
 #ifdef PLATFORM_WINDOWS
@@ -89,27 +91,27 @@ namespace Cori {
 
 	void Logger::SetClientLogLevel(const LogLevel level) {
 		switch (level) {
-		case Cori::LogLevel::CORI_TRACE:
+		case LogLevel::CORI_TRACE:
 			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Client log level is set to TRACE");
 			s_ClientLogger->set_level(spdlog::level::trace);
 			break;
-		case Cori::LogLevel::CORI_DEBUG:
+		case LogLevel::CORI_DEBUG:
 			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Client log level is set to DEBUG");
 			s_ClientLogger->set_level(spdlog::level::debug);
 			break;
-		case Cori::LogLevel::CORI_INFO:
+		case LogLevel::CORI_INFO:
 			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Client log level is set to INFO");
 			s_ClientLogger->set_level(spdlog::level::info);
 			break;
-		case Cori::LogLevel::CORI_WARN:
+		case LogLevel::CORI_WARN:
 			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Client log level is set to WARN");
 			s_ClientLogger->set_level(spdlog::level::warn);
 			break;
-		case Cori::LogLevel::CORI_ERROR:
+		case LogLevel::CORI_ERROR:
 			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Client log level is set to ERROR");
 			s_ClientLogger->set_level(spdlog::level::err);
 			break;
-		case Cori::LogLevel::CORI_FATAL:
+		case LogLevel::CORI_FATAL:
 			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Client log level is set to FATAL");
 			s_ClientLogger->set_level(spdlog::level::critical);
 			break;
@@ -118,27 +120,27 @@ namespace Cori {
 
 	void Logger::SetCoreLogLevel(const LogLevel level) {
 		switch (level) {
-		case Cori::LogLevel::CORI_TRACE:
+		case LogLevel::CORI_TRACE:
 			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Core log level is set to TRACE");
 			s_CoreLogger->set_level(spdlog::level::trace);
 			break;
-		case Cori::LogLevel::CORI_DEBUG:
+		case LogLevel::CORI_DEBUG:
 			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Core log level is set to DEBUG");
 			s_CoreLogger->set_level(spdlog::level::debug);
 			break;
-		case Cori::LogLevel::CORI_INFO:
+		case LogLevel::CORI_INFO:
 			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Core log level is set to INFO");
 			s_CoreLogger->set_level(spdlog::level::info);
 			break;
-		case Cori::LogLevel::CORI_WARN:
+		case LogLevel::CORI_WARN:
 			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Core log level is set to WARN");
 			s_CoreLogger->set_level(spdlog::level::warn);
 			break;
-		case Cori::LogLevel::CORI_ERROR:
+		case LogLevel::CORI_ERROR:
 			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Core log level is set to ERROR");
 			s_CoreLogger->set_level(spdlog::level::err);
 			break;
-		case Cori::LogLevel::CORI_FATAL:
+		case LogLevel::CORI_FATAL:
 			CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "Core log level is set to FATAL");
 			s_CoreLogger->set_level(spdlog::level::critical);
 			break;

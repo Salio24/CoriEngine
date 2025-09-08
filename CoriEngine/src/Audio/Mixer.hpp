@@ -2,7 +2,9 @@
 #include "IDDefs.hpp"
 
 namespace Cori {
-	class Application;
+	namespace Core {
+		class Application;
+	}
 
 	namespace Audio {
 		class Track;
@@ -44,58 +46,58 @@ namespace Cori {
 		class Mixer {
 		public:
 
-			[[nodiscard]] static std::expected<void, CoriError<>> PauseAllTracks();
-			[[nodiscard]] static std::expected<void, CoriError<>> ResumeAllTracks();
+			[[nodiscard]] static std::expected<void, Core::CoriError<>> PauseAllTracks();
+			[[nodiscard]] static std::expected<void, Core::CoriError<>> ResumeAllTracks();
 
-			[[nodiscard]] static std::expected<void, CoriError<>> SetMasterGain(const float gain);
+			[[nodiscard]] static std::expected<void, Core::CoriError<>> SetMasterGain(const float gain);
 			[[nodiscard]] static float GetMasterGain();
 
-			[[nodiscard]] static std::expected<void, CoriError<>> PlayTag(const char* tag, const PlayParams& params = PlayParams{});
-			[[nodiscard]] static std::expected<void, CoriError<>> StopTag(const char* tag, const int64_t fadeOutMS = 0);
-			[[nodiscard]] static std::expected<void, CoriError<>> PauseTag(const char* tag);
-			[[nodiscard]] static std::expected<void, CoriError<>> ResumeTag(const char* tag);
+			[[nodiscard]] static std::expected<void, Core::CoriError<>> PlayTag(const char* tag, const PlayParams& params = PlayParams{});
+			[[nodiscard]] static std::expected<void, Core::CoriError<>> StopTag(const char* tag, const int64_t fadeOutMS = 0);
+			[[nodiscard]] static std::expected<void, Core::CoriError<>> PauseTag(const char* tag);
+			[[nodiscard]] static std::expected<void, Core::CoriError<>> ResumeTag(const char* tag);
 
-			[[nodiscard]] static std::expected<void, CoriError<>> SetTagGain(const char* tag, const float gain);
+			[[nodiscard]] static std::expected<void, Core::CoriError<>> SetTagGain(const char* tag, const float gain);
 
 		protected:
 			friend Track;
 			friend Sound;
-			friend Application;
+			friend Core::Application;
 
 			static void Init();
 			static void Shutdown();
 
-			[[nodiscard]] static std::expected<void, CoriError<std::filesystem::path>> LoadSound(const std::filesystem::path& path, const bool preDecode, const SoundID soundID);
+			[[nodiscard]] static std::expected<void, Core::CoriError<std::filesystem::path>> LoadSound(const std::filesystem::path& path, const bool preDecode, const SoundID soundID);
 
 			static void UnloadSound(const SoundID soundID);
 
-			[[nodiscard]] static std::expected<void, CoriError<>> CreateTrack(Track* track);
+			[[nodiscard]] static std::expected<void, Core::CoriError<>> CreateTrack(Track* track);
 
 			static void DestroyTrack(const TrackID trackID);
 
-			[[nodiscard]] static std::expected<void, CoriError<>> SetTrackSound(const TrackID trackID, const Sound* sound);
+			[[nodiscard]] static std::expected<void, Core::CoriError<>> SetTrackSound(const TrackID trackID, const Sound* sound);
 
-			[[nodiscard]] static std::expected<void, CoriError<>> PlayTrack(const TrackID trackID, const PlayParams& params = {});
+			[[nodiscard]] static std::expected<void, Core::CoriError<>> PlayTrack(const TrackID trackID, const PlayParams& params = {});
 
-			[[nodiscard]] static std::expected<void, CoriError<>> StopTrack(const TrackID trackID, const int64_t fadeOutMS = 0);
+			[[nodiscard]] static std::expected<void, Core::CoriError<>> StopTrack(const TrackID trackID, const int64_t fadeOutMS = 0);
 
-			[[nodiscard]] static std::expected<void, CoriError<>> PauseTrack(const TrackID trackID);
+			[[nodiscard]] static std::expected<void, Core::CoriError<>> PauseTrack(const TrackID trackID);
 
-			[[nodiscard]] static std::expected<void, CoriError<>> ResumeTrack(const TrackID trackID);
+			[[nodiscard]] static std::expected<void, Core::CoriError<>> ResumeTrack(const TrackID trackID);
 
 			[[nodiscard]] static bool IsTrackPaused(const TrackID trackID);
 
 			[[nodiscard]] static bool IsTrackPlaying(const TrackID trackID);
 
-			[[nodiscard]] static std::expected<void, CoriError<>> SetTrackGain(const TrackID trackID, const float gain);
+			[[nodiscard]] static std::expected<void, Core::CoriError<>> SetTrackGain(const TrackID trackID, const float gain);
 
 			[[nodiscard]] static float GetTrackGain(const TrackID trackID);
 
-			[[nodiscard]] static std::expected<void, CoriError<>> TagTrack(const TrackID trackID, const char* tag);
+			[[nodiscard]] static std::expected<void, Core::CoriError<>> TagTrack(const TrackID trackID, const char* tag);
 
 			static void UntagTrack(const TrackID trackID, const char* tag);
 		private:
-			[[nodiscard]] static std::expected<int64_t, CoriError<>> MillisecondsToFrames(const TrackID trackID, const float milliseconds);
+			[[nodiscard]] static std::expected<int64_t, Core::CoriError<>> MillisecondsToFrames(const TrackID trackID, const float milliseconds);
 
 			struct Data;
 			static Data* s_Data;

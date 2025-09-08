@@ -1,0 +1,14 @@
+<map id="Cori::Graphics::CoriGraphicsAPI::Create" name="Cori::Graphics::CoriGraphicsAPI::Create">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,57,209,102"/>
+<area shape="rect" id="Node000002" href="$namespaceCori_1_1Graphics.html#ac10cdf39fd3a5b64fb82ad5cd57d4668" title=" " alt="" coords="257,5,488,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,54,256,42,290,34,291,40,257,47,206,59"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1Factory.html#a60367a81af9174d6823c87b0d53f0437" title=" " alt="" coords="302,57,443,102"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="209,76,286,76,286,82,209,82"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1Core_1_1Window.html#a675130786b522717fb797d28166b1da5" title=" " alt="" coords="300,126,445,171"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="196,100,285,123,284,128,195,105"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1Core_1_1Factory.html#a30ad48765e0f34046d7054c5d3985061" title=" " alt="" coords="536,57,677,102"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="443,76,520,76,520,82,443,82"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1Core_1_1Factory.html#a924e36be422a39be61f8329c2e90cea0" title=" " alt="" coords="725,57,867,102"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="678,76,710,76,710,82,678,82"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="759,57,758,47,764,38,777,32,796,30,816,33,829,39,826,44,815,38,796,35,779,37,768,42,763,48,765,56"/>
+</map>

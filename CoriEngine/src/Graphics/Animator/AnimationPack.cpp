@@ -26,7 +26,7 @@ namespace Cori {
 				try {
 					CORI_CORE_INFO_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadAnimator }, "Loading AnimationPack from: {}", jsonPath.string());
 					if (!f.good()) {
-						throw CoriError(std::format("Failed to open json file.", jsonPath.string()));
+						throw Core::CoriError(std::format("Failed to open json file.", jsonPath.string()));
 					}
 
 					json data = json::parse(f);
@@ -37,14 +37,14 @@ namespace Cori {
 					const std::filesystem::path atlasPath = jsonPath.parent_path() / data["meta"]["image"];
 					auto image = Image::Create(atlasPath);
 					if (!image->GetSuccessStatus()) {
-						throw CoriError(std::format("Failed to load image: {}", atlasPath.string()));
+						throw Core::CoriError(std::format("Failed to load image: {}", atlasPath.string()));
 					}
 
 					const glm::uvec2 initialImageResolution = { image->GetWidth(), image->GetHeight() };
 
 					auto atlas = SpriteAtlas::Create(data["meta"]["image"], image, frameResolution);
 					if (!atlas->GetSuccessStatus()) {
-						throw CoriError(std::format("Failed to load Sprite Atlas from: {}", atlasPath.string()));
+						throw Core::CoriError(std::format("Failed to load Sprite Atlas from: {}", atlasPath.string()));
 					}
 
 					std::vector<std::pair<uint32_t, json>> sortedFrameItems;
@@ -73,7 +73,7 @@ namespace Cori {
 					for (const auto& [frameIndex, frameData] : sortedFrameItems) {
 						glm::u16vec2 currentFrameResolution = { frameData["frame"]["w"], frameData["frame"]["h"] };
 						if (frameResolution != currentFrameResolution) {
-							throw CoriError(std::format("All animation frames should have the same resolution. Mismatch between frame '0' resolution: ({}, {}), and frame '{}' resolution: ({}, {})", frameResolution.x, frameResolution.y, frameIndex, currentFrameResolution.x, currentFrameResolution.y));
+							throw Core::CoriError(std::format("All animation frames should have the same resolution. Mismatch between frame '0' resolution: ({}, {}), and frame '{}' resolution: ({}, {})", frameResolution.x, frameResolution.y, frameIndex, currentFrameResolution.x, currentFrameResolution.y));
 						}
 
 						oldPos = pos;
@@ -110,7 +110,7 @@ namespace Cori {
 			}
 			if (type == CORI) {
 				try {
-					throw CoriError("Cori animation pack config type is not yet implemented.");
+					throw Core::CoriError("Cori animation pack config type is not yet implemented.");
 				}
 				catch (std::exception& e) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::AnimationPack }, "Failed to parse json file: {1}, and create the Animation Pack '{3}'. \n{0}Error: {2}. \n{0}Created a placeholder Animation Pack.", CORI_SECOND_LINE_SPACING, jsonPath.string(), e.what(), name);
@@ -122,7 +122,7 @@ namespace Cori {
 		}
 
 		std::shared_ptr<AnimationPack> AnimationPack::Create(const Descriptor& descriptor) {
-			return Create(descriptor.m_JsonPath, descriptor.m_ConfigType, Application::GetGameTimer().GetTimestep(), descriptor.m_Name);
+			return Create(descriptor.m_JsonPath, descriptor.m_ConfigType, Core::Application::GetGameTimer().GetTimestep(), descriptor.m_Name);
 		}
 
 		Animation AnimationPack::GetAnimation(const uint32_t index) {
@@ -137,7 +137,7 @@ namespace Cori {
 			frames.push_back(frame);
 			const AnimationData data(frames);
 			//return Animation(data, AssetManager::GetTexture2D(AssetPlaceholders::Texture2D), glm::vec2{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max() });
-			return Animation(data, AssetManager::Get(AssetPlaceholders::Texture2D), glm::vec2{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max() });
+			return Animation(data, AssetManager::Get(Internal::AssetPlaceholders::Texture2D), glm::vec2{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max() });
 		}
 
 		AnimationPack::AnimationPack(std::vector<AnimationData> animations, const std::shared_ptr<SpriteAtlas>& spriteAtlas, std::string name, const glm::u16vec2 frameResolution) : m_Animations(std::move(animations)), m_SpriteAtlas(spriteAtlas), m_Name(std::move(name)), m_FrameSize(frameResolution) {

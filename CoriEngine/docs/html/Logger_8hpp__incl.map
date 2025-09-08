@@ -1,0 +1,21 @@
+<map id="Logger.hpp" name="Logger.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="660,5,754,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,90,129,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="660,26,436,43,289,60,142,84,124,88,123,82,141,78,289,55,435,38,659,20"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="153,90,272,117"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="660,28,493,47,388,63,284,84,268,87,267,82,282,78,388,58,493,42,660,22"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="295,81,452,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="661,35,468,82,467,77,659,29"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="477,90,609,117"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="682,36,584,85,582,80,679,31"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="633,81,781,126"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="710,34,710,65,704,65,704,34"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="805,81,953,126"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="736,31,821,71,818,76,733,36"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="977,81,1125,126"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="755,29,963,78,962,83,753,34"/>
+<area shape="rect" id="Node000009" href="$CleanTypeName_8hpp.html" title=" " alt="" coords="1149,90,1348,117"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="754,24,923,46,1137,78,1166,83,1165,89,1136,84,923,52,754,29"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="1372,90,1436,117"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="754,20,1063,40,1236,57,1307,67,1361,78,1368,81,1366,86,1360,84,1306,72,1235,62,1063,45,754,25"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="Cori::Audio::Mixer::Init" name="Cori::Audio::Mixer::Init">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,24,143,68"/>
+<area shape="rect" id="Node000002" href="$ref_8cpp.html#a76eadf3ad6d2d8cd8e40e7ac744372e2" title=" " alt="" coords="191,5,369,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,34,175,30,176,35,143,40"/>
+<area shape="rect" id="Node000003" href="$ref_8cpp.html#aec39f8bd29e62cf0c9fbbf22dd391cf7" title=" " alt="" coords="243,57,317,85"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="143,52,228,62,227,67,143,57"/>
+</map>

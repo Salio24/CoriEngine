@@ -3,36 +3,38 @@
 #include "WorldSystem/Components.hpp"
 
 namespace Cori {
-	class CameraController {
-	public:
-		CameraController() = default;
-		~CameraController() = default;
+	namespace Graphics {
+		class CameraController {
+		public:
+			CameraController() = default;
+			~CameraController() = default;
 
-		void CreateOrthoCamera(float left, float right, float bottom, float top, float zNear = -50.0f, float zFar = 0.0f);
+			void CreateOrthoCamera(float left, float right, float bottom, float top, float zNear = -50.0f, float zFar = 0.0f);
 
-		void SetPosition(const glm::vec2 newPos);
+			void SetPosition(const glm::vec2 newPos);
 
-		void SetRotation(const float angle);
+			void SetRotation(const float angle);
 
-		void SetZoomLevel(const float factor);
+			void SetZoomLevel(const float factor);
 
-		glm::vec2 GetPosition() const;
+			glm::vec2 GetPosition() const;
 
-		float GetRotation() const;
+			float GetRotation() const;
 
-		float GetZoomLevel() const;
+			float GetZoomLevel() const;
 
-		glm::vec2 GetSize() const;
+			glm::vec2 GetSize() const;
 
-		void RecalculateVP();
+			void RecalculateVP();
 
-		void BindCameraComponent(Components::Scene::Camera* camera) {
-			m_CurrentCameraComponent = camera;
-		}
+			void BindCameraComponent(World::Components::Scene::Camera* camera) {
+				m_CurrentCameraComponent = camera;
+			}
 
-	private:
+		private:
 
-		Components::Scene::Camera* m_CurrentCameraComponent{ nullptr };
+			World::Components::Scene::Camera* m_CurrentCameraComponent{ nullptr };
 
-	};
+		};
+	}
 }

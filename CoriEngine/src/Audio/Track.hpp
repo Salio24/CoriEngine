@@ -16,7 +16,7 @@ namespace Cori {
 		class Track : public Profiling::Trackable<Track> {
 		public:
 			// ReSharper disable once CppMemberFunctionMayBeConst
-			std::expected<void, CoriError<>> SetSound(const std::shared_ptr<Sound>& sound) {
+			std::expected<void, Core::CoriError<>> SetSound(const std::shared_ptr<Sound>& sound) {
 				if (m_Valid) {
 					if (!m_ActiveSequence) {
 						if (sound->IsValid()) {
@@ -28,39 +28,39 @@ namespace Cori {
 							return Mixer::SetTrackSound(m_ID, sound.get());
 						}
 
-						return std::unexpected(CoriError(std::format("Failed to assign Sound '{} (SoundID: {})' to Track '{} (TrackID: {})'. Sound object is invalid.", sound->m_Name, sound->m_ID, m_Name, m_ID)));
+						return std::unexpected(Core::CoriError(std::format("Failed to assign Sound '{} (SoundID: {})' to Track '{} (TrackID: {})'. Sound object is invalid.", sound->m_Name, sound->m_ID, m_Name, m_ID)));
 					}
 
-					return std::unexpected(CoriError(std::format("Failed to assign Sound '{} (SoundID: {})' to Track '{} (TrackID: {})'. A sequence is currently playing on this track. Can't assign Sound when a sequence is playing.", sound->m_Name, sound->m_ID, m_Name, m_ID)));
+					return std::unexpected(Core::CoriError(std::format("Failed to assign Sound '{} (SoundID: {})' to Track '{} (TrackID: {})'. A sequence is currently playing on this track. Can't assign Sound when a sequence is playing.", sound->m_Name, sound->m_ID, m_Name, m_ID)));
 
 				}
 
 
-				return std::unexpected(CoriError(std::format("Failed to assign Sound '{} (SoundID: {})' to Track '{} (TrackID: {})'. Track object is invalid.", sound->m_Name, sound->m_ID, m_Name, m_ID)));
+				return std::unexpected(Core::CoriError(std::format("Failed to assign Sound '{} (SoundID: {})' to Track '{} (TrackID: {})'. Track object is invalid.", sound->m_Name, sound->m_ID, m_Name, m_ID)));
 			}
 
 			// ReSharper disable once CppMemberFunctionMayBeConst
-			std::expected<void, CoriError<>> Play(const PlayParams& params = PlayParams{}) {
+			std::expected<void, Core::CoriError<>> Play(const PlayParams& params = PlayParams{}) {
 				if (m_Valid) {
 					if (!m_ActiveSequence) {
 						CORI_CORE_TRACE_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "Playing Track '{} (TrackID: {})'", m_Name, m_ID);
 						return Mixer::PlayTrack(m_ID, params);
 					}
 
-					return std::unexpected(CoriError(std::format("Failed to play Track '{} (TrackID: {})'. A sequence is currently playing on this track. Can't play Sound when a sequence is playing.", m_Name, m_ID)));
+					return std::unexpected(Core::CoriError(std::format("Failed to play Track '{} (TrackID: {})'. A sequence is currently playing on this track. Can't play Sound when a sequence is playing.", m_Name, m_ID)));
 				}
 
-				return std::unexpected(CoriError(std::format("Failed to play Track '{} (TrackID: {})'. Track object is invalid.", m_Name, m_ID)));
+				return std::unexpected(Core::CoriError(std::format("Failed to play Track '{} (TrackID: {})'. Track object is invalid.", m_Name, m_ID)));
 			}
 
-			std::expected<void, CoriError<>> PlaySoundWithParams(SoundWithParams& object) {
+			std::expected<void, Core::CoriError<>> PlaySoundWithParams(SoundWithParams& object) {
 				return SetSound(object.first).and_then([this, object] {
 					return Play(object.second);
 				});
 			}
 
 			// FIXME: reduce the possible Play/Stop func pairs to one that will handle both sequence and simple play operations
-			std::expected<void, CoriError<>> StartSequence(const IsSoundWithParams auto&... sequence) {
+			std::expected<void, Core::CoriError<>> StartSequence(const IsSoundWithParams auto&... sequence) {
 				static_assert(sizeof...(sequence) > 2, "Sequence should contain at least 2 SoundWithParams objects.");
 				if (m_Valid) {
 					if (!m_ActiveSequence) {
@@ -138,15 +138,15 @@ namespace Cori {
 						return {};
 					}
 
-					return std::unexpected(CoriError(std::format("Failed to play sequence on Track '{} (TrackID: {})'. A sequence is already playing on this track.", m_Name, m_ID)));
+					return std::unexpected(Core::CoriError(std::format("Failed to play sequence on Track '{} (TrackID: {})'. A sequence is already playing on this track.", m_Name, m_ID)));
 				}
 
-				return std::unexpected(CoriError(std::format("Failed to play sequence on Track '{} (TrackID: {})'. Track object is invalid.", m_Name, m_ID)));
+				return std::unexpected(Core::CoriError(std::format("Failed to play sequence on Track '{} (TrackID: {})'. Track object is invalid.", m_Name, m_ID)));
 			}
 
 			// maybe add an ability to play outro sequence
 			// fadeoutms are applied only when abruptStop is true!
-			std::expected<void, CoriError<>> StopSequence(const bool abruptStop, const int64_t fadeOutMS = 0) {
+			std::expected<void, Core::CoriError<>> StopSequence(const bool abruptStop, const int64_t fadeOutMS = 0) {
 				if (m_Valid) {
 					if (m_ActiveSequence) {
 						SetTrackStopCallbackInternal([this] {
@@ -164,45 +164,45 @@ namespace Cori {
 						}
 					}
 
-					return std::unexpected(CoriError(std::format("Failed to stop sequence on Track '{} (TrackID: {})'. No sequence is currently playing on this track.", m_Name, m_ID)));
+					return std::unexpected(Core::CoriError(std::format("Failed to stop sequence on Track '{} (TrackID: {})'. No sequence is currently playing on this track.", m_Name, m_ID)));
 				}
 
-				return std::unexpected(CoriError(std::format("Failed to stop sequence on Track '{} (TrackID: {})'. Track object is invalid.", m_Name, m_ID)));
+				return std::unexpected(Core::CoriError(std::format("Failed to stop sequence on Track '{} (TrackID: {})'. Track object is invalid.", m_Name, m_ID)));
 			}
 
 
 			// ReSharper disable once CppMemberFunctionMayBeConst
-			std::expected<void, CoriError<>> Stop(const int64_t fadeOutMS) {
+			std::expected<void, Core::CoriError<>> Stop(const int64_t fadeOutMS) {
 				if (m_Valid) {
 					if (!m_ActiveSequence) {
 						CORI_CORE_TRACE_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "Stopping Track '{} (TrackID: {})'", m_Name, m_ID);
 						return Mixer::StopTrack(m_ID, fadeOutMS);
 					}
 
-					return std::unexpected(CoriError(std::format("Failed to stop Track '{} (TrackID: {})'. A sequence is currently playing on this track. Can't stop when a sequence is playing.", m_Name, m_ID)));
+					return std::unexpected(Core::CoriError(std::format("Failed to stop Track '{} (TrackID: {})'. A sequence is currently playing on this track. Can't stop when a sequence is playing.", m_Name, m_ID)));
 				}
 
-				return std::unexpected(CoriError(std::format("Failed to stop Track '{} (TrackID: {})'. Track object is invalid.", m_Name, m_ID)));
+				return std::unexpected(Core::CoriError(std::format("Failed to stop Track '{} (TrackID: {})'. Track object is invalid.", m_Name, m_ID)));
 			}
 
 			// ReSharper disable once CppMemberFunctionMayBeConst
-			std::expected<void, CoriError<>> Pause() {
+			std::expected<void, Core::CoriError<>> Pause() {
 				if (m_Valid) {
 					CORI_CORE_TRACE_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "Pausing Track '{} (TrackID: {})'", m_Name, m_ID);
 					return Mixer::PauseTrack(m_ID);
 				}
 
-				return std::unexpected(CoriError(std::format("Failed to pause Track '{} (TrackID: {})'. Track object is invalid.", m_Name, m_ID)));
+				return std::unexpected(Core::CoriError(std::format("Failed to pause Track '{} (TrackID: {})'. Track object is invalid.", m_Name, m_ID)));
 			}
 
 			// ReSharper disable once CppMemberFunctionMayBeConst
-			std::expected<void, CoriError<>> Resume() {
+			std::expected<void, Core::CoriError<>> Resume() {
 				if (m_Valid) {
 					CORI_CORE_TRACE_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "Resuming Track '{} (TrackID: {})'", m_Name, m_ID);
 					return Mixer::ResumeTrack(m_ID);
 				}
 
-				return std::unexpected(CoriError(std::format("Failed to resume Track '{} (TrackID: {})'. Track object is invalid.", m_Name, m_ID)));
+				return std::unexpected(Core::CoriError(std::format("Failed to resume Track '{} (TrackID: {})'. Track object is invalid.", m_Name, m_ID)));
 			}
 
 
@@ -223,13 +223,13 @@ namespace Cori {
 			}
 
 			// ReSharper disable once CppMemberFunctionMayBeConst
-			std::expected<void, CoriError<>> SetGain(const float gain) {
+			std::expected<void, Core::CoriError<>> SetGain(const float gain) {
 				if (m_Valid) {
 					CORI_CORE_TRACE_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "Setting Track '{} (TrackID: {})' gain to '{}'", m_Name, m_ID, gain);
 					return Mixer::SetTrackGain(m_ID, gain);
 				}
 
-				return std::unexpected(CoriError(std::format("Failed to set Track '{} (TrackID: {})' gain. Track object is invalid.", m_Name, m_ID)));
+				return std::unexpected(Core::CoriError(std::format("Failed to set Track '{} (TrackID: {})' gain. Track object is invalid.", m_Name, m_ID)));
 			}
 
 			[[nodiscard]] float GetGain() const {
@@ -241,14 +241,14 @@ namespace Cori {
 			}
 
 			// ReSharper disable once CppMemberFunctionMayBeConst
-			std::expected<void, CoriError<>> SetTag(const char* tag) {
+			std::expected<void, Core::CoriError<>> SetTag(const char* tag) {
 				if (m_Valid) {
 					CORI_CORE_TRACE_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "Assigning Tag '{}' to Track '{} (TrackID: {})'", tag, m_Name, m_ID);
 					m_CurrentTag = std::string(tag);
 					return Mixer::TagTrack(m_ID, tag);
 				}
 
-				return std::unexpected(CoriError(std::format("Failed to assign Tag '{}' to Track '{} (TrackID: {})'. Track object is invalid.", tag, m_Name, m_ID)));
+				return std::unexpected(Core::CoriError(std::format("Failed to assign Tag '{}' to Track '{} (TrackID: {})'. Track object is invalid.", tag, m_Name, m_ID)));
 			}
 
 			// ReSharper disable once CppMemberFunctionMayBeConst
@@ -306,7 +306,7 @@ namespace Cori {
 			TrackStopCallbackFn m_EngineCallBack;
 			TrackStopCallbackFn m_ClientCallBack;
 
-			std::expected<void, CoriError<>> ProcessSequencePart(const SoundWithParams& part) {
+			std::expected<void, Core::CoriError<>> ProcessSequencePart(const SoundWithParams& part) {
 				m_SoundSequence.push_back(part);
 
 				return {};

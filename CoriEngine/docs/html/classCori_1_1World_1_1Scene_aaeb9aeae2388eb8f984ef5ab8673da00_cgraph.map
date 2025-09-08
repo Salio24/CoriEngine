@@ -1,0 +1,15 @@
+<map id="Cori::World::Scene::DestroyEntity" name="Cori::World::Scene::DestroyEntity">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,159,146,203"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Scene.html#a614439ccac0344926adc4c0165d64060" title=" " alt="" coords="194,29,334,74"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,156,142,121,192,84,199,80,202,84,195,89,145,125,103,160"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="194,99,334,143"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="145,156,179,145,180,150,147,161"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="382,129,521,174"/>
+<area shape="poly" id="edge6_Node000001_Node000004" title=" " alt="" coords="146,173,367,156,367,161,146,178"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1World_1_1Entity.html#ac9d21daa112e64d4f43f54715aef21b2" title=" " alt="" coords="194,219,334,263"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="147,201,180,212,179,217,145,206"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title=" " alt="" coords="194,288,334,333"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="103,202,145,237,195,273,202,278,199,282,192,278,142,241,100,206"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="227,29,226,19,233,10,245,5,264,3,284,5,296,11,294,16,282,10,264,8,247,10,236,15,232,21,233,28"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="335,130,368,135,367,141,334,135"/>
+</map>

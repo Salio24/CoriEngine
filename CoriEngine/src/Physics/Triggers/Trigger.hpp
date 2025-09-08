@@ -8,31 +8,33 @@
 #endif
 
 namespace Cori {
-	namespace Components {
-		namespace Entity {
-			class Trigger {
-			public:
-				Trigger() = default;
-				explicit Trigger(Cori::Entity& trigger);
+	namespace World {
+		namespace Components {
+			namespace Entity {
+				class Trigger {
+				public:
+					Trigger() = default;
+					explicit Trigger(World::Entity& trigger);
 
-				void OnEnter(Cori::Entity& entity);
+					void OnEnter(World::Entity& entity);
 
-				void OnTickUpdate(const float timeStep);
+					void OnTickUpdate(const float timeStep);
 
-				void OnExit(Cori::Entity& entity);
+					void OnExit(World::Entity& entity);
 
-				template<typename Behavior>
-				void SetBehavior() {
-					static_assert(std::is_base_of_v<Physics::TriggerBehaviour, Behavior>, "Behavior must inherit from TriggerBehaviour");
-					m_Behavior = std::make_unique<Behavior>();
-					m_VisitorBuffer.clear();
-				}
+					template<typename Behavior>
+					void SetBehavior() {
+						static_assert(std::is_base_of_v<TriggerBehaviour, Behavior>, "Behavior must inherit from TriggerBehaviour");
+						m_Behavior = std::make_unique<Behavior>();
+						m_VisitorBuffer.clear();
+					}
 
-			private:
-				PackedArray<Cori::Entity, uint32_t, CORI_MAX_TRIGGER_VISITORS> m_VisitorBuffer;
+				private:
+					Core::PackedArray<World::Entity, uint32_t, CORI_MAX_TRIGGER_VISITORS> m_VisitorBuffer;
 
-				std::unique_ptr<Physics::TriggerBehaviour> m_Behavior{ nullptr };
-			};
+					std::unique_ptr<TriggerBehaviour> m_Behavior{ nullptr };
+				};
+			}
 		}
 	}
 }

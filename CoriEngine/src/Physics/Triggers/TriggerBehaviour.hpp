@@ -2,7 +2,7 @@
 #include "WorldSystem/Entity.hpp"
 
 namespace Cori {
-	namespace Physics {
+	namespace World {
 		class TriggerBehaviour {
 		public:
 			virtual ~TriggerBehaviour() = default;

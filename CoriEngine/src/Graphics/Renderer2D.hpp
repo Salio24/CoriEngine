@@ -7,7 +7,7 @@
 #include "API.hpp"
 #include "Core/Application.hpp"
 #include "Font.hpp"
-#include "Core/Utility/UTF.hpp"
+#include "Utility/UTF.hpp"
 
 #ifndef CORI_SPACES_PER_TAB
 	#define CORI_SPACES_PER_TAB 4
@@ -75,11 +75,11 @@ namespace Cori {
 				SEMI_TRANSPARENT
 			};
 
-			static void BeginScene(const Components::Scene::Camera& camera);
+			static void BeginScene(const World::Components::Scene::Camera& camera);
 
 			static void EndScene();
 
-			static void DrawScene(Scene* scene);
+			static void DrawScene(World::Scene* scene);
 
 			static void FlushRenderQueues();
 

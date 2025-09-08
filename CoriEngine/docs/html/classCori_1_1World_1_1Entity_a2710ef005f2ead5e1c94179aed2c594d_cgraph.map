@@ -1,0 +1,15 @@
+<map id="Cori::World::Entity::PrintHierarchy" name="Cori::World::Entity::PrintHierarchy">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,96,145,141"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Entity.html#ab8a030530a39a2c1b30f3bfee117d2a2" title=" " alt="" coords="193,5,332,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,93,200,55,202,60,124,98"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Entity.html#a3a9f02681e535ca7dec7da55aa6522df" title=" " alt="" coords="193,125,332,170"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="146,127,178,132,177,137,145,132"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="380,65,519,110"/>
+<area shape="poly" id="edge6_Node000001_Node000004" title=" " alt="" coords="145,110,364,92,365,97,145,115"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1World_1_1Entity.html#ac9d21daa112e64d4f43f54715aef21b2" title=" " alt="" coords="193,195,332,239"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="118,139,194,180,203,185,201,189,191,185,116,144"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="332,123,364,112,366,117,333,128"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="567,96,707,141"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="332,140,552,122,552,128,333,145"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="520,96,552,102,551,107,519,102"/>
+</map>

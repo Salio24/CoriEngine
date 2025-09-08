@@ -37,21 +37,20 @@ project(main)
         set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:>")
     endif ()
 
-
     if (NOT (
-            (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/glad2/cmake/CMakeLists.txt") AND 
-            (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/glm/CMakeLists.txt") AND 
-            (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/nlohmann_json/CMakeLists.txt") AND 
-            (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/SDL3/CMakeLists.txt") AND 
-            (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/SDL3_image/CMakeLists.txt") AND 
-            (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/SDL3_mixer/CMakeLists.txt") AND 
-            (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/spdlog/CMakeLists.txt") AND
-            (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/tmxlite/tmxlite/CMakeLists.txt") AND 
-            (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/entt/CMakeLists.txt") AND 
-            (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/imgui/LICENSE.txt") AND
-            (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/stduuid/CMakeLists.txt") AND
-            (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/utfcpp/CMakeLists.txt") AND
-            (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/thirdparty/msdf-atlas-gen/CMakeLists.txt")
+            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/glad2/cmake/CMakeLists.txt") AND
+            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/glm/CMakeLists.txt") AND
+            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/nlohmann_json/CMakeLists.txt") AND
+            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/SDL3/CMakeLists.txt") AND
+            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/SDL3_image/CMakeLists.txt") AND
+            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/SDL3_mixer/CMakeLists.txt") AND
+            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/spdlog/CMakeLists.txt") AND
+            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/tmxlite/tmxlite/CMakeLists.txt") AND
+            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/entt/CMakeLists.txt") AND
+            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/imgui/LICENSE.txt") AND
+            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/stduuid/CMakeLists.txt") AND
+            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/utfcpp/CMakeLists.txt") AND
+            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/msdf-atlas-gen/CMakeLists.txt")
             ))
         message(FATAL_ERROR "CoriEngine thirdparty dependencies not found. Are you sure you cloned the repo recursively? Try running 'git submodule update --init --recursive' to download dependencies.")
     endif()
@@ -61,12 +60,12 @@ project(main)
     add_compile_options(-Wall -Wextra -Wpedantic)
     add_compile_options(-fdiagnostics-color=always)
 
-    add_subdirectory(${PROJECT_SOURCE_DIR}/CoriEngine)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/Engine)
 
     if (CORI_BUILD_SANDBOX_APPS)
-        add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/Sandbox)
-        add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/RendererSandbox)
-        add_subdirectory(${PROJECT_SOURCE_DIR}/Apps/PhysicsSandbox)
+        add_subdirectory(${PROJECT_SOURCE_DIR}/Sandboxes/Sandbox)
+        add_subdirectory(${PROJECT_SOURCE_DIR}/Sandboxes/RendererSandbox)
+        add_subdirectory(${PROJECT_SOURCE_DIR}/Sandboxes/PhysicsSandbox)
     endif ()
 
 

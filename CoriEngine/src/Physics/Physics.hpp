@@ -95,9 +95,9 @@ namespace Cori {
 		struct ShapeUserData {
 			ShapeUserData() = default;
 
-			explicit ShapeUserData(const Entity& entity) : m_Entity(entity) {}
+			explicit ShapeUserData(const Cori::World::Entity& entity) : m_Entity(entity) {}
 
-			Entity m_Entity{};
+			Cori::World::Entity m_Entity{};
 		};
 
 		struct CastResult {

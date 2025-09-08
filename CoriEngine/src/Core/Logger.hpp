@@ -7,7 +7,7 @@
 #include <spdlog/fmt/bundled/color.h>
 #include <spdlog/fmt/bundled/base.h>
 #include <spdlog/fmt/bundled/format.h>
-#include "Core/Utility/CleanTypeName.hpp"
+#include "Utility/CleanTypeName.hpp"
 
 #if defined(__clang__)
 #define BUGTRAP __builtin_debugtrap()
@@ -20,17 +20,18 @@
 
 
 namespace Cori {
-	enum class LogLevel {
-		CORI_TRACE,
-		CORI_DEBUG,
-		CORI_INFO,
-		CORI_WARN,
-		CORI_ERROR,
-		CORI_FATAL
-	};
 
 	class Logger {
 	public:
+		enum class LogLevel {
+			CORI_TRACE,
+			CORI_DEBUG,
+			CORI_INFO,
+			CORI_WARN,
+			CORI_ERROR,
+			CORI_FATAL
+		};
+
 		struct Tags {
 			struct AssetManager {
 				static constexpr char Self[] = "Asset Manager";

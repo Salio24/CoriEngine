@@ -1,26 +1,26 @@
 #pragma once
 #include "Engine.hpp"
 
-extern Cori::Application* Cori::CreateApplication();
+extern Cori::Core::Application* Cori::Core::CreateApplication();
 
 // ReSharper disable once CppNonInlineFunctionDefinitionInHeaderFile
 int32_t main([[maybe_unused]] int32_t argc, [[maybe_unused]] char** argv) {
 
 #ifdef CORI_ASYNC_LOGGING
 #ifndef CORI_NO_FILE_LOGGING
-	Cori::Engine::Start(true, true);
+	Cori::Core::Engine::Start(true, true);
 #else
-	Cori::Engine::Start(true, false);
+	Cori::Core::Engine::Start(true, false);
 #endif
 #else 
 #ifndef CORI_NO_FILE_LOGGING
-	Cori::Engine::Start(false, true);
+	Cori::Core::Engine::Start(false, true);
 #else
-	Cori::Engine::Start(false, false);
+	Cori::Core::Engine::Start(false, false);
 #endif
 #endif
 
-	Cori::Application* app = Cori::CreateApplication();
+	Cori::Core::Application* app = Cori::Core::CreateApplication();
 
 	if (app) {
 		app->Run();
@@ -30,5 +30,5 @@ int32_t main([[maybe_unused]] int32_t argc, [[maybe_unused]] char** argv) {
 		return -1;
 	}
 
-	Cori::Engine::Stop();
+	Cori::Core::Engine::Stop();
 }

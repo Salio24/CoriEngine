@@ -1,18 +1,20 @@
 #pragma once
 namespace Cori {
-	template <typename T>
-	concept IsDescriptor = requires(const T& a, const T& b) {
-		{ a.GetRuntimeID() } -> std::same_as<uint32_t>;
-		{ a.m_Name } -> std::convertible_to<std::string>;
-		{ a == b } -> std::convertible_to<bool>;
-		typename T::AssetType;
-		typename T::Hasher;
-	};
+	namespace Internal {
+		template <typename T>
+		concept IsDescriptor = requires(const T& a, const T& b) {
+			{ a.GetRuntimeID() } -> std::same_as<uint32_t>;
+			{ a.m_Name } -> std::convertible_to<std::string>;
+			{ a == b } -> std::convertible_to<bool>;
+			typename T::AssetType;
+			typename T::Hasher;
+		};
 
-	template <typename Descriptor>
-	concept CanBeDefaultLoaded = IsDescriptor<Descriptor> && requires(const Descriptor& d) {
-		{ Descriptor::AssetType::Create(d) } -> std::same_as<std::shared_ptr<typename Descriptor::AssetType>>;
-	};
+		template <typename Descriptor>
+		concept CanBeDefaultLoaded = IsDescriptor<Descriptor> && requires(const Descriptor& d) {
+			{ Descriptor::AssetType::Create(d) } -> std::same_as<std::shared_ptr<typename Descriptor::AssetType>>;
+		};
+	}
 
 	class AssetManager {
 		struct Cache {
@@ -23,7 +25,7 @@ namespace Cori {
 		static void Init();
 		static void Shutdown();
 
-		template <CanBeDefaultLoaded Descriptor>
+		template <Internal::CanBeDefaultLoaded Descriptor>
 		static std::shared_ptr<typename Descriptor::AssetType> Get(const Descriptor& descriptor) {
 			CORI_PROFILE_FUNCTION();
 
@@ -39,7 +41,7 @@ namespace Cori {
 			return newAsset;
 		}
 
-		template <CanBeDefaultLoaded Descriptor>
+		template <Internal::CanBeDefaultLoaded Descriptor>
 		static void Preload(const std::initializer_list<Descriptor> descriptors) {
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::AssetManager::Self }, "Preloading {} <{}(s/es)>", descriptors.size(), CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType));
 			for (const auto& descriptor : descriptors) {
@@ -48,7 +50,7 @@ namespace Cori {
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::AssetManager::Self }, "Preloaded {} <{}(s/es)>", descriptors.size(), CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType));
 		}
 
-		template <IsDescriptor Descriptor>
+		template <Internal::IsDescriptor Descriptor>
 		static void Unload(const std::initializer_list<Descriptor>& descriptors) {
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::AssetManager::Self }, "Unloading {} <{}(s/es)>", descriptors.size(), CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType));
 			for (const auto& descriptor : descriptors) {

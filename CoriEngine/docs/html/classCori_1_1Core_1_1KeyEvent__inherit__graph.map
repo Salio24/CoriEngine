@@ -1,0 +1,9 @@
+<map id="Cori::Core::KeyEvent" name="Cori::Core::KeyEvent">
+<area shape="rect" id="Node000001" title=" " alt="" coords="147,81,301,109"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1KeyPressedEvent.html" title=" " alt="" coords="5,157,211,184"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="192,120,130,158,127,154,189,115"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1Core_1_1KeyReleasedEvent.html" title=" " alt="" coords="234,157,448,184"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="259,115,322,154,319,158,256,119"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1Event.html" title=" " alt="" coords="159,5,289,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="227,49,227,81,221,81,221,49"/>
+</map>

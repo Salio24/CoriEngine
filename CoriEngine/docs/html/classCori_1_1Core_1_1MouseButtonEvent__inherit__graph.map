@@ -1,0 +1,9 @@
+<map id="Cori::Core::MouseButtonEvent" name="Cori::Core::MouseButtonEvent">
+<area shape="rect" id="Node000001" title=" " alt="" coords="142,81,358,109"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1MouseButtonPressedEvent.html" title=" " alt="" coords="5,157,236,201"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="218,120,156,158,153,154,215,115"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1Core_1_1MouseButtonReleasedEvent.html" title=" " alt="" coords="260,157,499,201"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="285,115,346,154,343,158,282,120"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1Event.html" title=" " alt="" coords="185,5,315,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="252,49,252,81,247,81,247,49"/>
+</map>

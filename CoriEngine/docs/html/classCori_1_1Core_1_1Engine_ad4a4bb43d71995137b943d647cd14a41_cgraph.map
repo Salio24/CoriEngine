@@ -1,0 +1,7 @@
+<map id="Cori::Core::Engine::Start" name="Cori::Core::Engine::Start">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,36,143,81"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Logger.html#ad54a7f43253539a16a7f84a203c08317" title=" " alt="" coords="191,5,385,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,46,175,41,176,46,144,51"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Logger.html#ad5aa72017ebaac8fc14bf673492b5efb" title=" " alt="" coords="224,74,352,102"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="144,65,209,74,208,79,143,70"/>
+</map>
