@@ -129,7 +129,7 @@ namespace Cori {
 		}
 
 		std::expected<void, Core::CoriError<std::filesystem::path>> Mixer::LoadSound(const std::filesystem::path& path, const bool preDecode, const SoundID soundID) {
-			const auto result = MIX_LoadAudio(s_Data->m_Mixer, path.c_str(), preDecode);
+			const auto result = MIX_LoadAudio(s_Data->m_Mixer, path.string().c_str(), preDecode);
 			if (!result) {
 				return std::unexpected(Core::CoriError<std::filesystem::path>(std::format("Failed to load Sound. SDL_Error: {}", SDL_GetError()), "Path", path));
 			}

@@ -7,7 +7,7 @@ project(CoriEngine)
     #engine assets
     set(ENGINE_ASSETS_DIR "${CORI_ENGINE_SOURCE_DIR}/enginedata")
 
-    cmake_path(CONVERT "${ENGINE_ASSETS_DIR}" TO_NATIVE_PATH_LIST ENGINEDATA_PATH)
+    cmake_path(CONVERT "${ENGINE_ASSETS_DIR}" TO_CMAKE_PATH_LIST ENGINEDATA_PATH)
 
     set(PATH_DEFINES_HEADER_IN "${CORI_ENGINE_SOURCE_DIR}/cmake/PathDefines.hpp.in")
     set(PATH_DEFINES_HEADER_OUT "${CMAKE_CURRENT_BINARY_DIR}/generated/PathDefinesGenerated.hpp")
@@ -137,6 +137,7 @@ project(CoriEngine)
     set(MSDF_ATLAS_USE_VCPKG OFF CACHE BOOL "")
     set(MSDF_ATLAS_INSTALL ON CACHE BOOL "")
     set(MSDF_ATLAS_USE_SKIA OFF CACHE BOOL "")
+    set(MSDFGEN_DISABLE_PNG OFF CACHE BOOL "")
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/msdf-atlas-gen EXCLUDE_FROM_ALL)
 
 

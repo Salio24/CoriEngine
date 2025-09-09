@@ -9,7 +9,7 @@ namespace Cori {
 			std::shared_ptr<Font> coriFont = nullptr;
 			msdfgen::FreetypeHandle* ft = msdfgen::initializeFreetype();
 			CORI_CORE_ASSERT(ft, "Failed to initialize FreeType when loading Font");
-			msdfgen::FontHandle* font = msdfgen::loadFont(ft, path.c_str());
+			msdfgen::FontHandle* font = msdfgen::loadFont(ft, path.string().c_str());
 			if (font) {
 				coriFont.reset(new Font(static_cast<void*>(font), charsets, path, minimalScale, miterLimit));
 				CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Loaded Font from '{}' successfully.", path.string());

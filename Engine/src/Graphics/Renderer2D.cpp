@@ -66,7 +66,7 @@ namespace Cori {
 
 			s_Data->CharInstanceBufferBase = new Char[RendererData::MaxCharInstanceCount];
 
-			s_Data->CharInstanceShader = ShaderProgram::Create("enginedata/shaders/TextInstancedVert.glsl", "enginedata/shaders/TextInstancedFrag.glsl");
+			s_Data->CharInstanceShader = ShaderProgram::Create(std::filesystem::path(FileSystem::Internal::PathDefines::EngineDataRoot) / std::filesystem::path("shaders/TextInstancedVert.glsl"), std::filesystem::path(FileSystem::Internal::PathDefines::EngineDataRoot) /  std::filesystem::path("shaders/TextInstancedFrag.glsl"));
 
 			s_Data->WorldSpaceTransparentTextQueue.reserve(RendererData::WorldSpaceTransparentTextQueueInitialSize);
 

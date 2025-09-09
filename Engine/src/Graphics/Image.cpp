@@ -18,7 +18,7 @@ namespace Cori {
 	namespace Graphics {
 		Image::Image(const std::filesystem::path& path) {
 			if (std::filesystem::exists(path)) {
-				m_Surface = IMG_Load(path.c_str());
+				m_Surface = IMG_Load(path.string().c_str());
 			} else {
 				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Image }, "Could not find an image at the specified path: '{}', a placeholder will be loaded instead.", path.string());
 				m_Surface = IMG_Load(FileSystem::Internal::PathDefines::PlaceholderTexture);
