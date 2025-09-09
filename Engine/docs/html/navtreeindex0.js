@@ -222,8 +222,6 @@ var NAVTREEINDEX0 =
 "MouseEvent_8hpp_source.html":[4,0,0,0,0,2,1,3],
 "PackedArray_8hpp.html":[4,0,0,0,0,2,0,0],
 "PackedArray_8hpp_source.html":[4,0,0,0,0,2,0,0],
-"PathDefines_8hpp.html":[4,0,0,0,0,3,3],
-"PathDefines_8hpp_source.html":[4,0,0,0,0,3,3],
 "Physics_8cpp.html":[4,0,0,0,0,7,1],
 "Physics_8cpp_source.html":[4,0,0,0,0,7,1],
 "Physics_8hpp.html":[4,0,0,0,0,7,2],
@@ -249,5 +247,7 @@ var NAVTREEINDEX0 =
 "SceneManager_8cpp.html":[4,0,0,0,0,11,7],
 "SceneManager_8cpp_source.html":[4,0,0,0,0,11,7],
 "SceneManager_8hpp.html":[4,0,0,0,0,11,8],
-"SceneManager_8hpp_source.html":[4,0,0,0,0,11,8]
+"SceneManager_8hpp_source.html":[4,0,0,0,0,11,8],
+"Scene_8cpp.html":[4,0,0,0,0,11,4],
+"Scene_8cpp_source.html":[4,0,0,0,0,11,4]
 };

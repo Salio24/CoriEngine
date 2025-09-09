@@ -7,11 +7,11 @@ namespace Cori {
 		void API::Init() {
 			s_GraphicsAPI = CoriGraphicsAPI::Create();
 			s_GraphicsAPI->Init();
-			Graphics::Renderer2D::Init();
+			Renderer2D::Init();
 		}
 
 		void API::Shutdown() {
-			Graphics::Renderer2D::Shutdown();
+			Renderer2D::Shutdown();
 			s_GraphicsAPI.reset();
 		}
 	}

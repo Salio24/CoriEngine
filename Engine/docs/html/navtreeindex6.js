@@ -1,9 +1,5 @@
 var NAVTREEINDEX6 =
 {
-"classCori_1_1Graphics_1_1OpenGLTexture2D.html#a3904eedddef47d387c4bc06df85fb2c7":[3,0,0,3,15,8],
-"classCori_1_1Graphics_1_1OpenGLTexture2D.html#a48e28823b8e046f544fc635533895e7d":[1,0,0,3,15,4],
-"classCori_1_1Graphics_1_1OpenGLTexture2D.html#a48e28823b8e046f544fc635533895e7d":[3,0,0,3,15,4],
-"classCori_1_1Graphics_1_1OpenGLTexture2D.html#a4a03e2ee7938cf712d6f679622789012":[1,0,0,3,15,6],
 "classCori_1_1Graphics_1_1OpenGLTexture2D.html#a4a03e2ee7938cf712d6f679622789012":[3,0,0,3,15,6],
 "classCori_1_1Graphics_1_1OpenGLTexture2D.html#a4b68abd301a65b8e5e711497d61cc802":[1,0,0,3,15,2],
 "classCori_1_1Graphics_1_1OpenGLTexture2D.html#a4b68abd301a65b8e5e711497d61cc802":[3,0,0,3,15,2],
@@ -249,5 +245,9 @@ var NAVTREEINDEX6 =
 "classCori_1_1Graphics_1_1Texture.html#a4b68abd301a65b8e5e711497d61cc802a41fdad157aad4c1782d4277b6f1fab7e":[3,0,0,3,22,3,2],
 "classCori_1_1Graphics_1_1Texture.html#a4b68abd301a65b8e5e711497d61cc802a6145b73e4eafd42014a5ff8cdf57efa5":[1,0,0,3,22,3,0],
 "classCori_1_1Graphics_1_1Texture.html#a4b68abd301a65b8e5e711497d61cc802a6145b73e4eafd42014a5ff8cdf57efa5":[3,0,0,3,22,3,0],
-"classCori_1_1Graphics_1_1Texture.html#a6a26ce62697f9a927af9ed399b8aab00":[1,0,0,3,22,6]
+"classCori_1_1Graphics_1_1Texture.html#a6a26ce62697f9a927af9ed399b8aab00":[1,0,0,3,22,6],
+"classCori_1_1Graphics_1_1Texture.html#a6a26ce62697f9a927af9ed399b8aab00":[3,0,0,3,22,6],
+"classCori_1_1Graphics_1_1Texture.html#a7f6233a071b2957ce2d5d472c36680ce":[1,0,0,3,22,2],
+"classCori_1_1Graphics_1_1Texture.html#a7f6233a071b2957ce2d5d472c36680ce":[3,0,0,3,22,2],
+"classCori_1_1Graphics_1_1Texture.html#a7f6233a071b2957ce2d5d472c36680ceac0cf7cf68b09baa87bd7675fb8af653d":[1,0,0,3,22,2,0]
 };

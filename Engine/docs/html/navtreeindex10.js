@@ -1,9 +1,5 @@
 var NAVTREEINDEX10 =
 {
-"functions_func.html":[3,3,1,0],
-"functions_func_b.html":[3,3,1,1],
-"functions_func_c.html":[3,3,1,2],
-"functions_func_d.html":[3,3,1,3],
 "functions_func_e.html":[3,3,1,4],
 "functions_func_f.html":[3,3,1,5],
 "functions_func_g.html":[3,3,1,6],
@@ -249,5 +245,9 @@ var NAVTREEINDEX10 =
 "namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416aa67c1dc08ab1d1dd6da6ceb2ab25084fe":[1,0,0,1,35,224],
 "namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416aa683207fb57a7f40ad6404ff12013c92c":[1,0,0,1,35,182],
 "namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416aa6c19a0d14e54fcf5e6825ed4f6bc9e39":[1,0,0,1,35,205],
-"namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416aa6c3612cace5b8e8e41161fb7fc0b5da4":[1,0,0,1,35,99]
+"namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416aa6c3612cace5b8e8e41161fb7fc0b5da4":[1,0,0,1,35,99],
+"namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416aa6c4afc7856120096b880c13f93460baa":[1,0,0,1,35,55],
+"namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416aa6c6e630ae89358af2d49407642eb890a":[1,0,0,1,35,141],
+"namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416aa6ca883b1b29c5dcfb6bf8032f5a63bf3":[1,0,0,1,35,180],
+"namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416aa6caf367b03b18a5b198d157424879fe5":[1,0,0,1,35,140]
 };

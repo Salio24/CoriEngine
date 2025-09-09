@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['scene_0',['Scene',['../classCori_1_1World_1_1Entity.html#a032858ae1fe02d2d1170981c2af2d67c',1,'Cori::World::Entity']]]
+  ['window_0',['Window',['../structCori_1_1Core_1_1ScreenMode.html#a553f958a25683445088050a69d3de8e9',1,'Cori::Core::ScreenMode']]]
 ];

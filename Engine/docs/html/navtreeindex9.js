@@ -1,9 +1,5 @@
 var NAVTREEINDEX9 =
 {
-"classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18":[3,0,0,7,1,7],
-"classCori_1_1World_1_1Entity.html#ab03e196a48f4b4a873a6e4ab82c3ed85":[1,0,0,10,1,20],
-"classCori_1_1World_1_1Entity.html#ab03e196a48f4b4a873a6e4ab82c3ed85":[3,0,0,7,1,20],
-"classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292":[1,0,0,10,1,11],
 "classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292":[3,0,0,7,1,11],
 "classCori_1_1World_1_1Entity.html#ab6e4981e239a25bd112e40e8647cbab2":[1,0,0,10,1,22],
 "classCori_1_1World_1_1Entity.html#ab6e4981e239a25bd112e40e8647cbab2":[3,0,0,7,1,22],
@@ -204,7 +200,7 @@ var NAVTREEINDEX9 =
 "conceptCori_1_1Audio_1_1IsSoundWithParams.html":[2,0,0,0],
 "conceptCori_1_1Core_1_1AllAreExceptions.html":[1,0,0,1,31],
 "conceptCori_1_1Core_1_1AllAreExceptions.html":[2,0,1,0],
-"conceptCori_1_1FileSystem_1_1JsonSerializable.html":[1,0,0,2,3],
+"conceptCori_1_1FileSystem_1_1JsonSerializable.html":[1,0,0,2,2],
 "conceptCori_1_1FileSystem_1_1JsonSerializable.html":[2,0,2,0],
 "conceptCori_1_1Internal_1_1CanBeDefaultLoaded.html":[1,0,0,5,2],
 "conceptCori_1_1Internal_1_1CanBeDefaultLoaded.html":[2,0,3,1],
@@ -249,5 +245,9 @@ var NAVTREEINDEX9 =
 "functions_enum.html":[3,3,4],
 "functions_eval.html":[3,3,5],
 "functions_f.html":[3,3,0,5],
-"functions_func.html":[3,3,1]
+"functions_func.html":[3,3,1],
+"functions_func.html":[3,3,1,0],
+"functions_func_b.html":[3,3,1,1],
+"functions_func_c.html":[3,3,1,2],
+"functions_func_d.html":[3,3,1,3]
 };

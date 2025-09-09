@@ -4,6 +4,16 @@ project(CoriEngine)
     # hides all compiler warnings caused by subprojects
     get_filename_component(CORI_ENGINE_SOURCE_DIR ${PROJECT_SOURCE_DIR} ABSOLUTE)
 
+    #engine assets
+    set(ENGINE_ASSETS_DIR "${CORI_ENGINE_SOURCE_DIR}/enginedata")
+
+    cmake_path(CONVERT "${ENGINE_ASSETS_DIR}" TO_NATIVE_PATH_LIST ENGINEDATA_PATH)
+
+    set(PATH_DEFINES_HEADER_IN "${CORI_ENGINE_SOURCE_DIR}/cmake/PathDefines.hpp.in")
+    set(PATH_DEFINES_HEADER_OUT "${CMAKE_CURRENT_BINARY_DIR}/generated/PathDefinesGenerated.hpp")
+
+    configure_file(${PATH_DEFINES_HEADER_IN} ${PATH_DEFINES_HEADER_OUT})
+
     set(HIDE_DEPENDENCY_WARNINGS ON CACHE BOOL "")
     
     set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "") 
@@ -84,7 +94,7 @@ project(CoriEngine)
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/magic_enum EXCLUDE_FROM_ALL)
 
     #entt
-    set(ENTT_BUILD_DOCS ON CACHE BOOL "")
+    set(ENTT_BUILD_DOCS OFF CACHE BOOL "")
     set(ENTT_INCLUDE_HEADERS ON CACHE BOOL "")
     set(ENTT_INCLUDE_TOOLS ON CACHE BOOL "")
     set(ENTT_INSTALL OFF CACHE BOOL "")
@@ -129,6 +139,7 @@ project(CoriEngine)
     set(MSDF_ATLAS_USE_SKIA OFF CACHE BOOL "")
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/msdf-atlas-gen EXCLUDE_FROM_ALL)
 
+
 # project's binary setup vvv
 
     # varible sets
@@ -145,11 +156,6 @@ project(CoriEngine)
     ${CORI_ENGINE_SOURCE_DIR}/src/*.cpp
     )
 
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        add_compile_options(-g)
-        #add_compile_options(-fsanitize=address)
-    endif()
-
     # my shared lib
     add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES})
 
@@ -165,7 +171,7 @@ project(CoriEngine)
     )
 
     # compile flags just for the engine dll
-    target_compile_options(${ENGINE_LIBRARY_NAME} PRIVATE -Wall -Wextra)
+    target_compile_options(${ENGINE_LIBRARY_NAME} PRIVATE -Wall -Wextra -Wpedantic)
 
     # build binary output dir
     set_target_properties(${ENGINE_LIBRARY_NAME} PROPERTIES
@@ -176,10 +182,11 @@ project(CoriEngine)
 
     # includes
     target_include_directories(${ENGINE_LIBRARY_NAME} PUBLIC
-    ${CORI_ENGINE_SOURCE_DIR}/thirdparty/box2cpp/include
-    ${CORI_ENGINE_SOURCE_DIR}/thirdparty/ska_sort
-    ${CORI_ENGINE_SOURCE_DIR}/src
-    ${CORI_INCLUDE_DIR}
+            ${CORI_ENGINE_SOURCE_DIR}/thirdparty/box2cpp/include
+            ${CORI_ENGINE_SOURCE_DIR}/thirdparty/ska_sort
+            ${CORI_ENGINE_SOURCE_DIR}/src
+            ${CORI_INCLUDE_DIR}
+            ${CMAKE_CURRENT_BINARY_DIR}/generated
     )
 
     target_include_directories(${ENGINE_LIBRARY_NAME} PRIVATE
@@ -234,3 +241,4 @@ project(CoriEngine)
         add_subdirectory(docs)
         add_dependencies(${ENGINE_LIBRARY_NAME} CoriEngine-docs)
     endif()
+

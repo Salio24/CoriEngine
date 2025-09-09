@@ -1,5 +1,8 @@
 #pragma once
 namespace Cori {
+	namespace Core {
+		class Application;
+	}
 	namespace Internal {
 		template <typename T>
 		concept IsDescriptor = requires(const T& a, const T& b) {
@@ -22,9 +25,6 @@ namespace Cori {
 		};
 
 	public:
-		static void Init();
-		static void Shutdown();
-
 		template <Internal::CanBeDefaultLoaded Descriptor>
 		static std::shared_ptr<typename Descriptor::AssetType> Get(const Descriptor& descriptor) {
 			CORI_PROFILE_FUNCTION();
@@ -74,6 +74,10 @@ namespace Cori {
 				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::AssetManager::Self }, "Cleared cache for type <{}>", CORI_CLEAN_TYPE_NAME(AssetType));
 			}
 		}
+	protected:
+		friend Core::Application;
+		static void Init();
+		static void Shutdown();
 
 	private:
 		template <typename AssetType>

@@ -1,0 +1,17 @@
+#pragma once
+
+namespace Cori {
+	namespace FileSystem {
+		namespace Internal {
+			struct PathDefines {
+				static constexpr char EngineDataRoot[] = "@ENGINEDATA_PATH@";
+
+				static constexpr char PlaceholderTexture[] = "@ENGINEDATA_PATH@/placeholders/missing_texture32.png";
+
+				static constexpr char PlaceholderFont[] = "@ENGINEDATA_PATH@/placeholders/unifont-16.0.04.otf";
+
+				static constexpr char PlaceholderSound[] = "@ENGINEDATA_PATH@/placeholders/placeholder.ogg";
+			};
+		}
+	}
+}

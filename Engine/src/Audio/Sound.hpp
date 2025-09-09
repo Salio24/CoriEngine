@@ -1,7 +1,7 @@
 #pragma once
 #include "Profiling/Trackable.hpp"
 #include "Mixer.hpp"
-#include "../FileSystem/PathDefines.hpp"
+#include <PathDefinesGenerated.hpp>
 
 namespace Cori {
 	namespace Audio {

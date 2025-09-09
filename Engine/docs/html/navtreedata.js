@@ -68,21 +68,20 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "AABB_8hpp.html",
-"Scene_8cpp.html",
-"classCori_1_1Core_1_1AppTickEvent.html#a5a03692137df9192dcd8c8e40a18e51e",
-"classCori_1_1Core_1_1KeyPressedEvent.html#aba06db0f68390f1e14252fa08fa44f09",
-"classCori_1_1Core_1_1PackedArray.html#a4ce02e8ddf3e8eec14792c04c4d4cb45",
-"classCori_1_1Graphics_1_1CameraController.html",
-"classCori_1_1Graphics_1_1OpenGLTexture2D.html#a3904eedddef47d387c4bc06df85fb2c7",
-"classCori_1_1Graphics_1_1Texture.html#a6a26ce62697f9a927af9ed399b8aab00",
-"classCori_1_1Logger.html#ac276294e7291acf64ce1b2f57dcac45e",
-"classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18",
-"functions_func.html",
-"namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416aa6c4afc7856120096b880c13f93460baa",
-"namespaceCori_1_1Physics.html#a8047a4c99b5cdee7471cf1381a812e55af58c56c29a8632852e0d0a90e812ce21",
-"structCori_1_1Graphics_1_1AnimationFrame.html#a961f14a730f2d4668f1098dc0a44f1e2",
-"structCori_1_1Profiling_1_1InstanceMetrics.html#a179a01917fe48888a883a1c41c7d8ceb",
-"structCori_1_1World_1_1Components_1_1Scene_1_1Camera.html#ad35126a5537d298d6a59a463952e0065"
+"Scene_8hpp.html",
+"classCori_1_1Core_1_1AppTickEvent.html#a6af3ea01d151ab36276061535be27491",
+"classCori_1_1Core_1_1KeyPressedEvent.html#ad5158204e65e6ec9243543a463d76e6f",
+"classCori_1_1Core_1_1PackedArray.html#a593d763f08f1145705fcb0776edad8a8",
+"classCori_1_1Graphics_1_1CameraController.html#a1102295f544674c1719b2fab50d9857d",
+"classCori_1_1Graphics_1_1OpenGLTexture2D.html#a4a03e2ee7938cf712d6f679622789012",
+"classCori_1_1Graphics_1_1Texture.html#a7f6233a071b2957ce2d5d472c36680ceac0cf7cf68b09baa87bd7675fb8af653d",
+"classCori_1_1Logger.html#ac6be12bc1619ef60a1c782ed5682ed98",
+"classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292",
+"functions_func_e.html",
+"namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416aa71016f21a35f92a05b6b376090e1612a",
+"namespaceCori_1_1Physics.html#a9286a3fef308091ef8cd0445622b3356",
+"structCori_1_1Graphics_1_1Animation_1_1PlayParams.html#a37dccc3094a19f7411ae86284c99b145",
+"structCori_1_1Profiling_1_1InstanceMetrics.html#a9b5249a64d21417fedcd34042c78b408"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

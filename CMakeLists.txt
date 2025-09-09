@@ -30,6 +30,7 @@ endif ()
 option(CORI_BUILD_SANDBOX_APPS   "Build sandbox apps. (can break the compilation if enabled)" OFF)
 option(CORI_BUILD_DOCS "Build CoriEngine documentation" OFF)
 option(CORI_SANITIZE "Enable address sanitization" OFF)
+option(CORI_USE_AVX2 "Allows the compiler to use AVX2 instruction set. Disabled by default, gcc/clang have -march=native set by default, msvc doesn't have a default /arch: set. Setting it to ON will force AVX2 on gcc/clang/msvc." OFF)
 
 project(main)
     if(CLANG_VARIANT STREQUAL "OTHER" AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -57,12 +58,17 @@ project(main)
     endif()
     set(CMAKE_CXX_STANDARD 23)
 
-    add_compile_options(-mavx2)
-    add_compile_options(-Wall -Wextra -Wpedantic)
-    #add_compile_options(-Wno-unused-variable)
-    #add_compile_options(-Wno-unused-parameter)
-    #add_compile_options(-Wno-sign-compare)
-    add_compile_options(-fdiagnostics-color=always)
+    if (NOT MSVC AND NOT CORI_USE_AVX2)
+        add_compile_options(-march=native)
+    endif()
+
+    if (MSVC AND CORI_USE_AVX2)
+        add_compile_options(/arch:AVX2)
+    endif()
+    if(NOT MSVC AND CORI_USE_AVX2)
+        add_compile_options(-mavx2)
+    endif ()
+    #set(CMAKE_COLOR_DIAGNOSTICS ON CACHE BOOL "")
 
     add_subdirectory(${PROJECT_SOURCE_DIR}/Engine)
 
@@ -71,7 +77,5 @@ project(main)
         add_subdirectory(${PROJECT_SOURCE_DIR}/Sandboxes/RendererSandbox)
         add_subdirectory(${PROJECT_SOURCE_DIR}/Sandboxes/PhysicsSandbox)
     endif ()
-
-add_compile_options(-Wall -Wextra)
 
 

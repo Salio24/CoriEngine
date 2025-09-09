@@ -1,6 +1,6 @@
 #include "Font.hpp"
 #include "FontData.hpp"
-#include "../FileSystem/PathDefines.hpp"
+#include <PathDefinesGenerated.hpp>
 
 namespace Cori {
 	namespace Graphics {

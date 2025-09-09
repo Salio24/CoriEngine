@@ -50,7 +50,7 @@ namespace Cori {
 			}
 
 		protected:
-			friend class Core::Application;
+			friend Core::Application;
 			static void Init();
 			static void Shutdown();
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "Graphics/Texture.hpp"
-#include "FileSystem/PathDefines.hpp"
+#include <PathDefinesGenerated.hpp>
 
 namespace Cori {
 	namespace Internal {

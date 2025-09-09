@@ -1,5 +1,5 @@
 #include "SpriteAtlas.hpp"
-#include "../FileSystem/PathDefines.hpp"
+#include <PathDefinesGenerated.hpp>
 
 namespace Cori {
 	namespace Graphics {

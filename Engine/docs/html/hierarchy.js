@@ -107,7 +107,6 @@ var hierarchy =
     [ "Cori::World::Components::Entity::Name", "structCori_1_1World_1_1Components_1_1Entity_1_1Name.html", null ],
     [ "Cori::Core::PackedArray< T, SizeT, MaxSize >", "classCori_1_1Core_1_1PackedArray.html", null ],
     [ "Cori::Graphics::Texture::Params", "structCori_1_1Graphics_1_1Texture_1_1Params.html", null ],
-    [ "Cori::FileSystem::Internal::PathDefines", "structCori_1_1FileSystem_1_1Internal_1_1PathDefines.html", null ],
     [ "Cori::Audio::PlayParams", "structCori_1_1Audio_1_1PlayParams.html", null ],
     [ "Cori::Graphics::Animation::PlayParams", "structCori_1_1Graphics_1_1Animation_1_1PlayParams.html", null ],
     [ "Cori::Core::PossibleErrors< Errors >", "classCori_1_1Core_1_1PossibleErrors.html", null ],

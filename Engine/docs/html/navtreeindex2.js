@@ -1,7 +1,5 @@
 var NAVTREEINDEX2 =
 {
-"classCori_1_1Core_1_1AppTickEvent.html#a5a03692137df9192dcd8c8e40a18e51e":[3,0,0,1,2,8],
-"classCori_1_1Core_1_1AppTickEvent.html#a6af3ea01d151ab36276061535be27491":[1,0,0,1,2,2],
 "classCori_1_1Core_1_1AppTickEvent.html#a6af3ea01d151ab36276061535be27491":[3,0,0,1,2,2],
 "classCori_1_1Core_1_1AppTickEvent.html#a9dc61d6e0adcb496a74e7443cccac481":[1,0,0,1,2,4],
 "classCori_1_1Core_1_1AppTickEvent.html#a9dc61d6e0adcb496a74e7443cccac481":[3,0,0,1,2,4],
@@ -249,5 +247,7 @@ var NAVTREEINDEX2 =
 "classCori_1_1Core_1_1KeyPressedEvent.html#a797d4514adde804fd555d954f61f2793":[3,0,0,1,13,8],
 "classCori_1_1Core_1_1KeyPressedEvent.html#ab07cd18a976b0466c743d674bed2ce9a":[1,0,0,1,13,3],
 "classCori_1_1Core_1_1KeyPressedEvent.html#ab07cd18a976b0466c743d674bed2ce9a":[3,0,0,1,13,3],
-"classCori_1_1Core_1_1KeyPressedEvent.html#aba06db0f68390f1e14252fa08fa44f09":[1,0,0,1,13,0]
+"classCori_1_1Core_1_1KeyPressedEvent.html#aba06db0f68390f1e14252fa08fa44f09":[1,0,0,1,13,0],
+"classCori_1_1Core_1_1KeyPressedEvent.html#aba06db0f68390f1e14252fa08fa44f09":[3,0,0,1,13,0],
+"classCori_1_1Core_1_1KeyPressedEvent.html#ad5158204e65e6ec9243543a463d76e6f":[1,0,0,1,13,7]
 };

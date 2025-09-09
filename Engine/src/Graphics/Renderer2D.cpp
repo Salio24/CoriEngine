@@ -1,6 +1,7 @@
 #include "Renderer2D.hpp"
 #include <ska_sort.hpp>
 #include "Utility/AABB.hpp"
+#include <PathDefinesGenerated.hpp>
 #include "FontData.hpp"
 
 namespace Cori {
@@ -37,7 +38,7 @@ namespace Cori {
 
 			s_Data->QuadInstanceBufferBase = new Quad[RendererData::MaxInstanceCount];
 
-			s_Data->QuadInstanceShader = ShaderProgram::Create("enginedata/shaders/QuadInstancedVert.glsl", "enginedata/shaders/QuadInstancedFrag.glsl");
+			s_Data->QuadInstanceShader = ShaderProgram::Create(std::filesystem::path(FileSystem::Internal::PathDefines::EngineDataRoot) / std::filesystem::path("shaders/QuadInstancedVert.glsl"), std::filesystem::path(FileSystem::Internal::PathDefines::EngineDataRoot) / std::filesystem::path("shaders/QuadInstancedFrag.glsl"));
 
 			s_Data->WorldSpaceTransparentQuadQueue.reserve(RendererData::WorldSpaceTransparentQuadQueueInitialSize);
 			s_Data->WorldSpaceOpaqueQuadQueue.reserve(RendererData::WorldSpaceOpaqueQuadQueueInitialSize);

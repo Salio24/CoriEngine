@@ -41,9 +41,6 @@ var annotated_dup =
         [ "WindowResizeEvent", "classCori_1_1Core_1_1WindowResizeEvent.html", "classCori_1_1Core_1_1WindowResizeEvent" ]
       ] ],
       [ "FileSystem", "namespaceCori_1_1FileSystem.html", [
-        [ "Internal", "namespaceCori_1_1FileSystem_1_1Internal.html", [
-          [ "PathDefines", "structCori_1_1FileSystem_1_1Internal_1_1PathDefines.html", "structCori_1_1FileSystem_1_1Internal_1_1PathDefines" ]
-        ] ],
         [ "FileManager", "classCori_1_1FileSystem_1_1FileManager.html", "classCori_1_1FileSystem_1_1FileManager" ],
         [ "JsonSerializer", "classCori_1_1FileSystem_1_1JsonSerializer.html", "classCori_1_1FileSystem_1_1JsonSerializer" ]
       ] ],

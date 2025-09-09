@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['quadanimator_0',['QuadAnimator',['../structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#a0ef04065717beba854d7d2d63c9b6c46',1,'Cori::World::Components::Entity::QuadRenderer']]],
-  ['quadanimatornew_1',['QuadAnimatorNew',['../structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#aa3d84e41dcaffb217db0c34037834a20',1,'Cori::World::Components::Entity::QuadRenderer']]]
+  ['renderer2d_0',['Renderer2D',['../classCori_1_1Graphics_1_1Font.html#a5222bc319f9a1a80f91167670e26e8db',1,'Cori::Graphics::Font']]]
 ];

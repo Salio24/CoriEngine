@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['openglvertexarray_0',['OpenGLVertexArray',['../classCori_1_1Graphics_1_1OpenGLVertexBuffer.html#a289c485777837430762818029483d815',1,'Cori::Graphics::OpenGLVertexBuffer::OpenGLVertexArray()'],['../classCori_1_1Graphics_1_1OpenGLIndexBuffer.html#a289c485777837430762818029483d815',1,'Cori::Graphics::OpenGLIndexBuffer::OpenGLVertexArray()']]],
-  ['operator_3c_3c_1',['operator&lt;&lt;',['../structCori_1_1Audio_1_1PlayParams.html#a88cbcd811f59e5e32f36440c815a7da8',1,'Cori::Audio::PlayParams']]]
+  ['quadanimator_0',['QuadAnimator',['../structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#a0ef04065717beba854d7d2d63c9b6c46',1,'Cori::World::Components::Entity::QuadRenderer']]],
+  ['quadanimatornew_1',['QuadAnimatorNew',['../structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#aa3d84e41dcaffb217db0c34037834a20',1,'Cori::World::Components::Entity::QuadRenderer']]]
 ];

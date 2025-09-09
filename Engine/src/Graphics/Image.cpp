@@ -1,5 +1,5 @@
 #include "Image.hpp"
-#include "../FileSystem/PathDefines.hpp"
+#include <PathDefinesGenerated.hpp>
 #include <SDL3_image/SDL_image.h>
 
 namespace {

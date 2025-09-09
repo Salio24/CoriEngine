@@ -11,6 +11,5 @@ var classCori_1_1Graphics_1_1API =
     [ "SetClearColor", "classCori_1_1Graphics_1_1API.html#aa4725bd17a24014c86e9881770b5906c", null ],
     [ "SetDepthMask", "classCori_1_1Graphics_1_1API.html#ae4804b495376e5f9845104ddafb85922", null ],
     [ "SetViewport", "classCori_1_1Graphics_1_1API.html#ad905aa90475acc45c5e37818a0fdd227", null ],
-    [ "Shutdown", "classCori_1_1Graphics_1_1API.html#a5f311499459a478be38d5f3c764146a8", null ],
-    [ "Core::Application", "classCori_1_1Graphics_1_1API.html#a857ea1a81cbbe25db2db331f4e6ac125", null ]
+    [ "Shutdown", "classCori_1_1Graphics_1_1API.html#a5f311499459a478be38d5f3c764146a8", null ]
 ];
