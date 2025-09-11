@@ -1,5 +1,5 @@
 <map id="Cori::Core::Application::Run" name="Cori::Core::Application::Run">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,48,205,76"/>
+<area shape="rect" id="Node000001" title="Run loop, internal." alt="" coords="5,48,205,76"/>
 <area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1API.html#a9f8a49bfbd988d82c7b46b96a611ac0e" title=" " alt="" coords="253,5,396,50"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,45,237,39,238,44,197,51"/>
 <area shape="rect" id="Node000003" href="$classCori_1_1Graphics_1_1API.html#aa4725bd17a24014c86e9881770b5906c" title=" " alt="" coords="254,75,395,119"/>

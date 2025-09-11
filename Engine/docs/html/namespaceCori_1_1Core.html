@@ -134,7 +134,9 @@ Concepts</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:afc36a1b3e23811692c4ee44e864d7736" id="r_afc36a1b3e23811692c4ee44e864d7736"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="#ac30a2dd14b7822e0fa5173507ca9416a">Cori::Core::CoriKeycode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afc36a1b3e23811692c4ee44e864d7736">CoriKeycode</a></td></tr>
+<tr class="memdesc:afc36a1b3e23811692c4ee44e864d7736"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is a adaptation of SDL3 scancodes. Taken from 'SDL_scancode.h'.  <br /></td></tr>
 <tr class="memitem:a4bc46a5af3c5f8cd4255abdb2d967c45" id="r_a4bc46a5af3c5f8cd4255abdb2d967c45"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="#ab53f79e2cbbc7ea34fba4a55d0d61d86">Cori::Core::CoriMouseCode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4bc46a5af3c5f8cd4255abdb2d967c45">CoriMouseCode</a></td></tr>
+<tr class="memdesc:a4bc46a5af3c5f8cd4255abdb2d967c45"><td class="mdescLeft">&#160;</td><td class="mdescRight">An enum of all available mouse buttons.  <br /></td></tr>
 <tr class="memitem:a08e9d123ca1f41c356257d96fc97c241" id="r_a08e9d123ca1f41c356257d96fc97c241"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a08e9d123ca1f41c356257d96fc97c241">EventCallbackFn</a> = std::function&lt;void(<a class="el" href="classCori_1_1Core_1_1Event.html">Event</a>&amp;)&gt;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-enum-members" class="groupheader"><a id="enum-members" name="enum-members"></a>
@@ -453,6 +455,7 @@ Enumerations</h2></td></tr>
 &#160;&#160;<a class="el" href="#ac30a2dd14b7822e0fa5173507ca9416aacad8101c23ed3abdc6788dfd298d999e">CORI_KEY_COUNT</a> = 512
 <br />
  }</td></tr>
+<tr class="memdesc:ac30a2dd14b7822e0fa5173507ca9416a"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is a adaptation of SDL3 scancodes. Taken from 'SDL_scancode.h'.  <a href="#ac30a2dd14b7822e0fa5173507ca9416a">More...</a><br /></td></tr>
 <tr class="memitem:ab53f79e2cbbc7ea34fba4a55d0d61d86" id="r_ab53f79e2cbbc7ea34fba4a55d0d61d86"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab53f79e2cbbc7ea34fba4a55d0d61d86">CoriMouseCode</a> { <br />
 &#160;&#160;<a class="el" href="#ab53f79e2cbbc7ea34fba4a55d0d61d86a3e32cfc4e839224f7716c37edf3f5ce7">CORI_MOUSEBUTTON_UNKNOWN</a> = 0
 , <a class="el" href="#ab53f79e2cbbc7ea34fba4a55d0d61d86ad6c412235ced2eeeb1066e61f75fbdd2">CORI_MOUSEBUTTON_LEFT</a> = 1
@@ -463,6 +466,7 @@ Enumerations</h2></td></tr>
 , <a class="el" href="#ab53f79e2cbbc7ea34fba4a55d0d61d86a40a4d390cf3fe85daea193d076235d3a">CORI_MOUSEBUTTON_X2</a> = 5
 <br />
  }</td></tr>
+<tr class="memdesc:ab53f79e2cbbc7ea34fba4a55d0d61d86"><td class="mdescLeft">&#160;</td><td class="mdescRight">An enum of all available mouse buttons.  <a href="#ab53f79e2cbbc7ea34fba4a55d0d61d86">More...</a><br /></td></tr>
 <tr class="memitem:abcfaf65cf7455cdc2b49a7fee4c5d10d" id="r_abcfaf65cf7455cdc2b49a7fee4c5d10d"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abcfaf65cf7455cdc2b49a7fee4c5d10d">EventType</a> { <br />
 &#160;&#160;<a class="el" href="#abcfaf65cf7455cdc2b49a7fee4c5d10da6adf97f83acf6453d4a6a4b1070f3754">None</a> = 0
 , <a class="el" href="#abcfaf65cf7455cdc2b49a7fee4c5d10dac984201d37197ab297a14d19efee4b07">WindowClose</a>
@@ -523,6 +527,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>This is a adaptation of SDL3 scancodes. Taken from 'SDL_scancode.h'. </p>
+
 </div>
 </div>
 <a id="a4bc46a5af3c5f8cd4255abdb2d967c45" name="a4bc46a5af3c5f8cd4255abdb2d967c45"></a>
@@ -536,6 +542,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>An enum of all available mouse buttons. </p>
 
 </div>
 </div>
@@ -567,6 +575,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>This is a adaptation of SDL3 scancodes. Taken from 'SDL_scancode.h'. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ac30a2dd14b7822e0fa5173507ca9416aadca3d71f9d32fd0ac5758105a9d46072" name="ac30a2dd14b7822e0fa5173507ca9416aadca3d71f9d32fd0ac5758105a9d46072"></a>CORI_KEY_UNKNOWN&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ac30a2dd14b7822e0fa5173507ca9416aa5163601d31a87cef670c8f051637d3ad" name="ac30a2dd14b7822e0fa5173507ca9416aa5163601d31a87cef670c8f051637d3ad"></a>CORI_KEY_A&#160;</td><td class="fielddoc"></td></tr>
@@ -888,7 +898,7 @@ Functions</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="CoriKeycodes_8hpp_source.html#l00009">9</a> of file <a class="el" href="CoriKeycodes_8hpp_source.html">CoriKeycodes.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="CoriKeycodes_8hpp_source.html#l00012">12</a> of file <a class="el" href="CoriKeycodes_8hpp_source.html">CoriKeycodes.hpp</a>.</p>
 
 </div>
 </div>
@@ -903,6 +913,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>An enum of all available mouse buttons. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ab53f79e2cbbc7ea34fba4a55d0d61d86a3e32cfc4e839224f7716c37edf3f5ce7" name="ab53f79e2cbbc7ea34fba4a55d0d61d86a3e32cfc4e839224f7716c37edf3f5ce7"></a>CORI_MOUSEBUTTON_UNKNOWN&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ab53f79e2cbbc7ea34fba4a55d0d61d86ad6c412235ced2eeeb1066e61f75fbdd2" name="ab53f79e2cbbc7ea34fba4a55d0d61d86ad6c412235ced2eeeb1066e61f75fbdd2"></a>CORI_MOUSEBUTTON_LEFT&#160;</td><td class="fielddoc"></td></tr>
@@ -912,7 +924,7 @@ Functions</h2></td></tr>
 <tr><td class="fieldname"><a id="ab53f79e2cbbc7ea34fba4a55d0d61d86a40a4d390cf3fe85daea193d076235d3a" name="ab53f79e2cbbc7ea34fba4a55d0d61d86a40a4d390cf3fe85daea193d076235d3a"></a>CORI_MOUSEBUTTON_X2&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="CoriMouseCodes_8hpp_source.html#l00009">9</a> of file <a class="el" href="CoriMouseCodes_8hpp_source.html">CoriMouseCodes.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="CoriMouseCodes_8hpp_source.html#l00012">12</a> of file <a class="el" href="CoriMouseCodes_8hpp_source.html">CoriMouseCodes.hpp</a>.</p>
 
 </div>
 </div>
@@ -1035,7 +1047,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="CoriKeycodes_8hpp_source.html#l00388">388</a> of file <a class="el" href="CoriKeycodes_8hpp_source.html">CoriKeycodes.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="CoriKeycodes_8hpp_source.html#l00391">391</a> of file <a class="el" href="CoriKeycodes_8hpp_source.html">CoriKeycodes.hpp</a>.</p>
 
 </div>
 </div>
@@ -1062,7 +1074,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="CoriMouseCodes_8hpp_source.html#l00018">18</a> of file <a class="el" href="CoriMouseCodes_8hpp_source.html">CoriMouseCodes.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="CoriMouseCodes_8hpp_source.html#l00021">21</a> of file <a class="el" href="CoriMouseCodes_8hpp_source.html">CoriMouseCodes.hpp</a>.</p>
 
 </div>
 </div>

@@ -13,6 +13,7 @@
 # build directories 
 */bin/*
 Engine/bin
+/Engine/docs/temp/*
 
 # git submodules 
 /Engine/thirdparty/freetype/*
