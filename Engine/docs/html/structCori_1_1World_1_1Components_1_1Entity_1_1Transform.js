@@ -13,10 +13,6 @@ var structCori_1_1World_1_1Components_1_1Entity_1_1Transform =
     [ "SetLocalPosition", "structCori_1_1World_1_1Components_1_1Entity_1_1Transform.html#a1d9aa082eb8a4be7e5caeb8900e68dd1", null ],
     [ "SetLocalRotation", "structCori_1_1World_1_1Components_1_1Entity_1_1Transform.html#a2d454e078cc8f8d2bae01263bad4d1f8", null ],
     [ "SetLocalScale", "structCori_1_1World_1_1Components_1_1Entity_1_1Transform.html#a79f932caf72a51ff4c7006312c00de41", null ],
-    [ "m_LastParentTransform", "structCori_1_1World_1_1Components_1_1Entity_1_1Transform.html#ae4666f58d2dbda7005b8047663b8f0f2", null ],
-    [ "m_LocalPosition", "structCori_1_1World_1_1Components_1_1Entity_1_1Transform.html#a18b0ef5f29f262ce7e182994e52cf0ca", null ],
-    [ "m_LocalRotation", "structCori_1_1World_1_1Components_1_1Entity_1_1Transform.html#a5a3a3bc20f4f086a8cf0e2d19e4cc52a", null ],
-    [ "m_LocalScale", "structCori_1_1World_1_1Components_1_1Entity_1_1Transform.html#a2af166fbdfb49cc14dd4c8ca1eac2cae", null ],
     [ "m_WorldDepth", "structCori_1_1World_1_1Components_1_1Entity_1_1Transform.html#a55f07c82e341f89b1b44b13b10a69afc", null ],
     [ "m_WorldTransform", "structCori_1_1World_1_1Components_1_1Entity_1_1Transform.html#a3518d43be0aae8682f399c2d5a7e06ef", null ]
 ];

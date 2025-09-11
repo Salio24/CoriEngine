@@ -15,12 +15,8 @@ var structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer =
     [ "SetUVs", "structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#a30dafc51829488c8fcadb42a56f943ee", null ],
     [ "QuadAnimator", "structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#a0ef04065717beba854d7d2d63c9b6c46", null ],
     [ "QuadAnimatorNew", "structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#aa3d84e41dcaffb217db0c34037834a20", null ],
-    [ "m_AnimatorBound", "structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#a2b0422a998169709d7ab86bbb5310ca4", null ],
     [ "m_FlatColored", "structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#a27892501df7b6d1527717ccc079ab95a", null ],
     [ "m_FlipX", "structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#a9d32ae08ef6892aeb6c3dd1bb263ac33", null ],
     [ "m_FlipY", "structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#a421b9a4b4a8d2aa4522d5826e99227b5", null ],
-    [ "m_HalfSize", "structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#acaefc5ea615b3f91abc0db90cea0d27c", null ],
-    [ "m_Texture", "structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#ab6116934e2c5db399e48451751e9fa0e", null ],
-    [ "m_UVs", "structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#a8a5cf34ac23161eaff7f81da73d477ab", null ],
     [ "m_Visible", "structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#aee9740eda4b7d11e1b83ace8054d28f4", null ]
 ];

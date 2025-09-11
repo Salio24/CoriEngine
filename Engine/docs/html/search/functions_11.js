@@ -10,7 +10,7 @@ var searchData=
   ['registerinfactory_7',['RegisterInFactory',['../classCori_1_1Core_1_1RegisterInFactory.html#aaeb2414bd692b7ecc03bd83a445a7cf6',1,'Cori::Core::RegisterInFactory::RegisterInFactory()=default'],['../classCori_1_1Core_1_1RegisterInFactory.html#a97f7d4a0d52520066d892f51a10eedb2',1,'Cori::Core::RegisterInFactory::RegisterInFactory(const RegisterInFactory &amp;)=delete'],['../classCori_1_1Core_1_1RegisterInFactory.html#a7635a6644bdb1c44ebe98e93caa1166f',1,'Cori::Core::RegisterInFactory::RegisterInFactory(RegisterInFactory &amp;&amp;)=delete']]],
   ['registershared_8',['RegisterShared',['../classCori_1_1Core_1_1Factory.html#a1e34f4c32307a455c2735ebb4377948e',1,'Cori::Core::Factory']]],
   ['registerunique_9',['RegisterUnique',['../classCori_1_1Core_1_1Factory.html#a53481a4bf94c50087164f2670a63a3b5',1,'Cori::Core::Factory']]],
-  ['remove_10',['remove',['../classCori_1_1Core_1_1PackedArray.html#a4ce02e8ddf3e8eec14792c04c4d4cb45',1,'Cori::Core::PackedArray']]],
+  ['remove_10',['remove',['../classCori_1_1Core_1_1PackedArray.html#a4ce02e8ddf3e8eec14792c04c4d4cb45',1,'Cori::Core::PackedArray::remove(const T &amp;value)'],['../classCori_1_1Core_1_1PackedArray.html#a2172972a5bcecc91f8509eca6c0bbf0b',1,'Cori::Core::PackedArray::remove(const SizeT index)']]],
   ['removecomponents_11',['RemoveComponents',['../classCori_1_1World_1_1Entity.html#ad1050e27aa9c1b96e84f980bd22b3374',1,'Cori::World::Entity']]],
   ['removecontextcomponent_12',['RemoveContextComponent',['../classCori_1_1World_1_1Scene.html#aa5c985337a6935ad59ac7b1575eb40aa',1,'Cori::World::Scene::RemoveContextComponent()'],['../classCori_1_1World_1_1SceneHandle.html#a85d9fd05a971c364850b2b7b783330e4',1,'Cori::World::SceneHandle::RemoveContextComponent()']]],
   ['removeentityfromcache_13',['RemoveEntityFromCache',['../classCori_1_1World_1_1Scene.html#a66bb5445666fe8e95b9522f86e1e4beb',1,'Cori::World::Scene::RemoveEntityFromCache()'],['../classCori_1_1World_1_1SceneHandle.html#a4ddaa82febc6a67740b05dfb59e44235',1,'Cori::World::SceneHandle::RemoveEntityFromCache()']]],
@@ -23,7 +23,6 @@ var searchData=
   ['resume_20',['Resume',['../classCori_1_1Audio_1_1Track.html#aa0dbf9c5885f0b5b30e81080994670c8',1,'Cori::Audio::Track']]],
   ['resumealltracks_21',['ResumeAllTracks',['../classCori_1_1Audio_1_1Mixer.html#adad9ad27587cc1dc51a92cf3154f8195',1,'Cori::Audio::Mixer']]],
   ['resumetag_22',['ResumeTag',['../classCori_1_1Audio_1_1Mixer.html#ab3149caca78d862fec8c7b961351d18b',1,'Cori::Audio::Mixer']]],
-  ['resumetrack_23',['ResumeTrack',['../classCori_1_1Audio_1_1Mixer.html#ae59fe1baac8964b016477519ebed56a8',1,'Cori::Audio::Mixer']]],
-  ['rigidbody_24',['Rigidbody',['../structCori_1_1World_1_1Components_1_1Entity_1_1Rigidbody.html#a357d48d0c19d74b6cecfa899f6a7d063',1,'Cori::World::Components::Entity::Rigidbody']]],
-  ['run_25',['Run',['../classCori_1_1Core_1_1Application.html#a8755f2d4b93f79f760688246a54a5f7f',1,'Cori::Core::Application']]]
+  ['rigidbody_23',['Rigidbody',['../structCori_1_1World_1_1Components_1_1Entity_1_1Rigidbody.html#a357d48d0c19d74b6cecfa899f6a7d063',1,'Cori::World::Components::Entity::Rigidbody']]],
+  ['run_24',['Run',['../classCori_1_1Core_1_1Application.html#a8755f2d4b93f79f760688246a54a5f7f',1,'Cori::Core::Application']]]
 ];

@@ -84,12 +84,12 @@ namespace Cori {
 			return s_Instance->m_LayerStack.PushOverlayToQueue(overlay);
 		}
 
-		void Application::PopLayer(Layer* layer) {
-			s_Instance->m_LayerStack.PopLayerToQueue(layer);
+		void Application::PopLayer() {
+			s_Instance->m_LayerStack.PopLayerToQueue();
 		}
 
-		void Application::PopOverlay(Layer* overlay) {
-			s_Instance->m_LayerStack.PopOverlayToQueue(overlay);
+		void Application::PopOverlay() {
+			s_Instance->m_LayerStack.PopOverlayToQueue();
 		}
 
 		void Application::SetBackgroundColor(const glm::vec4& color) {

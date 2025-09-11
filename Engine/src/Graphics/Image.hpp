@@ -18,7 +18,7 @@ namespace Cori {
 
 			std::expected<void, Core::CoriError<>> AddPadding(const glm::u16vec2 spriteResolution);
 
-			static std::shared_ptr<Image> Create(const std::filesystem::path& path);
+			[[nodiscard]] static std::shared_ptr<Image> Create(const std::filesystem::path& path);
 
 			~Image();
 

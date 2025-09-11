@@ -97,17 +97,24 @@ $(function(){initNavTree('structCori_1_1Audio_1_1PlayParams.html','','structCori
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a986b36c033309b59c427e95641f236d8" id="r_a986b36c033309b59c427e95641f236d8"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a986b36c033309b59c427e95641f236d8">Stringify</a> () const</td></tr>
+<tr class="memitem:a8ba6c7e3b633897ab0e3f9e4cd49e6fa" id="r_a8ba6c7e3b633897ab0e3f9e4cd49e6fa"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8ba6c7e3b633897ab0e3f9e4cd49e6fa">ToString</a> () const</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a9f7cb5db8e9f87d36db1c4003014bbc1" id="r_a9f7cb5db8e9f87d36db1c4003014bbc1"><td class="memItemLeft" align="right" valign="top">int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9f7cb5db8e9f87d36db1c4003014bbc1">Loops</a> { 0 }</td></tr>
+<tr class="memdesc:a9f7cb5db8e9f87d36db1c4003014bbc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of times to loop the track when it reaches the end. A value of -1 will result in an infinite loop.  <br /></td></tr>
 <tr class="memitem:a2711d88dd523b7e42b77b81abd3df734" id="r_a2711d88dd523b7e42b77b81abd3df734"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2711d88dd523b7e42b77b81abd3df734">MaxMilliseconds</a> { -1.0f }</td></tr>
+<tr class="memdesc:a2711d88dd523b7e42b77b81abd3df734"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mix at most n milliseconds. Default -1.0f, mixes all available audio.  <br /></td></tr>
 <tr class="memitem:ae0c6be8fc409fe6923630e4f2b152fcd" id="r_ae0c6be8fc409fe6923630e4f2b152fcd"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae0c6be8fc409fe6923630e4f2b152fcd">StartMillisecond</a> { 0.0f }</td></tr>
+<tr class="memdesc:ae0c6be8fc409fe6923630e4f2b152fcd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start mixing at n'th millisecond. Values &lt;=0 will result in mixing from the very beginning of the tracks input.  <br /></td></tr>
 <tr class="memitem:aa6ef437d9e2d577f89600e442b15c526" id="r_aa6ef437d9e2d577f89600e442b15c526"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa6ef437d9e2d577f89600e442b15c526">LoopStartMillisecond</a> { 0.0f }</td></tr>
+<tr class="memdesc:aa6ef437d9e2d577f89600e442b15c526"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start looping at n'th millisecond. Values &lt;=0 will result in looping from the very beginning of the tracks input.  <br /></td></tr>
 <tr class="memitem:acaf17849d16d523ef157a57a4138d7f7" id="r_acaf17849d16d523ef157a57a4138d7f7"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acaf17849d16d523ef157a57a4138d7f7">FadeInMilliseconds</a> { 0.0f }</td></tr>
+<tr class="memdesc:acaf17849d16d523ef157a57a4138d7f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fade in the audio over n milliseconds. Will start from silence and reach full volume smoothly. A value &lt;= 0 disables fade in.  <br /></td></tr>
 <tr class="memitem:aeb8ace6957ee04cc03226a54abf9c06e" id="r_aeb8ace6957ee04cc03226a54abf9c06e"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aeb8ace6957ee04cc03226a54abf9c06e">AppendSilenceMilliseconds</a> { 0.0f }</td></tr>
+<tr class="memdesc:aeb8ace6957ee04cc03226a54abf9c06e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Append n milliseconds to the end of a track after all loops (specified in <a class="el" href="#a9f7cb5db8e9f87d36db1c4003014bbc1" title="Number of times to loop the track when it reaches the end. A value of -1 will result in an infinite l...">PlayParams::Loops</a>) are complete. A value &lt;= 0 appends nothing.  <br /></td></tr>
 <tr class="memitem:a9eca5a8ae949a614398528118812a577" id="r_a9eca5a8ae949a614398528118812a577"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9eca5a8ae949a614398528118812a577">LoopedInSequence</a> { true }</td></tr>
+<tr class="memdesc:a9eca5a8ae949a614398528118812a577"><td class="mdescLeft">&#160;</td><td class="mdescRight">This value is used to define a sequence looping point when passing a sequence to <a class="el" href="classCori_1_1Audio_1_1Track.html#af95ff936e9195d03eba3409f4387f2a8" title="Plays a single or a sequence of SoundWithParams objects.">Track::Play</a>, this value is ignored everywhere else.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-friends" class="groupheader"><a id="friends" name="friends"></a>
 Friends</h2></td></tr>
@@ -117,8 +124,8 @@ Friends</h2></td></tr>
 <div class="textblock">
 <p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00014">14</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="a986b36c033309b59c427e95641f236d8" name="a986b36c033309b59c427e95641f236d8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a986b36c033309b59c427e95641f236d8">&#9670;&#160;</a></span>Stringify()</h2>
+<a id="a8ba6c7e3b633897ab0e3f9e4cd49e6fa" name="a8ba6c7e3b633897ab0e3f9e4cd49e6fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ba6c7e3b633897ab0e3f9e4cd49e6fa">&#9670;&#160;</a></span>ToString()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -127,7 +134,7 @@ Friends</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::string Cori::Audio::PlayParams::Stringify </td>
+          <td class="memname">std::string Cori::Audio::PlayParams::ToString </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
@@ -140,7 +147,7 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00034">34</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00061">61</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
 
 </div>
 </div>
@@ -172,7 +179,7 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00023">23</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00050">50</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
 
 </div>
 </div>
@@ -189,7 +196,9 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00020">20</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
+<p>Append n milliseconds to the end of a track after all loops (specified in <a class="el" href="#a9f7cb5db8e9f87d36db1c4003014bbc1" title="Number of times to loop the track when it reaches the end. A value of -1 will result in an infinite l...">PlayParams::Loops</a>) are complete. A value &lt;= 0 appends nothing. </p>
+
+<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00043">43</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
 
 </div>
 </div>
@@ -205,7 +214,9 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00019">19</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
+<p>Fade in the audio over n milliseconds. Will start from silence and reach full volume smoothly. A value &lt;= 0 disables fade in. </p>
+
+<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00038">38</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
 
 </div>
 </div>
@@ -221,7 +232,9 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00021">21</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
+<p>This value is used to define a sequence looping point when passing a sequence to <a class="el" href="classCori_1_1Audio_1_1Track.html#af95ff936e9195d03eba3409f4387f2a8" title="Plays a single or a sequence of SoundWithParams objects.">Track::Play</a>, this value is ignored everywhere else. </p>
+
+<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00048">48</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
 
 </div>
 </div>
@@ -237,7 +250,9 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00015">15</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
+<p>Number of times to loop the track when it reaches the end. A value of -1 will result in an infinite loop. </p>
+
+<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00018">18</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
 
 </div>
 </div>
@@ -253,7 +268,9 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00018">18</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
+<p>Start looping at n'th millisecond. Values &lt;=0 will result in looping from the very beginning of the tracks input. </p>
+
+<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00033">33</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
 
 </div>
 </div>
@@ -269,7 +286,9 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00016">16</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
+<p>Mix at most n milliseconds. Default -1.0f, mixes all available audio. </p>
+
+<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00023">23</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
 
 </div>
 </div>
@@ -285,7 +304,9 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00017">17</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
+<p>Start mixing at n'th millisecond. Values &lt;=0 will result in mixing from the very beginning of the tracks input. </p>
+
+<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00028">28</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
 
 </div>
 </div>

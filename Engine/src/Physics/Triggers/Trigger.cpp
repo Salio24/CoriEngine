@@ -20,7 +20,7 @@ namespace Cori {
 						}
 						CORI_CORE_TRACE_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::Trigger }, "Trigger '{}': Entity '{}' has entered.", m_Behavior->GetDebugName(), entity.GetDebugData());
 						m_Behavior->OnEnter(entity);
-						m_VisitorBuffer.add(entity);
+						m_VisitorBuffer.push_back(entity);
 					}
 				}
 

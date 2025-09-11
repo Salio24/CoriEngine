@@ -1,5 +1,5 @@
 <map id="Cori::Audio::Mixer::PlayTag" name="Cori::Audio::Mixer::PlayTag">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,143,50"/>
+<area shape="rect" id="Node000001" title="Start (ot restart) mixing all tracks with a specific tag." alt="" coords="5,5,143,50"/>
 <area shape="rect" id="Node000002" href="$ref_8cpp.html#aa1fc0c13a8a7cf297e892b438c34b41e" title=" " alt="" coords="191,14,294,42"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
 </map>

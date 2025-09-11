@@ -2,8 +2,6 @@ var namespaceCori_1_1Core =
 [
     [ "Application", "classCori_1_1Core_1_1Application.html", "classCori_1_1Core_1_1Application" ],
     [ "AppRenderEvent", "classCori_1_1Core_1_1AppRenderEvent.html", "classCori_1_1Core_1_1AppRenderEvent" ],
-    [ "AppTickEvent", "classCori_1_1Core_1_1AppTickEvent.html", "classCori_1_1Core_1_1AppTickEvent" ],
-    [ "AppUpdateEvent", "classCori_1_1Core_1_1AppUpdateEvent.html", "classCori_1_1Core_1_1AppUpdateEvent" ],
     [ "CoriError", "classCori_1_1Core_1_1CoriError.html", "classCori_1_1Core_1_1CoriError" ],
     [ "Engine", "classCori_1_1Core_1_1Engine.html", "classCori_1_1Core_1_1Engine" ],
     [ "Event", "classCori_1_1Core_1_1Event.html", "classCori_1_1Core_1_1Event" ],
@@ -310,12 +308,7 @@ var namespaceCori_1_1Core =
       [ "WindowFocus", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da1c68d5453b28d52622bf5486a5fd95ca", null ],
       [ "WindowLostFocus", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da1c2119b9d61e623975f13f1029f1d97c", null ],
       [ "WindowMoved", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10dab94473d9dfc85f8fdbf5cb3b1d992bda", null ],
-      [ "GameTriggerEntered", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da66808e9a60fc457bf7b1fb6502b31ad9", null ],
-      [ "GameTriggerExit", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da899ac247e9e1616dc41b0857db55c79c", null ],
-      [ "GameTriggerStay", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da485b9c7ff554b73104cbcfd19eadfa42", null ],
       [ "GameUserDefinedEvent", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10dacc0f5f07e3e37fbe671e9eb7b53efb9c", null ],
-      [ "AppTick", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da559b408d45669603dbac61cd15984f13", null ],
-      [ "AppUpdate", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10dac177abb86f28dea426f2e3409e14bcda", null ],
       [ "AppRender", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da4b2eb3c601042333ac1c0565ff58e3d6", null ],
       [ "KeyPressed", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10dac17e6984c1e5a887a49831beadee6bca", null ],
       [ "KeyReleased", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da4a77f07c8ad223b71ab4ce78a63841ab", null ],
@@ -333,5 +326,6 @@ var namespaceCori_1_1Core =
     [ "CoriGetKeyName", "namespaceCori_1_1Core.html#a09d0f7f06afa9053cc89a211ed71a82a", null ],
     [ "CoriGetKeyName", "namespaceCori_1_1Core.html#a9634359fbc09d8de419c7c39e510169c", null ],
     [ "CreateApplication", "namespaceCori_1_1Core.html#a660de86b4342b4de453e28d25ff418db", null ],
+    [ "format_as", "namespaceCori_1_1Core.html#a5585b1fa9cb167df70c60eaa4d616858", null ],
     [ "operator<<", "namespaceCori_1_1Core.html#a51dc3b1c13b479e0a67f640413a66cc8", null ]
 ];

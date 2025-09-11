@@ -26,7 +26,7 @@ namespace Cori {
 
 			virtual void SetDepthMask(const bool mode) = 0;
 
-			static std::unique_ptr<CoriGraphicsAPI> Create();
+			[[nodiscard]] static std::unique_ptr<CoriGraphicsAPI> Create();
 		};
 	}
 }

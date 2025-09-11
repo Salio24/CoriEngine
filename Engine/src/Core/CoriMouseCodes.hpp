@@ -6,6 +6,9 @@
 
 namespace Cori {
 	namespace Core {
+		/**
+		 * @brief An enum of all available mouse buttons.
+		 */
 		typedef enum CoriMouseCode {
 			CORI_MOUSEBUTTON_UNKNOWN = 0,
 			CORI_MOUSEBUTTON_LEFT = 1,

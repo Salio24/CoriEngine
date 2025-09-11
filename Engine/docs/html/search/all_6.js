@@ -34,7 +34,7 @@ var searchData=
   ['event_2ehpp_31',['Event.hpp',['../Event_8hpp.html',1,'']]],
   ['event_5fclass_5fcategory_32',['EVENT_CLASS_CATEGORY',['../Event_8hpp.html#abd52deea587a36ef619e596a0c691839',1,'Event.hpp']]],
   ['event_5fclass_5ftype_33',['EVENT_CLASS_TYPE',['../Event_8hpp.html#a80d534fc4d69a68eefd1573fd0ac2f44',1,'Event.hpp']]],
-  ['eventcallbackfn_34',['EventCallbackFn',['../classCori_1_1Core_1_1Layer.html#ab6d101670fd190f0c1cc15b70db7c3a8',1,'Cori::Core::Layer::EventCallbackFn'],['../namespaceCori_1_1Core.html#a08e9d123ca1f41c356257d96fc97c241',1,'Cori::Core::EventCallbackFn']]],
+  ['eventcallbackfn_34',['EventCallbackFn',['../namespaceCori_1_1Core.html#a08e9d123ca1f41c356257d96fc97c241',1,'Cori::Core']]],
   ['eventcategory_35',['EventCategory',['../namespaceCori_1_1Core.html#a0f06acce81d71ecdca15612fa8ecaa18',1,'Cori::Core']]],
   ['eventcategoryapplication_36',['EventCategoryApplication',['../namespaceCori_1_1Core.html#a0f06acce81d71ecdca15612fa8ecaa18ab36c913f14afcba26e88f2d5c4e77722',1,'Cori::Core']]],
   ['eventcategorygameplay_37',['EventCategoryGameplay',['../namespaceCori_1_1Core.html#a0f06acce81d71ecdca15612fa8ecaa18a8f04c84c0807ea9894695bb18fbabed9',1,'Cori::Core']]],

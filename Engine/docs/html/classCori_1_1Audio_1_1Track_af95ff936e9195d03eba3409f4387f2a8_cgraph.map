@@ -1,0 +1,5 @@
+<map id="Cori::Audio::Track::Play" name="Cori::Audio::Track::Play">
+<area shape="rect" id="Node000001" title="Plays a single or a sequence of SoundWithParams objects." alt="" coords="5,5,141,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Audio_1_1Track.html#aa7f21b308227530ecc4a08a89aba0c81" title="Stops the Track." alt="" coords="189,5,324,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,25,173,25,173,30,141,30"/>
+</map>

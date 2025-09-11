@@ -6,6 +6,9 @@
 
 namespace Cori {
 	namespace Core {
+		/**
+		 * @brief This is a adaptation of SDL3 scancodes. Taken from 'SDL_scancode.h'
+		 */
 		typedef enum CoriKeycode {
 
 			// this is just an adapted sdl scancodes for cori API

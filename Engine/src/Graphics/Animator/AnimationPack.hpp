@@ -62,9 +62,9 @@ namespace Cori {
 
 			};
 
-			static std::shared_ptr<AnimationPack> Create(const std::filesystem::path& jsonPath, ConfigType type, const float timeStep, const std::string& name);
+			[[nodiscard]] static std::shared_ptr<AnimationPack> Create(const std::filesystem::path& jsonPath, ConfigType type, const float timeStep, const std::string& name);
 
-			static std::shared_ptr<AnimationPack> Create(const Descriptor& descriptor);
+			[[nodiscard]] static std::shared_ptr<AnimationPack> Create(const Descriptor& descriptor);
 
 			[[nodiscard]] Animation GetAnimation(const uint32_t index);
 

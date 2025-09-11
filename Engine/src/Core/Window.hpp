@@ -34,7 +34,7 @@ namespace Cori {
 
 		class Window : public Profiling::Trackable<Window> {
 		public:
-			static std::unique_ptr<Window> Create(std::string name, const bool vsync = false);
+			[[nodiscard]] static std::unique_ptr<Window> Create(std::string name, const bool vsync = false);
 
 			~Window();
 
@@ -52,18 +52,16 @@ namespace Cori {
 			[[nodiscard]] WindowMode GetWindowMode() const;
 			[[nodiscard]] std::expected<void, CoriError<>> SetWindowMode(WindowMode mode);
 
-		protected:
-
-			friend class Application;
-			void OnUpdate();
-			void SetEventCallback(const EventCallbackFn& callback);
-
+		private:
 			friend class ImGuiLayer;
 			friend Graphics::OpenGLContext;
 			[[nodiscard]] void* GetNativeContext() const;
 			[[nodiscard]] void* GetNativeWindow() const;
 
-		private:
+			friend class Application;
+			void OnUpdate();
+			void SetEventCallback(const EventCallbackFn& callback);
+
 			explicit Window(std::string title, const bool vsync = false);
 
 			inline static auto s_API = Graphics::GraphicsAPIs::OpenGL;

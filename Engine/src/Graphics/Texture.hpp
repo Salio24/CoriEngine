@@ -75,11 +75,11 @@ namespace Cori {
 				inline static std::atomic<uint32_t> s_NextRuntimeID{ 1 };
 			};
 
-			static std::shared_ptr<Texture2D> Create(const std::shared_ptr<Image>& image);
+			[[nodiscard]] static std::shared_ptr<Texture2D> Create(const std::shared_ptr<Image>& image);
 
-			static std::shared_ptr<Texture2D> Create(const void* pixelData, const uint32_t width, const uint32_t height, const Params& params);
+			[[nodiscard]] static std::shared_ptr<Texture2D> Create(const void* pixelData, const uint32_t width, const uint32_t height, const Params& params);
 
-			static std::shared_ptr<Texture2D> Create(const Descriptor& descriptor);
+			[[nodiscard]] static std::shared_ptr<Texture2D> Create(const Descriptor& descriptor);
 		};
 	}
 }

@@ -14,12 +14,12 @@ namespace Cori {
 			[[nodiscard]] static std::expected<std::shared_ptr<Scene>, Core::CoriError<>> GetScene(const std::string& name);
 
 			[[nodiscard]] static std::expected<void, Core::CoriError<>> DestroyScene(const std::string& name);
-		protected:
+
+		private:
 			friend Core::Application;
 			static void Init();
 			static void Shutdown();
 
-		private:
 			struct Data;
 			static Data* s_Data;
 		};

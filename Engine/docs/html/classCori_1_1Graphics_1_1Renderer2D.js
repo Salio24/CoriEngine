@@ -19,12 +19,9 @@ var classCori_1_1Graphics_1_1Renderer2D =
     [ "EndScene", "classCori_1_1Graphics_1_1Renderer2D.html#a3b3e941fe66f05f856ddc334c890eb7c", null ],
     [ "FlushRenderQueues", "classCori_1_1Graphics_1_1Renderer2D.html#a08238aaeb190bbdee929f1f26fcc37e8", null ],
     [ "GetStatistics", "classCori_1_1Graphics_1_1Renderer2D.html#a8a491c2687235f9d5c90ed67bd4d4ff2", null ],
-    [ "Init", "classCori_1_1Graphics_1_1Renderer2D.html#af3c9a801f5f325f27963d3dcc83a136c", null ],
-    [ "Shutdown", "classCori_1_1Graphics_1_1Renderer2D.html#ae0c06c83c39f0fb9b43307e9e5e65758", null ],
     [ "SubmitAABB", "classCori_1_1Graphics_1_1Renderer2D.html#a9598ee9081568ac3b1dcfda84c823d54", null ],
     [ "SubmitColoredQuad", "classCori_1_1Graphics_1_1Renderer2D.html#a7441ab6962608fbfacf28b2f089fd4cb", null ],
     [ "SubmitQuad", "classCori_1_1Graphics_1_1Renderer2D.html#ad02fd3723475c38842c06b9536ecc358", null ],
     [ "SubmitText", "classCori_1_1Graphics_1_1Renderer2D.html#a3ea5c9ecfd1337e84c59d7cb817ae941", null ],
-    [ "SubmitText", "classCori_1_1Graphics_1_1Renderer2D.html#a0c20cd8591a2143954bbf7197414c7a9", null ],
-    [ "API", "classCori_1_1Graphics_1_1Renderer2D.html#a28a4f48e177ed2a9e7cdbe79ce1285f4", null ]
+    [ "SubmitText", "classCori_1_1Graphics_1_1Renderer2D.html#a0c20cd8591a2143954bbf7197414c7a9", null ]
 ];

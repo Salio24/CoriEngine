@@ -53,8 +53,6 @@ var hierarchy =
     [ "Cori::World::EntityView< View >", "classCori_1_1World_1_1EntityView.html", null ],
     [ "Cori::Core::Event", "classCori_1_1Core_1_1Event.html", [
       [ "Cori::Core::AppRenderEvent", "classCori_1_1Core_1_1AppRenderEvent.html", null ],
-      [ "Cori::Core::AppTickEvent", "classCori_1_1Core_1_1AppTickEvent.html", null ],
-      [ "Cori::Core::AppUpdateEvent", "classCori_1_1Core_1_1AppUpdateEvent.html", null ],
       [ "Cori::Core::KeyEvent", "classCori_1_1Core_1_1KeyEvent.html", [
         [ "Cori::Core::KeyPressedEvent", "classCori_1_1Core_1_1KeyPressedEvent.html", null ],
         [ "Cori::Core::KeyReleasedEvent", "classCori_1_1Core_1_1KeyReleasedEvent.html", null ]

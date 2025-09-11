@@ -13,13 +13,12 @@ var searchData=
   ['line_10',['Line',['../structCori_1_1Profiling_1_1RawProfileEvent.html#a1a3a571dcb0a4d318500a1ab83fb3487',1,'Cori::Profiling::RawProfileEvent::Line'],['../structCori_1_1Profiling_1_1ProfileResult.html#afdddc2598d33c239e69d2ec064524da8',1,'Cori::Profiling::ProfileResult::Line']]],
   ['linear_11',['LINEAR',['../classCori_1_1Graphics_1_1Texture.html#ac5339b8f9aa643fa8ff1e1f20000d003aab00ba95e5af37b01f11baaf33708fba',1,'Cori::Graphics::Texture']]],
   ['load_12',['Load',['../classCori_1_1FileSystem_1_1JsonSerializer.html#abebae8a1401520b67b68d5961c6d6054',1,'Cori::FileSystem::JsonSerializer']]],
-  ['loadsound_13',['LoadSound',['../classCori_1_1Audio_1_1Mixer.html#ab41a8c7a9928adc7ef963c273698ee6b',1,'Cori::Audio::Mixer']]],
-  ['logger_14',['Logger',['../classCori_1_1Logger.html',1,'Cori::Logger'],['../structCori_1_1Logger_1_1Tags_1_1Core.html#af73acf448251011d676a3f00fe548fe1',1,'Cori::Logger::Tags::Core::Logger']]],
-  ['logger_2ecpp_15',['Logger.cpp',['../Logger_8cpp.html',1,'']]],
-  ['logger_2ehpp_16',['Logger.hpp',['../Logger_8hpp.html',1,'']]],
-  ['logging_20and_20imgui_3a_17',['Logging and ImGui:',['../index.html#logging-and-imgui',1,'']]],
-  ['loglevel_18',['LogLevel',['../classCori_1_1Logger.html#a0433e103adbeb9b1521b08af4a9d3b16',1,'Cori::Logger']]],
-  ['loopedinsequence_19',['LoopedInSequence',['../structCori_1_1Audio_1_1PlayParams.html#a9eca5a8ae949a614398528118812a577',1,'Cori::Audio::PlayParams::LoopedInSequence'],['../structCori_1_1Graphics_1_1Animation_1_1PlayParams.html#a37dccc3094a19f7411ae86284c99b145',1,'Cori::Graphics::Animation::PlayParams::LoopedInSequence']]],
-  ['loops_20',['Loops',['../structCori_1_1Audio_1_1PlayParams.html#a9f7cb5db8e9f87d36db1c4003014bbc1',1,'Cori::Audio::PlayParams::Loops'],['../structCori_1_1Graphics_1_1Animation_1_1PlayParams.html#a20652e6315ced38eeaf6fa2a4b6d8ece',1,'Cori::Graphics::Animation::PlayParams::Loops']]],
-  ['loopstartmillisecond_21',['LoopStartMillisecond',['../structCori_1_1Audio_1_1PlayParams.html#aa6ef437d9e2d577f89600e442b15c526',1,'Cori::Audio::PlayParams']]]
+  ['logger_13',['Logger',['../classCori_1_1Logger.html',1,'Cori::Logger'],['../structCori_1_1Logger_1_1Tags_1_1Core.html#af73acf448251011d676a3f00fe548fe1',1,'Cori::Logger::Tags::Core::Logger']]],
+  ['logger_2ecpp_14',['Logger.cpp',['../Logger_8cpp.html',1,'']]],
+  ['logger_2ehpp_15',['Logger.hpp',['../Logger_8hpp.html',1,'']]],
+  ['logging_20and_20imgui_3a_16',['Logging and ImGui:',['../index.html#logging-and-imgui',1,'']]],
+  ['loglevel_17',['LogLevel',['../classCori_1_1Logger.html#a0433e103adbeb9b1521b08af4a9d3b16',1,'Cori::Logger']]],
+  ['loopedinsequence_18',['LoopedInSequence',['../structCori_1_1Audio_1_1PlayParams.html#a9eca5a8ae949a614398528118812a577',1,'Cori::Audio::PlayParams::LoopedInSequence'],['../structCori_1_1Graphics_1_1Animation_1_1PlayParams.html#a37dccc3094a19f7411ae86284c99b145',1,'Cori::Graphics::Animation::PlayParams::LoopedInSequence']]],
+  ['loops_19',['Loops',['../structCori_1_1Audio_1_1PlayParams.html#a9f7cb5db8e9f87d36db1c4003014bbc1',1,'Cori::Audio::PlayParams::Loops'],['../structCori_1_1Graphics_1_1Animation_1_1PlayParams.html#a20652e6315ced38eeaf6fa2a4b6d8ece',1,'Cori::Graphics::Animation::PlayParams::Loops']]],
+  ['loopstartmillisecond_20',['LoopStartMillisecond',['../structCori_1_1Audio_1_1PlayParams.html#aa6ef437d9e2d577f89600e442b15c526',1,'Cori::Audio::PlayParams']]]
 ];

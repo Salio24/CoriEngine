@@ -60,17 +60,16 @@ namespace Cori {
 				inline static std::atomic<uint32_t> s_NextRuntimeID{ 1 };
 			};
 
-			static std::shared_ptr<Font> Create(const std::filesystem::path& path, const std::vector<CharsetRange>& charsets, const float minimalScale = 48.0f, const float miterLimit = 1.0f);
+			[[nodiscard]]static std::shared_ptr<Font> Create(const std::filesystem::path& path, const std::vector<CharsetRange>& charsets, const float minimalScale = 48.0f, const float miterLimit = 1.0f);
 
-			static std::shared_ptr<Font> Create(const Descriptor& descriptor);
+			[[nodiscard]] static std::shared_ptr<Font> Create(const Descriptor& descriptor);
 
 			~Font();
 
-		protected:
+		private:
 			friend class Renderer2D;
 			FontData* GetData();
 
-		private:
 			Font(void* font, const std::vector<CharsetRange>& charsets, const std::filesystem::path& fontPath, const float minimalScale, const float miterLimit);
 			FontData* m_Data{ nullptr };
 		};

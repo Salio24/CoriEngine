@@ -1,7 +1,7 @@
 <map id="Cori::Core::operator&lt;&lt;" name="Cori::Core::operator&lt;&lt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,14,176,42"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1Event.html#a26d0871fc6502150a001352a47bdbc3f" title=" " alt="" coords="224,5,362,50"/>
+<area shape="rect" id="Node000001" title="Needed for CoriError." alt="" coords="5,14,176,42"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1Event.html#a26d0871fc6502150a001352a47bdbc3f" title="Returns the name of the Event." alt="" coords="224,5,362,50"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="176,25,208,25,208,30,176,30"/>
-<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1Event.html#a2b72405936a555efbfa708452eecb325" title=" " alt="" coords="410,5,548,50"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1Event.html#a2b72405936a555efbfa708452eecb325" title="This will give you the string version of EventType." alt="" coords="410,5,548,50"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="363,25,394,25,394,30,363,30"/>
 </map>

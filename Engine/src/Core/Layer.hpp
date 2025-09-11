@@ -9,8 +9,6 @@ namespace Cori {
 	namespace Core {
 		class Layer {
 		public:
-			using EventCallbackFn = std::function<void(Event&)>;
-
 			explicit Layer(std::string name);
 
 			virtual ~Layer();

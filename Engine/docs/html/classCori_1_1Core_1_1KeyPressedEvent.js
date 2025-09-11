@@ -1,7 +1,7 @@
 var classCori_1_1Core_1_1KeyPressedEvent =
 [
     [ "KeyPressedEvent", "classCori_1_1Core_1_1KeyPressedEvent.html#aba06db0f68390f1e14252fa08fa44f09", null ],
-    [ "GetCategoryFlags", "classCori_1_1Core_1_1KeyPressedEvent.html#ae7bf1ef67ae3d9d06700a58a7d1f2085", null ],
+    [ "GetCategoryFlags", "classCori_1_1Core_1_1KeyPressedEvent.html#a28279a9fc721ef5a4afe30c73bfca8f4", null ],
     [ "GetEventType", "classCori_1_1Core_1_1KeyPressedEvent.html#afeb033dd662bce8e94fbd6bfc01d0b25", null ],
     [ "GetKeyCode", "classCori_1_1Core_1_1KeyPressedEvent.html#ab07cd18a976b0466c743d674bed2ce9a", null ],
     [ "GetName", "classCori_1_1Core_1_1KeyPressedEvent.html#a28495a97d1c67d7c318af1d8add1d074", null ],

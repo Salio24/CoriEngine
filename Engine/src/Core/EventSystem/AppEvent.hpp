@@ -34,30 +34,6 @@ namespace Cori {
 			EVENT_CLASS_CATEGORY(EventCategoryApplication)
 		};
 
-		class AppTickEvent final : public Event {
-		public:
-			AppTickEvent() = default;
-
-			[[nodiscard]] std::string ToString() const override {
-				return "AppTickEvent";
-			}
-
-			EVENT_CLASS_TYPE(AppTick)
-			EVENT_CLASS_CATEGORY(EventCategoryApplication)
-		};
-
-		class AppUpdateEvent final : public Event {
-		public:
-			AppUpdateEvent() = default;
-
-			[[nodiscard]] std::string ToString() const override {
-				return "AppUpdateEvent";
-			}
-
-			EVENT_CLASS_TYPE(AppUpdate)
-			EVENT_CLASS_CATEGORY(EventCategoryApplication)
-		};
-
 		class AppRenderEvent final : public Event {
 		public:
 			AppRenderEvent() = default;

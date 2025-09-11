@@ -8,8 +8,9 @@ var searchData=
   ['flushrenderqueues_5',['FlushRenderQueues',['../classCori_1_1Graphics_1_1Renderer2D.html#a08238aaeb190bbdee929f1f26fcc37e8',1,'Cori::Graphics::Renderer2D']]],
   ['fnv1a64_6',['fnv1a64',['../namespaceCori_1_1Utility.html#aadae1036bd08323331712cb16b48813e',1,'Cori::Utility']]],
   ['fontdata_7',['FontData',['../structCori_1_1Graphics_1_1FontData.html#a11d5e305f3f3f569eaedddcf6ec6f8c6',1,'Cori::Graphics::FontData']]],
-  ['frameend_8',['FrameEnd',['../classCori_1_1Profiling_1_1TimeProfiler.html#aab3b9ccab43b8f7796c48c569b667cb9',1,'Cori::Profiling::TimeProfiler']]],
-  ['framestart_9',['FrameStart',['../classCori_1_1Profiling_1_1TimeProfiler.html#af904ac39a861b860bd84b472dca474ae',1,'Cori::Profiling::TimeProfiler']]],
-  ['front_10',['front',['../classCori_1_1Graphics_1_1VBLayout.html#a184e683b6d2ce2b7234782ffa3e0cb20',1,'Cori::Graphics::VBLayout::front()'],['../classCori_1_1Graphics_1_1VBLayout.html#a12e5de65a16b5a4b0df0dad53a00df55',1,'Cori::Graphics::VBLayout::front() const']]],
-  ['full_11',['full',['../classCori_1_1Core_1_1PackedArray.html#a728edc3c2fa578519db94ec237a6590b',1,'Cori::Core::PackedArray']]]
+  ['format_5fas_8',['format_as',['../namespaceCori_1_1Core.html#a5585b1fa9cb167df70c60eaa4d616858',1,'Cori::Core']]],
+  ['frameend_9',['FrameEnd',['../classCori_1_1Profiling_1_1TimeProfiler.html#aab3b9ccab43b8f7796c48c569b667cb9',1,'Cori::Profiling::TimeProfiler']]],
+  ['framestart_10',['FrameStart',['../classCori_1_1Profiling_1_1TimeProfiler.html#af904ac39a861b860bd84b472dca474ae',1,'Cori::Profiling::TimeProfiler']]],
+  ['front_11',['front',['../classCori_1_1Graphics_1_1VBLayout.html#a184e683b6d2ce2b7234782ffa3e0cb20',1,'Cori::Graphics::VBLayout::front()'],['../classCori_1_1Graphics_1_1VBLayout.html#a12e5de65a16b5a4b0df0dad53a00df55',1,'Cori::Graphics::VBLayout::front() const']]],
+  ['full_12',['full',['../classCori_1_1Core_1_1PackedArray.html#a728edc3c2fa578519db94ec237a6590b',1,'Cori::Core::PackedArray']]]
 ];

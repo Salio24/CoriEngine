@@ -76,7 +76,7 @@ namespace Cori {
 				m_Registry.ctx().erase<T>();
 			}
 
-			static std::shared_ptr<Scene> Create(std::string name);
+			[[nodiscard]] static std::shared_ptr<Scene> Create(std::string name);
 
 			Graphics::CameraController m_ActiveCamera;
 

@@ -6,7 +6,7 @@ var searchData=
   ['shaderprogram_3',['ShaderProgram',['../structCori_1_1Logger_1_1Tags_1_1Graphics.html#a9770ff93c5101f47a650062b93da47df',1,'Cori::Logger::Tags::Graphics']]],
   ['shape_4',['shape',['../structCori_1_1Physics_1_1CastResult.html#a3121dcad51f687df6c407c9a11bb366d',1,'Cori::Physics::CastResult']]],
   ['shared_5',['Shared',['../structCori_1_1Logger_1_1Tags_1_1Core_1_1Factory.html#ae51aa7cd887e412d15bbf9cdd310989a',1,'Cori::Logger::Tags::Core::Factory']]],
-  ['sound_6',['Sound',['../classCori_1_1Audio_1_1Mixer.html#aa8eb79db3adaa05ce787440a76daa1ab',1,'Cori::Audio::Mixer::Sound'],['../structCori_1_1Logger_1_1Tags_1_1Audio.html#aae5db4736dc4f1aa49cfa9a8a615f4ee',1,'Cori::Logger::Tags::Audio::Sound']]],
+  ['sound_6',['Sound',['../structCori_1_1Logger_1_1Tags_1_1Audio.html#aae5db4736dc4f1aa49cfa9a8a615f4ee',1,'Cori::Logger::Tags::Audio']]],
   ['spriteatlas_7',['SpriteAtlas',['../structCori_1_1Logger_1_1Tags_1_1Graphics.html#aab151d739e4f9959c898d4b9cec31b62',1,'Cori::Logger::Tags::Graphics']]],
   ['startframe_8',['StartFrame',['../structCori_1_1Graphics_1_1Animation_1_1PlayParams.html#ad7d09566aa4ce5a1753a7f010664f22d',1,'Cori::Graphics::Animation::PlayParams']]],
   ['startmillisecond_9',['StartMillisecond',['../structCori_1_1Audio_1_1PlayParams.html#ae0c6be8fc409fe6923630e4f2b152fcd',1,'Cori::Audio::PlayParams']]],

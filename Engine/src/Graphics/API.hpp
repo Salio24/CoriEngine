@@ -49,12 +49,11 @@ namespace Cori {
 				s_GraphicsAPI->SetDepthMask(mode);
 			}
 
-		protected:
+		private:
 			friend Core::Application;
 			static void Init();
 			static void Shutdown();
 
-		private:
 			static std::unique_ptr<CoriGraphicsAPI> s_GraphicsAPI;
 		};
 	}

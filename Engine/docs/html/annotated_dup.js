@@ -10,8 +10,6 @@ var annotated_dup =
       [ "Core", "namespaceCori_1_1Core.html", [
         [ "Application", "classCori_1_1Core_1_1Application.html", "classCori_1_1Core_1_1Application" ],
         [ "AppRenderEvent", "classCori_1_1Core_1_1AppRenderEvent.html", "classCori_1_1Core_1_1AppRenderEvent" ],
-        [ "AppTickEvent", "classCori_1_1Core_1_1AppTickEvent.html", "classCori_1_1Core_1_1AppTickEvent" ],
-        [ "AppUpdateEvent", "classCori_1_1Core_1_1AppUpdateEvent.html", "classCori_1_1Core_1_1AppUpdateEvent" ],
         [ "CoriError", "classCori_1_1Core_1_1CoriError.html", "classCori_1_1Core_1_1CoriError" ],
         [ "Engine", "classCori_1_1Core_1_1Engine.html", "classCori_1_1Core_1_1Engine" ],
         [ "Event", "classCori_1_1Core_1_1Event.html", "classCori_1_1Core_1_1Event" ],

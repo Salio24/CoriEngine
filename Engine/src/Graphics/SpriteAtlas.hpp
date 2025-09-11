@@ -40,9 +40,9 @@ namespace Cori {
 
 			};
 
-			static std::shared_ptr<SpriteAtlas> Create(std::string name, const std::shared_ptr<Image>& image, const glm::u16vec2 spriteResolution);
+			[[nodiscard]] static std::shared_ptr<SpriteAtlas> Create(std::string name, const std::shared_ptr<Image>& image, const glm::u16vec2 spriteResolution);
 
-			static std::shared_ptr<SpriteAtlas> Create(const Descriptor& descriptor);
+			[[nodiscard]] static std::shared_ptr<SpriteAtlas> Create(const Descriptor& descriptor);
 
 			[[nodiscard]] const UVs& GetSpriteUVsAtIndex(uint32_t index) const;
 

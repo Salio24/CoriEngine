@@ -10,13 +10,13 @@ namespace Cori {
 
 			void PushLayer(Layer* layer);
 			void PushOverlay(Layer* overlay);
-			void PopLayer(Layer* layer);
-			void PopOverlay(Layer* overlay);
+			void PopLayer();
+			void PopOverlay();
 
 			std::expected<void, CoriError<>> PushLayerToQueue(Layer* layer);
 			std::expected<void, CoriError<>> PushOverlayToQueue(Layer* overlay);
-			void PopLayerToQueue(Layer* layer);
-			void PopOverlayToQueue(Layer* overlay);
+			void PopLayerToQueue();
+			void PopOverlayToQueue();
 
 			void ProcessQueue();
 
@@ -32,12 +32,12 @@ namespace Cori {
 			std::vector<Layer*> m_Layers;
 
 			std::vector<Layer*> m_LayerPushQueue;
-			std::vector<Layer*> m_LayerPopQueue;
+			uint32_t m_LayerPopQueue{ 0 };
 			std::vector<Layer*> m_OverlayPushQueue;
-			std::vector<Layer*> m_OverlayPopQueue;
+			uint32_t m_OverlayPopQueue{ 0 };
 
-
-			uint32_t m_LayerInsertIndex{ 0 };
+			uint32_t m_LayerInsertIndex{ 0 }; // also a regular layer count
+			uint32_t m_OverlayLayerCount{ 0 };
 
 			std::vector<Layer*>::iterator m_LayerInsert{ m_Layers.begin() };
 		};

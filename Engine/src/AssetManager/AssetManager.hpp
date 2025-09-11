@@ -3,6 +3,7 @@ namespace Cori {
 	namespace Core {
 		class Application;
 	}
+
 	namespace Internal {
 		template <typename T>
 		concept IsDescriptor = requires(const T& a, const T& b) {
@@ -25,6 +26,12 @@ namespace Cori {
 		};
 
 	public:
+		/**
+		 * @brief Gets the asset from the asset manager cache, it works with any asset that has a Descriptor defined.
+		 * @tparam Descriptor Will be deduced, no need to specify.
+		 * @param descriptor Instance of the asset descriptor.
+		 * @return A shared pointer to the loaded asset.
+		 */
 		template <Internal::CanBeDefaultLoaded Descriptor>
 		static std::shared_ptr<typename Descriptor::AssetType> Get(const Descriptor& descriptor) {
 			CORI_PROFILE_FUNCTION();
@@ -41,6 +48,13 @@ namespace Cori {
 			return newAsset;
 		}
 
+
+		/**
+		 * @brief Preloads a group (or one) of assets into the cache.
+		 * @tparam Descriptor Will be deduced, no need to specify.
+		 * @param descriptors An list of asset descriptors to preload, all should have the same type, can't mix different asset descriptor types in one call.
+		 * @details It is needed to avoid the stutter that will be caused when the asset is requested but not yet loaded.
+		 */
 		template <Internal::CanBeDefaultLoaded Descriptor>
 		static void Preload(const std::initializer_list<Descriptor> descriptors) {
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::AssetManager::Self }, "Preloading {} <{}(s/es)>", descriptors.size(), CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType));
@@ -50,6 +64,12 @@ namespace Cori {
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::AssetManager::Self }, "Preloaded {} <{}(s/es)>", descriptors.size(), CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType));
 		}
 
+		/**
+		 * @brief Unloads a group (or one) of assets from the cache.
+		 * @tparam Descriptor Will be deduced, no need to specify.
+		 * @param descriptors An list of asset descriptors to unloaded, all should have the same type, can't mix different asset descriptor types in one call.
+		 * @note If an asset is still used somewhere (ref count > 1) it will be removed from cache, but freed only when the ref count drops to 0.
+		 */
 		template <Internal::IsDescriptor Descriptor>
 		static void Unload(const std::initializer_list<Descriptor>& descriptors) {
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::AssetManager::Self }, "Unloading {} <{}(s/es)>", descriptors.size(), CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType));
@@ -60,6 +80,12 @@ namespace Cori {
 					CORI_CORE_WARN_TAGGED({ Logger::Tags::AssetManager::Self }, "Trying to unload <{}> that is not loaded, name '{}', (RuntimeID: {})", CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType), descriptor.m_Name, descriptor.GetRuntimeID());
 					return;
 				}
+
+				auto ptr = cache.at(descriptor.GetRuntimeID());
+				if (ptr.use_count() > 1) {
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::AssetManager::Self }, "Trying to unload <{}>, name '{}' that is still used somewhere, it will be freed, as soon as refcount drops to 0. (RuntimeID: {})", CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType), descriptor.m_Name, descriptor.GetRuntimeID());
+				}
+
 				cache.erase(descriptor.GetRuntimeID());
 				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::AssetManager::Self }, "Unloaded <{}>, name: '{}' (RuntimeID: {}).", CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType), descriptor.m_Name, descriptor.GetRuntimeID());
 			}
@@ -67,6 +93,11 @@ namespace Cori {
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::AssetManager::Self }, "Unloaded {} <{}(s/es)>", descriptors.size(), CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType));
 		}
 
+		/**
+		 * @brief Clears cache for o specified asset type.
+		 * @tparam AssetType The type os asset that we want to clear cache for.
+		 * @note If an asset is still used somewhere (ref count > 1) it will be removed from cache, but freed only when the ref count drops to 0.
+		 */
 		template <typename AssetType>
 		static void ClearCache() {
 			if (s_Cache->m_Caches.contains(std::type_index(typeid(AssetType)))) {
@@ -74,12 +105,11 @@ namespace Cori {
 				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::AssetManager::Self }, "Cleared cache for type <{}>", CORI_CLEAN_TYPE_NAME(AssetType));
 			}
 		}
-	protected:
+	private:
 		friend Core::Application;
 		static void Init();
 		static void Shutdown();
 
-	private:
 		template <typename AssetType>
 		static std::unordered_map<uint32_t, std::shared_ptr<AssetType>>& GetCache() {
 			const auto typeIndex = std::type_index(typeid(AssetType));

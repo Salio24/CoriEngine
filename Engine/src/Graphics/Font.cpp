@@ -166,6 +166,8 @@ namespace Cori {
 
 				uint32_t charsetSize = charsets.size();
 
+				//TODO: check for changes in minimal scale and miter limit, and recreate atlas if changed. check the total atlas size and compare to the actual data read, if mismatch, recreate atlas
+
 				/* Font Cache binary file layout
 				 * 4 bytes (int32_t) - atlas width,
 				 * 4 bytes (int32_t) - atlas width,

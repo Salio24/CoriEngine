@@ -2,6 +2,13 @@
 
 namespace Cori {
 	namespace Core {
+		/**
+		 * @brief This is my packed/dense array custom implementation.
+		 * @tparam T Type to be stored in an array.
+		 * @tparam SizeT Type of size/indexes. Should be an unsigned integer.
+		 * @tparam MaxSize Maximum pack array capacity.
+		 * @note I tried mimicking the stl API so should be intuitive.
+		 */
 		template<typename T, std::unsigned_integral SizeT, SizeT MaxSize> requires std::equality_comparable<T> && std::movable<T>
 		class PackedArray {
 		public:
@@ -10,7 +17,7 @@ namespace Cori {
 
 			PackedArray() = default;
 
-			bool add(const T& value) {
+			bool push_back(const T& value) {
 				if (m_Size >= MaxSize) {
 					return false;
 				}
@@ -53,6 +60,14 @@ namespace Cori {
 				return true;
 			}
 
+			bool remove(const SizeT index) {
+				if (index <= m_Size) {
+					return remove(m_Data[index]);
+				}
+
+				return false;
+			}
+
 			iterator begin() { return m_Data.begin(); }
 			const_iterator cbegin() const { return m_Data.cbegin(); }
 
@@ -63,7 +78,6 @@ namespace Cori {
 				return m_Size;
 			}
 
-			// ReSharper disable once CppMemberFunctionMayBeStatic
 			constexpr SizeT capacity() const {
 				return MaxSize;
 			}

@@ -2,7 +2,7 @@
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,144,282,189"/>
 <area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1Window.html#a337ad17d98810547e15d4c0711b166aa" title=" " alt="" coords="340,5,486,50"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,141,249,102,328,60,340,54,343,59,331,65,252,107,184,146"/>
-<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1Application.html#ab0aa424cc7dd313c6b342b4c9710a022" title=" " alt="" coords="330,75,496,119"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1Application.html#ab0aa424cc7dd313c6b342b4c9710a022" title="Getter for the main Window." alt="" coords="330,75,496,119"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="233,141,314,120,315,125,234,146"/>
 <area shape="rect" id="Node000004" href="$classCori_1_1Core_1_1Window.html#ab051f165e8a834ef0df43154f64672fd" title=" " alt="" coords="340,144,486,189"/>
 <area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="282,164,325,164,325,169,282,169"/>

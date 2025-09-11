@@ -99,21 +99,20 @@ $(function(){initNavTree('classCori_1_1AssetManager.html','','classCori_1_1Asset
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a260467acee6791a7dc3e19db26a51b5c" id="r_a260467acee6791a7dc3e19db26a51b5c"><td class="memTemplParams" colspan="2">template&lt;Internal::CanBeDefaultLoaded Descriptor&gt; </td></tr>
 <tr class="memitem:a260467acee6791a7dc3e19db26a51b5c template"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; typename Descriptor::AssetType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a260467acee6791a7dc3e19db26a51b5c">Get</a> (const Descriptor &amp;descriptor)</td></tr>
+<tr class="memdesc:a260467acee6791a7dc3e19db26a51b5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the asset from the asset manager cache, it works with any asset that has a Descriptor defined.  <br /></td></tr>
 <tr class="memitem:a38fea5c65cf899bd9d044c1551314838" id="r_a38fea5c65cf899bd9d044c1551314838"><td class="memTemplParams" colspan="2">template&lt;Internal::CanBeDefaultLoaded Descriptor&gt; </td></tr>
 <tr class="memitem:a38fea5c65cf899bd9d044c1551314838 template"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a38fea5c65cf899bd9d044c1551314838">Preload</a> (const std::initializer_list&lt; Descriptor &gt; descriptors)</td></tr>
+<tr class="memdesc:a38fea5c65cf899bd9d044c1551314838"><td class="mdescLeft">&#160;</td><td class="mdescRight">Preloads a group (or one) of assets into the cache.  <br /></td></tr>
 <tr class="memitem:a0ce9dbdd459266dfdbdca5f61331a68b" id="r_a0ce9dbdd459266dfdbdca5f61331a68b"><td class="memTemplParams" colspan="2">template&lt;Internal::IsDescriptor Descriptor&gt; </td></tr>
 <tr class="memitem:a0ce9dbdd459266dfdbdca5f61331a68b template"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0ce9dbdd459266dfdbdca5f61331a68b">Unload</a> (const std::initializer_list&lt; Descriptor &gt; &amp;descriptors)</td></tr>
+<tr class="memdesc:a0ce9dbdd459266dfdbdca5f61331a68b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unloads a group (or one) of assets from the cache.  <br /></td></tr>
 <tr class="memitem:a3db3959ea2b22cbba60a8d20de3e9afd" id="r_a3db3959ea2b22cbba60a8d20de3e9afd"><td class="memTemplParams" colspan="2">template&lt;typename AssetType&gt; </td></tr>
 <tr class="memitem:a3db3959ea2b22cbba60a8d20de3e9afd template"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3db3959ea2b22cbba60a8d20de3e9afd">ClearCache</a> ()</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-pro-static-methods" class="groupheader"><a id="pro-static-methods" name="pro-static-methods"></a>
-Static Protected Member Functions</h2></td></tr>
-<tr class="memitem:a087914bbc1eb502a8fbbc7bd3ffcf480" id="r_a087914bbc1eb502a8fbbc7bd3ffcf480"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a087914bbc1eb502a8fbbc7bd3ffcf480">Init</a> ()</td></tr>
-<tr class="memitem:a1143bea2f5645415c6585c72568714af" id="r_a1143bea2f5645415c6585c72568714af"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1143bea2f5645415c6585c72568714af">Shutdown</a> ()</td></tr>
+<tr class="memdesc:a3db3959ea2b22cbba60a8d20de3e9afd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears cache for o specified asset type.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00022">22</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00023">23</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a3db3959ea2b22cbba60a8d20de3e9afd" name="a3db3959ea2b22cbba60a8d20de3e9afd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3db3959ea2b22cbba60a8d20de3e9afd">&#9670;&#160;</a></span>ClearCache()</h2>
@@ -140,7 +139,16 @@ template&lt;typename AssetType&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00071">71</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
+<p>Clears cache for o specified asset type. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">AssetType</td><td>The type os asset that we want to clear cache for. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>If an asset is still used somewhere (ref count &gt; 1) it will be removed from cache, but freed only when the ref count drops to 0. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00102">102</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
 
 </div>
 </div>
@@ -169,34 +177,22 @@ template&lt;Internal::CanBeDefaultLoaded Descriptor&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00029">29</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
+<p>Gets the asset from the asset manager cache, it works with any asset that has a Descriptor defined. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Descriptor</td><td>Will be deduced, no need to specify. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">descriptor</td><td>Instance of the asset descriptor. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A shared pointer to the loaded asset. </dd></dl>
 
-</div>
-</div>
-<a id="a087914bbc1eb502a8fbbc7bd3ffcf480" name="a087914bbc1eb502a8fbbc7bd3ffcf480"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a087914bbc1eb502a8fbbc7bd3ffcf480">&#9670;&#160;</a></span>Init()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::AssetManager::Init </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="AssetManager_8cpp_source.html#l00006">6</a> of file <a class="el" href="AssetManager_8cpp_source.html">AssetManager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00036">36</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
 
 </div>
 </div>
@@ -225,44 +221,32 @@ template&lt;Internal::CanBeDefaultLoaded Descriptor&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00045">45</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
+<p>Preloads a group (or one) of assets into the cache. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Descriptor</td><td>Will be deduced, no need to specify. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">descriptors</td><td>An list of asset descriptors to preload, all should have the same type, can't mix different asset descriptor types in one call.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>It is needed to avoid the stutter that will be caused when the asset is requested but not yet loaded. </p>
+
+<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00059">59</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1AssetManager_a38fea5c65cf899bd9d044c1551314838_cgraph.png" border="0" usemap="#aclassCori_1_1AssetManager_a38fea5c65cf899bd9d044c1551314838_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1AssetManager_a38fea5c65cf899bd9d044c1551314838_cgraph" id="aclassCori_1_1AssetManager_a38fea5c65cf899bd9d044c1551314838_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,154,50"/>
-<area shape="rect" href="classCori_1_1AssetManager.html#a260467acee6791a7dc3e19db26a51b5c" title=" " alt="" coords="202,14,381,42"/>
+<area shape="rect" title="Preloads a group (or one) of assets into the cache." alt="" coords="5,5,154,50"/>
+<area shape="rect" href="classCori_1_1AssetManager.html#a260467acee6791a7dc3e19db26a51b5c" title="Gets the asset from the asset manager cache, it works with any asset that has a Descriptor defined." alt="" coords="202,14,381,42"/>
 <area shape="poly" title=" " alt="" coords="154,25,186,25,186,30,154,30"/>
 </map>
 </div>
-
-</div>
-</div>
-<a id="a1143bea2f5645415c6585c72568714af" name="a1143bea2f5645415c6585c72568714af"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1143bea2f5645415c6585c72568714af">&#9670;&#160;</a></span>Shutdown()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::AssetManager::Shutdown </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="AssetManager_8cpp_source.html#l00010">10</a> of file <a class="el" href="AssetManager_8cpp_source.html">AssetManager.cpp</a>.</p>
 
 </div>
 </div>
@@ -291,7 +275,22 @@ template&lt;Internal::IsDescriptor Descriptor&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00054">54</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
+<p>Unloads a group (or one) of assets from the cache. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Descriptor</td><td>Will be deduced, no need to specify. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">descriptors</td><td>An list of asset descriptors to unloaded, all should have the same type, can't mix different asset descriptor types in one call. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>If an asset is still used somewhere (ref count &gt; 1) it will be removed from cache, but freed only when the ref count drops to 0. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00074">74</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
 
 </div>
 </div>

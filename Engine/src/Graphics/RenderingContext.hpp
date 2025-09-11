@@ -11,7 +11,7 @@ namespace Cori {
 			virtual void Init(SDL_Window* window) = 0;
 			virtual void SwapBuffers() = 0;
 			virtual inline void* GetNativeContext() const = 0;
-			static std::unique_ptr<RenderingContext> Create(GraphicsAPIs api);
+			[[nodiscard]] static std::unique_ptr<RenderingContext> Create(GraphicsAPIs api);
 		};
 	}
 }

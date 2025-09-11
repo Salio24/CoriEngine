@@ -128,7 +128,7 @@ namespace Cori {
 
 			ConvexHull(const b2Hull& hull) : m_Hull(hull) {} // NOLINT
 
-			ConvexHull Create(const std::vector<Vec2>& vertices) {
+			[[nodiscard]] ConvexHull Create(const std::vector<Vec2>& vertices) {
 #ifdef DEBUG_BUILD
 				m_Hull = b2ComputeHull(vertices.data(), vertices.size());
 				if (m_Hull.count == 0) {
@@ -163,23 +163,23 @@ namespace Cori {
 
 			Polygon(const b2Polygon& polygon) : b2Polygon(polygon) {} // NOLINT
 
-			static Polygon CreateBox(const Vec2 halfSize, const Vec2 offset, const Rot rotation = Rot{ 1, 0 }, const float radius = 0.0f) {
+			[[nodiscard]] static Polygon CreateBox(const Vec2 halfSize, const Vec2 offset, const Rot rotation = Rot{ 1, 0 }, const float radius = 0.0f) {
 				return b2MakeOffsetRoundedBox(halfSize.x, halfSize.y, offset, rotation, radius);
 			}
 
-			static Polygon CreateBox(const Vec2 halfSize) {
+			[[nodiscard]] static Polygon CreateBox(const Vec2 halfSize) {
 				return b2MakeBox(halfSize.x, halfSize.y);
 			}
 
-			static Polygon CreateBox(const Vec2 halfSize, const float radius) {
+			[[nodiscard]] static Polygon CreateBox(const Vec2 halfSize, const float radius) {
 				return b2MakeRoundedBox(halfSize.x, halfSize.y, radius);
 			}
 
-			static Polygon CreatePolygon(const ConvexHull& hull, const float radius = 0.0f) {
+			[[nodiscard]] static Polygon CreatePolygon(const ConvexHull& hull, const float radius = 0.0f) {
 				return b2MakePolygon(hull, radius);
 			}
 
-			static Polygon CreatePolygon(const ConvexHull& hull, const Vec2 offset, const Rot rotation = Rot{ 1, 0 }, const float radius = 0.0f) {
+			[[nodiscard]] static Polygon CreatePolygon(const ConvexHull& hull, const Vec2 offset, const Rot rotation = Rot{ 1, 0 }, const float radius = 0.0f) {
 				return b2MakeOffsetRoundedPolygon(hull, offset, rotation, radius);
 			}
 		};
@@ -191,7 +191,7 @@ namespace Cori {
 			Circle(const b2Circle& circle) : b2Circle(circle) {} // NOLINT
 			Circle(const Vec2 center, const float radius) : b2Circle{center, radius} {}
 
-			static Circle Create(Vec2 center, float radius) {
+			[[nodiscard]] static Circle Create(Vec2 center, float radius) {
 				return { center, radius };
 			}
 		};
@@ -203,7 +203,7 @@ namespace Cori {
 			Capsule(const b2Capsule& capsule) : b2Capsule(capsule) {} // NOLINT
 			Capsule(const Vec2 center1, const Vec2 center2, const float radius) : b2Capsule{ center1, center2, radius } {}
 
-			static Capsule Create(Vec2 center1, Vec2 center2, float radius) {
+			[[nodiscard]] static Capsule Create(Vec2 center1, Vec2 center2, float radius) {
 				return { center1, center2, radius };
 			}
 		};
@@ -215,7 +215,7 @@ namespace Cori {
 			Segment(const b2Segment& segment) : b2Segment(segment) {} // NOLINT
 			Segment(const Vec2 point1, const Vec2 point2) : b2Segment{ point1, point2 } {}
 
-			static Segment Create(Vec2 point1, Vec2 point2) {
+			[[nodiscard]] static Segment Create(Vec2 point1, Vec2 point2) {
 				return { point1, point2 };
 			}
 		};

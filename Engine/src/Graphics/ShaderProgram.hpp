@@ -56,9 +56,9 @@ namespace Cori {
 
 			[[nodiscard]] virtual std::string GetShaderNames() const = 0;
 
-			static std::shared_ptr<ShaderProgram> Create(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath, const std::filesystem::path& geometryPath = {});
+			[[nodiscard]] static std::shared_ptr<ShaderProgram> Create(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath, const std::filesystem::path& geometryPath = {});
 
-			static std::shared_ptr<ShaderProgram> Create(const Descriptor& descriptor);
+			[[nodiscard]] static std::shared_ptr<ShaderProgram> Create(const Descriptor& descriptor);
 		};
 	}
 }

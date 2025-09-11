@@ -1,6 +1,5 @@
 var classCori_1_1Core_1_1Layer =
 [
-    [ "EventCallbackFn", "classCori_1_1Core_1_1Layer.html#ab6d101670fd190f0c1cc15b70db7c3a8", null ],
     [ "Layer", "classCori_1_1Core_1_1Layer.html#a89ce1cc1e98e0dbd2d5dc1068780258e", null ],
     [ "~Layer", "classCori_1_1Core_1_1Layer.html#a81cb2995f804b81c63ae01f19ca0ed00", null ],
     [ "BindScene", "classCori_1_1Core_1_1Layer.html#a750c34fbd1690db2d042dcb0dfdf3482", null ],

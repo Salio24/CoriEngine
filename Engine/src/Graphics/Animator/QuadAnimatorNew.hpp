@@ -8,7 +8,6 @@ namespace Cori {
 		namespace Components {
 			namespace Entity {
 				using AnimationStopCallbackFn = std::function<void()>;
-
 				using AnimationWithParams = std::pair<Graphics::Animation, Graphics::Animation::PlayParams>;
 
 				template<typename T>
@@ -16,6 +15,7 @@ namespace Cori {
 
 				class QuadAnimatorNew {
 				public:
+
 					explicit QuadAnimatorNew(const World::Entity& entity);
 
 					~QuadAnimatorNew();

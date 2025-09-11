@@ -20,10 +20,11 @@ var searchData=
   ['fontdata_17',['FontData',['../structCori_1_1Graphics_1_1FontData.html',1,'Cori::Graphics::FontData'],['../structCori_1_1Graphics_1_1FontData.html#a11d5e305f3f3f569eaedddcf6ec6f8c6',1,'Cori::Graphics::FontData::FontData()']]],
   ['fontdata_2ehpp_18',['FontData.hpp',['../FontData_8hpp.html',1,'']]],
   ['for_20the_20future_19',['Plans for the future',['../index.html#plans-for-the-future',1,'']]],
-  ['fraction_20',['fraction',['../structCori_1_1Physics_1_1CastResult.html#ab86e1a839c699612da3c1e8b4f5a9ec8',1,'Cori::Physics::CastResult']]],
-  ['frameend_21',['FrameEnd',['../classCori_1_1Profiling_1_1TimeProfiler.html#aab3b9ccab43b8f7796c48c569b667cb9',1,'Cori::Profiling::TimeProfiler']]],
-  ['framestart_22',['FrameStart',['../classCori_1_1Profiling_1_1TimeProfiler.html#af904ac39a861b860bd84b472dca474ae',1,'Cori::Profiling::TimeProfiler']]],
-  ['front_23',['front',['../classCori_1_1Graphics_1_1VBLayout.html#a184e683b6d2ce2b7234782ffa3e0cb20',1,'Cori::Graphics::VBLayout::front()'],['../classCori_1_1Graphics_1_1VBLayout.html#a12e5de65a16b5a4b0df0dad53a00df55',1,'Cori::Graphics::VBLayout::front() const']]],
-  ['full_24',['full',['../classCori_1_1Core_1_1PackedArray.html#a728edc3c2fa578519db94ec237a6590b',1,'Cori::Core::PackedArray']]],
-  ['future_25',['Plans for the future',['../index.html#plans-for-the-future',1,'']]]
+  ['format_5fas_20',['format_as',['../namespaceCori_1_1Core.html#a5585b1fa9cb167df70c60eaa4d616858',1,'Cori::Core']]],
+  ['fraction_21',['fraction',['../structCori_1_1Physics_1_1CastResult.html#ab86e1a839c699612da3c1e8b4f5a9ec8',1,'Cori::Physics::CastResult']]],
+  ['frameend_22',['FrameEnd',['../classCori_1_1Profiling_1_1TimeProfiler.html#aab3b9ccab43b8f7796c48c569b667cb9',1,'Cori::Profiling::TimeProfiler']]],
+  ['framestart_23',['FrameStart',['../classCori_1_1Profiling_1_1TimeProfiler.html#af904ac39a861b860bd84b472dca474ae',1,'Cori::Profiling::TimeProfiler']]],
+  ['front_24',['front',['../classCori_1_1Graphics_1_1VBLayout.html#a184e683b6d2ce2b7234782ffa3e0cb20',1,'Cori::Graphics::VBLayout::front()'],['../classCori_1_1Graphics_1_1VBLayout.html#a12e5de65a16b5a4b0df0dad53a00df55',1,'Cori::Graphics::VBLayout::front() const']]],
+  ['full_25',['full',['../classCori_1_1Core_1_1PackedArray.html#a728edc3c2fa578519db94ec237a6590b',1,'Cori::Core::PackedArray']]],
+  ['future_26',['Plans for the future',['../index.html#plans-for-the-future',1,'']]]
 ];

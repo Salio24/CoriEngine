@@ -1,7 +1,7 @@
 var classCori_1_1Core_1_1Event =
 [
     [ "~Event", "classCori_1_1Core_1_1Event.html#a66e7aaa4e7eaa1e699152836077c9342", null ],
-    [ "GetCategoryFlags", "classCori_1_1Core_1_1Event.html#a381a6f16c2a54b5f125aafcb32e7183d", null ],
+    [ "GetCategoryFlags", "classCori_1_1Core_1_1Event.html#a9bb2f80b8728972db28bbccec0b64e55", null ],
     [ "GetEventType", "classCori_1_1Core_1_1Event.html#a7f81583c73ebcb5f95e0e15162df5e5a", null ],
     [ "GetName", "classCori_1_1Core_1_1Event.html#a2b72405936a555efbfa708452eecb325", null ],
     [ "IsInCategory", "classCori_1_1Core_1_1Event.html#a2bdec15b54fdab9f56e72d7144df34ba", null ],

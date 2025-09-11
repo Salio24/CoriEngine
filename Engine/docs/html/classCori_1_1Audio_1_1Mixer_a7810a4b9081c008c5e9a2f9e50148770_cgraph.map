@@ -1,5 +1,5 @@
 <map id="Cori::Audio::Mixer::GetMasterGain" name="Cori::Audio::Mixer::GetMasterGain">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,143,50"/>
+<area shape="rect" id="Node000001" title="Returns the current master gain specified for the mixer. The default gain for a mixer is 1...." alt="" coords="5,5,143,50"/>
 <area shape="rect" id="Node000002" href="$ref_8cpp.html#a5f5f009e5114c3c04ab0283d39d6e04e" title=" " alt="" coords="191,14,342,42"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
 </map>

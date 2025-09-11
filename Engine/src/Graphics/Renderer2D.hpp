@@ -98,12 +98,11 @@ namespace Cori {
 			// void DrawCircle(...);
 			// void DrawLine(...);
 
-		protected:
+		private:
 			friend API;
 			static void Init();
 			static void Shutdown();
 
-		private:
 			struct Quad {
 				glm::mat3 m_Transform{ 0.0f };
 				glm::vec4 m_TexturePosition{ 0.0f };

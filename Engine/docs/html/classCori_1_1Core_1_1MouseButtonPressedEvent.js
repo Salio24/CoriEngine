@@ -1,7 +1,7 @@
 var classCori_1_1Core_1_1MouseButtonPressedEvent =
 [
     [ "MouseButtonPressedEvent", "classCori_1_1Core_1_1MouseButtonPressedEvent.html#a110e1bfa06d10f605352f8cc0aaf266e", null ],
-    [ "GetCategoryFlags", "classCori_1_1Core_1_1MouseButtonPressedEvent.html#a40b159a027a2e7d18d6b845e0383f0fc", null ],
+    [ "GetCategoryFlags", "classCori_1_1Core_1_1MouseButtonPressedEvent.html#aa0a7b51eac16b5bea1bd57f2d6fecd74", null ],
     [ "GetEventType", "classCori_1_1Core_1_1MouseButtonPressedEvent.html#a32c17c9ecd63be878c8fcafebf08c604", null ],
     [ "GetMouseButton", "classCori_1_1Core_1_1MouseButtonPressedEvent.html#a9dc26c05e2b7f36b2d75fa8b077e020b", null ],
     [ "GetName", "classCori_1_1Core_1_1MouseButtonPressedEvent.html#aa6f3f42163a9b28d0da168ac1ad52fe6", null ],

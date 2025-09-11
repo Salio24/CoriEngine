@@ -27,7 +27,7 @@ namespace Cori {
 			namespace Entity {
 				struct Name {
 					Name() = default;
-				protected:
+				private:
 					friend World::Entity;
 					friend World::Scene;
 					std::string m_Name;
@@ -120,7 +120,7 @@ namespace Cori {
 
 
 
-				protected:
+				private:
 					friend World::Scene;
 					glm::vec2 m_LocalPosition{ 0.0f, 0.0f };
 					glm::vec2 m_LocalScale{ 1.0f, 1.0f };
@@ -241,14 +241,13 @@ namespace Cori {
 						return m_HasSemiTransparency;
 					}
 
-				protected:
+				private:
 					friend class QuadAnimator;
 					friend class QuadAnimatorNew;
 
 					glm::vec2 m_HalfSize{ 0.0f };
 					Graphics::UVs m_UVs{};
 					std::shared_ptr<Graphics::Texture2D> m_Texture{ nullptr };
-				private:
 					glm::vec4 m_Color{ 1.0f, 1.0f, 1.0f, 1.0f };
 				public:
 					bool m_Visible{ true };
@@ -257,7 +256,6 @@ namespace Cori {
 					bool m_FlipY{ false };
 				private:
 					bool m_HasSemiTransparency{ false };
-				protected:
 					bool m_AnimatorBound{ false };
 				};
 
