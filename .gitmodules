@@ -53,3 +53,6 @@
 [submodule "Engine/thirdparty/utfcpp"]
 	path = Engine/thirdparty/utfcpp
 	url = https://github.com/nemtrif/utfcpp
+[submodule "Engine/thirdparty/tracy"]
+	path = Engine/thirdparty/tracy
+	url = https://github.com/wolfpld/tracy.git

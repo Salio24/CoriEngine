@@ -30,7 +30,17 @@ endif ()
 option(CORI_BUILD_SANDBOX_APPS   "Build sandbox apps. (can break the compilation if enabled)" OFF)
 option(CORI_BUILD_DOCS "Build CoriEngine documentation" OFF)
 option(CORI_SANITIZE "Enable address sanitization" OFF)
-option(CORI_USE_AVX2 "Force AVX2, default OFF, -march=native is used by default" OFF)
+option(CORI_USE_AVX2 "Allows the use of AVX2 in thirdparty libs" ON)
+option(CORI_FORCE_AVX2 "Force AVX2, default OFF, -march=native is used by default" OFF)
+option(CORI_ENABLE_TRACY_PROFILER "Enables Tracy profiler in debug builds" ON)
+
+if (NOT CORI_USE_AVX2)
+    set(CORI_FORCE_AVX2 OFF)
+endif()
+
+if(CORI_FORCE_AVX2)
+    set(CORI_USE_AVX2 ON)
+endif()
 
 project(main)
     if(CLANG_VARIANT STREQUAL "OTHER" AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -56,11 +66,13 @@ project(main)
     endif()
     set(CMAKE_CXX_STANDARD 23)
 
-    if (NOT CORI_USE_AVX2)
+    if (NOT CORI_FORCE_AVX2)
         add_compile_options(-march=native)
     else()
         add_compile_options(-mavx2)
     endif()
+
+    add_compile_options()
 
     #set(CMAKE_COLOR_DIAGNOSTICS ON CACHE BOOL "")
 

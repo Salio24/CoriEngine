@@ -12,8 +12,8 @@ namespace Cori {
 			public:
 				constexpr Descriptor(std::string name, std::filesystem::path path, const bool preDecode = true) noexcept
 					: m_Path(std::move(path)),
-					m_PreDecode(preDecode),
 					m_Name(std::move(name)),
+					m_PreDecode(preDecode),
 					m_RuntimeID(s_NextRuntimeID.fetch_add(1, std::memory_order_relaxed))
 				{ }
 
@@ -32,8 +32,8 @@ namespace Cori {
 				};
 
 				const std::filesystem::path m_Path;
-				const bool m_PreDecode;
 				const std::string m_Name;
+				const bool m_PreDecode;
 
 			private:
 				const uint32_t m_RuntimeID{ 0 };

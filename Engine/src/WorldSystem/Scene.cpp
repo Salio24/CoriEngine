@@ -29,12 +29,14 @@ namespace Cori {
 			auto& nameComp = m_Registry.emplace<Components::Entity::Name>(entity);
 			nameComp.m_Name = name;
 			m_Registry.emplace<Components::Entity::Tag>(entity, tag);
-			m_Registry.emplace<Components::Entity::Transform>(entity);
+			//m_Registry.emplace<Components::Entity::Transform>(entity);
 			m_Registry.emplace<Components::Entity::Hierarchy>(entity);
 			const auto& uuidComp = m_Registry.emplace<Components::Entity::UUID>(entity);
 			m_UUIDToEntity.insert({ uuidComp.m_UUID, entity });
 			CORI_CORE_TRACE_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Created Entity With ID: {}, Version: {}, Name: {}, Tag: {}", entt::to_integral(entity), entt::to_version(entity), name, tag.GetDebugName());
-			return Entity{ {m_Registry, entity} };
+			Entity e = entt::handle{m_Registry, entity};
+			e.AddComponent<Components::Entity::Transform>(e);
+			return e;
 		}
 
 		std::expected<void, Core::CoriError<>> Scene::AddEntityToCache(const Entity entity, const Utility::StringHash32 key) {
@@ -170,13 +172,21 @@ namespace Cori {
 		}
 
 		void Scene::UpdateTransform() {
-			const auto view = m_Registry.view<Components::Entity::Transform, Components::Entity::Hierarchy>();
-			for (const auto entity : view) {
-				const auto& hierarchy = view.get<Components::Entity::Hierarchy>(entity);
-				if (!m_Registry.valid(hierarchy.m_Parent)) {
-					UpdateTransformRecursive(entity, glm::mat3(1.0f), 1, false, false);
-				}
+			//const auto view = m_Registry.view<Components::Entity::Transform, Components::Entity::Hierarchy>();
+			//for (const auto entity : view) {
+			//	const auto& hierarchy = view.get<Components::Entity::Hierarchy>(entity);
+			//	if (!m_Registry.valid(hierarchy.m_Parent)) {
+			//		UpdateTransformRecursive(entity, glm::mat3(1.0f), 1, false, false);
+			//	}
+			//}
+
+			const auto view1 = m_Registry.view<Components::Entity::DirtyTransformFlag>();
+
+			// 2. This loop runs only a handful of times per frame in a typical scene.
+			for (const auto entity : view1) {
+				UpdateTransformRecursive(entity, glm::mat3(1.0f), 1, false, false);
 			}
+			m_Registry.clear<Components::Entity::DirtyTransformFlag>();
 		}
 		void Scene::UpdateTransformRecursive(entt::entity entity, const glm::mat3& parentTransform, const uint8_t parentDepth, const bool parentTransformDirty, const bool parentDepthDirty) {
 			auto& transform = m_Registry.get<Components::Entity::Transform>(entity);
@@ -190,7 +200,6 @@ namespace Cori {
 				} else {
 					transform.m_WorldTransform = transform.m_LastParentTransform * transform.GetLocalTransform();
 				}
-
 				transform.m_DirtyTransform = false;
 			}
 			if (layerDirty) {
@@ -205,13 +214,13 @@ namespace Cori {
 					transform.m_DirtyDepth = false;
 				}
 			}
-
 			const auto& hierarchy = m_Registry.get<Components::Entity::Hierarchy>(entity);
 			entt::entity currentChild = hierarchy.m_FirstChild;
 			while (m_Registry.valid(currentChild)) {
 				UpdateTransformRecursive(currentChild, transform.m_WorldTransform, transform.m_WorldDepth, transformDirty, layerDirty);
 				currentChild = m_Registry.get<Components::Entity::Hierarchy>(currentChild).m_NextSibling;
 			}
+
 		}
 
 		void Scene::OnHierarchyComponentDestroyed(entt::registry& registry, entt::entity entity) {

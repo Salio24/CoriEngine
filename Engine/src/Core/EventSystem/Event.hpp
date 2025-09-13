@@ -119,7 +119,7 @@ namespace Cori {
 		 * @brief Needed for fmt/spadlog.
 		 */
 		inline std::string format_as(const Event& e) {
-			return e.ToString();
+			return std::string(e.ToString());
 		}
 
 		using EventCallbackFn = std::function<void(Event&)>;

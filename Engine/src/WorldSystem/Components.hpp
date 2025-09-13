@@ -56,14 +56,32 @@ namespace Cori {
 					entt::entity m_PreviousSibling { entt::null };
 				};
 
+				struct DirtyTransformFlag {
+					DirtyTransformFlag() = default;
+				private:
+					// entt cant create fully empty components
+					[[maybe_unused]] uint8_t placeholder{ 0 };
+				};
+
 				struct Transform {
 					Transform() = default;
-					Transform(const glm::vec2 localPosition, const uint8_t localLayer) : m_LocalPosition(localPosition), m_LocalDepthOffset(localLayer) {}
+					explicit Transform(const World::Entity& owner) : m_Owner(owner) {}
 
 					void SetLocalPosition(const glm::vec2 localPosition) {
 						if (m_LocalPosition != localPosition) {
 							m_LocalPosition = localPosition;
 							m_DirtyTransform = true;
+
+							entt::entity root = m_Owner.GetRawEntity();
+							entt::entity currentParent = m_Owner.GetComponents<Hierarchy>().m_Parent;
+							while (m_Owner.GetRawHandle().registry()->valid(currentParent)) {
+								root = currentParent;
+								currentParent = m_Owner.GetRawHandle().registry()->get<Hierarchy>(root).m_Parent;
+							}
+
+							if (!m_Owner.GetRawHandle().registry()->all_of<DirtyTransformFlag>(root)) {
+								m_Owner.GetRawHandle().registry()->emplace<DirtyTransformFlag>(root);
+							}
 						}
 					}
 
@@ -71,6 +89,17 @@ namespace Cori {
 						if (m_LocalRotation != localRotation) {
 							m_LocalRotation = localRotation;
 							m_DirtyTransform = true;
+
+							entt::entity root = m_Owner.GetRawEntity();
+							entt::entity currentParent = m_Owner.GetComponents<Hierarchy>().m_Parent;
+							while (m_Owner.GetRawHandle().registry()->valid(currentParent)) {
+								root = currentParent;
+								currentParent = m_Owner.GetRawHandle().registry()->get<Hierarchy>(root).m_Parent;
+							}
+
+							if (!m_Owner.GetRawHandle().registry()->all_of<DirtyTransformFlag>(root)) {
+								m_Owner.GetRawHandle().registry()->emplace<DirtyTransformFlag>(root);
+							}
 						}
 					}
 
@@ -78,6 +107,17 @@ namespace Cori {
 						if (m_LocalScale != localScale) {
 							m_LocalScale = localScale;
 							m_DirtyTransform = true;
+
+							entt::entity root = m_Owner.GetRawEntity();
+							entt::entity currentParent = m_Owner.GetComponents<Hierarchy>().m_Parent;
+							while (m_Owner.GetRawHandle().registry()->valid(currentParent)) {
+								root = currentParent;
+								currentParent = m_Owner.GetRawHandle().registry()->get<Hierarchy>(root).m_Parent;
+							}
+
+							if (!m_Owner.GetRawHandle().registry()->all_of<DirtyTransformFlag>(root)) {
+								m_Owner.GetRawHandle().registry()->emplace<DirtyTransformFlag>(root);
+							}
 						}
 					}
 
@@ -85,6 +125,17 @@ namespace Cori {
 						if (m_LocalDepthOffset != localDepth) {
 							m_LocalDepthOffset = localDepth;
 							m_DirtyDepth = true;
+
+							entt::entity root = m_Owner.GetRawEntity();
+							entt::entity currentParent = m_Owner.GetComponents<Hierarchy>().m_Parent;
+							while (m_Owner.GetRawHandle().registry()->valid(currentParent)) {
+								root = currentParent;
+								currentParent = m_Owner.GetRawHandle().registry()->get<Hierarchy>(root).m_Parent;
+							}
+
+							if (!m_Owner.GetRawHandle().registry()->all_of<DirtyTransformFlag>(root)) {
+								m_Owner.GetRawHandle().registry()->emplace<DirtyTransformFlag>(root);
+							}
 						}
 					}
 
@@ -118,14 +169,13 @@ namespace Cori {
 									glm::scale(glm::mat3(1.0f), m_LocalScale);
 					}
 
-
-
 				private:
 					friend World::Scene;
 					glm::vec2 m_LocalPosition{ 0.0f, 0.0f };
 					glm::vec2 m_LocalScale{ 1.0f, 1.0f };
 					float m_LocalRotation{ 0.0f };
 					glm::mat3 m_LastParentTransform{ 1.0f };
+					World::Entity m_Owner;
 				public:
 					glm::mat3 m_WorldTransform{ 1.0f };
 					uint8_t m_WorldDepth{ 1 };

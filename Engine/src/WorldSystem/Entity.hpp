@@ -117,9 +117,11 @@ namespace Cori {
 
 			[[nodiscard]] entt::entity GetRawEntity() const { return m_EntityHandle.entity(); }
 
+			[[nodiscard]] entt::handle GetRawHandle() const { return m_EntityHandle; }
+
 			void PrintHierarchy() const;
 
-			std::string GetName() const;
+			std::string_view GetName() const;
 
 			void SetName(const std::string& name);
 		private:

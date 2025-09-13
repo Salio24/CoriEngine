@@ -12,8 +12,9 @@
 
 # build directories 
 */bin/*
-Engine/bin
+/Engine/bin/*
 /Engine/docs/temp/*
+/Engine/tools/TracyGUI/*
 
 # git submodules 
 /Engine/thirdparty/freetype/*

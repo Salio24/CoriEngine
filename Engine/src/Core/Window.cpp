@@ -176,13 +176,13 @@ namespace Cori {
 					}
 				case SDL_EVENT_MOUSE_BUTTON_DOWN:
 					{
-						MouseButtonPressedEvent mouseButtonPressedEvent(static_cast<CoriMouseCode>(e.button.button));
+						MouseButtonPressedEvent mouseButtonPressedEvent(static_cast<CoriMouseKeycode>(e.button.button));
 						m_Data->m_EventCallback(mouseButtonPressedEvent);
 						break;
 					}
 				case SDL_EVENT_MOUSE_BUTTON_UP:
 					{
-						MouseButtonReleasedEvent mouseButtonReleasedEvent(static_cast<CoriMouseCode>(e.button.button));
+						MouseButtonReleasedEvent mouseButtonReleasedEvent(static_cast<CoriMouseKeycode>(e.button.button));
 						m_Data->m_EventCallback(mouseButtonReleasedEvent);
 						break;
 					}

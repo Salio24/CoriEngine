@@ -69,15 +69,15 @@ namespace Cori {
 			if (m_LayerPushQueue.size() != 0) {
 				for (Layer* layer : std::views::reverse(m_LayerPushQueue)) {
 					PushLayer(layer);
+					m_LayerPushQueue.erase(std::ranges::find(m_LayerPushQueue, layer));
 				}
-				m_LayerPushQueue.clear();
 			}
 
 			if (m_OverlayPushQueue.size() != 0) {
 				for (Layer* layer : std::views::reverse(m_OverlayPushQueue)) {
 					PushOverlay(layer);
+					m_OverlayPushQueue.erase(std::ranges::find(m_OverlayPushQueue, layer));
 				}
-				m_OverlayPushQueue.clear();
 			}
 
 			if (m_LayerPopQueue != 0) {

@@ -49,10 +49,6 @@ namespace Cori {
 			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::ImGui }, "ImGuiLayer detached");
 		}
 
-		void ImGuiLayer::OnImGuiRender([[maybe_unused]] const double deltaTime) {
-
-		}
-
 		void ImGuiLayer::OnEvent(Event& event) {
 			const ImGuiIO& io = ImGui::GetIO();
 

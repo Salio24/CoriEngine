@@ -101,76 +101,76 @@ namespace Cori {
 			glUseProgram(0);
 		}
 
-		void OpenGLShaderProgram::SetBool(const std::string& name, const bool value) const {
+		void OpenGLShaderProgram::SetBool(const char* name, const bool value) const {
 			if (!m_UniformLocations.contains(name)) {
-				m_UniformLocations.insert({ name, static_cast<int32_t>(glGetUniformLocation(m_ID, name.c_str())) });
+				m_UniformLocations.insert({ name, static_cast<int32_t>(glGetUniformLocation(m_ID, name)) });
 			}
 
-			glProgramUniform1i(m_ID, static_cast<GLint>(m_UniformLocations.at(name)), static_cast<GLint>(value));
+			glProgramUniform1i(m_ID, static_cast<GLint>(m_UniformLocations.find(name)->second), static_cast<GLint>(value));
 		}
 
-		void OpenGLShaderProgram::SetInt(const std::string& name, const int32_t value) const {
+		void OpenGLShaderProgram::SetInt(const char* name, const int32_t value) const {
 			if (!m_UniformLocations.contains(name)) {
-				m_UniformLocations.insert({ name, static_cast<int32_t>(glGetUniformLocation(m_ID, name.c_str())) });
+				m_UniformLocations.insert({ name, static_cast<int32_t>(glGetUniformLocation(m_ID, name)) });
 			}
 
-			glProgramUniform1i(m_ID, static_cast<GLint>(m_UniformLocations.at(name)), value);
+			glProgramUniform1i(m_ID, static_cast<GLint>(m_UniformLocations.find(name)->second), value);
 		}
 
-		void OpenGLShaderProgram::SetFloat(const std::string& name, const float value) const {
+		void OpenGLShaderProgram::SetFloat(const char* name, const float value) const {
 			if (!m_UniformLocations.contains(name)) {
-				m_UniformLocations.insert({ name, static_cast<int32_t>(glGetUniformLocation(m_ID, name.c_str())) });
+				m_UniformLocations.insert({ name, static_cast<int32_t>(glGetUniformLocation(m_ID, name)) });
 			}
 
-			glProgramUniform1f(m_ID, static_cast<GLint>(m_UniformLocations.at(name)), value);
+			glProgramUniform1f(m_ID, static_cast<GLint>(m_UniformLocations.find(name)->second), value);
 		}
 
-		void OpenGLShaderProgram::SetVec2(const std::string& name, const glm::vec2& value) const {
+		void OpenGLShaderProgram::SetVec2(const char* name, const glm::vec2& value) const {
 			if (!m_UniformLocations.contains(name)) {
-				m_UniformLocations.insert({ name, static_cast<int32_t>(glGetUniformLocation(m_ID, name.c_str())) });
+				m_UniformLocations.insert({ name, static_cast<int32_t>(glGetUniformLocation(m_ID, name)) });
 			}
 
-			glProgramUniform2fv(m_ID, static_cast<GLint>(m_UniformLocations.at(name)), 1, &value[0]);
+			glProgramUniform2fv(m_ID, static_cast<GLint>(m_UniformLocations.find(name)->second), 1, &value[0]);
 		}
 
-		void OpenGLShaderProgram::SetVec3(const std::string& name, const glm::vec3& value) const {
+		void OpenGLShaderProgram::SetVec3(const char* name, const glm::vec3& value) const {
 			if (!m_UniformLocations.contains(name)) {
-				m_UniformLocations.insert({ name, static_cast<int32_t>(glGetUniformLocation(m_ID, name.c_str())) });
+				m_UniformLocations.insert({ name, static_cast<int32_t>(glGetUniformLocation(m_ID, name)) });
 			}
 
-			glProgramUniform3fv(m_ID, static_cast<GLint>(m_UniformLocations.at(name)), 1, &value[0]);
+			glProgramUniform3fv(m_ID, static_cast<GLint>(m_UniformLocations.find(name)->second), 1, &value[0]);
 		}
 
-		void OpenGLShaderProgram::SetVec4(const std::string& name, const glm::vec4& value) const {
+		void OpenGLShaderProgram::SetVec4(const char* name, const glm::vec4& value) const {
 			if (!m_UniformLocations.contains(name)) {
-				m_UniformLocations.insert({ name, static_cast<int32_t>(glGetUniformLocation(m_ID, name.c_str())) });
+				m_UniformLocations.insert({ name, static_cast<int32_t>(glGetUniformLocation(m_ID, name)) });
 			}
 
-			glProgramUniform4fv(m_ID, static_cast<GLint>(m_UniformLocations.at(name)), 1, &value[0]);
+			glProgramUniform4fv(m_ID, static_cast<GLint>(m_UniformLocations.find(name)->second), 1, &value[0]);
 		}
 
-		void OpenGLShaderProgram::SetMat2(const std::string& name, const glm::mat2& value) const {
+		void OpenGLShaderProgram::SetMat2(const char* name, const glm::mat2& value) const {
 			if (!m_UniformLocations.contains(name)) {
-				m_UniformLocations.insert({ name, static_cast<int32_t>(glGetUniformLocation(m_ID, name.c_str())) });
+				m_UniformLocations.insert({ name, static_cast<int32_t>(glGetUniformLocation(m_ID, name)) });
 			}
 
-			glProgramUniformMatrix2fv(m_ID, static_cast<GLint>(m_UniformLocations.at(name)), 1, GL_FALSE, &value[0][0]);
+			glProgramUniformMatrix2fv(m_ID, static_cast<GLint>(m_UniformLocations.find(name)->second), 1, GL_FALSE, &value[0][0]);
 		}
 
-		void OpenGLShaderProgram::SetMat3(const std::string& name, const glm::mat3& value) const {
+		void OpenGLShaderProgram::SetMat3(const char* name, const glm::mat3& value) const {
 			if (!m_UniformLocations.contains(name)) {
-				m_UniformLocations.insert({ name, static_cast<int32_t>(glGetUniformLocation(m_ID, name.c_str())) });
+				m_UniformLocations.insert({ name, static_cast<int32_t>(glGetUniformLocation(m_ID, name)) });
 			}
 
-			glProgramUniformMatrix3fv(m_ID, static_cast<GLint>(m_UniformLocations.at(name)), 1, GL_FALSE, &value[0][0]);
+			glProgramUniformMatrix3fv(m_ID, static_cast<GLint>(m_UniformLocations.find(name)->second), 1, GL_FALSE, &value[0][0]);
 		}
 
-		void OpenGLShaderProgram::SetMat4(const std::string& name, const glm::mat4& value) const {
+		void OpenGLShaderProgram::SetMat4(const char* name, const glm::mat4& value) const {
 			if (!m_UniformLocations.contains(name)) {
-				m_UniformLocations.insert({ name, static_cast<int32_t>(glGetUniformLocation(m_ID, name.c_str())) });
+				m_UniformLocations.insert({ name, static_cast<int32_t>(glGetUniformLocation(m_ID, name)) });
 			}
 
-			glProgramUniformMatrix4fv(m_ID, static_cast<GLint>(m_UniformLocations.at(name)), 1, GL_FALSE, &value[0][0]);
+			glProgramUniformMatrix4fv(m_ID, static_cast<GLint>(m_UniformLocations.find(name)->second), 1, GL_FALSE, &value[0][0]);
 		}
 
 		bool OpenGLShaderProgram::CheckCompileErrors(const uint32_t shader, std::string type) {

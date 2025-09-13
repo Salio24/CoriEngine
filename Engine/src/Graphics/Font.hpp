@@ -1,6 +1,8 @@
 #pragma once
 #include "Profiling/Trackable.hpp"
 
+
+
 namespace Cori {
 	namespace Graphics {
 

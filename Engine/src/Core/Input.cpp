@@ -2,12 +2,12 @@
 
 namespace Cori {
 	namespace Core {
-		bool Input::IsKeyPressed(const CoriKeycode keycode) {
+		bool Input::IsKeyDown(const CoriKeycode keycode) {
 			const auto state = SDL_GetKeyboardState(nullptr);
 			return state[keycode] == 1;
 		}
 
-		bool Input::IsMouseKeyPressed(const CoriMouseCode button) {
+		bool Input::IsMouseKeyDown(const CoriMouseKeycode button) {
 			const auto state = SDL_GetMouseState(nullptr, nullptr);
 			return (state & SDL_BUTTON_MASK(button)) != 0;
 		}
@@ -22,6 +22,12 @@ namespace Cori {
 			float y;
 			SDL_GetMouseState(nullptr, &y);
 			return static_cast<int32_t>(y);
+		}
+
+		glm::ivec2 Input::GetMousePosition() {
+			float x, y;
+			SDL_GetMouseState(&x, &y);
+			return { x, y };
 		}
 	}
 }

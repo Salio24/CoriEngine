@@ -1,4 +1,20 @@
 #pragma once
+#ifdef CORI_ENABLE_PROFILING
+#include <tracy/Tracy.hpp>
+
+inline void* operator new(std::size_t count)
+{
+	auto ptr= malloc(count);
+	TracyAllocS(ptr, count, 10);
+	return ptr;
+}
+inline void operator delete(void* ptr) noexcept
+{
+	TracyFreeS(ptr, 10);
+	free(ptr);
+}
+#endif
+
 #include "Engine.hpp"
 
 extern Cori::Core::Application* Cori::Core::CreateApplication();

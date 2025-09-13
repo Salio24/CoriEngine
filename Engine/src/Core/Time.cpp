@@ -21,7 +21,7 @@ namespace Cori {
 			if (m_Timestep != 0) {
 				while (m_Accumulator >= m_Timestep) {
 
-					m_TickrateUpdateFunc(m_Timestep);
+					m_TickrateUpdateFunc(*this);
 
 					m_Accumulator -= m_Timestep;
 				}

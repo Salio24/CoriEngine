@@ -162,7 +162,7 @@ namespace Cori {
 			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self }, "Finished");
 		}
 
-		std::string Entity::GetName() const {
+		std::string_view Entity::GetName() const {
 			return GetComponents<Components::Entity::Name>().m_Name;
 		}
 		void Entity::SetName(const std::string& name) {

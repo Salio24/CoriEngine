@@ -51,7 +51,7 @@ namespace Cori {
 #ifdef DEBUG_BUILD
 			dispatcher.Dispatch<KeyReleasedEvent>([](const KeyReleasedEvent& e) -> bool {
 				if (e.GetKeyCode() == CORI_KEY_F8) {
-					CORI_PROFILE_REQUEST_NEXT_FRAME();
+					//CORI_PROFILER_FRAME_START();
 				}
 				return false;
 			});
@@ -122,7 +122,7 @@ namespace Cori {
 
 					if (m_RenderImGui) {
 						for (Layer* layer : m_LayerStack) {
-							layer->OnImGuiRender(m_GameTimer.GetDeltaTime());
+							layer->OnImGuiRender(m_GameTimer);
 						}
 					}
 
@@ -132,22 +132,21 @@ namespace Cori {
 
 					m_LayerStack.ProcessQueue();
 				}
-				CORI_PROFILER_FRAME_END();
 			}
 		}
 
 
 
-		void Application::TickrateUpdate(const float timeStep) {
+		void Application::TickrateUpdate(GameTimer& gameTimer) {
 			//static uint64_t ti = 0;
 			if (m_ManualStep) {
 				static bool oneshot = true;
-				if (Input::IsKeyPressed(CORI_KEY_K)) {
+				if (Input::IsKeyDown(CORI_KEY_K)) {
 					if (oneshot) {
 						oneshot = false;
 						for (Layer* layer : m_LayerStack) {
-							layer->SceneTickrateUpdate(timeStep);
-							layer->OnTickUpdate(timeStep);
+							layer->SceneTickrateUpdate(gameTimer.GetTimestep());
+							layer->OnTickUpdate(gameTimer);
 						}
 						//ti++;
 						//CORI_CORE_DEBUG("TICK {}", ti);
@@ -159,8 +158,8 @@ namespace Cori {
 
 			} else {
 				for (Layer* layer : m_LayerStack) {
-					layer->SceneTickrateUpdate(timeStep);
-					layer->OnTickUpdate(timeStep);
+					layer->SceneTickrateUpdate(gameTimer.GetTimestep());
+					layer->OnTickUpdate(gameTimer);
 
 				}
 				//ti++;

@@ -7,7 +7,6 @@ namespace Cori {
 			GameTimer();
 			~GameTimer() = default;
 
-			void Update();
 			void SetTickrate(const uint16_t tickrate);
 
 			double GetDeltaTime() const { return m_DeltaTime; }
@@ -19,9 +18,12 @@ namespace Cori {
 			double GetMinutes() const { return m_Time / 60.0f; }
 			double GetHours() const { return m_Time / 3600.0f; }
 
-			void SetTickrateUpdateFunc(const std::function<void(const float)>& func) { m_TickrateUpdateFunc = func; }
 
 		private:
+			friend class Application;
+			void SetTickrateUpdateFunc(const std::function<void(GameTimer&)>& func) { m_TickrateUpdateFunc = func; }
+			void Update();
+
 			double m_DeltaTime{ 0 };
 			double m_TickAlpha{ 0 };
 
@@ -35,7 +37,7 @@ namespace Cori {
 
 			uint16_t m_Tickrate{ 0 };
 
-			std::function<void(const float)> m_TickrateUpdateFunc{ nullptr };
+			std::function<void(GameTimer&)> m_TickrateUpdateFunc{ nullptr };
 		};
 
 		class ManualTimer {

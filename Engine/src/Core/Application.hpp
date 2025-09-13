@@ -86,7 +86,7 @@ namespace Cori {
 		private:
 			void OnEvent(Event& event);
 
-			void TickrateUpdate(const float timeStep);
+			void TickrateUpdate(GameTimer& gameTimer);
 
 			bool OnWindowClose();
 

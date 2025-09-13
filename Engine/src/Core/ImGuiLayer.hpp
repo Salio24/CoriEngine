@@ -9,7 +9,6 @@ namespace Cori {
 			~ImGuiLayer() override;
 			void OnAttach() override;
 			void OnDetach() override;
-			void OnImGuiRender(const double deltaTime) override;
 			void OnEvent(Event& event) override;
 
 			void StartFrame();
