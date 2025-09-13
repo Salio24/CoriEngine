@@ -2,13 +2,13 @@
 #ifdef CORI_ENABLE_PROFILING
 #include <tracy/Tracy.hpp>
 
-inline void* operator new(std::size_t count)
+void* operator new(std::size_t count)
 {
 	auto ptr= malloc(count);
 	TracyAllocS(ptr, count, 10);
 	return ptr;
 }
-inline void operator delete(void* ptr) noexcept
+void operator delete(void* ptr) noexcept
 {
 	TracyFreeS(ptr, 10);
 	free(ptr);
