@@ -27,6 +27,7 @@ namespace Cori {
 
 			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindEntity(const std::string& name);
 			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindEntity(const std::string& name, const Utility::HashedTag64& tag);
+			[[nodiscard]] std::vector<Entity> GetEntitiesWithTag(const Utility::HashedTag64& tag);
 
 			template<typename... Component>
 			[[nodiscard]] auto View() {

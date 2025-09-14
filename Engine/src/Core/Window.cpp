@@ -95,7 +95,7 @@ namespace Cori {
 
 			CORI_CORE_ASSERT(m_Data->m_Window, "Failed to create Window '{}'. SDL_Error: {}", m_Data->m_WindowTitle, SDL_GetError());
 
-			const auto logoPath = std::filesystem::path(FileSystem::Internal::PathDefines::EngineDataRoot) / std::filesystem::path("ui/logo256.png");
+			const auto logoPath = std::filesystem::path(FileSystem::Internal::PathDefines::GetEngineDataRoot()) / std::filesystem::path("ui/logo256.png");
 			SDL_Surface* logo = IMG_Load(logoPath.string().c_str());
 
 			if (!logo) {

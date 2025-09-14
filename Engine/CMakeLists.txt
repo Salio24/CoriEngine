@@ -10,7 +10,7 @@ project(CoriEngine)
     cmake_path(CONVERT "${ENGINE_ASSETS_DIR}" TO_CMAKE_PATH_LIST ENGINEDATA_PATH)
 
     set(PATH_DEFINES_HEADER_IN "${CORI_ENGINE_SOURCE_DIR}/cmake/PathDefines.hpp.in")
-    set(PATH_DEFINES_HEADER_OUT "${CMAKE_CURRENT_BINARY_DIR}/generated/PathDefinesGenerated.hpp")
+    set(PATH_DEFINES_HEADER_OUT "${CORI_ENGINE_SOURCE_DIR}/src/Generated/PathDefinesGenerated.hpp")
 
     configure_file(${PATH_DEFINES_HEADER_IN} ${PATH_DEFINES_HEADER_OUT})
 
@@ -201,11 +201,11 @@ project(CoriEngine)
             ${CORI_ENGINE_SOURCE_DIR}/thirdparty/ska_sort
             ${CORI_ENGINE_SOURCE_DIR}/src
             ${CORI_INCLUDE_DIR}
-            ${CMAKE_CURRENT_BINARY_DIR}/generated
     )
 
     target_include_directories(${ENGINE_LIBRARY_NAME} PRIVATE
-    ${CORI_HEADERS_DIR}
+            ${CORI_HEADERS_DIR}
+            ${CORI_ENGINE_SOURCE_DIR}/src/Generated
     )
 
     # pch

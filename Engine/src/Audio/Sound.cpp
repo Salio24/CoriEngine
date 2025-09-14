@@ -38,7 +38,7 @@ namespace Cori {
 				} else {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Sound }, "Failed to create Sound '{} (SoundID: {})'. Error: {}. Trying to load a placeholder.", m_Name, m_ID, result.error().what());
 
-					auto result_ = Mixer::LoadSound(FileSystem::Internal::PathDefines::PlaceholderSound, preDecode, m_ID);
+					auto result_ = Mixer::LoadSound(FileSystem::Internal::PathDefines::GetEngineDataRoot() / "/placeholders/placeholder.ogg", preDecode, m_ID);
 					if (result_) {
 						m_Valid = true;
 						m_Placeholder = true;
@@ -50,7 +50,7 @@ namespace Cori {
 				}
 			} else {
 				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Sound }, "Failed to create a Sound '{} (SoundID: {})' from: '{}', specified path does not exist. Trying to load a placeholder.", m_Name, m_ID, path.string());
-				auto result_ = Mixer::LoadSound(FileSystem::Internal::PathDefines::PlaceholderSound, preDecode, m_ID);
+				auto result_ = Mixer::LoadSound(FileSystem::Internal::PathDefines::GetEngineDataRoot() / "/placeholders/placeholder.ogg", preDecode, m_ID);
 				if (result_) {
 					m_Valid = true;
 					m_Placeholder = true;

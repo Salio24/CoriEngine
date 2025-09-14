@@ -35,6 +35,7 @@
 # build directory for libs and tmp files
 /out
 
+/Engine/src/generated/*
 
 /.local
 deinitSub.sh

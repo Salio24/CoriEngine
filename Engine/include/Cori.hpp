@@ -35,7 +35,7 @@
 
 #include "../src/FileSystem/JsonSerializer.hpp"
 
-#include "../src/Profiling/TimeProfiler.hpp"
+#include "../src/Profiling/Profiler.hpp"
 
 #include "../src/WorldSystem/Scene.hpp"
 #include "../src/WorldSystem/SceneManager.hpp"

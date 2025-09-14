@@ -30,6 +30,7 @@ namespace Cori {
 				}
 
 				m_LayerPushQueue.push_back(layer);
+				layer->OnAttach();
 				return {};
 			}
 
@@ -51,6 +52,7 @@ namespace Cori {
 				}
 
 				m_OverlayPushQueue.push_back(overlay);
+				overlay->OnAttach();
 				return {};
 			}
 
@@ -107,14 +109,14 @@ namespace Cori {
 
 		void LayerStack::PushLayer(Layer* layer) {
 			m_Layers.emplace(m_Layers.begin() + m_LayerInsertIndex, layer);
-			layer->OnAttach();
+			//layer->OnAttach();
 			++m_LayerInsertIndex;
 			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Pushed Layer '{}' to LayerStack.", layer->GetName());
 		}
 
 		void LayerStack::PushOverlay(Layer* overlay) {
 			m_Layers.emplace_back(overlay);
-			overlay->OnAttach();
+			//overlay->OnAttach();
 			++m_OverlayLayerCount;
 			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Pushed Overlay Layer '{}' to LayerStack.", overlay->GetName());
 		}

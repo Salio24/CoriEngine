@@ -208,14 +208,14 @@ namespace Cori {
 				struct QuadRenderer {
 					QuadRenderer() = default;
 
-					QuadRenderer(const glm::vec2 size, const std::shared_ptr<Graphics::Texture2D>& texture, const Graphics::UVs& uvs) : m_HalfSize(size), m_UVs(uvs) {
+					QuadRenderer(const glm::vec2 halfSize, const std::shared_ptr<Graphics::Texture2D>& texture, const Graphics::UVs& uvs) : m_HalfSize(halfSize), m_UVs(uvs) {
 						const auto result = SetTexture(texture);
 						if (!result) {
 							CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadRenderer }, "Failed to fully recreate Quad Renderer. Details: '{}'", result.error().what());
 						}
 					}
 
-					QuadRenderer(const glm::vec2 size, const std::shared_ptr<Graphics::Texture2D>& texture, const Graphics::UVs& uvs, const glm::vec4& tintColor) : m_HalfSize(size), m_UVs(uvs) {
+					QuadRenderer(const glm::vec2 halfSize, const std::shared_ptr<Graphics::Texture2D>& texture, const Graphics::UVs& uvs, const glm::vec4& tintColor) : m_HalfSize(halfSize), m_UVs(uvs) {
 						const auto result = SetTexture(texture);
 						if (!result) {
 							CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadRenderer }, "Failed to fully recreate Quad Renderer. Details: '{}'", result.error().what());
@@ -223,7 +223,7 @@ namespace Cori {
 						SetColor(tintColor);
 					}
 
-					QuadRenderer(const glm::vec2 size, const glm::vec4& color) : m_HalfSize(size), m_FlatColored(true) {
+					QuadRenderer(const glm::vec2 halfSize, const glm::vec4& color) : m_HalfSize(halfSize), m_FlatColored(true) {
 						SetColor(color);
 					}
 
@@ -345,13 +345,6 @@ namespace Cori {
 						}
 					}
 					~Rigidbody() { if (IsValid()) { Destroy(); } }
-				};
-
-				struct Spawnpoint {
-					Spawnpoint() = default;
-					explicit Spawnpoint(const glm::vec2& point)
-						: m_Spawnpoint(point) {}
-					glm::vec2 m_Spawnpoint{ 0.0f, 0.0f };
 				};
 			}
 		}

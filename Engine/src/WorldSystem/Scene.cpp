@@ -90,6 +90,19 @@ namespace Cori {
 			return std::unexpected(Core::CoriError("No entity found with the specified name and tag."));
 		}
 
+		std::vector<Entity> Scene::GetEntitiesWithTag(const Utility::HashedTag64& tag) {
+			std::vector<Entity> entities;
+			CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Performing slow scene-wide collection of all entities with tag: '{}'. Consider caching it. This shouldn't be called every frame! Be aware.", tag.GetDebugName());
+			const auto view = m_Registry.view<Components::Entity::Tag>();
+			for (const auto entity : view) {
+				auto& tagComp = view.get<Components::Entity::Tag>(entity);
+				if (tag == tagComp.m_Tag) {
+					entities.emplace_back(entt::handle{ m_Registry, entity });
+				}
+			}
+			return entities;
+		}
+
 		void Scene::DestroyEntity(Entity entity) {
 			if (!entity.IsValid()) { return; }
 			if (entity.HasComponents<Components::Entity::Hierarchy>()) {
@@ -145,7 +158,9 @@ namespace Cori {
 
 				Entity& trigger = static_cast<Physics::BodyUserData*>(static_cast<Physics::ShapeRef>(beginTouch->sensorShapeId).GetBody().GetUserData())->m_Entity;
 
-				trigger.GetComponents<Components::Entity::Trigger>().OnEnter(visitor);
+				if (trigger.IsActiveGlobally()) {
+					trigger.GetComponents<Components::Entity::Trigger>().OnEnter(visitor);
+				}
 			}
 
 			for (int32_t i = 0; i < endCount; ++i)
@@ -156,7 +171,9 @@ namespace Cori {
 
 				Entity& trigger = static_cast<Physics::BodyUserData*>(static_cast<Physics::ShapeRef>(endTouch->sensorShapeId).GetBody().GetUserData())->m_Entity;
 
-				trigger.GetComponents<Components::Entity::Trigger>().OnExit(visitor);
+				if (trigger.IsActiveGlobally()) {
+					trigger.GetComponents<Components::Entity::Trigger>().OnExit(visitor);
+				}
 			}
 
 		}

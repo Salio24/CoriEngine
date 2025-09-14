@@ -271,7 +271,7 @@ namespace Cori {
 			if (finalEffectiveState) {
 				registry->remove<Components::Entity::InactiveGloballyFlag>(parent);
 			} else {
-				registry->emplace<Components::Entity::InactiveLocallyFlag>(parent);
+				registry->emplace_or_replace<Components::Entity::InactiveLocallyFlag>(parent);
 			}
 
 			const auto& hierarchy = registry->get<Components::Entity::Hierarchy>(parent);

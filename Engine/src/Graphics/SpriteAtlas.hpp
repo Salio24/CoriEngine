@@ -9,10 +9,10 @@ namespace Cori {
 		public:
 			class Descriptor {
 			public:
-				constexpr Descriptor(std::string debugName, std::filesystem::path texturePath, const glm::uvec2 spriteResolution) noexcept
+				constexpr Descriptor(std::string name, std::filesystem::path texturePath, const glm::uvec2 spriteResolution) noexcept
 					: m_TexturePath(std::move(texturePath)),
 					m_SpriteResolution(spriteResolution),
-					m_Name(std::move(debugName)),
+					m_Name(std::move(name)),
 					m_RuntimeID(s_NextRuntimeID.fetch_add(1, std::memory_order_relaxed))
 				{ }
 

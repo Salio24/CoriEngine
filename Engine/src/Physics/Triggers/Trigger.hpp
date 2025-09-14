@@ -16,11 +16,6 @@ namespace Cori {
 					Trigger() = default;
 					explicit Trigger(World::Entity& trigger);
 
-					void OnEnter(World::Entity& entity);
-
-					void OnTickUpdate(const float timeStep);
-
-					void OnExit(World::Entity& entity);
 
 					template<typename Behavior>
 					void SetBehavior() {
@@ -29,10 +24,22 @@ namespace Cori {
 						m_VisitorBuffer.clear();
 					}
 
-				private:
-					Core::PackedArray<World::Entity, uint32_t, CORI_MAX_TRIGGER_VISITORS> m_VisitorBuffer;
+					template<typename Behavior>
+					Behavior* GetBehavior() {
+						static_assert(std::is_base_of_v<TriggerBehaviour, Behavior>, "Behavior must inherit from TriggerBehaviour");
+						return dynamic_cast<Behavior*>(m_Behavior.get());
+					}
 
+				private:
+					friend World::Scene;
+					void OnEnter(World::Entity& entity);
+
+					void OnTickUpdate(const float timeStep);
+
+					void OnExit(World::Entity& entity);
+					Core::PackedArray<World::Entity, uint32_t, CORI_MAX_TRIGGER_VISITORS> m_VisitorBuffer;
 					std::unique_ptr<TriggerBehaviour> m_Behavior{ nullptr };
+					World::Entity m_Trigger;
 				};
 			}
 		}

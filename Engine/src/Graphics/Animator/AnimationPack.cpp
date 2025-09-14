@@ -137,7 +137,7 @@ namespace Cori {
 			frames.push_back(frame);
 			const AnimationData data(frames);
 			//return Animation(data, AssetManager::GetTexture2D(AssetPlaceholders::Texture2D), glm::vec2{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max() });
-			return Animation(data, AssetManager::Get(Internal::AssetPlaceholders::Texture2D), glm::vec2{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max() });
+			return Animation(data, AssetManager::Get(Internal::AssetPlaceholders::Texture2DPlaceholder), glm::vec2{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max() });
 		}
 
 		AnimationPack::AnimationPack(std::vector<AnimationData> animations, const std::shared_ptr<SpriteAtlas>& spriteAtlas, std::string name, const glm::u16vec2 frameResolution) : m_Animations(std::move(animations)), m_SpriteAtlas(spriteAtlas), m_Name(std::move(name)), m_FrameSize(frameResolution) {

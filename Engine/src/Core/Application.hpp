@@ -83,6 +83,12 @@ namespace Cori {
 			 */
 			static GameTimer& GetGameTimer() { return s_Instance->m_GameTimer; }
 
+			/**
+			 * @brief Emits the event and propagates it thought the LayerStack.
+			 * @param event Event reference to emit.
+			 */
+			static void EmitEvent(Event& event);
+
 		private:
 			void OnEvent(Event& event);
 

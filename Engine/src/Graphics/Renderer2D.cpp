@@ -38,7 +38,7 @@ namespace Cori {
 
 			s_Data->QuadInstanceBufferBase = new Quad[RendererData::MaxInstanceCount];
 
-			s_Data->QuadInstanceShader = ShaderProgram::Create(std::filesystem::path(FileSystem::Internal::PathDefines::EngineDataRoot) / std::filesystem::path("shaders/QuadInstancedVert.glsl"), std::filesystem::path(FileSystem::Internal::PathDefines::EngineDataRoot) / std::filesystem::path("shaders/QuadInstancedFrag.glsl"));
+			s_Data->QuadInstanceShader = ShaderProgram::Create(FileSystem::Internal::PathDefines::GetEngineDataRoot() / std::filesystem::path("shaders/QuadInstancedVert.glsl"), FileSystem::Internal::PathDefines::GetEngineDataRoot() / std::filesystem::path("shaders/QuadInstancedFrag.glsl"));
 
 			s_Data->WorldSpaceTransparentQuadQueue.reserve(RendererData::WorldSpaceTransparentQuadQueueInitialSize);
 			s_Data->WorldSpaceOpaqueQuadQueue.reserve(RendererData::WorldSpaceOpaqueQuadQueueInitialSize);
@@ -66,7 +66,7 @@ namespace Cori {
 
 			s_Data->CharInstanceBufferBase = new Char[RendererData::MaxCharInstanceCount];
 
-			s_Data->CharInstanceShader = ShaderProgram::Create(std::filesystem::path(FileSystem::Internal::PathDefines::EngineDataRoot) / std::filesystem::path("shaders/TextInstancedVert.glsl"), std::filesystem::path(FileSystem::Internal::PathDefines::EngineDataRoot) /  std::filesystem::path("shaders/TextInstancedFrag.glsl"));
+			s_Data->CharInstanceShader = ShaderProgram::Create(FileSystem::Internal::PathDefines::GetEngineDataRoot() / std::filesystem::path("shaders/TextInstancedVert.glsl"), FileSystem::Internal::PathDefines::GetEngineDataRoot() /  std::filesystem::path("shaders/TextInstancedFrag.glsl"));
 
 			s_Data->WorldSpaceTransparentTextQueue.reserve(RendererData::WorldSpaceTransparentTextQueueInitialSize);
 
@@ -374,8 +374,8 @@ namespace Cori {
 				return;
 			}
 
-			SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(text.m_LimitX, 0.0f)), glm::vec2(1.0f, 50.0f), glm::vec4(1.0f), nullptr, UVs{}, 15, false, false, true);
-			SubmitQuad(SCREEN_SPACE, OPAQUE, text.m_Transform, glm::vec2(0.5f, 0.5f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
+			//SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(text.m_LimitX, 0.0f)), glm::vec2(1.0f, 50.0f), glm::vec4(1.0f), nullptr, UVs{}, 15, false, false, true);
+			//SubmitQuad(SCREEN_SPACE, OPAQUE, text.m_Transform, glm::vec2(0.5f, 0.5f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
 
 			BeginCharInstancedSet();
 
@@ -521,14 +521,14 @@ namespace Cori {
 				case LEFT:
 					{
 						const float offset = totalLineLength;
-						SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
+						//SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
 
 						break;
 					}
 				case CENTER:
 					{
 						const float offset = -(totalLineLength / 2.0f);
-						SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
+						//SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
 						EndCharInstancedSet(atlas.get(), glm::translate(glm::mat3(1.0f), glm::vec2(offset, 0.0f)));
 						BeginCharInstancedSet();
 						break;
@@ -536,7 +536,7 @@ namespace Cori {
 				case RIGHT:
 					{
 						const float offset = -totalLineLength;
-						SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
+						//SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
 						EndCharInstancedSet(atlas.get(), glm::translate(glm::mat3(1.0f), glm::vec2(offset, 0.0f)));
 						BeginCharInstancedSet();
 						break;
@@ -673,21 +673,21 @@ namespace Cori {
 			case LEFT:
 				{
 					const float offset = totalLineLength;
-					SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
+					//SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
 					EndCharInstancedSet(atlas.get(), glm::mat3(1.0f));
 					break;
 				}
 			case CENTER:
 				{
 					const float offset = -(totalLineLength / 2.0f);
-					SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
+					//SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
 					EndCharInstancedSet(atlas.get(), glm::translate(glm::mat3(1.0f), glm::vec2(offset, 0.0f)));
 					break;
 				}
 			case RIGHT:
 				{
 					const float offset = -totalLineLength;
-					SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
+					//SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
 					EndCharInstancedSet(atlas.get(), glm::translate(glm::mat3(1.0f), glm::vec2(offset, 0.0f)));
 					break;
 				}

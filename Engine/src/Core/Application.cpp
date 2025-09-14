@@ -13,6 +13,7 @@ namespace Cori {
 		Application* Application::s_Instance{ nullptr };
 
 		Application::Application(const char* windowName) {
+			//m_ManualStep = true;
 			CORI_CORE_ASSERT(!s_Instance, "Trying to construct application for the second time. Application already exists!");
 			s_Instance = this;
 
@@ -41,6 +42,10 @@ namespace Cori {
 			World::SceneManager::Shutdown();
 			Graphics::API::Shutdown();
 			Audio::Mixer::Shutdown();
+		}
+
+		void Application::EmitEvent(Event& event) {
+			s_Instance->OnEvent(event);
 		}
 
 		void Application::OnEvent(Event& event) {

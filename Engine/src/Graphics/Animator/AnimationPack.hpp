@@ -6,15 +6,17 @@
 namespace Cori {
 	namespace Graphics {
 		struct Animation {
-		struct PlayParams {
-			// TODO: implement the logic that uses all this parameters
-			uint32_t Loops{ 0 };
-			uint32_t MaxFrames{ 0 };
-			uint32_t StartFrame{ 0 };
-			uint32_t MaxTicks{ 0 };
-			uint32_t StartTick{ 0 };
-			bool LoopedInSequence{ false };
-		};
+			struct PlayParams {
+				// TODO: implement the logic that uses all this parameters
+				uint32_t Loops{ 0 };
+				uint32_t MaxFrames{ 0 };
+				uint32_t StartFrame{ 0 };
+				uint32_t MaxTicks{ 0 };
+				uint32_t StartTick{ 0 };
+				bool LoopedInSequence{ false };
+			};
+
+
 
 			AnimationData m_Data;
 			std::shared_ptr<Texture2D> m_Texture;

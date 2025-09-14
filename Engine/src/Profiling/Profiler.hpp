@@ -9,7 +9,7 @@ namespace Cori {
 }
 
 #ifdef CORI_ENABLE_PROFILING
-#define CORI_PROFILE_FUNCTION() ZoneScopedS(10)
+#define CORI_PROFILE_FUNCTION() ZoneScopedS(35)
 #define CORI_PROFILE_SCOPE(name) ZoneScopedN(name)
 #define CORI_PROFILER_FRAME_START() FrameMark
 #else
