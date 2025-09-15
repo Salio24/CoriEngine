@@ -2,6 +2,9 @@
 
 namespace Cori {
 	namespace Utility {
+		/**
+		 * @brief Checks if T is present in Types pack.
+		 */
 		template <typename T, typename... Types>
 		concept IsInPack = (std::same_as<T, Types> || ...);
 
@@ -13,9 +16,15 @@ namespace Cori {
 			inline constexpr bool HasDuplicatesImpl<T, Rest...> = IsInPack<T, Rest...> || HasDuplicatesImpl<Rest...>;
 		}
 
+		/**
+		 * @brief Checks if Types pack has duplicated types.
+		 */
 		template <typename... Types>
 		concept HasDuplicates = Internal::HasDuplicatesImpl<Types...>;
 
+		/**
+		 * @brief Checks if T can be streamed.
+		 */
 		template <typename T>
 		concept IsStreamable = requires(std::ostream& os, const T& val) {
 			{ os << val } -> std::same_as<std::ostream&>;

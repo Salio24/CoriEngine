@@ -5,6 +5,9 @@ namespace Cori {
 	}
 
 	namespace Internal {
+		/**
+		 * @brief Checks T can be considered a descriptor.
+		 */
 		template <typename T>
 		concept IsDescriptor = requires(const T& a, const T& b) {
 			{ a.GetRuntimeID() } -> std::same_as<uint32_t>;
@@ -14,8 +17,11 @@ namespace Cori {
 			typename T::Hasher;
 		};
 
+		/**
+		 * @brief Checks if AssetType of Descriptor can be loaded by the AssetManager.
+		 */
 		template <typename Descriptor>
-		concept CanBeDefaultLoaded = IsDescriptor<Descriptor> && requires(const Descriptor& d) {
+		concept CanBeLoaded = IsDescriptor<Descriptor> && requires(const Descriptor& d) {
 			{ Descriptor::AssetType::Create(d) } -> std::same_as<std::shared_ptr<typename Descriptor::AssetType>>;
 		};
 	}
@@ -40,7 +46,7 @@ namespace Cori {
 		 * @param descriptor Instance of the asset descriptor.
 		 * @return A shared pointer to the loaded asset.
 		 */
-		template <Internal::CanBeDefaultLoaded Descriptor>
+		template <Internal::CanBeLoaded Descriptor>
 		static std::shared_ptr<typename Descriptor::AssetType> Get(const Descriptor& descriptor) {
 			CORI_PROFILE_FUNCTION();
 
@@ -63,7 +69,7 @@ namespace Cori {
 		 * @param descriptors An list of asset descriptors to preload, all should have the same type, can't mix different asset descriptor types in one call.
 		 * @details It is needed to avoid the stutter that will be caused when the asset is requested but not yet loaded.
 		 */
-		template <Internal::CanBeDefaultLoaded Descriptor>
+		template <Internal::CanBeLoaded Descriptor>
 		static void Preload(const std::initializer_list<Descriptor> descriptors) {
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::AssetManager::Self }, "Preloading {} <{}(s/es)>", descriptors.size(), CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType));
 			for (const auto& descriptor : descriptors) {

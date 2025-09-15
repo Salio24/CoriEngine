@@ -20,6 +20,8 @@ namespace Cori {
 	}
 }
 
+//TODO: delete copy constructors, copy assigment operators, move constructors, move assigment operators for all components!
+
 namespace Cori {
 	namespace World {
 		class Scene;

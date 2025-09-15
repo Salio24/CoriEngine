@@ -100,12 +100,24 @@ namespace Cori {
 			std::function<void(GameTimer&)> m_TickrateUpdateFunc{ nullptr };
 		};
 
+		/**
+		 * @brief You can use this to manual time something.
+		 */
 		class ManualTimer {
 		public:
 			ManualTimer() = default;
 			~ManualTimer() = default;
 
+			/**
+			 * @brief Start the manual timer.
+			 */
+
 			void Start();
+
+			/**
+			 * @brief Stops the manual timer.
+			 * @return Elapsed time in milliseconds.
+			 */
 			double End() const;
 		private:
 			uint64_t m_Start{ 0 };

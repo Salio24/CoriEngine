@@ -2,29 +2,35 @@
 
 namespace Cori {
 	namespace Utility {
+		/**
+		 * @brief Random uint32_t generator.
+		 */
 		class RandomUint32 {
 		public:
+			/**
+			 * @brief Generates a random uint32_t without a range constraints.
+			 * @return A random uint32_t.
+			 */
 			static uint32_t Gen() {
-				return Get().GenImpl();
+				if (!Get().dist_full_range) {
+					Get().dist_full_range.emplace();
+				}
+				return (*Get().dist_full_range)(Get().gen);
 			}
 
+			/**
+			 * @brief Generates a random uint32_t with a range constraint.
+			 * @param min Minimal viable result.
+			 * @param max Maximal viable result.
+			 * @return A random uint32_t in range [min, max].
+			 */
 			static uint32_t Gen(const uint32_t min, const uint32_t max) {
-				return Get().GenImpl(min, max);
+				std::uniform_int_distribution dist(min, max);
+				return dist(Get().gen);
 			}
 
 		private:
 			RandomUint32() : gen(std::random_device{}()) {}
-			uint32_t GenImpl() {
-				if (!dist_full_range) {
-					dist_full_range.emplace();
-				}
-				return (*dist_full_range)(gen);
-			}
-
-			uint32_t GenImpl(const uint32_t min, const uint32_t max) {
-				std::uniform_int_distribution dist(min, max);
-				return dist(gen);
-			}
 
 			static RandomUint32& Get() {
 				static RandomUint32 instance;

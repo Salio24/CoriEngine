@@ -5,24 +5,33 @@
 
 namespace Cori {
 	namespace Core {
+		/**
+		 * @brief All types from Types pack are std::exception or derived from it.
+		 */
 		template <typename... Types>
 		concept AllAreExceptions = (std::derived_from<Types, std::exception> && ...);
-
-		template <typename T>
-		concept IsStreamable = requires(std::stringstream& os, const T& value) {
-			{ os << value } -> std::same_as<std::ostream&>;
-		};
 
 		/**
 		 * @brief Custom error class mainly used in std::expected.
 		 * @tparam DeclaredTypes Types that will be obtainable.
 		 * @details Can hold variables that are passed upon creation that are later obtainable via Get method, duplicate types are illegal. As it is derived from std::exception it can be thrown.
-		 * If a CoriError object was constructed and never 'seen' it will print the formated error message upon destruction.
+		 * \n If a CoriError object was constructed and never 'seen' it will print the formated error message upon destruction.
+		 * \n DeclaredTypes typenames will be embedded into the formated error message alongside the user-defined description for each one, and if they are streamable their value will be embedded as well.
+		 * \n Example usage:
+		 * \n Example specialization: CoriError<int, std::type_index>
+		 * \n Constructed like this: CoriError<int, std::type_index>("Main error message", "user-defined description for int", intValue, "user-defined description for std::type_index", type_indexValue);
+		 * \n The final error message will be: Main error message | Additional data: (user-defined description for int (int): 'intValue', user-defined description for std::type_index (std::type_index): 'Type is not streamable, you can retrieve it with Get<T>()') |
+		 * \n Also all the types from DeclaredTypes can be later retried using Get<T>(), and it also supports retrieving multiple at a time and returning them in a tuple.
 		 */
-		template <IsStreamable... DeclaredTypes>
+		template <typename... DeclaredTypes>
 		class CoriError final : public std::exception {
 		public:
-			template <IsStreamable... Args>
+			/**
+			 * @brief Constructs CoriError object and formats the final error message.
+			 * @param message Main error message.
+			 * @param args Pairs descriptions and values for each DeclaredTypes.
+			 */
+			template <typename... Args>
 			explicit CoriError(const std::string& message, Args&&... args) {
 				static_assert(sizeof...(Args) == 2 * sizeof...(DeclaredTypes), "Incorrect number of arguments provided. Expected a description and a value for each declared type.");
 
@@ -120,7 +129,11 @@ namespace Cori {
 			void ProcessArgs(std::stringstream& ss, const std::string& description, ValT&& value, RestArgs&&... restArgs) {
 				static_assert(std::is_constructible_v<DeclaredT, ValT>, "A declared error type cannot be constructed from its provided value.");
 
-				ss << description << "(" << CORI_CLEAN_TYPE_NAME(DeclaredT) << "): '" << value << "'";
+				if constexpr (Utility::IsStreamable<DeclaredT>) {
+					ss << description << " (" << CORI_CLEAN_TYPE_NAME(DeclaredT) << "): '" << value << "'";
+				} else {
+					ss << description << " (" << CORI_CLEAN_TYPE_NAME(DeclaredT) << "): 'Type is not streamable, you can retrieve it with Get<T>()'";
+				}
 
 				if constexpr (sizeof...(RestArgs) > 0) {
 					ss << ", ";

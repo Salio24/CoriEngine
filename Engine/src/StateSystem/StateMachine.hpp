@@ -1,15 +1,27 @@
 #pragma once
-#include "State.hpp"
+#include "EntityState.hpp"
 #include "WorldSystem/Entity.hpp"
 
 namespace Cori {
 	namespace World {
 		namespace Components {
 			namespace Entity {
+				/**
+				 * @brief A StateMachine component is used in combination with custom objects derived from EntityState.
+				 * @details You declare several types deriver from EntityState and implement the state logic you need, then before using states you need to register them with the StateMachine by using Register<T>() method.
+				 * \n Let's say out Entity is in a state A then it changed state to B, then at tick N it entered state C. The tick sequence of this will be as follows:
+				 * \n Entity changes it's state form A to B, tick 1: OnTickUpdate of A is called one last time, then OnExit of A is called, then OnEnter of B is called.
+				 * \n Entity stays in state B, ticks 2 - (N - 1): Fire OnTickUpdate of B.
+				 * \n Entity leaves state B and enters state C, tick N: OnTickUpdate of B is fired one last time, then OnExit of B is called, then OnEnder of C is called.
+				 * @note Always make sure to set some initial state before actually using the FSM.
+				 */
 				class StateMachine {
 				public:
-					// ReSharper disable once CppParameterMayBeConst
-					explicit StateMachine(World::Entity owner) : m_Owner(owner), m_CurrentState(nullptr), m_LastState(nullptr) {
+					/**
+					 * @brief Constructs the StateMachine, you need to pass an Entity that owns this StateMachine to the constructor.
+					 * @param owner Owner Entity.
+					 */
+					explicit StateMachine(const World::Entity& owner) : m_Owner(owner), m_CurrentState(nullptr), m_LastState(nullptr) {
 						CORI_CORE_ASSERT(m_Owner.IsValid(), "StateMachine owner Entity is not valid!");
 					}
 
@@ -21,8 +33,15 @@ namespace Cori {
 
 					StateMachine(const StateMachine&) = delete;
 					StateMachine& operator=(const StateMachine&) = delete;
+					StateMachine(StateMachine&&) = delete;
+					StateMachine& operator=(StateMachine&&) = delete;
 
-					template<typename StateType, typename... Args>
+					/**
+					 * @brief Registers an EntityState with a StateMachine, you need to register a state before using it.
+					 * @tparam StateType State type to register.
+					 * @param args Arguments to the constructor of the StateType to use.
+					 */
+					template<std::derived_from<EntityState> StateType, typename... Args>
 					void Register(Args&&... args) {
 						const std::type_index stateID(typeid(StateType));
 
@@ -35,6 +54,10 @@ namespace Cori {
 						CORI_CORE_TRACE_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::StateMachine }, "StateMachine for Entity - {}: Registered state '{}'", m_Owner.GetDebugData(), CORI_CLEAN_TYPE_NAME(StateType));
 					}
 
+					/**
+					 * @brief Changes the current state to the specified one.
+					 * @tparam StateType State to change to.
+					 */
 					template<std::derived_from<EntityState> StateType>
 					void SetState() {
 						const std::type_index nextStateID(typeid(StateType));
@@ -60,7 +83,7 @@ namespace Cori {
 
 						m_CurrentState = nextStateRawPtr;
 						CORI_CORE_TRACE_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::StateMachine }, "StateMachine for Entity - {}: Entering state '{}'", m_Owner.GetDebugData(), CORI_CLEAN_TYPE_NAME(*m_CurrentState));
-						m_CurrentState->OnEnter(m_Owner);
+						m_CurrentState->OnEnter(m_Owner, typeid(*m_LastState));
 					}
 
 					void OnTickUpdate(const float timeStep) {
@@ -69,6 +92,11 @@ namespace Cori {
 						}
 					}
 
+					/**
+					 * @brief Cheks if an Entity is in a specific state.
+					 * @tparam StateType State to check for.
+					 * @return True if is currently in StateType, false otherwise.
+					 */
 					template<std::derived_from<EntityState> StateType>
 					bool IsInState() const {
 						if (!m_CurrentState) {
@@ -78,6 +106,10 @@ namespace Cori {
 						return typeid(StateType) == typeid(*m_CurrentState);
 					}
 
+					/**
+					 * @brief Sets an Entity to the state only if it is not currently in that state.
+					 * @tparam StateType State to change to.
+					 */
 					template<std::derived_from<EntityState> StateType>
 					void SetStateIfNotInState() {
 						if (!IsInState<StateType>()) {
@@ -85,18 +117,22 @@ namespace Cori {
 						}
 					}
 
+					/**
+					 * @brief Gets the pointer to the current state. Can be used to get the type_info of the current state.
+					 * @return Pointer of their current state instance.
+					 */
 					EntityState* GetCurrentState() const {
-						CORI_CORE_ASSERT("Trying to retrieve current state, but current state is null. Always make sure you set some initial state before using fsm.")
+						CORI_CORE_ASSERT(m_CurrentState, "Trying to retrieve current state, but current state is null. Always make sure you set some initial state before using fsm.")
 						return m_CurrentState;
 					}
 
+					/**
+					 * @brief Gets the pointer to the last state. Can be used to get the type_info of the last state.
+					 * @return Pointer of their last state instance.
+					 */
 					EntityState* GetLastState() const {
-						CORI_CORE_ASSERT("Trying to retrieve last state, but last state is null. Always make sure you set some initial state before using fsm.")
+						CORI_CORE_ASSERT(m_LastState, "Trying to retrieve last state, but last state is null. Always make sure you set some initial state before using fsm.")
 						return m_LastState;
-					}
-
-					World::Entity GetOwner() const {
-						return m_Owner;
 					}
 
 				private:

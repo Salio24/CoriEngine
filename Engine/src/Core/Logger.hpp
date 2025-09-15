@@ -35,6 +35,9 @@ namespace Cori {
 			CORI_FATAL
 		};
 
+		/**
+		 * @brief Available logger tags in somewhat hierarchical state. These are used in CORI_DEBUGLEVEL_CORE_TAGGED logging calls.
+		 */
 		struct Tags {
 			struct AssetManager {
 				static constexpr char Self[] = "Asset Manager";

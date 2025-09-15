@@ -9,9 +9,6 @@ namespace Cori {
 	namespace World {
 		class SceneHandle {
 		public:
-			SceneHandle() = default;
-			~SceneHandle() = default;
-
 			void OnUpdate(const double deltaTime) {
 				if (m_SceneRaw) {
 					m_SceneRaw->OnUpdate(deltaTime);

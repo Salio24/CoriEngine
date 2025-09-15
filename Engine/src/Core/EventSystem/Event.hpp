@@ -6,7 +6,6 @@ namespace Cori {
 			None = 0,
 			WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
 			GameUserDefinedEvent,
-			AppRender,
 			KeyPressed, KeyReleased, KeyTyped,
 			MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 		};

@@ -2,9 +2,8 @@
 #include "Image.hpp"
 
 namespace Cori {
-	namespace Core {
-		class AssetManager;
-	}
+	class AssetManager;
+
 	namespace Graphics {
 		struct UVs {
 			glm::vec2 UVmin{ 0.0f, 0.0f };
@@ -48,7 +47,7 @@ namespace Cori {
 				Filter m_Filter{ NEAREST };
 
 				/**
-				 * @brief Generally you want to leave this by default if you'are creating a texture from an image, they all have align of 4.
+				 * @brief Generally you want to leave this by default if you're creating a texture from an image, they all have align of 4.
 				 */
 				int32_t m_UnpackAlignment{ 0 };
 
@@ -148,7 +147,7 @@ namespace Cori {
 			[[nodiscard]] static std::shared_ptr<Texture2D> Create(const void* pixelData, const uint32_t width, const uint32_t height, const Params& params);
 
 		private:
-			friend Core::AssetManager;
+			friend AssetManager;
 			[[nodiscard]] static std::shared_ptr<Texture2D> Create(const Descriptor& descriptor);
 		};
 	}

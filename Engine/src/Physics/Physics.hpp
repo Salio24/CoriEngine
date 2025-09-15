@@ -8,8 +8,16 @@
 #endif
 
 namespace Cori {
+	/**
+	 * @details Cori engine doesn't have a native physics engine and uses Box2D, so refer to Box2D docs 'https://box2d.org/' for any details on physics.
+	 * \n All the engine does is provide a convenient C++ API for it, as Box2D is a C project and the default API is not really convenient in C++ environment.
+	 * \n Big thanks HolyBlackCat for: 'https://github.com/HolyBlackCat/box2cpp/tree/master'
+	 */
 	namespace Physics {
 
+		/**
+		 * @brief An alias for Box2D native vec2 type, if you see it somewhere, be sure data there is in meters contrary to when glm used, there data is in camera pixels.
+		 */
 		using Vec2 = b2Vec2;
 		using Rot = b2Rot;
 		using Transform = b2Transform;
@@ -110,16 +118,50 @@ namespace Cori {
 			ShapeRef shape;
 		};
 
-		// maybe remove them? do i even need those? idk
-		bool PointVsRect(const glm::vec2& point, const glm::vec2& boxSize, const glm::vec2& boxPos);
-
+		/**
+		 * @brief Calculates the winding order of the polygon made up from individual points. Box2D version. Takes Box2Ds vec2s.
+		 * @param polygon Point that from a polygon.
+		 * @return A resulting enumerator of type WindingOrder.
+		 */
 		WindingOrder GetPolygonWindingOrder(const std::vector<Vec2>& polygon);
-		WindingOrder GetPolygonWindingOrder(const std::vector<tmx::Vector2f>& polygon);
-		std::string WindingOrderToString(WindingOrder order);
 
+		/**
+		 * @brief Calculates the winding order of the polygon made up from individual points. TMXLite version. Takes TMXLite vec2s.
+		 * @param polygon Point that from a polygon.
+		 * @return A resulting enumerator of type WindingOrder.
+		 */
+		WindingOrder GetPolygonWindingOrder(const std::vector<tmx::Vector2f>& polygon);
+
+		/**
+		 * @brief Converts the WindingOrder enumerator to string, for logging.
+		 * @param order Enumerator.
+		 * @return Resulting string.
+		 */
+		const char* WindingOrderToString(WindingOrder order);
+
+
+		/**
+		 * @brief Converts physical meters to camera space pixels.
+		 * @param vec Position in meters.
+		 * @return Position in pixels.
+		 * @note Talking about camera space pixels, not screen space/viewport pixels. Uses CORI_PIXELS_PER_METER as a convertion modifier.
+		 */
 		glm::vec2 ToPixels(const Vec2 vec);
+
+		/**
+		 * @brief Converts camera space pixels to physical meters.
+		 * @param vec Position in pixels.
+		 * @return Position in pixels.
+		 * @note Talking about camera space pixels, not screen space/viewport pixels. Uses CORI_PIXELS_PER_METER as a convertion modifier.
+		 */
 		Vec2 ToMeters(const glm::vec2 vec);
 
+		/**
+		 * @brief Converts a native Box2D vec2 to string, for logging.
+		 * @param vec Native Box2D vec2 to convert to string.
+		 * @return Formated string.
+		 * @note This is a convenience function and will cause several allocation connected to constructing a string. Be aware.
+		 */
 		std::string Vec2ToString(Vec2 vec);
 
 		class ConvexHull {

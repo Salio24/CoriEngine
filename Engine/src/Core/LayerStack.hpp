@@ -3,6 +3,9 @@
 
 namespace Cori {
 	namespace Core {
+		/**
+		 * @brief Internal class that stores and manages all the Layer objects.
+		 */
 		class LayerStack {
 			friend class Application;
 			LayerStack();

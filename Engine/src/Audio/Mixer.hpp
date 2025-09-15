@@ -11,6 +11,10 @@ namespace Cori {
 		class Sound;
 
 		// Note: sub millisecond data will be discarded when params are passed to Mixer::PlayTag, it only works with Mixer::PlayTrack
+		/**
+		 * @brief Parameters to be used when playing sound, you can mix your audio playback however you want with these.
+		 * @note Sub millisecond data will be discarded when params are passed to Mixer::PlayTag, it only works with Mixer::PlayTrack
+		 */
 		struct PlayParams {
 			/**
 			 * @brief Number of times to loop the track when it reaches the end. A value of -1 will result in an infinite loop.

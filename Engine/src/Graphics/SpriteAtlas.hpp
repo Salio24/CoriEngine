@@ -93,7 +93,7 @@ namespace Cori {
 		private:
 			explicit SpriteAtlas(std::string name, const std::shared_ptr<Image>& image, const glm::u16vec2 spriteResolution, const bool success);
 
-			friend Core::AssetManager;
+			friend AssetManager;
 			[[nodiscard]] static std::shared_ptr<SpriteAtlas> Create(const Descriptor& descriptor);
 			std::string m_Name;
 

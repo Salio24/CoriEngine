@@ -33,17 +33,5 @@ namespace Cori {
 			EVENT_CLASS_TYPE(WindowClose)
 			EVENT_CLASS_CATEGORY(EventCategoryApplication)
 		};
-
-		class AppRenderEvent final : public Event {
-		public:
-			AppRenderEvent() = default;
-
-			[[nodiscard]] std::string ToString() const override {
-				return "AppRenderEvent";
-			}
-
-			EVENT_CLASS_TYPE(AppRender)
-			EVENT_CLASS_CATEGORY(EventCategoryApplication)
-		};
 	}
 }

@@ -5,7 +5,8 @@ namespace Cori {
 		namespace Components {
 			namespace Entity {
 				Trigger::Trigger(World::Entity& trigger) {
-					if (trigger.IsValid()) {
+					if (CORI_CORE_VERIFY(trigger.IsValid(), "An unvalid entity was passed to the trigger, always pass the same entity you're adding a trigger to. This can blow up any second now.")) {}
+					else {
 						auto& ud = trigger.AddComponent<Physics::BodyUserData>(trigger);
 						auto& rb = trigger.GetComponents<Rigidbody>();
 						rb.SetUserData(&ud);
@@ -25,7 +26,6 @@ namespace Cori {
 					}
 				}
 
-				// order is not enforced
 				void Trigger::OnTickUpdate(const float timeStep) {
 					for (auto& visitor : m_VisitorBuffer) {
 						if (m_Behavior) {

@@ -101,6 +101,7 @@ namespace Cori {
 			 * @param flipX Flip quad on X axis.
 			 * @param flipY Flip quad on Y axis.
 			 * @param flatColored Ignore the texture and use a plain white texture.
+			 * @warning You need to make sure that texture pointer stays valid until the end of the frame, or this will induce a dangling pointer. Be aware!
 			 */
 			static void SubmitQuad(const DrawSpace space, const ObjectTransparency transparencyMode,
 			                       const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor,
@@ -141,6 +142,7 @@ namespace Cori {
 			 * \n For TextAlignment::CENTER it's the lower bound on y of the first line, and on x the center between the left border of the char in the first line and the right border of the char in the first line.
 			 * \n For TextAlignment::RIGHT it's the left lower border of the last char in the line.
 			 * @note All text is considered semi transparent when rendering.
+			 * @warning You need to make sure that font pointer stays valid until the end of the frame, or this will induce a dangling pointer. Be aware!
 			 */
 			static void SubmitText(const DrawSpace space, const TextAlignment alignment, const glm::mat3& transform,
 			                       const float fontSize, const std::u32string_view& text, const glm::vec4& color,
@@ -164,6 +166,7 @@ namespace Cori {
 			 * \n For TextAlignment::CENTER it's the lower bound on y of the first line, and on x the center between the left border of the char in the first line and the right border of the char in the first line.
 			 * \n For TextAlignment::RIGHT it's the left lower border of the last char in the line.
 			 * @note All text is considered semi transparent when rendering.
+			 * @warning You need to make sure that font pointer stays valid until the end of the frame, or this will induce a dangling pointer. Be aware!
 			 */
 			static void SubmitText(const DrawSpace space, const TextAlignment alignment, const glm::mat3& transform,
 			                       const float fontSize, const std::string_view& text, const glm::vec4& color,

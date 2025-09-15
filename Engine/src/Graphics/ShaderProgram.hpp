@@ -3,7 +3,7 @@
 namespace Cori {
 	namespace Graphics {
 		/**
-		 * @brief ShaderProgram, there is no use for it on the client side for now.
+		 * @brief There is no use for it on the client side for now.
 		 */
 		class ShaderProgram {
 		public:

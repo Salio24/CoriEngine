@@ -42,7 +42,6 @@ namespace Cori {
 
 			s_Data->WorldSpaceTransparentQuadQueue.reserve(RendererData::WorldSpaceTransparentQuadQueueInitialSize);
 			s_Data->WorldSpaceOpaqueQuadQueue.reserve(RendererData::WorldSpaceOpaqueQuadQueueInitialSize);
-
 			s_Data->ScreenSpaceTransparentQuadQueue.reserve(RendererData::ScreenSpaceTransparentQuadQueueInitialSize);
 			s_Data->ScreenSpaceOpaqueQuadQueue.reserve(RendererData::ScreenSpaceOpaqueQuadQueueInitialSize);
 

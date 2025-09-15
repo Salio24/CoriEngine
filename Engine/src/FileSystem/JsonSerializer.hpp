@@ -4,7 +4,7 @@
 namespace Cori {
 	namespace FileSystem {
 		/**
-		 * @brief To satisfy use NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE macro. Refer here https://json.nlohmann.me/api/macros/nlohmann_define_type_non_intrusive/ for details
+		 * @brief To satisfy use NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE macro. Refer here https://json.nlohmann.me/api/macros/nlohmann_define_type_non_intrusive/ for details.
 		 */
 		template<typename T>
 		concept JsonSerializable = requires(T value, const nlohmann::json j) {

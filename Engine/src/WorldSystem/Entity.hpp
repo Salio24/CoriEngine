@@ -56,7 +56,7 @@ namespace Cori {
 			}
 
 			template<typename... T>
-			bool HasComponents() const {
+			[[nodiscard]] bool HasComponents() const {
 				return m_EntityHandle.all_of<T...>();
 			}
 
