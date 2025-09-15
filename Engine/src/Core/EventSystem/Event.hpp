@@ -21,6 +21,9 @@ namespace Cori {
 			EventCategoryMouseButton = 1 << 5
 		};
 
+		/**
+		 * @brief An abstract class that is ment to be used as a template for defining events.
+		 */
 		class Event {
 			friend class EventDispatcher;
 		public:

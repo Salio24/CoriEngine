@@ -21,7 +21,7 @@ namespace Cori {
 			Entity CreateEntity(const std::string& name, const Utility::HashedTag64& tag);
 			void DestroyEntity(Entity entity);
 
-			[[nodiscard]] std::expected<void, Core::CoriError<>> AddEntityToCache(const Entity entity, const Utility::StringHash32 key);
+			std::expected<void, Core::CoriError<>> AddEntityToCache(const Entity entity, const Utility::StringHash32 key);
 			[[nodiscard]] std::expected<Entity, Core::CoriError<>> GetEntityFromCache(const Utility::StringHash32 key);
 			void RemoveEntityFromCache(const Utility::StringHash32 key);
 

@@ -22,13 +22,13 @@ namespace Cori {
 			m_Window->SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent, CORI_PLACEHOLDERS(1)));
 			m_Window->SetVSync(false);
 
-			m_ImGuiLayer = new ImGuiLayer();
+			m_ImGuiLayer = new Internal::ImGuiLayer();
 
 			m_LayerStack.PushOverlay(m_ImGuiLayer);
 
 			AssetManager::Init();
 			World::SceneManager::Init();
-			Graphics::API::Init();
+			Graphics::Internal::API::Init();
 			Audio::Mixer::Init();
 
 			m_GameTimer.SetTickrate(60);
@@ -40,7 +40,7 @@ namespace Cori {
 			m_LayerStack.ClearStack();
 			AssetManager::Shutdown();
 			World::SceneManager::Shutdown();
-			Graphics::API::Shutdown();
+			Graphics::Internal::API::Shutdown();
 			Audio::Mixer::Shutdown();
 		}
 
@@ -68,7 +68,7 @@ namespace Cori {
 				return false;
 			});
 			dispatcher.Dispatch<WindowResizeEvent>([](const WindowResizeEvent& e) -> bool {
-				Graphics::API::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
+				Graphics::Internal::API::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
 				return false;
 			});
 
@@ -101,10 +101,6 @@ namespace Cori {
 			s_Instance->m_BackgroundColor = color;
 		}
 
-		void Application::SetManualTickStep(const bool state) {
-			s_Instance->m_ManualStep = state;
-		}
-
 		void Application::Run() {
 			while(m_Running) {
 				CORI_PROFILER_FRAME_START();
@@ -112,8 +108,8 @@ namespace Cori {
 					CORI_PROFILE_SCOPE("Cori Engine Global Update");
 					m_GameTimer.Update();
 
-					Graphics::API::SetClearColor(m_BackgroundColor);
-					Graphics::API::ClearFramebuffer();
+					Graphics::Internal::API::SetClearColor(m_BackgroundColor);
+					Graphics::Internal::API::ClearFramebuffer();
 
 					for (Layer* layer : m_LayerStack) {
 						layer->OnUpdate(m_GameTimer);
@@ -143,32 +139,9 @@ namespace Cori {
 
 
 		void Application::TickrateUpdate(GameTimer& gameTimer) {
-			//static uint64_t ti = 0;
-			if (m_ManualStep) {
-				static bool oneshot = true;
-				if (Input::IsKeyDown(CORI_KEY_K)) {
-					if (oneshot) {
-						oneshot = false;
-						for (Layer* layer : m_LayerStack) {
-							layer->SceneTickrateUpdate(gameTimer.GetTimestep());
-							layer->OnTickUpdate(gameTimer);
-						}
-						//ti++;
-						//CORI_CORE_DEBUG("TICK {}", ti);
-					}
-				}
-				else {
-					oneshot = true;
-				}
-
-			} else {
-				for (Layer* layer : m_LayerStack) {
-					layer->SceneTickrateUpdate(gameTimer.GetTimestep());
-					layer->OnTickUpdate(gameTimer);
-
-				}
-				//ti++;
-				//CORI_CORE_DEBUG("TICK {}", ti);
+			for (Layer* layer : m_LayerStack) {
+				layer->SceneTickrateUpdate(gameTimer.GetTimestep());
+				layer->OnTickUpdate(gameTimer);
 			}
 		}
 

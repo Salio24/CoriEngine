@@ -9,6 +9,9 @@
 
 namespace Cori {
 	namespace Core {
+		/**
+		 * @brief Main Application object, there can only be one Application object. Basically a root of the program.
+		 */
 		class Application {
 		public:
 			explicit Application(const char* windowName);
@@ -54,28 +57,17 @@ namespace Cori {
 			 */
 			static void PopOverlay();
 
-
 			/**
 			 * @brief Setts the background color of the rendering canvas.
 			 * @param color Normalized RGBA color.
 			 */
 			static void SetBackgroundColor(const glm::vec4& color);
 
-
-			/**
-			 * @brief Enables or disables manual tick step.
-			 * @param state On or off state.
-			 * @details When enabled ticks don't happened on their own, instead you can advance one tick at a time by pressing K.
-			 */
-			static void SetManualTickStep(const bool state);
-
-
 			/**
 			 * @brief Getter for the main Window.
 			 * @return Non const reference to the main Window.
 			 */
 			static Window& GetWindow() { return *s_Instance->m_Window; }
-
 
 			/**
 			 * @brief Getter for the GameTimer.
@@ -97,11 +89,10 @@ namespace Cori {
 			bool OnWindowClose();
 
 			bool m_RenderImGui{ true };
-			bool m_ManualStep{ false };
 
 			std::unique_ptr<Window> m_Window;
 
-			ImGuiLayer* m_ImGuiLayer;
+			Internal::ImGuiLayer* m_ImGuiLayer;
 
 			LayerStack m_LayerStack;
 

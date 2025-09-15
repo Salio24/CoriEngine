@@ -21,6 +21,9 @@
 
 namespace Cori {
 
+	/**
+	 * @brief Logger is the first thing that is initialized during startup. Does console and file logging.
+	 */
 	class Logger {
 	public:
 		enum class LogLevel {
@@ -127,8 +130,6 @@ namespace Cori {
 				static constexpr char UTF[] = "UTF";
 			};
 
-
-
 			// Ungrouped tags
 			static constexpr char UnusedError[] = "Unused Error";
 		};
@@ -160,25 +161,95 @@ namespace Cori {
 			return "False";
 		}
 
+		/**
+		 * @brief Enables the logging of a specific core tag.
+		 * @param tag Tag to enable.
+		 * @note All core tags are enabled by default, you only need to enable a tag if you disabled it earlier.
+		 */
 		static void EnableCoreTag(const char* tag);
+
+		/**
+		 * @brief Same as EnableCoreTag but enables multiple tags at once.
+		 * @param tags Tags to enable.
+		 * @note All core tags are enabled by default, you only need to enable a tag if you disabled it earlier.
+		 */
 		static void EnableCoreTags(const std::initializer_list<const char*> tags);
 
+
+		/**
+		 * @brief Disables the logging of a specific core tag.
+		 * @param tag Tag to disable.
+		 */
 		static void DisableCoreTag(const char* tag);
+
+
+		/**
+		 * @brief Same as DisableCoreTag but disables multiple tags at once.
+		 * @param tags Tags to disable.
+		 */
 		static void DisableCoreTags(const std::initializer_list<const char*> tags);
 
+		/**
+		 * @brief Checks if a specific core tag is enabled.
+		 * @param tag Tag to check.
+		 * @return True if enabled, false otherwise.
+		 */
 		static bool IsCoreTagDisabled(const char* tag);
+
+
+		/**
+		 * @brief Clears the core tag filter, all tags that were disabled become enabled again as a result.
+		 */
 		static void ClearCoreTagFilter();
+
+		/**
+		 * @brief Gies a list of all currently disabled core tags.
+		 * @return Vector with all disabled core tags.
+		 */
 		static std::vector<std::string> GetCoreInactiveTags();
 
+		/**
+		 * @brief Enables the logging of a specific client tag.
+		 * @param tag Tag to enable.
+		 * @note All client tags are enabled by default, you only need to enable a tag if you disabled it earlier.
+		 */
 		static void EnableClientTag(const char* tag);
+
+		/**
+		 * @brief Same as EnableClientTag but enables multiple tags at once.
+		 * @param tags Tags to enable.
+		 * @note All client tags are enabled by default, you only need to enable a tag if you disabled it earlier.
+		 */
 		static void EnableClientTags(const std::initializer_list<const char*> tags);
 
-
+		/**
+		 * @brief Disables the logging of a specific core tag.
+		 * @param tag Tag to disable.
+		 */
 		static void DisableClientTag(const char* tag);
+
+		/**
+		 * @brief Same as DisableClientTag but disables multiple tags at once.
+		 * @param tags Tags to disable.
+		 */
 		static void DisableClientTags(const std::initializer_list<const char*> tags);
 
+		/**
+		 * @brief Checks if a specific client tag is enabled.
+		 * @param tag Tag to check.
+		 * @return True if enabled, false otherwise.
+		 */
 		static bool IsClientTagDisabled(const char* tag);
+
+		/**
+		 * @brief Clears the client tag filter, all tags that were disabled become enabled again as a result.
+		 */
 		static void ClearClientTagFilter();
+
+		/**
+		 * @brief Gies a list of all currently disabled client tags.
+		 * @return Vector with all disabled client tags.
+		 */
 		static std::vector<std::string> GetClientInactiveTags();
 
 		template<typename... Args>

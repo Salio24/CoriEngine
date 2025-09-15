@@ -1,11 +1,28 @@
 #include "Time.hpp"
 #include <SDL3/SDL_timer.h>
+#include "Input.hpp"
 
 namespace Cori {
 	namespace Core {
 		GameTimer::GameTimer() {
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::GameTimer }, "GameTimer created");
 			m_LastTime = SDL_GetPerformanceCounter();
+		}
+
+		std::string GameTimer::FormatTime_MS_to_M_S_MS(const double milliseconds) {
+			auto minutes = static_cast<int32_t>(milliseconds / 60000);
+			auto seconds = static_cast<int32_t>((milliseconds - minutes * 60000) / 1000);
+			auto ms      = static_cast<int32_t>(milliseconds) % 1000;
+
+			return std::format("{}:{:02}:{:03}", minutes, seconds, ms);
+		}
+
+		std::string GameTimer::FormatTime_S_to_M_S_MS(const double seconds) {
+			return FormatTime_MS_to_M_S_MS(seconds * 1000.0);
+		}
+
+		void GameTimer::SetManualTickStep(const bool state) {
+			m_ManualStep = state;
 		}
 
 		void GameTimer::Update() {
@@ -16,19 +33,51 @@ namespace Cori {
 
 			m_Time += m_DeltaTime;
 
-			m_Accumulator += m_DeltaTime;
+			if (!m_ManualStep) {
+				m_Accumulator += m_DeltaTime;
 
-			if (m_Timestep != 0) {
-				while (m_Accumulator >= m_Timestep) {
+				if (m_Timestep != 0) {
+					while (m_Accumulator >= m_Timestep) {
 
-					m_TickrateUpdateFunc(*this);
+						m_TickrateUpdateFunc(*this);
 
-					m_Accumulator -= m_Timestep;
+						m_Accumulator -= m_Timestep;
+					}
+
+					m_TickAlpha = m_Accumulator / m_Timestep;
+				}
+			} else {
+				static bool oneshot = true;
+				if (Input::IsKeyDown(CORI_KEY_K)) {
+					if (oneshot) {
+						oneshot = false;
+						m_ManualTickGate = true;
+					}
+				} else {
+					oneshot = true;
 				}
 
-				m_TickAlpha = m_Accumulator / m_Timestep;
+				if (Input::IsKeyDown(CORI_KEY_J)) {
+					m_ManualTickGate = true;
+				}
 
+				if (m_ManualTickGate) {
+					m_Accumulator += m_DeltaTime;
+
+					if (m_Timestep != 0) {
+						while (m_Accumulator >= m_Timestep) {
+
+							m_TickrateUpdateFunc(*this);
+							m_ManualTickGate = false;
+
+							m_Accumulator -= m_Timestep;
+						}
+
+						m_TickAlpha = m_Accumulator / m_Timestep;
+					}
+				}
 			}
+
 		}
 
 		void GameTimer::SetTickrate(const uint16_t tickrate) {

@@ -227,7 +227,7 @@ namespace Cori {
 						SetColor(color);
 					}
 
-					[[nodiscard]] std::expected<void, Core::CoriError<>> SetTexture(const std::shared_ptr<Graphics::Texture2D>& texture) {
+					std::expected<void, Core::CoriError<>> SetTexture(const std::shared_ptr<Graphics::Texture2D>& texture) {
 						if (!m_AnimatorBound) {
 							if (m_HasSemiTransparency && m_Color.a != 1.0f) {
 								m_Texture = texture;
@@ -262,7 +262,7 @@ namespace Cori {
 						return m_Color;
 					}
 
-					[[nodiscard]] std::expected<void, Core::CoriError<>> SetUVs(const Graphics::UVs& uvs) {
+					std::expected<void, Core::CoriError<>> SetUVs(const Graphics::UVs& uvs) {
 						if (!m_AnimatorBound) {
 							m_UVs = uvs;
 							return {};
@@ -275,7 +275,7 @@ namespace Cori {
 						return m_UVs;
 					}
 
-					[[nodiscard]] std::expected<void, Core::CoriError<>> SetHalfSize(const glm::vec2 halfSize) {
+					std::expected<void, Core::CoriError<>> SetHalfSize(const glm::vec2 halfSize) {
 						if (!m_AnimatorBound) {
 							m_HalfSize = halfSize;
 							return {};

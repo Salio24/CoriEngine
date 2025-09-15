@@ -7,6 +7,9 @@
 
 namespace Cori {
 	namespace Core {
+		/**
+		 * @brief An abstract class that is ment to be used as a template for defining layers.
+		 */
 		class Layer {
 		public:
 			explicit Layer(std::string name);
@@ -74,13 +77,13 @@ namespace Cori {
 			 * @param name Name of the Scene to bind.
 			 * @return Expected object with void on success or CoriError<> on failure.
 			 */
-			[[nodiscard]] std::expected<void, CoriError<>> BindScene(const std::string& name);
+			std::expected<void, CoriError<>> BindScene(const std::string& name);
 
 			/**
 			 * @brief Unbinds the Scene from the Layer.
 			 * @return Expected object with void on success or CoriError<> on failure.
 			 */
-			[[nodiscard]] std::expected<void, CoriError<>> UnbindScene();
+			std::expected<void, CoriError<>> UnbindScene();
 
 			/**
 			 * @brief A SceneHandle to the Scene that is currently bound.

@@ -2,7 +2,6 @@
 #include <entt/entt.hpp>
 #include "Utility/StringHash.hpp"
 
-
 namespace Cori {
 	namespace World {
 		class Entity {
@@ -106,7 +105,7 @@ namespace Cori {
 
 			[[nodiscard]] std::string GetDebugData(const bool showUUID = false) const;
 
-			[[nodiscard]] std::expected<void, Core::CoriError<>> SetParent(Entity parent);
+			std::expected<void, Core::CoriError<>> SetParent(Entity parent);
 
 			[[nodiscard]] std::expected<std::vector<Entity>, Core::CoriError<>> GetSiblings() const;
 			[[nodiscard]] std::expected<Entity, Core::CoriError<>> GetParent() const;
@@ -121,7 +120,7 @@ namespace Cori {
 
 			void PrintHierarchy() const;
 
-			std::string_view GetName() const;
+			[[nodiscard]] std::string_view GetName() const;
 
 			void SetName(const std::string& name);
 		private:

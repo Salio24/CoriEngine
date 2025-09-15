@@ -70,6 +70,9 @@ namespace Cori {
 			}
 		};
 
+		/**
+		 * @brief Mixer is responsible for mixing all the sounds, it is a global object and there can only be one Mixer.
+		 */
 		class Mixer {
 		public:
 

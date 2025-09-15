@@ -30,6 +30,7 @@
 #include "../src/Graphics/Renderer2D.hpp"
 #include "../src/Graphics/Animator/AnimationPack.hpp"
 #include "../src/Graphics/Animator/QuadAnimatorNew.hpp"
+#include "../src/Graphics/Color.hpp"
 
 #include "../src/AssetManager/AssetManager.hpp"
 

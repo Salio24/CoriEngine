@@ -4,6 +4,9 @@
 
 namespace Cori {
 	namespace Core {
+		/**
+		 * @brief A simple static class that allows to query for physical keyboard or mose inputs.
+		 */
 		class Input {
 		public:
 

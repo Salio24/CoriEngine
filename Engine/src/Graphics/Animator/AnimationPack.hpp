@@ -16,8 +16,6 @@ namespace Cori {
 				bool LoopedInSequence{ false };
 			};
 
-
-
 			AnimationData m_Data;
 			std::shared_ptr<Texture2D> m_Texture;
 			glm::vec2 m_Size;

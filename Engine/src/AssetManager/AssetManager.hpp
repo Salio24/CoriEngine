@@ -20,6 +20,14 @@ namespace Cori {
 		};
 	}
 
+	/**
+	 * @brief Used when you want to manually control the asset lifetime, loading, preloading, unloading.
+	 * @details Mainly used for assets that are not bound to any particular object, but you want to keep them alive.
+	 * \n For example: Fonts, AnimationPacks, Sounds, etc. Because all asset lifetimes in Cori are managed by a shared pointers,
+	 * if not for the AssetManager these asset would be unloaded as soon as some object is done with them and refcount dropped to 0,
+	 * AssetManger is a convenient place to keep these objects loaded and alive.
+	 * \n For loading and later reviving the asset AssetManger uses descriptors that describe how to load a particular asset. "TODO: link here the wiki page about descriptors"
+	 */
 	class AssetManager {
 		struct Cache {
 			std::unordered_map<std::type_index, std::any> m_Caches;

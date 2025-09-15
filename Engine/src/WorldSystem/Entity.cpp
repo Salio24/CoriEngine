@@ -170,7 +170,6 @@ namespace Cori {
 			if (nameComponent.m_Name == name) {
 				return;
 			}
-			nameComponent.m_Name = name;
 
 			if (HasComponents<Components::Entity::Hierarchy>()) {
 				const auto& hierarchy = GetComponents<Components::Entity::Hierarchy>();
@@ -183,6 +182,8 @@ namespace Cori {
 					cache.m_Children.emplace(name, m_EntityHandle.entity());
 				}
 			}
+
+			nameComponent.m_Name = name;
 		}
 
 

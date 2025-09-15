@@ -4,7 +4,7 @@
 namespace Cori {
 	namespace Core {
 		class LayerStack {
-		public:
+			friend class Application;
 			LayerStack();
 			~LayerStack();
 
@@ -26,8 +26,6 @@ namespace Cori {
 			std::vector<Layer*>::iterator end() { return m_Layers.end(); }
 			std::vector<Layer*>::reverse_iterator rbegin() { return m_Layers.rbegin(); }
 			std::vector<Layer*>::reverse_iterator rend() { return m_Layers.rend(); }
-
-		private:
 
 			std::vector<Layer*> m_Layers;
 

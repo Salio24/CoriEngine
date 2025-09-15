@@ -34,7 +34,7 @@ namespace Cori {
 				m_SceneRaw->DestroyEntity(entity);
 			}
 
-			[[nodiscard]] std::expected<void, Core::CoriError<>> AddEntityToCache(Entity entity, const Utility::StringHash32 tag) {
+			std::expected<void, Core::CoriError<>> AddEntityToCache(Entity entity, const Utility::StringHash32 tag) {
 				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
 				return m_SceneRaw->AddEntityToCache(entity, tag);
 			}

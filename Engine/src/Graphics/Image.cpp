@@ -96,6 +96,10 @@ namespace Cori {
 		}
 
 		std::expected<void, Core::CoriError<>> Image::AddPadding(const glm::u16vec2 spriteResolution) {
+			if (m_IsPadded) {
+				std::unexpected(Core::CoriError("The image is already padded, you can't add padding to the image if it is already padded."));
+			}
+
 			auto* originalSurface = static_cast<SDL_Surface*>(m_Surface);
 
 			const uint32_t cols = originalSurface->w / spriteResolution.x;
@@ -229,11 +233,6 @@ namespace Cori {
 			}
 
 			SDL_UnlockSurface(static_cast<SDL_Surface*>(m_Surface));
-		}
-
-		void Image::Mirror() {
-			FlipVertically();
-			FlipHorizontally();
 		}
 	}
 }

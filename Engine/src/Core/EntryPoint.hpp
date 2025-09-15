@@ -24,15 +24,15 @@ int32_t main([[maybe_unused]] int32_t argc, [[maybe_unused]] char** argv) {
 
 #ifdef CORI_ASYNC_LOGGING
 #ifndef CORI_NO_FILE_LOGGING
-	Cori::Core::Engine::Start(true, true);
+	Cori::Core::Internal::Engine::Start(true, true);
 #else
-	Cori::Core::Engine::Start(true, false);
+	Cori::Core::Internal::Engine::Start(true, false);
 #endif
 #else 
 #ifndef CORI_NO_FILE_LOGGING
-	Cori::Core::Engine::Start(false, true);
+	Cori::Core::Internal::Engine::Start(false, true);
 #else
-	Cori::Core::Engine::Start(false, false);
+	Cori::Core::Internal::Engine::Start(false, false);
 #endif
 #endif
 
@@ -46,5 +46,5 @@ int32_t main([[maybe_unused]] int32_t argc, [[maybe_unused]] char** argv) {
 		return -1;
 	}
 
-	Cori::Core::Engine::Stop();
+	Cori::Core::Internal::Engine::Stop();
 }

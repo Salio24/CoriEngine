@@ -6,10 +6,22 @@ namespace Cori {
 	class AssetManager;
 	namespace Audio {
 
+		/**
+		 * @brief Sound asset to be played on a Track.
+		 */
 		class Sound : public Profiling::Trackable<Sound> {
 		public:
+			/**
+			 * @brief Sound Descriptor meant to be used with AssetManager only.
+			 */
 			class Descriptor {
 			public:
+				/**
+				 * @brief Constructs a descriptor. It's recommended to use "inline const" when defining the Descriptor in a namespace.
+				 * @param name Name to be assigned to the Sound.
+				 * @param path Path to the audio asset.
+				 * @param preDecode Whether to precede the audio or no. Generally you want to leave it at default.
+				 */
 				constexpr Descriptor(std::string name, std::filesystem::path path, const bool preDecode = true) noexcept
 					: m_Path(std::move(path)),
 					m_Name(std::move(name)),

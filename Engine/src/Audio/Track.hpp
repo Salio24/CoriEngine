@@ -13,6 +13,9 @@ namespace Cori {
 		template<typename T>
 		concept IsSoundWithParams = std::is_same_v<T, SoundWithParams>;
 
+		/**
+		 * @brief You use Track to play and mix Sound objects.
+		 */
 		class Track : public Profiling::Trackable<Track> {
 		public:
 			/**

@@ -33,7 +33,7 @@ namespace Cori {
 		Font::Font(void* font, const std::vector<CharsetRange>& charsets, const std::filesystem::path& fontPath, const float minimalScale, const float miterLimit) {
 			auto font_ = static_cast<msdfgen::FontHandle*>(font);
 
-			m_Data = new FontData();
+			m_Data = new Internal::FontData();
 
 			msdf_atlas::Charset charset;
 
@@ -75,7 +75,7 @@ namespace Cori {
 
 			std::filesystem::create_directories(target.parent_path());
 
-			uintmax_t fontFileSize = std::filesystem::file_size(fontPath);
+			size_t fontFileSize = std::filesystem::file_size(fontPath);
 
 			static auto CheckCached = [&] -> bool {
 				std::ifstream f(target, std::ios::in | std::ios::binary);
@@ -92,7 +92,7 @@ namespace Cori {
 				}
 
 				f.seekg(0, std::ios::end);
-				auto fileSize = f.tellg();
+				size_t fileSize = f.tellg();
 				f.seekg(0, std::ios::beg);
 
 				std::vector<unsigned char> buffer(fileSize);
@@ -101,9 +101,21 @@ namespace Cori {
 
 				f.close();
 
-				auto width2 = *reinterpret_cast<int32_t*>(&buffer[0]);
-				auto height2 = *reinterpret_cast<int32_t*>(&buffer[4]);
-				auto cachedFontFileSize = *reinterpret_cast<uintmax_t*>(&buffer[8]);
+				auto widthLoaded = *reinterpret_cast<int32_t*>(&buffer[0]);
+				auto heightLoaded = *reinterpret_cast<int32_t*>(&buffer[4]);
+				auto finalSizeLoaded = *reinterpret_cast<double*>(&buffer[8]);
+				auto miterLimitLoaded = *reinterpret_cast<float*>(&buffer[16]);
+				auto cachedFontFileSize = *reinterpret_cast<size_t*>(&buffer[20]);
+
+				if (finalSizeLoaded != m_Data->m_FinalScale) {
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Cache for font with name '{}' was generated with different scale, regenerating it now.", fontPath.stem().string());
+					return true;
+				}
+
+				if (miterLimitLoaded != miterLimit) {
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Cache for font with name '{}' was generated with different miter limit, regenerating it now.", fontPath.stem().string());
+					return true;
+				}
 
 				if (cachedFontFileSize != fontFileSize) {
 					CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Cache for font with name '{}' was generated with the font that had different filesize, regenerating it now.", fontPath.stem().string());
@@ -112,8 +124,8 @@ namespace Cori {
 
 				for (const auto& [m_Start, m_End] : charsets) {
 					bool found = false;
-					for (uint32_t i = 0; i < static_cast<uint32_t>(buffer[sizeof(uintmax_t) + 8]); ++i) {
-						size_t startPos = sizeof(uintmax_t) + 12 + i * 8;
+					for (uint32_t i = 0; i < static_cast<uint32_t>(buffer[28]); ++i) {
+						size_t startPos = 32 + i * 8;
 						auto start = *reinterpret_cast<uint32_t*>(&buffer[startPos]);
 						auto end = *reinterpret_cast<uint32_t*>(&buffer[startPos + 4]);
 
@@ -129,12 +141,21 @@ namespace Cori {
 					}
 				}
 
+				size_t assumedAtlasSize = widthLoaded * 3 * heightLoaded;
+				size_t pixelsOffset = 32 + static_cast<uint32_t>(buffer[28]) * 8;
+				size_t actualAtlasSize = fileSize - pixelsOffset;
+
+				if (assumedAtlasSize != actualAtlasSize) {
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Cache for font with name '{}' has corrupted pixel data, regenerating it now.", fontPath.stem().string());
+					return true;
+				}
+
 				CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Cache found for font '{}', msdf-atlas will be loaded from it.", fontPath.stem().string());
 
-				void* pixels = &buffer[sizeof(uintmax_t) + 12 + static_cast<uint32_t>(buffer[sizeof(uintmax_t) + 8]) * 8];
+				void* pixels = &buffer[pixelsOffset];
 
 				Texture::Params params2 { .m_PixelFormat = Texture::RGB888, .m_WrapMode = Texture::CLAMP_TO_EDGE, .m_Filter = Texture::LINEAR, .m_UnpackAlignment = 1, .m_HasSemiTransparency = false, };
-				m_Data->m_Atlas = Texture2D::Create(pixels, width2, height2, params2);
+				m_Data->m_Atlas = Texture2D::Create(pixels, widthLoaded, heightLoaded, params2);
 				return false;
 			};
 
@@ -167,19 +188,21 @@ namespace Cori {
 
 				uint32_t charsetSize = charsets.size();
 
-				//TODO: check for changes in minimal scale and miter limit, and recreate atlas if changed. check the total atlas size and compare to the actual data read, if mismatch, recreate atlas
-
 				/* Font Cache binary file layout
-				 * 4 bytes (int32_t) - atlas width,
-				 * 4 bytes (int32_t) - atlas width,
-				 * 8 bytes (sizeof(uintmax_t)) (uintmax_t) - size of the font file the cache was created from,
-				 * 4 bytes (uint32_t) - the amount of charsets the cache was created with, and also the amount of charsets present further in the file,
-				 * next there is charsets, the amount is described by the previous 4 bytes. Each charset is 8 bytes, first 4 bytes (uint32_t) - start codepoint, last 4 bytes (uint32_t) - end codepoint.
+				 * offset 0 - size 4 bytes (int32_t) - atlas width,
+				 * offset 4 - size 4 bytes (int32_t) - atlas width,
+				 * offset 8 - size 8 bytes (double) - finalScale,
+				 * offset 16 - size 4  bytes (float) - mitterLimit,
+				 * offset 20 - size 8 bytes (size_t) - size of the font file the cache was created from,
+				 * offset 28 - size 4 bytes (uint32_t) - the amount of charsets the cache was created with, and also the amount of charsets present further in the file,
+				 * offset 32: next there is charsets, the amount is described by the previous 4 bytes. Each charset is 8 bytes, first 4 bytes (uint32_t) - start codepoint, last 4 bytes (uint32_t) - end codepoint.
 				 * the rest is msdf-atlas in uncompressed RGB888 format, without padding for Alpha channel.
 				 */
 
 				out.write(reinterpret_cast<const char*>(&storage.width), sizeof(storage.width));
 				out.write(reinterpret_cast<const char*>(&storage.height), sizeof(storage.height));
+				out.write(reinterpret_cast<const char*>(&m_Data->m_FinalScale), sizeof(m_Data->m_FinalScale));
+				out.write(reinterpret_cast<const char*>(&miterLimit), sizeof(miterLimit));
 				out.write(reinterpret_cast<const char*>(&fontFileSize), sizeof(fontFileSize));
 				out.write(reinterpret_cast<const char*>(&charsetSize), sizeof(charsetSize));
 
@@ -202,7 +225,7 @@ namespace Cori {
 			delete m_Data;
 		}
 
-		FontData* Font::GetData() {
+		Internal::FontData* Font::GetData() {
 			return m_Data;
 		}
 	}

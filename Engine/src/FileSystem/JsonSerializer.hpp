@@ -12,6 +12,9 @@ namespace Cori {
 			{ j.get<T>() } -> std::same_as<T>;
 		};
 
+		/**
+		 * @brief Class is responsible for simple loading/saving config and save files as json files.
+		 */
 		class JsonSerializer {
 		public:
 			/**
@@ -19,7 +22,7 @@ namespace Cori {
 			 * @tparam T A type that satisfies the JsonSerializable concept.
 			 * @param data The object to save.
 			 * @param filepath The destination file path.
-			 * @return std::expected<void, Core::CoriError<>> which is empty on success, or contains an error on failure.
+			 * @return Expected object with void on success or CoriError<> on failure.
 			 */
 			template<JsonSerializable T>
 			static std::expected<void, Core::CoriError<>> Save(const T& data, const std::filesystem::path& filepath) {
@@ -52,7 +55,7 @@ namespace Cori {
 			 * @brief Loads an object from a JSON file.
 			 * @tparam T A type that satisfies the JsonSerializable concept.
 			 * @param filepath The source file path.
-			 * @return std::expected<T, Core::CoriError<>> which contains the loaded object on success, or an error on failure.
+			 * @return Expected object with void on success or CoriError<> on failure.
 			 */
 			template<JsonSerializable T>
 			static std::expected<T, Core::CoriError<>> Load(const std::filesystem::path& filepath) {

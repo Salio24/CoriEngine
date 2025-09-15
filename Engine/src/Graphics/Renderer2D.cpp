@@ -19,21 +19,21 @@ namespace Cori {
 
 			// quad setup
 
-			s_Data->QuadInstanceVertexArray = VertexArray::Create();
-			s_Data->QuadInstanceVertexBuffer = VertexBuffer::Create();
+			s_Data->QuadInstanceVertexArray = Internal::VertexArray::Create();
+			s_Data->QuadInstanceVertexBuffer = Internal::VertexBuffer::Create();
 			s_Data->QuadInstanceVertexBuffer->SetLayout({
-					{ShaderDataType::Mat3, "a_Transform", 1},
-					{ShaderDataType::Vec4, "a_TexturePosition", 1},
-					{ShaderDataType::Vec2, "a_Size", 1},
-					{ShaderDataType::Vec4, "a_TintColor", 1},
-					{ShaderDataType::Float, "a_Layer", 1},
+					{Internal::ShaderDataType::Mat3, "a_Transform", 1},
+					{Internal::ShaderDataType::Vec4, "a_TexturePosition", 1},
+					{Internal::ShaderDataType::Vec2, "a_Size", 1},
+					{Internal::ShaderDataType::Vec4, "a_TintColor", 1},
+					{Internal::ShaderDataType::Float, "a_Layer", 1},
 				});
 
-			s_Data->QuadInstanceVertexBuffer->Init(nullptr, RendererData::MaxInstanceCount * s_Data->QuadInstanceVertexBuffer->GetLayout().GetStride(), DRAW_TYPE::DYNAMIC);
+			s_Data->QuadInstanceVertexBuffer->Init(nullptr, RendererData::MaxInstanceCount * s_Data->QuadInstanceVertexBuffer->GetLayout().GetStride(), Internal::DRAW_TYPE::DYNAMIC);
 			s_Data->QuadInstanceVertexArray->AddVertexBuffer(s_Data->QuadInstanceVertexBuffer);
 
 			uint32_t quadIndices[6] = { 0, 1, 2, 2, 3, 0 };
-			s_Data->QuadInstanceIndexBuffer = IndexBuffer::Create(quadIndices, 6);
+			s_Data->QuadInstanceIndexBuffer = Internal::IndexBuffer::Create(quadIndices, 6);
 			s_Data->QuadInstanceVertexArray->AddIndexBuffer(s_Data->QuadInstanceIndexBuffer);
 
 			s_Data->QuadInstanceBufferBase = new Quad[RendererData::MaxInstanceCount];
@@ -48,20 +48,20 @@ namespace Cori {
 
 			// text setup
 
-			s_Data->CharInstanceVertexArray = VertexArray::Create();
-			s_Data->CharInstanceVertexBuffer = VertexBuffer::Create();
+			s_Data->CharInstanceVertexArray = Internal::VertexArray::Create();
+			s_Data->CharInstanceVertexBuffer = Internal::VertexBuffer::Create();
 			s_Data->CharInstanceVertexBuffer->SetLayout({
-					{ShaderDataType::Mat3, "a_Transform", 1},
-					{ShaderDataType::Vec4, "a_TexturePosition", 1},
-					{ShaderDataType::Vec4, "a_CharQuad", 1},
-					{ShaderDataType::Vec4, "a_Color", 1},
-					{ShaderDataType::Float, "a_Layer", 1}
+					{Internal::ShaderDataType::Mat3, "a_Transform", 1},
+					{Internal::ShaderDataType::Vec4, "a_TexturePosition", 1},
+					{Internal::ShaderDataType::Vec4, "a_CharQuad", 1},
+					{Internal::ShaderDataType::Vec4, "a_Color", 1},
+					{Internal::ShaderDataType::Float, "a_Layer", 1}
 				});
 
-			s_Data->CharInstanceVertexBuffer->Init(nullptr, RendererData::MaxCharInstanceCount * s_Data->CharInstanceVertexBuffer->GetLayout().GetStride(), DRAW_TYPE::DYNAMIC);
+			s_Data->CharInstanceVertexBuffer->Init(nullptr, RendererData::MaxCharInstanceCount * s_Data->CharInstanceVertexBuffer->GetLayout().GetStride(), Internal::DRAW_TYPE::DYNAMIC);
 			s_Data->CharInstanceVertexArray->AddVertexBuffer(s_Data->CharInstanceVertexBuffer);
 
-			s_Data->CharInstanceIndexBuffer = IndexBuffer::Create(quadIndices, 6);
+			s_Data->CharInstanceIndexBuffer = Internal::IndexBuffer::Create(quadIndices, 6);
 			s_Data->CharInstanceVertexArray->AddIndexBuffer(s_Data->CharInstanceIndexBuffer);
 
 			s_Data->CharInstanceBufferBase = new Char[RendererData::MaxCharInstanceCount];
@@ -131,10 +131,10 @@ namespace Cori {
 							if (AABBOverlapCheck(camera.m_CameraBounds, entityBounds)) {
 								//SubmitAABB(entityBounds, 0.2f, {1.0f, 0.0f, 1.0f});
 								if (renderer.GetSemiTransparencyState()) {
-									SubmitQuad(WORLD_SPACE, SEMI_TRANSPARENT, transform.m_WorldTransform, renderer.GetHalfSize(), renderer.GetColor(), renderer.GetTexture(), renderer.GetUVs(), transform.m_WorldDepth, renderer.m_FlipX, renderer.m_FlipY, renderer.m_FlatColored);
+									SubmitQuad(WORLD_SPACE, SEMI_TRANSPARENT, transform.m_WorldTransform, renderer.GetHalfSize(), renderer.GetColor(), renderer.GetTexture().get(), renderer.GetUVs(), transform.m_WorldDepth, renderer.m_FlipX, renderer.m_FlipY, renderer.m_FlatColored);
 									continue;
 								}
-								SubmitQuad(WORLD_SPACE, OPAQUE, transform.m_WorldTransform, renderer.GetHalfSize(), renderer.GetColor(), renderer.GetTexture(), renderer.GetUVs(), transform.m_WorldDepth, renderer.m_FlipX, renderer.m_FlipY, renderer.m_FlatColored);
+								SubmitQuad(WORLD_SPACE, OPAQUE, transform.m_WorldTransform, renderer.GetHalfSize(), renderer.GetColor(), renderer.GetTexture().get(), renderer.GetUVs(), transform.m_WorldDepth, renderer.m_FlipX, renderer.m_FlipY, renderer.m_FlatColored);
 							}
 						} else {
 							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Renderer2D }, "DrawScene: Texture inside Quad Renderer for Entity '{}', is null, skipping it.", entity.GetDebugData());
@@ -151,7 +151,7 @@ namespace Cori {
 			FlushTransparentQueues();
 		}
 
-		void Renderer2D::SubmitQuad(const DrawSpace space, const ObjectTransparency transparencyMode, const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor, const std::shared_ptr<Texture2D>& texture, const UVs& uvs, const uint8_t depth, const bool flipX, const bool flipY, const bool flatColored) {
+		void Renderer2D::SubmitQuad(const DrawSpace space, const ObjectTransparency transparencyMode, const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor, Texture2D* texture, const UVs& uvs, const uint8_t depth, const bool flipX, const bool flipY, const bool flatColored) {
 			if (space == WORLD_SPACE) {
 				if (transparencyMode == OPAQUE) {
 					SubmitQuadToQueue(s_Data->WorldSpaceOpaqueQuadQueue, transform, halfSize, tintColor, texture, uvs, depth, flipX, flipY, flatColored);
@@ -227,13 +227,13 @@ namespace Cori {
 			}
 		}
 
-		void Renderer2D::SubmitQuadToQueue(std::vector<QuadInstance>& queue, const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor, const std::shared_ptr<Texture2D>& texture, const UVs& uvs, const uint8_t depth, const bool flipX, const bool flipY, const bool flatColored) {
+		void Renderer2D::SubmitQuadToQueue(std::vector<QuadInstance>& queue, const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor, Texture2D* texture, const UVs& uvs, const uint8_t depth, const bool flipX, const bool flipY, const bool flatColored) {
 			if (!flipX && !flipY) {
 				queue.emplace_back(
 					transform,
 					halfSize,
 					tintColor,
-					flatColored ? s_Data->WhiteTexture : texture,
+					flatColored ? s_Data->WhiteTexture.get() : texture,
 					static_cast<glm::vec4>(uvs),
 					depth
 				);
@@ -243,7 +243,7 @@ namespace Cori {
 					transform,
 					halfSize,
 					tintColor,
-					flatColored ? s_Data->WhiteTexture : texture,
+					flatColored ? s_Data->WhiteTexture.get() : texture,
 					glm::vec4{uvs.UVmax.x, uvs.UVmin.y, uvs.UVmin.x, uvs.UVmax.y},
 					depth
 				);
@@ -253,7 +253,7 @@ namespace Cori {
 					transform,
 					halfSize,
 					tintColor,
-					flatColored ? s_Data->WhiteTexture : texture,
+					flatColored ? s_Data->WhiteTexture.get() : texture,
 					glm::vec4{uvs.UVmin.x, uvs.UVmax.y, uvs.UVmax.x, uvs.UVmin.y},
 					depth
 				);
@@ -263,7 +263,7 @@ namespace Cori {
 					transform,
 					halfSize,
 					tintColor,
-					flatColored ? s_Data->WhiteTexture : texture,
+					flatColored ? s_Data->WhiteTexture.get() : texture,
 					glm::vec4{uvs.UVmax.x, uvs.UVmax.y, uvs.UVmin.x, uvs.UVmin.y},
 					depth
 				);
@@ -285,7 +285,7 @@ namespace Cori {
 			SubmitColoredQuad(WORLD_SPACE, {aabb.m_Max.x - size.x / 2.0f, aabb.m_Max.y}, {size.x / 2.0f - lineThickness, lineThickness}, color);
 		}
 
-		void Renderer2D::SubmitTextToQueue(std::vector<TextInstance>& queue, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::u32string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) {
+		void Renderer2D::SubmitTextToQueue(std::vector<TextInstance>& queue, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::u32string_view& text, const glm::vec4& color, Font* font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) {
 			queue.emplace_back(
 				alignment,
 				transform,
@@ -300,7 +300,7 @@ namespace Cori {
 			);
 		}
 
-		void Renderer2D::SubmitTextToQueue(std::vector<TextInstance>& queue, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) {
+		void Renderer2D::SubmitTextToQueue(std::vector<TextInstance>& queue, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::string_view& text, const glm::vec4& color, Font* font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) {
 			queue.emplace_back(
 				alignment,
 				transform,
@@ -315,7 +315,7 @@ namespace Cori {
 			);
 		}
 
-		void Renderer2D::SubmitText(const DrawSpace space, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::u32string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) {
+		void Renderer2D::SubmitText(const DrawSpace space, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::u32string_view& text, const glm::vec4& color, Font* font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) {
 			if (space == WORLD_SPACE) {
 				SubmitTextToQueue(s_Data->WorldSpaceTransparentTextQueue, alignment, transform, fontSize, text, color, font, depth, limitX, lineSpacing, kerning);
 				return;
@@ -324,7 +324,7 @@ namespace Cori {
 			SubmitTextToQueue(s_Data->ScreenSpaceTransparentTextQueue, alignment, transform, fontSize, text, color, font, depth, limitX, lineSpacing, kerning);
 		}
 
-		void Renderer2D::SubmitText(const DrawSpace space, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) {
+		void Renderer2D::SubmitText(const DrawSpace space, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::string_view& text, const glm::vec4& color, Font* font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) {
 			if (space == WORLD_SPACE) {
 				SubmitTextToQueue(s_Data->WorldSpaceTransparentTextQueue, alignment, transform, fontSize, text, color, font, depth, limitX, lineSpacing, kerning);
 				return;
@@ -337,6 +337,12 @@ namespace Cori {
 			return s_Data->Stats;
 		}
 
+		void Renderer2D::EndFrame(const World::Components::Scene::Camera& camera) {
+			BeginScene(camera);
+			FlushRenderQueues();
+			EndScene();
+		}
+
 		void Renderer2D::DrawQuadInstanced(const QuadInstance& quad) {
 			if (!quad.m_Texture) {
 				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Renderer2D }, "DrawQuadInstanced: Texture is nullptr, trying to avoid read access violation");
@@ -347,13 +353,13 @@ namespace Cori {
 				StartNewInstancedSet();
 			}
 
-			if (s_Data->NecessaryTexture != quad.m_Texture.get()) {
+			if (s_Data->NecessaryTexture != quad.m_Texture) {
 				if (!s_Data->NecessaryTexture) {
-					s_Data->NecessaryTexture = quad.m_Texture.get();
+					s_Data->NecessaryTexture = quad.m_Texture;
 				}
 				else {
 					StartNewInstancedSet();
-					s_Data->NecessaryTexture = quad.m_Texture.get();
+					s_Data->NecessaryTexture = quad.m_Texture;
 				}
 			}
 
@@ -715,7 +721,7 @@ namespace Cori {
 						s_Data->WorldSpaceOpaqueQuadQueue.begin(),
 						s_Data->WorldSpaceOpaqueQuadQueue.end(),
 						[](const QuadInstance& quad) -> uint64_t {
-							return reinterpret_cast<uint64_t>(quad.m_Texture.get());
+							return reinterpret_cast<uint64_t>(quad.m_Texture);
 						}
 					);
 				}
@@ -745,7 +751,7 @@ namespace Cori {
 						s_Data->ScreenSpaceOpaqueQuadQueue.begin(),
 						s_Data->ScreenSpaceOpaqueQuadQueue.end(),
 						[](const QuadInstance& quad) -> uint64_t {
-							return reinterpret_cast<uint64_t>(quad.m_Texture.get());
+							return reinterpret_cast<uint64_t>(quad.m_Texture);
 						}
 					);
 				}
@@ -777,7 +783,7 @@ namespace Cori {
 						s_Data->WorldSpaceTransparentQuadQueue.begin(),
 						s_Data->WorldSpaceTransparentQuadQueue.end(),
 						[](const QuadInstance& quad) -> uint64_t {
-							return reinterpret_cast<uint64_t>(quad.m_Texture.get());
+							return reinterpret_cast<uint64_t>(quad.m_Texture);
 						}
 					);
 				}
@@ -793,8 +799,8 @@ namespace Cori {
 					);
 				}
 
-				API::EnableBlending();
-				API::SetDepthMask(false);
+				Internal::API::EnableBlending();
+				Internal::API::SetDepthMask(false);
 
 				{
 					CORI_PROFILE_SCOPE("Transparent instanced quad draw");
@@ -807,8 +813,8 @@ namespace Cori {
 					EndInstancedSet();
 				}
 
-				API::SetDepthMask(true);
-				API::DisableBlending();
+				Internal::API::SetDepthMask(true);
+				Internal::API::DisableBlending();
 
 				s_Data->WorldSpaceTransparentQuadQueue.clear();
 			}
@@ -829,8 +835,8 @@ namespace Cori {
 					);
 				}
 
-				API::EnableBlending();
-				API::SetDepthMask(false);
+				Internal::API::EnableBlending();
+				Internal::API::SetDepthMask(false);
 
 				{
 					CORI_PROFILE_SCOPE("Instanced Text draw");
@@ -839,8 +845,8 @@ namespace Cori {
 					}
 				}
 
-				API::SetDepthMask(true);
-				API::DisableBlending();
+				Internal::API::SetDepthMask(true);
+				Internal::API::DisableBlending();
 
 				s_Data->WorldSpaceTransparentTextQueue.clear();
 			}
@@ -856,7 +862,7 @@ namespace Cori {
 						s_Data->ScreenSpaceTransparentQuadQueue.begin(),
 						s_Data->ScreenSpaceTransparentQuadQueue.end(),
 						[](const QuadInstance& quad) -> uint64_t {
-							return reinterpret_cast<uint64_t>(quad.m_Texture.get());
+							return reinterpret_cast<uint64_t>(quad.m_Texture);
 						}
 					);
 				}
@@ -872,8 +878,8 @@ namespace Cori {
 					);
 				}
 
-				API::EnableBlending();
-				API::SetDepthMask(false);
+				Internal::API::EnableBlending();
+				Internal::API::SetDepthMask(false);
 
 				{
 					CORI_PROFILE_SCOPE("Transparent screen space instanced quad draw");
@@ -886,8 +892,8 @@ namespace Cori {
 					EndInstancedSet();
 				}
 
-				API::SetDepthMask(true);
-				API::DisableBlending();
+				Internal::API::SetDepthMask(true);
+				Internal::API::DisableBlending();
 
 				s_Data->ScreenSpaceTransparentQuadQueue.clear();
 			}
@@ -908,8 +914,8 @@ namespace Cori {
 					);
 				}
 
-				API::EnableBlending();
-				API::SetDepthMask(false);
+				Internal::API::EnableBlending();
+				Internal::API::SetDepthMask(false);
 
 				{
 					CORI_PROFILE_SCOPE("Screen Space instanced Text draw");
@@ -918,8 +924,8 @@ namespace Cori {
 					}
 				}
 
-				API::SetDepthMask(true);
-				API::DisableBlending();
+				Internal::API::SetDepthMask(true);
+				Internal::API::DisableBlending();
 
 				s_Data->ScreenSpaceTransparentTextQueue.clear();
 			}
@@ -939,7 +945,7 @@ namespace Cori {
 				s_Data->CurrentTexture = s_Data->NecessaryTexture;
 			}
 
-			API::DrawElementsInstancedTriangles(s_Data->QuadInstanceCount);
+			Internal::API::DrawElementsInstancedTriangles(s_Data->QuadInstanceCount);
 
 			s_Data->Stats.DrawCalls++;
 			s_Data->Stats.QuadCount += s_Data->QuadInstanceCount;
@@ -965,7 +971,7 @@ namespace Cori {
 				s_Data->CurrentTexture = atlas;
 			}
 
-			API::DrawElementsInstancedTriangles(s_Data->CharInstanceCount);
+			Internal::API::DrawElementsInstancedTriangles(s_Data->CharInstanceCount);
 
 			s_Data->Stats.DrawCalls++;
 			s_Data->Stats.CharCount += s_Data->CharInstanceCount;
