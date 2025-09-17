@@ -187,7 +187,7 @@ namespace Cori {
 			friend Internal::API;
 
 			static void EndFrame(const World::Components::Scene::Camera& camera);
-			static void DrawScene(World::Scene* scene);
+			static void SubmitScene(World::Scene* scene);
 			static void Init();
 			static void Shutdown();
 			static void BeginScene(const World::Components::Scene::Camera& camera);

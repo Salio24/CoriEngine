@@ -28,8 +28,8 @@ namespace Cori {
 				public:
 					Trigger() = default;
 					/**
-					 * @brief Constructs the Trigger, you need to pass an Entity that owns this Trigger to the constructor.
-					 * @param trigger Owner Entity.
+					 * @brief Constructs the Trigger.
+					 * @param trigger Owner Entity, you need to pass an Entity that owns this Trigger.
 					 */
 					explicit Trigger(World::Entity& trigger);
 

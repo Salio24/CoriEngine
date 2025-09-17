@@ -5,10 +5,11 @@ namespace Cori {
 		namespace Components {
 			namespace Entity {
 				Trigger::Trigger(World::Entity& trigger) {
-					if (CORI_CORE_VERIFY(trigger.IsValid(), "An unvalid entity was passed to the trigger, always pass the same entity you're adding a trigger to. This can blow up any second now.")) {}
+					if (CORI_CORE_VERIFY(trigger.IsValid(), "An invalid entity was passed to the Trigger, always pass the same entity you're adding a Trigger to. This can blow up any second now.")) {}
 					else {
-						auto& ud = trigger.AddComponent<Physics::BodyUserData>(trigger);
-						auto& rb = trigger.GetComponents<Rigidbody>();
+						auto& ud = trigger.GetOrAddComponent<Physics::BodyUserData>();
+						ud.m_Entity = trigger;
+						auto& rb = trigger.GetComponents<RigidBody>();
 						rb.SetUserData(&ud);
 						m_Trigger = trigger;
 					}

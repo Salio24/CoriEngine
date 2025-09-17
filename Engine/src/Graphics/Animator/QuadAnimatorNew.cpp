@@ -4,7 +4,7 @@ namespace Cori {
 	namespace World {
 		namespace Components {
 			namespace Entity {
-				QuadAnimatorNew::QuadAnimatorNew(const World::Entity& entity): m_Entity(entity) {
+				QuadAnimator::QuadAnimator(const World::Entity& entity): m_Entity(entity) {
 					auto& renderer = m_Entity.GetOrAddComponent<QuadRenderer>();
 					renderer.m_AnimatorBound = true;
 					m_ActiveSequence = false;
@@ -13,20 +13,20 @@ namespace Cori {
 					SetNextTickCallback([]{});
 				}
 
-				QuadAnimatorNew::~QuadAnimatorNew() {
+				QuadAnimator::~QuadAnimator() {
 					auto& renderer = m_Entity.GetComponents<QuadRenderer>();
 					renderer.m_AnimatorBound = false;
 				}
 
-				void QuadAnimatorNew::SetStopCallback(AnimationStopCallbackFn callback) {
+				void QuadAnimator::SetStopCallback(AnimationStopCallbackFn callback) {
 					m_StopCallBack = std::move(callback);
 				}
 
-				void QuadAnimatorNew::SetNextTickCallback(AnimationStopCallbackFn callback) {
+				void QuadAnimator::SetNextTickCallback(AnimationStopCallbackFn callback) {
 					m_NextTickCallBack = std::move(callback);
 				}
 
-				void QuadAnimatorNew::Stop(const bool abruptStop) {
+				void QuadAnimator::Stop(const bool abruptStop) {
 					if (abruptStop) {
 						m_ActiveSequence = false;
 					}
@@ -34,7 +34,7 @@ namespace Cori {
 					m_LoopStartIndex = 0xFFFF;
 				}
 
-				void QuadAnimatorNew::OnTickUpdate() {
+				void QuadAnimator::OnTickUpdate() {
 					if (m_ActiveSequence) {
 						if (m_TicksElapsedSinceStart == 1) {
 							m_NextTickCallBack();
@@ -86,15 +86,15 @@ namespace Cori {
 					}
 				}
 
-				void QuadAnimatorNew::SetSizeScale(const float scale) {
+				void QuadAnimator::SetSizeScale(const float scale) {
 					m_SizeScale = scale;
 				}
 
-				float QuadAnimatorNew::GetSizeScale() const {
+				float QuadAnimator::GetSizeScale() const {
 					return m_SizeScale;
 				}
 
-				uint64_t QuadAnimatorNew::GetTicksElapsed() const {
+				uint64_t QuadAnimator::GetTicksElapsed() const {
 					return m_TicksElapsedSinceStart;
 				}
 			}

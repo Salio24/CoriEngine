@@ -121,7 +121,7 @@ namespace Cori {
 				UpdateTransform();
 			}
 
-			Graphics::Renderer2D::DrawScene(this);
+			Graphics::Renderer2D::SubmitScene(this);
 			Graphics::Renderer2D::EndFrame(GetContextComponent<Components::Scene::Camera>());
 		}
 
@@ -134,10 +134,10 @@ namespace Cori {
 				fsmv.Get<Components::Entity::StateMachine>(entity).OnTickUpdate(timeStep);
 			}
 
-			EntityView animv = View<Components::Entity::QuadAnimatorNew>(Exclude<Components::Entity::InactiveLocallyFlag>());
+			EntityView animv = View<Components::Entity::QuadAnimator>(Exclude<Components::Entity::InactiveLocallyFlag>());
 
 			for (const auto entity : animv) {
-				animv.Get<Components::Entity::QuadAnimatorNew>(entity).OnTickUpdate();
+				animv.Get<Components::Entity::QuadAnimator>(entity).OnTickUpdate();
 			}
 
 			EntityView trigv = View<Components::Entity::Trigger>(Exclude<Components::Entity::InactiveLocallyFlag>());
@@ -195,13 +195,13 @@ namespace Cori {
 			//	}
 			//}
 
-			const auto view1 = m_Registry.view<Components::Entity::DirtyTransformFlag>();
+			const auto view1 = m_Registry.view<Components::Entity::Internal::DirtyTransformFlag>();
 
 			// 2. This loop runs only a handful of times per frame in a typical scene.
 			for (const auto entity : view1) {
 				UpdateTransformRecursive(entity, glm::mat3(1.0f), 1, false, false);
 			}
-			m_Registry.clear<Components::Entity::DirtyTransformFlag>();
+			m_Registry.clear<Components::Entity::Internal::DirtyTransformFlag>();
 		}
 		void Scene::UpdateTransformRecursive(entt::entity entity, const glm::mat3& parentTransform, const uint8_t parentDepth, const bool parentTransformDirty, const bool parentDepthDirty) {
 			auto& transform = m_Registry.get<Components::Entity::Transform>(entity);

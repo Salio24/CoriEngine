@@ -2,19 +2,17 @@
 
 namespace Cori {
 	namespace Profiling {
+		/**
+		 * @brief This crap needs a rewrite.
+		 */
 		template<typename T>
-		struct InstanceMetrics {
+		class InstanceMetrics {
+		public:
+			template<typename DerivedType, typename BaseType>
+			friend class Trackable;
+
 			using DerivedMetricsReporter = std::function<void()>;
 			using DerivedMetricsProvider = std::function<std::pair<int64_t, int64_t>()>;
-
-			static void Increment() {
-				s_AliveCount.fetch_add(1, std::memory_order_relaxed);
-				s_TotalCreatedCount.fetch_add(1, std::memory_order_relaxed);
-			}
-
-			static void Decrement() {
-				s_AliveCount.fetch_sub(1, std::memory_order_relaxed);
-			}
 
 			static int64_t GetDirectAliveCount() {
 				return s_AliveCount.load(std::memory_order_relaxed);
@@ -118,7 +116,18 @@ namespace Cori {
 				return counts;
 			}
 
+		protected:
+			static void Increment() {
+				s_AliveCount.fetch_add(1, std::memory_order_relaxed);
+				s_TotalCreatedCount.fetch_add(1, std::memory_order_relaxed);
+			}
+
+			static void Decrement() {
+				s_AliveCount.fetch_sub(1, std::memory_order_relaxed);
+			}
+
 		private:
+
 			inline static std::atomic<int64_t> s_AliveCount{ 0 };
 			inline static std::atomic<int64_t> s_TotalCreatedCount{ 0 };
 

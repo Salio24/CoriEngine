@@ -3,7 +3,7 @@
 
 namespace Cori {
 	namespace Profiling {
-		template <typename DerivedType, typename BaseType = DerivedType>
+		template<typename DerivedType, typename BaseType = DerivedType>
 		class Trackable {
 		public:
 			Trackable(const Trackable&) = delete;
@@ -12,6 +12,7 @@ namespace Cori {
 			Trackable& operator=(Trackable&&) = delete;
 
 		protected:
+
 			Trackable() {
 				InstanceMetrics<DerivedType>::Increment();
 				static ReporterRegistrar registrar_trigger;
@@ -41,6 +42,4 @@ namespace Cori {
 			//inline static ReporterRegistrar s_ReporterRegistrar;
 		};
 	}
-
-
 }

@@ -13,12 +13,12 @@ namespace Cori {
 				template<typename T>
 				concept IsAnimationWithParams = std::is_same_v<T, AnimationWithParams>;
 
-				class QuadAnimatorNew {
+				class QuadAnimator {
 				public:
 
-					explicit QuadAnimatorNew(const World::Entity& entity);
+					explicit QuadAnimator(const World::Entity& entity);
 
-					~QuadAnimatorNew();
+					~QuadAnimator();
 
 					void SetStopCallback(AnimationStopCallbackFn callback);
 					void SetNextTickCallback(AnimationStopCallbackFn callback);

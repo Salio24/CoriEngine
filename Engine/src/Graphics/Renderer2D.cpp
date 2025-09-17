@@ -112,31 +112,30 @@ namespace Cori {
 			CORI_PROFILE_FUNCTION();
 		}
 
-		void Renderer2D::DrawScene(World::Scene* scene) {
+		void Renderer2D::SubmitScene(World::Scene* scene) {
 			CORI_PROFILE_FUNCTION();
 
-			{
-				CORI_PROFILE_SCOPE("Quad Submission");
-				const auto& camera = scene->GetContextComponent<World::Components::Scene::Camera>();
-				//Utility::AABB cameraBounds = { camera.m_CameraMinBound, camera.m_CameraMaxBound };
-				World::EntityView view = scene->View<World::Components::Entity::QuadRenderer, World::Components::Entity::Transform>(World::Exclude<World::Components::Entity::InactiveLocallyFlag>());
-				for (const auto entity : view) {
-					auto& renderer = view.Get<World::Components::Entity::QuadRenderer>(entity);
-					if (renderer.m_Visible) {
-						if (renderer.GetTexture()) {
-							auto& transform = view.Get<World::Components::Entity::Transform>(entity);
-							Utility::AABB entityBounds = Utility::CalculateAABB(transform.m_WorldTransform, renderer.GetHalfSize());
-							//SubmitAABB(camera.m_CameraBounds, 0.2f, {0.0f, 1.0f, 0.0f});
-							if (AABBOverlapCheck(camera.m_CameraBounds, entityBounds)) {
-								//SubmitAABB(entityBounds, 0.2f, {1.0f, 0.0f, 1.0f});
-								if (renderer.GetSemiTransparencyState()) {
-									SubmitQuad(WORLD_SPACE, SEMI_TRANSPARENT, transform.m_WorldTransform, renderer.GetHalfSize(), renderer.GetColor(), renderer.GetTexture().get(), renderer.GetUVs(), transform.m_WorldDepth, renderer.m_FlipX, renderer.m_FlipY, renderer.m_FlatColored);
-									continue;
-								}
-								SubmitQuad(WORLD_SPACE, OPAQUE, transform.m_WorldTransform, renderer.GetHalfSize(), renderer.GetColor(), renderer.GetTexture().get(), renderer.GetUVs(), transform.m_WorldDepth, renderer.m_FlipX, renderer.m_FlipY, renderer.m_FlatColored);
+			const auto& camera = scene->GetContextComponent<World::Components::Scene::Camera>();
+			//Utility::AABB cameraBounds = { camera.m_CameraMinBound, camera.m_CameraMaxBound };
+			World::EntityView view = scene->View<World::Components::Entity::QuadRenderer, World::Components::Entity::Transform>(World::Exclude<World::Components::Entity::InactiveLocallyFlag>());
+			for (const auto entity : view) {
+				auto& renderer = view.Get<World::Components::Entity::QuadRenderer>(entity);
+				if (__builtin_expect(renderer.m_Visible, 1)) {
+					const auto texture = renderer.GetTexture().get();
+					if (__builtin_expect(!texture, 0)) {
+						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Renderer2D }, "DrawScene: Texture inside Quad Renderer for Entity '{}', is null, skipping it.", entity.GetDebugData());
+					}
+					else {
+						auto& transform = view.Get<World::Components::Entity::Transform>(entity);
+						Utility::AABB entityBounds = Utility::CalculateAABB(transform.m_WorldTransform, renderer.GetHalfSize());
+						//SubmitAABB(camera.m_CameraBounds, 0.2f, {0.0f, 1.0f, 0.0f});
+						if (AABBOverlapCheck(camera.m_CameraBounds, entityBounds)) {
+							//SubmitAABB(entityBounds, 0.2f, {1.0f, 0.0f, 1.0f});
+							if (!renderer.GetSemiTransparencyState()) {
+								SubmitQuad(WORLD_SPACE, OPAQUE, transform.m_WorldTransform, renderer.GetHalfSize(), renderer.GetColor(), texture, renderer.GetUVs(), transform.m_WorldDepth, renderer.m_FlipX, renderer.m_FlipY, renderer.m_FlatColored);
+								continue;
 							}
-						} else {
-							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Renderer2D }, "DrawScene: Texture inside Quad Renderer for Entity '{}', is null, skipping it.", entity.GetDebugData());
+							SubmitQuad(WORLD_SPACE, SEMI_TRANSPARENT, transform.m_WorldTransform, renderer.GetHalfSize(), renderer.GetColor(), texture, renderer.GetUVs(), transform.m_WorldDepth, renderer.m_FlipX, renderer.m_FlipY, renderer.m_FlatColored);
 						}
 					}
 				}
