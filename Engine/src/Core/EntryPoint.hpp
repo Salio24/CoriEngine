@@ -19,22 +19,19 @@ void operator delete(void* ptr) noexcept
 
 extern Cori::Core::Application* Cori::Core::CreateApplication();
 
-// ReSharper disable once CppNonInlineFunctionDefinitionInHeaderFile
 int32_t main([[maybe_unused]] int32_t argc, [[maybe_unused]] char** argv) {
 
-#ifdef CORI_ASYNC_LOGGING
-#ifndef CORI_NO_FILE_LOGGING
-	Cori::Core::Internal::Engine::Start(true, true);
-#else
-	Cori::Core::Internal::Engine::Start(true, false);
-#endif
-#else 
-#ifndef CORI_NO_FILE_LOGGING
-	Cori::Core::Internal::Engine::Start(false, true);
-#else
-	Cori::Core::Internal::Engine::Start(false, false);
-#endif
-#endif
+	bool asyncLogging = false;
+	#ifdef CORI_ASYNC_LOGGING
+		asyncLogging = true;
+	#endif
+
+	bool fileLogging = true;
+	#ifdef CORI_NO_FILE_LOGGING
+		fileLogging = false;
+	#endif
+
+	Cori::Core::Internal::Engine::Start(asyncLogging, fileLogging);
 
 	Cori::Core::Application* app = Cori::Core::CreateApplication();
 

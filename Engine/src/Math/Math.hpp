@@ -1,6 +1,9 @@
 #pragma once
 
 namespace Cori {
+	/**
+	 * @brief Anything custom connected to math is in this namespace.
+	 */
 	namespace Math {
 		/**
 		 * @brief Returns a sign of a number.

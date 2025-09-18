@@ -977,9 +977,10 @@ namespace Cori {
 
 inline const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') + "]: ";
 
-// vvv Engine Side
+//#define DISABLE_LOGGING
 
-#ifdef DEBUG_BUILD
+// vvv Engine Side
+#if defined(DEBUG_BUILD) && !defined(DISABLE_LOGGING)
 
 	#define CORI_CORE_TRACE(...) ::Cori::Logger::CoreLogTrace(__VA_ARGS__)
 	#define CORI_CORE_DEBUG(...) ::Cori::Logger::CoreLogDebug(__VA_ARGS__)

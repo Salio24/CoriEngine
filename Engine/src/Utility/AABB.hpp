@@ -1,6 +1,9 @@
 #pragma once
 
 namespace Cori {
+	/**
+	 * @brief A namespace for utilities of different kinds.
+	 */
 	namespace Utility {
 		/**
 		 * @brief Axis-Aligned bounding box.

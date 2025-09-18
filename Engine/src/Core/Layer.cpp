@@ -29,17 +29,17 @@ namespace Cori {
 			}
 
 			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Layer }, "Binding Scene '{}' to Layer '{}'", name, m_Name);
-			const auto result = World::SceneManager::GetScene(name);
+			auto result = World::SceneManager::GetScene(name);
 			if (!result) {
 				return std::unexpected(result.error());
 			}
 
-			const bool success = result.value()->OnBind();
+			const bool success = result.value().OnBind();
 			if (!success) {
 				return std::unexpected(CoriError(std::format("Failed to bind Scene '{}'", name)));
 			}
 
-			ActiveScene.m_SceneRaw = result.value();
+			ActiveScene = result.value();
 			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Layer }, "Scene '{}' bound to Layer '{}' successfully", name, m_Name);
 			return {};
 		}
@@ -58,7 +58,7 @@ namespace Cori {
 			}
 
 			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Layer }, "Scene '{}' unbound from Layer '{}' successfully", ActiveScene.GetName(), m_Name);
-			ActiveScene.m_SceneRaw = nullptr;
+			ActiveScene.m_SceneRaw = std::shared_ptr<World::Scene>(nullptr);
 			return {};
 		}
 	}

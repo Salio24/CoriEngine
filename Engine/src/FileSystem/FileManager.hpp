@@ -1,6 +1,9 @@
 #pragma once
 
 namespace Cori {
+	/**
+	 * @brief Everything connected to interacting with files and filesystem is in this namespace.
+	 */
 	namespace FileSystem {
 		/**
 		 * @brief Simple static class used to read files as string. Will likely expand its functionality later.

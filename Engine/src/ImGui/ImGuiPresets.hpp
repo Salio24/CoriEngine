@@ -7,7 +7,7 @@ namespace Cori {
 	 */
 	namespace ImGuiPresets {
 		/**
-		 * @brief Enables the debug draw of box2d physics.
+		 * @brief Enables the debug draw of Box2D physics.
 		 * @param cameraSize Size of the debug cameras viewport, use GetSize() with your main Graphics::CameraController to align the main camera and debug camera.
 		 * @param cameraPos Position of the debug camera, use GetSize() with your main Graphics::CameraController to align the main camera and debug camera.
 		 * @param pixelsPerMeter Pixels in main camera per meter range. Use CORI_PIXELS_PER_METER.

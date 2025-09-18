@@ -1,9 +1,9 @@
 #include "AnimationPack.hpp"
 #include "Core/Application.hpp"
 #include "Graphics/Image.hpp"
-#include "AssetManager/AssetManager.hpp"
 #include "AssetManager/EngineAssets.hpp"
 #include <nlohmann/json.hpp>
+#include <PathDefinesGenerated.hpp>
 using json = nlohmann::json;
 
 namespace {
@@ -127,8 +127,9 @@ namespace Cori {
 
 		Animation AnimationPack::GetAnimation(const uint32_t index) {
 			if (m_Valid) {
-				if (CORI_CORE_CHECK(index + 1 <= m_Animations.size(), "Animation Pack '{}' doesn't have an animation at index '{}', returning animation at index '0'. Total animation cound '{}'", m_Name, index, m_Animations.size())) { return Animation(m_Animations[0], m_SpriteAtlas->GetTexture(), m_FrameSize); }
-				return Animation(m_Animations[index], m_SpriteAtlas->GetTexture(), m_FrameSize);
+				if (CORI_CORE_CHECK(index + 1 <= m_Animations.size(), "Animation Pack '{}' doesn't have an animation at index '{}', returning animation at index '0'. Total animation cound '{}'", m_Name, index, m_Animations.size())) { return Animation{ shared_from_this(), 0 }; }
+				//return Animation(m_Animations[index], m_SpriteAtlas->GetTexture(), m_FrameSize);
+				return Animation{ shared_from_this(), index };
 			}
 
 			CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::AnimationPack }, "Animation Pack '{}', was created as a placeholder. Requested animation at '{}' doesn't exist, returning a placeholder.", m_Name, index);
@@ -137,15 +138,24 @@ namespace Cori {
 			frames.push_back(frame);
 			const AnimationData data(frames);
 			//return Animation(data, AssetManager::GetTexture2D(AssetPlaceholders::Texture2D), glm::vec2{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max() });
-			return Animation(data, AssetManager::Get(Cori::Internal::AssetPlaceholders::Texture2DPlaceholder), glm::vec2{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max() });
+			//return Animation(data, AssetManager::Get(Cori::Internal::AssetPlaceholders::Texture2DPlaceholder), glm::vec2{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max() });
+			return Animation{ shared_from_this(), 0 };
+
 		}
 
-		AnimationPack::AnimationPack(std::vector<AnimationData> animations, const std::shared_ptr<SpriteAtlas>& spriteAtlas, std::string name, const glm::u16vec2 frameResolution) : m_Animations(std::move(animations)), m_SpriteAtlas(spriteAtlas), m_Name(std::move(name)), m_FrameSize(frameResolution) {
+		AnimationPack::AnimationPack(std::vector<AnimationData> animations, const std::shared_ptr<SpriteAtlas>& spriteAtlas, std::string name, const glm::u16vec2 frameResolution) : m_Animations(std::move(animations)), m_SpriteAtlas(spriteAtlas), m_FrameSize(frameResolution), m_Name(std::move(name)) {
 			m_Valid = true;
 		}
 
 		AnimationPack::AnimationPack() {
 			m_Valid = false;
+			std::vector<AnimationFrame> frames;
+			constexpr AnimationFrame frame{ UVs{}, 2 };
+			frames.push_back(frame);
+			const AnimationData data(frames);
+			m_Animations.clear();
+			m_Animations.push_back(data);
+			m_SpriteAtlas = SpriteAtlas::Create("placeholder for AnimationPack", Image::Create(FileSystem::Internal::PathDefines::GetEngineDataRoot() / "/placeholders/missing_texture32.png"), glm::u16vec2(32));
 		}
 	}
 }

@@ -56,6 +56,7 @@ namespace Cori {
 			 * @brief Change the Layer modal state.
 			 * @param state Desired state.
 			 * @detail When Layer is in a modal state all events that are passed to it will be considered handled and will not be passed further down the LayerStack.
+			 * \n Also when a layer is modal any layer below it will not be updated, both tick update and frame update, it effectively stops any logic execution in the layers below it.
 			 */
 			void SetModal(const bool state) { m_Modal = state; }
 
@@ -88,7 +89,7 @@ namespace Cori {
 			/**
 			 * @brief A SceneHandle to the Scene that is currently bound.
 			 */
-			World::SceneHandle ActiveScene;
+			World::SceneHandle ActiveScene{nullptr};
 
 			inline static Physics::DebugImguiRenderer m_DebugImGuiRenderer;
 

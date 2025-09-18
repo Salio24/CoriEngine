@@ -6,6 +6,9 @@ namespace Cori {
 		class Application;
 	}
 
+	/**
+	 * @brief Everything connected to audio is in this namespace.
+	 */
 	namespace Audio {
 		class Track;
 		class Sound;

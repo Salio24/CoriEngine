@@ -21,13 +21,23 @@ namespace Cori {
 }
 
 namespace Cori {
+	/**
+	 * @brief Anything connected to WorldSystem (ECS) is in this namespace.
+	 */
 	namespace World {
 		class Scene;
+		/**
+		 * @brief Components that are used with the WorldSystem (ECS).
+		 */
 		namespace Components {
+			/**
+			 * @brief Components designed to be used with entities.
+			 */
 			namespace Entity {
 				namespace Internal {
 					/**
 					 * @brief Flags an Entity transform for recalculation. Only for internal usage!
+					 * @warning Don't add or remove this component manually!
 					 */
 					struct DirtyTransformFlag {
 						DirtyTransformFlag() = default;
@@ -85,7 +95,11 @@ namespace Cori {
 					Hierarchy& operator=(const Hierarchy&) = delete;
 					Hierarchy(Hierarchy&&) = delete;
 					Hierarchy& operator=(Hierarchy&&) = delete;
-					
+
+				private:
+					friend World::Entity;
+					friend World::Scene;
+					friend struct Transform;
 					entt::entity m_Parent { entt::null };
 					entt::entity m_FirstChild { entt::null };
 					entt::entity m_NextSibling { entt::null };
@@ -283,11 +297,28 @@ namespace Cori {
 					ChildCache(ChildCache&&) = delete;
 					ChildCache& operator=(ChildCache&&) = delete;
 
-					std::unordered_map<std::string, entt::entity> m_Children;
+				private:
+					friend World::Entity;
+					struct TransparentHash {
+						using is_transparent = void;
+						size_t operator()(std::string_view sv) const noexcept {
+							return std::hash<std::string_view>{}(sv);
+						}
+					};
+
+					struct TransparentEqual {
+						using is_transparent = void;
+						bool operator()(std::string_view lhs, std::string_view rhs) const noexcept {
+							return lhs == rhs;
+						}
+					};
+
+					std::unordered_map<std::string, entt::entity, TransparentHash, TransparentEqual> m_Children;
 				};
 
 				/**
 				 * @brief Entity aquifers this flag when is disabled explicitly.
+				 * @warning Don't add or remove this component manually!
 				 */
 				struct InactiveLocallyFlag {
 					InactiveLocallyFlag() = default;
@@ -298,6 +329,7 @@ namespace Cori {
 
 				/**
 				 * @brief Entity aquifers this flag when is disabled explicitly or its parent Entity is disabled.
+				 * @warning Don't add or remove this component manually!
 				 */
 				struct InactiveGloballyFlag {
 					InactiveGloballyFlag() = default;

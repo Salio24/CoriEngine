@@ -1,6 +1,6 @@
 # Cori Engine (WIP)
 
-![Cori](/github/git_logo.png?raw=true "Cori")
+![Cori](https://raw.githubusercontent.com/Salio24/CoriEngine/CoriStable/github/git_logo.png)
 
 Cori is my game engine that I’m actively working on. When building, I took some inspiration from Hazel Engine by The Cherno. The current feature set of the engine is: Basic 2D Batch Renderer, Asset Manager, Event System, Layer System, Input Handler, Logging, ImGui integration, Entity Component System, Scene System, API agnostic window/graphics/rendering abstraction.
 

@@ -4,6 +4,9 @@
 namespace Cori {
 	namespace World {
 		namespace Components {
+			/**
+			 * @brief Components designed to be used with scenes.
+			 */
 			namespace Scene {
 				/**
 				 * @brief A Scene context component with all the graphical camera data.

@@ -6,6 +6,9 @@ namespace Cori {
 		class Application;
 	}
 
+	/**
+	 * @brief Almost everything connected to graphics is in this namespace.
+	 */
 	namespace Graphics {
 		namespace Internal {
 			class API {

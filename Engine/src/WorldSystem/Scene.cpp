@@ -2,7 +2,7 @@
 #include "Graphics/CameraController.hpp"
 #include "Physics/Triggers/Trigger.hpp"
 #include "Graphics/Renderer2D.hpp"
-#include "Graphics/Animator/QuadAnimatorNew.hpp"
+#include "Graphics/Animator/QuadAnimator.hpp"
 #include "StateSystem/StateMachine.hpp"
 
 namespace Cori {
@@ -24,12 +24,16 @@ namespace Cori {
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Scene: '{}' destroyed.", m_Name);
 		}
 
+		Entity Scene::CreateBlankEntity() {
+			entt::entity entity = m_Registry.create();
+			return Entity{{m_Registry, entity}};
+		}
+
 		Entity Scene::CreateEntity(const std::string& name, const Utility::HashedTag64& tag) {
 			entt::entity entity = m_Registry.create();
 			auto& nameComp = m_Registry.emplace<Components::Entity::Name>(entity);
 			nameComp.m_Name = name;
 			m_Registry.emplace<Components::Entity::Tag>(entity, tag);
-			//m_Registry.emplace<Components::Entity::Transform>(entity);
 			m_Registry.emplace<Components::Entity::Hierarchy>(entity);
 			const auto& uuidComp = m_Registry.emplace<Components::Entity::UUID>(entity);
 			m_UUIDToEntity.insert({ uuidComp.m_UUID, entity });
@@ -187,17 +191,8 @@ namespace Cori {
 		}
 
 		void Scene::UpdateTransform() {
-			//const auto view = m_Registry.view<Components::Entity::Transform, Components::Entity::Hierarchy>();
-			//for (const auto entity : view) {
-			//	const auto& hierarchy = view.get<Components::Entity::Hierarchy>(entity);
-			//	if (!m_Registry.valid(hierarchy.m_Parent)) {
-			//		UpdateTransformRecursive(entity, glm::mat3(1.0f), 1, false, false);
-			//	}
-			//}
-
 			const auto view1 = m_Registry.view<Components::Entity::Internal::DirtyTransformFlag>();
 
-			// 2. This loop runs only a handful of times per frame in a typical scene.
 			for (const auto entity : view1) {
 				UpdateTransformRecursive(entity, glm::mat3(1.0f), 1, false, false);
 			}

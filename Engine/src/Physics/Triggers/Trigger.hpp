@@ -12,8 +12,8 @@ namespace Cori {
 		namespace Components {
 			namespace Entity {
 				/**
-				 * @brief A Trigger components is used in combination with Rigidbody component used to respond to an entity getting into a specific area that has the Trigger.
-				 * @details For a Trigger to work you need to attach a shape (From now on I will refer to shapes created like this as a Trigger zone) to the Rigidbody body component with the following params:
+				 * @brief A Trigger components is used in combination with RigidBody component used to respond to an entity getting into a specific area that has the Trigger.
+				 * @details For a Trigger to work you need to attach a shape (From now on I will refer to shapes created like this as a Trigger zone) to the RigidBody body component with the following params:
 				 * \n filter.categoryBits = Cori::Physics::CollisionBits::SensorBit;
 				 * \n isSensor = true;
 				 * \n enableSensorEvents = true;

@@ -7,7 +7,13 @@
 #include "WorldSystem/SceneManager.hpp"
 #include "Time.hpp"
 
+/**
+ * @brief Global engine namespace.
+ */
 namespace Cori {
+	/**
+	 * @brief Core systems of the engine are here.
+	 */
 	namespace Core {
 		/**
 		 * @brief Main Application object, there can only be one Application object. Basically a root of the program.

@@ -10,7 +10,7 @@ project(CoriEngine)
     cmake_path(CONVERT "${ENGINE_ASSETS_DIR}" TO_CMAKE_PATH_LIST ENGINEDATA_PATH)
 
     set(PATH_DEFINES_HEADER_IN "${CORI_ENGINE_SOURCE_DIR}/cmake/PathDefines.hpp.in")
-    set(PATH_DEFINES_HEADER_OUT "${CORI_ENGINE_SOURCE_DIR}/src/Generated/PathDefinesGenerated.hpp")
+    set(PATH_DEFINES_HEADER_OUT "${CMAKE_CURRENT_BINARY_DIR}/generated/PathDefinesGenerated.hpp")
 
     configure_file(${PATH_DEFINES_HEADER_IN} ${PATH_DEFINES_HEADER_OUT})
 
@@ -34,11 +34,11 @@ project(CoriEngine)
     set(SDLMIXER_OPUS OFF)
     set(SDLMIXER_DEPS_SHARED OFF)
     #find_package(Threads REQUIRED)
-    #set(SDLMIXER_VENDORED ON)
+    set(SDLMIXER_VENDORED OFF)
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/SDL3_mixer EXCLUDE_FROM_ALL)
 
     # SDL_image
-    set(SDLIMAGE_VENDORED ON)
+    set(SDLIMAGE_VENDORED OFF)
     set(SDLIMAGE_AVIF OFF)
     set(SDLIMAGE_JPEG OFF)
     set(SDLIMAGE_WEBP OFF)
@@ -205,7 +205,7 @@ project(CoriEngine)
 
     target_include_directories(${ENGINE_LIBRARY_NAME} PRIVATE
             ${CORI_HEADERS_DIR}
-            ${CORI_ENGINE_SOURCE_DIR}/src/Generated
+            ${CMAKE_CURRENT_BINARY_DIR}/generated
     )
 
     # pch
@@ -225,12 +225,12 @@ project(CoriEngine)
         target_compile_options(msdf-atlas-gen PRIVATE -w)
         target_compile_options(msdfgen-core PRIVATE -w)
         target_compile_options(tmxlite PRIVATE -w)
-        if(TARGET TIFF::tiff)
-            set(SDLIMAGE_TIF_TARGET "tiff")
-        else()
-            set(SDLIMAGE_TIF_TARGET "TIFF")
-        endif()
-        target_compile_options(${SDLIMAGE_TIF_TARGET} PRIVATE -w)
+        #if(TARGET TIFF::tiff)
+        #    set(SDLIMAGE_TIF_TARGET "tiff")
+        #else()
+        #    set(SDLIMAGE_TIF_TARGET "TIFF")
+        #endif()
+        #target_compile_options(${SDLIMAGE_TIF_TARGET} PRIVATE -w)
         target_compile_options(spdlog PRIVATE -w)
     endif()
 

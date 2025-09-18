@@ -124,6 +124,9 @@ namespace Cori {
 					if (m_RenderImGui) {
 						for (Layer* layer : m_LayerStack) {
 							layer->OnImGuiRender(m_GameTimer);
+							if (layer->IsModal()) {
+								break;
+							}
 						}
 					}
 
@@ -142,6 +145,9 @@ namespace Cori {
 			for (Layer* layer : m_LayerStack) {
 				layer->SceneTickrateUpdate(gameTimer.GetTimestep());
 				layer->OnTickUpdate(gameTimer);
+				if (layer->IsModal()) {
+					break;
+				}
 			}
 		}
 
