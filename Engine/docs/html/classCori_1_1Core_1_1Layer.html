@@ -93,15 +93,18 @@ $(function(){initNavTree('classCori_1_1Core_1_1Layer.html','','classCori_1_1Core
 </div><!--header-->
 <div class="contents">
 
+<p>An abstract class that is ment to be used as a template for defining layers.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for Cori::Core::Layer:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1Core_1_1Layer__inherit__graph.png" border="0" usemap="#aCori_1_1Core_1_1Layer_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
 <map name="aCori_1_1Core_1_1Layer_inherit__map" id="aCori_1_1Core_1_1Layer_inherit__map">
-<area shape="rect" title=" " alt="" coords="25,5,154,33"/>
-<area shape="rect" href="classCori_1_1Core_1_1ImGuiLayer.html" title=" " alt="" coords="5,81,174,109"/>
-<area shape="poly" title=" " alt="" coords="92,49,92,81,87,81,87,49"/>
+<area shape="rect" title="An abstract class that is ment to be used as a template for defining layers." alt="" coords="12,5,142,33"/>
+<area shape="rect" href="classCori_1_1Core_1_1Internal_1_1ImGuiLayer.html" title=" " alt="" coords="5,81,149,126"/>
+<area shape="poly" title=" " alt="" coords="80,49,80,80,74,80,74,49"/>
 </map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
@@ -109,8 +112,8 @@ Collaboration diagram for Cori::Core::Layer:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1Core_1_1Layer__coll__graph.png" border="0" usemap="#aCori_1_1Core_1_1Layer_coll__map" loading="lazy" alt="Collaboration graph"/></div>
 <map name="aCori_1_1Core_1_1Layer_coll__map" id="aCori_1_1Core_1_1Layer_coll__map">
-<area shape="rect" title=" " alt="" coords="34,106,163,134"/>
-<area shape="rect" href="classCori_1_1World_1_1SceneHandle.html" title=" " alt="" coords="5,5,192,33"/>
+<area shape="rect" title="An abstract class that is ment to be used as a template for defining layers." alt="" coords="34,106,163,134"/>
+<area shape="rect" href="classCori_1_1World_1_1SceneHandle.html" title="A handle for the scene, checks for scene validity before any call to the scene, if scene is invalid a..." alt="" coords="5,5,192,33"/>
 <area shape="poly" title=" " alt="" coords="101,49,101,105,96,105,96,49"/>
 </map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
@@ -120,35 +123,45 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a89ce1cc1e98e0dbd2d5dc1068780258e" id="r_a89ce1cc1e98e0dbd2d5dc1068780258e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a89ce1cc1e98e0dbd2d5dc1068780258e">Layer</a> (std::string name)</td></tr>
 <tr class="memitem:a81cb2995f804b81c63ae01f19ca0ed00" id="r_a81cb2995f804b81c63ae01f19ca0ed00"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a81cb2995f804b81c63ae01f19ca0ed00">~Layer</a> ()</td></tr>
 <tr class="memitem:ac7b2bdf424d72b53c404a43d7473b5df" id="r_ac7b2bdf424d72b53c404a43d7473b5df"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac7b2bdf424d72b53c404a43d7473b5df">OnAttach</a> ()</td></tr>
+<tr class="memdesc:ac7b2bdf424d72b53c404a43d7473b5df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method that runs when the layer gets attached to the <a class="el" href="classCori_1_1Core_1_1LayerStack.html" title="Internal class that stores and manages all the Layer objects.">LayerStack</a>.  <br /></td></tr>
 <tr class="memitem:a60dfc8253731a492071cd7e621d7175d" id="r_a60dfc8253731a492071cd7e621d7175d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a60dfc8253731a492071cd7e621d7175d">OnDetach</a> ()</td></tr>
-<tr class="memitem:abba06b305dc4e8382e08e7e05e7c46c6" id="r_abba06b305dc4e8382e08e7e05e7c46c6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abba06b305dc4e8382e08e7e05e7c46c6">OnUpdate</a> (const <a class="el" href="classCori_1_1Core_1_1GameTimer.html">GameTimer</a> &amp;gameTimer)</td></tr>
-<tr class="memitem:a54520baf72b41de1259fa64c749127e1" id="r_a54520baf72b41de1259fa64c749127e1"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a54520baf72b41de1259fa64c749127e1">OnTickUpdate</a> (const float timeStep)</td></tr>
-<tr class="memitem:a8fea8da16657c51a7c24256984aed0ec" id="r_a8fea8da16657c51a7c24256984aed0ec"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8fea8da16657c51a7c24256984aed0ec">OnImGuiRender</a> (const double deltaTime)</td></tr>
+<tr class="memdesc:a60dfc8253731a492071cd7e621d7175d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method that runs when the layer gets detached to the <a class="el" href="classCori_1_1Core_1_1LayerStack.html" title="Internal class that stores and manages all the Layer objects.">LayerStack</a>.  <br /></td></tr>
+<tr class="memitem:a69c3b9defc38da61f19069d30493e426" id="r_a69c3b9defc38da61f19069d30493e426"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a69c3b9defc38da61f19069d30493e426">OnUpdate</a> (<a class="el" href="classCori_1_1Core_1_1GameTimer.html">GameTimer</a> &amp;gameTimer)</td></tr>
+<tr class="memdesc:a69c3b9defc38da61f19069d30493e426"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run every frame.  <br /></td></tr>
+<tr class="memitem:a8869c809f2d7eff5b10dc2811fe3953c" id="r_a8869c809f2d7eff5b10dc2811fe3953c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8869c809f2d7eff5b10dc2811fe3953c">OnTickUpdate</a> (<a class="el" href="classCori_1_1Core_1_1GameTimer.html">GameTimer</a> &amp;gameTimer)</td></tr>
+<tr class="memdesc:a8869c809f2d7eff5b10dc2811fe3953c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run every tick.  <br /></td></tr>
+<tr class="memitem:a239f73334b58ec5649077cba8e4b3a5b" id="r_a239f73334b58ec5649077cba8e4b3a5b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a239f73334b58ec5649077cba8e4b3a5b">OnImGuiRender</a> (<a class="el" href="classCori_1_1Core_1_1GameTimer.html">GameTimer</a> &amp;gameTimer)</td></tr>
+<tr class="memdesc:a239f73334b58ec5649077cba8e4b3a5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run every frame, this is the method where you do all the ImGui stuff.  <br /></td></tr>
 <tr class="memitem:afa687f24942a85673f79d1b5a2d82194" id="r_afa687f24942a85673f79d1b5a2d82194"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afa687f24942a85673f79d1b5a2d82194">OnEvent</a> (<a class="el" href="classCori_1_1Core_1_1Event.html">Event</a> &amp;event)</td></tr>
+<tr class="memdesc:afa687f24942a85673f79d1b5a2d82194"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is the method to handle all the event at.  <br /></td></tr>
 <tr class="memitem:a417a3ddae5b0c594faaef5542995250f" id="r_a417a3ddae5b0c594faaef5542995250f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a417a3ddae5b0c594faaef5542995250f">SetModal</a> (const bool state)</td></tr>
+<tr class="memdesc:a417a3ddae5b0c594faaef5542995250f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the <a class="el" href="classCori_1_1Core_1_1Layer.html" title="An abstract class that is ment to be used as a template for defining layers.">Layer</a> modal state.  <br /></td></tr>
 <tr class="memitem:a6c2b8c6aad9e8f4550a0bb45f7f04f99" id="r_a6c2b8c6aad9e8f4550a0bb45f7f04f99"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6c2b8c6aad9e8f4550a0bb45f7f04f99">IsModal</a> () const</td></tr>
-<tr class="memitem:aa872ffd5c19033825424495c20ef804a" id="r_aa872ffd5c19033825424495c20ef804a"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa872ffd5c19033825424495c20ef804a">GetName</a> () const</td></tr>
+<tr class="memdesc:a6c2b8c6aad9e8f4550a0bb45f7f04f99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the <a class="el" href="classCori_1_1Core_1_1Layer.html" title="An abstract class that is ment to be used as a template for defining layers.">Layer</a> is modal.  <br /></td></tr>
+<tr class="memitem:a0a19612f6f522ae260c997cbcd8dc23c" id="r_a0a19612f6f522ae260c997cbcd8dc23c"><td class="memItemLeft" align="right" valign="top">std::string_view&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0a19612f6f522ae260c997cbcd8dc23c">GetName</a> () const</td></tr>
+<tr class="memdesc:a0a19612f6f522ae260c997cbcd8dc23c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the name of the <a class="el" href="classCori_1_1Core_1_1Layer.html" title="An abstract class that is ment to be used as a template for defining layers.">Layer</a>.  <br /></td></tr>
 <tr class="memitem:a750c34fbd1690db2d042dcb0dfdf3482" id="r_a750c34fbd1690db2d042dcb0dfdf3482"><td class="memItemLeft" align="right" valign="top">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a750c34fbd1690db2d042dcb0dfdf3482">BindScene</a> (const std::string &amp;name)</td></tr>
+<tr class="memdesc:a750c34fbd1690db2d042dcb0dfdf3482"><td class="mdescLeft">&#160;</td><td class="mdescRight">Binds the Scene to the <a class="el" href="classCori_1_1Core_1_1Layer.html" title="An abstract class that is ment to be used as a template for defining layers.">Layer</a>.  <br /></td></tr>
 <tr class="memitem:a997ae29aa22d45defb32cd4cbcd61a94" id="r_a997ae29aa22d45defb32cd4cbcd61a94"><td class="memItemLeft" align="right" valign="top">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a997ae29aa22d45defb32cd4cbcd61a94">UnbindScene</a> ()</td></tr>
-<tr class="memitem:a79f0e402f243e00fcb3d6f689ea2ac21" id="r_a79f0e402f243e00fcb3d6f689ea2ac21"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a79f0e402f243e00fcb3d6f689ea2ac21">SceneUpdate</a> (const double deltaTime)</td></tr>
-<tr class="memitem:a515c224b608fa6e9ba527930350e1f1c" id="r_a515c224b608fa6e9ba527930350e1f1c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a515c224b608fa6e9ba527930350e1f1c">SceneTickrateUpdate</a> (const float timeStep)</td></tr>
+<tr class="memdesc:a997ae29aa22d45defb32cd4cbcd61a94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unbinds the Scene from the <a class="el" href="classCori_1_1Core_1_1Layer.html" title="An abstract class that is ment to be used as a template for defining layers.">Layer</a>.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a762cc500aef85f7a13115fee67823a7a" id="r_a762cc500aef85f7a13115fee67823a7a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCori_1_1World_1_1SceneHandle.html">World::SceneHandle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a762cc500aef85f7a13115fee67823a7a">ActiveScene</a></td></tr>
+<tr class="memitem:a762cc500aef85f7a13115fee67823a7a" id="r_a762cc500aef85f7a13115fee67823a7a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCori_1_1World_1_1SceneHandle.html">World::SceneHandle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a762cc500aef85f7a13115fee67823a7a">ActiveScene</a> {nullptr}</td></tr>
+<tr class="memdesc:a762cc500aef85f7a13115fee67823a7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">A SceneHandle to the Scene that is currently bound.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-attribs" class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
 <tr class="memitem:a76471f8f2e77efe171cb795aeedbad0d" id="r_a76471f8f2e77efe171cb795aeedbad0d"><td class="memItemLeft" align="right" valign="top">static Physics::DebugImguiRenderer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a76471f8f2e77efe171cb795aeedbad0d">m_DebugImGuiRenderer</a></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-pro-attribs" class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
-Protected Attributes</h2></td></tr>
-<tr class="memitem:a537d73dfa3c4ecb06c92328908d0b314" id="r_a537d73dfa3c4ecb06c92328908d0b314"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a537d73dfa3c4ecb06c92328908d0b314">m_Modal</a> { false }</td></tr>
-<tr class="memitem:a71e89f5a55dae777568bdf9332d13944" id="r_a71e89f5a55dae777568bdf9332d13944"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a71e89f5a55dae777568bdf9332d13944">m_Name</a></td></tr>
+<tr class="heading"><td colspan="2"><h2 id="header-friends" class="groupheader"><a id="friends" name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:a23f25bcc02a0e94c2f5a4188496b04d0" id="r_a23f25bcc02a0e94c2f5a4188496b04d0"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a23f25bcc02a0e94c2f5a4188496b04d0">Application</a></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00010">10</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
+<div class="textblock"><p>An abstract class that is ment to be used as a template for defining layers. </p>
+
+<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00013">13</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a89ce1cc1e98e0dbd2d5dc1068780258e" name="a89ce1cc1e98e0dbd2d5dc1068780258e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a89ce1cc1e98e0dbd2d5dc1068780258e">&#9670;&#160;</a></span>Layer()</h2>
@@ -219,9 +232,6 @@ Here is the call graph for this function:</div>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">CoriError</a>&lt;&gt; &gt; Cori::Core::Layer::BindScene </td>
@@ -230,12 +240,16 @@ Here is the call graph for this function:</div>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel nodiscard">nodiscard</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
+
+<p>Binds the Scene to the <a class="el" href="classCori_1_1Core_1_1Layer.html" title="An abstract class that is ment to be used as a template for defining layers.">Layer</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>Name of the Scene to bind. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with void on success or <a class="el" href="classCori_1_1Core_1_1CoriError.html" title="Custom error class mainly used in std::expected.">CoriError&lt;&gt;</a> on failure. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="Layer_8cpp_source.html#l00026">26</a> of file <a class="el" href="Layer_8cpp_source.html">Layer.cpp</a>.</p>
 <div class="dynheader">
@@ -243,17 +257,17 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1Core_1_1Layer_a750c34fbd1690db2d042dcb0dfdf3482_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1Layer_a750c34fbd1690db2d042dcb0dfdf3482_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1Core_1_1Layer_a750c34fbd1690db2d042dcb0dfdf3482_cgraph" id="aclassCori_1_1Core_1_1Layer_a750c34fbd1690db2d042dcb0dfdf3482_cgraph">
-<area shape="rect" title=" " alt="" coords="5,29,143,74"/>
+<area shape="rect" title="Binds the Scene to the Layer." alt="" coords="5,29,143,74"/>
 <area shape="poly" title=" " alt="" coords="33,29,31,19,38,10,53,5,74,3,97,5,111,12,109,17,96,10,74,8,54,10,42,15,37,21,38,28"/>
-<area shape="rect" href="classCori_1_1World_1_1SceneManager.html#a1dde64a0f21154288e01e5f1e31fd533" title=" " alt="" coords="191,29,388,74"/>
+<area shape="rect" href="classCori_1_1World_1_1SceneManager.html#a7e7150d32b69eb1657eec703a24df688" title="Retries the scene with the specified name from the cache." alt="" coords="191,29,388,74"/>
 <area shape="poly" title=" " alt="" coords="143,49,175,49,175,54,143,54"/>
 </map>
 </div>
 
 </div>
 </div>
-<a id="aa872ffd5c19033825424495c20ef804a" name="aa872ffd5c19033825424495c20ef804a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa872ffd5c19033825424495c20ef804a">&#9670;&#160;</a></span>GetName()</h2>
+<a id="a0a19612f6f522ae260c997cbcd8dc23c" name="a0a19612f6f522ae260c997cbcd8dc23c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a19612f6f522ae260c997cbcd8dc23c">&#9670;&#160;</a></span>GetName()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -262,7 +276,7 @@ Here is the call graph for this function:</div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const std::string &amp; Cori::Core::Layer::GetName </td>
+          <td class="memname">std::string_view Cori::Core::Layer::GetName </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
@@ -275,7 +289,10 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00026">26</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
+<p>Returns the name of the <a class="el" href="classCori_1_1Core_1_1Layer.html" title="An abstract class that is ment to be used as a template for defining layers.">Layer</a>. </p>
+<dl class="section return"><dt>Returns</dt><dd>String view, so read only. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00074">74</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -302,7 +319,9 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00024">24</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
+<p>Checks if the <a class="el" href="classCori_1_1Core_1_1Layer.html" title="An abstract class that is ment to be used as a template for defining layers.">Layer</a> is modal. </p>
+
+<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00067">67</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -329,7 +348,9 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classCori_1_1Core_1_1ImGuiLayer.html#abebd1974c280938aaf5c568118cadf2d">Cori::Core::ImGuiLayer</a>.</p>
+<p>Method that runs when the layer gets attached to the <a class="el" href="classCori_1_1Core_1_1LayerStack.html" title="Internal class that stores and manages all the Layer objects.">LayerStack</a>. </p>
+
+<p>Reimplemented in <a class="el" href="classCori_1_1Core_1_1Internal_1_1ImGuiLayer.html#a56f6def890f225da0761ea3aa5df68ed">Cori::Core::Internal::ImGuiLayer</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="Layer_8cpp_source.html#l00018">18</a> of file <a class="el" href="Layer_8cpp_source.html">Layer.cpp</a>.</p>
 <div class="dynheader">
@@ -337,7 +358,7 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1Core_1_1Layer_ac7b2bdf424d72b53c404a43d7473b5df_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1Layer_ac7b2bdf424d72b53c404a43d7473b5df_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1Core_1_1Layer_ac7b2bdf424d72b53c404a43d7473b5df_cgraph" id="aclassCori_1_1Core_1_1Layer_ac7b2bdf424d72b53c404a43d7473b5df_cgraph">
-<area shape="rect" title=" " alt="" coords="5,29,143,74"/>
+<area shape="rect" title="Method that runs when the layer gets attached to the LayerStack." alt="" coords="5,29,143,74"/>
 <area shape="poly" title=" " alt="" coords="47,29,46,19,50,11,60,5,74,3,89,5,98,12,95,16,87,10,74,8,62,10,54,14,51,20,52,29"/>
 </map>
 </div>
@@ -367,7 +388,9 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classCori_1_1Core_1_1ImGuiLayer.html#aedd0f4f3f244214cebd22ee868544223">Cori::Core::ImGuiLayer</a>.</p>
+<p>Method that runs when the layer gets detached to the <a class="el" href="classCori_1_1Core_1_1LayerStack.html" title="Internal class that stores and manages all the Layer objects.">LayerStack</a>. </p>
+
+<p>Reimplemented in <a class="el" href="classCori_1_1Core_1_1Internal_1_1ImGuiLayer.html#aa241c4e55f3d63bff0f40d6bff3e8307">Cori::Core::Internal::ImGuiLayer</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="Layer_8cpp_source.html#l00022">22</a> of file <a class="el" href="Layer_8cpp_source.html">Layer.cpp</a>.</p>
 <div class="dynheader">
@@ -375,7 +398,7 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1Core_1_1Layer_a60dfc8253731a492071cd7e621d7175d_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1Layer_a60dfc8253731a492071cd7e621d7175d_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1Core_1_1Layer_a60dfc8253731a492071cd7e621d7175d_cgraph" id="aclassCori_1_1Core_1_1Layer_a60dfc8253731a492071cd7e621d7175d_cgraph">
-<area shape="rect" title=" " alt="" coords="5,29,143,74"/>
+<area shape="rect" title="Method that runs when the layer gets detached to the LayerStack." alt="" coords="5,29,143,74"/>
 <area shape="poly" title=" " alt="" coords="47,29,46,19,50,11,60,5,74,3,89,5,98,12,95,16,87,10,74,8,62,10,54,14,51,20,52,29"/>
 </map>
 </div>
@@ -405,14 +428,22 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classCori_1_1Core_1_1ImGuiLayer.html#a27001301101c9152994b297cb0dcf736">Cori::Core::ImGuiLayer</a>.</p>
+<p>This is the method to handle all the event at. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">event</td><td><a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a> to handle or skip. </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00021">21</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
+<p>Reimplemented in <a class="el" href="classCori_1_1Core_1_1Internal_1_1ImGuiLayer.html#a23ae324534c89a068c4e063be2df3264">Cori::Core::Internal::ImGuiLayer</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00052">52</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a8fea8da16657c51a7c24256984aed0ec" name="a8fea8da16657c51a7c24256984aed0ec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8fea8da16657c51a7c24256984aed0ec">&#9670;&#160;</a></span>OnImGuiRender()</h2>
+<a id="a239f73334b58ec5649077cba8e4b3a5b" name="a239f73334b58ec5649077cba8e4b3a5b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a239f73334b58ec5649077cba8e4b3a5b">&#9670;&#160;</a></span>OnImGuiRender()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -423,7 +454,7 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="memname">virtual void Cori::Core::Layer::OnImGuiRender </td>
           <td>(</td>
-          <td class="paramtype">const double</td>          <td class="paramname"><span class="paramname"><em>deltaTime</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classCori_1_1Core_1_1GameTimer.html">GameTimer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>gameTimer</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -434,14 +465,20 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classCori_1_1Core_1_1ImGuiLayer.html#af583ab4efcf5fd2c4cbd8cf928eaf581">Cori::Core::ImGuiLayer</a>.</p>
+<p>Run every frame, this is the method where you do all the ImGui stuff. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">gameTimer</td><td>Global timer. </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00020">20</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00046">46</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a54520baf72b41de1259fa64c749127e1" name="a54520baf72b41de1259fa64c749127e1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a54520baf72b41de1259fa64c749127e1">&#9670;&#160;</a></span>OnTickUpdate()</h2>
+<a id="a8869c809f2d7eff5b10dc2811fe3953c" name="a8869c809f2d7eff5b10dc2811fe3953c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8869c809f2d7eff5b10dc2811fe3953c">&#9670;&#160;</a></span>OnTickUpdate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -452,7 +489,7 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="memname">virtual void Cori::Core::Layer::OnTickUpdate </td>
           <td>(</td>
-          <td class="paramtype">const float</td>          <td class="paramname"><span class="paramname"><em>timeStep</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classCori_1_1Core_1_1GameTimer.html">GameTimer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>gameTimer</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -463,12 +500,20 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00019">19</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
+<p>Run every tick. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">gameTimer</td><td>Global timer. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00039">39</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
 
 </div>
 </div>
-<a id="abba06b305dc4e8382e08e7e05e7c46c6" name="abba06b305dc4e8382e08e7e05e7c46c6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abba06b305dc4e8382e08e7e05e7c46c6">&#9670;&#160;</a></span>OnUpdate()</h2>
+<a id="a69c3b9defc38da61f19069d30493e426" name="a69c3b9defc38da61f19069d30493e426"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69c3b9defc38da61f19069d30493e426">&#9670;&#160;</a></span>OnUpdate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -479,7 +524,7 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="memname">virtual void Cori::Core::Layer::OnUpdate </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classCori_1_1Core_1_1GameTimer.html">GameTimer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>gameTimer</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classCori_1_1Core_1_1GameTimer.html">GameTimer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>gameTimer</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -490,61 +535,15 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00018">18</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
+<p>Run every frame. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">gameTimer</td><td>Global timer. </td></tr>
+  </table>
+  </dd>
+</dl>
 
-</div>
-</div>
-<a id="a515c224b608fa6e9ba527930350e1f1c" name="a515c224b608fa6e9ba527930350e1f1c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a515c224b608fa6e9ba527930350e1f1c">&#9670;&#160;</a></span>SceneTickrateUpdate()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::Core::Layer::SceneTickrateUpdate </td>
-          <td>(</td>
-          <td class="paramtype">const float</td>          <td class="paramname"><span class="paramname"><em>timeStep</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00035">35</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a79f0e402f243e00fcb3d6f689ea2ac21" name="a79f0e402f243e00fcb3d6f689ea2ac21"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a79f0e402f243e00fcb3d6f689ea2ac21">&#9670;&#160;</a></span>SceneUpdate()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::Core::Layer::SceneUpdate </td>
-          <td>(</td>
-          <td class="paramtype">const double</td>          <td class="paramname"><span class="paramname"><em>deltaTime</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00031">31</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00033">33</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -571,7 +570,16 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00023">23</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
+<p>Change the <a class="el" href="classCori_1_1Core_1_1Layer.html" title="An abstract class that is ment to be used as a template for defining layers.">Layer</a> modal state. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">state</td><td>Desired state. @detail When <a class="el" href="classCori_1_1Core_1_1Layer.html" title="An abstract class that is ment to be used as a template for defining layers.">Layer</a> is in a modal state all events that are passed to it will be considered handled and will not be passed further down the <a class="el" href="classCori_1_1Core_1_1LayerStack.html" title="Internal class that stores and manages all the Layer objects.">LayerStack</a>. <br  />
+ Also when a layer is modal any layer below it will not be updated, both tick update and frame update, it effectively stops any logic execution in the layers below it. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00061">61</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -580,9 +588,6 @@ Here is the call graph for this function:</div>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">CoriError</a>&lt;&gt; &gt; Cori::Core::Layer::UnbindScene </td>
@@ -591,12 +596,10 @@ Here is the call graph for this function:</div>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel nodiscard">nodiscard</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
+
+<p>Unbinds the Scene from the <a class="el" href="classCori_1_1Core_1_1Layer.html" title="An abstract class that is ment to be used as a template for defining layers.">Layer</a>. </p>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with void on success or <a class="el" href="classCori_1_1Core_1_1CoriError.html" title="Custom error class mainly used in std::expected.">CoriError&lt;&gt;</a> on failure. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="Layer_8cpp_source.html#l00047">47</a> of file <a class="el" href="Layer_8cpp_source.html">Layer.cpp</a>.</p>
 <div class="dynheader">
@@ -604,10 +607,35 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1Core_1_1Layer_a997ae29aa22d45defb32cd4cbcd61a94_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1Layer_a997ae29aa22d45defb32cd4cbcd61a94_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1Core_1_1Layer_a997ae29aa22d45defb32cd4cbcd61a94_cgraph" id="aclassCori_1_1Core_1_1Layer_a997ae29aa22d45defb32cd4cbcd61a94_cgraph">
-<area shape="rect" title=" " alt="" coords="5,29,143,74"/>
+<area shape="rect" title="Unbinds the Scene from the Layer." alt="" coords="5,29,143,74"/>
 <area shape="poly" title=" " alt="" coords="47,29,46,19,50,11,60,5,74,3,89,5,98,12,95,16,87,10,74,8,62,10,54,14,51,20,52,29"/>
 </map>
 </div>
+
+</div>
+</div>
+<a name="doc-related-members" id="doc-related-members"></a><h2 id="header-doc-related-members" class="groupheader">Friends And Related Symbol Documentation</h2>
+<a id="a23f25bcc02a0e94c2f5a4188496b04d0" name="a23f25bcc02a0e94c2f5a4188496b04d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23f25bcc02a0e94c2f5a4188496b04d0">&#9670;&#160;</a></span>Application</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="classCori_1_1Core_1_1Application.html">Application</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel friend">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00097">97</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -619,12 +647,14 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classCori_1_1World_1_1SceneHandle.html">World::SceneHandle</a> Cori::Core::Layer::ActiveScene</td>
+          <td class="memname"><a class="el" href="classCori_1_1World_1_1SceneHandle.html">World::SceneHandle</a> Cori::Core::Layer::ActiveScene {nullptr}</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00039">39</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
+<p>A SceneHandle to the Scene that is currently bound. </p>
+
+<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00092">92</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -648,55 +678,7 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00041">41</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a537d73dfa3c4ecb06c92328908d0b314" name="a537d73dfa3c4ecb06c92328908d0b314"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a537d73dfa3c4ecb06c92328908d0b314">&#9670;&#160;</a></span>m_Modal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool Cori::Core::Layer::m_Modal { false }</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00044">44</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a71e89f5a55dae777568bdf9332d13944" name="a71e89f5a55dae777568bdf9332d13944"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a71e89f5a55dae777568bdf9332d13944">&#9670;&#160;</a></span>m_Name</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::string Cori::Core::Layer::m_Name</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00045">45</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Layer_8hpp_source.html#l00094">94</a> of file <a class="el" href="Layer_8hpp_source.html">Layer.hpp</a>.</p>
 
 </div>
 </div>

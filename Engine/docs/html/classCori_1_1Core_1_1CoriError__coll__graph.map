@@ -1,5 +1,5 @@
 <map id="Cori::Core::CoriError&lt; DeclaredTypes &gt;" name="Cori::Core::CoriError&lt; DeclaredTypes &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,81,156,126"/>
+<area shape="rect" id="Node000001" title="Custom error class mainly used in std::expected." alt="" coords="5,81,156,126"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="24,5,137,33"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,49,83,80,78,80,78,49"/>
 </map>

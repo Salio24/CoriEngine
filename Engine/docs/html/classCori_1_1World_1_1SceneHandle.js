@@ -1,10 +1,9 @@
 var classCori_1_1World_1_1SceneHandle =
 [
-    [ "SceneHandle", "classCori_1_1World_1_1SceneHandle.html#a0d9f1dcf5b7c4556af19a7333a1cd689", null ],
-    [ "~SceneHandle", "classCori_1_1World_1_1SceneHandle.html#a07c3db356bf8314eaeb660d4d23ef886", null ],
+    [ "SceneHandle", "classCori_1_1World_1_1SceneHandle.html#a813d1be172637c97d4e16e1d2cb2b1a0", null ],
     [ "AddContextComponent", "classCori_1_1World_1_1SceneHandle.html#aa99240ea7047ec96b38a5a0d98e6ff3c", null ],
-    [ "AddEntityToCache", "classCori_1_1World_1_1SceneHandle.html#a1eb7d722b54f07e85589df4ccb6dc4a1", null ],
-    [ "AddOrAssignContextComponent", "classCori_1_1World_1_1SceneHandle.html#a86b6fed465d62afd5f36e94c09c98bbe", null ],
+    [ "AddEntityToCache", "classCori_1_1World_1_1SceneHandle.html#a8bd5b652fec33ba5a4ddea3a788124af", null ],
+    [ "CreateBlankEntity", "classCori_1_1World_1_1SceneHandle.html#a8cf10d493d2807a034739be4b623c04f", null ],
     [ "CreateEntity", "classCori_1_1World_1_1SceneHandle.html#a46b08e2e911c85099e477732fa5b756e", null ],
     [ "DestroyEntity", "classCori_1_1World_1_1SceneHandle.html#a66b13440298c0ade23ed1c049285e7c2", null ],
     [ "FindEntity", "classCori_1_1World_1_1SceneHandle.html#afb16d97aedf6766dfbfdc2136f396858", null ],
@@ -13,18 +12,19 @@ var classCori_1_1World_1_1SceneHandle =
     [ "GetActiveCamera", "classCori_1_1World_1_1SceneHandle.html#ae8fe6c0fb5711c04bfb3b7a075ba9abc", null ],
     [ "GetContextComponent", "classCori_1_1World_1_1SceneHandle.html#ac707a6d173880ba779a2afe8a7f2b582", null ],
     [ "GetContextComponent", "classCori_1_1World_1_1SceneHandle.html#aa2651f75c9e84a8bf219d8c639b8e7ed", null ],
-    [ "GetEntityFromCache", "classCori_1_1World_1_1SceneHandle.html#aeaf6472af9ec234214182b4bda824f96", null ],
+    [ "GetEntitiesWithTag", "classCori_1_1World_1_1SceneHandle.html#a21caaedecc2cc736807e38617ee360cd", null ],
+    [ "GetEntityFromCache", "classCori_1_1World_1_1SceneHandle.html#ae6a805494fd2a0b5683911409f9ae679", null ],
     [ "GetName", "classCori_1_1World_1_1SceneHandle.html#a4181fc61fcd6e1624f5f00046fca57bd", null ],
     [ "GetPhysicsWorld", "classCori_1_1World_1_1SceneHandle.html#a18e2be46d524a816b64344222bb6bec4", null ],
     [ "GetPhysicsWorld", "classCori_1_1World_1_1SceneHandle.html#a7a3950ee55cfcb7f2f8b19fe0323ca5e", null ],
     [ "HasContextComponent", "classCori_1_1World_1_1SceneHandle.html#a915cdd20f21ab9fd6e5544516397c848", null ],
     [ "IsValid", "classCori_1_1World_1_1SceneHandle.html#a8dc80c34aa269debcb546acb7563308d", null ],
+    [ "OnBind", "classCori_1_1World_1_1SceneHandle.html#a8972bdb35207b71c0053d6a76ca32844", null ],
     [ "OnTickUpdate", "classCori_1_1World_1_1SceneHandle.html#ad1a9b504f1acf6d8e10729cf60dd5f77", null ],
     [ "OnUnbind", "classCori_1_1World_1_1SceneHandle.html#a1b7204a8f5b252905a94f2759d6e7965", null ],
     [ "OnUpdate", "classCori_1_1World_1_1SceneHandle.html#a22a84c910484cf181aa52f47b602b2be", null ],
     [ "RemoveContextComponent", "classCori_1_1World_1_1SceneHandle.html#a85d9fd05a971c364850b2b7b783330e4", null ],
     [ "RemoveEntityFromCache", "classCori_1_1World_1_1SceneHandle.html#a4ddaa82febc6a67740b05dfb59e44235", null ],
     [ "View", "classCori_1_1World_1_1SceneHandle.html#a3967cfcddbbed706fc35d7ee5eba78c5", null ],
-    [ "View", "classCori_1_1World_1_1SceneHandle.html#a08cb3004596a74d38ea23738700cbe81", null ],
-    [ "m_SceneRaw", "classCori_1_1World_1_1SceneHandle.html#a30aa5f3cfc53cc82c0da8b45d9866601", null ]
+    [ "View", "classCori_1_1World_1_1SceneHandle.html#ac3de20023e2998cc7a8cd5cc13e9e65b", null ]
 ];

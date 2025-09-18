@@ -1,7 +1,0 @@
-<map id="Cori::Core::ImGuiLayer::OnEvent" name="Cori::Core::ImGuiLayer::OnEvent">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,174,50"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1Event.html#a2bdec15b54fdab9f56e72d7144df34ba" title="Checks if the Event is in specific category." alt="" coords="222,5,360,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="174,25,206,25,206,30,174,30"/>
-<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1Event.html#a9bb2f80b8728972db28bbccec0b64e55" title="Gives the flags of particular Event." alt="" coords="408,5,546,50"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="361,25,392,25,392,30,361,30"/>
-</map>

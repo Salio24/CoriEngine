@@ -1,8 +1,9 @@
 var searchData=
 [
-  ['texture2d_0',['Texture2D',['../structCori_1_1Logger_1_1Tags_1_1Graphics.html#a49012f810a4c094e3085a9962d3ff64f',1,'Cori::Logger::Tags::Graphics::Texture2D'],['../namespaceCori_1_1Internal_1_1AssetPlaceholders.html#a2c79093ef11d3503a467c21775d452fe',1,'Cori::Internal::AssetPlaceholders::Texture2D']]],
-  ['threadid_1',['ThreadID',['../structCori_1_1Profiling_1_1ProfileResult.html#aebb9111bf6511490d0622b503881f55b',1,'Cori::Profiling::ProfileResult']]],
-  ['track_2',['Track',['../structCori_1_1Logger_1_1Tags_1_1Audio.html#ad61f7a39c9be3ad8c1698c2efa5ff53a',1,'Cori::Logger::Tags::Audio']]],
-  ['trigger_3',['Trigger',['../structCori_1_1Logger_1_1Tags_1_1World_1_1Entity.html#a9a2c29f49eb319062100b2cf997b61b1',1,'Cori::Logger::Tags::World::Entity']]],
-  ['type_4',['Type',['../structCori_1_1Profiling_1_1RawProfileEvent.html#ac1571df79833b069f1b4ab40089e7806',1,'Cori::Profiling::RawProfileEvent']]]
+  ['unique_0',['Unique',['../structCori_1_1Logger_1_1Tags_1_1Core_1_1Factory.html#aedfe36eb47af1a53bb1e05eae308a679',1,'Cori::Logger::Tags::Core::Factory']]],
+  ['unusederror_1',['UnusedError',['../structCori_1_1Logger_1_1Tags.html#ae38cc5804ce90e17777896ded1f61ad4',1,'Cori::Logger::Tags']]],
+  ['utf_2',['UTF',['../structCori_1_1Logger_1_1Tags_1_1Utility.html#ac9c443328da1c588f138a08947dbff72',1,'Cori::Logger::Tags::Utility']]],
+  ['uuid_3',['UUID',['../structCori_1_1Logger_1_1Tags_1_1Core.html#aeda4c19fad540492f7555d44c9671385',1,'Cori::Logger::Tags::Core']]],
+  ['uvmax_4',['UVmax',['../structCori_1_1Graphics_1_1UVs.html#a568869a86900fb0fda1716934c783630',1,'Cori::Graphics::UVs']]],
+  ['uvmin_5',['UVmin',['../structCori_1_1Graphics_1_1UVs.html#a021b7fcfdb91920b9e7af65e7c6d4787',1,'Cori::Graphics::UVs']]]
 ];

@@ -22,7 +22,6 @@ var Event_8hpp =
       [ "Cori::Core::EventType::WindowLostFocus", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da1c2119b9d61e623975f13f1029f1d97c", null ],
       [ "Cori::Core::EventType::WindowMoved", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10dab94473d9dfc85f8fdbf5cb3b1d992bda", null ],
       [ "Cori::Core::EventType::GameUserDefinedEvent", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10dacc0f5f07e3e37fbe671e9eb7b53efb9c", null ],
-      [ "Cori::Core::EventType::AppRender", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da4b2eb3c601042333ac1c0565ff58e3d6", null ],
       [ "Cori::Core::EventType::KeyPressed", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10dac17e6984c1e5a887a49831beadee6bca", null ],
       [ "Cori::Core::EventType::KeyReleased", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da4a77f07c8ad223b71ab4ce78a63841ab", null ],
       [ "Cori::Core::EventType::KeyTyped", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da9afbfd35b289eb4fc7f1bc148d7b422e", null ],

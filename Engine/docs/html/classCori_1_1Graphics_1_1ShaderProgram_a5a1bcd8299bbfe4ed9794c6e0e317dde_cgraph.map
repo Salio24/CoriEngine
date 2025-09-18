@@ -6,7 +6,7 @@
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="488,54,576,34,577,39,489,59"/>
 <area shape="rect" id="Node000004" href="$classCori_1_1Core_1_1Factory.html#a0eeb110662af3542e9ba9cdd1c86203d" title=" " alt="" coords="587,57,728,102"/>
 <area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="494,76,571,76,571,82,494,82"/>
-<area shape="rect" id="Node000007" href="$classCori_1_1Core_1_1Window.html#a675130786b522717fb797d28166b1da5" title=" " alt="" coords="585,126,730,171"/>
+<area shape="rect" id="Node000007" href="$classCori_1_1Core_1_1Window.html#a675130786b522717fb797d28166b1da5" title="Returns the graphical API used by this window." alt="" coords="585,126,730,171"/>
 <area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="476,100,571,124,569,129,474,105"/>
 <area shape="rect" id="Node000005" href="$classCori_1_1Core_1_1Factory.html#a30ad48765e0f34046d7054c5d3985061" title=" " alt="" coords="821,57,963,102"/>
 <area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="729,76,806,76,806,82,729,82"/>

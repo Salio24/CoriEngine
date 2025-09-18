@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structCori_1_1World_1_1SceneManager_1_1Data.html" title=" " alt="" coords="5,5,203,50"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,14,119,42"/>
+<area shape="rect" id="Node000001" href="$classCori_1_1Core_1_1CoriError.html" title="Custom error class mainly used in std::expected." alt="" coords="167,5,317,50"/>
+<area shape="poly" id="edge47_Node000000_Node000001" title=" " alt="" coords="134,25,166,25,166,30,134,30"/>
 </map>

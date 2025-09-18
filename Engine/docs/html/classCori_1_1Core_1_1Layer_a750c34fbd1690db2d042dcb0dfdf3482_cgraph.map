@@ -1,6 +1,6 @@
 <map id="Cori::Core::Layer::BindScene" name="Cori::Core::Layer::BindScene">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,143,74"/>
+<area shape="rect" id="Node000001" title="Binds the Scene to the Layer." alt="" coords="5,29,143,74"/>
 <area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="33,29,31,19,38,10,53,5,74,3,97,5,111,12,109,17,96,10,74,8,54,10,42,15,37,21,38,28"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1SceneManager.html#a1dde64a0f21154288e01e5f1e31fd533" title=" " alt="" coords="191,29,388,74"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1SceneManager.html#a7e7150d32b69eb1657eec703a24df688" title="Retries the scene with the specified name from the cache." alt="" coords="191,29,388,74"/>
 <area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="143,49,175,49,175,54,143,54"/>
 </map>

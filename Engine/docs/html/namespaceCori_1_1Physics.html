@@ -92,6 +92,9 @@ $(function(){initNavTree('namespaceCori_1_1Physics.html','',''); });
   <div class="headertitle"><div class="title">Cori::Physics Namespace Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Anything connected to physics is in this namespace. Please refer to Box2D docs '<a href="https://box2d.org/'">https://box2d.org/'</a> for any details regarding physics.  
+<a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -108,6 +111,7 @@ Classes</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:a2bfbc259fe8557a7496e269f19b7dd22" id="r_a2bfbc259fe8557a7496e269f19b7dd22"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2bfbc259fe8557a7496e269f19b7dd22">Vec2</a> = b2Vec2</td></tr>
+<tr class="memdesc:a2bfbc259fe8557a7496e269f19b7dd22"><td class="mdescLeft">&#160;</td><td class="mdescRight">An alias for Box2D native vec2 type, if you see it somewhere, be sure data there is in meters contrary to when glm used, there data is in camera pixels.  <br /></td></tr>
 <tr class="memitem:a44a814423cb95c13b671368326ef48be" id="r_a44a814423cb95c13b671368326ef48be"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a44a814423cb95c13b671368326ef48be">Rot</a> = b2Rot</td></tr>
 <tr class="memitem:a8133f217e5ac3348f15842be77a00291" id="r_a8133f217e5ac3348f15842be77a00291"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8133f217e5ac3348f15842be77a00291">Transform</a> = b2Transform</td></tr>
 <tr class="memitem:ab1d234b71010c1fc81be2f9c8b8777a3" id="r_ab1d234b71010c1fc81be2f9c8b8777a3"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab1d234b71010c1fc81be2f9c8b8777a3">CollisionPlane</a> = b2CollisionPlane</td></tr>
@@ -207,14 +211,24 @@ Enumerations</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a9286a3fef308091ef8cd0445622b3356" id="r_a9286a3fef308091ef8cd0445622b3356"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ae29f6970ff2516975fb7067534b274d8">WindingOrder</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9286a3fef308091ef8cd0445622b3356">GetPolygonWindingOrder</a> (const std::vector&lt; <a class="el" href="#a2bfbc259fe8557a7496e269f19b7dd22">Vec2</a> &gt; &amp;polygon)</td></tr>
+<tr class="memdesc:a9286a3fef308091ef8cd0445622b3356"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the winding order of the polygon made up from individual points. Box2D version. Takes Box2Ds vec2s.  <br /></td></tr>
 <tr class="memitem:ae2395017c0391537a6e3555d8fd885d9" id="r_ae2395017c0391537a6e3555d8fd885d9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ae29f6970ff2516975fb7067534b274d8">WindingOrder</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae2395017c0391537a6e3555d8fd885d9">GetPolygonWindingOrder</a> (const std::vector&lt; tmx::Vector2f &gt; &amp;polygon)</td></tr>
-<tr class="memitem:abbbae8e68b3e8d4d6f0805a386ed3e55" id="r_abbbae8e68b3e8d4d6f0805a386ed3e55"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abbbae8e68b3e8d4d6f0805a386ed3e55">WindingOrderToString</a> (const <a class="el" href="#ae29f6970ff2516975fb7067534b274d8">WindingOrder</a> order)</td></tr>
+<tr class="memdesc:ae2395017c0391537a6e3555d8fd885d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the winding order of the polygon made up from individual points. TMXLite version. Takes TMXLite vec2s.  <br /></td></tr>
+<tr class="memitem:a931c7818793a1979c825e80e6bcd15fc" id="r_a931c7818793a1979c825e80e6bcd15fc"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a931c7818793a1979c825e80e6bcd15fc">WindingOrderToString</a> (<a class="el" href="#ae29f6970ff2516975fb7067534b274d8">WindingOrder</a> order)</td></tr>
+<tr class="memdesc:a931c7818793a1979c825e80e6bcd15fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts the <a class="el" href="#ae29f6970ff2516975fb7067534b274d8">WindingOrder</a> enumerator to string, for logging.  <br /></td></tr>
 <tr class="memitem:a491c9dcd23247116ce942fe77bfe0abe" id="r_a491c9dcd23247116ce942fe77bfe0abe"><td class="memItemLeft" align="right" valign="top">glm::vec2&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a491c9dcd23247116ce942fe77bfe0abe">ToPixels</a> (const <a class="el" href="#a2bfbc259fe8557a7496e269f19b7dd22">Vec2</a> vec)</td></tr>
+<tr class="memdesc:a491c9dcd23247116ce942fe77bfe0abe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts physical meters to camera space pixels.  <br /></td></tr>
 <tr class="memitem:af7999b7e5269142ac7e135a0b323b360" id="r_af7999b7e5269142ac7e135a0b323b360"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a2bfbc259fe8557a7496e269f19b7dd22">Vec2</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af7999b7e5269142ac7e135a0b323b360">ToMeters</a> (const glm::vec2 vec)</td></tr>
-<tr class="memitem:aac21505d53e8c9163187a7f321099d66" id="r_aac21505d53e8c9163187a7f321099d66"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aac21505d53e8c9163187a7f321099d66">Vec2ToString</a> (const <a class="el" href="#a2bfbc259fe8557a7496e269f19b7dd22">Vec2</a> vec)</td></tr>
-<tr class="memitem:a8abae802d82edb4d9ab91c20f5fcb987" id="r_a8abae802d82edb4d9ab91c20f5fcb987"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8abae802d82edb4d9ab91c20f5fcb987">PointVsRect</a> (const glm::vec2 &amp;point, const glm::vec2 &amp;boxSize, const glm::vec2 &amp;boxPos)</td></tr>
+<tr class="memdesc:af7999b7e5269142ac7e135a0b323b360"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts camera space pixels to physical meters.  <br /></td></tr>
+<tr class="memitem:aedad8d02f847de338e13b5a63440c10e" id="r_aedad8d02f847de338e13b5a63440c10e"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aedad8d02f847de338e13b5a63440c10e">Vec2ToString</a> (<a class="el" href="#a2bfbc259fe8557a7496e269f19b7dd22">Vec2</a> vec)</td></tr>
+<tr class="memdesc:aedad8d02f847de338e13b5a63440c10e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a native Box2D vec2 to string, for logging.  <br /></td></tr>
 </table>
-<a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">Typedef Documentation</h2>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Anything connected to physics is in this namespace. Please refer to Box2D docs '<a href="https://box2d.org/'">https://box2d.org/'</a> for any details regarding physics. </p>
+<p><a class="el" href="namespaceCori.html" title="Global engine namespace.">Cori</a> engine doesn't have a native physics engine and uses Box2D, so refer to Box2D docs '<a href="https://box2d.org/'">https://box2d.org/'</a> for any details on physics. <br  />
+ All the engine does is provide a convenient C++ API for it, as Box2D is a C project and the default API is not really convenient in C++ environment. <br  />
+ Big thanks HolyBlackCat for: '<a href="https://github.com/HolyBlackCat/box2cpp/tree/master'">https://github.com/HolyBlackCat/box2cpp/tree/master'</a> </p>
+</div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">Typedef Documentation</h2>
 <a id="ab1d234b71010c1fc81be2f9c8b8777a3" name="ab1d234b71010c1fc81be2f9c8b8777a3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab1d234b71010c1fc81be2f9c8b8777a3">&#9670;&#160;</a></span>CollisionPlane</h2>
 
@@ -227,7 +241,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Physics_8hpp_source.html#l00016">16</a> of file <a class="el" href="Physics_8hpp_source.html">Physics.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Physics_8hpp_source.html#l00025">25</a> of file <a class="el" href="Physics_8hpp_source.html">Physics.hpp</a>.</p>
 
 </div>
 </div>
@@ -243,7 +257,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Physics_8hpp_source.html#l00017">17</a> of file <a class="el" href="Physics_8hpp_source.html">Physics.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Physics_8hpp_source.html#l00026">26</a> of file <a class="el" href="Physics_8hpp_source.html">Physics.hpp</a>.</p>
 
 </div>
 </div>
@@ -259,7 +273,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Physics_8hpp_source.html#l00014">14</a> of file <a class="el" href="Physics_8hpp_source.html">Physics.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Physics_8hpp_source.html#l00023">23</a> of file <a class="el" href="Physics_8hpp_source.html">Physics.hpp</a>.</p>
 
 </div>
 </div>
@@ -275,7 +289,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Physics_8hpp_source.html#l00015">15</a> of file <a class="el" href="Physics_8hpp_source.html">Physics.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Physics_8hpp_source.html#l00024">24</a> of file <a class="el" href="Physics_8hpp_source.html">Physics.hpp</a>.</p>
 
 </div>
 </div>
@@ -291,7 +305,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Physics_8hpp_source.html#l00013">13</a> of file <a class="el" href="Physics_8hpp_source.html">Physics.hpp</a>.</p>
+<p>An alias for Box2D native vec2 type, if you see it somewhere, be sure data there is in meters contrary to when glm used, there data is in camera pixels. </p>
+
+<p class="definition">Definition at line <a class="el" href="Physics_8hpp_source.html#l00022">22</a> of file <a class="el" href="Physics_8hpp_source.html">Physics.hpp</a>.</p>
 
 </div>
 </div>
@@ -375,7 +391,7 @@ Functions</h2></td></tr>
 <tr><td class="fieldname"><a id="a8047a4c99b5cdee7471cf1381a812e55a207a8e8945dd8e8254909a0df1506b3e" name="a8047a4c99b5cdee7471cf1381a812e55a207a8e8945dd8e8254909a0df1506b3e"></a>AllBits&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="Physics_8hpp_source.html#l00020">20</a> of file <a class="el" href="Physics_8hpp_source.html">Physics.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Physics_8hpp_source.html#l00029">29</a> of file <a class="el" href="Physics_8hpp_source.html">Physics.hpp</a>.</p>
 
 </div>
 </div>
@@ -404,7 +420,7 @@ Functions</h2></td></tr>
 <tr><td class="fieldname"><a id="ae29f6970ff2516975fb7067534b274d8a3ee5f41e38164502bc9d7e7a5627bc33" name="ae29f6970ff2516975fb7067534b274d8a3ee5f41e38164502bc9d7e7a5627bc33"></a>COUNTER_CLOCKWISE&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="Physics_8hpp_source.html#l00089">89</a> of file <a class="el" href="Physics_8hpp_source.html">Physics.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Physics_8hpp_source.html#l00098">98</a> of file <a class="el" href="Physics_8hpp_source.html">Physics.hpp</a>.</p>
 
 </div>
 </div>
@@ -423,6 +439,15 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Calculates the winding order of the polygon made up from individual points. TMXLite version. Takes TMXLite vec2s. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">polygon</td><td>Point that from a polygon. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A resulting enumerator of type <a class="el" href="#ae29f6970ff2516975fb7067534b274d8">WindingOrder</a>. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="Physics_8cpp_source.html#l00030">30</a> of file <a class="el" href="Physics_8cpp_source.html">Physics.cpp</a>.</p>
 
@@ -443,33 +468,16 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Calculates the winding order of the polygon made up from individual points. Box2D version. Takes Box2Ds vec2s. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">polygon</td><td>Point that from a polygon. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A resulting enumerator of type <a class="el" href="#ae29f6970ff2516975fb7067534b274d8">WindingOrder</a>. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="Physics_8cpp_source.html#l00005">5</a> of file <a class="el" href="Physics_8cpp_source.html">Physics.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a8abae802d82edb4d9ab91c20f5fcb987" name="a8abae802d82edb4d9ab91c20f5fcb987"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8abae802d82edb4d9ab91c20f5fcb987">&#9670;&#160;</a></span>PointVsRect()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool Cori::Physics::PointVsRect </td>
-          <td>(</td>
-          <td class="paramtype">const glm::vec2 &amp;</td>          <td class="paramname"><span class="paramname"><em>point</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const glm::vec2 &amp;</td>          <td class="paramname"><span class="paramname"><em>boxSize</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const glm::vec2 &amp;</td>          <td class="paramname"><span class="paramname"><em>boxPos</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
 
 </div>
 </div>
@@ -487,6 +495,16 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Converts camera space pixels to physical meters. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">vec</td><td>Position in pixels. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Position in pixels. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Talking about camera space pixels, not screen space/viewport pixels. Uses CORI_PIXELS_PER_METER as a convertion modifier. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="Physics_8cpp_source.html#l00074">74</a> of file <a class="el" href="Physics_8cpp_source.html">Physics.cpp</a>.</p>
 
@@ -507,12 +525,22 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Converts physical meters to camera space pixels. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">vec</td><td>Position in meters. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Position in pixels. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Talking about camera space pixels, not screen space/viewport pixels. Uses CORI_PIXELS_PER_METER as a convertion modifier. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="Physics_8cpp_source.html#l00070">70</a> of file <a class="el" href="Physics_8cpp_source.html">Physics.cpp</a>.</p>
 
 </div>
 </div>
-<a id="aac21505d53e8c9163187a7f321099d66" name="aac21505d53e8c9163187a7f321099d66"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aac21505d53e8c9163187a7f321099d66">&#9670;&#160;</a></span>Vec2ToString()</h2>
+<a id="aedad8d02f847de338e13b5a63440c10e" name="aedad8d02f847de338e13b5a63440c10e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aedad8d02f847de338e13b5a63440c10e">&#9670;&#160;</a></span>Vec2ToString()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -520,30 +548,49 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">std::string Cori::Physics::Vec2ToString </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="#a2bfbc259fe8557a7496e269f19b7dd22">Vec2</a></td>          <td class="paramname"><span class="paramname"><em>vec</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="#a2bfbc259fe8557a7496e269f19b7dd22">Vec2</a></td>          <td class="paramname"><span class="paramname"><em>vec</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Converts a native Box2D vec2 to string, for logging. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">vec</td><td>Native Box2D vec2 to convert to string. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Formated string. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This is a convenience function and will cause several allocation connected to constructing a string. Be aware. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="Physics_8cpp_source.html#l00078">78</a> of file <a class="el" href="Physics_8cpp_source.html">Physics.cpp</a>.</p>
 
 </div>
 </div>
-<a id="abbbae8e68b3e8d4d6f0805a386ed3e55" name="abbbae8e68b3e8d4d6f0805a386ed3e55"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abbbae8e68b3e8d4d6f0805a386ed3e55">&#9670;&#160;</a></span>WindingOrderToString()</h2>
+<a id="a931c7818793a1979c825e80e6bcd15fc" name="a931c7818793a1979c825e80e6bcd15fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a931c7818793a1979c825e80e6bcd15fc">&#9670;&#160;</a></span>WindingOrderToString()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::string Cori::Physics::WindingOrderToString </td>
+          <td class="memname">const char * Cori::Physics::WindingOrderToString </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="#ae29f6970ff2516975fb7067534b274d8">WindingOrder</a></td>          <td class="paramname"><span class="paramname"><em>order</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="#ae29f6970ff2516975fb7067534b274d8">WindingOrder</a></td>          <td class="paramname"><span class="paramname"><em>order</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Converts the <a class="el" href="#ae29f6970ff2516975fb7067534b274d8">WindingOrder</a> enumerator to string, for logging. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">order</td><td>Enumerator. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Resulting string. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="Physics_8cpp_source.html#l00056">56</a> of file <a class="el" href="Physics_8cpp_source.html">Physics.cpp</a>.</p>
 

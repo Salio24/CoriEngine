@@ -15,7 +15,6 @@ var classCori_1_1Graphics_1_1Texture2D =
       [ "REPEAT", "classCori_1_1Graphics_1_1Texture2D.html#a4b68abd301a65b8e5e711497d61cc802a41fdad157aad4c1782d4277b6f1fab7e", null ]
     ] ],
     [ "Bind", "classCori_1_1Graphics_1_1Texture2D.html#a1d775e8f22b2b24f70c55aedc713fef0", null ],
-    [ "Create", "classCori_1_1Graphics_1_1Texture2D.html#a4a03e2ee7938cf712d6f679622789012", null ],
     [ "Create", "classCori_1_1Graphics_1_1Texture2D.html#acbe765f47b11b1dc332a3afe975aa0de", null ],
     [ "Create", "classCori_1_1Graphics_1_1Texture2D.html#a3904eedddef47d387c4bc06df85fb2c7", null ],
     [ "GetHeight", "classCori_1_1Graphics_1_1Texture2D.html#a6a26ce62697f9a927af9ed399b8aab00", null ],

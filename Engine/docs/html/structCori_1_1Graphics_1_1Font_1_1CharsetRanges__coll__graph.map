@@ -1,5 +1,5 @@
 <map id="Cori::Graphics::Font::CharsetRanges" name="Cori::Graphics::Font::CharsetRanges">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,235,154,279"/>
-<area shape="rect" id="Node000002" href="$structCori_1_1Graphics_1_1Font_1_1CharsetRange.html" title=" " alt="" coords="5,5,154,50"/>
+<area shape="rect" id="Node000001" title="These are predefined UTF&#45;32 charset ranges to be used when creating a Font." alt="" coords="5,235,154,279"/>
+<area shape="rect" id="Node000002" href="$structCori_1_1Graphics_1_1Font_1_1CharsetRange.html" title="A UTF&#45;32 charset range." alt="" coords="5,5,154,50"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,66,82,234,77,234,77,66"/>
 </map>

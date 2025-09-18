@@ -93,21 +93,32 @@ $(function(){initNavTree('structCori_1_1World_1_1Components_1_1Entity_1_1AudioSo
 </div><!--header-->
 <div class="contents">
 
+<p>Allows an <a class="el" href="namespaceCori_1_1World_1_1Components_1_1Entity.html" title="Components designed to be used with entities.">Entity</a> to emit a sound.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="Components_8hpp_source.html">Components.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a78bfdf995cc4f4c5f77a8012d6738c4b" id="r_a78bfdf995cc4f4c5f77a8012d6738c4b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a78bfdf995cc4f4c5f77a8012d6738c4b">AudioSource</a> ()=default</td></tr>
-<tr class="memitem:a6f6dc4cadbfda4607276c4c9f6db121c" id="r_a6f6dc4cadbfda4607276c4c9f6db121c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6f6dc4cadbfda4607276c4c9f6db121c">AddTrack</a> (const std::string &amp;name)</td></tr>
+<tr class="memitem:a15054131e7b13f0221a1e29e63f40c4e" id="r_a15054131e7b13f0221a1e29e63f40c4e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a15054131e7b13f0221a1e29e63f40c4e">AudioSource</a> (const <a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html">AudioSource</a> &amp;)=delete</td></tr>
+<tr class="memitem:a5c88ba812223f19566f1a5f76cd55323" id="r_a5c88ba812223f19566f1a5f76cd55323"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html">AudioSource</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5c88ba812223f19566f1a5f76cd55323">operator=</a> (const <a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html">AudioSource</a> &amp;)=delete</td></tr>
+<tr class="memitem:addd88f88dd6a714007153bea04975c05" id="r_addd88f88dd6a714007153bea04975c05"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#addd88f88dd6a714007153bea04975c05">AudioSource</a> (<a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html">AudioSource</a> &amp;&amp;)=delete</td></tr>
+<tr class="memitem:a157619156f7779b791e3b8b29d48ce6b" id="r_a157619156f7779b791e3b8b29d48ce6b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html">AudioSource</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a157619156f7779b791e3b8b29d48ce6b">operator=</a> (<a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html">AudioSource</a> &amp;&amp;)=delete</td></tr>
+<tr class="memitem:a6f49201e941c997eeeecd396082672d4" id="r_a6f49201e941c997eeeecd396082672d4"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classCori_1_1Audio_1_1Track.html">Audio::Track</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6f49201e941c997eeeecd396082672d4">AddTrack</a> (const std::string &amp;name)</td></tr>
+<tr class="memdesc:a6f49201e941c997eeeecd396082672d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a Track to the <a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html" title="Allows an Entity to emit a sound.">AudioSource</a> cache.  <br /></td></tr>
 <tr class="memitem:ab5cf6f490af2c6f05630c85779c8b7a0" id="r_ab5cf6f490af2c6f05630c85779c8b7a0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab5cf6f490af2c6f05630c85779c8b7a0">RemoveTrack</a> (const std::string &amp;name)</td></tr>
+<tr class="memdesc:ab5cf6f490af2c6f05630c85779c8b7a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes a Track from the <a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html" title="Allows an Entity to emit a sound.">AudioSource</a>, and deletes it if it is not referenced anywhere.  <br /></td></tr>
 <tr class="memitem:aa5555d1b218083dca63773c19ae7487e" id="r_aa5555d1b218083dca63773c19ae7487e"><td class="memItemLeft" align="right" valign="top">std::expected&lt; std::shared_ptr&lt; <a class="el" href="classCori_1_1Audio_1_1Track.html">Audio::Track</a> &gt;, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa5555d1b218083dca63773c19ae7487e">GetTrack</a> (const std::string &amp;name)</td></tr>
+<tr class="memdesc:aa5555d1b218083dca63773c19ae7487e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retries a Track from the <a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html" title="Allows an Entity to emit a sound.">AudioSource</a> cache.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="Components_8hpp_source.html#l00262">262</a> of file <a class="el" href="Components_8hpp_source.html">Components.hpp</a>.</p>
+<div class="textblock"><p>Allows an <a class="el" href="namespaceCori_1_1World_1_1Components_1_1Entity.html" title="Components designed to be used with entities.">Entity</a> to emit a sound. </p>
+
+<p class="definition">Definition at line <a class="el" href="Components_8hpp_source.html#l00498">498</a> of file <a class="el" href="Components_8hpp_source.html">Components.hpp</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a78bfdf995cc4f4c5f77a8012d6738c4b" name="a78bfdf995cc4f4c5f77a8012d6738c4b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a78bfdf995cc4f4c5f77a8012d6738c4b">&#9670;&#160;</a></span>AudioSource()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a78bfdf995cc4f4c5f77a8012d6738c4b">&#9670;&#160;</a></span>AudioSource() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -131,9 +142,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="a6f6dc4cadbfda4607276c4c9f6db121c" name="a6f6dc4cadbfda4607276c4c9f6db121c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6f6dc4cadbfda4607276c4c9f6db121c">&#9670;&#160;</a></span>AddTrack()</h2>
+<a id="a15054131e7b13f0221a1e29e63f40c4e" name="a15054131e7b13f0221a1e29e63f40c4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15054131e7b13f0221a1e29e63f40c4e">&#9670;&#160;</a></span>AudioSource() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -142,7 +152,78 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void Cori::World::Components::Entity::AudioSource::AddTrack </td>
+          <td class="memname">Cori::World::Components::Entity::AudioSource::AudioSource </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html">AudioSource</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a15054131e7b13f0221a1e29e63f40c4e_cgraph.png" border="0" usemap="#astructCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a15054131e7b13f0221a1e29e63f40c4e_cgraph" loading="lazy" alt=""/></div>
+<map name="astructCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a15054131e7b13f0221a1e29e63f40c4e_cgraph" id="astructCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a15054131e7b13f0221a1e29e63f40c4e_cgraph">
+<area shape="rect" title=" " alt="" coords="5,5,189,67"/>
+<area shape="rect" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html#a78bfdf995cc4f4c5f77a8012d6738c4b" title=" " alt="" coords="237,5,420,67"/>
+<area shape="poly" title=" " alt="" coords="189,34,221,34,221,39,189,39"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="addd88f88dd6a714007153bea04975c05" name="addd88f88dd6a714007153bea04975c05"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#addd88f88dd6a714007153bea04975c05">&#9670;&#160;</a></span>AudioSource() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Cori::World::Components::Entity::AudioSource::AudioSource </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html">AudioSource</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_addd88f88dd6a714007153bea04975c05_cgraph.png" border="0" usemap="#astructCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_addd88f88dd6a714007153bea04975c05_cgraph" loading="lazy" alt=""/></div>
+<map name="astructCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_addd88f88dd6a714007153bea04975c05_cgraph" id="astructCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_addd88f88dd6a714007153bea04975c05_cgraph">
+<area shape="rect" title=" " alt="" coords="5,5,189,67"/>
+<area shape="rect" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html#a78bfdf995cc4f4c5f77a8012d6738c4b" title=" " alt="" coords="237,5,420,67"/>
+<area shape="poly" title=" " alt="" coords="189,34,221,34,221,39,189,39"/>
+</map>
+</div>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
+<a id="a6f49201e941c997eeeecd396082672d4" name="a6f49201e941c997eeeecd396082672d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f49201e941c997eeeecd396082672d4">&#9670;&#160;</a></span>AddTrack()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; <a class="el" href="classCori_1_1Audio_1_1Track.html">Audio::Track</a> &gt; Cori::World::Components::Entity::AudioSource::AddTrack </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
           <td></td>
@@ -155,13 +236,22 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Components_8hpp_source.html#l00265">265</a> of file <a class="el" href="Components_8hpp_source.html">Components.hpp</a>.</p>
+<p>Adds a Track to the <a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html" title="Allows an Entity to emit a sound.">AudioSource</a> cache. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td><a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1Name.html" title="Every Entity by default has a name component, it holds a non-unique entity name. Just holds the data,...">Name</a> of the track, will be later used to retrieve the created track from the <a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html" title="Allows an Entity to emit a sound.">AudioSource</a> cache. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Shared pointer to the created Track object. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Components_8hpp_source.html#l00511">511</a> of file <a class="el" href="Components_8hpp_source.html">Components.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a6f6dc4cadbfda4607276c4c9f6db121c_cgraph.png" border="0" usemap="#astructCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a6f6dc4cadbfda4607276c4c9f6db121c_cgraph" loading="lazy" alt=""/></div>
-<map name="astructCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a6f6dc4cadbfda4607276c4c9f6db121c_cgraph" id="astructCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a6f6dc4cadbfda4607276c4c9f6db121c_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,189,67"/>
+<div class="center"><img src="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a6f49201e941c997eeeecd396082672d4_cgraph.png" border="0" usemap="#astructCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a6f49201e941c997eeeecd396082672d4_cgraph" loading="lazy" alt=""/></div>
+<map name="astructCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a6f49201e941c997eeeecd396082672d4_cgraph" id="astructCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a6f49201e941c997eeeecd396082672d4_cgraph">
+<area shape="rect" title="Adds a Track to the AudioSource cache." alt="" coords="5,5,189,67"/>
 <area shape="rect" href="classCori_1_1Audio_1_1Track.html#ae65e55e0e2a4d29cd1269f559658b563" title="Creates a Track object." alt="" coords="237,14,372,58"/>
 <area shape="poly" title=" " alt="" coords="189,34,221,34,221,39,189,39"/>
 </map>
@@ -192,7 +282,86 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Components_8hpp_source.html#l00276">276</a> of file <a class="el" href="Components_8hpp_source.html">Components.hpp</a>.</p>
+<p>Retries a Track from the <a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html" title="Allows an Entity to emit a sound.">AudioSource</a> cache. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td><a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1Name.html" title="Every Entity by default has a name component, it holds a non-unique entity name. Just holds the data,...">Name</a> of the Track to retrieve. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with the shared pointer to the requested Track on success, or CoriError on faliure. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Components_8hpp_source.html#l00533">533</a> of file <a class="el" href="Components_8hpp_source.html">Components.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a157619156f7779b791e3b8b29d48ce6b" name="a157619156f7779b791e3b8b29d48ce6b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a157619156f7779b791e3b8b29d48ce6b">&#9670;&#160;</a></span>operator=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html">AudioSource</a> &amp; Cori::World::Components::Entity::AudioSource::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html">AudioSource</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a157619156f7779b791e3b8b29d48ce6b_cgraph.png" border="0" usemap="#astructCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a157619156f7779b791e3b8b29d48ce6b_cgraph" loading="lazy" alt=""/></div>
+<map name="astructCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a157619156f7779b791e3b8b29d48ce6b_cgraph" id="astructCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a157619156f7779b791e3b8b29d48ce6b_cgraph">
+<area shape="rect" title=" " alt="" coords="5,5,189,67"/>
+<area shape="rect" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html#a78bfdf995cc4f4c5f77a8012d6738c4b" title=" " alt="" coords="237,5,420,67"/>
+<area shape="poly" title=" " alt="" coords="189,34,221,34,221,39,189,39"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a5c88ba812223f19566f1a5f76cd55323" name="a5c88ba812223f19566f1a5f76cd55323"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c88ba812223f19566f1a5f76cd55323">&#9670;&#160;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html">AudioSource</a> &amp; Cori::World::Components::Entity::AudioSource::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html">AudioSource</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a5c88ba812223f19566f1a5f76cd55323_cgraph.png" border="0" usemap="#astructCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a5c88ba812223f19566f1a5f76cd55323_cgraph" loading="lazy" alt=""/></div>
+<map name="astructCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a5c88ba812223f19566f1a5f76cd55323_cgraph" id="astructCori_1_1World_1_1Components_1_1Entity_1_1AudioSource_a5c88ba812223f19566f1a5f76cd55323_cgraph">
+<area shape="rect" title=" " alt="" coords="5,5,189,67"/>
+<area shape="rect" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html#a78bfdf995cc4f4c5f77a8012d6738c4b" title=" " alt="" coords="237,5,420,67"/>
+<area shape="poly" title=" " alt="" coords="189,34,221,34,221,39,189,39"/>
+</map>
+</div>
 
 </div>
 </div>
@@ -219,7 +388,16 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Components_8hpp_source.html#l00270">270</a> of file <a class="el" href="Components_8hpp_source.html">Components.hpp</a>.</p>
+<p>Removes a Track from the <a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html" title="Allows an Entity to emit a sound.">AudioSource</a>, and deletes it if it is not referenced anywhere. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td><a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1Name.html" title="Every Entity by default has a name component, it holds a non-unique entity name. Just holds the data,...">Name</a> of the Track remove. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>If a track with the specified name is not found in <a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1AudioSource.html" title="Allows an Entity to emit a sound.">AudioSource</a> cache, nothing will happen. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Components_8hpp_source.html#l00522">522</a> of file <a class="el" href="Components_8hpp_source.html">Components.hpp</a>.</p>
 
 </div>
 </div>

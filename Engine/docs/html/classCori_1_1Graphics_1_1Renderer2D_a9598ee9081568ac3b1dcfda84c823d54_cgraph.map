@@ -1,7 +1,7 @@
 <map id="Cori::Graphics::Renderer2D::SubmitAABB" name="Cori::Graphics::Renderer2D::SubmitAABB">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,193,50"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Renderer2D.html#a7441ab6962608fbfacf28b2f089fd4cb" title=" " alt="" coords="241,5,428,50"/>
+<area shape="rect" id="Node000001" title="Draws the AABB, also a debug convenience function, always draws in world space." alt="" coords="5,5,193,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Renderer2D.html#a7441ab6962608fbfacf28b2f089fd4cb" title="Convenience function mainly for debugging, draws a plain colored quad." alt="" coords="241,5,428,50"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="193,25,225,25,225,30,193,30"/>
-<area shape="rect" id="Node000003" href="$classCori_1_1Graphics_1_1Renderer2D.html#ad02fd3723475c38842c06b9536ecc358" title=" " alt="" coords="476,5,663,50"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Graphics_1_1Renderer2D.html#a9dbfc85edb152a8a68d70c1cb1d06ddd" title="Submits the quad to the render queue." alt="" coords="476,5,663,50"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="429,25,460,25,460,30,429,30"/>
 </map>

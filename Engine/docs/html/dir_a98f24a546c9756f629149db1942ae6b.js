@@ -4,6 +4,6 @@ var dir_a98f24a546c9756f629149db1942ae6b =
     [ "AnimationFrame.hpp", "AnimationFrame_8hpp.html", "AnimationFrame_8hpp" ],
     [ "AnimationPack.cpp", "AnimationPack_8cpp.html", "AnimationPack_8cpp" ],
     [ "AnimationPack.hpp", "AnimationPack_8hpp.html", "AnimationPack_8hpp" ],
-    [ "QuadAnimatorNew.cpp", "QuadAnimatorNew_8cpp.html", null ],
-    [ "QuadAnimatorNew.hpp", "QuadAnimatorNew_8hpp.html", "QuadAnimatorNew_8hpp" ]
+    [ "QuadAnimator.cpp", "QuadAnimator_8cpp.html", null ],
+    [ "QuadAnimator.hpp", "QuadAnimator_8hpp.html", "QuadAnimator_8hpp" ]
 ];

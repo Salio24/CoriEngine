@@ -1,7 +1,7 @@
 <map id="Cori::Graphics::Texture" name="Cori::Graphics::Texture">
-<area shape="rect" id="Node000001" title=" " alt="" coords="39,5,208,33"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Texture2D.html" title=" " alt="" coords="30,81,217,109"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,49,126,81,121,81,121,49"/>
-<area shape="rect" id="Node000003" href="$classCori_1_1Graphics_1_1OpenGLTexture2D.html" title=" " alt="" coords="5,157,242,184"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="126,124,126,156,121,156,121,124"/>
+<area shape="rect" id="Node000001" title="Abstract class for textures." alt="" coords="14,5,183,33"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Texture2D.html" title="A regular 2D texture with 1 layer." alt="" coords="5,81,192,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,49,101,81,96,81,96,49"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Graphics_1_1Internal_1_1OpenGLTexture2D.html" title=" " alt="" coords="13,157,184,201"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="101,125,101,156,96,156,96,125"/>
 </map>

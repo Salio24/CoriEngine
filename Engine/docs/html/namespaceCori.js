@@ -5,7 +5,7 @@ var namespaceCori =
     [ "FileSystem", "namespaceCori_1_1FileSystem.html", "namespaceCori_1_1FileSystem" ],
     [ "Graphics", "namespaceCori_1_1Graphics.html", "namespaceCori_1_1Graphics" ],
     [ "ImGuiPresets", "namespaceCori_1_1ImGuiPresets.html", [
-      [ "Box2dDebugDraw", "namespaceCori_1_1ImGuiPresets.html#ad70f2c6ec43749c3b70557e61ddcbe0e", null ],
+      [ "Box2dDebugDraw", "namespaceCori_1_1ImGuiPresets.html#a0a39a6f3fbbebe5e933a613b6396450c", null ],
       [ "ScreenModeAndResolutionDropdowns", "namespaceCori_1_1ImGuiPresets.html#a8dd9d314670bee7f21553063201e2c31", null ]
     ] ],
     [ "Internal", "namespaceCori_1_1Internal.html", "namespaceCori_1_1Internal" ],

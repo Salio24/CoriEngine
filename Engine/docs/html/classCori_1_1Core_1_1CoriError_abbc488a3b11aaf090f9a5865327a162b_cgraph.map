@@ -1,5 +1,5 @@
 <map id="Cori::Core::CoriError::Get" name="Cori::Core::CoriError::Get">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,187,33"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1CoriError.html#af3239f81407c0f59658f5645f5b537f7" title=" " alt="" coords="235,5,416,33"/>
+<area shape="rect" id="Node000001" title="The overload of Get method for use with structured bindings." alt="" coords="5,5,187,33"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1CoriError.html#af3239f81407c0f59658f5645f5b537f7" title="Retrieves the value of the type requested from the CoriError object." alt="" coords="235,5,416,33"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,16,219,16,219,22,187,22"/>
 </map>

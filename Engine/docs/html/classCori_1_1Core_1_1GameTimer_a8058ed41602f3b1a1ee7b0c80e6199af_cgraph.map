@@ -1,0 +1,5 @@
+<map id="Cori::Core::GameTimer::FormatTime_S_to_M_S_MS" name="Cori::Core::GameTimer::FormatTime_S_to_M_S_MS">
+<area shape="rect" id="Node000001" title="Formats seconds into a string with a format Min:Sec:Ms." alt="" coords="5,5,209,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1GameTimer.html#acab7fc8507b8180ac7ee63d7049388f2" title="Formats milliseconds into a string with a format Min:Sec:Ms." alt="" coords="257,5,472,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="209,25,241,25,241,30,209,30"/>
+</map>

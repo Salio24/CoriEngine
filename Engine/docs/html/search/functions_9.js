@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['justlog_0',['JustLog',['../classCori_1_1Core_1_1PossibleErrors.html#a12f0dec5bdea45e1ed70ba3aabb48c34',1,'Cori::Core::PossibleErrors']]]
+  ['keyevent_0',['KeyEvent',['../classCori_1_1Core_1_1KeyEvent.html#a979aef4026f1b832b879d3593d699391',1,'Cori::Core::KeyEvent']]],
+  ['keypressedevent_1',['KeyPressedEvent',['../classCori_1_1Core_1_1KeyPressedEvent.html#aba06db0f68390f1e14252fa08fa44f09',1,'Cori::Core::KeyPressedEvent']]],
+  ['keyreleasedevent_2',['KeyReleasedEvent',['../classCori_1_1Core_1_1KeyReleasedEvent.html#a374697a9e7d884c16ae33c434f4df219',1,'Cori::Core::KeyReleasedEvent']]]
 ];

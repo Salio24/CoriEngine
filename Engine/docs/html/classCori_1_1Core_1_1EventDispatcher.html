@@ -103,12 +103,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4e2af9b09ba1552675b9d83b1e12103a" id="r_a4e2af9b09ba1552675b9d83b1e12103a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4e2af9b09ba1552675b9d83b1e12103a">EventDispatcher</a> (<a class="el" href="classCori_1_1Core_1_1Event.html">Event</a> &amp;event)</td></tr>
 <tr class="memitem:a34eeab42b3bb0094e7153f3363450958" id="r_a34eeab42b3bb0094e7153f3363450958"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
 <tr class="memitem:a34eeab42b3bb0094e7153f3363450958 template"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a34eeab42b3bb0094e7153f3363450958">Dispatch</a> (EventFn&lt; T &gt; func)</td></tr>
-<tr class="memdesc:a34eeab42b3bb0094e7153f3363450958"><td class="mdescLeft">&#160;</td><td class="mdescRight">Binds dispatch function that will handle a specific <a class="el" href="classCori_1_1Core_1_1Event.html">Event</a> type.  <br /></td></tr>
+<tr class="memdesc:a34eeab42b3bb0094e7153f3363450958"><td class="mdescLeft">&#160;</td><td class="mdescRight">Binds dispatch function that will handle a specific <a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a> type.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Used in OnEvent methods to dispatch and handle Events. </p>
 
-<p class="definition">Definition at line <a class="el" href="Event_8hpp_source.html#l00084">84</a> of file <a class="el" href="Event_8hpp_source.html">Event.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Event_8hpp_source.html#l00086">86</a> of file <a class="el" href="Event_8hpp_source.html">Event.hpp</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a4e2af9b09ba1552675b9d83b1e12103a" name="a4e2af9b09ba1552675b9d83b1e12103a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4e2af9b09ba1552675b9d83b1e12103a">&#9670;&#160;</a></span>EventDispatcher()</h2>
@@ -133,7 +133,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Event_8hpp_source.html#l00088">88</a> of file <a class="el" href="Event_8hpp_source.html">Event.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Event_8hpp_source.html#l00090">90</a> of file <a class="el" href="Event_8hpp_source.html">Event.hpp</a>.</p>
 
 </div>
 </div>
@@ -163,10 +163,10 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Binds dispatch function that will handle a specific <a class="el" href="classCori_1_1Core_1_1Event.html">Event</a> type. </p>
+<p>Binds dispatch function that will handle a specific <a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a> type. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td><a class="el" href="classCori_1_1Core_1_1Event.html">Event</a> type to dispatch. </td></tr>
+    <tr><td class="paramname">T</td><td><a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a> type to dispatch. </td></tr>
   </table>
   </dd>
 </dl>
@@ -176,9 +176,9 @@ template&lt;typename T&gt; </div>
   </table>
   </dd>
 </dl>
-<p>If true is returned from the bound function the <a class="el" href="classCori_1_1Core_1_1Event.html">Event</a> is considered handled, otherwise the said <a class="el" href="classCori_1_1Core_1_1Event.html">Event</a> will be propagated down the <a class="el" href="classCori_1_1Core_1_1LayerStack.html">LayerStack</a>. </p><dl class="section return"><dt>Returns</dt><dd>Returns the same value that is returned in the bound function. </dd></dl>
+<p>If true is returned from the bound function the <a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a> is considered handled, otherwise the said <a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a> will be propagated down the <a class="el" href="classCori_1_1Core_1_1LayerStack.html" title="Internal class that stores and manages all the Layer objects.">LayerStack</a>. </p><dl class="section return"><dt>Returns</dt><dd>Returns the same value that is returned in the bound function. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Event_8hpp_source.html#l00100">100</a> of file <a class="el" href="Event_8hpp_source.html">Event.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Event_8hpp_source.html#l00102">102</a> of file <a class="el" href="Event_8hpp_source.html">Event.hpp</a>.</p>
 
 </div>
 </div>

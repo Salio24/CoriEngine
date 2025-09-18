@@ -93,14 +93,17 @@ $(function(){initNavTree('classCori_1_1AssetManager.html','','classCori_1_1Asset
 </div><!--header-->
 <div class="contents">
 
+<p>Used when you want to manually control the asset lifetime, loading, preloading, unloading.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a260467acee6791a7dc3e19db26a51b5c" id="r_a260467acee6791a7dc3e19db26a51b5c"><td class="memTemplParams" colspan="2">template&lt;Internal::CanBeDefaultLoaded Descriptor&gt; </td></tr>
+<tr class="memitem:a260467acee6791a7dc3e19db26a51b5c" id="r_a260467acee6791a7dc3e19db26a51b5c"><td class="memTemplParams" colspan="2">template&lt;Internal::CanBeLoaded Descriptor&gt; </td></tr>
 <tr class="memitem:a260467acee6791a7dc3e19db26a51b5c template"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; typename Descriptor::AssetType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a260467acee6791a7dc3e19db26a51b5c">Get</a> (const Descriptor &amp;descriptor)</td></tr>
 <tr class="memdesc:a260467acee6791a7dc3e19db26a51b5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the asset from the asset manager cache, it works with any asset that has a Descriptor defined.  <br /></td></tr>
-<tr class="memitem:a38fea5c65cf899bd9d044c1551314838" id="r_a38fea5c65cf899bd9d044c1551314838"><td class="memTemplParams" colspan="2">template&lt;Internal::CanBeDefaultLoaded Descriptor&gt; </td></tr>
+<tr class="memitem:a38fea5c65cf899bd9d044c1551314838" id="r_a38fea5c65cf899bd9d044c1551314838"><td class="memTemplParams" colspan="2">template&lt;Internal::CanBeLoaded Descriptor&gt; </td></tr>
 <tr class="memitem:a38fea5c65cf899bd9d044c1551314838 template"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a38fea5c65cf899bd9d044c1551314838">Preload</a> (const std::initializer_list&lt; Descriptor &gt; descriptors)</td></tr>
 <tr class="memdesc:a38fea5c65cf899bd9d044c1551314838"><td class="mdescLeft">&#160;</td><td class="mdescRight">Preloads a group (or one) of assets into the cache.  <br /></td></tr>
 <tr class="memitem:a0ce9dbdd459266dfdbdca5f61331a68b" id="r_a0ce9dbdd459266dfdbdca5f61331a68b"><td class="memTemplParams" colspan="2">template&lt;Internal::IsDescriptor Descriptor&gt; </td></tr>
@@ -111,8 +114,12 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memdesc:a3db3959ea2b22cbba60a8d20de3e9afd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears cache for o specified asset type.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00023">23</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
+<div class="textblock"><p>Used when you want to manually control the asset lifetime, loading, preloading, unloading. </p>
+<p>Mainly used for assets that are not bound to any particular object, but you want to keep them alive. <br  />
+ For example: Fonts, AnimationPacks, Sounds, etc. Because all asset lifetimes in <a class="el" href="namespaceCori.html" title="Global engine namespace.">Cori</a> are managed by a shared pointers, if not for the <a class="el" href="classCori_1_1AssetManager.html" title="Used when you want to manually control the asset lifetime, loading, preloading, unloading.">AssetManager</a> these asset would be unloaded as soon as some object is done with them and refcount dropped to 0, AssetManger is a convenient place to keep these objects loaded and alive. <br  />
+ For loading and later reviving the asset AssetManger uses descriptors that describe how to load a particular asset. "TODO: link here the wiki page about descriptors" </p>
+
+<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00037">37</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a3db3959ea2b22cbba60a8d20de3e9afd" name="a3db3959ea2b22cbba60a8d20de3e9afd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3db3959ea2b22cbba60a8d20de3e9afd">&#9670;&#160;</a></span>ClearCache()</h2>
@@ -148,7 +155,7 @@ template&lt;typename AssetType&gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>If an asset is still used somewhere (ref count &gt; 1) it will be removed from cache, but freed only when the ref count drops to 0. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00102">102</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00116">116</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
 
 </div>
 </div>
@@ -158,7 +165,7 @@ template&lt;typename AssetType&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;Internal::CanBeDefaultLoaded Descriptor&gt; </div>
+template&lt;Internal::CanBeLoaded Descriptor&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -192,7 +199,7 @@ template&lt;Internal::CanBeDefaultLoaded Descriptor&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A shared pointer to the loaded asset. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00036">36</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00050">50</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
 
 </div>
 </div>
@@ -202,7 +209,7 @@ template&lt;Internal::CanBeDefaultLoaded Descriptor&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;Internal::CanBeDefaultLoaded Descriptor&gt; </div>
+template&lt;Internal::CanBeLoaded Descriptor&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -236,7 +243,7 @@ template&lt;Internal::CanBeDefaultLoaded Descriptor&gt; </div>
 </dl>
 <p>It is needed to avoid the stutter that will be caused when the asset is requested but not yet loaded. </p>
 
-<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00059">59</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00073">73</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -290,7 +297,7 @@ template&lt;Internal::IsDescriptor Descriptor&gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>If an asset is still used somewhere (ref count &gt; 1) it will be removed from cache, but freed only when the ref count drops to 0. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00074">74</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00088">88</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
 
 </div>
 </div>

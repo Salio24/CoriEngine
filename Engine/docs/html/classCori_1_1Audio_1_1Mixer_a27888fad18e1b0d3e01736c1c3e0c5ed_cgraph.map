@@ -1,5 +1,0 @@
-<map id="Cori::Audio::Mixer::SetTagGain" name="Cori::Audio::Mixer::SetTagGain">
-<area shape="rect" id="Node000001" title="Sets the gain of all tracks with a specific tag." alt="" coords="5,5,143,50"/>
-<area shape="rect" id="Node000002" href="$ref_8cpp.html#abf0456af3b19a52b986b272c88b4f528" title=" " alt="" coords="191,14,317,42"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>

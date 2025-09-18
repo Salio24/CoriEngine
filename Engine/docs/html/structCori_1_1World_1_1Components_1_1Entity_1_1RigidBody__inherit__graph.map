@@ -1,0 +1,5 @@
+<map id="Cori::World::Components::Entity::RigidBody" name="Cori::World::Components::Entity::RigidBody">
+<area shape="rect" id="Node000001" title="A physics rigit body." alt="" coords="5,81,189,126"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="30,5,164,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,49,100,80,94,80,94,49"/>
+</map>

@@ -1,16 +1,7 @@
 var searchData=
 [
-  ['scenemanager_0',['SceneManager',['../structCori_1_1Logger_1_1Tags_1_1Core.html#a598a9a35b900f3ccca2617f549c6f7f5',1,'Cori::Logger::Tags::Core']]],
-  ['self_1',['Self',['../structCori_1_1Logger_1_1Tags_1_1AssetManager.html#ad6349c0791f9052a3956f31b5121aee1',1,'Cori::Logger::Tags::AssetManager::Self'],['../structCori_1_1Logger_1_1Tags_1_1Graphics.html#ad0a8f4afd4224d0fa9345dca58ffe9cc',1,'Cori::Logger::Tags::Graphics::Self'],['../structCori_1_1Logger_1_1Tags_1_1Audio.html#a6d95cfdab3198557b83f9a7e7502f0a2',1,'Cori::Logger::Tags::Audio::Self'],['../structCori_1_1Logger_1_1Tags_1_1Core.html#a7c20f51a86d96ee9c64355780076470a',1,'Cori::Logger::Tags::Core::Self'],['../structCori_1_1Logger_1_1Tags_1_1Core_1_1Factory.html#a572e304aef191a7b80a2c44827ec8db5',1,'Cori::Logger::Tags::Core::Factory::Self'],['../structCori_1_1Logger_1_1Tags_1_1World.html#a1ef48402582b7f2ad35f17367c9876bf',1,'Cori::Logger::Tags::World::Self'],['../structCori_1_1Logger_1_1Tags_1_1World_1_1Scene.html#a678932e72e5c072df00c9196797ec54c',1,'Cori::Logger::Tags::World::Scene::Self'],['../structCori_1_1Logger_1_1Tags_1_1World_1_1Entity.html#a13af9ebae9f0a396fd03fbf4bd877655',1,'Cori::Logger::Tags::World::Entity::Self'],['../structCori_1_1Logger_1_1Tags_1_1Profiler.html#a14b6fb73080b9d3dc3bc4d5e271f029c',1,'Cori::Logger::Tags::Profiler::Self'],['../structCori_1_1Logger_1_1Tags_1_1Utility.html#a7c6290d83d47a17795f28c10d244153f',1,'Cori::Logger::Tags::Utility::Self']]],
-  ['selffactory_2',['SelfFactory',['../structCori_1_1Logger_1_1Tags_1_1Core_1_1Factory.html#adabafbc181a5c35dcd44766eebd5a38d',1,'Cori::Logger::Tags::Core::Factory']]],
-  ['shaderprogram_3',['ShaderProgram',['../structCori_1_1Logger_1_1Tags_1_1Graphics.html#a9770ff93c5101f47a650062b93da47df',1,'Cori::Logger::Tags::Graphics']]],
-  ['shape_4',['shape',['../structCori_1_1Physics_1_1CastResult.html#a3121dcad51f687df6c407c9a11bb366d',1,'Cori::Physics::CastResult']]],
-  ['shared_5',['Shared',['../structCori_1_1Logger_1_1Tags_1_1Core_1_1Factory.html#ae51aa7cd887e412d15bbf9cdd310989a',1,'Cori::Logger::Tags::Core::Factory']]],
-  ['sound_6',['Sound',['../structCori_1_1Logger_1_1Tags_1_1Audio.html#aae5db4736dc4f1aa49cfa9a8a615f4ee',1,'Cori::Logger::Tags::Audio']]],
-  ['spriteatlas_7',['SpriteAtlas',['../structCori_1_1Logger_1_1Tags_1_1Graphics.html#aab151d739e4f9959c898d4b9cec31b62',1,'Cori::Logger::Tags::Graphics']]],
-  ['startframe_8',['StartFrame',['../structCori_1_1Graphics_1_1Animation_1_1PlayParams.html#ad7d09566aa4ce5a1753a7f010664f22d',1,'Cori::Graphics::Animation::PlayParams']]],
-  ['startmillisecond_9',['StartMillisecond',['../structCori_1_1Audio_1_1PlayParams.html#ae0c6be8fc409fe6923630e4f2b152fcd',1,'Cori::Audio::PlayParams']]],
-  ['starttick_10',['StartTick',['../structCori_1_1Graphics_1_1Animation_1_1PlayParams.html#ae81448729892f62dbb2cb0419bcff368',1,'Cori::Graphics::Animation::PlayParams']]],
-  ['starttimemicros_11',['StartTimeMicros',['../structCori_1_1Profiling_1_1ProfileResult.html#a728b4fc9f563a5dbb4574a574ac6a304',1,'Cori::Profiling::ProfileResult']]],
-  ['statemachine_12',['StateMachine',['../structCori_1_1Logger_1_1Tags_1_1World_1_1Entity.html#a294ac862308bb95f35685dba7b9a4e45',1,'Cori::Logger::Tags::World::Entity']]]
+  ['texture2d_0',['Texture2D',['../structCori_1_1Logger_1_1Tags_1_1Graphics.html#a49012f810a4c094e3085a9962d3ff64f',1,'Cori::Logger::Tags::Graphics']]],
+  ['texture2dplaceholder_1',['Texture2DPlaceholder',['../namespaceCori_1_1Internal_1_1AssetPlaceholders.html#a3641f51ff4e8b0b519e4bb2f211cc7e0',1,'Cori::Internal::AssetPlaceholders']]],
+  ['track_2',['Track',['../structCori_1_1Logger_1_1Tags_1_1Audio.html#ad61f7a39c9be3ad8c1698c2efa5ff53a',1,'Cori::Logger::Tags::Audio']]],
+  ['trigger_3',['Trigger',['../structCori_1_1Logger_1_1Tags_1_1World_1_1Entity.html#a9a2c29f49eb319062100b2cf997b61b1',1,'Cori::Logger::Tags::World::Entity']]]
 ];

@@ -1,7 +1,7 @@
 <map id="Cori::World::Entity::GetEUID" name="Cori::World::Entity::GetEUID">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,40,145,85"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title=" " alt="" coords="193,5,332,50"/>
+<area shape="rect" id="Node000001" title="Gets the EUID (entity unique ID). A combination of entity ID and version, it is unique for every enti..." alt="" coords="5,40,145,85"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="193,5,332,50"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,47,177,41,178,46,146,52"/>
-<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title=" " alt="" coords="193,75,332,119"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="193,75,332,119"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="146,73,178,79,177,84,145,78"/>
 </map>

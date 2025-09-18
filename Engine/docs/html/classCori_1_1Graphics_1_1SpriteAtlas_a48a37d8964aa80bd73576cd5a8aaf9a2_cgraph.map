@@ -1,6 +1,8 @@
 <map id="Cori::Graphics::SpriteAtlas::Create" name="Cori::Graphics::SpriteAtlas::Create">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,197,74"/>
-<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="58,29,57,19,64,10,79,5,101,3,125,5,140,12,138,17,124,10,101,8,80,10,67,15,62,21,63,28"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Image.html#a8a1e6ccfa0bed29acbb6f2d1136398b5" title=" " alt="" coords="245,29,406,74"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,49,229,49,229,54,197,54"/>
+<area shape="rect" id="Node000001" title="Creates a SpriteAtlas." alt="" coords="5,40,197,85"/>
+<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="51,40,49,30,58,21,75,15,101,13,130,16,147,22,145,27,128,21,101,19,76,21,60,25,54,31,56,39"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Image.html#a8a1e6ccfa0bed29acbb6f2d1136398b5" title="Creates an Image from the picture at the specified path." alt="" coords="286,5,448,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,47,270,38,271,43,197,53"/>
+<area shape="rect" id="Node000003" href="$structCori_1_1FileSystem_1_1Internal_1_1PathDefines.html#a764405f16de7bfaa989d3cbc2e9b0279" title=" " alt="" coords="245,75,489,119"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="197,72,230,76,229,82,197,77"/>
 </map>

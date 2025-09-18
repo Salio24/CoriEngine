@@ -1,5 +1,5 @@
 <map id="Cori::Graphics::SpriteAtlas::Descriptor::operator==" name="Cori::Graphics::SpriteAtlas::Descriptor::operator==">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,5,197,50"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1SpriteAtlas_1_1Descriptor.html#a92ff9def327aeaa2bb624c6cc8ece523" title=" " alt="" coords="245,5,436,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1SpriteAtlas_1_1Descriptor.html#afc7ad6beefb42e368b39859c8944ceac" title="Constructs a descriptor. It&#39;s recommended to use &quot;inline const&quot; when defining the Descriptor in a nam..." alt="" coords="245,5,436,50"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,25,229,25,229,30,197,30"/>
 </map>

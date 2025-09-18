@@ -9,7 +9,7 @@
 
 namespace Cori {
 	/**
-	 * @details Anything connected to physics is in this namespace.
+	 * @brief Anything connected to physics is in this namespace. Please refer to Box2D docs 'https://box2d.org/' for any details regarding physics.
 	 * @details Cori engine doesn't have a native physics engine and uses Box2D, so refer to Box2D docs 'https://box2d.org/' for any details on physics.
 	 * \n All the engine does is provide a convenient C++ API for it, as Box2D is a C project and the default API is not really convenient in C++ environment.
 	 * \n Big thanks HolyBlackCat for: 'https://github.com/HolyBlackCat/box2cpp/tree/master'

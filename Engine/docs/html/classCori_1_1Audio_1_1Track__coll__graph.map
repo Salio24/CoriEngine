@@ -1,5 +1,5 @@
 <map id="Cori::Audio::Track" name="Cori::Audio::Track">
-<area shape="rect" id="Node000001" title=" " alt="" coords="28,98,163,126"/>
+<area shape="rect" id="Node000001" title="You use Track to play and mix Sound objects." alt="" coords="28,98,163,126"/>
 <area shape="rect" id="Node000002" href="$classCori_1_1Profiling_1_1Trackable.html" title=" " alt="" coords="5,5,186,50"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="98,66,98,97,93,97,93,66"/>
 </map>

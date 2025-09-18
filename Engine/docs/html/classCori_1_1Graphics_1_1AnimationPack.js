@@ -7,5 +7,8 @@ var classCori_1_1Graphics_1_1AnimationPack =
     ] ],
     [ "Create", "classCori_1_1Graphics_1_1AnimationPack.html#ac01ce6803c34809be6fbf483a9311b03", null ],
     [ "Create", "classCori_1_1Graphics_1_1AnimationPack.html#a9d7eb51b6b9f0267d84fc1f29751f961", null ],
-    [ "GetAnimation", "classCori_1_1Graphics_1_1AnimationPack.html#a12289a28ef75895d9831bc4c45d99439", null ]
+    [ "GetAnimation", "classCori_1_1Graphics_1_1AnimationPack.html#a12289a28ef75895d9831bc4c45d99439", null ],
+    [ "m_Animations", "classCori_1_1Graphics_1_1AnimationPack.html#a577f0419b8d9572ad256e37024e3e7df", null ],
+    [ "m_FrameSize", "classCori_1_1Graphics_1_1AnimationPack.html#aa622c866b80d3cad85ec3a6a00e42d18", null ],
+    [ "m_SpriteAtlas", "classCori_1_1Graphics_1_1AnimationPack.html#ab167abed91ee9aeb11bb84d40b163e35", null ]
 ];

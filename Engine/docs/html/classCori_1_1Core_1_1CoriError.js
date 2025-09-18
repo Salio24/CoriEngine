@@ -6,7 +6,7 @@ var classCori_1_1Core_1_1CoriError =
     [ "CoriError", "classCori_1_1Core_1_1CoriError.html#a43fae5bfcc1556b18ec8310ca8f7aa64", null ],
     [ "Get", "classCori_1_1Core_1_1CoriError.html#af3239f81407c0f59658f5645f5b537f7", null ],
     [ "Get", "classCori_1_1Core_1_1CoriError.html#abbc488a3b11aaf090f9a5865327a162b", null ],
-    [ "ignore", "classCori_1_1Core_1_1CoriError.html#a320c8e2b01194c3775ab6839f35c7f0b", null ],
+    [ "Ignore", "classCori_1_1Core_1_1CoriError.html#a77cf601e6f4463974612f14bcacf3de7", null ],
     [ "operator=", "classCori_1_1Core_1_1CoriError.html#a97218adfe7a8ac4911a7c1455614613e", null ],
     [ "operator=", "classCori_1_1Core_1_1CoriError.html#a32f73bd2a0a2af97bfee98ed606e0baf", null ],
     [ "what", "classCori_1_1Core_1_1CoriError.html#ac035b7444bbd435105aebe026f3b465c", null ]

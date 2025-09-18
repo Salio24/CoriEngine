@@ -14,14 +14,10 @@ var classCori_1_1Graphics_1_1Renderer2D =
       [ "CENTER", "classCori_1_1Graphics_1_1Renderer2D.html#aca9bfbe7f940d87d8ae365de1f16bcffa08352984e6324efb936cb5a130becbcb", null ],
       [ "LEFT", "classCori_1_1Graphics_1_1Renderer2D.html#aca9bfbe7f940d87d8ae365de1f16bcffa46d0841393c78ec7b940c40a205a3bcc", null ]
     ] ],
-    [ "BeginScene", "classCori_1_1Graphics_1_1Renderer2D.html#ad43e33fd07665c300907ac8618e0be06", null ],
-    [ "DrawScene", "classCori_1_1Graphics_1_1Renderer2D.html#a8cb879b33c833185aa49aa0d0f44c752", null ],
-    [ "EndScene", "classCori_1_1Graphics_1_1Renderer2D.html#a3b3e941fe66f05f856ddc334c890eb7c", null ],
-    [ "FlushRenderQueues", "classCori_1_1Graphics_1_1Renderer2D.html#a08238aaeb190bbdee929f1f26fcc37e8", null ],
     [ "GetStatistics", "classCori_1_1Graphics_1_1Renderer2D.html#a8a491c2687235f9d5c90ed67bd4d4ff2", null ],
     [ "SubmitAABB", "classCori_1_1Graphics_1_1Renderer2D.html#a9598ee9081568ac3b1dcfda84c823d54", null ],
     [ "SubmitColoredQuad", "classCori_1_1Graphics_1_1Renderer2D.html#a7441ab6962608fbfacf28b2f089fd4cb", null ],
-    [ "SubmitQuad", "classCori_1_1Graphics_1_1Renderer2D.html#ad02fd3723475c38842c06b9536ecc358", null ],
-    [ "SubmitText", "classCori_1_1Graphics_1_1Renderer2D.html#a3ea5c9ecfd1337e84c59d7cb817ae941", null ],
-    [ "SubmitText", "classCori_1_1Graphics_1_1Renderer2D.html#a0c20cd8591a2143954bbf7197414c7a9", null ]
+    [ "SubmitQuad", "classCori_1_1Graphics_1_1Renderer2D.html#a9dbfc85edb152a8a68d70c1cb1d06ddd", null ],
+    [ "SubmitText", "classCori_1_1Graphics_1_1Renderer2D.html#a0f75e8119ce61a3d1b4383550a532f92", null ],
+    [ "SubmitText", "classCori_1_1Graphics_1_1Renderer2D.html#a15d2a4f8c31487b857718c9ee147d858", null ]
 ];

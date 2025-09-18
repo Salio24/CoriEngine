@@ -1,8 +1,0 @@
-<map id="Cori::Core::LayerStack::PopLayer" name="Cori::Core::LayerStack::PopLayer">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,52,171,97"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1Layer.html#aa872ffd5c19033825424495c20ef804a" title=" " alt="" coords="219,5,356,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,52,203,45,205,50,172,58"/>
-<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1Layer.html#a60dfc8253731a492071cd7e621d7175d" title=" " alt="" coords="219,99,356,143"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="172,91,205,99,203,104,170,96"/>
-<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="249,98,248,89,254,80,268,74,287,72,309,74,322,81,319,85,307,80,287,77,269,79,258,84,253,90,254,98"/>
-</map>

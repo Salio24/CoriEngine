@@ -1,9 +1,0 @@
-<map id="Cori::Profiling::TimeProfiler::GetMicroseconds" name="Cori::Profiling::TimeProfiler::GetMicroseconds">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,202,74"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Profiling_1_1TimeProfiler.html#a368596a53637e9fe6756d7e5f48bdbc1" title=" " alt="" coords="250,12,477,40"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,39,234,36,234,42,202,45"/>
-<area shape="rect" id="Node000003" href="$classCori_1_1Profiling_1_1TimeProfiler.html#a5b8fef4685d0169cd46faa815b2fbaa2" title=" " alt="" coords="525,29,721,74"/>
-<area shape="poly" id="edge4_Node000001_Node000003" title=" " alt="" coords="202,49,510,49,510,54,202,54"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="478,35,509,38,509,43,477,40"/>
-<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="574,29,572,19,581,10,598,5,623,3,651,5,668,12,666,17,650,10,623,8,599,10,584,15,577,21,579,28"/>
-</map>

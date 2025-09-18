@@ -93,6 +93,9 @@ $(function(){initNavTree('classCori_1_1World_1_1Entity.html','','classCori_1_1Wo
 </div><!--header-->
 <div class="contents">
 
+<p>Entities are the essential part of WorldSystem.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
@@ -101,50 +104,83 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae2059d74ebf511cfb17568566048dd0c" id="r_ae2059d74ebf511cfb17568566048dd0c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae2059d74ebf511cfb17568566048dd0c">Entity</a> (entt::handle handle)</td></tr>
 <tr class="memitem:a7b8dc8e2678b0b088fcbc94bad61a931" id="r_a7b8dc8e2678b0b088fcbc94bad61a931"><td class="memTemplParams" colspan="2">template&lt;typename T, typename... Args&gt; </td></tr>
 <tr class="memitem:a7b8dc8e2678b0b088fcbc94bad61a931 template"><td class="memItemLeft" align="right" valign="top">T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7b8dc8e2678b0b088fcbc94bad61a931">AddComponent</a> (Args &amp;&amp;... args)</td></tr>
+<tr class="memdesc:a7b8dc8e2678b0b088fcbc94bad61a931"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a component to the entity.  <br /></td></tr>
 <tr class="memitem:a756076c46a7524e3e8f47dff70e2d3cd" id="r_a756076c46a7524e3e8f47dff70e2d3cd"><td class="memTemplParams" colspan="2">template&lt;typename T, typename... Args&gt; </td></tr>
 <tr class="memitem:a756076c46a7524e3e8f47dff70e2d3cd template"><td class="memItemLeft" align="right" valign="top">T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a756076c46a7524e3e8f47dff70e2d3cd">ReplaceComponent</a> (Args &amp;&amp;... args)</td></tr>
+<tr class="memdesc:a756076c46a7524e3e8f47dff70e2d3cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replaces the component with a newly created one.  <br /></td></tr>
 <tr class="memitem:acd37f1058bbcf434dcd150a8bcdc4f45" id="r_acd37f1058bbcf434dcd150a8bcdc4f45"><td class="memTemplParams" colspan="2">template&lt;typename T, typename... Args&gt; </td></tr>
 <tr class="memitem:acd37f1058bbcf434dcd150a8bcdc4f45 template"><td class="memItemLeft" align="right" valign="top">T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acd37f1058bbcf434dcd150a8bcdc4f45">AddOrReplaceComponent</a> (Args &amp;&amp;... args)</td></tr>
+<tr class="memdesc:acd37f1058bbcf434dcd150a8bcdc4f45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a component to the entity, or replaces it if the entity already has this component.  <br /></td></tr>
 <tr class="memitem:aa7d26560a1832af95311745558492c18" id="r_aa7d26560a1832af95311745558492c18"><td class="memTemplParams" colspan="2">template&lt;typename... T&gt; </td></tr>
 <tr class="memitem:aa7d26560a1832af95311745558492c18 template"><td class="memItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa7d26560a1832af95311745558492c18">GetComponents</a> ()</td></tr>
+<tr class="memdesc:aa7d26560a1832af95311745558492c18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retries the references to the requested components of the entity.  <br /></td></tr>
 <tr class="memitem:af953fa2f1e3329fb5935e106c687a127" id="r_af953fa2f1e3329fb5935e106c687a127"><td class="memTemplParams" colspan="2">template&lt;typename... T&gt; </td></tr>
 <tr class="memitem:af953fa2f1e3329fb5935e106c687a127 template"><td class="memItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af953fa2f1e3329fb5935e106c687a127">GetComponents</a> () const</td></tr>
-<tr class="memitem:a019b9aebf45fb412534ab7b977206c5d" id="r_a019b9aebf45fb412534ab7b977206c5d"><td class="memTemplParams" colspan="2">template&lt;typename... T, typename... Args&gt; </td></tr>
-<tr class="memitem:a019b9aebf45fb412534ab7b977206c5d template"><td class="memItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a019b9aebf45fb412534ab7b977206c5d">GetOrAddComponent</a> (Args &amp;&amp;... args)</td></tr>
+<tr class="memdesc:af953fa2f1e3329fb5935e106c687a127"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retries the references to the requested components of the entity. Const variant.  <br /></td></tr>
+<tr class="memitem:a4329fc9eb55370a9aa0d4f372e30b03b" id="r_a4329fc9eb55370a9aa0d4f372e30b03b"><td class="memTemplParams" colspan="2">template&lt;typename T, typename... Args&gt; </td></tr>
+<tr class="memitem:a4329fc9eb55370a9aa0d4f372e30b03b template"><td class="memItemLeft" align="right" valign="top">T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4329fc9eb55370a9aa0d4f372e30b03b">GetOrAddComponent</a> (Args &amp;&amp;... args)</td></tr>
+<tr class="memdesc:a4329fc9eb55370a9aa0d4f372e30b03b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retries or adds a component to the entity.  <br /></td></tr>
 <tr class="memitem:a6cf1d86ebe80c09050b81bb33a4288f3" id="r_a6cf1d86ebe80c09050b81bb33a4288f3"><td class="memTemplParams" colspan="2">template&lt;typename... T&gt; </td></tr>
 <tr class="memitem:a6cf1d86ebe80c09050b81bb33a4288f3 template"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6cf1d86ebe80c09050b81bb33a4288f3">HasComponents</a> () const</td></tr>
+<tr class="memdesc:a6cf1d86ebe80c09050b81bb33a4288f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the entity has all the specified components.  <br /></td></tr>
 <tr class="memitem:ad1050e27aa9c1b96e84f980bd22b3374" id="r_ad1050e27aa9c1b96e84f980bd22b3374"><td class="memTemplParams" colspan="2">template&lt;typename... T&gt; </td></tr>
 <tr class="memitem:ad1050e27aa9c1b96e84f980bd22b3374 template"><td class="memItemLeft" align="right" valign="top">entt::handle::size_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad1050e27aa9c1b96e84f980bd22b3374">RemoveComponents</a> ()</td></tr>
+<tr class="memdesc:ad1050e27aa9c1b96e84f980bd22b3374"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes components from the entity if entity has them.  <br /></td></tr>
 <tr class="memitem:a72066bf37a511027fc3c1b6f107b1383" id="r_a72066bf37a511027fc3c1b6f107b1383"><td class="memTemplParams" colspan="2">template&lt;typename... T&gt; </td></tr>
 <tr class="memitem:a72066bf37a511027fc3c1b6f107b1383 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a72066bf37a511027fc3c1b6f107b1383">EraseComponents</a> ()</td></tr>
+<tr class="memdesc:a72066bf37a511027fc3c1b6f107b1383"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erases components from the entity without checking if the entity actually have them.  <br /></td></tr>
 <tr class="memitem:ab6e4981e239a25bd112e40e8647cbab2" id="r_ab6e4981e239a25bd112e40e8647cbab2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab6e4981e239a25bd112e40e8647cbab2">operator bool</a> () const</td></tr>
 <tr class="memitem:a26c05c080a3ddb6d8038fde8b9c15c30" id="r_a26c05c080a3ddb6d8038fde8b9c15c30"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a26c05c080a3ddb6d8038fde8b9c15c30">operator==</a> (const <a class="el" href="classCori_1_1World_1_1Entity.html">Entity</a> &amp;other) const</td></tr>
 <tr class="memitem:a514df126cfc5550de3aebd020a89a5d0" id="r_a514df126cfc5550de3aebd020a89a5d0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a514df126cfc5550de3aebd020a89a5d0">operator!=</a> (const <a class="el" href="classCori_1_1World_1_1Entity.html">Entity</a> &amp;other) const</td></tr>
 <tr class="memitem:a1b1b4e604aed1c1e80b149e3ef2ec1ad" id="r_a1b1b4e604aed1c1e80b149e3ef2ec1ad"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1b1b4e604aed1c1e80b149e3ef2ec1ad">IsValid</a> () const</td></tr>
+<tr class="memdesc:a1b1b4e604aed1c1e80b149e3ef2ec1ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the actual entity behind this handle is valid.  <br /></td></tr>
 <tr class="memitem:a042c7ca1fbaeff9217e414feb7d51718" id="r_a042c7ca1fbaeff9217e414feb7d51718"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a042c7ca1fbaeff9217e414feb7d51718">SetActive</a> (const bool state)</td></tr>
+<tr class="memdesc:a042c7ca1fbaeff9217e414feb7d51718"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the activity state of the entity.  <br /></td></tr>
 <tr class="memitem:ab03e196a48f4b4a873a6e4ab82c3ed85" id="r_ab03e196a48f4b4a873a6e4ab82c3ed85"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab03e196a48f4b4a873a6e4ab82c3ed85">IsActiveLocally</a> () const</td></tr>
+<tr class="memdesc:ab03e196a48f4b4a873a6e4ab82c3ed85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the entity is active locally (doesn't have InactiveLocallyFlag), just a convenience function.  <br /></td></tr>
 <tr class="memitem:a1bb84495facd0c4237e828e22d67026b" id="r_a1bb84495facd0c4237e828e22d67026b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1bb84495facd0c4237e828e22d67026b">IsActiveGlobally</a> () const</td></tr>
+<tr class="memdesc:a1bb84495facd0c4237e828e22d67026b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the entity is active locally (doesn't have InactiveGloballyFlag), just a convenience function.  <br /></td></tr>
 <tr class="memitem:ab4a5426dc479bf437f31a4081cf4f292" id="r_ab4a5426dc479bf437f31a4081cf4f292"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab4a5426dc479bf437f31a4081cf4f292">GetID</a> () const</td></tr>
+<tr class="memdesc:ab4a5426dc479bf437f31a4081cf4f292"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the entity ID.  <br /></td></tr>
 <tr class="memitem:a65785a2159a6ed5ab34c56ac7ef337d6" id="r_a65785a2159a6ed5ab34c56ac7ef337d6"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a65785a2159a6ed5ab34c56ac7ef337d6">GetVersion</a> () const</td></tr>
+<tr class="memdesc:a65785a2159a6ed5ab34c56ac7ef337d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the entity version.  <br /></td></tr>
 <tr class="memitem:a8913bcd2cd290ab21affc6b8901a61e9" id="r_a8913bcd2cd290ab21affc6b8901a61e9"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8913bcd2cd290ab21affc6b8901a61e9">GetEUID</a> () const</td></tr>
-<tr class="memitem:a8f7d385629074f9ecc7e828922c29601" id="r_a8f7d385629074f9ecc7e828922c29601"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8f7d385629074f9ecc7e828922c29601">GetDebugData</a> (const bool showUUID=false) const</td></tr>
+<tr class="memdesc:a8913bcd2cd290ab21affc6b8901a61e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the EUID (entity unique ID). A combination of entity ID and version, it is unique for every entity.  <br /></td></tr>
+<tr class="memitem:aa3f3f27e39668c2253dcfd9fbeccb0a5" id="r_aa3f3f27e39668c2253dcfd9fbeccb0a5"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa3f3f27e39668c2253dcfd9fbeccb0a5">GetDebugData</a> (bool showUUID=false) const</td></tr>
+<tr class="memdesc:aa3f3f27e39668c2253dcfd9fbeccb0a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the debuting string for logging.  <br /></td></tr>
 <tr class="memitem:a62b8ef79065a6f0625986ef5a99e521e" id="r_a62b8ef79065a6f0625986ef5a99e521e"><td class="memItemLeft" align="right" valign="top">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a62b8ef79065a6f0625986ef5a99e521e">SetParent</a> (<a class="el" href="classCori_1_1World_1_1Entity.html">Entity</a> parent)</td></tr>
+<tr class="memdesc:a62b8ef79065a6f0625986ef5a99e521e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Links the entity to a parent entity.  <br /></td></tr>
 <tr class="memitem:a181987b34a09ad213dced442cae5f94f" id="r_a181987b34a09ad213dced442cae5f94f"><td class="memItemLeft" align="right" valign="top">std::expected&lt; std::vector&lt; <a class="el" href="classCori_1_1World_1_1Entity.html">Entity</a> &gt;, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a181987b34a09ad213dced442cae5f94f">GetSiblings</a> () const</td></tr>
+<tr class="memdesc:a181987b34a09ad213dced442cae5f94f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates and returns a vector containing all entity siblings.  <br /></td></tr>
 <tr class="memitem:a5bbdb3ec21fce171a65ca7ff1d7a4962" id="r_a5bbdb3ec21fce171a65ca7ff1d7a4962"><td class="memItemLeft" align="right" valign="top">std::expected&lt; <a class="el" href="classCori_1_1World_1_1Entity.html">Entity</a>, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5bbdb3ec21fce171a65ca7ff1d7a4962">GetParent</a> () const</td></tr>
+<tr class="memdesc:a5bbdb3ec21fce171a65ca7ff1d7a4962"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retries the parent entity of the entity if any.  <br /></td></tr>
 <tr class="memitem:a3a9f02681e535ca7dec7da55aa6522df" id="r_a3a9f02681e535ca7dec7da55aa6522df"><td class="memItemLeft" align="right" valign="top">std::expected&lt; std::vector&lt; <a class="el" href="classCori_1_1World_1_1Entity.html">Entity</a> &gt;, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3a9f02681e535ca7dec7da55aa6522df">GetChildren</a> () const</td></tr>
-<tr class="memitem:ae2677181c6fce8b640495b52ef959cdd" id="r_ae2677181c6fce8b640495b52ef959cdd"><td class="memItemLeft" align="right" valign="top">std::expected&lt; <a class="el" href="classCori_1_1World_1_1Entity.html">Entity</a>, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae2677181c6fce8b640495b52ef959cdd">FindChildByName</a> (const std::string &amp;name) const</td></tr>
+<tr class="memdesc:a3a9f02681e535ca7dec7da55aa6522df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates and returns a vector containing all entity children (does not include grandchildren and so on, not recursive).  <br /></td></tr>
+<tr class="memitem:afba911635cbf93da2831cefc2cbb8fa8" id="r_afba911635cbf93da2831cefc2cbb8fa8"><td class="memItemLeft" align="right" valign="top">std::expected&lt; <a class="el" href="classCori_1_1World_1_1Entity.html">Entity</a>, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afba911635cbf93da2831cefc2cbb8fa8">FindChildByName</a> (const char *name) const</td></tr>
+<tr class="memdesc:afba911635cbf93da2831cefc2cbb8fa8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds a children entity by name.  <br /></td></tr>
 <tr class="memitem:ac9d21daa112e64d4f43f54715aef21b2" id="r_ac9d21daa112e64d4f43f54715aef21b2"><td class="memItemLeft" align="right" valign="top">entt::entity&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac9d21daa112e64d4f43f54715aef21b2">GetRawEntity</a> () const</td></tr>
+<tr class="memdesc:ac9d21daa112e64d4f43f54715aef21b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a raw entt::entity if you need to interact with entt directly.  <br /></td></tr>
+<tr class="memitem:a37ec856a07cae6aab81663ef9bf44ee1" id="r_a37ec856a07cae6aab81663ef9bf44ee1"><td class="memItemLeft" align="right" valign="top">entt::handle&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a37ec856a07cae6aab81663ef9bf44ee1">GetRawHandle</a> () const</td></tr>
+<tr class="memdesc:a37ec856a07cae6aab81663ef9bf44ee1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a raw entt::handle if you need to interact with entt directly.  <br /></td></tr>
 <tr class="memitem:a2710ef005f2ead5e1c94179aed2c594d" id="r_a2710ef005f2ead5e1c94179aed2c594d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2710ef005f2ead5e1c94179aed2c594d">PrintHierarchy</a> () const</td></tr>
-<tr class="memitem:a937bc570e0916dae881465cf2b76c7bd" id="r_a937bc570e0916dae881465cf2b76c7bd"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a937bc570e0916dae881465cf2b76c7bd">GetName</a> () const</td></tr>
+<tr class="memdesc:a2710ef005f2ead5e1c94179aed2c594d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prints the full entity hierarchy tree in the console.  <br /></td></tr>
+<tr class="memitem:a30781f71b31406df4a5176779ae088e9" id="r_a30781f71b31406df4a5176779ae088e9"><td class="memItemLeft" align="right" valign="top">std::string_view&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a30781f71b31406df4a5176779ae088e9">GetName</a> () const</td></tr>
+<tr class="memdesc:a30781f71b31406df4a5176779ae088e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the name of the entity.  <br /></td></tr>
 <tr class="memitem:ae60b5c856550b3a9545b81fafc92bc93" id="r_ae60b5c856550b3a9545b81fafc92bc93"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae60b5c856550b3a9545b81fafc92bc93">SetName</a> (const std::string &amp;name)</td></tr>
+<tr class="memdesc:ae60b5c856550b3a9545b81fafc92bc93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the entity name.  <br /></td></tr>
+<tr class="memitem:a1a15764b67e9c8a661b3cf308634fa1f" id="r_a1a15764b67e9c8a661b3cf308634fa1f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1a15764b67e9c8a661b3cf308634fa1f">UnlinkFromParent</a> ()</td></tr>
+<tr class="memdesc:a1a15764b67e9c8a661b3cf308634fa1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unlinks the entity from its parent if it has one.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-friends" class="groupheader"><a id="friends" name="friends"></a>
 Friends</h2></td></tr>
 <tr class="memitem:a032858ae1fe02d2d1170981c2af2d67c" id="r_a032858ae1fe02d2d1170981c2af2d67c"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a032858ae1fe02d2d1170981c2af2d67c">Scene</a></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00008">8</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<div class="textblock"><p>Entities are the essential part of WorldSystem. </p>
+<p>Entities can have a parent-children hierarchy that is represented by a left-child right-sibling binary tree internally. <br  />
+ Instance of <a class="el" href="classCori_1_1World_1_1Entity.html" title="Entities are the essential part of WorldSystem.">Entity</a> class does not control a lifetime of an actual entity, it lifetime is controlled by the <a class="el" href="classCori_1_1World_1_1Scene.html" title="A scene in a game world.">Scene</a>. Through this class you interact with an actual entity, it is sort of a now-owning handle. </p>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00012">12</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ab8a030530a39a2c1b30f3bfee117d2a2" name="ab8a030530a39a2c1b30f3bfee117d2a2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab8a030530a39a2c1b30f3bfee117d2a2">&#9670;&#160;</a></span>Entity() <span class="overload">[1/2]</span></h2>
@@ -194,7 +230,7 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00012">12</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00016">16</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 
 </div>
 </div>
@@ -224,7 +260,22 @@ template&lt;typename T, typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00015">15</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p>Adds a component to the entity. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>Type of component to add. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">args</td><td>Arguments passed to the component constructor. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the newly created component. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00025">25</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 
 </div>
 </div>
@@ -253,7 +304,22 @@ template&lt;typename T, typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00025">25</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p>Adds a component to the entity, or replaces it if the entity already has this component. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>Type of component to add or replace. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">args</td><td>Arguments passed to the component constructor. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the newly created or replaced component. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00047">47</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 
 </div>
 </div>
@@ -282,12 +348,21 @@ template&lt;typename... T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00072">72</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p>Erases components from the entity without checking if the entity actually have them. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td><a class="el" href="namespaceCori_1_1World_1_1Components.html" title="Components that are used with the WorldSystem (ECS).">Components</a> to erase. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section warning"><dt>Warning</dt><dd>This method is dangerous, call it only when you absolutely sure that the entity has all the components you're trying to erase, if at least one component is absent it will cause a crash. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00127">127</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ae2677181c6fce8b640495b52ef959cdd" name="ae2677181c6fce8b640495b52ef959cdd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae2677181c6fce8b640495b52ef959cdd">&#9670;&#160;</a></span>FindChildByName()</h2>
+<a id="afba911635cbf93da2831cefc2cbb8fa8" name="afba911635cbf93da2831cefc2cbb8fa8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afba911635cbf93da2831cefc2cbb8fa8">&#9670;&#160;</a></span>FindChildByName()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -298,7 +373,7 @@ template&lt;typename... T&gt; </div>
         <tr>
           <td class="memname">std::expected&lt; <a class="el" href="classCori_1_1World_1_1Entity.html">Entity</a>, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt; Cori::World::Entity::FindChildByName </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -309,19 +384,42 @@ template&lt;typename... T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00129">129</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
+<p>Finds a children entity by name. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>Name of the children to find. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with child entity with the specified name, or CoriError&lt;&gt; on failure. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>It's illegal to call FindChildByName if entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release. <br  />
+ When creating an entity with <a class="el" href="classCori_1_1World_1_1Scene.html#a3f5dab395b4b413afd6fc5c9f57d110f">Scene::CreateEntity</a> you don't have to worry about it, applies only when you create an entity with <a class="el" href="classCori_1_1World_1_1Scene.html#a6c1c2c967b40f8bb9ed703a113addd25">Scene::CreateBlankEntity</a>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00140">140</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="classCori_1_1World_1_1Entity_ae2677181c6fce8b640495b52ef959cdd_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_ae2677181c6fce8b640495b52ef959cdd_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1World_1_1Entity_ae2677181c6fce8b640495b52ef959cdd_cgraph" id="aclassCori_1_1World_1_1Entity_ae2677181c6fce8b640495b52ef959cdd_cgraph">
-<area shape="rect" title=" " alt="" coords="5,40,150,85"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab8a030530a39a2c1b30f3bfee117d2a2" title=" " alt="" coords="198,5,337,50"/>
-<area shape="poly" title=" " alt="" coords="150,47,182,41,183,46,151,52"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="198,75,337,119"/>
-<area shape="poly" title=" " alt="" coords="151,73,183,79,182,84,150,78"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="385,75,524,119"/>
-<area shape="poly" title=" " alt="" coords="337,94,370,94,370,100,337,100"/>
+<div class="center"><img src="classCori_1_1World_1_1Entity_afba911635cbf93da2831cefc2cbb8fa8_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_afba911635cbf93da2831cefc2cbb8fa8_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1World_1_1Entity_afba911635cbf93da2831cefc2cbb8fa8_cgraph" id="aclassCori_1_1World_1_1Entity_afba911635cbf93da2831cefc2cbb8fa8_cgraph">
+<area shape="rect" title="Finds a children entity by name." alt="" coords="5,148,150,193"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab8a030530a39a2c1b30f3bfee117d2a2" title=" " alt="" coords="198,79,337,123"/>
+<area shape="poly" title=" " alt="" coords="140,145,189,127,191,132,142,150"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title="Retries the references to the requested components of the entity." alt="" coords="198,148,337,193"/>
+<area shape="poly" title=" " alt="" coords="150,168,182,168,182,173,150,173"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="572,213,712,258"/>
+<area shape="poly" title=" " alt="" coords="149,191,198,202,294,216,390,225,557,233,557,238,390,231,293,222,197,208,148,196"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa3f3f27e39668c2253dcfd9fbeccb0a5" title="Gets the debuting string for logging." alt="" coords="385,123,524,167"/>
+<area shape="poly" title=" " alt="" coords="337,167,369,163,370,168,338,172"/>
+<area shape="poly" title=" " alt="" coords="338,180,557,218,556,224,337,185"/>
+<area shape="poly" title=" " alt="" coords="385,148,353,153,352,147,384,143"/>
+<area shape="poly" title=" " alt="" coords="418,122,417,113,423,104,436,98,455,96,475,98,487,105,484,109,473,104,455,101,437,103,427,108,422,114,424,122"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="572,5,712,50"/>
+<area shape="poly" title=" " alt="" coords="484,120,571,60,579,56,581,60,574,65,487,125"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="572,75,712,119"/>
+<area shape="poly" title=" " alt="" coords="524,125,557,116,558,121,525,130"/>
+<area shape="poly" title=" " alt="" coords="504,165,582,204,579,209,501,170"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="572,144,712,189"/>
+<area shape="poly" title=" " alt="" coords="525,150,557,154,557,159,524,156"/>
 </map>
 </div>
 
@@ -350,18 +448,34 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00114">114</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
+<p>Creates and returns a vector containing all entity children (does not include grandchildren and so on, not recursive). </p>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with a vector of all children, or CoriError&lt;&gt; on failure. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>It's illegal to call GetChildren if entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release. <br  />
+ When creating an entity with <a class="el" href="classCori_1_1World_1_1Scene.html#a3f5dab395b4b413afd6fc5c9f57d110f">Scene::CreateEntity</a> you don't have to worry about it, applies only when you create an entity with <a class="el" href="classCori_1_1World_1_1Scene.html#a6c1c2c967b40f8bb9ed703a113addd25">Scene::CreateBlankEntity</a>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00122">122</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1World_1_1Entity_a3a9f02681e535ca7dec7da55aa6522df_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_a3a9f02681e535ca7dec7da55aa6522df_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1World_1_1Entity_a3a9f02681e535ca7dec7da55aa6522df_cgraph" id="aclassCori_1_1World_1_1Entity_a3a9f02681e535ca7dec7da55aa6522df_cgraph">
-<area shape="rect" title=" " alt="" coords="5,36,145,81"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="193,5,332,50"/>
-<area shape="poly" title=" " alt="" coords="145,44,177,39,178,44,146,50"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="380,36,519,81"/>
-<area shape="poly" title=" " alt="" coords="145,58,193,60,332,60,364,59,364,64,332,65,193,65,145,64"/>
-<area shape="poly" title=" " alt="" coords="333,36,365,42,364,47,332,42"/>
+<area shape="rect" title="Creates and returns a vector containing all entity children (does not include grandchildren and so on..." alt="" coords="5,204,145,249"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title="Retries the references to the requested components of the entity." alt="" coords="193,148,332,193"/>
+<area shape="poly" title=" " alt="" coords="144,203,177,193,178,198,146,208"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="567,213,707,258"/>
+<area shape="poly" title=" " alt="" coords="145,225,552,232,552,237,145,230"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa3f3f27e39668c2253dcfd9fbeccb0a5" title="Gets the debuting string for logging." alt="" coords="380,123,519,167"/>
+<area shape="poly" title=" " alt="" coords="332,167,364,163,365,168,333,172"/>
+<area shape="poly" title=" " alt="" coords="333,180,552,218,551,224,332,185"/>
+<area shape="poly" title=" " alt="" coords="380,148,348,153,347,147,379,143"/>
+<area shape="poly" title=" " alt="" coords="413,122,412,113,418,104,431,98,450,96,470,98,482,105,479,109,468,104,450,101,432,103,422,108,417,114,419,122"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="567,5,707,50"/>
+<area shape="poly" title=" " alt="" coords="479,120,566,60,574,56,576,60,569,65,482,125"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="567,75,707,119"/>
+<area shape="poly" title=" " alt="" coords="519,125,552,116,553,121,520,130"/>
+<area shape="poly" title=" " alt="" coords="499,165,577,204,574,209,496,170"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="567,144,707,189"/>
+<area shape="poly" title=" " alt="" coords="520,150,552,154,552,159,519,156"/>
 </map>
 </div>
 
@@ -392,15 +506,36 @@ template&lt;typename... T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00030">30</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p>Retries the references to the requested components of the entity. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>Types of components to retrieve. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>When retrieving multiple components use structured binding. Also make sure you use receive by reference not by value. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Referenced to the requested component(s). </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00058">58</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1World_1_1Entity_aa7d26560a1832af95311745558492c18_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_aa7d26560a1832af95311745558492c18_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1World_1_1Entity_aa7d26560a1832af95311745558492c18_cgraph" id="aclassCori_1_1World_1_1Entity_aa7d26560a1832af95311745558492c18_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,145,50"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="193,5,332,50"/>
-<area shape="poly" title=" " alt="" coords="145,25,177,25,177,30,145,30"/>
+<area shape="rect" title="Retries the references to the requested components of the entity." alt="" coords="5,144,145,189"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa3f3f27e39668c2253dcfd9fbeccb0a5" title="Gets the debuting string for logging." alt="" coords="193,144,332,189"/>
+<area shape="poly" title=" " alt="" coords="145,172,177,173,177,178,145,178"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="380,213,519,258"/>
+<area shape="poly" title=" " alt="" coords="145,186,193,198,281,214,365,225,364,230,281,219,192,204,144,191"/>
+<area shape="poly" title=" " alt="" coords="192,160,160,160,160,155,192,155"/>
+<area shape="poly" title=" " alt="" coords="226,144,225,134,231,125,244,119,262,117,282,120,295,126,292,131,281,125,262,123,245,125,234,129,230,135,231,143"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="380,5,519,50"/>
+<area shape="poly" title=" " alt="" coords="284,142,326,102,378,60,385,56,388,60,382,64,329,106,287,146"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="380,75,519,119"/>
+<area shape="poly" title=" " alt="" coords="324,141,372,123,374,128,326,146"/>
+<area shape="poly" title=" " alt="" coords="326,187,374,205,372,210,324,192"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="380,144,519,189"/>
+<area shape="poly" title=" " alt="" coords="332,164,365,164,365,169,332,169"/>
 </map>
 </div>
 
@@ -431,22 +566,46 @@ template&lt;typename... T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00042">42</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p>Retries the references to the requested components of the entity. Const variant. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>Types of components to retrieve. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>When retrieving multiple components use structured binding. Also make sure you use receive by const reference not by value. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Referenced to the requested component(s). </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00076">76</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1World_1_1Entity_af953fa2f1e3329fb5935e106c687a127_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_af953fa2f1e3329fb5935e106c687a127_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1World_1_1Entity_af953fa2f1e3329fb5935e106c687a127_cgraph" id="aclassCori_1_1World_1_1Entity_af953fa2f1e3329fb5935e106c687a127_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,145,50"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="193,5,332,50"/>
-<area shape="poly" title=" " alt="" coords="145,25,177,25,177,30,145,30"/>
+<area shape="rect" title="Retries the references to the requested components of the entity. Const variant." alt="" coords="5,225,145,270"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa3f3f27e39668c2253dcfd9fbeccb0a5" title="Gets the debuting string for logging." alt="" coords="193,125,332,170"/>
+<area shape="poly" title=" " alt="" coords="117,222,204,175,207,180,120,227"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="567,65,707,110"/>
+<area shape="poly" title=" " alt="" coords="116,268,195,306,245,325,299,340,356,350,412,351,467,341,518,319,542,301,562,278,594,226,615,172,627,125,632,126,620,174,599,229,566,282,545,304,521,323,469,346,413,356,355,355,298,345,244,330,193,311,114,273"/>
+<area shape="poly" title=" " alt="" coords="226,125,225,115,231,106,244,101,262,99,282,101,295,107,292,112,281,106,262,104,245,106,234,111,230,117,231,124"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title="Retries the references to the requested components of the entity." alt="" coords="380,5,519,50"/>
+<area shape="poly" title=" " alt="" coords="311,123,379,79,413,57,416,61,381,83,314,127"/>
+<area shape="poly" title=" " alt="" coords="332,122,379,110,468,97,551,89,552,95,469,102,381,116,333,127"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="380,125,519,170"/>
+<area shape="poly" title=" " alt="" coords="332,145,365,145,365,150,332,150"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="380,195,519,239"/>
+<area shape="poly" title=" " alt="" coords="326,168,374,186,372,191,324,173"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="380,264,519,309"/>
+<area shape="poly" title=" " alt="" coords="287,168,329,208,382,250,388,254,385,258,378,254,326,212,284,172"/>
+<area shape="poly" title=" " alt="" coords="391,53,381,59,297,117,294,113,379,55,389,48"/>
+<area shape="poly" title=" " alt="" coords="521,47,553,58,552,63,519,53"/>
 </map>
 </div>
 
 </div>
 </div>
-<a id="a8f7d385629074f9ecc7e828922c29601" name="a8f7d385629074f9ecc7e828922c29601"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8f7d385629074f9ecc7e828922c29601">&#9670;&#160;</a></span>GetDebugData()</h2>
+<a id="aa3f3f27e39668c2253dcfd9fbeccb0a5" name="aa3f3f27e39668c2253dcfd9fbeccb0a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3f3f27e39668c2253dcfd9fbeccb0a5">&#9670;&#160;</a></span>GetDebugData()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -457,7 +616,7 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="memname">std::string Cori::World::Entity::GetDebugData </td>
           <td>(</td>
-          <td class="paramtype">const bool</td>          <td class="paramname"><span class="paramname"><em>showUUID</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span></td><td>)</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>showUUID</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -468,23 +627,35 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00066">66</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
+<p>Gets the debuting string for logging. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">showUUID</td><td>Whether to include UUID in the debugging string. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Formated debugging string. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00064">64</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="classCori_1_1World_1_1Entity_a8f7d385629074f9ecc7e828922c29601_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_a8f7d385629074f9ecc7e828922c29601_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1World_1_1Entity_a8f7d385629074f9ecc7e828922c29601_cgraph" id="aclassCori_1_1World_1_1Entity_a8f7d385629074f9ecc7e828922c29601_cgraph">
-<area shape="rect" title=" " alt="" coords="5,109,145,154"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="193,5,332,50"/>
-<area shape="poly" title=" " alt="" coords="112,107,191,60,200,55,203,60,194,65,115,111"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title=" " alt="" coords="193,75,332,119"/>
-<area shape="poly" title=" " alt="" coords="145,116,177,110,178,115,146,121"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title=" " alt="" coords="193,144,332,189"/>
-<area shape="poly" title=" " alt="" coords="146,142,178,148,177,153,145,147"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title=" " alt="" coords="193,213,332,258"/>
-<area shape="poly" title=" " alt="" coords="115,152,194,199,203,203,200,208,191,203,112,157"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="380,5,519,50"/>
-<area shape="poly" title=" " alt="" coords="332,25,365,25,365,30,332,30"/>
+<div class="center"><img src="classCori_1_1World_1_1Entity_aa3f3f27e39668c2253dcfd9fbeccb0a5_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_aa3f3f27e39668c2253dcfd9fbeccb0a5_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1World_1_1Entity_aa3f3f27e39668c2253dcfd9fbeccb0a5_cgraph" id="aclassCori_1_1World_1_1Entity_aa3f3f27e39668c2253dcfd9fbeccb0a5_cgraph">
+<area shape="rect" title="Gets the debuting string for logging." alt="" coords="5,96,145,141"/>
+<area shape="poly" title=" " alt="" coords="39,96,38,86,44,77,56,71,75,69,95,72,107,78,105,83,94,77,75,75,58,77,47,81,43,87,44,95"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title="Retries the references to the requested components of the entity." alt="" coords="193,5,332,50"/>
+<area shape="poly" title=" " alt="" coords="139,93,214,56,217,60,142,98"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="380,36,519,81"/>
+<area shape="poly" title=" " alt="" coords="145,105,364,69,365,74,145,110"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="193,125,332,170"/>
+<area shape="poly" title=" " alt="" coords="146,127,178,132,177,137,145,132"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="193,195,332,239"/>
+<area shape="poly" title=" " alt="" coords="118,139,194,180,203,185,201,189,191,185,116,144"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="193,264,332,309"/>
+<area shape="poly" title=" " alt="" coords="94,139,136,193,164,223,194,250,200,253,196,258,191,254,160,227,132,197,90,143"/>
+<area shape="poly" title=" " alt="" coords="198,53,123,91,121,86,196,48"/>
+<area shape="poly" title=" " alt="" coords="333,36,365,42,364,47,332,42"/>
 </map>
 </div>
 
@@ -513,16 +684,19 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00103">103</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p>Gets the EUID (entity unique ID). A combination of entity ID and version, it is unique for every entity. </p>
+<dl class="section return"><dt>Returns</dt><dd>EUID. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00188">188</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1World_1_1Entity_a8913bcd2cd290ab21affc6b8901a61e9_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_a8913bcd2cd290ab21affc6b8901a61e9_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1World_1_1Entity_a8913bcd2cd290ab21affc6b8901a61e9_cgraph" id="aclassCori_1_1World_1_1Entity_a8913bcd2cd290ab21affc6b8901a61e9_cgraph">
-<area shape="rect" title=" " alt="" coords="5,40,145,85"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title=" " alt="" coords="193,5,332,50"/>
+<area shape="rect" title="Gets the EUID (entity unique ID). A combination of entity ID and version, it is unique for every enti..." alt="" coords="5,40,145,85"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="193,5,332,50"/>
 <area shape="poly" title=" " alt="" coords="145,47,177,41,178,46,146,52"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title=" " alt="" coords="193,75,332,119"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="193,75,332,119"/>
 <area shape="poly" title=" " alt="" coords="146,73,178,79,177,84,145,78"/>
 </map>
 </div>
@@ -552,54 +726,83 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00095">95</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p>Gets the entity ID. </p>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="classCori_1_1World_1_1Entity.html" title="Entities are the essential part of WorldSystem.">Entity</a> ID. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd><a class="el" href="classCori_1_1World_1_1Entity.html" title="Entities are the essential part of WorldSystem.">Entity</a> IDs can be reused, to differentiate one entity from the other, you need to compare entity ID and entity version. To get a unique entity ID use <a class="el" href="#a8913bcd2cd290ab21affc6b8901a61e9" title="Gets the EUID (entity unique ID). A combination of entity ID and version, it is unique for every enti...">GetEUID()</a> method. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00172">172</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a937bc570e0916dae881465cf2b76c7bd" name="a937bc570e0916dae881465cf2b76c7bd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a937bc570e0916dae881465cf2b76c7bd">&#9670;&#160;</a></span>GetName()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::string Cori::World::Entity::GetName </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00165">165</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1World_1_1Entity_a937bc570e0916dae881465cf2b76c7bd_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_a937bc570e0916dae881465cf2b76c7bd_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1World_1_1Entity_a937bc570e0916dae881465cf2b76c7bd_cgraph" id="aclassCori_1_1World_1_1Entity_a937bc570e0916dae881465cf2b76c7bd_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,145,50"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="193,5,332,50"/>
-<area shape="poly" title=" " alt="" coords="145,25,177,25,177,30,145,30"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="380,5,519,50"/>
-<area shape="poly" title=" " alt="" coords="332,25,365,25,365,30,332,30"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a019b9aebf45fb412534ab7b977206c5d" name="a019b9aebf45fb412534ab7b977206c5d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a019b9aebf45fb412534ab7b977206c5d">&#9670;&#160;</a></span>GetOrAddComponent()</h2>
+<a id="a30781f71b31406df4a5176779ae088e9" name="a30781f71b31406df4a5176779ae088e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30781f71b31406df4a5176779ae088e9">&#9670;&#160;</a></span>GetName()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;typename... T, typename... Args&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">decltype(auto) Cori::World::Entity::GetOrAddComponent </td>
+          <td class="memname">std::string_view Cori::World::Entity::GetName </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel nodiscard">nodiscard</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieves the name of the entity. </p>
+<dl class="section return"><dt>Returns</dt><dd>A view to the current entity name. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>It's illegal to call GetName if entity doesn't have Name component, this will lead to an assert in debug build and a crash in release. <br  />
+ When creating an entity with <a class="el" href="classCori_1_1World_1_1Scene.html#a3f5dab395b4b413afd6fc5c9f57d110f">Scene::CreateEntity</a> you don't have to worry about it, applies only when you create an entity with <a class="el" href="classCori_1_1World_1_1Scene.html#a6c1c2c967b40f8bb9ed703a113addd25">Scene::CreateBlankEntity</a>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00183">183</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classCori_1_1World_1_1Entity_a30781f71b31406df4a5176779ae088e9_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_a30781f71b31406df4a5176779ae088e9_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1World_1_1Entity_a30781f71b31406df4a5176779ae088e9_cgraph" id="aclassCori_1_1World_1_1Entity_a30781f71b31406df4a5176779ae088e9_cgraph">
+<area shape="rect" title="Retrieves the name of the entity." alt="" coords="5,204,145,249"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title="Retries the references to the requested components of the entity." alt="" coords="193,148,332,193"/>
+<area shape="poly" title=" " alt="" coords="144,203,177,193,178,198,146,208"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="567,213,707,258"/>
+<area shape="poly" title=" " alt="" coords="145,225,552,232,552,237,145,230"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa3f3f27e39668c2253dcfd9fbeccb0a5" title="Gets the debuting string for logging." alt="" coords="380,123,519,167"/>
+<area shape="poly" title=" " alt="" coords="332,167,364,163,365,168,333,172"/>
+<area shape="poly" title=" " alt="" coords="333,180,552,218,551,224,332,185"/>
+<area shape="poly" title=" " alt="" coords="380,148,348,153,347,147,379,143"/>
+<area shape="poly" title=" " alt="" coords="413,122,412,113,418,104,431,98,450,96,470,98,482,105,479,109,468,104,450,101,432,103,422,108,417,114,419,122"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="567,5,707,50"/>
+<area shape="poly" title=" " alt="" coords="479,120,566,60,574,56,576,60,569,65,482,125"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="567,75,707,119"/>
+<area shape="poly" title=" " alt="" coords="519,125,552,116,553,121,520,130"/>
+<area shape="poly" title=" " alt="" coords="499,165,577,204,574,209,496,170"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="567,144,707,189"/>
+<area shape="poly" title=" " alt="" coords="520,150,552,154,552,159,519,156"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a4329fc9eb55370a9aa0d4f372e30b03b" name="a4329fc9eb55370a9aa0d4f372e30b03b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4329fc9eb55370a9aa0d4f372e30b03b">&#9670;&#160;</a></span>GetOrAddComponent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, typename... Args&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T &amp; Cori::World::Entity::GetOrAddComponent </td>
           <td>(</td>
           <td class="paramtype">Args &amp;&amp;...</td>          <td class="paramname"><span class="paramname"><em>args</em></span></td><td>)</td>
           <td></td>
@@ -612,7 +815,22 @@ template&lt;typename... T, typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00055">55</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p>Retries or adds a component to the entity. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>Type of component to retrieve or add if absent. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">args</td><td>Arguments passed to the component constructor in case of addition of the component. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Reference to the added or received component. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00095">95</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 
 </div>
 </div>
@@ -639,20 +857,36 @@ template&lt;typename... T, typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00083">83</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
+<p>Retries the parent entity of the entity if any. </p>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with the parent entity, or CoriError&lt;&gt; on failure. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>It's illegal to call GetParent if entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release. <br  />
+ When creating an entity with <a class="el" href="classCori_1_1World_1_1Scene.html#a3f5dab395b4b413afd6fc5c9f57d110f">Scene::CreateEntity</a> you don't have to worry about it, applies only when you create an entity with <a class="el" href="classCori_1_1World_1_1Scene.html#a6c1c2c967b40f8bb9ed703a113addd25">Scene::CreateBlankEntity</a>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00089">89</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1World_1_1Entity_a5bbdb3ec21fce171a65ca7ff1d7a4962_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_a5bbdb3ec21fce171a65ca7ff1d7a4962_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1World_1_1Entity_a5bbdb3ec21fce171a65ca7ff1d7a4962_cgraph" id="aclassCori_1_1World_1_1Entity_a5bbdb3ec21fce171a65ca7ff1d7a4962_cgraph">
-<area shape="rect" title=" " alt="" coords="5,75,145,119"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab8a030530a39a2c1b30f3bfee117d2a2" title=" " alt="" coords="193,5,332,50"/>
-<area shape="poly" title=" " alt="" coords="136,72,185,53,187,58,138,77"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="193,75,332,119"/>
-<area shape="poly" title=" " alt="" coords="145,94,177,94,177,100,145,100"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="380,105,519,150"/>
-<area shape="poly" title=" " alt="" coords="142,117,193,129,281,135,364,133,365,138,281,141,192,134,141,123"/>
-<area shape="poly" title=" " alt="" coords="333,106,365,111,364,116,332,111"/>
+<area shape="rect" title="Retries the parent entity of the entity if any." alt="" coords="5,148,145,193"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab8a030530a39a2c1b30f3bfee117d2a2" title=" " alt="" coords="193,79,332,123"/>
+<area shape="poly" title=" " alt="" coords="136,145,185,127,187,132,138,150"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title="Retries the references to the requested components of the entity." alt="" coords="193,148,332,193"/>
+<area shape="poly" title=" " alt="" coords="145,168,177,168,177,173,145,173"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="567,213,707,258"/>
+<area shape="poly" title=" " alt="" coords="145,191,193,202,289,217,385,226,552,233,552,238,385,231,288,222,192,208,144,196"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa3f3f27e39668c2253dcfd9fbeccb0a5" title="Gets the debuting string for logging." alt="" coords="380,123,519,167"/>
+<area shape="poly" title=" " alt="" coords="332,167,364,163,365,168,333,172"/>
+<area shape="poly" title=" " alt="" coords="333,180,552,218,551,224,332,185"/>
+<area shape="poly" title=" " alt="" coords="380,148,348,153,347,147,379,143"/>
+<area shape="poly" title=" " alt="" coords="413,122,412,113,418,104,431,98,450,96,470,98,482,105,479,109,468,104,450,101,432,103,422,108,417,114,419,122"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="567,5,707,50"/>
+<area shape="poly" title=" " alt="" coords="479,120,566,60,574,56,576,60,569,65,482,125"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="567,75,707,119"/>
+<area shape="poly" title=" " alt="" coords="519,125,552,116,553,121,520,130"/>
+<area shape="poly" title=" " alt="" coords="499,165,577,204,574,209,496,170"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="567,144,707,189"/>
+<area shape="poly" title=" " alt="" coords="520,150,552,154,552,159,519,156"/>
 </map>
 </div>
 
@@ -681,7 +915,42 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00118">118</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p>Gets a raw entt::entity if you need to interact with entt directly. </p>
+<dl class="section return"><dt>Returns</dt><dd>Underlying entt::entity. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Use at your own risk and only if you know what you're doing. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00246">246</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a37ec856a07cae6aab81663ef9bf44ee1" name="a37ec856a07cae6aab81663ef9bf44ee1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37ec856a07cae6aab81663ef9bf44ee1">&#9670;&#160;</a></span>GetRawHandle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">entt::handle Cori::World::Entity::GetRawHandle </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets a raw entt::handle if you need to interact with entt directly. </p>
+<dl class="section return"><dt>Returns</dt><dd>Underlying entt::handle. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Use at your own risk and only if you know what you're doing. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00253">253</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 
 </div>
 </div>
@@ -708,24 +977,40 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00096">96</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
+<p>Creates and returns a vector containing all entity siblings. </p>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with a vector of siblings, or CoriError&lt;&gt; on failure. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>It's illegal to call GetSiblings if entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release. <br  />
+ When creating an entity with <a class="el" href="classCori_1_1World_1_1Scene.html#a3f5dab395b4b413afd6fc5c9f57d110f">Scene::CreateEntity</a> you don't have to worry about it, applies only when you create an entity with <a class="el" href="classCori_1_1World_1_1Scene.html#a6c1c2c967b40f8bb9ed703a113addd25">Scene::CreateBlankEntity</a>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00104">104</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1World_1_1Entity_a181987b34a09ad213dced442cae5f94f_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_a181987b34a09ad213dced442cae5f94f_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1World_1_1Entity_a181987b34a09ad213dced442cae5f94f_cgraph" id="aclassCori_1_1World_1_1Entity_a181987b34a09ad213dced442cae5f94f_cgraph">
-<area shape="rect" title=" " alt="" coords="5,96,145,141"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab8a030530a39a2c1b30f3bfee117d2a2" title=" " alt="" coords="193,5,332,50"/>
-<area shape="poly" title=" " alt="" coords="122,93,200,55,202,60,124,98"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a3a9f02681e535ca7dec7da55aa6522df" title=" " alt="" coords="193,125,332,170"/>
-<area shape="poly" title=" " alt="" coords="146,127,178,132,177,137,145,132"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="380,71,519,115"/>
-<area shape="poly" title=" " alt="" coords="145,111,364,96,365,101,145,116"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="567,131,707,175"/>
-<area shape="poly" title=" " alt="" coords="109,139,148,162,193,180,240,189,288,194,384,194,475,185,552,171,553,176,476,190,385,200,288,200,239,194,192,185,146,167,106,144"/>
-<area shape="poly" title=" " alt="" coords="332,125,364,115,366,120,333,130"/>
-<area shape="poly" title=" " alt="" coords="332,146,552,149,552,154,332,151"/>
-<area shape="poly" title=" " alt="" coords="521,113,553,123,552,129,519,118"/>
+<area shape="rect" title="Creates and returns a vector containing all entity siblings." alt="" coords="5,175,145,219"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab8a030530a39a2c1b30f3bfee117d2a2" title=" " alt="" coords="193,84,332,129"/>
+<area shape="poly" title=" " alt="" coords="122,172,200,133,202,138,124,177"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a3a9f02681e535ca7dec7da55aa6522df" title="Creates and returns a vector containing all entity children (does not include grandchildren and so on..." alt="" coords="193,204,332,249"/>
+<area shape="poly" title=" " alt="" coords="146,205,178,210,177,216,145,211"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title="Retries the references to the requested components of the entity." alt="" coords="380,144,519,189"/>
+<area shape="poly" title=" " alt="" coords="145,189,364,171,365,176,145,194"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="755,213,894,258"/>
+<area shape="poly" title=" " alt="" coords="109,218,148,241,193,258,266,273,342,281,417,284,491,282,629,269,739,251,740,257,629,275,492,287,417,289,341,287,265,278,192,264,146,245,106,222"/>
+<area shape="poly" title=" " alt="" coords="332,201,364,191,366,196,333,207"/>
+<area shape="poly" title=" " alt="" coords="332,225,739,232,739,237,332,230"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa3f3f27e39668c2253dcfd9fbeccb0a5" title="Gets the debuting string for logging." alt="" coords="567,103,707,147"/>
+<area shape="poly" title=" " alt="" coords="519,157,556,149,557,154,520,162"/>
+<area shape="poly" title=" " alt="" coords="520,177,740,217,739,223,519,182"/>
+<area shape="poly" title=" " alt="" coords="567,134,530,142,529,137,566,129"/>
+<area shape="poly" title=" " alt="" coords="601,102,600,93,606,84,618,78,637,76,657,78,669,85,667,89,656,84,637,81,620,83,609,88,605,94,606,102"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="755,5,894,50"/>
+<area shape="poly" title=" " alt="" coords="679,100,753,60,763,55,765,60,756,65,681,104"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="755,75,894,119"/>
+<area shape="poly" title=" " alt="" coords="707,112,739,107,740,112,707,117"/>
+<area shape="poly" title=" " alt="" coords="679,146,708,164,756,199,764,203,761,208,753,203,705,169,676,150"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="755,144,894,189"/>
+<area shape="poly" title=" " alt="" coords="708,138,740,145,739,150,707,143"/>
 </map>
 </div>
 
@@ -754,7 +1039,10 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00099">99</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p>Gets the entity version. </p>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="classCori_1_1World_1_1Entity.html" title="Entities are the essential part of WorldSystem.">Entity</a> version. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00180">180</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 
 </div>
 </div>
@@ -778,12 +1066,21 @@ template&lt;typename... T&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00060">60</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p>Checks if the entity has all the specified components. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td><a class="el" href="namespaceCori_1_1World_1_1Components.html" title="Components that are used with the WorldSystem (ECS).">Components</a> to check the presence of. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the entity has all the components, false if at least one is absent. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00105">105</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 
 </div>
 </div>
@@ -810,14 +1107,17 @@ template&lt;typename... T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00061">61</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
+<p>Checks if the entity is active locally (doesn't have InactiveGloballyFlag), just a convenience function. </p>
+<dl class="section return"><dt>Returns</dt><dd>True if it doesn't have InactiveGloballyFlag, false otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00060">60</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1World_1_1Entity_a1bb84495facd0c4237e828e22d67026b_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_a1bb84495facd0c4237e828e22d67026b_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1World_1_1Entity_a1bb84495facd0c4237e828e22d67026b_cgraph" id="aclassCori_1_1World_1_1Entity_a1bb84495facd0c4237e828e22d67026b_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,145,50"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="193,5,332,50"/>
+<area shape="rect" title="Checks if the entity is active locally (doesn&#39;t have InactiveGloballyFlag), just a convenience functi..." alt="" coords="5,5,145,50"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="193,5,332,50"/>
 <area shape="poly" title=" " alt="" coords="145,25,177,25,177,30,145,30"/>
 </map>
 </div>
@@ -847,14 +1147,17 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Checks if the entity is active locally (doesn't have InactiveLocallyFlag), just a convenience function. </p>
+<dl class="section return"><dt>Returns</dt><dd>True if it doesn't have InactiveLocallyFlag, false otherwise. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00056">56</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1World_1_1Entity_ab03e196a48f4b4a873a6e4ab82c3ed85_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_ab03e196a48f4b4a873a6e4ab82c3ed85_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1World_1_1Entity_ab03e196a48f4b4a873a6e4ab82c3ed85_cgraph" id="aclassCori_1_1World_1_1Entity_ab03e196a48f4b4a873a6e4ab82c3ed85_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,145,50"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="193,5,332,50"/>
+<area shape="rect" title="Checks if the entity is active locally (doesn&#39;t have InactiveLocallyFlag), just a convenience functio..." alt="" coords="5,5,145,50"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="193,5,332,50"/>
 <area shape="poly" title=" " alt="" coords="145,25,177,25,177,30,145,30"/>
 </map>
 </div>
@@ -884,7 +1187,10 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00085">85</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p>Checks if the actual entity behind this handle is valid. </p>
+<dl class="section return"><dt>Returns</dt><dd>True if valid, false otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00144">144</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 
 </div>
 </div>
@@ -911,7 +1217,7 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00076">76</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00131">131</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 
 </div>
 </div>
@@ -938,7 +1244,7 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00081">81</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00136">136</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -975,7 +1281,7 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00078">78</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00133">133</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -1004,25 +1310,41 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00139">139</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
+<p>Prints the full entity hierarchy tree in the console. </p>
+<dl class="section warning"><dt>Warning</dt><dd>It's illegal to call PrintHierarchy if entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release. <br  />
+ When creating an entity with <a class="el" href="classCori_1_1World_1_1Scene.html#a3f5dab395b4b413afd6fc5c9f57d110f">Scene::CreateEntity</a> you don't have to worry about it, applies only when you create an entity with <a class="el" href="classCori_1_1World_1_1Scene.html#a6c1c2c967b40f8bb9ed703a113addd25">Scene::CreateBlankEntity</a>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00156">156</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1World_1_1Entity_a2710ef005f2ead5e1c94179aed2c594d_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_a2710ef005f2ead5e1c94179aed2c594d_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1World_1_1Entity_a2710ef005f2ead5e1c94179aed2c594d_cgraph" id="aclassCori_1_1World_1_1Entity_a2710ef005f2ead5e1c94179aed2c594d_cgraph">
-<area shape="rect" title=" " alt="" coords="5,96,145,141"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab8a030530a39a2c1b30f3bfee117d2a2" title=" " alt="" coords="193,5,332,50"/>
-<area shape="poly" title=" " alt="" coords="122,93,200,55,202,60,124,98"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a3a9f02681e535ca7dec7da55aa6522df" title=" " alt="" coords="193,125,332,170"/>
-<area shape="poly" title=" " alt="" coords="146,127,178,132,177,137,145,132"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="380,65,519,110"/>
-<area shape="poly" title=" " alt="" coords="145,110,364,92,365,97,145,115"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#ac9d21daa112e64d4f43f54715aef21b2" title=" " alt="" coords="193,195,332,239"/>
-<area shape="poly" title=" " alt="" coords="118,139,194,180,203,185,201,189,191,185,116,144"/>
-<area shape="poly" title=" " alt="" coords="332,123,364,112,366,117,333,128"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="567,96,707,141"/>
-<area shape="poly" title=" " alt="" coords="332,140,552,122,552,128,333,145"/>
-<area shape="poly" title=" " alt="" coords="520,96,552,102,551,107,519,102"/>
+<area shape="rect" title="Prints the full entity hierarchy tree in the console." alt="" coords="5,204,145,249"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab8a030530a39a2c1b30f3bfee117d2a2" title=" " alt="" coords="193,84,332,129"/>
+<area shape="poly" title=" " alt="" coords="108,201,191,145,208,135,211,139,194,150,111,206"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a3a9f02681e535ca7dec7da55aa6522df" title="Creates and returns a vector containing all entity children (does not include grandchildren and so on..." alt="" coords="193,204,332,249"/>
+<area shape="poly" title=" " alt="" coords="145,224,177,224,177,229,145,229"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title="Retries the references to the requested components of the entity." alt="" coords="380,144,519,189"/>
+<area shape="poly" title=" " alt="" coords="145,201,192,189,281,176,364,168,365,173,281,181,193,194,146,206"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="755,213,894,258"/>
+<area shape="poly" title=" " alt="" coords="142,247,193,258,267,267,343,271,493,269,630,259,739,246,739,251,630,264,493,274,343,276,267,272,192,264,141,252"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ac9d21daa112e64d4f43f54715aef21b2" title="Gets a raw entt::entity if you need to interact with entt directly." alt="" coords="193,324,332,369"/>
+<area shape="poly" title=" " alt="" coords="111,247,194,303,211,313,208,318,191,307,108,251"/>
+<area shape="poly" title=" " alt="" coords="332,201,364,191,366,196,333,207"/>
+<area shape="poly" title=" " alt="" coords="332,225,739,232,739,237,332,230"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa3f3f27e39668c2253dcfd9fbeccb0a5" title="Gets the debuting string for logging." alt="" coords="567,103,707,147"/>
+<area shape="poly" title=" " alt="" coords="519,157,556,149,557,154,520,162"/>
+<area shape="poly" title=" " alt="" coords="520,177,740,217,739,223,519,182"/>
+<area shape="poly" title=" " alt="" coords="567,134,530,142,529,137,566,129"/>
+<area shape="poly" title=" " alt="" coords="601,102,600,93,606,84,618,78,637,76,657,78,669,85,667,89,656,84,637,81,620,83,609,88,605,94,606,102"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="755,5,894,50"/>
+<area shape="poly" title=" " alt="" coords="679,100,753,60,763,55,765,60,756,65,681,104"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="755,75,894,119"/>
+<area shape="poly" title=" " alt="" coords="707,112,739,107,740,112,707,117"/>
+<area shape="poly" title=" " alt="" coords="679,146,708,164,756,199,764,203,761,208,753,203,705,169,676,150"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="755,144,894,189"/>
+<area shape="poly" title=" " alt="" coords="708,138,740,145,739,150,707,143"/>
 </map>
 </div>
 
@@ -1053,7 +1375,17 @@ template&lt;typename... T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00066">66</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p>Removes components from the entity if entity has them. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td><a class="el" href="namespaceCori_1_1World_1_1Components.html" title="Components that are used with the WorldSystem (ECS).">Components</a> to remove. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Removes the components only if the entity has it, it's safe to try to remove a component that the entity doesn't have. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Amount of components removed. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00116">116</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 
 </div>
 </div>
@@ -1082,7 +1414,22 @@ template&lt;typename T, typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00020">20</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p>Replaces the component with a newly created one. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>Type of component to replace. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">args</td><td>Arguments passed to the component constructor. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the replaced component. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00036">36</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 
 </div>
 </div>
@@ -1101,22 +1448,42 @@ template&lt;typename T, typename... Args&gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p>Changes the activity state of the entity. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">state</td><td>Activity state to set.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>When deactivating the entity a InactiveLocallyFlag and InactiveGloballyFlag are assigned to it, it this entity has any children a InactiveGloballyFlag will be added to the whole children tree recursively (to the grandchildren, grand-grandchildren and so on). </p>
+
 <p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00006">6</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1World_1_1Entity_a042c7ca1fbaeff9217e414feb7d51718_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_a042c7ca1fbaeff9217e414feb7d51718_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1World_1_1Entity_a042c7ca1fbaeff9217e414feb7d51718_cgraph" id="aclassCori_1_1World_1_1Entity_a042c7ca1fbaeff9217e414feb7d51718_cgraph">
-<area shape="rect" title=" " alt="" coords="5,109,145,154"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a7b8dc8e2678b0b088fcbc94bad61a931" title=" " alt="" coords="197,5,336,50"/>
-<area shape="poly" title=" " alt="" coords="111,107,191,60,201,55,203,60,194,65,114,111"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a72066bf37a511027fc3c1b6f107b1383" title=" " alt="" coords="193,75,340,119"/>
-<area shape="poly" title=" " alt="" coords="144,116,177,110,178,116,145,122"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="197,144,336,189"/>
-<area shape="poly" title=" " alt="" coords="145,142,181,148,181,154,144,147"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="388,175,527,219"/>
-<area shape="poly" title=" " alt="" coords="106,152,146,178,193,198,239,207,285,211,373,207,373,213,285,216,238,213,192,204,143,183,103,157"/>
-<area shape="poly" title=" " alt="" coords="337,175,373,181,372,186,336,180"/>
+<area shape="rect" title="Changes the activity state of the entity." alt="" coords="5,113,145,158"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a7b8dc8e2678b0b088fcbc94bad61a931" title="Adds a component to the entity." alt="" coords="197,9,336,54"/>
+<area shape="poly" title=" " alt="" coords="111,111,191,64,201,59,203,64,194,69,114,115"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a72066bf37a511027fc3c1b6f107b1383" title="Erases components from the entity without checking if the entity actually have them." alt="" coords="193,79,340,123"/>
+<area shape="poly" title=" " alt="" coords="144,120,177,114,178,120,145,126"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title="Retries the references to the requested components of the entity." alt="" coords="197,148,336,193"/>
+<area shape="poly" title=" " alt="" coords="145,146,181,152,181,158,144,151"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="575,213,715,258"/>
+<area shape="poly" title=" " alt="" coords="107,156,147,182,194,202,290,225,388,237,481,240,560,239,560,244,481,246,388,242,289,230,192,208,144,186,104,161"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa3f3f27e39668c2253dcfd9fbeccb0a5" title="Gets the debuting string for logging." alt="" coords="388,123,527,167"/>
+<area shape="poly" title=" " alt="" coords="336,167,372,163,373,168,337,172"/>
+<area shape="poly" title=" " alt="" coords="337,180,561,219,560,224,336,185"/>
+<area shape="poly" title=" " alt="" coords="388,148,352,153,351,147,387,143"/>
+<area shape="poly" title=" " alt="" coords="421,122,420,113,426,104,439,98,458,96,478,98,490,105,487,109,476,104,458,101,440,103,430,108,425,114,427,122"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="575,5,715,50"/>
+<area shape="poly" title=" " alt="" coords="487,120,574,60,582,56,584,60,577,65,490,125"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="575,75,715,119"/>
+<area shape="poly" title=" " alt="" coords="527,125,560,116,561,121,528,130"/>
+<area shape="poly" title=" " alt="" coords="507,165,585,204,582,209,504,170"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="575,144,715,189"/>
+<area shape="poly" title=" " alt="" coords="528,150,560,154,560,159,527,156"/>
 </map>
 </div>
 
@@ -1137,18 +1504,39 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00168">168</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
+<p>Changes the entity name. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>Name to change to. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section warning"><dt>Warning</dt><dd>It's illegal to call SetName if entity doesn't have Name component, this will lead to an assert in debug build and a crash in release. <br  />
+ When creating an entity with <a class="el" href="classCori_1_1World_1_1Scene.html#a3f5dab395b4b413afd6fc5c9f57d110f">Scene::CreateEntity</a> you don't have to worry about it, applies only when you create an entity with <a class="el" href="classCori_1_1World_1_1Scene.html#a6c1c2c967b40f8bb9ed703a113addd25">Scene::CreateBlankEntity</a>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00187">187</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1World_1_1Entity_ae60b5c856550b3a9545b81fafc92bc93_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_ae60b5c856550b3a9545b81fafc92bc93_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1World_1_1Entity_ae60b5c856550b3a9545b81fafc92bc93_cgraph" id="aclassCori_1_1World_1_1Entity_ae60b5c856550b3a9545b81fafc92bc93_cgraph">
-<area shape="rect" title=" " alt="" coords="5,36,145,81"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="193,5,332,50"/>
-<area shape="poly" title=" " alt="" coords="145,44,177,39,178,44,146,50"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="380,36,519,81"/>
-<area shape="poly" title=" " alt="" coords="145,58,193,60,332,60,364,59,364,64,332,65,193,65,145,64"/>
-<area shape="poly" title=" " alt="" coords="333,36,365,42,364,47,332,42"/>
+<area shape="rect" title="Changes the entity name." alt="" coords="5,204,145,249"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title="Retries the references to the requested components of the entity." alt="" coords="193,148,332,193"/>
+<area shape="poly" title=" " alt="" coords="144,203,177,193,178,198,146,208"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="567,213,707,258"/>
+<area shape="poly" title=" " alt="" coords="145,225,552,232,552,237,145,230"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa3f3f27e39668c2253dcfd9fbeccb0a5" title="Gets the debuting string for logging." alt="" coords="380,123,519,167"/>
+<area shape="poly" title=" " alt="" coords="332,167,364,163,365,168,333,172"/>
+<area shape="poly" title=" " alt="" coords="333,180,552,218,551,224,332,185"/>
+<area shape="poly" title=" " alt="" coords="380,148,348,153,347,147,379,143"/>
+<area shape="poly" title=" " alt="" coords="413,122,412,113,418,104,431,98,450,96,470,98,482,105,479,109,468,104,450,101,432,103,422,108,417,114,419,122"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="567,5,707,50"/>
+<area shape="poly" title=" " alt="" coords="479,120,566,60,574,56,576,60,569,65,482,125"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="567,75,707,119"/>
+<area shape="poly" title=" " alt="" coords="519,125,552,116,553,121,520,130"/>
+<area shape="poly" title=" " alt="" coords="499,165,577,204,574,209,496,170"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="567,144,707,189"/>
+<area shape="poly" title=" " alt="" coords="520,150,552,154,552,159,519,156"/>
 </map>
 </div>
 
@@ -1159,9 +1547,6 @@ Here is the call graph for this function:</div>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt; Cori::World::Entity::SetParent </td>
@@ -1170,24 +1555,95 @@ Here is the call graph for this function:</div>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel nodiscard">nodiscard</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00074">74</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
+<p>Links the entity to a parent entity. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">parent</td><td>Parent entity to link the entity to. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with void on success or CoriError&lt;&gt; on failure. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>It's illegal to call SetParent if entity or parent entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release. <br  />
+ When creating an entity with <a class="el" href="classCori_1_1World_1_1Scene.html#a3f5dab395b4b413afd6fc5c9f57d110f">Scene::CreateEntity</a> you don't have to worry about it, applies only when you create an entity with <a class="el" href="classCori_1_1World_1_1Scene.html#a6c1c2c967b40f8bb9ed703a113addd25">Scene::CreateBlankEntity</a>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00077">77</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1World_1_1Entity_a62b8ef79065a6f0625986ef5a99e521e_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_a62b8ef79065a6f0625986ef5a99e521e_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1World_1_1Entity_a62b8ef79065a6f0625986ef5a99e521e_cgraph" id="aclassCori_1_1World_1_1Entity_a62b8ef79065a6f0625986ef5a99e521e_cgraph">
-<area shape="rect" title=" " alt="" coords="5,40,145,85"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab8a030530a39a2c1b30f3bfee117d2a2" title=" " alt="" coords="193,5,332,50"/>
-<area shape="poly" title=" " alt="" coords="145,47,177,41,178,46,146,52"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title=" " alt="" coords="193,75,332,119"/>
-<area shape="poly" title=" " alt="" coords="146,73,178,79,177,84,145,78"/>
+<area shape="rect" title="Links the entity to a parent entity." alt="" coords="5,96,145,141"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab8a030530a39a2c1b30f3bfee117d2a2" title=" " alt="" coords="196,5,336,50"/>
+<area shape="poly" title=" " alt="" coords="123,93,202,55,205,59,125,98"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="762,113,901,158"/>
+<area shape="poly" title=" " alt="" coords="145,112,193,110,453,106,568,109,714,118,746,121,746,127,713,124,567,115,453,111,193,116,145,117"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="762,321,901,366"/>
+<area shape="poly" title=" " alt="" coords="118,139,194,180,289,229,331,248,388,268,439,283,480,291,575,305,747,330,746,336,574,310,479,296,438,288,386,273,329,253,287,234,191,185,115,144"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1a15764b67e9c8a661b3cf308634fa1f" title="Unlinks the entity from its parent if it has one." alt="" coords="193,125,339,170"/>
+<area shape="poly" title=" " alt="" coords="146,126,178,131,177,137,145,132"/>
+<area shape="poly" title=" " alt="" coords="340,143,746,135,746,140,340,149"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title="Retries the references to the requested components of the entity." alt="" coords="387,213,526,258"/>
+<area shape="poly" title=" " alt="" coords="317,168,394,204,392,209,315,173"/>
+<area shape="poly" title=" " alt="" coords="526,215,746,156,747,161,527,220"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa3f3f27e39668c2253dcfd9fbeccb0a5" title="Gets the debuting string for logging." alt="" coords="574,251,714,295"/>
+<area shape="poly" title=" " alt="" coords="527,256,559,262,558,268,526,261"/>
+<area shape="poly" title=" " alt="" coords="668,248,717,203,760,168,767,164,770,168,763,172,721,207,671,252"/>
+<area shape="poly" title=" " alt="" coords="706,293,757,313,755,318,704,298"/>
+<area shape="poly" title=" " alt="" coords="573,253,541,246,542,241,574,248"/>
+<area shape="poly" title=" " alt="" coords="608,250,607,241,613,232,625,226,644,224,664,226,676,233,674,237,663,232,644,229,627,231,616,236,612,242,613,250"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="762,183,901,227"/>
+<area shape="poly" title=" " alt="" coords="706,248,753,231,755,236,708,253"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="762,252,901,297"/>
+<area shape="poly" title=" " alt="" coords="714,271,746,271,746,276,714,276"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a1a15764b67e9c8a661b3cf308634fa1f" name="a1a15764b67e9c8a661b3cf308634fa1f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a15764b67e9c8a661b3cf308634fa1f">&#9670;&#160;</a></span>UnlinkFromParent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Cori::World::Entity::UnlinkFromParent </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Unlinks the entity from its parent if it has one. </p>
+<dl class="section warning"><dt>Warning</dt><dd>It's illegal to call UnlinkFromParent if entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release. <br  />
+ When creating an entity with <a class="el" href="classCori_1_1World_1_1Scene.html#a3f5dab395b4b413afd6fc5c9f57d110f">Scene::CreateEntity</a> you don't have to worry about it, applies only when you create an entity with <a class="el" href="classCori_1_1World_1_1Scene.html#a6c1c2c967b40f8bb9ed703a113addd25">Scene::CreateBlankEntity</a>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Entity_8cpp_source.html#l00209">209</a> of file <a class="el" href="Entity_8cpp_source.html">Entity.cpp</a>.</p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classCori_1_1World_1_1Entity_a1a15764b67e9c8a661b3cf308634fa1f_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Entity_a1a15764b67e9c8a661b3cf308634fa1f_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1World_1_1Entity_a1a15764b67e9c8a661b3cf308634fa1f_cgraph" id="aclassCori_1_1World_1_1Entity_a1a15764b67e9c8a661b3cf308634fa1f_cgraph">
+<area shape="rect" title="Unlinks the entity from its parent if it has one." alt="" coords="5,204,152,249"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title="Retries the references to the requested components of the entity." alt="" coords="200,148,339,193"/>
+<area shape="poly" title=" " alt="" coords="151,202,184,193,185,198,153,207"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="574,213,714,258"/>
+<area shape="poly" title=" " alt="" coords="152,225,559,232,559,237,152,230"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa3f3f27e39668c2253dcfd9fbeccb0a5" title="Gets the debuting string for logging." alt="" coords="387,123,526,167"/>
+<area shape="poly" title=" " alt="" coords="339,167,371,163,372,168,340,172"/>
+<area shape="poly" title=" " alt="" coords="340,180,559,218,558,224,339,185"/>
+<area shape="poly" title=" " alt="" coords="387,148,355,153,354,147,386,143"/>
+<area shape="poly" title=" " alt="" coords="420,122,419,113,425,104,438,98,457,96,477,98,489,105,486,109,475,104,457,101,439,103,429,108,424,114,426,122"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="574,5,714,50"/>
+<area shape="poly" title=" " alt="" coords="486,120,573,60,581,56,583,60,576,65,489,125"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="574,75,714,119"/>
+<area shape="poly" title=" " alt="" coords="526,125,559,116,560,121,527,130"/>
+<area shape="poly" title=" " alt="" coords="506,165,584,204,581,209,503,170"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="574,144,714,189"/>
+<area shape="poly" title=" " alt="" coords="527,150,559,154,559,159,526,156"/>
 </map>
 </div>
 
@@ -1214,7 +1670,7 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00135">135</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Entity_8hpp_source.html#l00293">293</a> of file <a class="el" href="Entity_8hpp_source.html">Entity.hpp</a>.</p>
 
 </div>
 </div>

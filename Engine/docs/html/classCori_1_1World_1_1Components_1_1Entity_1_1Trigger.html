@@ -93,21 +93,37 @@ $(function(){initNavTree('classCori_1_1World_1_1Components_1_1Entity_1_1Trigger.
 </div><!--header-->
 <div class="contents">
 
+<p>A <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1Trigger.html" title="A Trigger components is used in combination with RigidBody component used to respond to an entity get...">Trigger</a> components is used in combination with <a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1RigidBody.html" title="A physics rigit body.">RigidBody</a> component used to respond to an entity getting into a specific area that has the <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1Trigger.html" title="A Trigger components is used in combination with RigidBody component used to respond to an entity get...">Trigger</a>.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="Trigger_8hpp_source.html">Trigger.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a149636a2a23f19316979986b680891bd" id="r_a149636a2a23f19316979986b680891bd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a149636a2a23f19316979986b680891bd">Trigger</a> ()=default</td></tr>
 <tr class="memitem:a46317908cac98d4dc79b70293469f327" id="r_a46317908cac98d4dc79b70293469f327"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a46317908cac98d4dc79b70293469f327">Trigger</a> (<a class="el" href="classCori_1_1World_1_1Entity.html">World::Entity</a> &amp;trigger)</td></tr>
-<tr class="memitem:ab5f060fbd26b661a35b4ef074c4dfe9e" id="r_ab5f060fbd26b661a35b4ef074c4dfe9e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab5f060fbd26b661a35b4ef074c4dfe9e">OnEnter</a> (<a class="el" href="classCori_1_1World_1_1Entity.html">World::Entity</a> &amp;entity)</td></tr>
-<tr class="memitem:ad75474dfc03bdeb11a54b1d6ca2abf1f" id="r_ad75474dfc03bdeb11a54b1d6ca2abf1f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad75474dfc03bdeb11a54b1d6ca2abf1f">OnTickUpdate</a> (const float timeStep)</td></tr>
-<tr class="memitem:a1848f32f88c98d04f1080f5615258adf" id="r_a1848f32f88c98d04f1080f5615258adf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1848f32f88c98d04f1080f5615258adf">OnExit</a> (<a class="el" href="classCori_1_1World_1_1Entity.html">World::Entity</a> &amp;entity)</td></tr>
-<tr class="memitem:a89679ad6f466bbd0fe199b4c4d0950c8" id="r_a89679ad6f466bbd0fe199b4c4d0950c8"><td class="memTemplParams" colspan="2">template&lt;typename Behavior&gt; </td></tr>
-<tr class="memitem:a89679ad6f466bbd0fe199b4c4d0950c8 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a89679ad6f466bbd0fe199b4c4d0950c8">SetBehavior</a> ()</td></tr>
+<tr class="memdesc:a46317908cac98d4dc79b70293469f327"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1Trigger.html" title="A Trigger components is used in combination with RigidBody component used to respond to an entity get...">Trigger</a>.  <br /></td></tr>
+<tr class="memitem:a6bdd067640383fae64f19cff7d566e31" id="r_a6bdd067640383fae64f19cff7d566e31"><td class="memTemplParams" colspan="2">template&lt;typename Behavior&gt; </td></tr>
+<tr class="memitem:a6bdd067640383fae64f19cff7d566e31 template"><td class="memItemLeft" align="right" valign="top">Behavior *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6bdd067640383fae64f19cff7d566e31">SetBehavior</a> ()</td></tr>
+<tr class="memdesc:a6bdd067640383fae64f19cff7d566e31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets or changes the current <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1Trigger.html" title="A Trigger components is used in combination with RigidBody component used to respond to an entity get...">Trigger</a> behavior/script.  <br /></td></tr>
+<tr class="memitem:a2893c53ea347d0f6e1156c9c6312163a" id="r_a2893c53ea347d0f6e1156c9c6312163a"><td class="memTemplParams" colspan="2">template&lt;typename Behavior&gt; </td></tr>
+<tr class="memitem:a2893c53ea347d0f6e1156c9c6312163a template"><td class="memItemLeft" align="right" valign="top">std::expected&lt; Behavior *, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt; std::type_index &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2893c53ea347d0f6e1156c9c6312163a">GetBehavior</a> ()</td></tr>
+<tr class="memdesc:a2893c53ea347d0f6e1156c9c6312163a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retries the pointer to the active behaviour instance.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="Trigger_8hpp_source.html#l00014">14</a> of file <a class="el" href="Trigger_8hpp_source.html">Trigger.hpp</a>.</p>
+<div class="textblock"><p>A <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1Trigger.html" title="A Trigger components is used in combination with RigidBody component used to respond to an entity get...">Trigger</a> components is used in combination with <a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1RigidBody.html" title="A physics rigit body.">RigidBody</a> component used to respond to an entity getting into a specific area that has the <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1Trigger.html" title="A Trigger components is used in combination with RigidBody component used to respond to an entity get...">Trigger</a>. </p>
+<p>For a <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1Trigger.html" title="A Trigger components is used in combination with RigidBody component used to respond to an entity get...">Trigger</a> to work you need to attach a shape (From now on I will refer to shapes created like this as a <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1Trigger.html" title="A Trigger components is used in combination with RigidBody component used to respond to an entity get...">Trigger</a> zone) to the <a class="el" href="structCori_1_1World_1_1Components_1_1Entity_1_1RigidBody.html" title="A physics rigit body.">RigidBody</a> body component with the following params: <br  />
+ filter.categoryBits = <a class="el" href="namespaceCori_1_1Physics.html#a8047a4c99b5cdee7471cf1381a812e55a9678882043a597331a194f1e1b317d09">Cori::Physics::CollisionBits::SensorBit</a>; <br  />
+ isSensor = true; <br  />
+ enableSensorEvents = true; <br  />
+ <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1Trigger.html" title="A Trigger components is used in combination with RigidBody component used to respond to an entity get...">Trigger</a> can register and update a limited amount of entities inside of it at the same time, this is controlled by CORI_MAX_TRIGGER_VISITORS define, default is 4, you can increase it if you need to. <br  />
+ When an entity enters the <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1Trigger.html" title="A Trigger components is used in combination with RigidBody component used to respond to an entity get...">Trigger</a> zone it will. All the function calls I'm referring to below is calls to the current <a class="el" href="classCori_1_1World_1_1TriggerBehaviour.html" title="An abstract class meant to be used with Trigger component. Derive from it to create a trigger behavio...">TriggerBehaviour</a> instance. (Lets say N is the tick entity exits the <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1Trigger.html" title="A Trigger components is used in combination with RigidBody component used to respond to an entity get...">Trigger</a> zone) <br  />
+ Tick 1: Fire OnEnter <br  />
+ Tick 2 - (N - 1): Fire OnTickUpdate <br  />
+ Tick N: Fire OnTickUpdate and then OnExit. <br  />
+ The order in which the OnTickUpdate fires for each <a class="el" href="namespaceCori_1_1World_1_1Components_1_1Entity.html" title="Components designed to be used with entities.">Entity</a> currently in the <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1Trigger.html" title="A Trigger components is used in combination with RigidBody component used to respond to an entity get...">Trigger</a> zone is not enforced or guaranteed to be in any particular order. </p>
+
+<p class="definition">Definition at line <a class="el" href="Trigger_8hpp_source.html#l00027">27</a> of file <a class="el" href="Trigger_8hpp_source.html">Trigger.hpp</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a149636a2a23f19316979986b680891bd" name="a149636a2a23f19316979986b680891bd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a149636a2a23f19316979986b680891bd">&#9670;&#160;</a></span>Trigger() <span class="overload">[1/2]</span></h2>
@@ -157,126 +173,47 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Constructs the <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1Trigger.html" title="A Trigger components is used in combination with RigidBody component used to respond to an entity get...">Trigger</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">trigger</td><td>Owner <a class="el" href="namespaceCori_1_1World_1_1Components_1_1Entity.html" title="Components designed to be used with entities.">Entity</a>, you need to pass an <a class="el" href="namespaceCori_1_1World_1_1Components_1_1Entity.html" title="Components designed to be used with entities.">Entity</a> that owns this <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1Trigger.html" title="A Trigger components is used in combination with RigidBody component used to respond to an entity get...">Trigger</a>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p class="definition">Definition at line <a class="el" href="Trigger_8cpp_source.html#l00007">7</a> of file <a class="el" href="Trigger_8cpp_source.html">Trigger.cpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1World_1_1Components_1_1Entity_1_1Trigger_a46317908cac98d4dc79b70293469f327_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Components_1_1Entity_1_1Trigger_a46317908cac98d4dc79b70293469f327_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1World_1_1Components_1_1Entity_1_1Trigger_a46317908cac98d4dc79b70293469f327_cgraph" id="aclassCori_1_1World_1_1Components_1_1Entity_1_1Trigger_a46317908cac98d4dc79b70293469f327_cgraph">
-<area shape="rect" title=" " alt="" coords="5,75,189,119"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a7b8dc8e2678b0b088fcbc94bad61a931" title=" " alt="" coords="237,5,376,50"/>
-<area shape="poly" title=" " alt="" coords="166,72,221,53,223,58,167,77"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="237,75,376,119"/>
-<area shape="poly" title=" " alt="" coords="189,94,221,94,221,100,189,100"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title=" " alt="" coords="237,144,376,189"/>
-<area shape="poly" title=" " alt="" coords="167,117,223,136,221,141,166,122"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="424,75,563,119"/>
-<area shape="poly" title=" " alt="" coords="376,94,409,94,409,100,376,100"/>
+<area shape="rect" title="Constructs the Trigger." alt="" coords="5,195,189,239"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title="Retries the references to the requested components of the entity." alt="" coords="251,131,390,175"/>
+<area shape="poly" title=" " alt="" coords="177,192,235,175,236,180,178,197"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="639,213,779,258"/>
+<area shape="poly" title=" " alt="" coords="189,217,624,230,624,236,189,222"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a4329fc9eb55370a9aa0d4f372e30b03b" title="Retries or adds a component to the entity." alt="" coords="237,255,404,299"/>
+<area shape="poly" title=" " alt="" coords="183,237,222,248,221,253,182,242"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa3f3f27e39668c2253dcfd9fbeccb0a5" title="Gets the debuting string for logging." alt="" coords="452,131,591,175"/>
+<area shape="poly" title=" " alt="" coords="391,159,436,159,436,165,391,164"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="639,5,779,50"/>
+<area shape="poly" title=" " alt="" coords="366,128,451,92,540,64,624,43,625,48,541,70,453,97,368,133"/>
+<area shape="poly" title=" " alt="" coords="452,147,406,147,406,141,452,142"/>
+<area shape="poly" title=" " alt="" coords="485,130,484,121,490,112,503,106,522,104,542,106,554,113,551,117,540,112,522,109,504,111,494,116,489,122,491,130"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="639,144,779,189"/>
+<area shape="poly" title=" " alt="" coords="592,155,624,158,624,163,592,161"/>
+<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="639,75,779,119"/>
+<area shape="poly" title=" " alt="" coords="591,130,623,120,625,125,593,135"/>
+<area shape="poly" title=" " alt="" coords="548,128,589,95,638,60,645,56,648,60,641,65,592,99,551,132"/>
+<area shape="poly" title=" " alt="" coords="575,173,644,204,642,209,573,178"/>
 </map>
 </div>
 
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="ab5f060fbd26b661a35b4ef074c4dfe9e" name="ab5f060fbd26b661a35b4ef074c4dfe9e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab5f060fbd26b661a35b4ef074c4dfe9e">&#9670;&#160;</a></span>OnEnter()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::World::Components::Entity::Trigger::OnEnter </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classCori_1_1World_1_1Entity.html">World::Entity</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>entity</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Trigger_8cpp_source.html#l00015">15</a> of file <a class="el" href="Trigger_8cpp_source.html">Trigger.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1World_1_1Components_1_1Entity_1_1Trigger_ab5f060fbd26b661a35b4ef074c4dfe9e_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Components_1_1Entity_1_1Trigger_ab5f060fbd26b661a35b4ef074c4dfe9e_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1World_1_1Components_1_1Entity_1_1Trigger_ab5f060fbd26b661a35b4ef074c4dfe9e_cgraph" id="aclassCori_1_1World_1_1Components_1_1Entity_1_1Trigger_ab5f060fbd26b661a35b4ef074c4dfe9e_cgraph">
-<area shape="rect" title=" " alt="" coords="5,109,189,154"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a8f7d385629074f9ecc7e828922c29601" title=" " alt="" coords="237,109,376,154"/>
-<area shape="poly" title=" " alt="" coords="189,129,221,129,221,134,189,134"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="424,5,563,50"/>
-<area shape="poly" title=" " alt="" coords="343,107,423,60,432,55,434,60,425,65,346,111"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title=" " alt="" coords="424,75,563,119"/>
-<area shape="poly" title=" " alt="" coords="376,116,408,110,409,115,377,121"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title=" " alt="" coords="424,144,563,189"/>
-<area shape="poly" title=" " alt="" coords="377,142,409,148,408,153,376,147"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title=" " alt="" coords="424,213,563,258"/>
-<area shape="poly" title=" " alt="" coords="346,152,425,199,434,203,432,208,423,203,343,157"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="611,5,751,50"/>
-<area shape="poly" title=" " alt="" coords="564,25,596,25,596,30,564,30"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a1848f32f88c98d04f1080f5615258adf" name="a1848f32f88c98d04f1080f5615258adf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1848f32f88c98d04f1080f5615258adf">&#9670;&#160;</a></span>OnExit()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::World::Components::Entity::Trigger::OnExit </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classCori_1_1World_1_1Entity.html">World::Entity</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>entity</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Trigger_8cpp_source.html#l00036">36</a> of file <a class="el" href="Trigger_8cpp_source.html">Trigger.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1World_1_1Components_1_1Entity_1_1Trigger_a1848f32f88c98d04f1080f5615258adf_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Components_1_1Entity_1_1Trigger_a1848f32f88c98d04f1080f5615258adf_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1World_1_1Components_1_1Entity_1_1Trigger_a1848f32f88c98d04f1080f5615258adf_cgraph" id="aclassCori_1_1World_1_1Components_1_1Entity_1_1Trigger_a1848f32f88c98d04f1080f5615258adf_cgraph">
-<area shape="rect" title=" " alt="" coords="5,109,189,154"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a8f7d385629074f9ecc7e828922c29601" title=" " alt="" coords="237,109,376,154"/>
-<area shape="poly" title=" " alt="" coords="189,129,221,129,221,134,189,134"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="424,5,563,50"/>
-<area shape="poly" title=" " alt="" coords="343,107,423,60,432,55,434,60,425,65,346,111"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title=" " alt="" coords="424,75,563,119"/>
-<area shape="poly" title=" " alt="" coords="376,116,408,110,409,115,377,121"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title=" " alt="" coords="424,144,563,189"/>
-<area shape="poly" title=" " alt="" coords="377,142,409,148,408,153,376,147"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title=" " alt="" coords="424,213,563,258"/>
-<area shape="poly" title=" " alt="" coords="346,152,425,199,434,203,432,208,423,203,343,157"/>
-<area shape="rect" href="classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="611,5,751,50"/>
-<area shape="poly" title=" " alt="" coords="564,25,596,25,596,30,564,30"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="ad75474dfc03bdeb11a54b1d6ca2abf1f" name="ad75474dfc03bdeb11a54b1d6ca2abf1f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad75474dfc03bdeb11a54b1d6ca2abf1f">&#9670;&#160;</a></span>OnTickUpdate()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::World::Components::Entity::Trigger::OnTickUpdate </td>
-          <td>(</td>
-          <td class="paramtype">const float</td>          <td class="paramname"><span class="paramname"><em>timeStep</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Trigger_8cpp_source.html#l00028">28</a> of file <a class="el" href="Trigger_8cpp_source.html">Trigger.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a89679ad6f466bbd0fe199b4c4d0950c8" name="a89679ad6f466bbd0fe199b4c4d0950c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89679ad6f466bbd0fe199b4c4d0950c8">&#9670;&#160;</a></span>SetBehavior()</h2>
+<a id="a2893c53ea347d0f6e1156c9c6312163a" name="a2893c53ea347d0f6e1156c9c6312163a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2893c53ea347d0f6e1156c9c6312163a">&#9670;&#160;</a></span>GetBehavior()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -287,7 +224,7 @@ template&lt;typename Behavior&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void Cori::World::Components::Entity::Trigger::SetBehavior </td>
+          <td class="memname">std::expected&lt; Behavior *, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt; std::type_index &gt; &gt; Cori::World::Components::Entity::Trigger::GetBehavior </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
@@ -300,7 +237,54 @@ template&lt;typename Behavior&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Trigger_8hpp_source.html#l00026">26</a> of file <a class="el" href="Trigger_8hpp_source.html">Trigger.hpp</a>.</p>
+<p>Retries the pointer to the active behaviour instance. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Behavior</td><td>A behavior type derived from <a class="el" href="classCori_1_1World_1_1TriggerBehaviour.html" title="An abstract class meant to be used with Trigger component. Derive from it to create a trigger behavio...">TriggerBehaviour</a>. This needs to be the same that you used when setting the behavior with <a class="el" href="#a6bdd067640383fae64f19cff7d566e31" title="Sets or changes the current Trigger behavior/script.">SetBehavior()</a>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with Behavior* on success, or a CoriError&lt;std::type_index&gt; object on failure, std::type_index stored inside the CoriError is the type_index of actual behavior currently used. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Trigger_8hpp_source.html#l00056">56</a> of file <a class="el" href="Trigger_8hpp_source.html">Trigger.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a6bdd067640383fae64f19cff7d566e31" name="a6bdd067640383fae64f19cff7d566e31"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6bdd067640383fae64f19cff7d566e31">&#9670;&#160;</a></span>SetBehavior()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Behavior&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Behavior * Cori::World::Components::Entity::Trigger::SetBehavior </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets or changes the current <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1Trigger.html" title="A Trigger components is used in combination with RigidBody component used to respond to an entity get...">Trigger</a> behavior/script. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Behavior</td><td>A behavior type derived from <a class="el" href="classCori_1_1World_1_1TriggerBehaviour.html" title="An abstract class meant to be used with Trigger component. Derive from it to create a trigger behavio...">TriggerBehaviour</a>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The raw ptr to the created Behavior instance. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Trigger_8hpp_source.html#l00042">42</a> of file <a class="el" href="Trigger_8hpp_source.html">Trigger.hpp</a>.</p>
 
 </div>
 </div>

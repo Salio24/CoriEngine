@@ -93,19 +93,59 @@ $(function(){initNavTree('classCori_1_1Core_1_1Input.html','','classCori_1_1Core
 </div><!--header-->
 <div class="contents">
 
+<p>A simple static class that allows to query for physical keyboard or mose inputs.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="Input_8hpp_source.html">Input.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a325a8c03521f0afa4100f01340a87403" id="r_a325a8c03521f0afa4100f01340a87403"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a325a8c03521f0afa4100f01340a87403">IsKeyPressed</a> (const <a class="el" href="namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416a">CoriKeycode</a> keycode)</td></tr>
-<tr class="memitem:af2287be73d647b9ebf2f9e3e16ed4df6" id="r_af2287be73d647b9ebf2f9e3e16ed4df6"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af2287be73d647b9ebf2f9e3e16ed4df6">IsMouseKeyPressed</a> (const <a class="el" href="namespaceCori_1_1Core.html#ab53f79e2cbbc7ea34fba4a55d0d61d86">CoriMouseCode</a> button)</td></tr>
+<tr class="memitem:a22daa970df26234b1911bf0219f26ae6" id="r_a22daa970df26234b1911bf0219f26ae6"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a22daa970df26234b1911bf0219f26ae6">IsKeyDown</a> (const <a class="el" href="namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416a">CoriKeycode</a> keycode)</td></tr>
+<tr class="memdesc:a22daa970df26234b1911bf0219f26ae6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if a specific keyboard key is down.  <br /></td></tr>
+<tr class="memitem:a937c83c3f3fae97fd3530f9b4dbba3cd" id="r_a937c83c3f3fae97fd3530f9b4dbba3cd"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a937c83c3f3fae97fd3530f9b4dbba3cd">IsMouseKeyDown</a> (const <a class="el" href="namespaceCori_1_1Core.html#ae658b0790213083fc41eebb5076698a5">CoriMouseKeycode</a> keycode)</td></tr>
+<tr class="memdesc:a937c83c3f3fae97fd3530f9b4dbba3cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if a specific mouse key is down.  <br /></td></tr>
 <tr class="memitem:a2cc257e72ce2fd3bc26e0d7b8c68ae43" id="r_a2cc257e72ce2fd3bc26e0d7b8c68ae43"><td class="memItemLeft" align="right" valign="top">static int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2cc257e72ce2fd3bc26e0d7b8c68ae43">GetMouseX</a> ()</td></tr>
+<tr class="memdesc:a2cc257e72ce2fd3bc26e0d7b8c68ae43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the current mouse X position on screen.  <br /></td></tr>
 <tr class="memitem:a7b83f38822bb19cd59f316b7ece3ac65" id="r_a7b83f38822bb19cd59f316b7ece3ac65"><td class="memItemLeft" align="right" valign="top">static int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7b83f38822bb19cd59f316b7ece3ac65">GetMouseY</a> ()</td></tr>
+<tr class="memdesc:a7b83f38822bb19cd59f316b7ece3ac65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the current mouse Y position on screen.  <br /></td></tr>
+<tr class="memitem:a504a8cb67474d586ff187cea6180c110" id="r_a504a8cb67474d586ff187cea6180c110"><td class="memItemLeft" align="right" valign="top">static glm::ivec2&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a504a8cb67474d586ff187cea6180c110">GetMousePosition</a> ()</td></tr>
+<tr class="memdesc:a504a8cb67474d586ff187cea6180c110"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the current mouse position on screen.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="Input_8hpp_source.html#l00007">7</a> of file <a class="el" href="Input_8hpp_source.html">Input.hpp</a>.</p>
+<div class="textblock"><p>A simple static class that allows to query for physical keyboard or mose inputs. </p>
+
+<p class="definition">Definition at line <a class="el" href="Input_8hpp_source.html#l00010">10</a> of file <a class="el" href="Input_8hpp_source.html">Input.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
+<a id="a504a8cb67474d586ff187cea6180c110" name="a504a8cb67474d586ff187cea6180c110"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a504a8cb67474d586ff187cea6180c110">&#9670;&#160;</a></span>GetMousePosition()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">glm::ivec2 Cori::Core::Input::GetMousePosition </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieves the current mouse position on screen. </p>
+<dl class="section return"><dt>Returns</dt><dd>Mouse position in screen coordinates. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Input_8cpp_source.html#l00027">27</a> of file <a class="el" href="Input_8cpp_source.html">Input.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a2cc257e72ce2fd3bc26e0d7b8c68ae43" name="a2cc257e72ce2fd3bc26e0d7b8c68ae43"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2cc257e72ce2fd3bc26e0d7b8c68ae43">&#9670;&#160;</a></span>GetMouseX()</h2>
 
@@ -128,6 +168,9 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Retrieves the current mouse X position on screen. </p>
+<dl class="section return"><dt>Returns</dt><dd>Mouse position on X in screen coordinates. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="Input_8cpp_source.html#l00015">15</a> of file <a class="el" href="Input_8cpp_source.html">Input.cpp</a>.</p>
 
@@ -156,12 +199,15 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Retrieves the current mouse Y position on screen. </p>
+<dl class="section return"><dt>Returns</dt><dd>Mouse position on Y in screen coordinates. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="Input_8cpp_source.html#l00021">21</a> of file <a class="el" href="Input_8cpp_source.html">Input.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a325a8c03521f0afa4100f01340a87403" name="a325a8c03521f0afa4100f01340a87403"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a325a8c03521f0afa4100f01340a87403">&#9670;&#160;</a></span>IsKeyPressed()</h2>
+<a id="a22daa970df26234b1911bf0219f26ae6" name="a22daa970df26234b1911bf0219f26ae6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a22daa970df26234b1911bf0219f26ae6">&#9670;&#160;</a></span>IsKeyDown()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -170,7 +216,7 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool Cori::Core::Input::IsKeyPressed </td>
+          <td class="memname">bool Cori::Core::Input::IsKeyDown </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416a">CoriKeycode</a></td>          <td class="paramname"><span class="paramname"><em>keycode</em></span></td><td>)</td>
           <td></td>
@@ -183,12 +229,21 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Checks if a specific keyboard key is down. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">keycode</td><td>Said key keycode. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if down, false otherwise. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="Input_8cpp_source.html#l00005">5</a> of file <a class="el" href="Input_8cpp_source.html">Input.cpp</a>.</p>
 
 </div>
 </div>
-<a id="af2287be73d647b9ebf2f9e3e16ed4df6" name="af2287be73d647b9ebf2f9e3e16ed4df6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af2287be73d647b9ebf2f9e3e16ed4df6">&#9670;&#160;</a></span>IsMouseKeyPressed()</h2>
+<a id="a937c83c3f3fae97fd3530f9b4dbba3cd" name="a937c83c3f3fae97fd3530f9b4dbba3cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a937c83c3f3fae97fd3530f9b4dbba3cd">&#9670;&#160;</a></span>IsMouseKeyDown()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -197,9 +252,9 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool Cori::Core::Input::IsMouseKeyPressed </td>
+          <td class="memname">bool Cori::Core::Input::IsMouseKeyDown </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceCori_1_1Core.html#ab53f79e2cbbc7ea34fba4a55d0d61d86">CoriMouseCode</a></td>          <td class="paramname"><span class="paramname"><em>button</em></span></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="namespaceCori_1_1Core.html#ae658b0790213083fc41eebb5076698a5">CoriMouseKeycode</a></td>          <td class="paramname"><span class="paramname"><em>keycode</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -209,6 +264,15 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Checks if a specific mouse key is down. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">keycode</td><td>Said mouse key key keycode. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if down, false otherwise. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="Input_8cpp_source.html#l00010">10</a> of file <a class="el" href="Input_8cpp_source.html">Input.cpp</a>.</p>
 
