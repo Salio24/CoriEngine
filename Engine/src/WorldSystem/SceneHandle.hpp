@@ -7,151 +7,295 @@ namespace Cori {
 	}
 
 	namespace World {
+		/**
+		 * @brief A handle for the scene, checks for scene validity before any call to the scene, if scene is invalid asserts. Will not keep the scene alive.
+		 */
 		class SceneHandle {
 		public:
-			SceneHandle() = default;
-			~SceneHandle() = default;
+			/**
+			 * @brief Creates a handle for the scene.
+			 * @param scene Scene to create a handle for.
+			 */
+			SceneHandle(const std::shared_ptr<Scene>& scene) : m_SceneRaw(scene) {} //NOLINT
 
-			void OnUpdate(const double deltaTime) {
-				if (m_SceneRaw) {
-					m_SceneRaw->OnUpdate(deltaTime);
-				}
+			/**
+			 * @brief Creates a blank Entity with no components attached.
+			 * @return A handle to the blank entity.
+			 * @warning Be very carefully when using entities that don't have a default set of components, when you create an entity with CreateEntity it has <Name, Tag, Hierarchy, UUID, Transform> components by default.
+			 * \n Some engine systems expect an entity to have some of those components.
+			 * \n Entity::SetName() and Entity::GetName() expects Entity to have a Name component.
+			 * \n Anything connected to the Entity hierarchy system expects an Entity to have Hierarchy and Name components.
+			 * \n Be aware and use carefully, can cause a crash if used incorrectly.
+			 */
+			[[nodiscard]] Entity CreateBlankEntity() {
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->CreateBlankEntity();
 			}
 
-			void OnTickUpdate(const float timeStep) {
-				if (m_SceneRaw) {
-					m_SceneRaw->OnTickUpdate(timeStep);
-				}
-			}
-
+			/**
+			 * @brief Creates an Entity with a default set of components.
+			 * @param name Name to assign to the Entity.
+			 * @param tag Tag to assign to the Entity.
+			 * @return A handle to the created entity.
+			 * @details Unlike Scene::CreateBlankEntity() it is safe to use an Entity created with this method anywhere you like. Default set of components is <Name, Tag, Hierarchy, UUID, Transform>.
+			 */
 			[[nodiscard]] Entity CreateEntity(const std::string& name, const Utility::HashedTag64& tag) {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				return m_SceneRaw->CreateEntity(name, tag);
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->CreateEntity(name, tag);
 			}
 
+			/**
+			 * @brief Destroys the entity.
+			 * @param entity Handle of the entity to destroy.
+			 */
 			void DestroyEntity(Entity entity) {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				m_SceneRaw->DestroyEntity(entity);
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				m_SceneRaw.lock()->DestroyEntity(entity);
 			}
 
-			[[nodiscard]] std::expected<void, Core::CoriError<>> AddEntityToCache(Entity entity, const Utility::StringHash32 tag) {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				return m_SceneRaw->AddEntityToCache(entity, tag);
+			/**
+			 * @brief Adds entity to the local scene cache.
+			 * @param entity Handle of the entity to add to cache.
+			 * @param key 32bit FNV-1a hashed string, you can use ""_hs32 operator to create a compile time hash.
+			 * @details Key used for adding/retriving an entity from scene local cache has nothing to do with the entities name or tag stored in Name and Tag components.
+			 * \n The only purpose of a scene local entity cache is to store entities that you plan to access very frequently but don't have a good place on the client side to store the handle.
+			 * @return Expected object with void on success or CoriError<> on failure.
+			 */
+			std::expected<void, Core::CoriError<>> AddEntityToCache(Entity entity, const Utility::StringHash32 key) {
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->AddEntityToCache(entity, key);
 			}
 
-			[[nodiscard]] std::expected<Entity, Core::CoriError<>> GetEntityFromCache(const Utility::StringHash32 tag) {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				return m_SceneRaw->GetEntityFromCache(tag);
+			/**
+			 * @brief Retries the entity from a scene local entity cache.
+			 * @param key Key you associated with an entity when adding it via AddEntityToCache method.
+			 * @return Expected object with an entity handle on success, or CoriError<> on failure.
+			 */
+			[[nodiscard]] std::expected<Entity, Core::CoriError<>> GetEntityFromCache(const Utility::StringHash32 key) {
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->GetEntityFromCache(key);
 			}
 
+			/**
+			 * @brief Removes an entity from the scene local entity cache.
+			 * @param key Key you associated with an entity when adding it via AddEntityToCache method.
+			 */
 			void RemoveEntityFromCache(const Utility::StringHash32 key) {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				m_SceneRaw->RemoveEntityFromCache(key);
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				m_SceneRaw.lock()->RemoveEntityFromCache(key);
 			}
 
+			/**
+			 * @brief Conducts a scene wide search for the entity with a particular name.
+			 * @param name Name of the entity you're searching for.
+			 * @note As the entity names doesn't have to be unique, it returns the first entity with the given name it finds.
+			 * @return Expected object with an entity handle on success, or CoriError<> on failure.
+			 * @warning This is pretty slow as it is a scene wide linear search and absolutely should not be used in a tight loop, each frame/tick or during gameplay!
+			 */
 			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindEntity(const std::string& name) {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				return m_SceneRaw->FindEntity(name);
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->FindEntity(name);
 			}
 
+			/**
+			 * @brief Conducts a scene wide search for the entity with a particular name and tag.
+			 * @param name Name of the entity you're searching for.
+			 * @param tag Tag of the entity you're searching for.
+			 * @note As the entity names and tags doesn't have to be unique, it returns the first entity with the given name and tag it finds.
+			 * @return Expected object with an entity handle on success, or CoriError<> on failure.
+			 * @warning This is pretty slow as it is a scene wide linear search and absolutely should not be used in a tight loop, each frame/tick or during gameplay!
+			 */
 			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindEntity(const std::string& name, const Utility::HashedTag64& tag) {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				return m_SceneRaw->FindEntity(name, tag);
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->FindEntity(name, tag);
 			}
 
+			/**
+			 * @brief Combines all entities that have a particular tag into a vector.
+			 * @param tag Particular tag to filter entities by.
+			 * @return A vector that has all the entities that have this tag.
+			 * @warning This is pretty slow as it is a scene wide linear search and absolutely should not be used in a tight loop, each frame/tick or during gameplay!
+			 */
+			[[nodiscard]] std::vector<Entity> GetEntitiesWithTag(const Utility::HashedTag64& tag) {
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->GetEntitiesWithTag(tag);
+			}
+
+			/**
+			 * @brief Constructs a view of the entities that have a particular set of components. Variant without component exclusion.
+			 * @tparam T A set of components of the entities in the view.
+			 * @details Example usage: auto view = View<ComponentOne, ComponentTwo>();
+			 * \n This way the view will consist of entities that both have <ComponentOne, ComponentTwo> components.
+			 * @return Newly constructed view.
+			 */
 			template<typename... T>
 			[[nodiscard]] auto View() {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				return m_SceneRaw->View<T...>();
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->View<T...>();
 			}
 
+			/**
+			 * @brief Constructs a view of the entities that have a particular set of components. Variant with component exclusion.
+			 * @tparam T A set of components of the entities in the view.
+			 * @tparam ExcludeT Component types to exclude from the view.
+			 * @param excludeList Instance of Exclude with ExcludeT components.
+			 * @details Example usage: auto view = View<ComponentOne, ComponentTwo>(Exclude<FlagOne, FlagTwo>());
+			 * \n This way the view will consist of entities that both have <ComponentOne, ComponentTwo> components, and at the same time don't have either FlagOne or FlagTwo.
+			 * @return Newly constructed view.
+			 */
 			template<typename... T, typename... ExcludeT>
-			[[nodiscard]] auto View(Exclude<ExcludeT...> exclude_list) {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				return m_SceneRaw->View<T...>(exclude_list);
+			[[nodiscard]] auto View(Exclude<ExcludeT...> excludeList) {
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->View<T...>(excludeList);
 			}
 
 			//template<typename... T, typename Func>
 			//void ForEach(Func func) {
-			//	CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-			//	m_SceneRaw->ForEach<T...>(func);
+			//	CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+			//	m_SceneRaw.lock()->ForEach<T...>(func);
 			//}
 
+			/**
+			 * @brief Adds a component to the scene.
+			 * @tparam T Type of component to add.
+			 * @param args Arguments passed to the component constructor.
+			 * @return A reference to the newly created component.
+			 */
 			template<typename T, typename... Args>
 			T& AddContextComponent(Args&&... args) {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				return m_SceneRaw->AddContextComponent<T>(std::forward<Args>(args)...);
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->AddContextComponent<T>(std::forward<Args>(args)...);
 			}
 
-			template<typename T, typename... Args>
-			T& AddOrAssignContextComponent(Args&&... args) {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				return m_SceneRaw->AddOrAssignContextComponent<T>(std::forward<Args>(args)...);
-			}
-
+			/**
+			 * @brief Retries the reference to the requested context component.
+			 * @tparam T Type of context component to retrieve.
+			 * @note Make sure you use receive by reference not by value.
+			 * @return Referenced to the requested context component.
+			 */
 			template<typename T>
 			[[nodiscard]] T& GetContextComponent() {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				return m_SceneRaw->GetContextComponent<T>();
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->GetContextComponent<T>();
 			}
 
+			/**
+			 * @brief Retries the reference to the requested context component. Const variant.
+			 * @tparam T Type of context component to retrieve.
+			 * @note Make sure you use receive by const reference not by value.
+			 * @return Referenced to the requested context component.
+			 */
 			template<typename T>
 			[[nodiscard]] const T& GetContextComponent() const {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				return m_SceneRaw->GetContextComponent<T>();
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->GetContextComponent<T>();
 			}
 
+			/**
+			 * @brief Checks if a scene has a specific context component.
+			 * @tparam T Component type to check.
+			 * @return True the scene has this context component, false otherwise.
+			 */
 			template<typename T>
 			[[nodiscard]] bool HasContextComponent() const {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				return m_SceneRaw->HasContextComponent<T>();
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->HasContextComponent<T>();
 			}
 
+			/**
+			 * @brief Removes a context component from the scene.
+			 * @tparam T Context component type to remove.
+			 * @note Removes the context components only if the scene has it, it's safe to try to remove a context component that the scene doesn't have.
+			 */
 			template<typename T>
 			void RemoveContextComponent() {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				m_SceneRaw->RemoveContextComponent<T>();
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				m_SceneRaw.lock()->RemoveContextComponent<T>();
 			}
 
+			/**
+			 * @brief Retrieves a reference to the CameraController associated with the current camera.
+			 * @return Reference to the CameraController.
+			 */
 			[[nodiscard]] Graphics::CameraController& GetActiveCamera() {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				return m_SceneRaw->m_ActiveCamera;
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->GetCameraController();
 			}
 
+			/**
+			 * @brief Retrieves a const reference to the CameraController associated with the current camera.
+			 * @return Const reference to the CameraController.
+			 */
 			[[nodiscard]] const Graphics::CameraController& GetActiveCamera() const {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				return m_SceneRaw->m_ActiveCamera;
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->GetCameraController();
 			}
 
+			/**
+			 * @brief Retrieves a reference to the Box2D physics world of the scene.
+			 * @return Reference to the PhysicsWorld.
+			 */
 			[[nodiscard]] Physics::PhysicsWorld& GetPhysicsWorld() {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				return m_SceneRaw->m_PhysicsWorld;
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->GetPhysicsWorld();
 			}
 
+			/**
+			 * @brief Retrieves a const reference to the Box2D physics world of the scene.
+			 * @return Const reference to the PhysicsWorld.
+			 */
 			[[nodiscard]] const Physics::PhysicsWorld& GetPhysicsWorld() const {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				return m_SceneRaw->m_PhysicsWorld;
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->GetPhysicsWorld();
 			}
 
+			/**
+			 * @brief Retrieves the name of the scene.
+			 * @return View to the name of the scene.
+			 */
 			[[nodiscard]] std::string_view GetName() const {
-				CORI_CORE_ASSERT(m_SceneRaw != nullptr, "No scene is currently bound.");
-				return m_SceneRaw->m_Name;
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->GetName();
 			}
 
+			/**
+			 * @brief Checks if the scene the handle points to is still valid.
+			 * @return True if scene is valid, false otherwise.
+			 */
 			[[nodiscard]] bool IsValid() const {
-				return m_SceneRaw != nullptr;
+				return !m_SceneRaw.expired();
 			}
 
 		protected:
 			friend Core::Layer;
+			void OnUpdate(const double deltaTime) {
+				if (!m_SceneRaw.expired()) {
+					m_SceneRaw.lock()->OnUpdate(deltaTime);
+				}
+			}
+
+			void OnTickUpdate(const float timeStep) {
+				if (!m_SceneRaw.expired()) {
+					m_SceneRaw.lock()->OnTickUpdate(timeStep);
+				}
+			}
+
 			[[nodiscard]] bool OnUnbind() {
-				if (m_SceneRaw != nullptr) {
-					return m_SceneRaw->OnUnbind();
+				if (!m_SceneRaw.expired()) {
+					return m_SceneRaw.lock()->OnUnbind();
 				}
 				return false;
 			}
 
-			std::shared_ptr<Scene> m_SceneRaw;
+			[[nodiscard]] bool OnBind() {
+				if (!m_SceneRaw.expired()) {
+					return m_SceneRaw.lock()->OnBind();
+				}
+				return false;
+			}
+
+		private:
+			std::weak_ptr<Scene> m_SceneRaw;
 		};
 	}
 }

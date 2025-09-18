@@ -2,6 +2,9 @@
 
 namespace Cori {
 	namespace Graphics {
+		/**
+		 * @brief There is no use for it on the client side for now.
+		 */
 		class ShaderProgram {
 		public:
 			class Descriptor {
@@ -44,21 +47,21 @@ namespace Cori {
 
 			[[nodiscard]] virtual uint32_t GetID() const = 0;
 
-			virtual void SetBool(const std::string& name, const bool value) const = 0;
-			virtual void SetInt(const std::string& name, const int32_t value) const = 0;
-			virtual void SetFloat(const std::string& name, const float value) const = 0;
-			virtual void SetVec2(const std::string& name, const glm::vec2& value) const = 0;
-			virtual void SetVec3(const std::string& name, const glm::vec3& value) const = 0;
-			virtual void SetVec4(const std::string& name, const glm::vec4& value) const = 0;
-			virtual void SetMat2(const std::string& name, const glm::mat2& value) const = 0;
-			virtual void SetMat3(const std::string& name, const glm::mat3& value) const = 0;
-			virtual void SetMat4(const std::string& name, const glm::mat4& value) const = 0;
+			virtual void SetBool(const char* name, const bool value) const = 0;
+			virtual void SetInt(const char* name, const int32_t value) const = 0;
+			virtual void SetFloat(const char* name, const float value) const = 0;
+			virtual void SetVec2(const char* name, const glm::vec2& value) const = 0;
+			virtual void SetVec3(const char* name, const glm::vec3& value) const = 0;
+			virtual void SetVec4(const char* name, const glm::vec4& value) const = 0;
+			virtual void SetMat2(const char* name, const glm::mat2& value) const = 0;
+			virtual void SetMat3(const char* name, const glm::mat3& value) const = 0;
+			virtual void SetMat4(const char* name, const glm::mat4& value) const = 0;
 
 			[[nodiscard]] virtual std::string GetShaderNames() const = 0;
 
-			static std::shared_ptr<ShaderProgram> Create(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath, const std::filesystem::path& geometryPath = {});
+			[[nodiscard]] static std::shared_ptr<ShaderProgram> Create(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath, const std::filesystem::path& geometryPath = {});
 
-			static std::shared_ptr<ShaderProgram> Create(const Descriptor& descriptor);
+			[[nodiscard]] static std::shared_ptr<ShaderProgram> Create(const Descriptor& descriptor);
 		};
 	}
 }

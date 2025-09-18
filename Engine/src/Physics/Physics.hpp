@@ -8,8 +8,17 @@
 #endif
 
 namespace Cori {
+	/**
+	 * @brief Anything connected to physics is in this namespace. Please refer to Box2D docs 'https://box2d.org/' for any details regarding physics.
+	 * @details Cori engine doesn't have a native physics engine and uses Box2D, so refer to Box2D docs 'https://box2d.org/' for any details on physics.
+	 * \n All the engine does is provide a convenient C++ API for it, as Box2D is a C project and the default API is not really convenient in C++ environment.
+	 * \n Big thanks HolyBlackCat for: 'https://github.com/HolyBlackCat/box2cpp/tree/master'
+	 */
 	namespace Physics {
 
+		/**
+		 * @brief An alias for Box2D native vec2 type, if you see it somewhere, be sure data there is in meters contrary to when glm used, there data is in camera pixels.
+		 */
 		using Vec2 = b2Vec2;
 		using Rot = b2Rot;
 		using Transform = b2Transform;
@@ -110,16 +119,50 @@ namespace Cori {
 			ShapeRef shape;
 		};
 
-		// maybe remove them? do i even need those? idk
-		bool PointVsRect(const glm::vec2& point, const glm::vec2& boxSize, const glm::vec2& boxPos);
-
+		/**
+		 * @brief Calculates the winding order of the polygon made up from individual points. Box2D version. Takes Box2Ds vec2s.
+		 * @param polygon Point that from a polygon.
+		 * @return A resulting enumerator of type WindingOrder.
+		 */
 		WindingOrder GetPolygonWindingOrder(const std::vector<Vec2>& polygon);
-		WindingOrder GetPolygonWindingOrder(const std::vector<tmx::Vector2f>& polygon);
-		std::string WindingOrderToString(WindingOrder order);
 
+		/**
+		 * @brief Calculates the winding order of the polygon made up from individual points. TMXLite version. Takes TMXLite vec2s.
+		 * @param polygon Point that from a polygon.
+		 * @return A resulting enumerator of type WindingOrder.
+		 */
+		WindingOrder GetPolygonWindingOrder(const std::vector<tmx::Vector2f>& polygon);
+
+		/**
+		 * @brief Converts the WindingOrder enumerator to string, for logging.
+		 * @param order Enumerator.
+		 * @return Resulting string.
+		 */
+		const char* WindingOrderToString(WindingOrder order);
+
+
+		/**
+		 * @brief Converts physical meters to camera space pixels.
+		 * @param vec Position in meters.
+		 * @return Position in pixels.
+		 * @note Talking about camera space pixels, not screen space/viewport pixels. Uses CORI_PIXELS_PER_METER as a convertion modifier.
+		 */
 		glm::vec2 ToPixels(const Vec2 vec);
+
+		/**
+		 * @brief Converts camera space pixels to physical meters.
+		 * @param vec Position in pixels.
+		 * @return Position in pixels.
+		 * @note Talking about camera space pixels, not screen space/viewport pixels. Uses CORI_PIXELS_PER_METER as a convertion modifier.
+		 */
 		Vec2 ToMeters(const glm::vec2 vec);
 
+		/**
+		 * @brief Converts a native Box2D vec2 to string, for logging.
+		 * @param vec Native Box2D vec2 to convert to string.
+		 * @return Formated string.
+		 * @note This is a convenience function and will cause several allocation connected to constructing a string. Be aware.
+		 */
 		std::string Vec2ToString(Vec2 vec);
 
 		class ConvexHull {
@@ -128,7 +171,7 @@ namespace Cori {
 
 			ConvexHull(const b2Hull& hull) : m_Hull(hull) {} // NOLINT
 
-			ConvexHull Create(const std::vector<Vec2>& vertices) {
+			[[nodiscard]] ConvexHull Create(const std::vector<Vec2>& vertices) {
 #ifdef DEBUG_BUILD
 				m_Hull = b2ComputeHull(vertices.data(), vertices.size());
 				if (m_Hull.count == 0) {
@@ -163,23 +206,23 @@ namespace Cori {
 
 			Polygon(const b2Polygon& polygon) : b2Polygon(polygon) {} // NOLINT
 
-			static Polygon CreateBox(const Vec2 halfSize, const Vec2 offset, const Rot rotation = Rot{ 1, 0 }, const float radius = 0.0f) {
+			[[nodiscard]] static Polygon CreateBox(const Vec2 halfSize, const Vec2 offset, const Rot rotation = Rot{ 1, 0 }, const float radius = 0.0f) {
 				return b2MakeOffsetRoundedBox(halfSize.x, halfSize.y, offset, rotation, radius);
 			}
 
-			static Polygon CreateBox(const Vec2 halfSize) {
+			[[nodiscard]] static Polygon CreateBox(const Vec2 halfSize) {
 				return b2MakeBox(halfSize.x, halfSize.y);
 			}
 
-			static Polygon CreateBox(const Vec2 halfSize, const float radius) {
+			[[nodiscard]] static Polygon CreateBox(const Vec2 halfSize, const float radius) {
 				return b2MakeRoundedBox(halfSize.x, halfSize.y, radius);
 			}
 
-			static Polygon CreatePolygon(const ConvexHull& hull, const float radius = 0.0f) {
+			[[nodiscard]] static Polygon CreatePolygon(const ConvexHull& hull, const float radius = 0.0f) {
 				return b2MakePolygon(hull, radius);
 			}
 
-			static Polygon CreatePolygon(const ConvexHull& hull, const Vec2 offset, const Rot rotation = Rot{ 1, 0 }, const float radius = 0.0f) {
+			[[nodiscard]] static Polygon CreatePolygon(const ConvexHull& hull, const Vec2 offset, const Rot rotation = Rot{ 1, 0 }, const float radius = 0.0f) {
 				return b2MakeOffsetRoundedPolygon(hull, offset, rotation, radius);
 			}
 		};
@@ -191,7 +234,7 @@ namespace Cori {
 			Circle(const b2Circle& circle) : b2Circle(circle) {} // NOLINT
 			Circle(const Vec2 center, const float radius) : b2Circle{center, radius} {}
 
-			static Circle Create(Vec2 center, float radius) {
+			[[nodiscard]] static Circle Create(Vec2 center, float radius) {
 				return { center, radius };
 			}
 		};
@@ -203,7 +246,7 @@ namespace Cori {
 			Capsule(const b2Capsule& capsule) : b2Capsule(capsule) {} // NOLINT
 			Capsule(const Vec2 center1, const Vec2 center2, const float radius) : b2Capsule{ center1, center2, radius } {}
 
-			static Capsule Create(Vec2 center1, Vec2 center2, float radius) {
+			[[nodiscard]] static Capsule Create(Vec2 center1, Vec2 center2, float radius) {
 				return { center1, center2, radius };
 			}
 		};
@@ -215,7 +258,7 @@ namespace Cori {
 			Segment(const b2Segment& segment) : b2Segment(segment) {} // NOLINT
 			Segment(const Vec2 point1, const Vec2 point2) : b2Segment{ point1, point2 } {}
 
-			static Segment Create(Vec2 point1, Vec2 point2) {
+			[[nodiscard]] static Segment Create(Vec2 point1, Vec2 point2) {
 				return { point1, point2 };
 			}
 		};

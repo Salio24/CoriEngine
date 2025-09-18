@@ -4,25 +4,37 @@
 #include "Animation.hpp"
 
 namespace Cori {
+	namespace World {
+		namespace Components {
+			namespace Entity {
+				class QuadAnimator;
+			}
+		}
+	}
 	namespace Graphics {
+		class AnimationPack;
+
 		struct Animation {
-		struct PlayParams {
-			// TODO: implement the logic that uses all this parameters
-			uint32_t Loops{ 0 };
-			uint32_t MaxFrames{ 0 };
-			uint32_t StartFrame{ 0 };
-			uint32_t MaxTicks{ 0 };
-			uint32_t StartTick{ 0 };
-			bool LoopedInSequence{ false };
+			struct PlayParams {
+				// TODO: implement the logic that uses all this parameters
+				uint32_t Loops{ 0 };
+				uint32_t MaxFrames{ 0 };
+				uint32_t StartFrame{ 0 };
+				uint32_t MaxTicks{ 0 };
+				uint32_t StartTick{ 0 };
+				bool LoopedInSequence{ false };
+			};
+
+			//AnimationData m_Data;
+			//std::shared_ptr<Texture2D> m_Texture;
+			//glm::vec2 m_Size;
+
+			std::shared_ptr<AnimationPack> m_Pack;
+			uint32_t m_AnimationID{ 0 };
 		};
 
-			AnimationData m_Data;
-			std::shared_ptr<Texture2D> m_Texture;
-			glm::vec2 m_Size;
-		};
 
-
-		class AnimationPack : public Profiling::Trackable<AnimationPack> {
+		class AnimationPack : public Profiling::Trackable<AnimationPack>, public std::enable_shared_from_this<AnimationPack>{
 		public:
 			enum ConfigType : uint8_t {
 				ASEPRITE,
@@ -62,20 +74,22 @@ namespace Cori {
 
 			};
 
-			static std::shared_ptr<AnimationPack> Create(const std::filesystem::path& jsonPath, ConfigType type, const float timeStep, const std::string& name);
+			[[nodiscard]] static std::shared_ptr<AnimationPack> Create(const std::filesystem::path& jsonPath, ConfigType type, const float timeStep, const std::string& name);
 
-			static std::shared_ptr<AnimationPack> Create(const Descriptor& descriptor);
+			[[nodiscard]] static std::shared_ptr<AnimationPack> Create(const Descriptor& descriptor);
 
 			[[nodiscard]] Animation GetAnimation(const uint32_t index);
 
+		protected:
+			friend World::Components::Entity::QuadAnimator;
+			std::vector<AnimationData> m_Animations;
+			std::shared_ptr<SpriteAtlas> m_SpriteAtlas;
+			glm::u16vec2 m_FrameSize{ 0, 0 };
 		private:
 			explicit AnimationPack(std::vector<AnimationData> animations, const std::shared_ptr<SpriteAtlas>& spriteAtlas, std::string name, const glm::u16vec2 frameResolution);
 			AnimationPack();
 
-			std::vector<AnimationData> m_Animations;
-			std::shared_ptr<SpriteAtlas> m_SpriteAtlas;
 			std::string m_Name;
-			glm::u16vec2 m_FrameSize{ 0, 0 };
 			bool m_Valid = false;
 		};
 	}

@@ -3,7 +3,6 @@ var classCori_1_1Core_1_1PackedArray =
     [ "const_iterator", "classCori_1_1Core_1_1PackedArray.html#acef15fa45f1fc37f325a9b0160908bef", null ],
     [ "iterator", "classCori_1_1Core_1_1PackedArray.html#a152802b0d66713ab1f76d9d5c5d8889e", null ],
     [ "PackedArray", "classCori_1_1Core_1_1PackedArray.html#a0012a144b5cb320f91919c338cd15f98", null ],
-    [ "add", "classCori_1_1Core_1_1PackedArray.html#a30eb51eced330053786596c44e291f7e", null ],
     [ "at", "classCori_1_1Core_1_1PackedArray.html#aa65ae4accb53bf074be3d4a35f8818f3", null ],
     [ "at", "classCori_1_1Core_1_1PackedArray.html#a8cbae9ada9d04568399dd95b2bb0261f", null ],
     [ "begin", "classCori_1_1Core_1_1PackedArray.html#ad9289fdc51d648941332831fb4dfec13", null ],
@@ -17,6 +16,8 @@ var classCori_1_1Core_1_1PackedArray =
     [ "full", "classCori_1_1Core_1_1PackedArray.html#a728edc3c2fa578519db94ec237a6590b", null ],
     [ "operator[]", "classCori_1_1Core_1_1PackedArray.html#ade6288532924a45cb5a67ef6d27a724b", null ],
     [ "operator[]", "classCori_1_1Core_1_1PackedArray.html#ab6ef8159f4dd152e605edd81c23ad4fc", null ],
+    [ "push_back", "classCori_1_1Core_1_1PackedArray.html#aadade3269ec813ea21667ee5dd515316", null ],
+    [ "remove", "classCori_1_1Core_1_1PackedArray.html#a2172972a5bcecc91f8509eca6c0bbf0b", null ],
     [ "remove", "classCori_1_1Core_1_1PackedArray.html#a4ce02e8ddf3e8eec14792c04c4d4cb45", null ],
     [ "size", "classCori_1_1Core_1_1PackedArray.html#a593d763f08f1145705fcb0776edad8a8", null ]
 ];

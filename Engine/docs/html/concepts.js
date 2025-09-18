@@ -12,7 +12,7 @@ var concepts =
       ] ],
       [ "Internal", "namespaceCori_1_1Internal.html", [
         [ "IsDescriptor", "conceptCori_1_1Internal_1_1IsDescriptor.html", null ],
-        [ "CanBeDefaultLoaded", "conceptCori_1_1Internal_1_1CanBeDefaultLoaded.html", null ]
+        [ "CanBeLoaded", "conceptCori_1_1Internal_1_1CanBeLoaded.html", null ]
       ] ],
       [ "Utility", "namespaceCori_1_1Utility.html", [
         [ "IsInPack", "conceptCori_1_1Utility_1_1IsInPack.html", null ],

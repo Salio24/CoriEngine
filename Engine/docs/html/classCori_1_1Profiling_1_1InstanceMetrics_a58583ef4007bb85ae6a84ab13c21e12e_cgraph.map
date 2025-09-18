@@ -1,0 +1,5 @@
+<map id="Cori::Profiling::InstanceMetrics::GetTotalCreatedCount" name="Cori::Profiling::InstanceMetrics::GetTotalCreatedCount">
+<area shape="rect" id="Node000001" title="Checks how many instances of type T were created, including derived classes." alt="" coords="5,5,226,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Profiling_1_1InstanceMetrics.html#ab56cad7544276a620332f4b7b908aa6f" title="Checks how many instances of type T were created, not including derived classes." alt="" coords="274,5,533,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="226,25,258,25,258,30,226,30"/>
+</map>

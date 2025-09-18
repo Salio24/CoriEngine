@@ -93,46 +93,49 @@ $(function(){initNavTree('classCori_1_1Core_1_1GameTimer.html','','classCori_1_1
 </div><!--header-->
 <div class="contents">
 
+<p>A <a class="el" href="classCori_1_1Core_1_1GameTimer.html" title="A GameTimer is responsible for managing everything that is connected with time, ticks,...">GameTimer</a> is responsible for managing everything that is connected with time, ticks, elapsed time since start, deltaTime. There can only be one <a class="el" href="classCori_1_1Core_1_1GameTimer.html" title="A GameTimer is responsible for managing everything that is connected with time, ticks,...">GameTimer</a>.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="Time_8hpp_source.html">Time.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aebfa622d490f55a58c6e4bb255e28219" id="r_aebfa622d490f55a58c6e4bb255e28219"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aebfa622d490f55a58c6e4bb255e28219">GameTimer</a> ()</td></tr>
 <tr class="memitem:ab5ac096648ec0790c2df5664a06375c8" id="r_ab5ac096648ec0790c2df5664a06375c8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab5ac096648ec0790c2df5664a06375c8">~GameTimer</a> ()=default</td></tr>
-<tr class="memitem:a52ad49a0a9967f1a5fa6ddf7d307f73a" id="r_a52ad49a0a9967f1a5fa6ddf7d307f73a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a52ad49a0a9967f1a5fa6ddf7d307f73a">Update</a> ()</td></tr>
 <tr class="memitem:a1e91d03f0822001ef3689c3b6039e524" id="r_a1e91d03f0822001ef3689c3b6039e524"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1e91d03f0822001ef3689c3b6039e524">SetTickrate</a> (const uint16_t tickrate)</td></tr>
+<tr class="memdesc:a1e91d03f0822001ef3689c3b6039e524"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the tickrate.  <br /></td></tr>
 <tr class="memitem:a6caefc02996fe678a376e40c1c8cd47d" id="r_a6caefc02996fe678a376e40c1c8cd47d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6caefc02996fe678a376e40c1c8cd47d">GetDeltaTime</a> () const</td></tr>
+<tr class="memdesc:a6caefc02996fe678a376e40c1c8cd47d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the deltaTime, scale is in seconds.  <br /></td></tr>
 <tr class="memitem:a574d093d4af47439981e65fdfc40c846" id="r_a574d093d4af47439981e65fdfc40c846"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a574d093d4af47439981e65fdfc40c846">GetTickAlpha</a> () const</td></tr>
+<tr class="memdesc:a574d093d4af47439981e65fdfc40c846"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the tickAlpha, scale is in seconds. Used for between tick interpolation.  <br /></td></tr>
 <tr class="memitem:a85a5157b39dd5a07ce8a342c65c87b36" id="r_a85a5157b39dd5a07ce8a342c65c87b36"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a85a5157b39dd5a07ce8a342c65c87b36">GetTimestep</a> () const</td></tr>
-<tr class="memitem:ad37ba53e02e9ad3e804e54d29b7fe8dd" id="r_ad37ba53e02e9ad3e804e54d29b7fe8dd"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad37ba53e02e9ad3e804e54d29b7fe8dd">GetMilliseconds</a> () const</td></tr>
-<tr class="memitem:af6309551d4c3cbe31d1970dbbbc00567" id="r_af6309551d4c3cbe31d1970dbbbc00567"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af6309551d4c3cbe31d1970dbbbc00567">GetSeconds</a> () const</td></tr>
-<tr class="memitem:ac74584c311e70614d14c9818924f8432" id="r_ac74584c311e70614d14c9818924f8432"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac74584c311e70614d14c9818924f8432">GetMinutes</a> () const</td></tr>
-<tr class="memitem:a1eadb4971ba8b198d7b5e43703d26049" id="r_a1eadb4971ba8b198d7b5e43703d26049"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1eadb4971ba8b198d7b5e43703d26049">GetHours</a> () const</td></tr>
-<tr class="memitem:aeab4d661f2affa0167a44fd55d332400" id="r_aeab4d661f2affa0167a44fd55d332400"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aeab4d661f2affa0167a44fd55d332400">SetTickrateUpdateFunc</a> (const std::function&lt; void(const float)&gt; &amp;func)</td></tr>
+<tr class="memdesc:a85a5157b39dd5a07ce8a342c65c87b36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current timeStep, scale is in seconds.  <br /></td></tr>
+<tr class="memitem:a175e14eb38b6451bf624c8e9d509dced" id="r_a175e14eb38b6451bf624c8e9d509dced"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a175e14eb38b6451bf624c8e9d509dced">GetElapsedMilliseconds</a> () const</td></tr>
+<tr class="memdesc:a175e14eb38b6451bf624c8e9d509dced"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the time in milliseconds since application start.  <br /></td></tr>
+<tr class="memitem:af909d0acb3d2af9f219b0c650cdd70db" id="r_af909d0acb3d2af9f219b0c650cdd70db"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af909d0acb3d2af9f219b0c650cdd70db">GetElapsedSeconds</a> () const</td></tr>
+<tr class="memdesc:af909d0acb3d2af9f219b0c650cdd70db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the time in seconds since application start.  <br /></td></tr>
+<tr class="memitem:a4328acf5f42b1442ea98d32bf1244680" id="r_a4328acf5f42b1442ea98d32bf1244680"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4328acf5f42b1442ea98d32bf1244680">GetElapsedMinutes</a> () const</td></tr>
+<tr class="memdesc:a4328acf5f42b1442ea98d32bf1244680"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the time in minutes since application start.  <br /></td></tr>
+<tr class="memitem:a392bb425dcb61a450a047bedc8d13473" id="r_a392bb425dcb61a450a047bedc8d13473"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a392bb425dcb61a450a047bedc8d13473">GetElapsedHours</a> () const</td></tr>
+<tr class="memdesc:a392bb425dcb61a450a047bedc8d13473"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the time in hours since application start.  <br /></td></tr>
+<tr class="memitem:a94cedc782a46f5568293a72b0fcc0448" id="r_a94cedc782a46f5568293a72b0fcc0448"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a94cedc782a46f5568293a72b0fcc0448">SetManualTickStep</a> (const bool state)</td></tr>
+<tr class="memdesc:a94cedc782a46f5568293a72b0fcc0448"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enables or disables manual tick step.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:acab7fc8507b8180ac7ee63d7049388f2" id="r_acab7fc8507b8180ac7ee63d7049388f2"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acab7fc8507b8180ac7ee63d7049388f2">FormatTime_MS_to_M_S_MS</a> (const double milliseconds)</td></tr>
+<tr class="memdesc:acab7fc8507b8180ac7ee63d7049388f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Formats milliseconds into a string with a format Min:Sec:Ms.  <br /></td></tr>
+<tr class="memitem:a8058ed41602f3b1a1ee7b0c80e6199af" id="r_a8058ed41602f3b1a1ee7b0c80e6199af"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8058ed41602f3b1a1ee7b0c80e6199af">FormatTime_S_to_M_S_MS</a> (const double seconds)</td></tr>
+<tr class="memdesc:a8058ed41602f3b1a1ee7b0c80e6199af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Formats seconds into a string with a format Min:Sec:Ms.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-friends" class="groupheader"><a id="friends" name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:a23f25bcc02a0e94c2f5a4188496b04d0" id="r_a23f25bcc02a0e94c2f5a4188496b04d0"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a23f25bcc02a0e94c2f5a4188496b04d0">Application</a></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00005">5</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
+<div class="textblock"><p>A <a class="el" href="classCori_1_1Core_1_1GameTimer.html" title="A GameTimer is responsible for managing everything that is connected with time, ticks,...">GameTimer</a> is responsible for managing everything that is connected with time, ticks, elapsed time since start, deltaTime. There can only be one <a class="el" href="classCori_1_1Core_1_1GameTimer.html" title="A GameTimer is responsible for managing everything that is connected with time, ticks,...">GameTimer</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00008">8</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="aebfa622d490f55a58c6e4bb255e28219" name="aebfa622d490f55a58c6e4bb255e28219"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aebfa622d490f55a58c6e4bb255e28219">&#9670;&#160;</a></span>GameTimer()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Cori::Core::GameTimer::GameTimer </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Time_8cpp_source.html#l00006">6</a> of file <a class="el" href="Time_8cpp_source.html">Time.cpp</a>.</p>
-
-</div>
-</div>
 <a id="ab5ac096648ec0790c2df5664a06375c8" name="ab5ac096648ec0790c2df5664a06375c8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab5ac096648ec0790c2df5664a06375c8">&#9670;&#160;</a></span>~GameTimer()</h2>
 
@@ -159,6 +162,88 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
+<a id="acab7fc8507b8180ac7ee63d7049388f2" name="acab7fc8507b8180ac7ee63d7049388f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acab7fc8507b8180ac7ee63d7049388f2">&#9670;&#160;</a></span>FormatTime_MS_to_M_S_MS()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string Cori::Core::GameTimer::FormatTime_MS_to_M_S_MS </td>
+          <td>(</td>
+          <td class="paramtype">const double</td>          <td class="paramname"><span class="paramname"><em>milliseconds</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Formats milliseconds into a string with a format Min:Sec:Ms. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">milliseconds</td><td>Value to convert. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Formated string. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Time_8cpp_source.html#l00012">12</a> of file <a class="el" href="Time_8cpp_source.html">Time.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a8058ed41602f3b1a1ee7b0c80e6199af" name="a8058ed41602f3b1a1ee7b0c80e6199af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8058ed41602f3b1a1ee7b0c80e6199af">&#9670;&#160;</a></span>FormatTime_S_to_M_S_MS()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string Cori::Core::GameTimer::FormatTime_S_to_M_S_MS </td>
+          <td>(</td>
+          <td class="paramtype">const double</td>          <td class="paramname"><span class="paramname"><em>seconds</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Formats seconds into a string with a format Min:Sec:Ms. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">seconds</td><td>Value to convert. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Formated string. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Time_8cpp_source.html#l00020">20</a> of file <a class="el" href="Time_8cpp_source.html">Time.cpp</a>.</p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classCori_1_1Core_1_1GameTimer_a8058ed41602f3b1a1ee7b0c80e6199af_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1GameTimer_a8058ed41602f3b1a1ee7b0c80e6199af_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1Core_1_1GameTimer_a8058ed41602f3b1a1ee7b0c80e6199af_cgraph" id="aclassCori_1_1Core_1_1GameTimer_a8058ed41602f3b1a1ee7b0c80e6199af_cgraph">
+<area shape="rect" title="Formats seconds into a string with a format Min:Sec:Ms." alt="" coords="5,5,209,50"/>
+<area shape="rect" href="classCori_1_1Core_1_1GameTimer.html#acab7fc8507b8180ac7ee63d7049388f2" title="Formats milliseconds into a string with a format Min:Sec:Ms." alt="" coords="257,5,472,50"/>
+<area shape="poly" title=" " alt="" coords="209,25,241,25,241,30,209,30"/>
+</map>
+</div>
+
+</div>
+</div>
 <a id="a6caefc02996fe678a376e40c1c8cd47d" name="a6caefc02996fe678a376e40c1c8cd47d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6caefc02996fe678a376e40c1c8cd47d">&#9670;&#160;</a></span>GetDeltaTime()</h2>
 
@@ -177,17 +262,19 @@ Public Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00013">13</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
+<p>Returns the deltaTime, scale is in seconds. </p>
+
+<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00021">21</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a1eadb4971ba8b198d7b5e43703d26049" name="a1eadb4971ba8b198d7b5e43703d26049"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1eadb4971ba8b198d7b5e43703d26049">&#9670;&#160;</a></span>GetHours()</h2>
+<a id="a392bb425dcb61a450a047bedc8d13473" name="a392bb425dcb61a450a047bedc8d13473"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a392bb425dcb61a450a047bedc8d13473">&#9670;&#160;</a></span>GetElapsedHours()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -196,7 +283,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">double Cori::Core::GameTimer::GetHours </td>
+          <td class="memname">double Cori::Core::GameTimer::GetElapsedHours </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
@@ -204,17 +291,20 @@ Public Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00020">20</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
+<p>Gets the time in hours since application start. </p>
+<dl class="section return"><dt>Returns</dt><dd>Hours elapsed. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00055">55</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ad37ba53e02e9ad3e804e54d29b7fe8dd" name="ad37ba53e02e9ad3e804e54d29b7fe8dd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad37ba53e02e9ad3e804e54d29b7fe8dd">&#9670;&#160;</a></span>GetMilliseconds()</h2>
+<a id="a175e14eb38b6451bf624c8e9d509dced" name="a175e14eb38b6451bf624c8e9d509dced"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a175e14eb38b6451bf624c8e9d509dced">&#9670;&#160;</a></span>GetElapsedMilliseconds()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -223,7 +313,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">double Cori::Core::GameTimer::GetMilliseconds </td>
+          <td class="memname">double Cori::Core::GameTimer::GetElapsedMilliseconds </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
@@ -231,17 +321,20 @@ Public Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00017">17</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
+<p>Gets the time in milliseconds since application start. </p>
+<dl class="section return"><dt>Returns</dt><dd>Milliseconds elapsed. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00037">37</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ac74584c311e70614d14c9818924f8432" name="ac74584c311e70614d14c9818924f8432"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac74584c311e70614d14c9818924f8432">&#9670;&#160;</a></span>GetMinutes()</h2>
+<a id="a4328acf5f42b1442ea98d32bf1244680" name="a4328acf5f42b1442ea98d32bf1244680"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4328acf5f42b1442ea98d32bf1244680">&#9670;&#160;</a></span>GetElapsedMinutes()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -250,7 +343,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">double Cori::Core::GameTimer::GetMinutes </td>
+          <td class="memname">double Cori::Core::GameTimer::GetElapsedMinutes </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
@@ -258,17 +351,20 @@ Public Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00019">19</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
+<p>Gets the time in minutes since application start. </p>
+<dl class="section return"><dt>Returns</dt><dd>Minutes elapsed. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00049">49</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
 
 </div>
 </div>
-<a id="af6309551d4c3cbe31d1970dbbbc00567" name="af6309551d4c3cbe31d1970dbbbc00567"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af6309551d4c3cbe31d1970dbbbc00567">&#9670;&#160;</a></span>GetSeconds()</h2>
+<a id="af909d0acb3d2af9f219b0c650cdd70db" name="af909d0acb3d2af9f219b0c650cdd70db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af909d0acb3d2af9f219b0c650cdd70db">&#9670;&#160;</a></span>GetElapsedSeconds()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -277,7 +373,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">double Cori::Core::GameTimer::GetSeconds </td>
+          <td class="memname">double Cori::Core::GameTimer::GetElapsedSeconds </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
@@ -285,12 +381,15 @@ Public Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00018">18</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
+<p>Gets the time in seconds since application start. </p>
+<dl class="section return"><dt>Returns</dt><dd>Seconds elapsed. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00043">43</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
 
 </div>
 </div>
@@ -312,12 +411,14 @@ Public Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00014">14</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
+<p>Returns the tickAlpha, scale is in seconds. Used for between tick interpolation. </p>
+
+<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00026">26</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
 
 </div>
 </div>
@@ -339,12 +440,42 @@ Public Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00015">15</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
+<p>Returns the current timeStep, scale is in seconds. </p>
+
+<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00031">31</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a94cedc782a46f5568293a72b0fcc0448" name="a94cedc782a46f5568293a72b0fcc0448"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94cedc782a46f5568293a72b0fcc0448">&#9670;&#160;</a></span>SetManualTickStep()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Cori::Core::GameTimer::SetManualTickStep </td>
+          <td>(</td>
+          <td class="paramtype">const bool</td>          <td class="paramname"><span class="paramname"><em>state</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Enables or disables manual tick step. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">state</td><td>On or off state.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>When enabled ticks don't happened on their own, instead you can advance one tick at a time by pressing K, or hold J to enable regular behaviour when enabled. </p>
+
+<p class="definition">Definition at line <a class="el" href="Time_8cpp_source.html#l00024">24</a> of file <a class="el" href="Time_8cpp_source.html">Time.cpp</a>.</p>
 
 </div>
 </div>
@@ -363,12 +494,21 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Time_8cpp_source.html#l00034">34</a> of file <a class="el" href="Time_8cpp_source.html">Time.cpp</a>.</p>
+<p>Changes the tickrate. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tickrate</td><td>Tickrate to set. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="Time_8cpp_source.html#l00083">83</a> of file <a class="el" href="Time_8cpp_source.html">Time.cpp</a>.</p>
 
 </div>
 </div>
-<a id="aeab4d661f2affa0167a44fd55d332400" name="aeab4d661f2affa0167a44fd55d332400"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeab4d661f2affa0167a44fd55d332400">&#9670;&#160;</a></span>SetTickrateUpdateFunc()</h2>
+<a name="doc-related-members" id="doc-related-members"></a><h2 id="header-doc-related-members" class="groupheader">Friends And Related Symbol Documentation</h2>
+<a id="a23f25bcc02a0e94c2f5a4188496b04d0" name="a23f25bcc02a0e94c2f5a4188496b04d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23f25bcc02a0e94c2f5a4188496b04d0">&#9670;&#160;</a></span>Application</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -377,39 +517,17 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void Cori::Core::GameTimer::SetTickrateUpdateFunc </td>
-          <td>(</td>
-          <td class="paramtype">const std::function&lt; void(const float)&gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>func</em></span></td><td>)</td>
-          <td></td>
+          <td class="memname">friend class <a class="el" href="classCori_1_1Core_1_1Application.html">Application</a></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel friend">friend</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00022">22</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a52ad49a0a9967f1a5fa6ddf7d307f73a" name="a52ad49a0a9967f1a5fa6ddf7d307f73a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a52ad49a0a9967f1a5fa6ddf7d307f73a">&#9670;&#160;</a></span>Update()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::Core::GameTimer::Update </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Time_8cpp_source.html#l00011">11</a> of file <a class="el" href="Time_8cpp_source.html">Time.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00079">79</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
 
 </div>
 </div>

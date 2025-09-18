@@ -2,7 +2,7 @@
 #include "Graphics/RenderingContext.hpp"
 #include <backends/imgui_impl_sdl3.h>
 #include <SDL3_image/SDL_image.h>
-
+#include <PathDefinesGenerated.hpp>
 #include "EventSystem/AppEvent.hpp"
 #include "EventSystem/KeyEvent.hpp"
 #include "EventSystem/MouseEvent.hpp"
@@ -15,14 +15,19 @@ namespace Cori {
 			std::string m_WindowTitle;
 
 			int32_t m_DisplayModeCount;
-			SDL_DisplayMode** m_SDLModes;
+			SDL_DisplayMode** m_SDLModes{ nullptr };
 			SDL_DisplayID m_PrimaryDisplayID{};
 
 			SDL_Window* m_Window{ nullptr };
-			std::unique_ptr<Graphics::RenderingContext> m_Context;
+			std::unique_ptr<Graphics::Internal::RenderingContext> m_Context;
 			bool m_VSync{ false };
 
 			EventCallbackFn m_EventCallback;
+
+			~Data() {
+				SDL_DestroyWindow(m_Window);
+				SDL_free(m_SDLModes);
+			}
 		};
 
 		std::unique_ptr<Window> Window::Create(std::string name, const bool vsync) {
@@ -34,7 +39,8 @@ namespace Cori {
 			m_Data->m_WindowTitle = std::move(title);
 			m_Data->m_VSync = vsync;
 
-			m_Data->m_Context = Graphics::RenderingContext::Create(s_API);
+			m_Data->m_Context = Graphics::Internal::RenderingContext::Create(s_API);
+
 
 			const SDL_DisplayID primaryDisplayID = SDL_GetPrimaryDisplay();
 			if (primaryDisplayID == 0) {
@@ -84,12 +90,13 @@ namespace Cori {
 			}
 
 			m_Data->m_Window = SDL_CreateWindowWithProperties(props);
+
 			SDL_DestroyProperties(props);
 
 			CORI_CORE_ASSERT(m_Data->m_Window, "Failed to create Window '{}'. SDL_Error: {}", m_Data->m_WindowTitle, SDL_GetError());
 
-			const auto logoPath = "enignedata/ui/logo256.png";
-			SDL_Surface* logo = IMG_Load(logoPath);
+			const auto logoPath = std::filesystem::path(FileSystem::Internal::PathDefines::GetEngineDataRoot()) / std::filesystem::path("ui/logo256.png");
+			SDL_Surface* logo = IMG_Load(logoPath.string().c_str());
 
 			if (!logo) {
 				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to load App Logo: {}", SDL_GetError());
@@ -107,10 +114,8 @@ namespace Cori {
 		}
 
 		Window::~Window() {
-			SDL_DestroyWindow(m_Data->m_Window);
-			SDL_free(m_Data->m_SDLModes);
-			delete m_Data;
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window '{}' Destroyed", m_Data->m_WindowTitle);
+			delete m_Data;
 		}
 
 		// ReSharper disable once CppMemberFunctionMayBeConst
@@ -171,13 +176,13 @@ namespace Cori {
 					}
 				case SDL_EVENT_MOUSE_BUTTON_DOWN:
 					{
-						MouseButtonPressedEvent mouseButtonPressedEvent(static_cast<CoriMouseCode>(e.button.button));
+						MouseButtonPressedEvent mouseButtonPressedEvent(static_cast<CoriMouseKeycode>(e.button.button));
 						m_Data->m_EventCallback(mouseButtonPressedEvent);
 						break;
 					}
 				case SDL_EVENT_MOUSE_BUTTON_UP:
 					{
-						MouseButtonReleasedEvent mouseButtonReleasedEvent(static_cast<CoriMouseCode>(e.button.button));
+						MouseButtonReleasedEvent mouseButtonReleasedEvent(static_cast<CoriMouseKeycode>(e.button.button));
 						m_Data->m_EventCallback(mouseButtonReleasedEvent);
 						break;
 					}
@@ -254,6 +259,10 @@ namespace Cori {
 					if (!success) {
 						return std::unexpected(CoriError(std::format("Failed to set window mode to 'Windowed'. SDL_Error: {}", SDL_GetError())));
 					}
+					const bool borderAdded = SDL_SetWindowBordered(m_Data->m_Window, true);
+					if (!borderAdded) {
+						CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to add border to the window. SDL_Error: {}", SDL_GetError());
+					}
 
 					const SDL_DisplayMode* desktopMode = SDL_GetCurrentDisplayMode(m_Data->m_PrimaryDisplayID);
 
@@ -268,6 +277,11 @@ namespace Cori {
 						if (!success) {
 							return std::unexpected(CoriError(std::format("Failed to set window mode to 'Windowed'. SDL_Error: {}", SDL_GetError())));
 						}
+					}
+
+					const bool windowMoveSuccess = SDL_SetWindowPosition(m_Data->m_Window, SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID), SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID));
+					if (!windowMoveSuccess) {
+						CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to set window position to the center of the main screen. (This is expected on Wayland) SDL_Error: {}", SDL_GetError());
 					}
 
 					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window set to 'Windowed' mode. Screen mode: (Width: {}, Height: {})", desktopMode->w, desktopMode->h);
@@ -301,7 +315,7 @@ namespace Cori {
 				{
 					const bool windowMoveSuccess = SDL_SetWindowPosition(m_Data->m_Window, SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID), SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID));
 					if (!windowMoveSuccess) {
-						CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to set window position to the center of the main screen. SDL_Error: {}", SDL_GetError());
+						CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to set window position to the center of the main screen. (This is expected on Wayland) SDL_Error: {}", SDL_GetError());
 					}
 
 					const SDL_DisplayMode* sdlMode = m_Data->m_SDLModes[m_Data->m_CurrentScreenMode.m_ModeIndex];

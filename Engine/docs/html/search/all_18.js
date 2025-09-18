@@ -3,7 +3,7 @@ var searchData=
   ['way_20i_20use_20it_20_3a_0',['Using Visual Studio 2022 CMake integration (the preferred way, i use it):',['../index.html#using-visual-studio-2022-cmake-integration-the-preferred-way-i-use-it',1,'']]],
   ['what_1',['what',['../classCori_1_1Core_1_1CoriError.html#ac035b7444bbd435105aebe026f3b465c',1,'Cori::Core::CoriError']]],
   ['windingorder_2',['WindingOrder',['../namespaceCori_1_1Physics.html#ae29f6970ff2516975fb7067534b274d8',1,'Cori::Physics']]],
-  ['windingordertostring_3',['WindingOrderToString',['../namespaceCori_1_1Physics.html#abbbae8e68b3e8d4d6f0805a386ed3e55',1,'Cori::Physics']]],
+  ['windingordertostring_3',['WindingOrderToString',['../namespaceCori_1_1Physics.html#a931c7818793a1979c825e80e6bcd15fc',1,'Cori::Physics']]],
   ['window_4',['Window',['../classCori_1_1Core_1_1Window.html',1,'Cori::Core::Window'],['../structCori_1_1Logger_1_1Tags_1_1Core.html#a35a735707b75ea83337d579f95665106',1,'Cori::Logger::Tags::Core::Window'],['../structCori_1_1Core_1_1ScreenMode.html#a553f958a25683445088050a69d3de8e9',1,'Cori::Core::ScreenMode::Window()']]],
   ['window_2ecpp_5',['Window.cpp',['../Window_8cpp.html',1,'']]],
   ['window_2ehpp_6',['Window.hpp',['../Window_8hpp.html',1,'']]],

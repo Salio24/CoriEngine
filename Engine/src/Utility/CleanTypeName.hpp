@@ -24,12 +24,20 @@ namespace Cori {
 }
 
 
+/**
+ * @brief Demangles a mangled name of the type.
+ * @param name Name to demangle.
+ */
 #define CORI_DEMANGLE(name) \
 	([](const char* mangled) -> const char* { \
 		thread_local char buffer[DEMANGLE_BUFFER_SIZE]; \
 		return Cori::internal::Demangle(mangled, buffer, sizeof(buffer)); \
 	})(name)
 
+/**
+ * @brief Gets the demangled name of the type.
+ * @param tn Type to get the name of.
+ */
 #define CORI_CLEAN_TYPE_NAME(tn) CORI_DEMANGLE(typeid(tn).name())
 
 #else

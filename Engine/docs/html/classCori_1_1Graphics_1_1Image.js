@@ -10,6 +10,5 @@ var classCori_1_1Graphics_1_1Image =
     [ "GetSuccessStatus", "classCori_1_1Graphics_1_1Image.html#a602cd7af9c2dbcfff96e24a138e5e2ba", null ],
     [ "GetWidth", "classCori_1_1Graphics_1_1Image.html#a445b7712fac6119977dcc4cd02e5ac48", null ],
     [ "HasSemiTransparency", "classCori_1_1Graphics_1_1Image.html#a1a3ba1496bcb9ee882109d3822e3b9f2", null ],
-    [ "IsPadded", "classCori_1_1Graphics_1_1Image.html#a633d8047e8d0ef97a3314bba633e0245", null ],
-    [ "Mirror", "classCori_1_1Graphics_1_1Image.html#ac9d1fe4720e1dc5a8aa2ff03c5ec9015", null ]
+    [ "IsPadded", "classCori_1_1Graphics_1_1Image.html#a633d8047e8d0ef97a3314bba633e0245", null ]
 ];

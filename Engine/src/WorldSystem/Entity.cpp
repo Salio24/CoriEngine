@@ -54,16 +54,19 @@ namespace Cori {
 		}
 
 		bool Entity::IsActiveLocally() const {
-			if (HasComponents<Components::Entity::InactiveLocallyFlag>()) { return false; }
-			return true;
+			return !HasComponents<Components::Entity::InactiveLocallyFlag>();
 		}
 
 		bool Entity::IsActiveGlobally() const {
-			if (HasComponents<Components::Entity::InactiveGloballyFlag>()) { return false; }
-			return true;
+			return !HasComponents<Components::Entity::InactiveGloballyFlag>();
 		}
 
-		std::string Entity::GetDebugData(const bool showUUID) const {
+		std::string Entity::GetDebugData(bool showUUID) const {
+			if (showUUID) {
+				if (CORI_CORE_CHECK(HasComponents<Components::Entity::UUID>(), "Calling GetDebugData with showUUID=true but entity '{}' doesn't have a UUID component, it will not be shown.", GetDebugData())) {
+					showUUID = false;
+				}
+			}
 			if (IsValid()) {
 				return "(Entity ID: '" + std::to_string(GetID()) + "', Version: '" + std::to_string(GetVersion()) + "', Name: '" + GetComponents<Components::Entity::Name>().m_Name + "', Tag: '" + std::string(GetComponents<Components::Entity::Tag>().m_Tag.m_DebugName) + (showUUID ? "', UUID: '" + GetComponents<Components::Entity::UUID>().m_UUID.GetSerializationString() + "')" : "')");
 			}
@@ -72,6 +75,9 @@ namespace Cori {
 
 		// ReSharper disable once CppParameterMayBeConst
 		std::expected<void, Core::CoriError<>> Entity::SetParent(Entity parent) {
+			CORI_CORE_ASSERT((HasComponents<Components::Entity::Hierarchy, Components::Entity::Name>()), "Calling SetParent on an Entity that doesn't have on of those components <Hierarchy, Name>. This is illegal.");
+			CORI_CORE_ASSERT((parent.HasComponents<Components::Entity::Hierarchy, Components::Entity::Name>()), "Calling SetParent with a parent Entity that doesn't have on of those components <Hierarchy, Name>. This is illegal.");
+
 			UnlinkFromParent();
 
 			if (parent.IsValid()) {
@@ -81,6 +87,8 @@ namespace Cori {
 		}
 
 		std::expected<Entity, Core::CoriError<>> Entity::GetParent() const {
+			CORI_CORE_ASSERT((HasComponents<Components::Entity::Hierarchy, Components::Entity::Name>()), "Calling GetParent on an Entity that doesn't have on of those components <Hierarchy, Name>. This is illegal.");
+
 			if (!HasComponents<Components::Entity::Hierarchy>()) {
 				return std::unexpected(Core::CoriError("Entity doesn't have HierarchyComponent, and thus doesn't have a parent."));
 			}
@@ -94,7 +102,7 @@ namespace Cori {
 		}
 
 		std::expected<std::vector<Entity>, Core::CoriError<>> Entity::GetSiblings() const {
-			if (!HasComponents<Components::Entity::Hierarchy>()) { return std::unexpected(Core::CoriError("Entity doesn't have HierarchyComponent, and thus doesn't have any siblings.")); }
+			CORI_CORE_ASSERT((HasComponents<Components::Entity::Hierarchy, Components::Entity::Name>()), "Calling GetSiblings on an Entity that doesn't have on of those components <Hierarchy, Name>. This is illegal.");
 
 			auto& hierarchy = GetComponents<Components::Entity::Hierarchy>();
 			entt::registry* registry = m_EntityHandle.registry();
@@ -108,35 +116,45 @@ namespace Cori {
 				return siblings.value();
 			}
 
-			return std::unexpected(Core::CoriError("Unknown error occurred."));
+			return std::unexpected(siblings.error());
 		}
 
 		std::expected<std::vector<Entity>, Core::CoriError<>> Entity::GetChildren() const {
+			CORI_CORE_ASSERT((HasComponents<Components::Entity::Hierarchy, Components::Entity::Name>()), "Calling GetChildren on an Entity that doesn't have on of those components <Hierarchy, Name>. This is illegal.");
 			std::vector<Entity> children;
-			if (!HasComponents<Components::Entity::Hierarchy>()) { return std::unexpected(Core::CoriError("Entity doesn't have HierarchyComponent, and thus doesn't have any children.")); }
+
+			if (!HasComponents<Components::Entity::ChildCache>()) {
+				return children;
+			}
 
 			entt::registry* registry = m_EntityHandle.registry();
-			auto& hierarchy = GetComponents<Components::Entity::Hierarchy>();
-			entt::entity currentChild = hierarchy.m_FirstChild;
+			auto& childCache = GetComponents<Components::Entity::ChildCache>();
 
-			while (registry->valid(currentChild)) {
-				children.emplace_back(entt::handle{*registry, currentChild});
-				currentChild = registry->get<Components::Entity::Hierarchy>(currentChild).m_NextSibling;
+			for (const auto& child : childCache.m_Children | std::views::values) {
+				children.emplace_back(entt::handle{*registry, child});
 			}
+
 			return children;
 		}
 
-		std::expected<Entity, Core::CoriError<>> Entity::FindChildByName(const std::string& name) const {
+		std::expected<Entity, Core::CoriError<>> Entity::FindChildByName(const char* name) const {
+			CORI_CORE_ASSERT((HasComponents<Components::Entity::Hierarchy, Components::Entity::Name>()), "Calling FindChildByName on an Entity that doesn't have on of those components <Hierarchy, Name>. This is illegal.");
+
+			if (!HasComponents<Components::Entity::ChildCache>()) {
+				return std::unexpected(Core::CoriError("Entity doesn't have any children."));
+			}
+
 			auto& cache = GetComponents<Components::Entity::ChildCache>();
 
 			if (cache.m_Children.contains(name)) {
-				entt::entity child = cache.m_Children.at(name);
+				entt::entity child = cache.m_Children.find(name)->second;
 				return Entity{ { *m_EntityHandle.registry(), child } };
 			}
 			return std::unexpected(Core::CoriError("No children found with the specified name."));
 		}
 
 		void Entity::PrintHierarchy() const {
+			CORI_CORE_ASSERT((HasComponents<Components::Entity::Hierarchy, Components::Entity::Name>()), "Calling PrintHierarchy on an Entity that doesn't have on of those components <Hierarchy, Name>. This is illegal.");
 			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self }, "Printing full hierarchy tree of '{}'", GetComponents<Components::Entity::Name>().m_Name);
 			entt::entity root = GetRawEntity();
 			entt::entity currentParent = GetComponents<Components::Entity::Hierarchy>().m_Parent;
@@ -162,31 +180,35 @@ namespace Cori {
 			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self }, "Finished");
 		}
 
-		std::string Entity::GetName() const {
+		std::string_view Entity::GetName() const {
+			CORI_CORE_ASSERT(HasComponents<Components::Entity::Name>(), "Calling GetName on an Entity that doesn't have Name component. This is illegal.");
 			return GetComponents<Components::Entity::Name>().m_Name;
 		}
 		void Entity::SetName(const std::string& name) {
+			CORI_CORE_ASSERT(HasComponents<Components::Entity::Name>(), "Calling SetName on an Entity that doesn't have Name component. This is illegal.");
 			auto& nameComponent = GetComponents<Components::Entity::Name>();
 			if (nameComponent.m_Name == name) {
 				return;
 			}
-			nameComponent.m_Name = name;
 
 			if (HasComponents<Components::Entity::Hierarchy>()) {
 				const auto& hierarchy = GetComponents<Components::Entity::Hierarchy>();
 				entt::registry* registry = m_EntityHandle.registry();
 				if (registry->valid(hierarchy.m_Parent)) {
-					// ReSharper disable once CppLocalVariableMayBeConst
-					entt::entity parent = hierarchy.m_Parent;
+					const entt::entity parent = hierarchy.m_Parent;
 					auto& cache = registry->get<Components::Entity::ChildCache>(parent);
 					cache.m_Children.erase(nameComponent.m_Name);
 					cache.m_Children.emplace(name, m_EntityHandle.entity());
 				}
 			}
+
+			nameComponent.m_Name = name;
 		}
 
 
 		void Entity::UnlinkFromParent() {
+			CORI_CORE_ASSERT((HasComponents<Components::Entity::Hierarchy, Components::Entity::Name>()), "Calling UnlinkFromParent on an Entity that doesn't have on of those components <Hierarchy, Name>. This is illegal.");
+
 			entt::registry* registry = m_EntityHandle.registry();
 			auto& hierarchy = GetComponents<Components::Entity::Hierarchy>();
 			const entt::entity parent = hierarchy.m_Parent;
@@ -197,10 +219,8 @@ namespace Cori {
 			cache.m_Children.erase(GetComponents<Components::Entity::Name>().m_Name);
 
 			auto& parentHierarchy = registry->get<Components::Entity::Hierarchy>(parent);
-			// ReSharper disable once CppLocalVariableMayBeConst
-			entt::entity previousSibling = parentHierarchy.m_PreviousSibling;
-			// ReSharper disable once CppLocalVariableMayBeConst
-			entt::entity nextSibling = parentHierarchy.m_NextSibling;
+			const entt::entity previousSibling = parentHierarchy.m_PreviousSibling;
+			const entt::entity nextSibling = parentHierarchy.m_NextSibling;
 
 			if (parentHierarchy.m_FirstChild == m_EntityHandle.entity()) {
 				parentHierarchy.m_FirstChild = nextSibling;
@@ -232,8 +252,7 @@ namespace Cori {
 			cache.m_Children.emplace(nameComp.m_Name, m_EntityHandle.entity());
 
 			auto& parentHierarchy = parent.GetComponents<Components::Entity::Hierarchy>();
-			// ReSharper disable once CppLocalVariableMayBeConst
-			entt::entity firstChild = parentHierarchy.m_FirstChild;
+			const entt::entity firstChild = parentHierarchy.m_FirstChild;
 
 			if (registry->valid(firstChild)) {
 				registry->get<Components::Entity::Hierarchy>(firstChild).m_PreviousSibling = m_EntityHandle.entity();
@@ -262,7 +281,6 @@ namespace Cori {
 			}
 		}
 
-		// ReSharper disable once CppParameterMayBeConst
 		void Entity::UpdateInactivityFlagsRecursive(entt::entity parent, const bool parentIsActive) {
 			entt::registry* registry = m_EntityHandle.registry();
 
@@ -271,7 +289,7 @@ namespace Cori {
 			if (finalEffectiveState) {
 				registry->remove<Components::Entity::InactiveGloballyFlag>(parent);
 			} else {
-				registry->emplace<Components::Entity::InactiveLocallyFlag>(parent);
+				registry->emplace_or_replace<Components::Entity::InactiveLocallyFlag>(parent);
 			}
 
 			const auto& hierarchy = registry->get<Components::Entity::Hierarchy>(parent);

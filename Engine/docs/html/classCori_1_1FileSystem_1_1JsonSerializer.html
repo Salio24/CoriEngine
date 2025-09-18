@@ -93,6 +93,9 @@ $(function(){initNavTree('classCori_1_1FileSystem_1_1JsonSerializer.html','','cl
 </div><!--header-->
 <div class="contents">
 
+<p>Class is responsible for simple loading/saving config and save files as json files.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="JsonSerializer_8hpp_source.html">JsonSerializer.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
@@ -105,8 +108,9 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memdesc:abebae8a1401520b67b68d5961c6d6054"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads an object from a JSON file.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="JsonSerializer_8hpp_source.html#l00015">15</a> of file <a class="el" href="JsonSerializer_8hpp_source.html">JsonSerializer.hpp</a>.</p>
+<div class="textblock"><p>Class is responsible for simple loading/saving config and save files as json files. </p>
+
+<p class="definition">Definition at line <a class="el" href="JsonSerializer_8hpp_source.html#l00018">18</a> of file <a class="el" href="JsonSerializer_8hpp_source.html">JsonSerializer.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="abebae8a1401520b67b68d5961c6d6054" name="abebae8a1401520b67b68d5961c6d6054"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abebae8a1401520b67b68d5961c6d6054">&#9670;&#160;</a></span>Load()</h2>
@@ -146,9 +150,9 @@ template&lt;JsonSerializable T&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>std::expected&lt;T, Core::CoriError&lt;&gt;&gt; which contains the loaded object on success, or an error on failure. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with void on success or CoriError&lt;&gt; on failure. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="JsonSerializer_8hpp_source.html#l00058">58</a> of file <a class="el" href="JsonSerializer_8hpp_source.html">JsonSerializer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="JsonSerializer_8hpp_source.html#l00061">61</a> of file <a class="el" href="JsonSerializer_8hpp_source.html">JsonSerializer.hpp</a>.</p>
 
 </div>
 </div>
@@ -195,9 +199,9 @@ template&lt;JsonSerializable T&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>std::expected&lt;void, Core::CoriError&lt;&gt;&gt; which is empty on success, or contains an error on failure. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with void on success or CoriError&lt;&gt; on failure. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="JsonSerializer_8hpp_source.html#l00025">25</a> of file <a class="el" href="JsonSerializer_8hpp_source.html">JsonSerializer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="JsonSerializer_8hpp_source.html#l00028">28</a> of file <a class="el" href="JsonSerializer_8hpp_source.html">JsonSerializer.hpp</a>.</p>
 
 </div>
 </div>

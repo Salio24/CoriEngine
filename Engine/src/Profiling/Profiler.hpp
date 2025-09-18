@@ -1,0 +1,14 @@
+#pragma once
+
+#ifdef CORI_ENABLE_PROFILING
+#include <tracy/Tracy.hpp>
+#define CORI_PROFILE_FUNCTION() ZoneScopedS(35)
+#define CORI_PROFILE_SCOPE(name) ZoneScopedN(name)
+#define CORI_PROFILER_FRAME_START() FrameMark
+#else
+#define CORI_PROFILE_FUNCTION()
+#define CORI_PROFILE_SCOPE(name)
+#define CORI_PROFILER_FRAME_START()
+#endif
+
+

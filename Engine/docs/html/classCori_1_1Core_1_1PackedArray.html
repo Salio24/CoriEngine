@@ -93,6 +93,9 @@ $(function(){initNavTree('classCori_1_1Core_1_1PackedArray.html','','classCori_1
 </div><!--header-->
 <div class="contents">
 
+<p>This is my packed/dense array custom implementation.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
@@ -103,11 +106,12 @@ Public Types</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a0012a144b5cb320f91919c338cd15f98" id="r_a0012a144b5cb320f91919c338cd15f98"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0012a144b5cb320f91919c338cd15f98">PackedArray</a> ()=default</td></tr>
-<tr class="memitem:a30eb51eced330053786596c44e291f7e" id="r_a30eb51eced330053786596c44e291f7e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a30eb51eced330053786596c44e291f7e">add</a> (const T &amp;value)</td></tr>
+<tr class="memitem:aadade3269ec813ea21667ee5dd515316" id="r_aadade3269ec813ea21667ee5dd515316"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aadade3269ec813ea21667ee5dd515316">push_back</a> (const T &amp;value)</td></tr>
 <tr class="memitem:ac158aa809f9db06e04927c5f3a8267c5" id="r_ac158aa809f9db06e04927c5f3a8267c5"><td class="memTemplParams" colspan="2">template&lt;typename... Args&gt; <br />
 requires std::constructible_from&lt;T, Args...&gt;</td></tr>
 <tr class="memitem:ac158aa809f9db06e04927c5f3a8267c5 template"><td class="memItemLeft" align="right" valign="top">T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac158aa809f9db06e04927c5f3a8267c5">emplace</a> (Args &amp;&amp;... args)</td></tr>
 <tr class="memitem:a4ce02e8ddf3e8eec14792c04c4d4cb45" id="r_a4ce02e8ddf3e8eec14792c04c4d4cb45"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4ce02e8ddf3e8eec14792c04c4d4cb45">remove</a> (const T &amp;value)</td></tr>
+<tr class="memitem:a2172972a5bcecc91f8509eca6c0bbf0b" id="r_a2172972a5bcecc91f8509eca6c0bbf0b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2172972a5bcecc91f8509eca6c0bbf0b">remove</a> (const SizeT index)</td></tr>
 <tr class="memitem:ad9289fdc51d648941332831fb4dfec13" id="r_ad9289fdc51d648941332831fb4dfec13"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a152802b0d66713ab1f76d9d5c5d8889e">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad9289fdc51d648941332831fb4dfec13">begin</a> ()</td></tr>
 <tr class="memitem:ab028335b904efa4411aa3cc771d1ef5c" id="r_ab028335b904efa4411aa3cc771d1ef5c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#acef15fa45f1fc37f325a9b0160908bef">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab028335b904efa4411aa3cc771d1ef5c">cbegin</a> () const</td></tr>
 <tr class="memitem:a8cd1bde5f7ac4f988ba898395a77109f" id="r_a8cd1bde5f7ac4f988ba898395a77109f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a152802b0d66713ab1f76d9d5c5d8889e">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8cd1bde5f7ac4f988ba898395a77109f">end</a> ()</td></tr>
@@ -125,8 +129,18 @@ requires std::constructible_from&lt;T, Args...&gt;</td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt;<br />
 requires std::equality_comparable&lt;T&gt; &amp;&amp; std::movable&lt;T&gt;<br />
-class Cori::Core::PackedArray&lt; T, SizeT, MaxSize &gt;</div>
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00006">6</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+class Cori::Core::PackedArray&lt; T, SizeT, MaxSize &gt;</div><p>This is my packed/dense array custom implementation. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>Type to be stored in an array. </td></tr>
+    <tr><td class="paramname">SizeT</td><td>Type of size/indexes. Should be an unsigned integer. </td></tr>
+    <tr><td class="paramname">MaxSize</td><td>Maximum pack array capacity. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>I tried mimicking the stl API so should be intuitive. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00013">13</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
 </div><a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">Member Typedef Documentation</h2>
 <a id="acef15fa45f1fc37f325a9b0160908bef" name="acef15fa45f1fc37f325a9b0160908bef"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acef15fa45f1fc37f325a9b0160908bef">&#9670;&#160;</a></span>const_iterator</h2>
@@ -142,7 +156,7 @@ template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00009">9</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00016">16</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
 
 </div>
 </div>
@@ -160,7 +174,7 @@ template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00008">8</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00015">15</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
 
 </div>
 </div>
@@ -193,35 +207,6 @@ template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="a30eb51eced330053786596c44e291f7e" name="a30eb51eced330053786596c44e291f7e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a30eb51eced330053786596c44e291f7e">&#9670;&#160;</a></span>add()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="classCori_1_1Core_1_1PackedArray.html">Cori::Core::PackedArray</a>&lt; T, SizeT, MaxSize &gt;::add </td>
-          <td>(</td>
-          <td class="paramtype">const T &amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00013">13</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
-
-</div>
-</div>
 <a id="aa65ae4accb53bf074be3d4a35f8818f3" name="aa65ae4accb53bf074be3d4a35f8818f3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa65ae4accb53bf074be3d4a35f8818f3">&#9670;&#160;</a></span>at() <span class="overload">[1/2]</span></h2>
 
@@ -247,7 +232,7 @@ template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00086">86</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00100">100</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
 
 </div>
 </div>
@@ -276,7 +261,7 @@ template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00093">93</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00107">107</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
 
 </div>
 </div>
@@ -305,7 +290,7 @@ template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00056">56</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00071">71</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
 
 </div>
 </div>
@@ -334,7 +319,7 @@ template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00067">67</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00081">81</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
 
 </div>
 </div>
@@ -363,7 +348,7 @@ template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00057">57</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00072">72</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
 
 </div>
 </div>
@@ -392,7 +377,7 @@ template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00060">60</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00075">75</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
 
 </div>
 </div>
@@ -421,7 +406,7 @@ template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00100">100</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00114">114</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
 
 </div>
 </div>
@@ -453,7 +438,7 @@ requires std::constructible_from&lt;T, Args...&gt;</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00023">23</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00030">30</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -492,7 +477,7 @@ template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00071">71</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00085">85</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
 
 </div>
 </div>
@@ -521,7 +506,7 @@ template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00059">59</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00074">74</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
 
 </div>
 </div>
@@ -550,7 +535,7 @@ template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00075">75</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00089">89</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
 
 </div>
 </div>
@@ -579,7 +564,7 @@ template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00079">79</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00093">93</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
 
 </div>
 </div>
@@ -608,12 +593,84 @@ template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00082">82</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00096">96</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aadade3269ec813ea21667ee5dd515316" name="aadade3269ec813ea21667ee5dd515316"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aadade3269ec813ea21667ee5dd515316">&#9670;&#160;</a></span>push_back()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classCori_1_1Core_1_1PackedArray.html">Cori::Core::PackedArray</a>&lt; T, SizeT, MaxSize &gt;::push_back </td>
+          <td>(</td>
+          <td class="paramtype">const T &amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00020">20</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a2172972a5bcecc91f8509eca6c0bbf0b" name="a2172972a5bcecc91f8509eca6c0bbf0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2172972a5bcecc91f8509eca6c0bbf0b">&#9670;&#160;</a></span>remove() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classCori_1_1Core_1_1PackedArray.html">Cori::Core::PackedArray</a>&lt; T, SizeT, MaxSize &gt;::remove </td>
+          <td>(</td>
+          <td class="paramtype">const SizeT</td>          <td class="paramname"><span class="paramname"><em>index</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00063">63</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classCori_1_1Core_1_1PackedArray_a2172972a5bcecc91f8509eca6c0bbf0b_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1PackedArray_a2172972a5bcecc91f8509eca6c0bbf0b_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1Core_1_1PackedArray_a2172972a5bcecc91f8509eca6c0bbf0b_cgraph" id="aclassCori_1_1Core_1_1PackedArray_a2172972a5bcecc91f8509eca6c0bbf0b_cgraph">
+<area shape="rect" title=" " alt="" coords="5,36,180,81"/>
+<area shape="rect" href="classCori_1_1Core_1_1PackedArray.html#a4ce02e8ddf3e8eec14792c04c4d4cb45" title=" " alt="" coords="228,36,402,81"/>
+<area shape="poly" title=" " alt="" coords="180,56,212,56,212,61,180,61"/>
+<area shape="rect" href="classCori_1_1Core_1_1PackedArray.html#ad9289fdc51d648941332831fb4dfec13" title=" " alt="" coords="466,5,640,50"/>
+<area shape="poly" title=" " alt="" coords="402,44,450,38,450,44,403,50"/>
+<area shape="rect" href="classCori_1_1Core_1_1PackedArray.html#a8cd1bde5f7ac4f988ba898395a77109f" title=" " alt="" coords="450,74,655,102"/>
+<area shape="poly" title=" " alt="" coords="403,66,435,70,434,76,402,72"/>
+</map>
+</div>
 
 </div>
 </div>
 <a id="a4ce02e8ddf3e8eec14792c04c4d4cb45" name="a4ce02e8ddf3e8eec14792c04c4d4cb45"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4ce02e8ddf3e8eec14792c04c4d4cb45">&#9670;&#160;</a></span>remove()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ce02e8ddf3e8eec14792c04c4d4cb45">&#9670;&#160;</a></span>remove() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -637,7 +694,7 @@ template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00033">33</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00040">40</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -678,7 +735,7 @@ template&lt;typename T, std::unsigned_integral SizeT, SizeT MaxSize&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00062">62</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PackedArray_8hpp_source.html#l00077">77</a> of file <a class="el" href="PackedArray_8hpp_source.html">PackedArray.hpp</a>.</p>
 
 </div>
 </div>

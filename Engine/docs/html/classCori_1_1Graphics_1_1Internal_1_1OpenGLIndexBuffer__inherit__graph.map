@@ -1,0 +1,9 @@
+<map id="Cori::Graphics::Internal::OpenGLIndexBuffer" name="Cori::Graphics::Internal::OpenGLIndexBuffer">
+<area shape="rect" id="Node000001" title=" " alt="" coords="320,75,490,119"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Internal_1_1IndexBuffer.html" title=" " alt="" coords="53,5,224,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="239,51,320,72,319,77,238,56"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Profiling_1_1Trackable.html" title=" " alt="" coords="7,75,270,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="285,94,319,94,319,100,285,100"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1Core_1_1RegisterInFactory.html" title=" " alt="" coords="5,143,272,222"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="277,135,332,117,334,122,279,140"/>
+</map>

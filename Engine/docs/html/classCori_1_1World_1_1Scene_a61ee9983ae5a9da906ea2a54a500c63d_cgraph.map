@@ -1,8 +1,5 @@
 <map id="Cori::World::Scene::FindEntity" name="Cori::World::Scene::FindEntity">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,64,146,109"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Scene.html#a614439ccac0344926adc4c0165d64060" title=" " alt="" coords="218,29,358,74"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,72,202,63,203,68,147,78"/>
-<area shape="rect" id="Node000003" href="$structCori_1_1Utility_1_1HashedTag64.html#ab454e3afd80fb5ed6d3774a826e1fd1a" title=" " alt="" coords="194,99,383,143"/>
-<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="147,95,179,100,178,106,146,100"/>
-<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="247,29,246,19,253,10,267,5,288,3,312,5,325,12,323,17,310,10,288,8,269,10,256,15,251,21,253,28"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,146,50"/>
+<area shape="rect" id="Node000002" href="$structCori_1_1Utility_1_1HashedTag64.html#ab454e3afd80fb5ed6d3774a826e1fd1a" title="Gets the name the tag was declared with." alt="" coords="194,5,383,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,25,178,25,178,30,146,30"/>
 </map>

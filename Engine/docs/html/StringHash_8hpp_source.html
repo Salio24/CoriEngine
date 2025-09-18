@@ -97,46 +97,46 @@ $(function(){initNavTree('StringHash_8hpp_source.html','',''); });
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceCori.html">Cori</a> {</div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>    <span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceCori_1_1Utility.html">Utility</a> {</div>
-<div class="foldopen" id="foldopen00006" data-start="{" data-end="}">
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno"><a class="line" href="namespaceCori_1_1Utility.html#aadae1036bd08323331712cb16b48813e">    6</a></span>        <span class="keyword">constexpr</span> std::uint64_t <a class="code hl_function" href="namespaceCori_1_1Utility.html#aadae1036bd08323331712cb16b48813e">fnv1a64</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *str, <span class="keyword">const</span> std::size_t len) {</div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>            std::uint64_t hash = 0xcbf29ce484222325ULL; <span class="comment">// offset basis</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>            <span class="keywordflow">for</span> (std::size_t i = 0; i &lt; len; ++i) {</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>                hash ^= <span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span> <span class="keywordtype">char</span><span class="keyword">&gt;</span>(str[i]);</div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>                hash *= 0x100000001b3ULL; <span class="comment">// fnv prime</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>            }</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>            <span class="keywordflow">return</span> hash;</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>        }</div>
+<div class="foldopen" id="foldopen00009" data-start="{" data-end="}">
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno"><a class="line" href="namespaceCori_1_1Utility.html#aadae1036bd08323331712cb16b48813e">    9</a></span>        <span class="keyword">constexpr</span> std::uint64_t <a class="code hl_function" href="namespaceCori_1_1Utility.html#aadae1036bd08323331712cb16b48813e">fnv1a64</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *str, <span class="keyword">const</span> std::size_t len) {</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>            std::uint64_t hash = 0xcbf29ce484222325ULL; <span class="comment">// offset basis</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>            <span class="keywordflow">for</span> (std::size_t i = 0; i &lt; len; ++i) {</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>                hash ^= <span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span> <span class="keywordtype">char</span><span class="keyword">&gt;</span>(str[i]);</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>                hash *= 0x100000001b3ULL; <span class="comment">// fnv prime</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>            }</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>            <span class="keywordflow">return</span> hash;</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        }</div>
 </div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="namespaceCori_1_1Utility.html#a0874b91f7005b49504a8d44a4fa1d3d2">   15</a></span>        <span class="keyword">using </span><a class="code hl_typedef" href="namespaceCori_1_1Utility.html#a0874b91f7005b49504a8d44a4fa1d3d2">StringHash64</a> = uint64_t;</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="namespaceCori_1_1Utility.html#a5f965739ff8e830abe22289a76367ed2">   16</a></span>        <span class="keyword">using </span><a class="code hl_typedef" href="namespaceCori_1_1Utility.html#a5f965739ff8e830abe22289a76367ed2">StringHash32</a> = entt::hashed_string::hash_type;</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        <span class="comment">//constexpr StringHash32 HashString(const char* str) {</span></div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>        <span class="comment">//  return entt::hashed_string(str).value();</span></div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>        <span class="comment">//}</span></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment">//</span></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        <span class="comment">//constexpr StringHash32 HashString(const std::string&amp; str) {</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>        <span class="comment">//  return entt::hashed_string(str.c_str()).value();</span></div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>        <span class="comment">//}</span></div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    }</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>}</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
-<div class="foldopen" id="foldopen00028" data-start="{" data-end="}">
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="StringHash_8hpp.html#ae66998c15905f1a46444dec3f2e25cde">   28</a></span>[[nodiscard]] <span class="keyword">consteval</span> <a class="code hl_typedef" href="namespaceCori_1_1Utility.html#a5f965739ff8e830abe22289a76367ed2">Cori::Utility::StringHash32</a> <span class="keyword">operator</span><span class="stringliteral">&quot;&quot;</span>_hs32(<span class="keyword">const</span> <span class="keywordtype">char</span>* str, [[maybe_unused]] <span class="keywordtype">size_t</span> len) {</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <span class="keywordflow">return</span> entt::hashed_string(str).value();</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>}</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="namespaceCori_1_1Utility.html#a0874b91f7005b49504a8d44a4fa1d3d2">   18</a></span>        <span class="keyword">using </span><a class="code hl_typedef" href="namespaceCori_1_1Utility.html#a0874b91f7005b49504a8d44a4fa1d3d2">StringHash64</a> = uint64_t;</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="namespaceCori_1_1Utility.html#a5f965739ff8e830abe22289a76367ed2">   19</a></span>        <span class="keyword">using </span><a class="code hl_typedef" href="namespaceCori_1_1Utility.html#a5f965739ff8e830abe22289a76367ed2">StringHash32</a> = entt::hashed_string::hash_type;</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>        <span class="comment">//constexpr StringHash32 HashString(const char* str) {</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        <span class="comment">//  return entt::hashed_string(str).value();</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>        <span class="comment">//}</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="comment">//</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>        <span class="comment">//constexpr StringHash32 HashString(const std::string&amp; str) {</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>        <span class="comment">//  return entt::hashed_string(str.c_str()).value();</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>        <span class="comment">//}</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    }</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>}</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span></div>
+<div class="foldopen" id="foldopen00034" data-start="{" data-end="}">
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="StringHash_8hpp.html#ae66998c15905f1a46444dec3f2e25cde">   34</a></span>[[nodiscard]] <span class="keyword">consteval</span> <a class="code hl_typedef" href="namespaceCori_1_1Utility.html#a5f965739ff8e830abe22289a76367ed2">Cori::Utility::StringHash32</a> <span class="keyword">operator</span><span class="stringliteral">&quot;&quot;</span>_hs32(<span class="keyword">const</span> <span class="keywordtype">char</span>* str, [[maybe_unused]] <span class="keywordtype">size_t</span> len) {</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordflow">return</span> entt::hashed_string(str).value();</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>}</div>
 </div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
-<div class="foldopen" id="foldopen00032" data-start="{" data-end="}">
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="StringHash_8hpp.html#aa734251b6960bb88683a3b3741f6be09">   32</a></span>[[nodiscard]] <span class="keyword">consteval</span> <a class="code hl_typedef" href="namespaceCori_1_1Utility.html#a0874b91f7005b49504a8d44a4fa1d3d2">Cori::Utility::StringHash64</a> <span class="keyword">operator</span><span class="stringliteral">&quot;&quot;</span>_hs64(<span class="keyword">const</span> <span class="keywordtype">char</span>* str, <span class="keyword">const</span> <span class="keywordtype">size_t</span> len) {</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="namespaceCori_1_1Utility.html#aadae1036bd08323331712cb16b48813e">Cori::Utility::fnv1a64</a>(str, len);</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>}</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span></div>
+<div class="foldopen" id="foldopen00041" data-start="{" data-end="}">
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="StringHash_8hpp.html#aa734251b6960bb88683a3b3741f6be09">   41</a></span>[[nodiscard]] <span class="keyword">consteval</span> <a class="code hl_typedef" href="namespaceCori_1_1Utility.html#a0874b91f7005b49504a8d44a4fa1d3d2">Cori::Utility::StringHash64</a> <span class="keyword">operator</span><span class="stringliteral">&quot;&quot;</span>_hs64(<span class="keyword">const</span> <span class="keywordtype">char</span>* str, <span class="keyword">const</span> <span class="keywordtype">size_t</span> len) {</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="namespaceCori_1_1Utility.html#aadae1036bd08323331712cb16b48813e">Cori::Utility::fnv1a64</a>(str, len);</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>}</div>
 </div>
-<div class="ttc" id="anamespaceCori_1_1Utility_html"><div class="ttname"><a href="namespaceCori_1_1Utility.html">Cori::Utility</a></div><div class="ttdef"><b>Definition</b> <a href="AABB_8hpp_source.html#l00004">AABB.hpp:4</a></div></div>
-<div class="ttc" id="anamespaceCori_1_1Utility_html_a0874b91f7005b49504a8d44a4fa1d3d2"><div class="ttname"><a href="namespaceCori_1_1Utility.html#a0874b91f7005b49504a8d44a4fa1d3d2">Cori::Utility::StringHash64</a></div><div class="ttdeci">uint64_t StringHash64</div><div class="ttdef"><b>Definition</b> <a href="#l00015">StringHash.hpp:15</a></div></div>
-<div class="ttc" id="anamespaceCori_1_1Utility_html_a5f965739ff8e830abe22289a76367ed2"><div class="ttname"><a href="namespaceCori_1_1Utility.html#a5f965739ff8e830abe22289a76367ed2">Cori::Utility::StringHash32</a></div><div class="ttdeci">entt::hashed_string::hash_type StringHash32</div><div class="ttdef"><b>Definition</b> <a href="#l00016">StringHash.hpp:16</a></div></div>
-<div class="ttc" id="anamespaceCori_1_1Utility_html_aadae1036bd08323331712cb16b48813e"><div class="ttname"><a href="namespaceCori_1_1Utility.html#aadae1036bd08323331712cb16b48813e">Cori::Utility::fnv1a64</a></div><div class="ttdeci">constexpr std::uint64_t fnv1a64(const char *str, const std::size_t len)</div><div class="ttdef"><b>Definition</b> <a href="#l00006">StringHash.hpp:6</a></div></div>
-<div class="ttc" id="anamespaceCori_html"><div class="ttname"><a href="namespaceCori.html">Cori</a></div><div class="ttdef"><b>Definition</b> <a href="AssetManager_8cpp_source.html#l00003">AssetManager.cpp:3</a></div></div>
+<div class="ttc" id="anamespaceCori_1_1Utility_html"><div class="ttname"><a href="namespaceCori_1_1Utility.html">Cori::Utility</a></div><div class="ttdoc">A namespace for utilities of different kinds.</div><div class="ttdef"><b>Definition</b> <a href="AABB_8hpp_source.html#l00007">AABB.hpp:7</a></div></div>
+<div class="ttc" id="anamespaceCori_1_1Utility_html_a0874b91f7005b49504a8d44a4fa1d3d2"><div class="ttname"><a href="namespaceCori_1_1Utility.html#a0874b91f7005b49504a8d44a4fa1d3d2">Cori::Utility::StringHash64</a></div><div class="ttdeci">uint64_t StringHash64</div><div class="ttdef"><b>Definition</b> <a href="#l00018">StringHash.hpp:18</a></div></div>
+<div class="ttc" id="anamespaceCori_1_1Utility_html_a5f965739ff8e830abe22289a76367ed2"><div class="ttname"><a href="namespaceCori_1_1Utility.html#a5f965739ff8e830abe22289a76367ed2">Cori::Utility::StringHash32</a></div><div class="ttdeci">entt::hashed_string::hash_type StringHash32</div><div class="ttdef"><b>Definition</b> <a href="#l00019">StringHash.hpp:19</a></div></div>
+<div class="ttc" id="anamespaceCori_1_1Utility_html_aadae1036bd08323331712cb16b48813e"><div class="ttname"><a href="namespaceCori_1_1Utility.html#aadae1036bd08323331712cb16b48813e">Cori::Utility::fnv1a64</a></div><div class="ttdeci">constexpr std::uint64_t fnv1a64(const char *str, const std::size_t len)</div><div class="ttdoc">Computes the 64bit FNV-1a string hash.</div><div class="ttdef"><b>Definition</b> <a href="#l00009">StringHash.hpp:9</a></div></div>
+<div class="ttc" id="anamespaceCori_html"><div class="ttname"><a href="namespaceCori.html">Cori</a></div><div class="ttdoc">Global engine namespace.</div><div class="ttdef"><b>Definition</b> <a href="AssetManager_8cpp_source.html#l00003">AssetManager.cpp:3</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 </div><!-- container -->

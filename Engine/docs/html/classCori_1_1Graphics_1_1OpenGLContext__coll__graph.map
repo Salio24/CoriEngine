@@ -1,9 +1,0 @@
-<map id="Cori::Graphics::OpenGLContext" name="Cori::Graphics::OpenGLContext">
-<area shape="rect" id="Node000001" title=" " alt="" coords="332,83,554,111"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1RenderingContext.html" title=" " alt="" coords="51,5,238,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="254,50,380,80,379,85,252,55"/>
-<area shape="rect" id="Node000003" href="$classCori_1_1Profiling_1_1Trackable.html" title=" " alt="" coords="5,75,284,119"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="299,94,331,94,331,100,299,100"/>
-<area shape="rect" id="Node000004" href="$classCori_1_1Core_1_1RegisterInFactory.html" title=" " alt="" coords="6,144,283,205"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="280,136,386,109,387,114,282,142"/>
-</map>

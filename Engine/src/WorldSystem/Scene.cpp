@@ -2,7 +2,7 @@
 #include "Graphics/CameraController.hpp"
 #include "Physics/Triggers/Trigger.hpp"
 #include "Graphics/Renderer2D.hpp"
-#include "Graphics/Animator/QuadAnimatorNew.hpp"
+#include "Graphics/Animator/QuadAnimator.hpp"
 #include "StateSystem/StateMachine.hpp"
 
 namespace Cori {
@@ -24,17 +24,23 @@ namespace Cori {
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Scene: '{}' destroyed.", m_Name);
 		}
 
+		Entity Scene::CreateBlankEntity() {
+			entt::entity entity = m_Registry.create();
+			return Entity{{m_Registry, entity}};
+		}
+
 		Entity Scene::CreateEntity(const std::string& name, const Utility::HashedTag64& tag) {
 			entt::entity entity = m_Registry.create();
 			auto& nameComp = m_Registry.emplace<Components::Entity::Name>(entity);
 			nameComp.m_Name = name;
 			m_Registry.emplace<Components::Entity::Tag>(entity, tag);
-			m_Registry.emplace<Components::Entity::Transform>(entity);
 			m_Registry.emplace<Components::Entity::Hierarchy>(entity);
 			const auto& uuidComp = m_Registry.emplace<Components::Entity::UUID>(entity);
 			m_UUIDToEntity.insert({ uuidComp.m_UUID, entity });
 			CORI_CORE_TRACE_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Created Entity With ID: {}, Version: {}, Name: {}, Tag: {}", entt::to_integral(entity), entt::to_version(entity), name, tag.GetDebugName());
-			return Entity{ {m_Registry, entity} };
+			Entity e = entt::handle{m_Registry, entity};
+			e.AddComponent<Components::Entity::Transform>(e);
+			return e;
 		}
 
 		std::expected<void, Core::CoriError<>> Scene::AddEntityToCache(const Entity entity, const Utility::StringHash32 key) {
@@ -88,6 +94,19 @@ namespace Cori {
 			return std::unexpected(Core::CoriError("No entity found with the specified name and tag."));
 		}
 
+		std::vector<Entity> Scene::GetEntitiesWithTag(const Utility::HashedTag64& tag) {
+			std::vector<Entity> entities;
+			CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Performing slow scene-wide collection of all entities with tag: '{}'. Consider caching it. This shouldn't be called every frame! Be aware.", tag.GetDebugName());
+			const auto view = m_Registry.view<Components::Entity::Tag>();
+			for (const auto entity : view) {
+				auto& tagComp = view.get<Components::Entity::Tag>(entity);
+				if (tag == tagComp.m_Tag) {
+					entities.emplace_back(entt::handle{ m_Registry, entity });
+				}
+			}
+			return entities;
+		}
+
 		void Scene::DestroyEntity(Entity entity) {
 			if (!entity.IsValid()) { return; }
 			if (entity.HasComponents<Components::Entity::Hierarchy>()) {
@@ -106,10 +125,8 @@ namespace Cori {
 				UpdateTransform();
 			}
 
-			Graphics::Renderer2D::BeginScene(GetContextComponent<Components::Scene::Camera>());
-			Graphics::Renderer2D::DrawScene(this);
-			Graphics::Renderer2D::FlushRenderQueues();
-			Graphics::Renderer2D::EndScene();
+			Graphics::Renderer2D::SubmitScene(this);
+			Graphics::Renderer2D::EndFrame(GetContextComponent<Components::Scene::Camera>());
 		}
 
 		void Scene::OnTickUpdate(const float timeStep) {
@@ -121,10 +138,10 @@ namespace Cori {
 				fsmv.Get<Components::Entity::StateMachine>(entity).OnTickUpdate(timeStep);
 			}
 
-			EntityView animv = View<Components::Entity::QuadAnimatorNew>(Exclude<Components::Entity::InactiveLocallyFlag>());
+			EntityView animv = View<Components::Entity::QuadAnimator>(Exclude<Components::Entity::InactiveLocallyFlag>());
 
 			for (const auto entity : animv) {
-				animv.Get<Components::Entity::QuadAnimatorNew>(entity).OnTickUpdate();
+				animv.Get<Components::Entity::QuadAnimator>(entity).OnTickUpdate();
 			}
 
 			EntityView trigv = View<Components::Entity::Trigger>(Exclude<Components::Entity::InactiveLocallyFlag>());
@@ -143,7 +160,9 @@ namespace Cori {
 
 				Entity& trigger = static_cast<Physics::BodyUserData*>(static_cast<Physics::ShapeRef>(beginTouch->sensorShapeId).GetBody().GetUserData())->m_Entity;
 
-				trigger.GetComponents<Components::Entity::Trigger>().OnEnter(visitor);
+				if (trigger.IsActiveGlobally()) {
+					trigger.GetComponents<Components::Entity::Trigger>().OnEnter(visitor);
+				}
 			}
 
 			for (int32_t i = 0; i < endCount; ++i)
@@ -154,7 +173,9 @@ namespace Cori {
 
 				Entity& trigger = static_cast<Physics::BodyUserData*>(static_cast<Physics::ShapeRef>(endTouch->sensorShapeId).GetBody().GetUserData())->m_Entity;
 
-				trigger.GetComponents<Components::Entity::Trigger>().OnExit(visitor);
+				if (trigger.IsActiveGlobally()) {
+					trigger.GetComponents<Components::Entity::Trigger>().OnExit(visitor);
+				}
 			}
 
 		}
@@ -170,13 +191,12 @@ namespace Cori {
 		}
 
 		void Scene::UpdateTransform() {
-			const auto view = m_Registry.view<Components::Entity::Transform, Components::Entity::Hierarchy>();
-			for (const auto entity : view) {
-				const auto& hierarchy = view.get<Components::Entity::Hierarchy>(entity);
-				if (!m_Registry.valid(hierarchy.m_Parent)) {
-					UpdateTransformRecursive(entity, glm::mat3(1.0f), 1, false, false);
-				}
+			const auto view1 = m_Registry.view<Components::Entity::Internal::DirtyTransformFlag>();
+
+			for (const auto entity : view1) {
+				UpdateTransformRecursive(entity, glm::mat3(1.0f), 1, false, false);
 			}
+			m_Registry.clear<Components::Entity::Internal::DirtyTransformFlag>();
 		}
 		void Scene::UpdateTransformRecursive(entt::entity entity, const glm::mat3& parentTransform, const uint8_t parentDepth, const bool parentTransformDirty, const bool parentDepthDirty) {
 			auto& transform = m_Registry.get<Components::Entity::Transform>(entity);
@@ -190,7 +210,6 @@ namespace Cori {
 				} else {
 					transform.m_WorldTransform = transform.m_LastParentTransform * transform.GetLocalTransform();
 				}
-
 				transform.m_DirtyTransform = false;
 			}
 			if (layerDirty) {
@@ -205,13 +224,13 @@ namespace Cori {
 					transform.m_DirtyDepth = false;
 				}
 			}
-
 			const auto& hierarchy = m_Registry.get<Components::Entity::Hierarchy>(entity);
 			entt::entity currentChild = hierarchy.m_FirstChild;
 			while (m_Registry.valid(currentChild)) {
 				UpdateTransformRecursive(currentChild, transform.m_WorldTransform, transform.m_WorldDepth, transformDirty, layerDirty);
 				currentChild = m_Registry.get<Components::Entity::Hierarchy>(currentChild).m_NextSibling;
 			}
+
 		}
 
 		void Scene::OnHierarchyComponentDestroyed(entt::registry& registry, entt::entity entity) {

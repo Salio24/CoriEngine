@@ -1,7 +1,0 @@
-<map id="Cori::Core::Application::OnEvent" name="Cori::Core::Application::OnEvent">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,40,172,85"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1EventDispatcher.html#a34eeab42b3bb0094e7153f3363450958" title=" " alt="" coords="220,5,420,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,47,204,42,205,48,172,53"/>
-<area shape="rect" id="Node000003" href="$classCori_1_1Graphics_1_1API.html#ad905aa90475acc45c5e37818a0fdd227" title=" " alt="" coords="249,75,390,119"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="172,72,235,82,234,87,171,77"/>
-</map>

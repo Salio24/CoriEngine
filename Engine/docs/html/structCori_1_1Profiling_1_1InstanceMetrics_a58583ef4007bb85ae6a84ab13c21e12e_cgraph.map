@@ -1,8 +1,0 @@
-<map id="Cori::Profiling::InstanceMetrics::GetTotalCreatedCount" name="Cori::Profiling::InstanceMetrics::GetTotalCreatedCount">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,36,226,81"/>
-<area shape="rect" id="Node000002" href="$structCori_1_1Profiling_1_1InstanceMetrics.html#ac06c4a4d4512ccae55607e8bfa3a7d02" title=" " alt="" coords="274,5,569,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="226,45,258,41,258,47,227,50"/>
-<area shape="rect" id="Node000003" href="$structCori_1_1Profiling_1_1InstanceMetrics.html#ab56cad7544276a620332f4b7b908aa6f" title=" " alt="" coords="617,36,876,81"/>
-<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="226,59,274,60,569,60,602,59,602,65,569,65,274,65,226,64"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="570,39,602,42,601,47,569,44"/>
-</map>

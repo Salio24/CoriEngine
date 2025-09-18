@@ -1,7 +1,7 @@
 var classCori_1_1Core_1_1WindowResizeEvent =
 [
     [ "WindowResizeEvent", "classCori_1_1Core_1_1WindowResizeEvent.html#acd7eda2b72e93ae6dbf0a7f09f7cb2ae", null ],
-    [ "GetCategoryFlags", "classCori_1_1Core_1_1WindowResizeEvent.html#a1bdcaa327db574477b5fdb8c3c91131f", null ],
+    [ "GetCategoryFlags", "classCori_1_1Core_1_1WindowResizeEvent.html#a45965d74a6c390b3e5c3fd8dc44f54cf", null ],
     [ "GetEventType", "classCori_1_1Core_1_1WindowResizeEvent.html#a7eb696df6c030ed79cdd93415edbcb74", null ],
     [ "GetHeight", "classCori_1_1Core_1_1WindowResizeEvent.html#a2c8833336a5116bba2aa46dfb34f4b56", null ],
     [ "GetName", "classCori_1_1Core_1_1WindowResizeEvent.html#ab7003dd1e8ecf64f3678c24b5dde01ac", null ],

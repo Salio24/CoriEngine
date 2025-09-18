@@ -93,16 +93,22 @@ $(function(){initNavTree('classCori_1_1Utility_1_1RandomUint32.html','','classCo
 </div><!--header-->
 <div class="contents">
 
+<p>Random uint32_t generator.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="Random_8hpp_source.html">Random.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a99b8e9068d18c971579f6cc5ab062013" id="r_a99b8e9068d18c971579f6cc5ab062013"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a99b8e9068d18c971579f6cc5ab062013">Gen</a> ()</td></tr>
+<tr class="memdesc:a99b8e9068d18c971579f6cc5ab062013"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a random uint32_t without a range constraints.  <br /></td></tr>
 <tr class="memitem:a3caa33c17cb1e7794012d4c50096388b" id="r_a3caa33c17cb1e7794012d4c50096388b"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3caa33c17cb1e7794012d4c50096388b">Gen</a> (const uint32_t min, const uint32_t max)</td></tr>
+<tr class="memdesc:a3caa33c17cb1e7794012d4c50096388b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a random uint32_t with a range constraint.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="Random_8hpp_source.html#l00005">5</a> of file <a class="el" href="Random_8hpp_source.html">Random.hpp</a>.</p>
+<div class="textblock"><p>Random uint32_t generator. </p>
+
+<p class="definition">Definition at line <a class="el" href="Random_8hpp_source.html#l00008">8</a> of file <a class="el" href="Random_8hpp_source.html">Random.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a99b8e9068d18c971579f6cc5ab062013" name="a99b8e9068d18c971579f6cc5ab062013"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a99b8e9068d18c971579f6cc5ab062013">&#9670;&#160;</a></span>Gen() <span class="overload">[1/2]</span></h2>
@@ -127,7 +133,10 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Random_8hpp_source.html#l00007">7</a> of file <a class="el" href="Random_8hpp_source.html">Random.hpp</a>.</p>
+<p>Generates a random uint32_t without a range constraints. </p>
+<dl class="section return"><dt>Returns</dt><dd>A random uint32_t. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Random_8hpp_source.html#l00014">14</a> of file <a class="el" href="Random_8hpp_source.html">Random.hpp</a>.</p>
 
 </div>
 </div>
@@ -158,7 +167,17 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Random_8hpp_source.html#l00011">11</a> of file <a class="el" href="Random_8hpp_source.html">Random.hpp</a>.</p>
+<p>Generates a random uint32_t with a range constraint. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">min</td><td>Minimal viable result. </td></tr>
+    <tr><td class="paramname">max</td><td>Maximal viable result. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A random uint32_t in range [min, max]. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Random_8hpp_source.html#l00027">27</a> of file <a class="el" href="Random_8hpp_source.html">Random.hpp</a>.</p>
 
 </div>
 </div>

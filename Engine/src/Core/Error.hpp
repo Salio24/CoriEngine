@@ -5,12 +5,32 @@
 
 namespace Cori {
 	namespace Core {
+		/**
+		 * @brief All types from Types pack are std::exception or derived from it.
+		 */
 		template <typename... Types>
 		concept AllAreExceptions = (std::derived_from<Types, std::exception> && ...);
 
+		/**
+		 * @brief Custom error class mainly used in std::expected.
+		 * @tparam DeclaredTypes Types that will be obtainable.
+		 * @details Can hold variables that are passed upon creation that are later obtainable via Get method, duplicate types are illegal. As it is derived from std::exception it can be thrown.
+		 * \n If a CoriError object was constructed and never 'seen' it will print the formated error message upon destruction.
+		 * \n DeclaredTypes typenames will be embedded into the formated error message alongside the user-defined description for each one, and if they are streamable their value will be embedded as well.
+		 * \n Example usage:
+		 * \n Example specialization: CoriError<int, std::type_index>
+		 * \n Constructed like this: CoriError<int, std::type_index>("Main error message", "user-defined description for int", intValue, "user-defined description for std::type_index", type_indexValue);
+		 * \n The final error message will be: Main error message | Additional data: (user-defined description for int (int): 'intValue', user-defined description for std::type_index (std::type_index): 'Type is not streamable, you can retrieve it with Get<T>()') |
+		 * \n Also all the types from DeclaredTypes can be later retried using Get<T>(), and it also supports retrieving multiple at a time and returning them in a tuple.
+		 */
 		template <typename... DeclaredTypes>
 		class CoriError final : public std::exception {
 		public:
+			/**
+			 * @brief Constructs CoriError object and formats the final error message.
+			 * @param message Main error message.
+			 * @param args Pairs descriptions and values for each DeclaredTypes.
+			 */
 			template <typename... Args>
 			explicit CoriError(const std::string& message, Args&&... args) {
 				static_assert(sizeof...(Args) == 2 * sizeof...(DeclaredTypes), "Incorrect number of arguments provided. Expected a description and a value for each declared type.");
@@ -46,6 +66,10 @@ namespace Cori {
 			CoriError& operator=(const CoriError& other) = delete;
 			CoriError& operator=(CoriError&& other) noexcept = delete;
 
+			/**
+			 * @brief Returns the formated message and if called the CoriError is considered 'seen'.
+			 * @return Formated error message.
+			 */
 			const char* what() const noexcept override {
 				if (!m_Seen) {
 					m_Seen = true;
@@ -53,10 +77,18 @@ namespace Cori {
 				return m_Message.c_str();
 			}
 
-			void ignore() const noexcept {
+			/**
+			 * @brief Explicitly sets the CoriError object into 'seen' state.
+			 */
+			void Ignore() const {
 				m_Seen = true;
 			}
 
+			/**
+			 * @brief Retrieves the value of the type requested from the CoriError object.
+			 * @tparam T Type to retrieve.
+			 * @return Value associated with the type provided.
+			 */
 			template <typename T>
 			T Get() const {
 				static_assert(Utility::IsInPack<T, DeclaredTypes...>, "Error: Attempting to Get<T> a type T that was not declared in the CoriError<TypeIsAnalogInPacks...> specialization.");
@@ -69,6 +101,11 @@ namespace Cori {
 				throw std::runtime_error("Type was declared for CoriError but not provided in this specific error instance."); // this should be unreachable, but i will still leave it here just in case
 			}
 
+			/**
+			 * @brief The overload of Get method for use with structured bindings.
+			 * @tparam Types A pack of types to retrieve.
+			 * @return A tuple containing the values requested.
+			 */
 			template <typename... Types> requires (sizeof...(Types) > 1)
 			std::tuple<Types...> Get() const {
 				return std::make_tuple(Get<Types>()...);
@@ -92,7 +129,11 @@ namespace Cori {
 			void ProcessArgs(std::stringstream& ss, const std::string& description, ValT&& value, RestArgs&&... restArgs) {
 				static_assert(std::is_constructible_v<DeclaredT, ValT>, "A declared error type cannot be constructed from its provided value.");
 
-				ss << description << "(" << CORI_CLEAN_TYPE_NAME(DeclaredT) << "): '" << value << "'";
+				if constexpr (Utility::IsStreamable<DeclaredT>) {
+					ss << description << " (" << CORI_CLEAN_TYPE_NAME(DeclaredT) << "): '" << value << "'";
+				} else {
+					ss << description << " (" << CORI_CLEAN_TYPE_NAME(DeclaredT) << "): 'Type is not streamable, you can retrieve it with Get<T>()'";
+				}
 
 				if constexpr (sizeof...(RestArgs) > 0) {
 					ss << ", ";
@@ -106,10 +147,14 @@ namespace Cori {
 			}
 		};
 
-		template <typename... Errors> requires AllAreExceptions<Errors...>
+		/**
+		 * @brief This class utilizes std::variant to hold one of the possible exception types.
+		 * @tparam Exceptions Possible exceptions. Should be either std::expected or derived from it.
+		 */
+		template <typename... Exceptions> requires AllAreExceptions<Exceptions...>
 		class PossibleErrors {
 		public:
-			template <typename E> requires(std::is_same_v<std::decay_t<E>, Errors> || ...)
+			template <typename E> requires(std::is_same_v<std::decay_t<E>, Exceptions> || ...)
 			PossibleErrors(E&& e) : m_Variant(std::forward<E>(e)) {} // NOLINT (to make clang-tidy happy :) ) constructor should be implicid for std::unexpected to work properly
 
 			~PossibleErrors() {
@@ -131,6 +176,10 @@ namespace Cori {
 			PossibleErrors& operator=(const PossibleErrors& other) = delete;
 			PossibleErrors& operator=(PossibleErrors&& other) noexcept = delete;
 
+			/**
+			 * @brief Returns a pointer to the exception held inside of the object.
+			 * @return Pointer to the exception.
+			 */
 			[[nodiscard]] const std::exception* GetRaw() const {
 				m_ErrorHandled = true;
 				return std::visit([](const auto& e) -> const std::exception* {
@@ -138,21 +187,36 @@ namespace Cori {
 				}, m_Variant);
 			}
 
+
+			/**
+			 * @brief Visits the variant inside of the object with a callable.
+			 * @param visitor A callable that is valid with any of the possible errors stored.
+			 */
 			template <typename Visitor>
 			void Visit(Visitor&& visitor) const & {
 				m_ErrorHandled = true;
 				std::visit(std::forward<Visitor>(visitor), m_Variant);
 			}
 
+			/**
+			 * @brief Visits the variant inside of the object with a callable.
+			 * @param visitor A callable that accepts and is valid with any of the possible errors stored.
+			 */
 			template <typename Visitor>
 			void Visit(Visitor&& visitor) const && {
 				m_ErrorHandled = true;
 				std::visit(std::forward<Visitor>(visitor), std::move(m_Variant));
 			}
 
-			template <typename SpecificError, typename Func>
+			/**
+			 * @brief Handles the exception with a callable if it is a specific exception type.
+			 * @tparam SpecificException Exception type the method will handle.
+			 * @param handler A callable function that accepts SpecificException.
+			 * @note This can be used as a monadic method.
+			 */
+			template <typename SpecificException, typename Func>
 			PossibleErrors& On(Func&& handler) & {
-				auto* e = std::get_if<SpecificError>(&m_Variant);
+				auto* e = std::get_if<SpecificException>(&m_Variant);
 				if (e) {
 					handler(*e);
 					m_ErrorHandled = true;
@@ -160,9 +224,15 @@ namespace Cori {
 				return *this;
 			}
 
-			template <typename SpecificError, typename Func>
+			/**
+			 * @brief Handles the exception with a callable if it is a specific exception type.
+			 * @tparam SpecificException Exception type the method will handle.
+			 * @param handler A callable function that accepts SpecificException.
+			 * @note This can be used as a monadic method.
+			 */
+			template <typename SpecificException, typename Func>
 			PossibleErrors&& On(Func&& handler) && {
-				auto* e = std::get_if<SpecificError>(&m_Variant);
+				auto* e = std::get_if<SpecificException>(&m_Variant);
 				if (e) {
 					handler(*e);
 					m_ErrorHandled = true;
@@ -170,17 +240,18 @@ namespace Cori {
 				return std::move(*this);
 			}
 
-			void JustLog() const {
-				CORI_CORE_ERROR("Logging an error inside of PossibleErrors. Error: '{}'", GetRaw()->what());
-			}
 
+			/**
+			 * @brief Simply returns the formated error message held inside the execution object.
+			 * @return Formated error message.
+			 */
 			const char* GetWhat() const {
 				return GetRaw()->what();
 			}
 
 		private:
-			std::variant<Errors...> m_Variant;
-			mutable bool m_ErrorHandled{false};
+			std::variant<Exceptions...> m_Variant;
+			mutable bool m_ErrorHandled{ false };
 		};
 	}
 }

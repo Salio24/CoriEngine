@@ -4,17 +4,35 @@
 
 namespace Cori {
 	namespace Core {
+		/**
+		 * @brief A 128bit UUID, can be serialized to the string and deserialized from it.
+		 */
 		class UUID {
 		public:
+			/**
+			 * @brief Generates a random 128bit UUID.
+			 */
 			UUID();
+
+			/**
+			 * @brief Loads UUID from a serialized string, the one created by GetSerializationString() method.
+			 * @param uuidStr Serialized string.
+			 */
 			explicit UUID(const std::string& uuidStr) : m_ID(LoadFromString(uuidStr)) {}
 
 			explicit operator uuids::uuid() const noexcept { return m_ID; }
 
+			/**
+			 * @brief Returns the UUID as a formated string liable for serialization.
+			 * @return Formated string.
+			 */
 			[[nodiscard]] std::string GetSerializationString() const {
 				return uuids::to_string(m_ID);
 			}
 
+			/**
+			 * @brief Do really i need to explain this?
+			 */
 			bool operator==(const UUID& other) const {
 				return m_ID ==  other.m_ID;
 			}

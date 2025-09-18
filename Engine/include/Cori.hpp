@@ -29,13 +29,14 @@
 #include "../src/Graphics/CameraController.hpp"
 #include "../src/Graphics/Renderer2D.hpp"
 #include "../src/Graphics/Animator/AnimationPack.hpp"
-#include "../src/Graphics/Animator/QuadAnimatorNew.hpp"
+#include "../src/Graphics/Animator/QuadAnimator.hpp"
+#include "../src/Graphics/Color.hpp"
 
 #include "../src/AssetManager/AssetManager.hpp"
 
 #include "../src/FileSystem/JsonSerializer.hpp"
 
-#include "../src/Profiling/TimeProfiler.hpp"
+#include "../src/Profiling/Profiler.hpp"
 
 #include "../src/WorldSystem/Scene.hpp"
 #include "../src/WorldSystem/SceneManager.hpp"

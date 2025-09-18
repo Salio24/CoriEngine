@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['opengl_0',['OpenGL',['../structCori_1_1Logger_1_1Tags_1_1Graphics.html#a2d26b224495f861fd82906d190559bca',1,'Cori::Logger::Tags::Graphics']]]
+  ['point_0',['point',['../structCori_1_1Physics_1_1CastResult.html#a12b77e9e5fe6287523a76df83fcc769b',1,'Cori::Physics::CastResult']]]
 ];

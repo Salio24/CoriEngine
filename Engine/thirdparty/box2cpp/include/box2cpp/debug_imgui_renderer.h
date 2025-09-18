@@ -375,7 +375,7 @@ namespace Cori::Physics
 		}
 
 
-		void DrawText(b2Vec2 p, fmt::color color, std::string text) {
+		void DrawText(b2Vec2 p, fmt::color color, const std::string& text) {
 			DrawList().AddText(Box2dToImguiPoint(p), FmtColorToImguiColor(color), text.c_str());
 			
 		}

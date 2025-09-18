@@ -47,7 +47,7 @@
 #include <imgui.h>
 #include "../src/Utility/Macros.hpp"
 #include "../src/Core/Logger.hpp"
-#include "../src/Profiling/TimeProfiler.hpp"
+#include "../src/Profiling/Profiler.hpp"
 #include "../src/Core/Uuid.hpp"
 #include "../src/Core/Error.hpp"
 

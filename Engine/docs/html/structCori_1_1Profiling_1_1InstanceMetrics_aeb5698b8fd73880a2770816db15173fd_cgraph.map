@@ -1,7 +1,0 @@
-<map id="Cori::Profiling::InstanceMetrics::Report" name="Cori::Profiling::InstanceMetrics::Report">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,40,178,85"/>
-<area shape="rect" id="Node000002" href="$structCori_1_1Profiling_1_1InstanceMetrics.html#a179a01917fe48888a883a1c41c7d8ceb" title=" " alt="" coords="250,5,460,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,48,234,41,235,46,178,54"/>
-<area shape="rect" id="Node000003" href="$structCori_1_1Profiling_1_1InstanceMetrics.html#ab56cad7544276a620332f4b7b908aa6f" title=" " alt="" coords="226,75,485,119"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="178,71,211,75,210,81,178,76"/>
-</map>

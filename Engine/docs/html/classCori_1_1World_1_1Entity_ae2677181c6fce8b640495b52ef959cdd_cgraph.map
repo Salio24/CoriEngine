@@ -1,9 +1,0 @@
-<map id="Cori::World::Entity::FindChildByName" name="Cori::World::Entity::FindChildByName">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,40,150,85"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Entity.html#ab8a030530a39a2c1b30f3bfee117d2a2" title=" " alt="" coords="198,5,337,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,47,182,41,183,46,151,52"/>
-<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="198,75,337,119"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="151,73,183,79,182,84,150,78"/>
-<area shape="rect" id="Node000004" href="$classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="385,75,524,119"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="337,94,370,94,370,100,337,100"/>
-</map>

@@ -1,5 +1,5 @@
 #include "Image.hpp"
-#include "Utility/PathDefines.hpp"
+#include <PathDefinesGenerated.hpp>
 #include <SDL3_image/SDL_image.h>
 
 namespace {
@@ -17,19 +17,20 @@ namespace {
 namespace Cori {
 	namespace Graphics {
 		Image::Image(const std::filesystem::path& path) {
+			const std::filesystem::path placeholder = FileSystem::Internal::PathDefines::GetEngineDataRoot() / "/placeholders/missing_texture32.png";
 			if (std::filesystem::exists(path)) {
-				m_Surface = IMG_Load(path.c_str());
+				m_Surface = IMG_Load(path.string().c_str());
 			} else {
 				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Image }, "Could not find an image at the specified path: '{}', a placeholder will be loaded instead.", path.string());
-				m_Surface = IMG_Load(Utility::Internal::PathDefines::PlaceholderTexture);
-				CORI_CORE_ASSERT(m_Surface, "Failed to load a placeholder image, placeholder path: '{}'", Utility::Internal::PathDefines::PlaceholderTexture);
+				m_Surface = IMG_Load(placeholder.string().c_str());
+				CORI_CORE_ASSERT(m_Surface, "Failed to load a placeholder image, placeholder path: '{}'", placeholder.string());
 			}
 
 
 			if (!m_Surface) {
 				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Image }, "Failed to load image at path: '{}'. SDL_Error: '{}'", path.string(), SDL_GetError());
-				m_Surface = IMG_Load(Utility::Internal::PathDefines::PlaceholderTexture);
-				CORI_CORE_ASSERT(m_Surface, "Failed to load a placeholder image, placeholder path: '{}'", Utility::Internal::PathDefines::PlaceholderTexture);
+				m_Surface = IMG_Load(placeholder.string().c_str());
+				CORI_CORE_ASSERT(m_Surface, "Failed to load a placeholder image, placeholder path: '{}'", placeholder.string());
 			}
 			else {
 				m_SuccessStatus = true;
@@ -42,8 +43,8 @@ namespace Cori {
 					SDL_Surface* converted = SDL_ConvertSurface(static_cast<SDL_Surface*>(m_Surface), SDL_PIXELFORMAT_RGBA32);
 					if (!converted) {
 						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Image }, "Failed to convert image at path: '{}'. Loading placeholder. SDL_Error: '{}'", path.string(), SDL_GetError());
-						m_Surface = IMG_Load(Utility::Internal::PathDefines::PlaceholderTexture);
-						CORI_CORE_ASSERT(m_Surface, "Failed to load a placeholder image, placeholder path: '{}'", Utility::Internal::PathDefines::PlaceholderTexture);
+						m_Surface = IMG_Load(placeholder.string().c_str());
+						CORI_CORE_ASSERT(m_Surface, "Failed to load a placeholder image, placeholder path: '{}'", placeholder.string());
 						SDL_DestroySurface(converted);
 						m_SuccessStatus = false;
 					}
@@ -95,6 +96,10 @@ namespace Cori {
 		}
 
 		std::expected<void, Core::CoriError<>> Image::AddPadding(const glm::u16vec2 spriteResolution) {
+			if (m_IsPadded) {
+				std::unexpected(Core::CoriError("The image is already padded, you can't add padding to the image if it is already padded."));
+			}
+
 			auto* originalSurface = static_cast<SDL_Surface*>(m_Surface);
 
 			const uint32_t cols = originalSurface->w / spriteResolution.x;
@@ -228,11 +233,6 @@ namespace Cori {
 			}
 
 			SDL_UnlockSurface(static_cast<SDL_Surface*>(m_Surface));
-		}
-
-		void Image::Mirror() {
-			FlipVertically();
-			FlipHorizontally();
 		}
 	}
 }

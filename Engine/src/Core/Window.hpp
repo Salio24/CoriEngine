@@ -5,9 +5,14 @@
 
 namespace Cori {
 	namespace Graphics {
-		class OpenGLContext;
+		namespace Internal {
+			class OpenGLContext;
+		}
 	}
 	namespace Core {
+		namespace Internal {
+			class ImGuiLayer;
+		}
 		struct ScreenMode {
 			int32_t m_Width{};
 			int32_t m_Height{};
@@ -32,38 +37,80 @@ namespace Cori {
 			EXCLUSIVE_FULLSCREEN = 2
 		};
 
+		/**
+		 * @brief This class manages everything that is connected with physical Window management, i might add multiwindow support later, but for now, only one Window per application.
+		 */
 		class Window : public Profiling::Trackable<Window> {
 		public:
-			static std::unique_ptr<Window> Create(std::string name, const bool vsync = false);
-
 			~Window();
 
+			/**
+			 * @brief Give the current window width.
+			 * @return Window width in pixels.
+			 */
 			[[nodiscard]] int32_t GetWidth() const;
+
+			/**
+			 * @brief Give the current window height.
+			 * @return Window height in pixels.
+			 */
 			[[nodiscard]] int32_t GetHeight() const;
 
+			/**
+			 * @brief Returns the graphical API used by this window.
+			 * @return API enumerator.
+			 */
 			[[nodiscard]] static Graphics::GraphicsAPIs GetCurrentAPI() { return s_API; } // NOLINT
 
+			/**
+			 * @brief Changes the VSync state.
+			 * @param status True enable, false disable.
+			 */
 			void SetVSync(const bool status);
+
+			/**
+			 * @brief Checks is VSynch is currently enabled.
+			 * @return True enabled, false disabled.
+			 */
 			[[nodiscard]] bool IsVSync() const;
 
+			/**
+			 * @brief Retrieves a list of all available ScreenMode.
+			 * @return A vector containing all available ScreenMode.
+			 */
 			[[nodiscard]] std::vector<ScreenMode> GetScreenModes() const;
-			[[nodiscard]] std::expected<void, CoriError<>> SetScreenMode(const ScreenMode& mode);
 
+			/**
+			 * @brief Changes the current ScreenMode.
+			 * @param mode ScreenMode to change to.
+			 * @return Expected object with void on success or CoriError<> on failure.
+			 */
+			std::expected<void, CoriError<>> SetScreenMode(const ScreenMode& mode);
+
+			/**
+			 * @brief Gets the current WindowMode;
+			 * @return Enumerator of the current WindowMode.
+			 */
 			[[nodiscard]] WindowMode GetWindowMode() const;
-			[[nodiscard]] std::expected<void, CoriError<>> SetWindowMode(WindowMode mode);
 
-		protected:
+			/**
+			 * @brief Changes the current WindowMode.
+			 * @param mode WindowMode enumerator to change to.
+			 * @return Expected object with void on success or CoriError<> on failure.
+			 */
+			std::expected<void, CoriError<>> SetWindowMode(WindowMode mode);
 
-			friend class Application;
-			void OnUpdate();
-			void SetEventCallback(const EventCallbackFn& callback);
-
-			friend class ImGuiLayer;
-			friend Graphics::OpenGLContext;
+		private:
+			friend Internal::ImGuiLayer;
+			friend Graphics::Internal::OpenGLContext;
 			[[nodiscard]] void* GetNativeContext() const;
 			[[nodiscard]] void* GetNativeWindow() const;
 
-		private:
+			friend class Application;
+			[[nodiscard]] static std::unique_ptr<Window> Create(std::string name, const bool vsync = false);
+			void OnUpdate();
+			void SetEventCallback(const EventCallbackFn& callback);
+
 			explicit Window(std::string title, const bool vsync = false);
 
 			inline static auto s_API = Graphics::GraphicsAPIs::OpenGL;

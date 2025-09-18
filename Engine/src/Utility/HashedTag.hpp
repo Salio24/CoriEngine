@@ -3,7 +3,14 @@
 
 namespace Cori {
 	namespace Utility {
+		/**
+		 * @brief HashedTag that uses a 64bit string hash (FNV-1a).
+		 */
 		struct HashedTag64 {
+			/**
+			 * @brief Gets the name the tag was declared with.
+			 * @return c
+			 */
 			const char* GetDebugName() const {
 				return m_DebugName;
 			}
@@ -11,7 +18,6 @@ namespace Cori {
 			bool operator==(const HashedTag64& other) const {
 				return m_Hash == other.m_Hash;
 			}
-
 
 			StringHash64 m_Hash{ 0 };
 			const char* m_DebugName;
@@ -42,6 +48,10 @@ namespace Cori {
 	#define CONCAT_IMPL(a, b) a##b
 	#define CONCAT(a, b) CONCAT_IMPL(a, b)
 
+	/**
+	 * @brief Declares a hashed tag.
+	 * @param tag Name to use for a tag.
+	 */
 	#define CORI_DECLARE_TAG(tag) inline constexpr Cori::Utility::HashedTag64 tag{#tag##_hs64, #tag}; \
 		static const bool CONCAT(RegisterTagForCheck, __LINE__) = [](){ \
 			Cori::Utility::Internal::CheckGlobalTag64Collision(#tag##_hs64, #tag); \
@@ -49,6 +59,10 @@ namespace Cori {
 		}
 
 	#else
+	/**
+	 * @brief Declares a hashed tag.
+	 * @param tag Name to use for a tag.
+	 */
 	#define CORI_DECLARE_TAG(tag) inline constexpr Cori::Utility::HashedTag64 tag{#tag##_hs64, #tag};
 	#endif
 #else

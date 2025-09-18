@@ -44,18 +44,18 @@ namespace Cori {
 
 		class MouseButtonEvent : public Event {
 		public:
-			CoriMouseCode GetMouseButton() const { return m_Button; }
+			CoriMouseKeycode GetMouseButton() const { return m_Button; }
 			EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryMouseButton | EventCategoryInput)
 		protected:
-			explicit MouseButtonEvent(const CoriMouseCode button)
+			explicit MouseButtonEvent(const CoriMouseKeycode button)
 				: m_Button(button) {}
 
-			CoriMouseCode m_Button{ CORI_MOUSEBUTTON_UNKNOWN };
+			CoriMouseKeycode m_Button{ CORI_MOUSEBUTTON_UNKNOWN };
 		};
 
 		class MouseButtonPressedEvent final : public MouseButtonEvent {
 		public:
-			explicit MouseButtonPressedEvent(const CoriMouseCode button)
+			explicit MouseButtonPressedEvent(const CoriMouseKeycode button)
 				: MouseButtonEvent(button) {}
 
 			std::string ToString() const override {
@@ -66,7 +66,7 @@ namespace Cori {
 
 		class MouseButtonReleasedEvent final : public MouseButtonEvent {
 		public:
-			explicit MouseButtonReleasedEvent(const CoriMouseCode button)
+			explicit MouseButtonReleasedEvent(const CoriMouseKeycode button)
 				: MouseButtonEvent(button) {}
 
 			std::string ToString() const override {

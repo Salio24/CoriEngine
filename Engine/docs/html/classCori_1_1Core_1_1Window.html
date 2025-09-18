@@ -93,13 +93,16 @@ $(function(){initNavTree('classCori_1_1Core_1_1Window.html','','classCori_1_1Cor
 </div><!--header-->
 <div class="contents">
 
+<p>This class manages everything that is connected with physical <a class="el" href="classCori_1_1Core_1_1Window.html" title="This class manages everything that is connected with physical Window management, i might add multiwin...">Window</a> management, i might add multiwindow support later, but for now, only one <a class="el" href="classCori_1_1Core_1_1Window.html" title="This class manages everything that is connected with physical Window management, i might add multiwin...">Window</a> per application.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="Window_8hpp_source.html">Window.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for Cori::Core::Window:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1Core_1_1Window__inherit__graph.png" border="0" usemap="#aCori_1_1Core_1_1Window_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
 <map name="aCori_1_1Core_1_1Window_inherit__map" id="aCori_1_1Core_1_1Window_inherit__map">
-<area shape="rect" title=" " alt="" coords="23,98,168,126"/>
+<area shape="rect" title="This class manages everything that is connected with physical Window management, i might add multiwin..." alt="" coords="23,98,168,126"/>
 <area shape="rect" href="classCori_1_1Profiling_1_1Trackable.html" title=" " alt="" coords="5,5,186,50"/>
 <area shape="poly" title=" " alt="" coords="98,66,98,97,93,97,93,66"/>
 </map>
@@ -109,7 +112,7 @@ Collaboration diagram for Cori::Core::Window:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1Core_1_1Window__coll__graph.png" border="0" usemap="#aCori_1_1Core_1_1Window_coll__map" loading="lazy" alt="Collaboration graph"/></div>
 <map name="aCori_1_1Core_1_1Window_coll__map" id="aCori_1_1Core_1_1Window_coll__map">
-<area shape="rect" title=" " alt="" coords="23,98,168,126"/>
+<area shape="rect" title="This class manages everything that is connected with physical Window management, i might add multiwin..." alt="" coords="23,98,168,126"/>
 <area shape="rect" href="classCori_1_1Profiling_1_1Trackable.html" title=" " alt="" coords="5,5,186,50"/>
 <area shape="poly" title=" " alt="" coords="98,66,98,97,93,97,93,66"/>
 </map>
@@ -123,34 +126,35 @@ Classes</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a3aefba0f81afbd93cfe4a30c31599753" id="r_a3aefba0f81afbd93cfe4a30c31599753"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3aefba0f81afbd93cfe4a30c31599753">~Window</a> ()</td></tr>
 <tr class="memitem:aaa78dc6e7c9e22b75d164758ab3fd137" id="r_aaa78dc6e7c9e22b75d164758ab3fd137"><td class="memItemLeft" align="right" valign="top">int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaa78dc6e7c9e22b75d164758ab3fd137">GetWidth</a> () const</td></tr>
+<tr class="memdesc:aaa78dc6e7c9e22b75d164758ab3fd137"><td class="mdescLeft">&#160;</td><td class="mdescRight">Give the current window width.  <br /></td></tr>
 <tr class="memitem:a1219353bd026ce777945452057bdd921" id="r_a1219353bd026ce777945452057bdd921"><td class="memItemLeft" align="right" valign="top">int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1219353bd026ce777945452057bdd921">GetHeight</a> () const</td></tr>
+<tr class="memdesc:a1219353bd026ce777945452057bdd921"><td class="mdescLeft">&#160;</td><td class="mdescRight">Give the current window height.  <br /></td></tr>
 <tr class="memitem:ac844103c29392f145f760cf9f6fab6cc" id="r_ac844103c29392f145f760cf9f6fab6cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac844103c29392f145f760cf9f6fab6cc">SetVSync</a> (const bool status)</td></tr>
+<tr class="memdesc:ac844103c29392f145f760cf9f6fab6cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the VSync state.  <br /></td></tr>
 <tr class="memitem:accaaf8dee723ddf78ff5eadda5b27d51" id="r_accaaf8dee723ddf78ff5eadda5b27d51"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#accaaf8dee723ddf78ff5eadda5b27d51">IsVSync</a> () const</td></tr>
+<tr class="memdesc:accaaf8dee723ddf78ff5eadda5b27d51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks is VSynch is currently enabled.  <br /></td></tr>
 <tr class="memitem:a337ad17d98810547e15d4c0711b166aa" id="r_a337ad17d98810547e15d4c0711b166aa"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a337ad17d98810547e15d4c0711b166aa">GetScreenModes</a> () const</td></tr>
+<tr class="memdesc:a337ad17d98810547e15d4c0711b166aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves a list of all available <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a>.  <br /></td></tr>
 <tr class="memitem:a6ecba393a8a84ce0f4c7d30d0fc6c08e" id="r_a6ecba393a8a84ce0f4c7d30d0fc6c08e"><td class="memItemLeft" align="right" valign="top">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6ecba393a8a84ce0f4c7d30d0fc6c08e">SetScreenMode</a> (const <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a> &amp;mode)</td></tr>
+<tr class="memdesc:a6ecba393a8a84ce0f4c7d30d0fc6c08e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the current <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a>.  <br /></td></tr>
 <tr class="memitem:ab051f165e8a834ef0df43154f64672fd" id="r_ab051f165e8a834ef0df43154f64672fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceCori_1_1Core.html#a4058f0d1174cf6b294dfc0a31642cb95">WindowMode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab051f165e8a834ef0df43154f64672fd">GetWindowMode</a> () const</td></tr>
+<tr class="memdesc:ab051f165e8a834ef0df43154f64672fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the current <a class="el" href="namespaceCori_1_1Core.html#a4058f0d1174cf6b294dfc0a31642cb95">WindowMode</a>;.  <br /></td></tr>
 <tr class="memitem:adf479affc833e89a9275b708d7c24572" id="r_adf479affc833e89a9275b708d7c24572"><td class="memItemLeft" align="right" valign="top">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adf479affc833e89a9275b708d7c24572">SetWindowMode</a> (<a class="el" href="namespaceCori_1_1Core.html#a4058f0d1174cf6b294dfc0a31642cb95">WindowMode</a> mode)</td></tr>
+<tr class="memdesc:adf479affc833e89a9275b708d7c24572"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the current <a class="el" href="namespaceCori_1_1Core.html#a4058f0d1174cf6b294dfc0a31642cb95">WindowMode</a>.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a52e67079bcba5610f4c1db74357e1f52" id="r_a52e67079bcba5610f4c1db74357e1f52"><td class="memItemLeft" align="right" valign="top">static std::unique_ptr&lt; <a class="el" href="classCori_1_1Core_1_1Window.html">Window</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a52e67079bcba5610f4c1db74357e1f52">Create</a> (std::string name, const bool vsync=false)</td></tr>
 <tr class="memitem:a675130786b522717fb797d28166b1da5" id="r_a675130786b522717fb797d28166b1da5"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespaceCori_1_1Graphics.html#a506205d247975afdf34efa0392771312">Graphics::GraphicsAPIs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a675130786b522717fb797d28166b1da5">GetCurrentAPI</a> ()</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-pro-methods" class="groupheader"><a id="pro-methods" name="pro-methods"></a>
-Protected Member Functions</h2></td></tr>
-<tr class="memitem:ab8c60d316674ba5859388b95ec1fbc35" id="r_ab8c60d316674ba5859388b95ec1fbc35"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab8c60d316674ba5859388b95ec1fbc35">OnUpdate</a> ()</td></tr>
-<tr class="memitem:a558ab56b88591689101fe8942572fbec" id="r_a558ab56b88591689101fe8942572fbec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a558ab56b88591689101fe8942572fbec">SetEventCallback</a> (const <a class="el" href="namespaceCori_1_1Core.html#a08e9d123ca1f41c356257d96fc97c241">EventCallbackFn</a> &amp;callback)</td></tr>
-<tr class="memitem:a5649c47c4d8d94536fd3a7648be7cba3" id="r_a5649c47c4d8d94536fd3a7648be7cba3"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5649c47c4d8d94536fd3a7648be7cba3">GetNativeContext</a> () const</td></tr>
-<tr class="memitem:a4fa3bd225d4cca3a963d6fbc4039818c" id="r_a4fa3bd225d4cca3a963d6fbc4039818c"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4fa3bd225d4cca3a963d6fbc4039818c">GetNativeWindow</a> () const</td></tr>
+<tr class="memdesc:a675130786b522717fb797d28166b1da5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the graphical API used by this window.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-friends" class="groupheader"><a id="friends" name="friends"></a>
 Friends</h2></td></tr>
 <tr class="memitem:a23f25bcc02a0e94c2f5a4188496b04d0" id="r_a23f25bcc02a0e94c2f5a4188496b04d0"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a23f25bcc02a0e94c2f5a4188496b04d0">Application</a></td></tr>
-<tr class="memitem:aac33c3bcb667ff80a3ece6045da4c257" id="r_aac33c3bcb667ff80a3ece6045da4c257"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aac33c3bcb667ff80a3ece6045da4c257">ImGuiLayer</a></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="Window_8hpp_source.html#l00035">35</a> of file <a class="el" href="Window_8hpp_source.html">Window.hpp</a>.</p>
+<div class="textblock"><p>This class manages everything that is connected with physical <a class="el" href="classCori_1_1Core_1_1Window.html" title="This class manages everything that is connected with physical Window management, i might add multiwin...">Window</a> management, i might add multiwindow support later, but for now, only one <a class="el" href="classCori_1_1Core_1_1Window.html" title="This class manages everything that is connected with physical Window management, i might add multiwin...">Window</a> per application. </p>
+
+<p class="definition">Definition at line <a class="el" href="Window_8hpp_source.html#l00043">43</a> of file <a class="el" href="Window_8hpp_source.html">Window.hpp</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a3aefba0f81afbd93cfe4a30c31599753" name="a3aefba0f81afbd93cfe4a30c31599753"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3aefba0f81afbd93cfe4a30c31599753">&#9670;&#160;</a></span>~Window()</h2>
@@ -167,42 +171,11 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00109">109</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00116">116</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
 
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="a52e67079bcba5610f4c1db74357e1f52" name="a52e67079bcba5610f4c1db74357e1f52"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a52e67079bcba5610f4c1db74357e1f52">&#9670;&#160;</a></span>Create()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::unique_ptr&lt; <a class="el" href="classCori_1_1Core_1_1Window.html">Window</a> &gt; Cori::Core::Window::Create </td>
-          <td>(</td>
-          <td class="paramtype">std::string</td>          <td class="paramname"><span class="paramname"><em>name</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const bool</td>          <td class="paramname"><span class="paramname"><em>vsync</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00028">28</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
-
-</div>
-</div>
 <a id="a675130786b522717fb797d28166b1da5" name="a675130786b522717fb797d28166b1da5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a675130786b522717fb797d28166b1da5">&#9670;&#160;</a></span>GetCurrentAPI()</h2>
 
@@ -226,7 +199,10 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Window_8hpp_source.html#l00044">44</a> of file <a class="el" href="Window_8hpp_source.html">Window.hpp</a>.</p>
+<p>Returns the graphical API used by this window. </p>
+<dl class="section return"><dt>Returns</dt><dd>API enumerator. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Window_8hpp_source.html#l00063">63</a> of file <a class="el" href="Window_8hpp_source.html">Window.hpp</a>.</p>
 
 </div>
 </div>
@@ -253,61 +229,10 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00194">194</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p>Give the current window height. </p>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="classCori_1_1Core_1_1Window.html" title="This class manages everything that is connected with physical Window management, i might add multiwin...">Window</a> height in pixels. </dd></dl>
 
-</div>
-</div>
-<a id="a5649c47c4d8d94536fd3a7648be7cba3" name="a5649c47c4d8d94536fd3a7648be7cba3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5649c47c4d8d94536fd3a7648be7cba3">&#9670;&#160;</a></span>GetNativeContext()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void * Cori::Core::Window::GetNativeContext </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel nodiscard">nodiscard</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00221">221</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a4fa3bd225d4cca3a963d6fbc4039818c" name="a4fa3bd225d4cca3a963d6fbc4039818c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4fa3bd225d4cca3a963d6fbc4039818c">&#9670;&#160;</a></span>GetNativeWindow()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void * Cori::Core::Window::GetNativeWindow </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel nodiscard">nodiscard</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00225">225</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00199">199</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
 
 </div>
 </div>
@@ -334,7 +259,10 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00229">229</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p>Retrieves a list of all available <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a>. </p>
+<dl class="section return"><dt>Returns</dt><dd>A vector containing all available <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00234">234</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
 
 </div>
 </div>
@@ -361,7 +289,10 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00190">190</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p>Give the current window width. </p>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="classCori_1_1Core_1_1Window.html" title="This class manages everything that is connected with physical Window management, i might add multiwin...">Window</a> width in pixels. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00195">195</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
 
 </div>
 </div>
@@ -388,7 +319,10 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00243">243</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p>Gets the current <a class="el" href="namespaceCori_1_1Core.html#a4058f0d1174cf6b294dfc0a31642cb95">WindowMode</a>;. </p>
+<dl class="section return"><dt>Returns</dt><dd>Enumerator of the current <a class="el" href="namespaceCori_1_1Core.html#a4058f0d1174cf6b294dfc0a31642cb95">WindowMode</a>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00248">248</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
 
 </div>
 </div>
@@ -415,61 +349,10 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00216">216</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p>Checks is VSynch is currently enabled. </p>
+<dl class="section return"><dt>Returns</dt><dd>True enabled, false disabled. </dd></dl>
 
-</div>
-</div>
-<a id="ab8c60d316674ba5859388b95ec1fbc35" name="ab8c60d316674ba5859388b95ec1fbc35"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab8c60d316674ba5859388b95ec1fbc35">&#9670;&#160;</a></span>OnUpdate()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::Core::Window::OnUpdate </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00117">117</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a558ab56b88591689101fe8942572fbec" name="a558ab56b88591689101fe8942572fbec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a558ab56b88591689101fe8942572fbec">&#9670;&#160;</a></span>SetEventCallback()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::Core::Window::SetEventCallback </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceCori_1_1Core.html#a08e9d123ca1f41c356257d96fc97c241">EventCallbackFn</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>callback</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00199">199</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00221">221</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
 
 </div>
 </div>
@@ -478,9 +361,6 @@ Friends</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">CoriError</a>&lt;&gt; &gt; Cori::Core::Window::SetScreenMode </td>
@@ -489,21 +369,25 @@ Friends</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel nodiscard">nodiscard</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00238">238</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p>Changes the current <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mode</td><td><a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a> to change to. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with void on success or <a class="el" href="classCori_1_1Core_1_1CoriError.html" title="Custom error class mainly used in std::expected.">CoriError&lt;&gt;</a> on failure. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00243">243</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1Core_1_1Window_a6ecba393a8a84ce0f4c7d30d0fc6c08e_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1Window_a6ecba393a8a84ce0f4c7d30d0fc6c08e_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1Core_1_1Window_a6ecba393a8a84ce0f4c7d30d0fc6c08e_cgraph" id="aclassCori_1_1Core_1_1Window_a6ecba393a8a84ce0f4c7d30d0fc6c08e_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,151,50"/>
-<area shape="rect" href="classCori_1_1Core_1_1Window.html#adf479affc833e89a9275b708d7c24572" title=" " alt="" coords="199,5,344,50"/>
+<area shape="rect" title="Changes the current ScreenMode." alt="" coords="5,5,151,50"/>
+<area shape="rect" href="classCori_1_1Core_1_1Window.html#adf479affc833e89a9275b708d7c24572" title="Changes the current WindowMode." alt="" coords="199,5,344,50"/>
 <area shape="poly" title=" " alt="" coords="151,25,183,25,183,30,151,30"/>
 </map>
 </div>
@@ -525,7 +409,15 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00204">204</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p>Changes the VSync state. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">status</td><td>True enable, false disable. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00209">209</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
 
 </div>
 </div>
@@ -534,9 +426,6 @@ Here is the call graph for this function:</div>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">CoriError</a>&lt;&gt; &gt; Cori::Core::Window::SetWindowMode </td>
@@ -545,14 +434,18 @@ Here is the call graph for this function:</div>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel nodiscard">nodiscard</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00248">248</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p>Changes the current <a class="el" href="namespaceCori_1_1Core.html#a4058f0d1174cf6b294dfc0a31642cb95">WindowMode</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mode</td><td><a class="el" href="namespaceCori_1_1Core.html#a4058f0d1174cf6b294dfc0a31642cb95">WindowMode</a> enumerator to change to. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with void on success or <a class="el" href="classCori_1_1Core_1_1CoriError.html" title="Custom error class mainly used in std::expected.">CoriError&lt;&gt;</a> on failure. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00253">253</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
 
 </div>
 </div>
@@ -577,31 +470,7 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Window_8hpp_source.html#l00057">57</a> of file <a class="el" href="Window_8hpp_source.html">Window.hpp</a>.</p>
-
-</div>
-</div>
-<a id="aac33c3bcb667ff80a3ece6045da4c257" name="aac33c3bcb667ff80a3ece6045da4c257"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aac33c3bcb667ff80a3ece6045da4c257">&#9670;&#160;</a></span>ImGuiLayer</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">friend class <a class="el" href="classCori_1_1Core_1_1ImGuiLayer.html">ImGuiLayer</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel friend">friend</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Window_8hpp_source.html#l00061">61</a> of file <a class="el" href="Window_8hpp_source.html">Window.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Window_8hpp_source.html#l00109">109</a> of file <a class="el" href="Window_8hpp_source.html">Window.hpp</a>.</p>
 
 </div>
 </div>

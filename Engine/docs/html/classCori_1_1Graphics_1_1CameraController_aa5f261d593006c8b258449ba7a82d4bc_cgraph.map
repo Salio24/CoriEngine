@@ -1,7 +1,0 @@
-<map id="Cori::Graphics::CameraController::CreateOrthoCamera" name="Cori::Graphics::CameraController::CreateOrthoCamera">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,241,50"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1CameraController.html#aa6c48672e6f3e6d75e14295a01e3382a" title=" " alt="" coords="289,5,524,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="241,25,273,25,273,30,241,30"/>
-<area shape="rect" id="Node000003" href="$namespaceCori_1_1Utility.html#a5e616457526b11d7509529108fb5872d" title=" " alt="" coords="572,14,771,42"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="524,25,556,25,556,30,524,30"/>
-</map>

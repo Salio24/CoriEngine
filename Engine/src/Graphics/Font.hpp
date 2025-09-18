@@ -1,19 +1,32 @@
 #pragma once
 #include "Profiling/Trackable.hpp"
 
+
+
 namespace Cori {
+	class AssetManager;
 	namespace Graphics {
+		namespace Internal {
+			struct FontData;
+		}
 
-		struct FontData;
-
+		/**
+		 * @brief Font asset to be used when rendering text. Pretty expensive to create if not cached, always preload it.
+		 */
 		class Font : public Profiling::Trackable<Font> {
 		public:
+			/**
+			 * @brief A UTF-32 charset range.
+			 */
 			struct CharsetRange {
 				uint32_t m_Start;
 				uint32_t m_End;
 			};
 
-			// all (probably) UTF-8 ranges: https://symbl.cc/en/unicode-table/
+			/**
+			 * @brief These are predefined UTF-32 charset ranges to be used when creating a Font.
+			 * @note This is of course not all charset ranges you can use, find more here: https://symbl.cc/en/unicode-table/
+			 */
 			struct CharsetRanges {
 				static constexpr CharsetRange Latin = { 0x0020, 0x00FF };
 				static constexpr CharsetRange LatinExtendedA = { 0x0100, 0x017F };
@@ -24,8 +37,19 @@ namespace Cori {
 				static constexpr CharsetRange CyrillicExtendedB = { 0xA640, 0xA69F };
 			};
 
+			/**
+			 * @brief Font Descriptor meant to be used with AssetManager only.
+			 */
 			class Descriptor {
 			public:
+				/**
+				 * @brief Constructs a descriptor. It's recommended to use "inline const" when defining the Descriptor in a namespace.
+				 * @param name Name to be used in AssetManager logging.
+				 * @param fontPath Path to the font file.
+				 * @param charsetRanges An vector with CharsetRanges to be loaded from the font.
+				 * @param minimalScale Minimal glyph scale, the higher the value, the slower generation time, higher memory usage, but smoother glyphs when using high font size. Default is a good middle-ground, increase only if your glyphs looks choppy or have slight imperfections.
+				 * @param miterLimit You shouldn't touch this, the default is good, but you can try to increase it in case you see some significant artifacts.
+				 */
 				constexpr Descriptor(std::string name, std::filesystem::path fontPath, std::vector<CharsetRange> charsetRanges, const float minimalScale = 48.0f, const float miterLimit = 1.0f)
 					: m_Name(std::move(name)),
 					m_FontPath(std::move(fontPath)),
@@ -60,19 +84,26 @@ namespace Cori {
 				inline static std::atomic<uint32_t> s_NextRuntimeID{ 1 };
 			};
 
-			static std::shared_ptr<Font> Create(const std::filesystem::path& path, const std::vector<CharsetRange>& charsets, const float minimalScale = 48.0f, const float miterLimit = 1.0f);
-
-			static std::shared_ptr<Font> Create(const Descriptor& descriptor);
+			/**
+			 * @brief Creates a Font object.
+			 * @param path Path to the font file.
+			 * @param charsets An vector with CharsetRanges to be loaded from the font.
+			 * @param minimalScale Minimal glyph scale, the higher the value, the slower generation time, higher memory usage, but smoother glyphs when using high font size. Default is a good middle-ground, increase only if your glyphs looks choppy or have slight imperfections.
+			 * @param miterLimit You shouldn't touch this, the default is good, but you can try to increase it in case you see some significant artifacts.
+			 * @return Shared pointer to the loaded Font asset.
+			 */
+			[[nodiscard]] static std::shared_ptr<Font> Create(const std::filesystem::path& path, const std::vector<CharsetRange>& charsets, const float minimalScale = 48.0f, const float miterLimit = 1.0f);
 
 			~Font();
 
-		protected:
-			friend class Renderer2D;
-			FontData* GetData();
-
 		private:
+			friend AssetManager;
+			friend class Renderer2D;
+			[[nodiscard]] static std::shared_ptr<Font> Create(const Descriptor& descriptor);
+			Internal::FontData* GetData();
+
 			Font(void* font, const std::vector<CharsetRange>& charsets, const std::filesystem::path& fontPath, const float minimalScale, const float miterLimit);
-			FontData* m_Data{ nullptr };
+			Internal::FontData* m_Data{ nullptr };
 		};
 	}
 }

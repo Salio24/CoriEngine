@@ -1,6 +1,7 @@
 var structCori_1_1Core_1_1Window_1_1Data =
 [
-    [ "m_Context", "structCori_1_1Core_1_1Window_1_1Data.html#aea051b541c43b6034c33e876246801b5", null ],
+    [ "~Data", "structCori_1_1Core_1_1Window_1_1Data.html#aae5afb671b6407d276ba200e678483a0", null ],
+    [ "m_Context", "structCori_1_1Core_1_1Window_1_1Data.html#a5ccd4846d8d7e52eaef3cf0ed26bd9a6", null ],
     [ "m_CurrentScreenMode", "structCori_1_1Core_1_1Window_1_1Data.html#a64e74b52b0334310fa626988a88dd76c", null ],
     [ "m_CurrentWindowMode", "structCori_1_1Core_1_1Window_1_1Data.html#a511b84a5c3bc238c6c45fc8af528f9d9", null ],
     [ "m_DisplayModeCount", "structCori_1_1Core_1_1Window_1_1Data.html#ae8f8af8008a4abff83f07f07808751ef", null ],

@@ -4,14 +4,16 @@
 
 namespace Cori {
 	namespace Graphics {
-		class RenderingContext {
-		public:
-			virtual ~RenderingContext() = default;
+		namespace Internal {
+			class RenderingContext {
+			public:
+				virtual ~RenderingContext() = default;
 
-			virtual void Init(SDL_Window* window) = 0;
-			virtual void SwapBuffers() = 0;
-			virtual inline void* GetNativeContext() const = 0;
-			static std::unique_ptr<RenderingContext> Create(GraphicsAPIs api);
-		};
+				virtual void Init(SDL_Window* window) = 0;
+				virtual void SwapBuffers() = 0;
+				[[nodiscard]] virtual inline void* GetNativeContext() const = 0;
+				[[nodiscard]] static std::unique_ptr<RenderingContext> Create(GraphicsAPIs api);
+			};
+		}
 	}
 }

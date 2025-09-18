@@ -1,5 +1,5 @@
 <map id="Cori::Core::Window::SetScreenMode" name="Cori::Core::Window::SetScreenMode">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,151,50"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1Window.html#adf479affc833e89a9275b708d7c24572" title=" " alt="" coords="199,5,344,50"/>
+<area shape="rect" id="Node000001" title="Changes the current ScreenMode." alt="" coords="5,5,151,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1Window.html#adf479affc833e89a9275b708d7c24572" title="Changes the current WindowMode." alt="" coords="199,5,344,50"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,25,183,25,183,30,151,30"/>
 </map>

@@ -46,7 +46,7 @@ namespace Cori {
 			return MIX_GetMasterGain(s_Data->m_Mixer);
 		}
 
-		std::expected<void, Core::CoriError<>> Mixer::PlayTag(const char* tag, const PlayParams& params) {
+		std::expected<void, Core::CoriError<>> Mixer::StartTag(const char* tag, const PlayParams& params) {
 			const SDL_PropertiesID props = SDL_CreateProperties();
 			SDL_SetNumberProperty(props, MIX_PROP_PLAY_LOOPS_NUMBER, params.Loops);
 			if (params.MaxMilliseconds != -1.0f) {
@@ -129,7 +129,7 @@ namespace Cori {
 		}
 
 		std::expected<void, Core::CoriError<std::filesystem::path>> Mixer::LoadSound(const std::filesystem::path& path, const bool preDecode, const SoundID soundID) {
-			const auto result = MIX_LoadAudio(s_Data->m_Mixer, path.c_str(), preDecode);
+			const auto result = MIX_LoadAudio(s_Data->m_Mixer, path.string().c_str(), preDecode);
 			if (!result) {
 				return std::unexpected(Core::CoriError<std::filesystem::path>(std::format("Failed to load Sound. SDL_Error: {}", SDL_GetError()), "Path", path));
 			}
@@ -150,7 +150,7 @@ namespace Cori {
 			}
 
 			MIX_SetTrackStoppedCallback(result, Track::TrackStopCallback, track);
-			s_Data->m_TrackPool.insert({ track->m_ID, std::make_pair(result, track) });
+			s_Data->m_TrackPool.insert({ track->GetID(), std::make_pair(result, track) });
 			return {};
 		}
 
@@ -160,9 +160,9 @@ namespace Cori {
 		}
 
 		std::expected<void, Core::CoriError<>> Mixer::SetTrackSound(const TrackID trackID, const Sound* sound) {
-			const bool success = MIX_SetTrackAudio(s_Data->m_TrackPool.at(trackID).first, s_Data->m_SDLAudios.at(sound->m_ID));
+			const bool success = MIX_SetTrackAudio(s_Data->m_TrackPool.at(trackID).first, s_Data->m_SDLAudios.at(sound->GetID()));
 			if (!success) {
-				return std::unexpected(Core::CoriError(std::format("Failed to assign Sound '{} (SoundID: {})' to Track '{} (TrackID: {})'. SDL_Error: {}", sound->m_Name, sound->m_ID, s_Data->m_TrackPool.at(trackID).second->m_Name, trackID, SDL_GetError())));
+				return std::unexpected(Core::CoriError(std::format("Failed to assign Sound '{} (SoundID: {})' to Track '{} (TrackID: {})'. SDL_Error: {}", sound->m_Name, sound->GetID(), s_Data->m_TrackPool.at(trackID).second->m_Name, trackID, SDL_GetError())));
 			}
 
 			return {};

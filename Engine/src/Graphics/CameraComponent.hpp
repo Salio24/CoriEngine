@@ -4,7 +4,13 @@
 namespace Cori {
 	namespace World {
 		namespace Components {
+			/**
+			 * @brief Components designed to be used with scenes.
+			 */
 			namespace Scene {
+				/**
+				 * @brief A Scene context component with all the graphical camera data.
+				 */
 				struct Camera {
 					static constexpr auto in_place_delete = true;
 
@@ -12,14 +18,14 @@ namespace Cori {
 					glm::mat4 m_ViewProjectionMatrix{ 1.0f };
 					glm::vec2 m_CameraPosition{ 0.0f };
 					float m_CameraRotation{ 0.0f };
-					float m_CameraZoomFactor{ 1.0f };
+					glm::vec2 m_CameraScale{ 1.0f };
 					glm::vec2 m_InitialCameraMinBound{ 0.0f };
 					glm::vec2 m_InitialCameraMaxBound{ 0.0f };
 					Utility::AABB m_CameraBounds{};
 					glm::vec2 m_CameraSize{ 0.0f };
 					Camera() = default;
-					Camera(const glm::mat4& projectionMatrix, const glm::mat4& viewProjectionMatrix, const glm::vec2& cameraPosition, float cameraRotation, float cameraZoomFactor)
-						: m_ProjectionMatrix(projectionMatrix), m_ViewProjectionMatrix(viewProjectionMatrix), m_CameraPosition(cameraPosition), m_CameraRotation(cameraRotation), m_CameraZoomFactor(cameraZoomFactor) {
+					Camera(const glm::mat4& projectionMatrix, const glm::mat4& viewProjectionMatrix, const glm::vec2& cameraPosition, const float cameraRotation, const glm::vec2 cameraScale)
+						: m_ProjectionMatrix(projectionMatrix), m_ViewProjectionMatrix(viewProjectionMatrix), m_CameraPosition(cameraPosition), m_CameraRotation(cameraRotation), m_CameraScale(cameraScale) {
 					}
 				};
 			}

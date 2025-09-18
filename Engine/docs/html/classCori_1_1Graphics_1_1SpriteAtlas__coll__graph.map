@@ -1,5 +1,5 @@
 <map id="Cori::Graphics::SpriteAtlas" name="Cori::Graphics::SpriteAtlas">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,98,197,126"/>
+<area shape="rect" id="Node000001" title="Holds the sprite atlas and UVs for sprites in it. All spite atlases are padded, so no sprite atlas bl..." alt="" coords="5,98,197,126"/>
 <area shape="rect" id="Node000002" href="$classCori_1_1Profiling_1_1Trackable.html" title=" " alt="" coords="11,5,191,50"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,66,104,97,98,97,98,66"/>
 </map>

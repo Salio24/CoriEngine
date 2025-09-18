@@ -1,7 +1,7 @@
 var classCori_1_1Core_1_1KeyEvent =
 [
     [ "KeyEvent", "classCori_1_1Core_1_1KeyEvent.html#a979aef4026f1b832b879d3593d699391", null ],
-    [ "GetCategoryFlags", "classCori_1_1Core_1_1KeyEvent.html#ae7bf1ef67ae3d9d06700a58a7d1f2085", null ],
+    [ "GetCategoryFlags", "classCori_1_1Core_1_1KeyEvent.html#a28279a9fc721ef5a4afe30c73bfca8f4", null ],
     [ "GetEventType", "classCori_1_1Core_1_1KeyEvent.html#a7f81583c73ebcb5f95e0e15162df5e5a", null ],
     [ "GetKeyCode", "classCori_1_1Core_1_1KeyEvent.html#ab07cd18a976b0466c743d674bed2ce9a", null ],
     [ "GetName", "classCori_1_1Core_1_1KeyEvent.html#a2b72405936a555efbfa708452eecb325", null ],

@@ -145,7 +145,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:Cori_3A_3ALogger" id="r_Cori_3A_3ALogger"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCori_1_1Logger.html">Cori::Logger</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classCori_1_1Logger.html" title="Logger is the first thing that is initialized during startup. Does console and file logging.">Logger</a> is the first thing that is initialized during startup. Does console and file logging.  <a href="classCori_1_1Logger.html#details">More...</a><br /></td></tr>
 <tr class="memitem:Cori_3A_3ALogger_3A_3ATags" id="r_Cori_3A_3ALogger_3A_3ATags"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCori_1_1Logger_1_1Tags.html">Cori::Logger::Tags</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Available logger tags in somewhat hierarchical state. These are used in CORI_DEBUGLEVEL_CORE_TAGGED logging calls.  <a href="structCori_1_1Logger_1_1Tags.html#details">More...</a><br /></td></tr>
 <tr class="memitem:Cori_3A_3ALogger_3A_3ATags_3A_3AAssetManager" id="r_Cori_3A_3ALogger_3A_3ATags_3A_3AAssetManager"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCori_1_1Logger_1_1Tags_1_1AssetManager.html">Cori::Logger::Tags::AssetManager</a></td></tr>
 <tr class="memitem:Cori_3A_3ALogger_3A_3ATags_3A_3AGraphics" id="r_Cori_3A_3ALogger_3A_3ATags_3A_3AGraphics"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCori_1_1Logger_1_1Tags_1_1Graphics.html">Cori::Logger::Tags::Graphics</a></td></tr>
 <tr class="memitem:Cori_3A_3ALogger_3A_3ATags_3A_3AAudio" id="r_Cori_3A_3ALogger_3A_3ATags_3A_3AAudio"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCori_1_1Logger_1_1Tags_1_1Audio.html">Cori::Logger::Tags::Audio</a></td></tr>
@@ -160,6 +162,7 @@ Classes</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-namespaces" class="groupheader"><a id="namespaces" name="namespaces"></a>
 Namespaces</h2></td></tr>
 <tr class="memitem:Cori" id="r_Cori"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceCori.html">Cori</a></td></tr>
+<tr class="memdesc:namespaceCori"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global engine namespace. <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
@@ -238,9 +241,9 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">if</span> (!(x)) { (SPDLOG_LOGGER_CRITICAL(<a class="code hl_function" href="classCori_1_1Logger.html#a4d84ca33d5d85a4bc2525ae6d6c01dad">::Cori::Logger::GetClientLogger</a>(), <span class="stringliteral">&quot;Assertion &#39;&quot;</span>#x<span class="stringliteral">&quot;&#39; Failed. Message: &quot;</span> __VA_ARGS__), <a class="code hl_function" href="classCori_1_1Logger.html#a4d84ca33d5d85a4bc2525ae6d6c01dad">::Cori::Logger::GetClientLogger</a>()-&gt;critical(<span class="stringliteral">&quot;    Function: {}&quot;</span>, __PRETTY_FUNCTION__), spdlog::shutdown(), <a class="code hl_define" href="#a9dd52672779b84dddeaaa99342974d9b">BUGTRAP</a>); }</div>
 <div class="ttc" id="aLogger_8hpp_html_a9dd52672779b84dddeaaa99342974d9b"><div class="ttname"><a href="#a9dd52672779b84dddeaaa99342974d9b">BUGTRAP</a></div><div class="ttdeci">#define BUGTRAP</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00018">Logger.hpp:18</a></div></div>
-<div class="ttc" id="aclassCori_1_1Logger_html_a4d84ca33d5d85a4bc2525ae6d6c01dad"><div class="ttname"><a href="classCori_1_1Logger.html#a4d84ca33d5d85a4bc2525ae6d6c01dad">Cori::Logger::GetClientLogger</a></div><div class="ttdeci">static std::shared_ptr&lt; spdlog::logger &gt; &amp; GetClientLogger()</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00141">Logger.hpp:141</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_a4d84ca33d5d85a4bc2525ae6d6c01dad"><div class="ttname"><a href="classCori_1_1Logger.html#a4d84ca33d5d85a4bc2525ae6d6c01dad">Cori::Logger::GetClientLogger</a></div><div class="ttdeci">static std::shared_ptr&lt; spdlog::logger &gt; &amp; GetClientLogger()</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00145">Logger.hpp:145</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00949">949</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01024">1024</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -264,7 +267,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">(!(x) ? (SPDLOG_LOGGER_ERROR(<a class="code hl_function" href="classCori_1_1Logger.html#a4d84ca33d5d85a4bc2525ae6d6c01dad">::Cori::Logger::GetClientLogger</a>(), <span class="stringliteral">&quot;Check &#39;&quot;</span>#x<span class="stringliteral">&quot;&#39; Failed. Message: &quot;</span> __VA_ARGS__), <a class="code hl_function" href="classCori_1_1Logger.html#a4d84ca33d5d85a4bc2525ae6d6c01dad">::Cori::Logger::GetClientLogger</a>()-&gt;error(<span class="stringliteral">&quot;    Function: {}&quot;</span>, __PRETTY_FUNCTION__), <span class="keyword">true</span>) : <span class="keyword">false</span>)</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00951">951</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01026">1026</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -283,9 +286,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_define" href="#a5c9753f03bd6576c4448d2c48b1bbf2d">CORI_CHECK</a>(x, <span class="stringliteral">&quot;std::expected returned an error, message: {}&quot;</span>, x.error().what())</div>
-<div class="ttc" id="aLogger_8hpp_html_a5c9753f03bd6576c4448d2c48b1bbf2d"><div class="ttname"><a href="#a5c9753f03bd6576c4448d2c48b1bbf2d">CORI_CHECK</a></div><div class="ttdeci">#define CORI_CHECK(x,...)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00951">Logger.hpp:951</a></div></div>
+<div class="ttc" id="aLogger_8hpp_html_a5c9753f03bd6576c4448d2c48b1bbf2d"><div class="ttname"><a href="#a5c9753f03bd6576c4448d2c48b1bbf2d">CORI_CHECK</a></div><div class="ttdeci">#define CORI_CHECK(x,...)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l01026">Logger.hpp:1026</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00952">952</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01027">1027</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -308,7 +311,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00931">931</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01006">1006</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -331,9 +334,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">(!(x) ? (SPDLOG_LOGGER_ERROR(<a class="code hl_function" href="classCori_1_1Logger.html#a6fde89b5ed00a6e37cbb808a4206c7ad">::Cori::Logger::GetCoreLogger</a>(), <span class="stringliteral">&quot;Check &#39;&quot;</span>#x<span class="stringliteral">&quot;&#39; Failed. Message: &quot;</span> __VA_ARGS__), <a class="code hl_function" href="classCori_1_1Logger.html#a6fde89b5ed00a6e37cbb808a4206c7ad">::Cori::Logger::GetCoreLogger</a>()-&gt;error(<span class="stringliteral">&quot;    Function: {}&quot;</span>, __PRETTY_FUNCTION__), <span class="keyword">true</span>) : <span class="keyword">false</span>)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_a6fde89b5ed00a6e37cbb808a4206c7ad"><div class="ttname"><a href="classCori_1_1Logger.html#a6fde89b5ed00a6e37cbb808a4206c7ad">Cori::Logger::GetCoreLogger</a></div><div class="ttdeci">static std::shared_ptr&lt; spdlog::logger &gt; &amp; GetCoreLogger()</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00140">Logger.hpp:140</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_a6fde89b5ed00a6e37cbb808a4206c7ad"><div class="ttname"><a href="classCori_1_1Logger.html#a6fde89b5ed00a6e37cbb808a4206c7ad">Cori::Logger::GetCoreLogger</a></div><div class="ttdeci">static std::shared_ptr&lt; spdlog::logger &gt; &amp; GetCoreLogger()</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00144">Logger.hpp:144</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00944">944</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01019">1019</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -352,9 +355,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_define" href="#a773eb0c043bf0f8d70f913c90a531256">CORI_CORE_CHECK</a>(x, <span class="stringliteral">&quot;std::expected returned an error, message: {}&quot;</span>, x.error().what())</div>
-<div class="ttc" id="aLogger_8hpp_html_a773eb0c043bf0f8d70f913c90a531256"><div class="ttname"><a href="#a773eb0c043bf0f8d70f913c90a531256">CORI_CORE_CHECK</a></div><div class="ttdeci">#define CORI_CORE_CHECK(x,...)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00944">Logger.hpp:944</a></div></div>
+<div class="ttc" id="aLogger_8hpp_html_a773eb0c043bf0f8d70f913c90a531256"><div class="ttname"><a href="#a773eb0c043bf0f8d70f913c90a531256">CORI_CORE_CHECK</a></div><div class="ttdeci">#define CORI_CORE_CHECK(x,...)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l01019">Logger.hpp:1019</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00945">945</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01020">1020</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -373,7 +376,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00924">924</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00999">999</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -392,7 +395,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00928">928</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01003">1003</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -411,9 +414,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="classCori_1_1Logger.html#a0cba21163a5438d45ceab900d2e07835">::Cori::Logger::CoreLogError</a>(__VA_ARGS__)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_a0cba21163a5438d45ceab900d2e07835"><div class="ttname"><a href="classCori_1_1Logger.html#a0cba21163a5438d45ceab900d2e07835">Cori::Logger::CoreLogError</a></div><div class="ttdeci">static void CoreLogError(const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00589">Logger.hpp:589</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_a0cba21163a5438d45ceab900d2e07835"><div class="ttname"><a href="classCori_1_1Logger.html#a0cba21163a5438d45ceab900d2e07835">Cori::Logger::CoreLogError</a></div><div class="ttdeci">static void CoreLogError(const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00663">Logger.hpp:663</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00937">937</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01012">1012</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -432,9 +435,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="classCori_1_1Logger.html#a85a34813c554c7ed0967086daf1584b4">::Cori::Logger::CoreLogErrorTagged</a>(__VA_ARGS__)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_a85a34813c554c7ed0967086daf1584b4"><div class="ttname"><a href="classCori_1_1Logger.html#a85a34813c554c7ed0967086daf1584b4">Cori::Logger::CoreLogErrorTagged</a></div><div class="ttdeci">static void CoreLogErrorTagged(const std::initializer_list&lt; const char * &gt; tags, const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00294">Logger.hpp:294</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_a85a34813c554c7ed0967086daf1584b4"><div class="ttname"><a href="classCori_1_1Logger.html#a85a34813c554c7ed0967086daf1584b4">Cori::Logger::CoreLogErrorTagged</a></div><div class="ttdeci">static void CoreLogErrorTagged(const std::initializer_list&lt; const char * &gt; tags, const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00368">Logger.hpp:368</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00941">941</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01016">1016</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -453,9 +456,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="classCori_1_1Logger.html#a1217e2ecae44c7f3f9cb9b9a93db6827">::Cori::Logger::CoreLogFatal</a>(__VA_ARGS__)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_a1217e2ecae44c7f3f9cb9b9a93db6827"><div class="ttname"><a href="classCori_1_1Logger.html#a1217e2ecae44c7f3f9cb9b9a93db6827">Cori::Logger::CoreLogFatal</a></div><div class="ttdeci">static void CoreLogFatal(const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00607">Logger.hpp:607</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_a1217e2ecae44c7f3f9cb9b9a93db6827"><div class="ttname"><a href="classCori_1_1Logger.html#a1217e2ecae44c7f3f9cb9b9a93db6827">Cori::Logger::CoreLogFatal</a></div><div class="ttdeci">static void CoreLogFatal(const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00681">Logger.hpp:681</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00938">938</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01013">1013</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -474,9 +477,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="classCori_1_1Logger.html#a5061ccb6de7d55dd104813ab92251c9c">::Cori::Logger::CoreLogFatalTagged</a>(__VA_ARGS__)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_a5061ccb6de7d55dd104813ab92251c9c"><div class="ttname"><a href="classCori_1_1Logger.html#a5061ccb6de7d55dd104813ab92251c9c">Cori::Logger::CoreLogFatalTagged</a></div><div class="ttdeci">static void CoreLogFatalTagged(const std::initializer_list&lt; const char * &gt; tags, const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00321">Logger.hpp:321</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_a5061ccb6de7d55dd104813ab92251c9c"><div class="ttname"><a href="classCori_1_1Logger.html#a5061ccb6de7d55dd104813ab92251c9c">Cori::Logger::CoreLogFatalTagged</a></div><div class="ttdeci">static void CoreLogFatalTagged(const std::initializer_list&lt; const char * &gt; tags, const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00395">Logger.hpp:395</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00942">942</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01017">1017</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -495,7 +498,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00925">925</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01000">1000</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -514,7 +517,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00929">929</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01004">1004</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -533,7 +536,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00923">923</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00998">998</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -552,7 +555,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00927">927</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01002">1002</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -576,7 +579,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">(!x)</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00932">932</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01007">1007</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -595,9 +598,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="classCori_1_1Logger.html#abf9741e4a7aeda59be266e64a9d9cd0e">::Cori::Logger::CoreLogWarn</a>(__VA_ARGS__)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_abf9741e4a7aeda59be266e64a9d9cd0e"><div class="ttname"><a href="classCori_1_1Logger.html#abf9741e4a7aeda59be266e64a9d9cd0e">Cori::Logger::CoreLogWarn</a></div><div class="ttdeci">static void CoreLogWarn(const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00571">Logger.hpp:571</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_abf9741e4a7aeda59be266e64a9d9cd0e"><div class="ttname"><a href="classCori_1_1Logger.html#abf9741e4a7aeda59be266e64a9d9cd0e">Cori::Logger::CoreLogWarn</a></div><div class="ttdeci">static void CoreLogWarn(const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00645">Logger.hpp:645</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00936">936</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01011">1011</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -616,9 +619,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="classCori_1_1Logger.html#a187304017b8501b556fe29e5c7343c2c">::Cori::Logger::CoreLogWarnTagged</a>(__VA_ARGS__)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_a187304017b8501b556fe29e5c7343c2c"><div class="ttname"><a href="classCori_1_1Logger.html#a187304017b8501b556fe29e5c7343c2c">Cori::Logger::CoreLogWarnTagged</a></div><div class="ttdeci">static void CoreLogWarnTagged(const std::initializer_list&lt; const char * &gt; tags, const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00267">Logger.hpp:267</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_a187304017b8501b556fe29e5c7343c2c"><div class="ttname"><a href="classCori_1_1Logger.html#a187304017b8501b556fe29e5c7343c2c">Cori::Logger::CoreLogWarnTagged</a></div><div class="ttdeci">static void CoreLogWarnTagged(const std::initializer_list&lt; const char * &gt; tags, const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00341">Logger.hpp:341</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00940">940</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01015">1015</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -637,9 +640,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="classCori_1_1Logger.html#a0a279e11b88bba146f7a6103fc29ff16">::Cori::Logger::ClientLogDebug</a>(__VA_ARGS__)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_a0a279e11b88bba146f7a6103fc29ff16"><div class="ttname"><a href="classCori_1_1Logger.html#a0a279e11b88bba146f7a6103fc29ff16">Cori::Logger::ClientLogDebug</a></div><div class="ttdeci">static void ClientLogDebug(const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00645">Logger.hpp:645</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_a0a279e11b88bba146f7a6103fc29ff16"><div class="ttname"><a href="classCori_1_1Logger.html#a0a279e11b88bba146f7a6103fc29ff16">Cori::Logger::ClientLogDebug</a></div><div class="ttdeci">static void ClientLogDebug(const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00719">Logger.hpp:719</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00955">955</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01030">1030</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -658,9 +661,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="classCori_1_1Logger.html#ad2a2945610dbe67db3ddf48ec4eb9bf4">::Cori::Logger::ClientLogDebugTagged</a>(__VA_ARGS__)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_ad2a2945610dbe67db3ddf48ec4eb9bf4"><div class="ttname"><a href="classCori_1_1Logger.html#ad2a2945610dbe67db3ddf48ec4eb9bf4">Cori::Logger::ClientLogDebugTagged</a></div><div class="ttdeci">static void ClientLogDebugTagged(const std::initializer_list&lt; const char * &gt; tags, const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00377">Logger.hpp:377</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_ad2a2945610dbe67db3ddf48ec4eb9bf4"><div class="ttname"><a href="classCori_1_1Logger.html#ad2a2945610dbe67db3ddf48ec4eb9bf4">Cori::Logger::ClientLogDebugTagged</a></div><div class="ttdeci">static void ClientLogDebugTagged(const std::initializer_list&lt; const char * &gt; tags, const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00451">Logger.hpp:451</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00962">962</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01037">1037</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -679,9 +682,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="classCori_1_1Logger.html#ac6be12bc1619ef60a1c782ed5682ed98">::Cori::Logger::ClientLogError</a>(__VA_ARGS__)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_ac6be12bc1619ef60a1c782ed5682ed98"><div class="ttname"><a href="classCori_1_1Logger.html#ac6be12bc1619ef60a1c782ed5682ed98">Cori::Logger::ClientLogError</a></div><div class="ttdeci">static void ClientLogError(const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00699">Logger.hpp:699</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_ac6be12bc1619ef60a1c782ed5682ed98"><div class="ttname"><a href="classCori_1_1Logger.html#ac6be12bc1619ef60a1c782ed5682ed98">Cori::Logger::ClientLogError</a></div><div class="ttdeci">static void ClientLogError(const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00773">Logger.hpp:773</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00958">958</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01033">1033</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -700,9 +703,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="classCori_1_1Logger.html#a87af4243b67d6417d301be0d7d025343">::Cori::Logger::ClientLogErrorTagged</a>(__VA_ARGS__)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_a87af4243b67d6417d301be0d7d025343"><div class="ttname"><a href="classCori_1_1Logger.html#a87af4243b67d6417d301be0d7d025343">Cori::Logger::ClientLogErrorTagged</a></div><div class="ttdeci">static void ClientLogErrorTagged(const std::initializer_list&lt; const char * &gt; tags, const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00458">Logger.hpp:458</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_a87af4243b67d6417d301be0d7d025343"><div class="ttname"><a href="classCori_1_1Logger.html#a87af4243b67d6417d301be0d7d025343">Cori::Logger::ClientLogErrorTagged</a></div><div class="ttdeci">static void ClientLogErrorTagged(const std::initializer_list&lt; const char * &gt; tags, const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00532">Logger.hpp:532</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00965">965</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01040">1040</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -721,9 +724,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="classCori_1_1Logger.html#a2bc55e4bb72a6f52f657e73f99e01fe1">::Cori::Logger::ClientLogFatal</a>(__VA_ARGS__)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_a2bc55e4bb72a6f52f657e73f99e01fe1"><div class="ttname"><a href="classCori_1_1Logger.html#a2bc55e4bb72a6f52f657e73f99e01fe1">Cori::Logger::ClientLogFatal</a></div><div class="ttdeci">static void ClientLogFatal(const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00717">Logger.hpp:717</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_a2bc55e4bb72a6f52f657e73f99e01fe1"><div class="ttname"><a href="classCori_1_1Logger.html#a2bc55e4bb72a6f52f657e73f99e01fe1">Cori::Logger::ClientLogFatal</a></div><div class="ttdeci">static void ClientLogFatal(const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00791">Logger.hpp:791</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00959">959</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01034">1034</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -742,9 +745,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="classCori_1_1Logger.html#a7b1da261144039e018487c11b8ed5032">::Cori::Logger::ClientLogFatalTagged</a>(__VA_ARGS__)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_a7b1da261144039e018487c11b8ed5032"><div class="ttname"><a href="classCori_1_1Logger.html#a7b1da261144039e018487c11b8ed5032">Cori::Logger::ClientLogFatalTagged</a></div><div class="ttdeci">static void ClientLogFatalTagged(const std::initializer_list&lt; const char * &gt; tags, const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00485">Logger.hpp:485</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_a7b1da261144039e018487c11b8ed5032"><div class="ttname"><a href="classCori_1_1Logger.html#a7b1da261144039e018487c11b8ed5032">Cori::Logger::ClientLogFatalTagged</a></div><div class="ttdeci">static void ClientLogFatalTagged(const std::initializer_list&lt; const char * &gt; tags, const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00559">Logger.hpp:559</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00966">966</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01041">1041</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -763,9 +766,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="classCori_1_1Logger.html#a7676fc48ae57f110ded0c07648003e5c">::Cori::Logger::ClientLogInfo</a>(__VA_ARGS__)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_a7676fc48ae57f110ded0c07648003e5c"><div class="ttname"><a href="classCori_1_1Logger.html#a7676fc48ae57f110ded0c07648003e5c">Cori::Logger::ClientLogInfo</a></div><div class="ttdeci">static void ClientLogInfo(const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00663">Logger.hpp:663</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_a7676fc48ae57f110ded0c07648003e5c"><div class="ttname"><a href="classCori_1_1Logger.html#a7676fc48ae57f110ded0c07648003e5c">Cori::Logger::ClientLogInfo</a></div><div class="ttdeci">static void ClientLogInfo(const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00737">Logger.hpp:737</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00956">956</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01031">1031</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -784,9 +787,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="classCori_1_1Logger.html#acf51df2289544993a26e8e58531c4949">::Cori::Logger::ClientLogInfoTagged</a>(__VA_ARGS__)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_acf51df2289544993a26e8e58531c4949"><div class="ttname"><a href="classCori_1_1Logger.html#acf51df2289544993a26e8e58531c4949">Cori::Logger::ClientLogInfoTagged</a></div><div class="ttdeci">static void ClientLogInfoTagged(const std::initializer_list&lt; const char * &gt; tags, const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00404">Logger.hpp:404</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_acf51df2289544993a26e8e58531c4949"><div class="ttname"><a href="classCori_1_1Logger.html#acf51df2289544993a26e8e58531c4949">Cori::Logger::ClientLogInfoTagged</a></div><div class="ttdeci">static void ClientLogInfoTagged(const std::initializer_list&lt; const char * &gt; tags, const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00478">Logger.hpp:478</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00963">963</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01038">1038</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -805,9 +808,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="classCori_1_1Logger.html#a1ceb67ac6f6a59940b73e5c83128acc6">::Cori::Logger::ClientLogTrace</a>(__VA_ARGS__)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_a1ceb67ac6f6a59940b73e5c83128acc6"><div class="ttname"><a href="classCori_1_1Logger.html#a1ceb67ac6f6a59940b73e5c83128acc6">Cori::Logger::ClientLogTrace</a></div><div class="ttdeci">static void ClientLogTrace(const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00627">Logger.hpp:627</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_a1ceb67ac6f6a59940b73e5c83128acc6"><div class="ttname"><a href="classCori_1_1Logger.html#a1ceb67ac6f6a59940b73e5c83128acc6">Cori::Logger::ClientLogTrace</a></div><div class="ttdeci">static void ClientLogTrace(const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00701">Logger.hpp:701</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00954">954</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01029">1029</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -826,9 +829,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="classCori_1_1Logger.html#a7b7e415ab719c86df6c5718291166b74">::Cori::Logger::ClientLogTraceTagged</a>(__VA_ARGS__)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_a7b7e415ab719c86df6c5718291166b74"><div class="ttname"><a href="classCori_1_1Logger.html#a7b7e415ab719c86df6c5718291166b74">Cori::Logger::ClientLogTraceTagged</a></div><div class="ttdeci">static void ClientLogTraceTagged(const std::initializer_list&lt; const char * &gt; tags, const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00350">Logger.hpp:350</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_a7b7e415ab719c86df6c5718291166b74"><div class="ttname"><a href="classCori_1_1Logger.html#a7b7e415ab719c86df6c5718291166b74">Cori::Logger::ClientLogTraceTagged</a></div><div class="ttdeci">static void ClientLogTraceTagged(const std::initializer_list&lt; const char * &gt; tags, const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00424">Logger.hpp:424</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00961">961</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01036">1036</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -852,7 +855,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">(!(x) ? (SPDLOG_LOGGER_CRITICAL(<a class="code hl_function" href="classCori_1_1Logger.html#a4d84ca33d5d85a4bc2525ae6d6c01dad">::Cori::Logger::GetClientLogger</a>(), <span class="stringliteral">&quot;Verify &#39;&quot;</span>#x<span class="stringliteral">&quot;&#39; Failed. Message: &quot;</span> __VA_ARGS__), <a class="code hl_function" href="classCori_1_1Logger.html#a4d84ca33d5d85a4bc2525ae6d6c01dad">::Cori::Logger::GetClientLogger</a>()-&gt;critical(<span class="stringliteral">&quot;    Function: {}&quot;</span>, __PRETTY_FUNCTION__), <span class="keyword">true</span>) : <span class="keyword">false</span>)</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00950">950</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01025">1025</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -871,9 +874,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="classCori_1_1Logger.html#aeac8dec0047f87a2c53348527a389f8a">::Cori::Logger::ClientLogWarn</a>(__VA_ARGS__)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_aeac8dec0047f87a2c53348527a389f8a"><div class="ttname"><a href="classCori_1_1Logger.html#aeac8dec0047f87a2c53348527a389f8a">Cori::Logger::ClientLogWarn</a></div><div class="ttdeci">static void ClientLogWarn(const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00681">Logger.hpp:681</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_aeac8dec0047f87a2c53348527a389f8a"><div class="ttname"><a href="classCori_1_1Logger.html#aeac8dec0047f87a2c53348527a389f8a">Cori::Logger::ClientLogWarn</a></div><div class="ttdeci">static void ClientLogWarn(const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00755">Logger.hpp:755</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00957">957</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01032">1032</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -892,9 +895,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="classCori_1_1Logger.html#ac460f885d135cbd3dbd92d51c6118aa4">::Cori::Logger::ClientLogWarnTagged</a>(__VA_ARGS__)</div>
-<div class="ttc" id="aclassCori_1_1Logger_html_ac460f885d135cbd3dbd92d51c6118aa4"><div class="ttname"><a href="classCori_1_1Logger.html#ac460f885d135cbd3dbd92d51c6118aa4">Cori::Logger::ClientLogWarnTagged</a></div><div class="ttdeci">static void ClientLogWarnTagged(const std::initializer_list&lt; const char * &gt; tags, const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00431">Logger.hpp:431</a></div></div>
+<div class="ttc" id="aclassCori_1_1Logger_html_ac460f885d135cbd3dbd92d51c6118aa4"><div class="ttname"><a href="classCori_1_1Logger.html#ac460f885d135cbd3dbd92d51c6118aa4">Cori::Logger::ClientLogWarnTagged</a></div><div class="ttdeci">static void ClientLogWarnTagged(const std::initializer_list&lt; const char * &gt; tags, const fmt::format_string&lt; Args... &gt; &amp;fmt, Args &amp;&amp;... args)</div><div class="ttdef"><b>Definition</b> <a href="Logger_8hpp_source.html#l00505">Logger.hpp:505</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00964">964</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l01039">1039</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -919,7 +922,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00904">904</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00978">978</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>

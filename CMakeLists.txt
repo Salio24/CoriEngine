@@ -28,12 +28,23 @@ if(CLANG_VARIANT STREQUAL "MSYS2")
 endif ()
 
 option(CORI_BUILD_SANDBOX_APPS   "Build sandbox apps. (can break the compilation if enabled)" OFF)
+option(CORI_BUILD_DOCS "Build CoriEngine documentation" OFF)
+option(CORI_SANITIZE "Enable address sanitization" OFF)
+option(CORI_USE_AVX2 "Allows the use of AVX2 in thirdparty libs" ON)
+option(CORI_FORCE_AVX2 "Force AVX2, default OFF, -march=native is used by default" OFF)
+option(CORI_ENABLE_TRACY_PROFILER "Enables Tracy profiler in debug builds" ON)
+
+if (NOT CORI_USE_AVX2)
+    set(CORI_FORCE_AVX2 OFF)
+endif()
+
+if(CORI_FORCE_AVX2)
+    set(CORI_USE_AVX2 ON)
+endif()
 
 project(main)
     if(CLANG_VARIANT STREQUAL "OTHER" AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_SYSTEM_NAME STREQUAL "Windows")
-        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:RelWithDebInfo>:Debug>")
-        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:>")
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:Debug>")
     endif ()
 
     if (NOT (
@@ -55,12 +66,15 @@ project(main)
     endif()
     set(CMAKE_CXX_STANDARD 23)
 
-    add_compile_options(-mavx2)
-    add_compile_options(-Wall -Wextra -Wpedantic)
-    #add_compile_options(-Wno-unused-variable)
-    #add_compile_options(-Wno-unused-parameter)
-    #add_compile_options(-Wno-sign-compare)
-    add_compile_options(-fdiagnostics-color=always)
+    if (NOT CORI_FORCE_AVX2)
+        add_compile_options(-march=native)
+    else()
+        add_compile_options(-mavx2)
+    endif()
+
+    add_compile_options()
+
+    #set(CMAKE_COLOR_DIAGNOSTICS ON CACHE BOOL "")
 
     add_subdirectory(${PROJECT_SOURCE_DIR}/Engine)
 
@@ -69,7 +83,5 @@ project(main)
         add_subdirectory(${PROJECT_SOURCE_DIR}/Sandboxes/RendererSandbox)
         add_subdirectory(${PROJECT_SOURCE_DIR}/Sandboxes/PhysicsSandbox)
     endif ()
-
-add_compile_options(-Wall -Wextra)
 
 

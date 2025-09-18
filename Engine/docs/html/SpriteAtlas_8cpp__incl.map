@@ -1,9 +1,9 @@
 <map id="SpriteAtlas.cpp" name="SpriteAtlas.cpp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="166,5,286,33"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="172,5,291,33"/>
 <area shape="rect" id="Node000002" href="$SpriteAtlas_8hpp.html" title=" " alt="" coords="80,81,201,109"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="212,36,169,73,166,69,209,32"/>
-<area shape="rect" id="Node000007" href="$PathDefines_8hpp.html" title=" " alt="" coords="225,81,398,109"/>
-<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="243,32,286,69,283,73,240,36"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="217,36,170,73,167,69,213,31"/>
+<area shape="rect" id="Node000007" href="$PathDefinesGenerated_8hpp.html" title=" " alt="" coords="225,81,422,109"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="249,31,297,69,294,73,246,36"/>
 <area shape="rect" id="Node000003" href="$Texture_8hpp.html" title=" " alt="" coords="5,157,103,184"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="127,111,82,149,79,145,123,107"/>
 <area shape="rect" id="Node000004" href="$Image_8hpp.html" title=" " alt="" coords="64,232,154,260"/>

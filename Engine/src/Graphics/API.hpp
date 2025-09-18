@@ -6,56 +6,62 @@ namespace Cori {
 		class Application;
 	}
 
+	/**
+	 * @brief Almost everything connected to graphics is in this namespace.
+	 */
 	namespace Graphics {
-		class API {
-		public:
-			static void SetViewport(const int32_t x, const int32_t y, const int32_t width, const int32_t height) {
-				s_GraphicsAPI->SetViewport(x, y, width, height);
-			}
+		namespace Internal {
+			class API {
+			public:
 
-			static void SetClearColor(const glm::vec4& color) {
-				s_GraphicsAPI->SetClearColor(color);
-			}
+				static void SetViewport(const int32_t x, const int32_t y, const int32_t width, const int32_t height) {
+					s_GraphicsAPI->SetViewport(x, y, width, height);
+				}
 
-			static void ClearFramebuffer() {
-				s_GraphicsAPI->ClearFramebuffer();
-			}
+				static void SetClearColor(const glm::vec4& color) {
+					s_GraphicsAPI->SetClearColor(color);
+				}
 
-			static void DrawElementsTriangles(const uint32_t elementCount) {
-				s_GraphicsAPI->DrawElementsTriangles(elementCount);
-			}
+				static void ClearFramebuffer() {
+					s_GraphicsAPI->ClearFramebuffer();
+				}
 
-			static void DrawElementsInstancedTriangles(const uint32_t instanceCount) {
-				s_GraphicsAPI->DrawElementsInstancedTriangles(instanceCount);
-			}
+				static void DrawElementsTriangles(const uint32_t elementCount) {
+					s_GraphicsAPI->DrawElementsTriangles(elementCount);
+				}
 
-			static void EnableDepthTest() {
-				s_GraphicsAPI->EnableDepthTest();
-			}
+				static void DrawElementsInstancedTriangles(const uint32_t instanceCount) {
+					s_GraphicsAPI->DrawElementsInstancedTriangles(instanceCount);
+				}
 
-			static void DisableDepthTest() {
-				s_GraphicsAPI->DisableDepthTest();
-			}
+				static void EnableDepthTest() {
+					s_GraphicsAPI->EnableDepthTest();
+				}
 
-			static void EnableBlending() {
-				s_GraphicsAPI->EnableBlending();
-			}
+				static void DisableDepthTest() {
+					s_GraphicsAPI->DisableDepthTest();
+				}
 
-			static void DisableBlending() {
-				s_GraphicsAPI->DisableBlending();
-			}
+				static void EnableBlending() {
+					s_GraphicsAPI->EnableBlending();
+				}
 
-			static void SetDepthMask(const bool mode) {
-				s_GraphicsAPI->SetDepthMask(mode);
-			}
+				static void DisableBlending() {
+					s_GraphicsAPI->DisableBlending();
+				}
 
-		protected:
-			friend class Core::Application;
-			static void Init();
-			static void Shutdown();
+				static void SetDepthMask(const bool mode) {
+					s_GraphicsAPI->SetDepthMask(mode);
+				}
 
-		private:
-			static std::unique_ptr<CoriGraphicsAPI> s_GraphicsAPI;
-		};
+			protected:
+				friend Core::Application;
+
+				static void Init();
+				static void Shutdown();
+
+				static std::unique_ptr<CoriGraphicsAPI> s_GraphicsAPI;
+			};
+		}
 	}
 }

@@ -3,9 +3,18 @@
 namespace Cori {
 	namespace Graphics {
 		enum class GraphicsAPIs {
+			/**
+			 * @brief Invalid enumerator.
+			 */
 			None = 0,
+			/**
+			 * @brief The only one available for now.
+			 */
 			OpenGL = 1,
-			Vulkan = 2 // i want to support vulkan, BUT later-later
+			/**
+			 * @brief I want to support vulkan, BUT later-later.
+			 */
+			Vulkan = 2
 		};
 
 		[[maybe_unused]] [[nodiscard]] static const char* APIEnumToName(const GraphicsAPIs api) {

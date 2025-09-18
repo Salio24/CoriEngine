@@ -1,5 +1,5 @@
 <map id="Cori::World::Components::Entity::UUID" name="Cori::World::Components::Entity::UUID">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,106,189,151"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1UUID.html" title=" " alt="" coords="33,5,161,33"/>
+<area shape="rect" id="Node000001" title="Every Entity by default has a UUID component, mostly unused for now." alt="" coords="5,106,189,151"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1UUID.html" title="A 128bit UUID, can be serialized to the string and deserialized from it." alt="" coords="33,5,161,33"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,49,100,105,94,105,94,49"/>
 </map>

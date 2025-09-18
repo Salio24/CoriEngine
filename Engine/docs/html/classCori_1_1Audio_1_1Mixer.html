@@ -93,6 +93,9 @@ $(function(){initNavTree('classCori_1_1Audio_1_1Mixer.html','','classCori_1_1Aud
 </div><!--header-->
 <div class="contents">
 
+<p><a class="el" href="classCori_1_1Audio_1_1Mixer.html" title="Mixer is responsible for mixing all the sounds, it is a global object and there can only be one Mixer...">Mixer</a> is responsible for mixing all the sounds, it is a global object and there can only be one <a class="el" href="classCori_1_1Audio_1_1Mixer.html" title="Mixer is responsible for mixing all the sounds, it is a global object and there can only be one Mixer...">Mixer</a>.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
@@ -102,122 +105,29 @@ Classes</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:abdc57fc209c063a68aee81622eb8d1f3" id="r_abdc57fc209c063a68aee81622eb8d1f3"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abdc57fc209c063a68aee81622eb8d1f3">PauseAllTracks</a> ()</td></tr>
+<tr class="memdesc:abdc57fc209c063a68aee81622eb8d1f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pauses all <a class="el" href="classCori_1_1Audio_1_1Track.html" title="You use Track to play and mix Sound objects.">Track</a> that are currently playing on the <a class="el" href="classCori_1_1Audio_1_1Mixer.html" title="Mixer is responsible for mixing all the sounds, it is a global object and there can only be one Mixer...">Mixer</a>.  <br /></td></tr>
 <tr class="memitem:adad9ad27587cc1dc51a92cf3154f8195" id="r_adad9ad27587cc1dc51a92cf3154f8195"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adad9ad27587cc1dc51a92cf3154f8195">ResumeAllTracks</a> ()</td></tr>
+<tr class="memdesc:adad9ad27587cc1dc51a92cf3154f8195"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resumes all <a class="el" href="classCori_1_1Audio_1_1Track.html" title="You use Track to play and mix Sound objects.">Track</a> that are currently paused on the <a class="el" href="classCori_1_1Audio_1_1Mixer.html" title="Mixer is responsible for mixing all the sounds, it is a global object and there can only be one Mixer...">Mixer</a>.  <br /></td></tr>
 <tr class="memitem:a3e22a147faf7da15e1b1907d5561d5fc" id="r_a3e22a147faf7da15e1b1907d5561d5fc"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3e22a147faf7da15e1b1907d5561d5fc">SetMasterGain</a> (const float gain)</td></tr>
+<tr class="memdesc:a3e22a147faf7da15e1b1907d5561d5fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the master gain of a <a class="el" href="classCori_1_1Audio_1_1Mixer.html" title="Mixer is responsible for mixing all the sounds, it is a global object and there can only be one Mixer...">Mixer</a>.  <br /></td></tr>
 <tr class="memitem:a7810a4b9081c008c5e9a2f9e50148770" id="r_a7810a4b9081c008c5e9a2f9e50148770"><td class="memItemLeft" align="right" valign="top">static float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7810a4b9081c008c5e9a2f9e50148770">GetMasterGain</a> ()</td></tr>
-<tr class="memitem:a7bd8438333a9869032c6430dd4f5aadc" id="r_a7bd8438333a9869032c6430dd4f5aadc"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7bd8438333a9869032c6430dd4f5aadc">PlayTag</a> (const char *tag, const <a class="el" href="structCori_1_1Audio_1_1PlayParams.html">PlayParams</a> &amp;params=<a class="el" href="structCori_1_1Audio_1_1PlayParams.html">PlayParams</a>{})</td></tr>
+<tr class="memdesc:a7810a4b9081c008c5e9a2f9e50148770"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current master gain specified for the <a class="el" href="classCori_1_1Audio_1_1Mixer.html" title="Mixer is responsible for mixing all the sounds, it is a global object and there can only be one Mixer...">Mixer</a>. The default gain for a <a class="el" href="classCori_1_1Audio_1_1Mixer.html" title="Mixer is responsible for mixing all the sounds, it is a global object and there can only be one Mixer...">Mixer</a> is 1.0f.  <br /></td></tr>
+<tr class="memitem:a736109f9bf9963b5b9da05ee55cc83cb" id="r_a736109f9bf9963b5b9da05ee55cc83cb"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a736109f9bf9963b5b9da05ee55cc83cb">StartTag</a> (const char *tag, const <a class="el" href="structCori_1_1Audio_1_1PlayParams.html">PlayParams</a> &amp;params=<a class="el" href="structCori_1_1Audio_1_1PlayParams.html">PlayParams</a>{})</td></tr>
+<tr class="memdesc:a736109f9bf9963b5b9da05ee55cc83cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start (ot restart) mixing all Tracks with a specific tag.  <br /></td></tr>
 <tr class="memitem:afb5eb3e63ba666c46fffece8131cc70d" id="r_afb5eb3e63ba666c46fffece8131cc70d"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afb5eb3e63ba666c46fffece8131cc70d">StopTag</a> (const char *tag, const int64_t fadeOutMS=0)</td></tr>
+<tr class="memdesc:afb5eb3e63ba666c46fffece8131cc70d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stops all <a class="el" href="classCori_1_1Audio_1_1Track.html" title="You use Track to play and mix Sound objects.">Track</a> with a specific tab, possibly fading out over time.  <br /></td></tr>
 <tr class="memitem:abdcfa2d00257f6fba9e19bda3b9a9353" id="r_abdcfa2d00257f6fba9e19bda3b9a9353"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abdcfa2d00257f6fba9e19bda3b9a9353">PauseTag</a> (const char *tag)</td></tr>
+<tr class="memdesc:abdcfa2d00257f6fba9e19bda3b9a9353"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pauses all tracks with a specific tag.  <br /></td></tr>
 <tr class="memitem:ab3149caca78d862fec8c7b961351d18b" id="r_ab3149caca78d862fec8c7b961351d18b"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab3149caca78d862fec8c7b961351d18b">ResumeTag</a> (const char *tag)</td></tr>
+<tr class="memdesc:ab3149caca78d862fec8c7b961351d18b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resumes all Tracks with a specific tag.  <br /></td></tr>
 <tr class="memitem:a27888fad18e1b0d3e01736c1c3e0c5ed" id="r_a27888fad18e1b0d3e01736c1c3e0c5ed"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a27888fad18e1b0d3e01736c1c3e0c5ed">SetTagGain</a> (const char *tag, const float gain)</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-pro-static-methods" class="groupheader"><a id="pro-static-methods" name="pro-static-methods"></a>
-Static Protected Member Functions</h2></td></tr>
-<tr class="memitem:a2883642660f598b0d8a96d1028ac0d87" id="r_a2883642660f598b0d8a96d1028ac0d87"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2883642660f598b0d8a96d1028ac0d87">Init</a> ()</td></tr>
-<tr class="memitem:a2bce53770d45e53dfe6759536051de39" id="r_a2bce53770d45e53dfe6759536051de39"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2bce53770d45e53dfe6759536051de39">Shutdown</a> ()</td></tr>
-<tr class="memitem:ab41a8c7a9928adc7ef963c273698ee6b" id="r_ab41a8c7a9928adc7ef963c273698ee6b"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt; std::filesystem::path &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab41a8c7a9928adc7ef963c273698ee6b">LoadSound</a> (const std::filesystem::path &amp;path, const bool preDecode, const <a class="el" href="namespaceCori_1_1Audio.html#aa22724655a6204d9536471babb77e287">SoundID</a> soundID)</td></tr>
-<tr class="memitem:a6405579db0e3b3853504b0ce0907e154" id="r_a6405579db0e3b3853504b0ce0907e154"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6405579db0e3b3853504b0ce0907e154">UnloadSound</a> (const <a class="el" href="namespaceCori_1_1Audio.html#aa22724655a6204d9536471babb77e287">SoundID</a> soundID)</td></tr>
-<tr class="memitem:ad4030a8be3c6a36a6b9897ac452c3f2c" id="r_ad4030a8be3c6a36a6b9897ac452c3f2c"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad4030a8be3c6a36a6b9897ac452c3f2c">CreateTrack</a> (<a class="el" href="classCori_1_1Audio_1_1Track.html">Track</a> *track)</td></tr>
-<tr class="memitem:a96e662d0cc462939a4478871ae11d408" id="r_a96e662d0cc462939a4478871ae11d408"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a96e662d0cc462939a4478871ae11d408">DestroyTrack</a> (const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a> trackID)</td></tr>
-<tr class="memitem:ae281ef82a21f6772ac6bfbc563eb0ced" id="r_ae281ef82a21f6772ac6bfbc563eb0ced"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae281ef82a21f6772ac6bfbc563eb0ced">SetTrackSound</a> (const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a> trackID, const <a class="el" href="classCori_1_1Audio_1_1Sound.html">Sound</a> *sound)</td></tr>
-<tr class="memitem:a868c5d3cf5e916c79430aa049ae87e32" id="r_a868c5d3cf5e916c79430aa049ae87e32"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a868c5d3cf5e916c79430aa049ae87e32">PlayTrack</a> (const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a> trackID, const <a class="el" href="structCori_1_1Audio_1_1PlayParams.html">PlayParams</a> &amp;params={})</td></tr>
-<tr class="memitem:a3688550f215cd3dff57f568b8d51370d" id="r_a3688550f215cd3dff57f568b8d51370d"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3688550f215cd3dff57f568b8d51370d">StopTrack</a> (const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a> trackID, const int64_t fadeOutMS=0)</td></tr>
-<tr class="memitem:a208abba3f9cba277b6b52461fe8a9f3a" id="r_a208abba3f9cba277b6b52461fe8a9f3a"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a208abba3f9cba277b6b52461fe8a9f3a">PauseTrack</a> (const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a> trackID)</td></tr>
-<tr class="memitem:ae59fe1baac8964b016477519ebed56a8" id="r_ae59fe1baac8964b016477519ebed56a8"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae59fe1baac8964b016477519ebed56a8">ResumeTrack</a> (const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a> trackID)</td></tr>
-<tr class="memitem:aa399bb78acd8ecbb81e15abad14ebf21" id="r_aa399bb78acd8ecbb81e15abad14ebf21"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa399bb78acd8ecbb81e15abad14ebf21">IsTrackPaused</a> (const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a> trackID)</td></tr>
-<tr class="memitem:a8ef26169265a19bc722940eac4d00580" id="r_a8ef26169265a19bc722940eac4d00580"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8ef26169265a19bc722940eac4d00580">IsTrackPlaying</a> (const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a> trackID)</td></tr>
-<tr class="memitem:a22338035d8c318ae483cfca826e96f50" id="r_a22338035d8c318ae483cfca826e96f50"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a22338035d8c318ae483cfca826e96f50">SetTrackGain</a> (const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a> trackID, const float gain)</td></tr>
-<tr class="memitem:ad02d6d90bbca7bebeefa9356277a55f6" id="r_ad02d6d90bbca7bebeefa9356277a55f6"><td class="memItemLeft" align="right" valign="top">static float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad02d6d90bbca7bebeefa9356277a55f6">GetTrackGain</a> (const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a> trackID)</td></tr>
-<tr class="memitem:ada545a39fb214e638684442c47da4f45" id="r_ada545a39fb214e638684442c47da4f45"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ada545a39fb214e638684442c47da4f45">TagTrack</a> (const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a> trackID, const char *tag)</td></tr>
-<tr class="memitem:af4101d1bb30f0c636f57e08a398834c0" id="r_af4101d1bb30f0c636f57e08a398834c0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af4101d1bb30f0c636f57e08a398834c0">UntagTrack</a> (const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a> trackID, const char *tag)</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-pro-attribs" class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
-Protected Attributes</h2></td></tr>
-<tr class="memitem:ae59f3aff15ced51e1f3cd575cfe5224b" id="r_ae59f3aff15ced51e1f3cd575cfe5224b"><td class="memItemLeft" align="right" valign="top">friend&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae59f3aff15ced51e1f3cd575cfe5224b">Track</a></td></tr>
-<tr class="memitem:aa8eb79db3adaa05ce787440a76daa1ab" id="r_aa8eb79db3adaa05ce787440a76daa1ab"><td class="memItemLeft" align="right" valign="top">friend&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa8eb79db3adaa05ce787440a76daa1ab">Sound</a></td></tr>
+<tr class="memdesc:a27888fad18e1b0d3e01736c1c3e0c5ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the gain of all tracks with a specific tag.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00046">46</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
+<div class="textblock"><p><a class="el" href="classCori_1_1Audio_1_1Mixer.html" title="Mixer is responsible for mixing all the sounds, it is a global object and there can only be one Mixer...">Mixer</a> is responsible for mixing all the sounds, it is a global object and there can only be one <a class="el" href="classCori_1_1Audio_1_1Mixer.html" title="Mixer is responsible for mixing all the sounds, it is a global object and there can only be one Mixer...">Mixer</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00083">83</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="ad4030a8be3c6a36a6b9897ac452c3f2c" name="ad4030a8be3c6a36a6b9897ac452c3f2c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad4030a8be3c6a36a6b9897ac452c3f2c">&#9670;&#160;</a></span>CreateTrack()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt; Cori::Audio::Mixer::CreateTrack </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classCori_1_1Audio_1_1Track.html">Track</a> *</td>          <td class="paramname"><span class="paramname"><em>track</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00146">146</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_ad4030a8be3c6a36a6b9897ac452c3f2c_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_ad4030a8be3c6a36a6b9897ac452c3f2c_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_ad4030a8be3c6a36a6b9897ac452c3f2c_cgraph" id="aclassCori_1_1Audio_1_1Mixer_ad4030a8be3c6a36a6b9897ac452c3f2c_cgraph">
-<area shape="rect" title=" " alt="" coords="5,49,143,94"/>
-<area shape="rect" href="ref_8cpp.html#a9da552faf202362aaa90bd8949db1835" title=" " alt="" coords="234,5,366,33"/>
-<area shape="poly" title=" " alt="" coords="142,53,221,34,222,40,144,58"/>
-<area shape="rect" href="ref_8cpp.html#a04fd3f644d337f0dcd7c62bf2a634c48" title=" " alt="" coords="191,57,409,85"/>
-<area shape="poly" title=" " alt="" coords="143,68,175,68,175,74,143,74"/>
-<area shape="rect" href="classCori_1_1Audio_1_1Track.html#a38d02b0f007b1dd5c18b9ac2d1fb866f" title=" " alt="" coords="225,109,374,154"/>
-<area shape="poly" title=" " alt="" coords="144,87,211,105,209,110,142,92"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a96e662d0cc462939a4478871ae11d408" name="a96e662d0cc462939a4478871ae11d408"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a96e662d0cc462939a4478871ae11d408">&#9670;&#160;</a></span>DestroyTrack()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::Audio::Mixer::DestroyTrack </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a></td>          <td class="paramname"><span class="paramname"><em>trackID</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00157">157</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_a96e662d0cc462939a4478871ae11d408_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_a96e662d0cc462939a4478871ae11d408_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_a96e662d0cc462939a4478871ae11d408_cgraph" id="aclassCori_1_1Audio_1_1Mixer_a96e662d0cc462939a4478871ae11d408_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#af9830959760bde842f8f5f62851c90b1" title=" " alt="" coords="191,14,330,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
-
-</div>
-</div>
 <a id="a7810a4b9081c008c5e9a2f9e50148770" name="a7810a4b9081c008c5e9a2f9e50148770"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7810a4b9081c008c5e9a2f9e50148770">&#9670;&#160;</a></span>GetMasterGain()</h2>
 
@@ -236,218 +146,15 @@ Here is the call graph for this function:</div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Returns the current master gain specified for the <a class="el" href="classCori_1_1Audio_1_1Mixer.html" title="Mixer is responsible for mixing all the sounds, it is a global object and there can only be one Mixer...">Mixer</a>. The default gain for a <a class="el" href="classCori_1_1Audio_1_1Mixer.html" title="Mixer is responsible for mixing all the sounds, it is a global object and there can only be one Mixer...">Mixer</a> is 1.0f. </p>
+<dl class="section return"><dt>Returns</dt><dd>Current <a class="el" href="classCori_1_1Audio_1_1Mixer.html" title="Mixer is responsible for mixing all the sounds, it is a global object and there can only be one Mixer...">Mixer</a> gain. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00045">45</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_a7810a4b9081c008c5e9a2f9e50148770_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_a7810a4b9081c008c5e9a2f9e50148770_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_a7810a4b9081c008c5e9a2f9e50148770_cgraph" id="aclassCori_1_1Audio_1_1Mixer_a7810a4b9081c008c5e9a2f9e50148770_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#a5f5f009e5114c3c04ab0283d39d6e04e" title=" " alt="" coords="191,14,342,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="ad02d6d90bbca7bebeefa9356277a55f6" name="ad02d6d90bbca7bebeefa9356277a55f6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad02d6d90bbca7bebeefa9356277a55f6">&#9670;&#160;</a></span>GetTrackGain()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">float Cori::Audio::Mixer::GetTrackGain </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a></td>          <td class="paramname"><span class="paramname"><em>trackID</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00267">267</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_ad02d6d90bbca7bebeefa9356277a55f6_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_ad02d6d90bbca7bebeefa9356277a55f6_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_ad02d6d90bbca7bebeefa9356277a55f6_cgraph" id="aclassCori_1_1Audio_1_1Mixer_ad02d6d90bbca7bebeefa9356277a55f6_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#a475326fbaebb057afa3f831de8643601" title=" " alt="" coords="191,14,332,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a2883642660f598b0d8a96d1028ac0d87" name="a2883642660f598b0d8a96d1028ac0d87"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2883642660f598b0d8a96d1028ac0d87">&#9670;&#160;</a></span>Init()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::Audio::Mixer::Init </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00116">116</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_a2883642660f598b0d8a96d1028ac0d87_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_a2883642660f598b0d8a96d1028ac0d87_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_a2883642660f598b0d8a96d1028ac0d87_cgraph" id="aclassCori_1_1Audio_1_1Mixer_a2883642660f598b0d8a96d1028ac0d87_cgraph">
-<area shape="rect" title=" " alt="" coords="5,24,143,68"/>
-<area shape="rect" href="ref_8cpp.html#a76eadf3ad6d2d8cd8e40e7ac744372e2" title=" " alt="" coords="191,5,369,33"/>
-<area shape="poly" title=" " alt="" coords="143,34,175,30,176,35,143,40"/>
-<area shape="rect" href="ref_8cpp.html#aec39f8bd29e62cf0c9fbbf22dd391cf7" title=" " alt="" coords="243,57,317,85"/>
-<area shape="poly" title=" " alt="" coords="143,52,228,62,227,67,143,57"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="aa399bb78acd8ecbb81e15abad14ebf21" name="aa399bb78acd8ecbb81e15abad14ebf21"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa399bb78acd8ecbb81e15abad14ebf21">&#9670;&#160;</a></span>IsTrackPaused()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool Cori::Audio::Mixer::IsTrackPaused </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a></td>          <td class="paramname"><span class="paramname"><em>trackID</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00250">250</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_aa399bb78acd8ecbb81e15abad14ebf21_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_aa399bb78acd8ecbb81e15abad14ebf21_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_aa399bb78acd8ecbb81e15abad14ebf21_cgraph" id="aclassCori_1_1Audio_1_1Mixer_aa399bb78acd8ecbb81e15abad14ebf21_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#a5dbace63cd2e817501ba97697fdd4295" title=" " alt="" coords="191,14,326,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a8ef26169265a19bc722940eac4d00580" name="a8ef26169265a19bc722940eac4d00580"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8ef26169265a19bc722940eac4d00580">&#9670;&#160;</a></span>IsTrackPlaying()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool Cori::Audio::Mixer::IsTrackPlaying </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a></td>          <td class="paramname"><span class="paramname"><em>trackID</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00254">254</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_a8ef26169265a19bc722940eac4d00580_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_a8ef26169265a19bc722940eac4d00580_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_a8ef26169265a19bc722940eac4d00580_cgraph" id="aclassCori_1_1Audio_1_1Mixer_a8ef26169265a19bc722940eac4d00580_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#a0e21cde25dd331317785d24f92a32be1" title=" " alt="" coords="191,14,327,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="ab41a8c7a9928adc7ef963c273698ee6b" name="ab41a8c7a9928adc7ef963c273698ee6b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab41a8c7a9928adc7ef963c273698ee6b">&#9670;&#160;</a></span>LoadSound()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt; std::filesystem::path &gt; &gt; Cori::Audio::Mixer::LoadSound </td>
-          <td>(</td>
-          <td class="paramtype">const std::filesystem::path &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const bool</td>          <td class="paramname"><span class="paramname"><em>preDecode</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="namespaceCori_1_1Audio.html#aa22724655a6204d9536471babb77e287">SoundID</a></td>          <td class="paramname"><span class="paramname"><em>soundID</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00131">131</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_ab41a8c7a9928adc7ef963c273698ee6b_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_ab41a8c7a9928adc7ef963c273698ee6b_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_ab41a8c7a9928adc7ef963c273698ee6b_cgraph" id="aclassCori_1_1Audio_1_1Mixer_ab41a8c7a9928adc7ef963c273698ee6b_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#a7b25745bd69636c86ff2154bd9182fe8" title=" " alt="" coords="191,14,312,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
 
 </div>
 </div>
@@ -469,22 +176,16 @@ Here is the call graph for this function:</div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
+<p>Pauses all <a class="el" href="classCori_1_1Audio_1_1Track.html" title="You use Track to play and mix Sound objects.">Track</a> that are currently playing on the <a class="el" href="classCori_1_1Audio_1_1Mixer.html" title="Mixer is responsible for mixing all the sounds, it is a global object and there can only be one Mixer...">Mixer</a>. </p>
+<dl class="section note"><dt>Note</dt><dd>Pausing a <a class="el" href="classCori_1_1Audio_1_1Track.html" title="You use Track to play and mix Sound objects.">Track</a> will not fire its stop callback. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with void on success or CoriError&lt;&gt; on failure. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00018">18</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_abdc57fc209c063a68aee81622eb8d1f3_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_abdc57fc209c063a68aee81622eb8d1f3_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_abdc57fc209c063a68aee81622eb8d1f3_cgraph" id="aclassCori_1_1Audio_1_1Mixer_abdc57fc209c063a68aee81622eb8d1f3_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#ab64eb19a823a278f48739c4c98b2bd96" title=" " alt="" coords="191,14,342,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
 
 </div>
 </div>
@@ -506,141 +207,22 @@ Here is the call graph for this function:</div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Pauses all tracks with a specific tag. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tag</td><td>Specific <a class="el" href="classCori_1_1Audio_1_1Track.html" title="You use Track to play and mix Sound objects.">Track</a> tag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Pausing a <a class="el" href="classCori_1_1Audio_1_1Track.html" title="You use Track to play and mix Sound objects.">Track</a> will not fire its stop callback. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with void on success or CoriError&lt;&gt; on failure. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00089">89</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_abdcfa2d00257f6fba9e19bda3b9a9353_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_abdcfa2d00257f6fba9e19bda3b9a9353_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_abdcfa2d00257f6fba9e19bda3b9a9353_cgraph" id="aclassCori_1_1Audio_1_1Mixer_abdcfa2d00257f6fba9e19bda3b9a9353_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#af9b43287ec3d346329a5598895a19ae5" title=" " alt="" coords="191,14,305,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a208abba3f9cba277b6b52461fe8a9f3a" name="a208abba3f9cba277b6b52461fe8a9f3a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a208abba3f9cba277b6b52461fe8a9f3a">&#9670;&#160;</a></span>PauseTrack()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt; Cori::Audio::Mixer::PauseTrack </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a></td>          <td class="paramname"><span class="paramname"><em>trackID</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00234">234</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_a208abba3f9cba277b6b52461fe8a9f3a_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_a208abba3f9cba277b6b52461fe8a9f3a_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_a208abba3f9cba277b6b52461fe8a9f3a_cgraph" id="aclassCori_1_1Audio_1_1Mixer_a208abba3f9cba277b6b52461fe8a9f3a_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#aa96397fcf0770de0d16edba1ff5d071d" title=" " alt="" coords="191,14,318,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a7bd8438333a9869032c6430dd4f5aadc" name="a7bd8438333a9869032c6430dd4f5aadc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7bd8438333a9869032c6430dd4f5aadc">&#9670;&#160;</a></span>PlayTag()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt; Cori::Audio::Mixer::PlayTag </td>
-          <td>(</td>
-          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>tag</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="structCori_1_1Audio_1_1PlayParams.html">PlayParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="structCori_1_1Audio_1_1PlayParams.html">PlayParams</a>{}</span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00049">49</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_a7bd8438333a9869032c6430dd4f5aadc_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_a7bd8438333a9869032c6430dd4f5aadc_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_a7bd8438333a9869032c6430dd4f5aadc_cgraph" id="aclassCori_1_1Audio_1_1Mixer_a7bd8438333a9869032c6430dd4f5aadc_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#aa1fc0c13a8a7cf297e892b438c34b41e" title=" " alt="" coords="191,14,294,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a868c5d3cf5e916c79430aa049ae87e32" name="a868c5d3cf5e916c79430aa049ae87e32"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a868c5d3cf5e916c79430aa049ae87e32">&#9670;&#160;</a></span>PlayTrack()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt; Cori::Audio::Mixer::PlayTrack </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a></td>          <td class="paramname"><span class="paramname"><em>trackID</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="structCori_1_1Audio_1_1PlayParams.html">PlayParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span><span class="paramdefsep"> = </span><span class="paramdefval">{}</span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00171">171</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_a868c5d3cf5e916c79430aa049ae87e32_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_a868c5d3cf5e916c79430aa049ae87e32_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_a868c5d3cf5e916c79430aa049ae87e32_cgraph" id="aclassCori_1_1Audio_1_1Mixer_a868c5d3cf5e916c79430aa049ae87e32_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#a3ba494ccd7ea56c47041a43238752f2e" title=" " alt="" coords="191,14,307,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
 
 </div>
 </div>
@@ -662,22 +244,15 @@ Here is the call graph for this function:</div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
+<p>Resumes all <a class="el" href="classCori_1_1Audio_1_1Track.html" title="You use Track to play and mix Sound objects.">Track</a> that are currently paused on the <a class="el" href="classCori_1_1Audio_1_1Mixer.html" title="Mixer is responsible for mixing all the sounds, it is a global object and there can only be one Mixer...">Mixer</a>. </p>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with void on success or CoriError&lt;&gt; on failure. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00027">27</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_adad9ad27587cc1dc51a92cf3154f8195_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_adad9ad27587cc1dc51a92cf3154f8195_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_adad9ad27587cc1dc51a92cf3154f8195_cgraph" id="aclassCori_1_1Audio_1_1Mixer_adad9ad27587cc1dc51a92cf3154f8195_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,147,50"/>
-<area shape="rect" href="ref_8cpp.html#a95d91f0a140f72a34da94eaef8e8e4e5" title=" " alt="" coords="195,14,360,42"/>
-<area shape="poly" title=" " alt="" coords="147,25,179,25,179,30,147,30"/>
-</map>
-</div>
 
 </div>
 </div>
@@ -699,59 +274,21 @@ Here is the call graph for this function:</div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Resumes all Tracks with a specific tag. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tag</td><td>Specific <a class="el" href="classCori_1_1Audio_1_1Track.html" title="You use Track to play and mix Sound objects.">Track</a> tag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with void on success or CoriError&lt;&gt; on failure. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00098">98</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_ab3149caca78d862fec8c7b961351d18b_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_ab3149caca78d862fec8c7b961351d18b_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_ab3149caca78d862fec8c7b961351d18b_cgraph" id="aclassCori_1_1Audio_1_1Mixer_ab3149caca78d862fec8c7b961351d18b_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#a168794d333ea3447ba3d3fb56b19242d" title=" " alt="" coords="191,14,319,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,176,25,176,30,143,30"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="ae59fe1baac8964b016477519ebed56a8" name="ae59fe1baac8964b016477519ebed56a8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae59fe1baac8964b016477519ebed56a8">&#9670;&#160;</a></span>ResumeTrack()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt; Cori::Audio::Mixer::ResumeTrack </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a></td>          <td class="paramname"><span class="paramname"><em>trackID</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00242">242</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_ae59fe1baac8964b016477519ebed56a8_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_ae59fe1baac8964b016477519ebed56a8_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_ae59fe1baac8964b016477519ebed56a8_cgraph" id="aclassCori_1_1Audio_1_1Mixer_ae59fe1baac8964b016477519ebed56a8_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#a917498a5803c6626320483a9a469fd39" title=" " alt="" coords="191,14,332,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
 
 </div>
 </div>
@@ -773,22 +310,22 @@ Here is the call graph for this function:</div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
+<p>Sets the master gain of a <a class="el" href="classCori_1_1Audio_1_1Mixer.html" title="Mixer is responsible for mixing all the sounds, it is a global object and there can only be one Mixer...">Mixer</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">gain</td><td>Specified gain, negative values are illegal.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Gain of 0.0f will completely silence the <a class="el" href="classCori_1_1Audio_1_1Mixer.html" title="Mixer is responsible for mixing all the sounds, it is a global object and there can only be one Mixer...">Mixer</a>, value of 1.0f will not change the <a class="el" href="classCori_1_1Audio_1_1Mixer.html" title="Mixer is responsible for mixing all the sounds, it is a global object and there can only be one Mixer...">Mixer</a> volume, values higher than 1.0f will increase the volume. There is no gain limit specified. </p><dl class="section return"><dt>Returns</dt><dd>Expected object with void on success or CoriError&lt;&gt; on failure. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Because there is no limit, this can get very load very quickly, be carefully. </dd></dl>
+
 <p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00036">36</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_a3e22a147faf7da15e1b1907d5561d5fc_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_a3e22a147faf7da15e1b1907d5561d5fc_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_a3e22a147faf7da15e1b1907d5561d5fc_cgraph" id="aclassCori_1_1Audio_1_1Mixer_a3e22a147faf7da15e1b1907d5561d5fc_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#a31c1a68aac604aa07cf09d10c5935612" title=" " alt="" coords="191,14,340,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
 
 </div>
 </div>
@@ -814,27 +351,28 @@ Here is the call graph for this function:</div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Sets the gain of all tracks with a specific tag. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tag</td><td>Specific <a class="el" href="classCori_1_1Audio_1_1Track.html" title="You use Track to play and mix Sound objects.">Track</a> tag. </td></tr>
+    <tr><td class="paramname">gain</td><td>Specified gain, negative values are illegal.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Gain of 0.0f will completely silence the Tracks, value of 1.0f will not change the Tracks volume, values higher than 1.0f will increase the volume. There is no gain limit specified. </p><dl class="section return"><dt>Returns</dt><dd>Expected object with void on success or CoriError&lt;&gt; on failure. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Because there is no limit, this can get very load very quickly, be carefully. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00107">107</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_a27888fad18e1b0d3e01736c1c3e0c5ed_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_a27888fad18e1b0d3e01736c1c3e0c5ed_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_a27888fad18e1b0d3e01736c1c3e0c5ed_cgraph" id="aclassCori_1_1Audio_1_1Mixer_a27888fad18e1b0d3e01736c1c3e0c5ed_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#abf0456af3b19a52b986b272c88b4f528" title=" " alt="" coords="191,14,317,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
 
 </div>
 </div>
-<a id="a22338035d8c318ae483cfca826e96f50" name="a22338035d8c318ae483cfca826e96f50"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a22338035d8c318ae483cfca826e96f50">&#9670;&#160;</a></span>SetTrackGain()</h2>
+<a id="a736109f9bf9963b5b9da05ee55cc83cb" name="a736109f9bf9963b5b9da05ee55cc83cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a736109f9bf9963b5b9da05ee55cc83cb">&#9670;&#160;</a></span>StartTag()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -843,112 +381,34 @@ Here is the call graph for this function:</div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt; Cori::Audio::Mixer::SetTrackGain </td>
+          <td class="memname">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt; Cori::Audio::Mixer::StartTag </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a></td>          <td class="paramname"><span class="paramname"><em>trackID</em></span>, </td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>tag</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const float</td>          <td class="paramname"><span class="paramname"><em>gain</em></span>&#160;)</td>
+          <td class="paramtype">const <a class="el" href="structCori_1_1Audio_1_1PlayParams.html">PlayParams</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>params</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="structCori_1_1Audio_1_1PlayParams.html">PlayParams</a>{}</span>&#160;)</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span><span class="mlabel protected">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00258">258</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_a22338035d8c318ae483cfca826e96f50_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_a22338035d8c318ae483cfca826e96f50_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_a22338035d8c318ae483cfca826e96f50_cgraph" id="aclassCori_1_1Audio_1_1Mixer_a22338035d8c318ae483cfca826e96f50_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#a11eee3a1f23cb2f120292b002ac9ce8e" title=" " alt="" coords="191,14,330,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
+<p>Start (ot restart) mixing all Tracks with a specific tag. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tag</td><td>Specific <a class="el" href="classCori_1_1Audio_1_1Track.html" title="You use Track to play and mix Sound objects.">Track</a> tag. </td></tr>
+    <tr><td class="paramname">params</td><td>A set of parameters to use when starting or restarting Tracks.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This function behaves very similarly to <a class="el" href="classCori_1_1Audio_1_1Track.html#a6380b612ac372013ab000a532bdf5cc0" title="Starts the Track that has a preassigned Sound asset.">Track::Start</a>, parameters when passed to this function have a 1ms accuracy, no sub millisecond when using this unfortunately. </p><dl class="section return"><dt>Returns</dt><dd>Expected object with void on success or CoriError&lt;&gt; on failure. </dd></dl>
 
-</div>
-</div>
-<a id="ae281ef82a21f6772ac6bfbc563eb0ced" name="ae281ef82a21f6772ac6bfbc563eb0ced"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae281ef82a21f6772ac6bfbc563eb0ced">&#9670;&#160;</a></span>SetTrackSound()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt; Cori::Audio::Mixer::SetTrackSound </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a></td>          <td class="paramname"><span class="paramname"><em>trackID</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classCori_1_1Audio_1_1Sound.html">Sound</a> *</td>          <td class="paramname"><span class="paramname"><em>sound</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00162">162</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_ae281ef82a21f6772ac6bfbc563eb0ced_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_ae281ef82a21f6772ac6bfbc563eb0ced_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_ae281ef82a21f6772ac6bfbc563eb0ced_cgraph" id="aclassCori_1_1Audio_1_1Mixer_ae281ef82a21f6772ac6bfbc563eb0ced_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#afd9934ae05d547acb775b031b657b91c" title=" " alt="" coords="191,14,337,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a2bce53770d45e53dfe6759536051de39" name="a2bce53770d45e53dfe6759536051de39"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2bce53770d45e53dfe6759536051de39">&#9670;&#160;</a></span>Shutdown()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::Audio::Mixer::Shutdown </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00126">126</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_a2bce53770d45e53dfe6759536051de39_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_a2bce53770d45e53dfe6759536051de39_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_a2bce53770d45e53dfe6759536051de39_cgraph" id="aclassCori_1_1Audio_1_1Mixer_a2bce53770d45e53dfe6759536051de39_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#a7a05f0fabee4b975e0e077f8952a7f52" title=" " alt="" coords="191,14,271,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
+<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00049">49</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
 
 </div>
 </div>
@@ -974,233 +434,23 @@ Here is the call graph for this function:</div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Stops all <a class="el" href="classCori_1_1Audio_1_1Track.html" title="You use Track to play and mix Sound objects.">Track</a> with a specific tab, possibly fading out over time. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tag</td><td>Specific <a class="el" href="classCori_1_1Audio_1_1Track.html" title="You use Track to play and mix Sound objects.">Track</a> tag. </td></tr>
+    <tr><td class="paramname">fadeOutMS</td><td>Number of milliseconds to spend fading out to silence before stopping. Optional, 0 by default.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>If the <a class="el" href="classCori_1_1Audio_1_1Track.html" title="You use Track to play and mix Sound objects.">Track</a> ends normally while the fade-out is still in progress, the audio stops there. The fade is not adjusted to be shorter if it will last longer than the audio remaining. </p><dl class="section note"><dt>Note</dt><dd>If a <a class="el" href="classCori_1_1Audio_1_1Track.html" title="You use Track to play and mix Sound objects.">Track</a> with the specific tag is currently playing a looped sequence, it will not be stoped, only when current <a class="el" href="classCori_1_1Audio_1_1Sound.html" title="Sound asset to be played on a Track.">Sound</a> that is playing will be. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with void on success or CoriError&lt;&gt; on failure. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00080">80</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_afb5eb3e63ba666c46fffece8131cc70d_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_afb5eb3e63ba666c46fffece8131cc70d_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_afb5eb3e63ba666c46fffece8131cc70d_cgraph" id="aclassCori_1_1Audio_1_1Mixer_afb5eb3e63ba666c46fffece8131cc70d_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#ad7b45c1498a355e38d9aa2dd51a2b69b" title=" " alt="" coords="191,14,295,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a3688550f215cd3dff57f568b8d51370d" name="a3688550f215cd3dff57f568b8d51370d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3688550f215cd3dff57f568b8d51370d">&#9670;&#160;</a></span>StopTrack()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt; Cori::Audio::Mixer::StopTrack </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a></td>          <td class="paramname"><span class="paramname"><em>trackID</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const int64_t</td>          <td class="paramname"><span class="paramname"><em>fadeOutMS</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00226">226</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_a3688550f215cd3dff57f568b8d51370d_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_a3688550f215cd3dff57f568b8d51370d_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_a3688550f215cd3dff57f568b8d51370d_cgraph" id="aclassCori_1_1Audio_1_1Mixer_a3688550f215cd3dff57f568b8d51370d_cgraph">
-<area shape="rect" title=" " alt="" coords="5,24,143,68"/>
-<area shape="rect" href="ref_8cpp.html#adf3b39e59cff4427ede8ddd6c22544e2" title=" " alt="" coords="217,5,334,33"/>
-<area shape="poly" title=" " alt="" coords="143,34,201,26,202,32,144,39"/>
-<area shape="rect" href="ref_8cpp.html#abc5f2b8692ec5fa56d81f778101860cf" title=" " alt="" coords="191,57,361,85"/>
-<area shape="poly" title=" " alt="" coords="144,52,175,56,175,61,143,57"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="ada545a39fb214e638684442c47da4f45" name="ada545a39fb214e638684442c47da4f45"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ada545a39fb214e638684442c47da4f45">&#9670;&#160;</a></span>TagTrack()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt; Cori::Audio::Mixer::TagTrack </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a></td>          <td class="paramname"><span class="paramname"><em>trackID</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>tag</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00271">271</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_ada545a39fb214e638684442c47da4f45_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_ada545a39fb214e638684442c47da4f45_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_ada545a39fb214e638684442c47da4f45_cgraph" id="aclassCori_1_1Audio_1_1Mixer_ada545a39fb214e638684442c47da4f45_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#aca9a9b1a9dc337f548fc6d1f0d3f0717" title=" " alt="" coords="191,14,301,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a6405579db0e3b3853504b0ce0907e154" name="a6405579db0e3b3853504b0ce0907e154"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6405579db0e3b3853504b0ce0907e154">&#9670;&#160;</a></span>UnloadSound()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::Audio::Mixer::UnloadSound </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceCori_1_1Audio.html#aa22724655a6204d9536471babb77e287">SoundID</a></td>          <td class="paramname"><span class="paramname"><em>soundID</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00141">141</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_a6405579db0e3b3853504b0ce0907e154_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_a6405579db0e3b3853504b0ce0907e154_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_a6405579db0e3b3853504b0ce0907e154_cgraph" id="aclassCori_1_1Audio_1_1Mixer_a6405579db0e3b3853504b0ce0907e154_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#a4fca76672f316d2ee604ba31ad0dde90" title=" " alt="" coords="191,14,332,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="af4101d1bb30f0c636f57e08a398834c0" name="af4101d1bb30f0c636f57e08a398834c0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af4101d1bb30f0c636f57e08a398834c0">&#9670;&#160;</a></span>UntagTrack()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::Audio::Mixer::UntagTrack </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf">TrackID</a></td>          <td class="paramname"><span class="paramname"><em>trackID</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>tag</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8cpp_source.html#l00280">280</a> of file <a class="el" href="Mixer_8cpp_source.html">Mixer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Audio_1_1Mixer_af4101d1bb30f0c636f57e08a398834c0_cgraph.png" border="0" usemap="#aclassCori_1_1Audio_1_1Mixer_af4101d1bb30f0c636f57e08a398834c0_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Audio_1_1Mixer_af4101d1bb30f0c636f57e08a398834c0_cgraph" id="aclassCori_1_1Audio_1_1Mixer_af4101d1bb30f0c636f57e08a398834c0_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,143,50"/>
-<area shape="rect" href="ref_8cpp.html#a7bf0536933fff9d100e21bb7172fdaba" title=" " alt="" coords="191,14,318,42"/>
-<area shape="poly" title=" " alt="" coords="143,25,175,25,175,30,143,30"/>
-</map>
-</div>
-
-</div>
-</div>
-<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
-<a id="aa8eb79db3adaa05ce787440a76daa1ab" name="aa8eb79db3adaa05ce787440a76daa1ab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa8eb79db3adaa05ce787440a76daa1ab">&#9670;&#160;</a></span>Sound</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">friend Cori::Audio::Mixer::Sound</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00064">64</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
-
-</div>
-</div>
-<a id="ae59f3aff15ced51e1f3cd575cfe5224b" name="ae59f3aff15ced51e1f3cd575cfe5224b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae59f3aff15ced51e1f3cd575cfe5224b">&#9670;&#160;</a></span>Track</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">friend Cori::Audio::Mixer::Track</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Mixer_8hpp_source.html#l00063">63</a> of file <a class="el" href="Mixer_8hpp_source.html">Mixer.hpp</a>.</p>
 
 </div>
 </div>

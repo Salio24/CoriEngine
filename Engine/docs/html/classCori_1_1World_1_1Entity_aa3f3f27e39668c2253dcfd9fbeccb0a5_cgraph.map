@@ -1,0 +1,16 @@
+<map id="Cori::World::Entity::GetDebugData" name="Cori::World::Entity::GetDebugData">
+<area shape="rect" id="Node000001" title="Gets the debuting string for logging." alt="" coords="5,96,145,141"/>
+<area shape="poly" id="edge4_Node000001_Node000001" title=" " alt="" coords="39,96,38,86,44,77,56,71,75,69,95,72,107,78,105,83,94,77,75,75,58,77,47,81,43,87,44,95"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title="Retries the references to the requested components of the entity." alt="" coords="193,5,332,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,93,214,56,217,60,142,98"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="380,36,519,81"/>
+<area shape="poly" id="edge7_Node000001_Node000003" title=" " alt="" coords="145,105,364,69,365,74,145,110"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="193,125,332,170"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="146,127,178,132,177,137,145,132"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="193,195,332,239"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="118,139,194,180,203,185,201,189,191,185,116,144"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="193,264,332,309"/>
+<area shape="poly" id="edge8_Node000001_Node000006" title=" " alt="" coords="94,139,136,193,164,223,194,250,200,253,196,258,191,254,160,227,132,197,90,143"/>
+<area shape="poly" id="edge2_Node000002_Node000001" title=" " alt="" coords="198,53,123,91,121,86,196,48"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="333,36,365,42,364,47,332,42"/>
+</map>

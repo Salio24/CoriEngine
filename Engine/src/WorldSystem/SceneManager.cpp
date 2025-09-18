@@ -10,12 +10,12 @@ namespace Cori {
 			std::unordered_map<std::string, std::shared_ptr<Scene>> m_Scenes;
 		};
 
-		std::expected<std::shared_ptr<Scene>, Core::CoriError<>> SceneManager::GetScene(const std::string& name) {
+		std::expected<SceneHandle, Core::CoriError<>> SceneManager::GetScene(const std::string& name) {
 			if (!s_Data->m_Scenes.contains(name)) {
 				return std::unexpected(Core::CoriError(std::format("No Scene with name '{}' exists.", name)));
 			}
 
-			return s_Data->m_Scenes.at(name);
+			return SceneHandle(s_Data->m_Scenes.at(name));
 		}
 
 		void SceneManager::Init() {
@@ -26,7 +26,7 @@ namespace Cori {
 			delete s_Data;
 		}
 
-		std::expected<std::shared_ptr<Scene>, Core::CoriError<>> SceneManager::CreateScene(const std::string& name) {
+		std::expected<SceneHandle, Core::CoriError<>> SceneManager::CreateScene(const std::string& name) {
 			if (name.empty()) {
 				return std::unexpected(Core::CoriError("Scene name cannot be empty!"));
 			}
@@ -39,7 +39,7 @@ namespace Cori {
 
 			std::shared_ptr<Scene> scene = Scene::Create(name);
 			s_Data->m_Scenes.insert({ name, scene });
-			return scene;
+			return SceneHandle(scene);
 		}
 
 		std::expected<void, Core::CoriError<>> SceneManager::DestroyScene(const std::string& name) {

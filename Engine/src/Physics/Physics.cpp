@@ -53,7 +53,7 @@ namespace Cori {
 			return WindingOrder::COLLINEAR;
 		}
 
-		std::string WindingOrderToString(const WindingOrder order) {
+		const char* WindingOrderToString(const WindingOrder order) {
 			switch (order) {
 			case WindingOrder::COLLINEAR:
 				return "Collinear";

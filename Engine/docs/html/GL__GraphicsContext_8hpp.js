@@ -1,4 +1,4 @@
 var GL__GraphicsContext_8hpp =
 [
-    [ "Cori::Graphics::OpenGLContext", "classCori_1_1Graphics_1_1OpenGLContext.html", "classCori_1_1Graphics_1_1OpenGLContext" ]
+    [ "Cori::Graphics::Internal::OpenGLContext", "classCori_1_1Graphics_1_1Internal_1_1OpenGLContext.html", "classCori_1_1Graphics_1_1Internal_1_1OpenGLContext" ]
 ];

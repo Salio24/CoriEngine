@@ -1,15 +1,15 @@
 <map id="SpriteAtlas.hpp" name="SpriteAtlas.hpp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="188,5,308,33"/>
-<area shape="rect" id="Node000002" href="$AnimationPack_8hpp.html" title=" " alt="" coords="96,81,243,109"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="224,46,185,83,181,79,221,42"/>
-<area shape="rect" id="Node000007" href="$SpriteAtlas_8cpp.html" title=" " alt="" coords="267,81,386,109"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="275,42,314,79,311,83,271,46"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="181,5,301,33"/>
+<area shape="rect" id="Node000002" href="$AnimationPack_8hpp.html" title=" " alt="" coords="89,81,236,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="218,46,178,83,175,79,214,42"/>
+<area shape="rect" id="Node000007" href="$SpriteAtlas_8cpp.html" title=" " alt="" coords="260,81,380,109"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="268,42,308,79,304,83,265,46"/>
 <area shape="rect" id="Node000003" href="$AnimationPack_8cpp.html" title=" " alt="" coords="5,157,152,184"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="143,121,96,158,93,154,139,117"/>
-<area shape="rect" id="Node000004" href="$QuadAnimatorNew_8hpp.html" title=" " alt="" coords="176,157,347,184"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="199,116,247,154,243,158,196,121"/>
-<area shape="rect" id="Node000005" href="$QuadAnimatorNew_8cpp.html" title=" " alt="" coords="99,232,269,260"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="238,197,199,234,196,230,235,193"/>
-<area shape="rect" id="Node000006" href="$Scene_8cpp.html" title=" " alt="" coords="294,232,381,260"/>
-<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="287,193,326,230,322,234,284,197"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="138,121,95,158,92,154,134,117"/>
+<area shape="rect" id="Node000004" href="$QuadAnimator_8hpp.html" title=" " alt="" coords="176,157,320,184"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="191,117,234,154,231,158,188,121"/>
+<area shape="rect" id="Node000005" href="$QuadAnimator_8cpp.html" title=" " alt="" coords="107,232,250,260"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="227,198,193,234,189,230,223,194"/>
+<area shape="rect" id="Node000006" href="$Scene_8cpp.html" title=" " alt="" coords="274,232,361,260"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="273,194,307,230,303,234,269,198"/>
 </map>

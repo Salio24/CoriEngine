@@ -30,6 +30,7 @@ namespace Cori {
 				}
 
 				m_LayerPushQueue.push_back(layer);
+				//layer->OnAttach();
 				return {};
 			}
 
@@ -51,66 +52,48 @@ namespace Cori {
 				}
 
 				m_OverlayPushQueue.push_back(overlay);
+				//overlay->OnAttach();
 				return {};
 			}
 
 			return std::unexpected(CoriError("Trying to push a null Overlay Layer."));
 		}
 
-		void LayerStack::PopLayerToQueue(Layer* layer) {
-			if (layer) {
-				const auto it = std::ranges::find(m_Layers, layer);
-				if (it != m_Layers.end()) {
-					m_LayerPopQueue.push_back(layer);
-					return;
-				}
-
-				CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Layer '{}' is not in the LayerStack, nothing to pop.", layer->GetName());
-			}
-
-			CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Trying to pop a null Layer.");
+		void LayerStack::PopLayerToQueue() {
+			m_LayerPopQueue++;
 		}
 
-		void LayerStack::PopOverlayToQueue(Layer* overlay) {
-			if (overlay) {
-				const auto it = std::ranges::find(m_Layers, overlay);
-				if (it != m_Layers.end()) {
-					m_LayerPopQueue.push_back(overlay);
-					return;
-				}
-				CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Overlay Layer '{}' is not in the LayerStack, nothing to pop.", overlay->GetName());
-			}
-
-			CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Trying to pop a null Overlay Layer.");
+		void LayerStack::PopOverlayToQueue() {
+			m_LayerPopQueue++;
 		}
 
 		void LayerStack::ProcessQueue() {
 			if (m_LayerPushQueue.size() != 0) {
 				for (Layer* layer : std::views::reverse(m_LayerPushQueue)) {
 					PushLayer(layer);
+					m_LayerPushQueue.erase(std::ranges::find(m_LayerPushQueue, layer));
 				}
-				m_LayerPushQueue.clear();
 			}
 
 			if (m_OverlayPushQueue.size() != 0) {
 				for (Layer* layer : std::views::reverse(m_OverlayPushQueue)) {
 					PushOverlay(layer);
+					m_OverlayPushQueue.erase(std::ranges::find(m_OverlayPushQueue, layer));
 				}
-				m_OverlayPushQueue.clear();
 			}
 
-			if (m_LayerPopQueue.size() != 0) {
-				for (Layer* layer : std::views::reverse(m_LayerPopQueue)) {
-					PopLayer(layer);
+			if (m_LayerPopQueue != 0) {
+				for (uint32_t i = 0; i < m_LayerPopQueue; ++i) {
+					PopLayer();
 				}
-				m_LayerPopQueue.clear();
+				m_LayerPopQueue = 0;
 			}
 
-			if (m_OverlayPopQueue.size() != 0) {
-				for (Layer* layer : std::views::reverse(m_OverlayPopQueue)) {
-					PopOverlay(layer);
+			if (m_OverlayPopQueue != 0) {
+				for (uint32_t i = 0; i < m_OverlayPopQueue; ++i) {
+					PopOverlay();
 				}
-				m_OverlayPopQueue.clear();
+				m_OverlayPopQueue = 0;
 			}
 		}
 
@@ -127,27 +110,35 @@ namespace Cori {
 		void LayerStack::PushLayer(Layer* layer) {
 			m_Layers.emplace(m_Layers.begin() + m_LayerInsertIndex, layer);
 			layer->OnAttach();
-			m_LayerInsertIndex++;
+			++m_LayerInsertIndex;
 			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Pushed Layer '{}' to LayerStack.", layer->GetName());
 		}
 
 		void LayerStack::PushOverlay(Layer* overlay) {
 			m_Layers.emplace_back(overlay);
 			overlay->OnAttach();
+			++m_OverlayLayerCount;
 			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Pushed Overlay Layer '{}' to LayerStack.", overlay->GetName());
 		}
 
-		void LayerStack::PopLayer(Layer* layer) {
-			layer->OnDetach();
-			m_Layers.erase(std::ranges::find(m_Layers, layer));
-			m_LayerInsertIndex--;
-			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Popped Layer '{}' from LayerStack.", layer->GetName());
+		void LayerStack::PopLayer() {
+			if (m_LayerInsertIndex != 0) {
+				Layer* layer = m_Layers.at(m_LayerInsertIndex - 1);
+				layer->OnDetach();
+				m_Layers.erase(m_Layers.begin() + m_LayerInsertIndex);
+				--m_LayerInsertIndex;
+				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Popped Layer '{}' from LayerStack.", layer->GetName());
+			}
 		}
 
-		void LayerStack::PopOverlay(Layer* overlay) {
-			overlay->OnDetach();
-			m_Layers.erase(std::ranges::find(m_Layers, overlay));
-			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Popped Overlay Layer '{}' from LayerStack.", overlay->GetName());
+		void LayerStack::PopOverlay() {
+			if (m_OverlayLayerCount != 0) {
+				Layer* overlay = m_Layers.at(m_Layers.size() - 1 - m_OverlayLayerCount);
+				overlay->OnDetach();
+				m_Layers.erase(m_Layers.begin() + m_Layers.size() - m_OverlayLayerCount);
+				--m_OverlayLayerCount;
+				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Popped Overlay Layer '{}' from LayerStack.", overlay->GetName());
+			}
 		}
 	}
 }

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['core_3a_3aapplication_0',['Application',['../classCori_1_1Graphics_1_1API.html#a857ea1a81cbbe25db2db331f4e6ac125',1,'Cori::Graphics::API']]]
+  ['eventdispatcher_0',['EventDispatcher',['../classCori_1_1Core_1_1Event.html#aad5f38ccd490ea17008460423f52325a',1,'Cori::Core::Event']]]
 ];

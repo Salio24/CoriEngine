@@ -1,6 +1,6 @@
 var structCori_1_1Audio_1_1PlayParams =
 [
-    [ "Stringify", "structCori_1_1Audio_1_1PlayParams.html#a986b36c033309b59c427e95641f236d8", null ],
+    [ "ToString", "structCori_1_1Audio_1_1PlayParams.html#a8ba6c7e3b633897ab0e3f9e4cd49e6fa", null ],
     [ "operator<<", "structCori_1_1Audio_1_1PlayParams.html#a88cbcd811f59e5e32f36440c815a7da8", null ],
     [ "AppendSilenceMilliseconds", "structCori_1_1Audio_1_1PlayParams.html#aeb8ace6957ee04cc03226a54abf9c06e", null ],
     [ "FadeInMilliseconds", "structCori_1_1Audio_1_1PlayParams.html#acaf17849d16d523ef157a57a4138d7f7", null ],

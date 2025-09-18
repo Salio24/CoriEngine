@@ -5,10 +5,13 @@ namespace Cori {
 		namespace Components {
 			namespace Entity {
 				Trigger::Trigger(World::Entity& trigger) {
-					if (trigger.IsValid()) {
-						auto& ud = trigger.AddComponent<Physics::BodyUserData>(trigger);
-						auto& rb = trigger.GetComponents<Rigidbody>();
+					if (CORI_CORE_VERIFY(trigger.IsValid(), "An invalid entity was passed to the Trigger, always pass the same entity you're adding a Trigger to. This can blow up any second now.")) {}
+					else {
+						auto& ud = trigger.GetOrAddComponent<Physics::BodyUserData>();
+						ud.m_Entity = trigger;
+						auto& rb = trigger.GetComponents<RigidBody>();
 						rb.SetUserData(&ud);
+						m_Trigger = trigger;
 					}
 				}
 
@@ -19,16 +22,15 @@ namespace Cori {
 							return;
 						}
 						CORI_CORE_TRACE_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::Trigger }, "Trigger '{}': Entity '{}' has entered.", m_Behavior->GetDebugName(), entity.GetDebugData());
-						m_Behavior->OnEnter(entity);
-						m_VisitorBuffer.add(entity);
+						m_Behavior->OnEnter(entity, m_Trigger);
+						m_VisitorBuffer.push_back(entity);
 					}
 				}
 
-				// order is not enforced
 				void Trigger::OnTickUpdate(const float timeStep) {
 					for (auto& visitor : m_VisitorBuffer) {
 						if (m_Behavior) {
-							m_Behavior->OnTickUpdate(visitor, timeStep);
+							m_Behavior->OnTickUpdate(visitor, m_Trigger, timeStep);
 						}
 					}
 				}
@@ -37,7 +39,7 @@ namespace Cori {
 					if (m_Behavior) {
 						if (m_VisitorBuffer.remove(entity)) {
 							CORI_CORE_TRACE_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::Trigger }, "Trigger '{}': Entity '{}' has exited.", m_Behavior->GetDebugName(), entity.GetDebugData());
-							m_Behavior->OnExit(entity);
+							m_Behavior->OnExit(entity, m_Trigger);
 						}
 					}
 				}

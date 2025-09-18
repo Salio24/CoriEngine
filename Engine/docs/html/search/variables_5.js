@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['gametimer_0',['GameTimer',['../structCori_1_1Logger_1_1Tags_1_1Core.html#a3b37f29fd3536ab2661977c38093b6f6',1,'Cori::Logger::Tags::Core']]],
-  ['graphicscontext_1',['GraphicsContext',['../structCori_1_1Logger_1_1Tags_1_1Graphics.html#a00c83a793c96ee4f99a8d359bf62f01c',1,'Cori::Logger::Tags::Graphics']]]
+  ['hasduplicatesimpl_0',['HasDuplicatesImpl',['../namespaceCori_1_1Utility_1_1Internal.html#a82b7dd5c4c8386897c726ec6545f2da5',1,'Cori::Utility::Internal']]],
+  ['hasduplicatesimpl_3c_20t_2c_20rest_2e_2e_2e_20_3e_1',['HasDuplicatesImpl&lt; T, Rest... &gt;',['../namespaceCori_1_1Utility_1_1Internal.html#a5699c0e52bcee33e9606fcdc1c7e894c',1,'Cori::Utility::Internal']]],
+  ['hit_2',['hit',['../structCori_1_1Physics_1_1CastResult.html#ad7a4dbdf952abfefaadd90e340409e4a',1,'Cori::Physics::CastResult']]]
 ];

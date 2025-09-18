@@ -1,19 +1,31 @@
 #pragma once
 #include "Profiling/Trackable.hpp"
 #include "Mixer.hpp"
-#include "Utility/PathDefines.hpp"
 
 namespace Cori {
+	class AssetManager;
 	namespace Audio {
 
+		/**
+		 * @brief Sound asset to be played on a Track.
+		 */
 		class Sound : public Profiling::Trackable<Sound> {
 		public:
+			/**
+			 * @brief Sound Descriptor meant to be used with AssetManager only.
+			 */
 			class Descriptor {
 			public:
+				/**
+				 * @brief Constructs a descriptor. It's recommended to use "inline const" when defining the Descriptor in a namespace.
+				 * @param name Name to be assigned to the Sound.
+				 * @param path Path to the audio asset.
+				 * @param preDecode Whether to precede the audio or no. Generally you want to leave it at default.
+				 */
 				constexpr Descriptor(std::string name, std::filesystem::path path, const bool preDecode = true) noexcept
 					: m_Path(std::move(path)),
-					m_PreDecode(preDecode),
 					m_Name(std::move(name)),
+					m_PreDecode(preDecode),
 					m_RuntimeID(s_NextRuntimeID.fetch_add(1, std::memory_order_relaxed))
 				{ }
 
@@ -32,75 +44,52 @@ namespace Cori {
 				};
 
 				const std::filesystem::path m_Path;
-				const bool m_PreDecode;
 				const std::string m_Name;
+				const bool m_PreDecode;
 
 			private:
 				const uint32_t m_RuntimeID{ 0 };
 				inline static std::atomic<uint32_t> s_NextRuntimeID{ 1 };
 			};
 
-			~Sound() {
-				Mixer::UnloadSound(m_ID);
-				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Sound }, "Sound '{} (SoundID: {})' destroyed." , m_Name, m_ID);
-			}
+			~Sound();
 
-			[[nodiscard]] bool IsValid() const {
-				return m_Valid;
-			}
+			/**
+			 * @brief Check if the Sound is valid.
+			 * @return Validity state.
+			 * @note Generally there is no need to explicitly check for sound validity, because Track already does so.
+			 */
+			[[nodiscard]] bool IsValid() const;
 
-			[[nodiscard]] bool IsPlaceholder() const {
-				return m_Placeholder;
-			}
+			/**
+			 * @brief Checks if the sound was created with a placeholder.
+			 * @return Placeholder state.
+			 */
+			[[nodiscard]] bool IsPlaceholder() const;
 
-			std::string m_Name;
-			const SoundID m_ID{ 0 };
+			/**
+			 * @brief Returns the SoundID associated with Sound.
+			 */
+			[[nodiscard]] SoundID GetID() const;
 
-			static std::shared_ptr<Sound> Create(const std::string& name, const std::filesystem::path& path, const bool preDecode = true) {
-				return std::shared_ptr<Sound>(new Sound(name, path, preDecode));
-			}
+			const std::string m_Name;
 
-			static std::shared_ptr<Sound> Create(const Descriptor& descriptor) {
-				return Create(descriptor.m_Name, descriptor.m_Path, descriptor.m_PreDecode);
-			}
-
+			/**
+			 * @brief Creates a Sound object.
+			 * @param name Name to be assigned to the Sound.
+			 * @param path Path to the audio asset.
+			 * @param preDecode Whether to precede the audio or no. Generally you want to leave it at default.
+			 * @return Shared pointer to the loaded Sound asset.
+			 */
+			[[nodiscard]] static std::shared_ptr<Sound> Create(const std::string& name, const std::filesystem::path& path, const bool preDecode = true);
 		private:
-			Sound(const std::string& name, const std::filesystem::path& path, const bool preDecode) : m_Name(std::move(name)), m_ID(s_NextIndex.fetch_add(1, std::memory_order_relaxed)) {
-				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Sound }, "Creating Sound '{} (SoundID: {})' from: '{}'", m_Name, m_ID, path.string());
-				if (std::filesystem::exists(path)) {
-					auto result = Mixer::LoadSound(path, preDecode, m_ID);
-					if (result) {
-						m_Valid = true;
-						CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Sound }, "Sound '{} (SoundID: {})' was created from: '{}'", m_Name, m_ID, path.string());
-					} else {
-						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Sound }, "Failed to create Sound '{} (SoundID: {})'. Error: {}. Trying to load a placeholder.", m_Name, m_ID, result.error().what());
-
-						auto result_ = Mixer::LoadSound(Utility::Internal::PathDefines::PlaceholderSound, preDecode, m_ID);
-						if (result_) {
-							m_Valid = true;
-							m_Placeholder = true;
-							CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Sound }, "Placeholder loaded for Sound '{} (SoundID: {})'",m_Name, m_ID);
-						} else {
-							m_Valid = false;
-							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Sound }, "Failed to load the placeholder for Sound '{} (SoundID: {})'. Error: {}. Invalid Sound object was created as a result, this should not crash as the engine prevents you from using an invalid Sound object.", m_Name, m_ID, result_.error().what());
-						}
-					}
-				} else {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Sound }, "Failed to create a Sound '{} (SoundID: {})' from: '{}', specified path does not exist. Trying to load a placeholder.", m_Name, m_ID, path.string());
-					auto result_ = Mixer::LoadSound(Utility::Internal::PathDefines::PlaceholderSound, preDecode, m_ID);
-					if (result_) {
-						m_Valid = true;
-						m_Placeholder = true;
-						CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Sound }, "Placeholder loaded for Sound '{} (SoundID: {})'", m_Name, m_ID);
-					} else {
-						m_Valid = false;
-						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Sound }, "Failed to load the placeholder for Sound '{} (SoundID: {})'. Error: {}. Invalid Sound object was created as a result, this should not crash as the engine prevents you from using an invalid Sound object.", m_Name, m_ID, result_.error().what());
-					}
-				}
-			}
+			friend AssetManager;
+			[[nodiscard]] static std::shared_ptr<Sound> Create(const Descriptor& descriptor);
+			Sound(std::string name, const std::filesystem::path& path, const bool preDecode);
 
 			bool m_Valid{ false };
 			bool m_Placeholder{ false };
+			const SoundID m_ID{ 0 };
 			inline static std::atomic<SoundID> s_NextIndex{ 1 };
 		};
 	}

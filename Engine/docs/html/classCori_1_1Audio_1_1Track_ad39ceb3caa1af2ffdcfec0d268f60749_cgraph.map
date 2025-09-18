@@ -1,7 +1,0 @@
-<map id="Cori::Audio::Track::IsPaused" name="Cori::Audio::Track::IsPaused">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,141,50"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Audio_1_1Mixer.html#aa399bb78acd8ecbb81e15abad14ebf21" title=" " alt="" coords="189,5,326,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,25,173,25,173,30,141,30"/>
-<area shape="rect" id="Node000003" href="$ref_8cpp.html#a5dbace63cd2e817501ba97697fdd4295" title=" " alt="" coords="374,14,509,42"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="326,25,359,25,359,30,326,30"/>
-</map>

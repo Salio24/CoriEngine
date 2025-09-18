@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.14.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CoriEngine: Cori::Core::PossibleErrors&lt; Errors &gt; Class Template Reference</title>
+<title>CoriEngine: Cori::Core::PossibleErrors&lt; Exceptions &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -89,56 +89,71 @@ $(function(){initNavTree('classCori_1_1Core_1_1PossibleErrors.html','','classCor
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">Cori::Core::PossibleErrors&lt; Errors &gt; Class Template Reference</div></div>
+  <div class="headertitle"><div class="title">Cori::Core::PossibleErrors&lt; Exceptions &gt; Class Template Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>This class utilizes std::variant to hold one of the possible exception types.  
+ <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="Error_8hpp_source.html">Error.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a10f291bdf9c5766441fa293f8dcec75a" id="r_a10f291bdf9c5766441fa293f8dcec75a"><td class="memTemplParams" colspan="2">template&lt;typename E&gt; <br />
-requires (std::is_same_v&lt;std::decay_t&lt;E&gt;, Errors&gt; || ...)</td></tr>
-<tr class="memitem:a10f291bdf9c5766441fa293f8dcec75a template"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a10f291bdf9c5766441fa293f8dcec75a">PossibleErrors</a> (E &amp;&amp;e)</td></tr>
-<tr class="memitem:a890df0b158d37320d9d55e68c0835f93" id="r_a890df0b158d37320d9d55e68c0835f93"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a890df0b158d37320d9d55e68c0835f93">~PossibleErrors</a> ()</td></tr>
-<tr class="memitem:afdcdd44018bfdf139fad30417e67e0f5" id="r_afdcdd44018bfdf139fad30417e67e0f5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afdcdd44018bfdf139fad30417e67e0f5">PossibleErrors</a> (const <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp;other) noexcept</td></tr>
-<tr class="memitem:a51a1c96d81744d96fe4412f28c1659eb" id="r_a51a1c96d81744d96fe4412f28c1659eb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a51a1c96d81744d96fe4412f28c1659eb">PossibleErrors</a> (<a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp;&amp;other) noexcept</td></tr>
-<tr class="memitem:a535c2b33dad65ec4bfe7a5b01d1253c8" id="r_a535c2b33dad65ec4bfe7a5b01d1253c8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a535c2b33dad65ec4bfe7a5b01d1253c8">operator=</a> (const <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp;other)=delete</td></tr>
-<tr class="memitem:aebc4babf6493f43fb6fa1a9385574e61" id="r_aebc4babf6493f43fb6fa1a9385574e61"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aebc4babf6493f43fb6fa1a9385574e61">operator=</a> (<a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp;&amp;other) noexcept=delete</td></tr>
-<tr class="memitem:a6403be3aede858853241cf6f45f5045b" id="r_a6403be3aede858853241cf6f45f5045b"><td class="memItemLeft" align="right" valign="top">const std::exception *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6403be3aede858853241cf6f45f5045b">GetRaw</a> () const</td></tr>
-<tr class="memitem:a1a0e070c29109facfaf1e9032ac9ac55" id="r_a1a0e070c29109facfaf1e9032ac9ac55"><td class="memTemplParams" colspan="2">template&lt;typename Visitor&gt; </td></tr>
-<tr class="memitem:a1a0e070c29109facfaf1e9032ac9ac55 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1a0e070c29109facfaf1e9032ac9ac55">Visit</a> (Visitor &amp;&amp;visitor) const &amp;</td></tr>
-<tr class="memitem:a329530b2dee25a59934d7f35ed46de92" id="r_a329530b2dee25a59934d7f35ed46de92"><td class="memTemplParams" colspan="2">template&lt;typename Visitor&gt; </td></tr>
-<tr class="memitem:a329530b2dee25a59934d7f35ed46de92 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a329530b2dee25a59934d7f35ed46de92">Visit</a> (Visitor &amp;&amp;visitor) const &amp;&amp;</td></tr>
-<tr class="memitem:a5898bd0196ec89a806db578a615b63cd" id="r_a5898bd0196ec89a806db578a615b63cd"><td class="memTemplParams" colspan="2">template&lt;typename SpecificError, typename Func&gt; </td></tr>
-<tr class="memitem:a5898bd0196ec89a806db578a615b63cd template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5898bd0196ec89a806db578a615b63cd">On</a> (Func &amp;&amp;handler) &amp;</td></tr>
-<tr class="memitem:a05fc51478ccb185715ec0f52acd7a0b2" id="r_a05fc51478ccb185715ec0f52acd7a0b2"><td class="memTemplParams" colspan="2">template&lt;typename SpecificError, typename Func&gt; </td></tr>
-<tr class="memitem:a05fc51478ccb185715ec0f52acd7a0b2 template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp;&amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a05fc51478ccb185715ec0f52acd7a0b2">On</a> (Func &amp;&amp;handler) &amp;&amp;</td></tr>
-<tr class="memitem:a12f0dec5bdea45e1ed70ba3aabb48c34" id="r_a12f0dec5bdea45e1ed70ba3aabb48c34"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a12f0dec5bdea45e1ed70ba3aabb48c34">JustLog</a> () const</td></tr>
-<tr class="memitem:ac9986579db8b5a73102dbbf289cdd351" id="r_ac9986579db8b5a73102dbbf289cdd351"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac9986579db8b5a73102dbbf289cdd351">GetWhat</a> () const</td></tr>
+<tr class="memitem:a6b4d3d0447eeb7b4d65e04eaa726fe68" id="r_a6b4d3d0447eeb7b4d65e04eaa726fe68"><td class="memTemplParams" colspan="2">template&lt;typename E&gt; <br />
+requires (std::is_same_v&lt;std::decay_t&lt;E&gt;, Exceptions&gt; || ...)</td></tr>
+<tr class="memitem:a6b4d3d0447eeb7b4d65e04eaa726fe68 template"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6b4d3d0447eeb7b4d65e04eaa726fe68">PossibleErrors</a> (E &amp;&amp;e)</td></tr>
+<tr class="memitem:a572d3d6eb75d18237f6f4d79633c1faf" id="r_a572d3d6eb75d18237f6f4d79633c1faf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a572d3d6eb75d18237f6f4d79633c1faf">~PossibleErrors</a> ()</td></tr>
+<tr class="memitem:a56cc853b5ec42a38a9612b9f047b164f" id="r_a56cc853b5ec42a38a9612b9f047b164f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a56cc853b5ec42a38a9612b9f047b164f">PossibleErrors</a> (const <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp;other) noexcept</td></tr>
+<tr class="memitem:a192f66dcbca84efc84d9fe6fceef4dfe" id="r_a192f66dcbca84efc84d9fe6fceef4dfe"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a192f66dcbca84efc84d9fe6fceef4dfe">PossibleErrors</a> (<a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp;&amp;other) noexcept</td></tr>
+<tr class="memitem:affee2fd8f95345b27b08e20ce5b3626b" id="r_affee2fd8f95345b27b08e20ce5b3626b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#affee2fd8f95345b27b08e20ce5b3626b">operator=</a> (const <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp;other)=delete</td></tr>
+<tr class="memitem:abc2f8b3c7b2bae22f2b0363f1bafdf22" id="r_abc2f8b3c7b2bae22f2b0363f1bafdf22"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abc2f8b3c7b2bae22f2b0363f1bafdf22">operator=</a> (<a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp;&amp;other) noexcept=delete</td></tr>
+<tr class="memitem:a98e960a7705e0f1f197aaeaedc744a7d" id="r_a98e960a7705e0f1f197aaeaedc744a7d"><td class="memItemLeft" align="right" valign="top">const std::exception *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a98e960a7705e0f1f197aaeaedc744a7d">GetRaw</a> () const</td></tr>
+<tr class="memdesc:a98e960a7705e0f1f197aaeaedc744a7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a pointer to the exception held inside of the object.  <br /></td></tr>
+<tr class="memitem:ab4e9731374500d8a9ca480cf90b860e0" id="r_ab4e9731374500d8a9ca480cf90b860e0"><td class="memTemplParams" colspan="2">template&lt;typename Visitor&gt; </td></tr>
+<tr class="memitem:ab4e9731374500d8a9ca480cf90b860e0 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab4e9731374500d8a9ca480cf90b860e0">Visit</a> (Visitor &amp;&amp;visitor) const &amp;</td></tr>
+<tr class="memdesc:ab4e9731374500d8a9ca480cf90b860e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits the variant inside of the object with a callable.  <br /></td></tr>
+<tr class="memitem:a6fedc4013e32764d8ab2e15dc352e427" id="r_a6fedc4013e32764d8ab2e15dc352e427"><td class="memTemplParams" colspan="2">template&lt;typename Visitor&gt; </td></tr>
+<tr class="memitem:a6fedc4013e32764d8ab2e15dc352e427 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6fedc4013e32764d8ab2e15dc352e427">Visit</a> (Visitor &amp;&amp;visitor) const &amp;&amp;</td></tr>
+<tr class="memdesc:a6fedc4013e32764d8ab2e15dc352e427"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits the variant inside of the object with a callable.  <br /></td></tr>
+<tr class="memitem:a0d5333b1012ff295096de9140b5bb0a1" id="r_a0d5333b1012ff295096de9140b5bb0a1"><td class="memTemplParams" colspan="2">template&lt;typename SpecificException, typename Func&gt; </td></tr>
+<tr class="memitem:a0d5333b1012ff295096de9140b5bb0a1 template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0d5333b1012ff295096de9140b5bb0a1">On</a> (Func &amp;&amp;handler) &amp;</td></tr>
+<tr class="memdesc:a0d5333b1012ff295096de9140b5bb0a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handles the exception with a callable if it is a specific exception type.  <br /></td></tr>
+<tr class="memitem:a213bd1986912fc842df830a3c81f8038" id="r_a213bd1986912fc842df830a3c81f8038"><td class="memTemplParams" colspan="2">template&lt;typename SpecificException, typename Func&gt; </td></tr>
+<tr class="memitem:a213bd1986912fc842df830a3c81f8038 template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp;&amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a213bd1986912fc842df830a3c81f8038">On</a> (Func &amp;&amp;handler) &amp;&amp;</td></tr>
+<tr class="memdesc:a213bd1986912fc842df830a3c81f8038"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handles the exception with a callable if it is a specific exception type.  <br /></td></tr>
+<tr class="memitem:a3ec2734e5f7c5a08011f7f2d3c6f4de1" id="r_a3ec2734e5f7c5a08011f7f2d3c6f4de1"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3ec2734e5f7c5a08011f7f2d3c6f4de1">GetWhat</a> () const</td></tr>
+<tr class="memdesc:a3ec2734e5f7c5a08011f7f2d3c6f4de1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Simply returns the formated error message held inside the execution object.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><div class="compoundTemplParams">template&lt;typename... Errors&gt;<br />
-requires AllAreExceptions&lt;Errors...&gt;<br />
-class Cori::Core::PossibleErrors&lt; Errors &gt;</div>
-<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00110">110</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
+<div class="textblock"><div class="compoundTemplParams">template&lt;typename... Exceptions&gt;<br />
+requires AllAreExceptions&lt;Exceptions...&gt;<br />
+class Cori::Core::PossibleErrors&lt; Exceptions &gt;</div><p>This class utilizes std::variant to hold one of the possible exception types. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Exceptions</td><td>Possible exceptions. Should be either std::expected or derived from it. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00155">155</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a10f291bdf9c5766441fa293f8dcec75a" name="a10f291bdf9c5766441fa293f8dcec75a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a10f291bdf9c5766441fa293f8dcec75a">&#9670;&#160;</a></span>PossibleErrors() <span class="overload">[1/3]</span></h2>
+<a id="a6b4d3d0447eeb7b4d65e04eaa726fe68" name="a6b4d3d0447eeb7b4d65e04eaa726fe68"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b4d3d0447eeb7b4d65e04eaa726fe68">&#9670;&#160;</a></span>PossibleErrors() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename... Errors&gt; </div>
+template&lt;typename... Exceptions&gt; </div>
 <div class="memtemplate">
 template&lt;typename E&gt; <br />
-requires (std::is_same_v&lt;std::decay_t&lt;E&gt;, Errors&gt; || ...)</div>
+requires (std::is_same_v&lt;std::decay_t&lt;E&gt;, Exceptions&gt; || ...)</div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Errors &gt;::PossibleErrors </td>
+          <td class="memname"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Exceptions &gt;::PossibleErrors </td>
           <td>(</td>
           <td class="paramtype">E &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>e</em></span></td><td>)</td>
           <td></td>
@@ -151,23 +166,23 @@ requires (std::is_same_v&lt;std::decay_t&lt;E&gt;, Errors&gt; || ...)</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00113">113</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00158">158</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a890df0b158d37320d9d55e68c0835f93" name="a890df0b158d37320d9d55e68c0835f93"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a890df0b158d37320d9d55e68c0835f93">&#9670;&#160;</a></span>~PossibleErrors()</h2>
+<a id="a572d3d6eb75d18237f6f4d79633c1faf" name="a572d3d6eb75d18237f6f4d79633c1faf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a572d3d6eb75d18237f6f4d79633c1faf">&#9670;&#160;</a></span>~PossibleErrors()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename... Errors&gt; </div>
+template&lt;typename... Exceptions&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Errors &gt;::~<a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> </td>
+          <td class="memname"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Exceptions &gt;::~<a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
@@ -180,25 +195,25 @@ template&lt;typename... Errors&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00115">115</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00160">160</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
 
 </div>
 </div>
-<a id="afdcdd44018bfdf139fad30417e67e0f5" name="afdcdd44018bfdf139fad30417e67e0f5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afdcdd44018bfdf139fad30417e67e0f5">&#9670;&#160;</a></span>PossibleErrors() <span class="overload">[2/3]</span></h2>
+<a id="a56cc853b5ec42a38a9612b9f047b164f" name="a56cc853b5ec42a38a9612b9f047b164f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a56cc853b5ec42a38a9612b9f047b164f">&#9670;&#160;</a></span>PossibleErrors() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename... Errors&gt; </div>
+template&lt;typename... Exceptions&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Errors &gt;::PossibleErrors </td>
+          <td class="memname"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Exceptions &gt;::PossibleErrors </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a>&lt; Errors &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a>&lt; Exceptions &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -209,35 +224,35 @@ template&lt;typename... Errors&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00123">123</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00168">168</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="classCori_1_1Core_1_1PossibleErrors_afdcdd44018bfdf139fad30417e67e0f5_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1PossibleErrors_afdcdd44018bfdf139fad30417e67e0f5_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Core_1_1PossibleErrors_afdcdd44018bfdf139fad30417e67e0f5_cgraph" id="aclassCori_1_1Core_1_1PossibleErrors_afdcdd44018bfdf139fad30417e67e0f5_cgraph">
+<div class="center"><img src="classCori_1_1Core_1_1PossibleErrors_a56cc853b5ec42a38a9612b9f047b164f_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1PossibleErrors_a56cc853b5ec42a38a9612b9f047b164f_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1Core_1_1PossibleErrors_a56cc853b5ec42a38a9612b9f047b164f_cgraph" id="aclassCori_1_1Core_1_1PossibleErrors_a56cc853b5ec42a38a9612b9f047b164f_cgraph">
 <area shape="rect" title=" " alt="" coords="5,5,191,50"/>
-<area shape="rect" href="classCori_1_1Core_1_1PossibleErrors.html#a10f291bdf9c5766441fa293f8dcec75a" title=" " alt="" coords="239,5,424,50"/>
+<area shape="rect" href="classCori_1_1Core_1_1PossibleErrors.html#a6b4d3d0447eeb7b4d65e04eaa726fe68" title=" " alt="" coords="239,5,424,50"/>
 <area shape="poly" title=" " alt="" coords="191,25,223,25,223,30,191,30"/>
 </map>
 </div>
 
 </div>
 </div>
-<a id="a51a1c96d81744d96fe4412f28c1659eb" name="a51a1c96d81744d96fe4412f28c1659eb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a51a1c96d81744d96fe4412f28c1659eb">&#9670;&#160;</a></span>PossibleErrors() <span class="overload">[3/3]</span></h2>
+<a id="a192f66dcbca84efc84d9fe6fceef4dfe" name="a192f66dcbca84efc84d9fe6fceef4dfe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a192f66dcbca84efc84d9fe6fceef4dfe">&#9670;&#160;</a></span>PossibleErrors() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename... Errors&gt; </div>
+template&lt;typename... Exceptions&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Errors &gt;::PossibleErrors </td>
+          <td class="memname"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Exceptions &gt;::PossibleErrors </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a>&lt; Errors &gt; &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a>&lt; Exceptions &gt; &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -248,14 +263,14 @@ template&lt;typename... Errors&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00127">127</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00172">172</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="classCori_1_1Core_1_1PossibleErrors_a51a1c96d81744d96fe4412f28c1659eb_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1PossibleErrors_a51a1c96d81744d96fe4412f28c1659eb_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Core_1_1PossibleErrors_a51a1c96d81744d96fe4412f28c1659eb_cgraph" id="aclassCori_1_1Core_1_1PossibleErrors_a51a1c96d81744d96fe4412f28c1659eb_cgraph">
+<div class="center"><img src="classCori_1_1Core_1_1PossibleErrors_a192f66dcbca84efc84d9fe6fceef4dfe_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1PossibleErrors_a192f66dcbca84efc84d9fe6fceef4dfe_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1Core_1_1PossibleErrors_a192f66dcbca84efc84d9fe6fceef4dfe_cgraph" id="aclassCori_1_1Core_1_1PossibleErrors_a192f66dcbca84efc84d9fe6fceef4dfe_cgraph">
 <area shape="rect" title=" " alt="" coords="5,5,191,50"/>
-<area shape="rect" href="classCori_1_1Core_1_1PossibleErrors.html#a10f291bdf9c5766441fa293f8dcec75a" title=" " alt="" coords="239,5,424,50"/>
+<area shape="rect" href="classCori_1_1Core_1_1PossibleErrors.html#a6b4d3d0447eeb7b4d65e04eaa726fe68" title=" " alt="" coords="239,5,424,50"/>
 <area shape="poly" title=" " alt="" coords="191,25,223,25,223,30,191,30"/>
 </map>
 </div>
@@ -263,19 +278,19 @@ Here is the call graph for this function:</div>
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="a6403be3aede858853241cf6f45f5045b" name="a6403be3aede858853241cf6f45f5045b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6403be3aede858853241cf6f45f5045b">&#9670;&#160;</a></span>GetRaw()</h2>
+<a id="a98e960a7705e0f1f197aaeaedc744a7d" name="a98e960a7705e0f1f197aaeaedc744a7d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a98e960a7705e0f1f197aaeaedc744a7d">&#9670;&#160;</a></span>GetRaw()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename... Errors&gt; </div>
+template&lt;typename... Exceptions&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const std::exception * <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Errors &gt;::GetRaw </td>
+          <td class="memname">const std::exception * <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Exceptions &gt;::GetRaw </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
@@ -288,23 +303,26 @@ template&lt;typename... Errors&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00134">134</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
+<p>Returns a pointer to the exception held inside of the object. </p>
+<dl class="section return"><dt>Returns</dt><dd>Pointer to the exception. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00183">183</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ac9986579db8b5a73102dbbf289cdd351" name="ac9986579db8b5a73102dbbf289cdd351"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac9986579db8b5a73102dbbf289cdd351">&#9670;&#160;</a></span>GetWhat()</h2>
+<a id="a3ec2734e5f7c5a08011f7f2d3c6f4de1" name="a3ec2734e5f7c5a08011f7f2d3c6f4de1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ec2734e5f7c5a08011f7f2d3c6f4de1">&#9670;&#160;</a></span>GetWhat()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename... Errors&gt; </div>
+template&lt;typename... Exceptions&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const char * <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Errors &gt;::GetWhat </td>
+          <td class="memname">const char * <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Exceptions &gt;::GetWhat </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
@@ -317,74 +335,38 @@ template&lt;typename... Errors&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00177">177</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
+<p>Simply returns the formated error message held inside the execution object. </p>
+<dl class="section return"><dt>Returns</dt><dd>Formated error message. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00248">248</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="classCori_1_1Core_1_1PossibleErrors_ac9986579db8b5a73102dbbf289cdd351_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1PossibleErrors_ac9986579db8b5a73102dbbf289cdd351_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Core_1_1PossibleErrors_ac9986579db8b5a73102dbbf289cdd351_cgraph" id="aclassCori_1_1Core_1_1PossibleErrors_ac9986579db8b5a73102dbbf289cdd351_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,191,50"/>
-<area shape="rect" href="classCori_1_1Core_1_1PossibleErrors.html#a6403be3aede858853241cf6f45f5045b" title=" " alt="" coords="239,5,424,50"/>
+<div class="center"><img src="classCori_1_1Core_1_1PossibleErrors_a3ec2734e5f7c5a08011f7f2d3c6f4de1_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1PossibleErrors_a3ec2734e5f7c5a08011f7f2d3c6f4de1_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1Core_1_1PossibleErrors_a3ec2734e5f7c5a08011f7f2d3c6f4de1_cgraph" id="aclassCori_1_1Core_1_1PossibleErrors_a3ec2734e5f7c5a08011f7f2d3c6f4de1_cgraph">
+<area shape="rect" title="Simply returns the formated error message held inside the execution object." alt="" coords="5,5,191,50"/>
+<area shape="rect" href="classCori_1_1Core_1_1PossibleErrors.html#a98e960a7705e0f1f197aaeaedc744a7d" title="Returns a pointer to the exception held inside of the object." alt="" coords="239,5,424,50"/>
 <area shape="poly" title=" " alt="" coords="191,25,223,25,223,30,191,30"/>
 </map>
 </div>
 
 </div>
 </div>
-<a id="a12f0dec5bdea45e1ed70ba3aabb48c34" name="a12f0dec5bdea45e1ed70ba3aabb48c34"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a12f0dec5bdea45e1ed70ba3aabb48c34">&#9670;&#160;</a></span>JustLog()</h2>
+<a id="a0d5333b1012ff295096de9140b5bb0a1" name="a0d5333b1012ff295096de9140b5bb0a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d5333b1012ff295096de9140b5bb0a1">&#9670;&#160;</a></span>On() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename... Errors&gt; </div>
+template&lt;typename... Exceptions&gt; </div>
+<div class="memtemplate">
+template&lt;typename SpecificException, typename Func&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Errors &gt;::JustLog </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00173">173</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Core_1_1PossibleErrors_a12f0dec5bdea45e1ed70ba3aabb48c34_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1PossibleErrors_a12f0dec5bdea45e1ed70ba3aabb48c34_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Core_1_1PossibleErrors_a12f0dec5bdea45e1ed70ba3aabb48c34_cgraph" id="aclassCori_1_1Core_1_1PossibleErrors_a12f0dec5bdea45e1ed70ba3aabb48c34_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,191,50"/>
-<area shape="rect" href="classCori_1_1Core_1_1PossibleErrors.html#a6403be3aede858853241cf6f45f5045b" title=" " alt="" coords="239,5,424,50"/>
-<area shape="poly" title=" " alt="" coords="191,25,223,25,223,30,191,30"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a5898bd0196ec89a806db578a615b63cd" name="a5898bd0196ec89a806db578a615b63cd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5898bd0196ec89a806db578a615b63cd">&#9670;&#160;</a></span>On() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename... Errors&gt; </div>
-<div class="memtemplate">
-template&lt;typename SpecificError, typename Func&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp; <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Errors &gt;::On </td>
+          <td class="memname"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp; <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Exceptions &gt;::On </td>
           <td>(</td>
           <td class="paramtype">Func &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>handler</em></span></td><td>)</td>
           <td> &amp;</td>
@@ -397,35 +379,50 @@ template&lt;typename SpecificError, typename Func&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00154">154</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
+<p>Handles the exception with a callable if it is a specific exception type. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">SpecificException</td><td>Exception type the method will handle. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">handler</td><td>A callable function that accepts SpecificException. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>This can be used as a monadic method. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00218">218</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="classCori_1_1Core_1_1PossibleErrors_a5898bd0196ec89a806db578a615b63cd_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1PossibleErrors_a5898bd0196ec89a806db578a615b63cd_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Core_1_1PossibleErrors_a5898bd0196ec89a806db578a615b63cd_cgraph" id="aclassCori_1_1Core_1_1PossibleErrors_a5898bd0196ec89a806db578a615b63cd_cgraph">
-<area shape="rect" title=" " alt="" coords="5,14,217,42"/>
-<area shape="rect" href="classCori_1_1Core_1_1PossibleErrors.html#a10f291bdf9c5766441fa293f8dcec75a" title=" " alt="" coords="265,5,450,50"/>
+<div class="center"><img src="classCori_1_1Core_1_1PossibleErrors_a0d5333b1012ff295096de9140b5bb0a1_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1PossibleErrors_a0d5333b1012ff295096de9140b5bb0a1_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1Core_1_1PossibleErrors_a0d5333b1012ff295096de9140b5bb0a1_cgraph" id="aclassCori_1_1Core_1_1PossibleErrors_a0d5333b1012ff295096de9140b5bb0a1_cgraph">
+<area shape="rect" title="Handles the exception with a callable if it is a specific exception type." alt="" coords="5,14,217,42"/>
+<area shape="rect" href="classCori_1_1Core_1_1PossibleErrors.html#a6b4d3d0447eeb7b4d65e04eaa726fe68" title=" " alt="" coords="265,5,450,50"/>
 <area shape="poly" title=" " alt="" coords="217,25,249,25,249,30,217,30"/>
 </map>
 </div>
 
 </div>
 </div>
-<a id="a05fc51478ccb185715ec0f52acd7a0b2" name="a05fc51478ccb185715ec0f52acd7a0b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a05fc51478ccb185715ec0f52acd7a0b2">&#9670;&#160;</a></span>On() <span class="overload">[2/2]</span></h2>
+<a id="a213bd1986912fc842df830a3c81f8038" name="a213bd1986912fc842df830a3c81f8038"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a213bd1986912fc842df830a3c81f8038">&#9670;&#160;</a></span>On() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename... Errors&gt; </div>
+template&lt;typename... Exceptions&gt; </div>
 <div class="memtemplate">
-template&lt;typename SpecificError, typename Func&gt; </div>
+template&lt;typename SpecificException, typename Func&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp;&amp; <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Errors &gt;::On </td>
+          <td class="memname"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp;&amp; <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Exceptions &gt;::On </td>
           <td>(</td>
           <td class="paramtype">Func &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>handler</em></span></td><td>)</td>
           <td> &amp;&amp;</td>
@@ -438,35 +435,50 @@ template&lt;typename SpecificError, typename Func&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00164">164</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
+<p>Handles the exception with a callable if it is a specific exception type. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">SpecificException</td><td>Exception type the method will handle. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">handler</td><td>A callable function that accepts SpecificException. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>This can be used as a monadic method. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00234">234</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="classCori_1_1Core_1_1PossibleErrors_a05fc51478ccb185715ec0f52acd7a0b2_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1PossibleErrors_a05fc51478ccb185715ec0f52acd7a0b2_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Core_1_1PossibleErrors_a05fc51478ccb185715ec0f52acd7a0b2_cgraph" id="aclassCori_1_1Core_1_1PossibleErrors_a05fc51478ccb185715ec0f52acd7a0b2_cgraph">
-<area shape="rect" title=" " alt="" coords="5,14,217,42"/>
-<area shape="rect" href="classCori_1_1Core_1_1PossibleErrors.html#a10f291bdf9c5766441fa293f8dcec75a" title=" " alt="" coords="265,5,450,50"/>
+<div class="center"><img src="classCori_1_1Core_1_1PossibleErrors_a213bd1986912fc842df830a3c81f8038_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1PossibleErrors_a213bd1986912fc842df830a3c81f8038_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1Core_1_1PossibleErrors_a213bd1986912fc842df830a3c81f8038_cgraph" id="aclassCori_1_1Core_1_1PossibleErrors_a213bd1986912fc842df830a3c81f8038_cgraph">
+<area shape="rect" title="Handles the exception with a callable if it is a specific exception type." alt="" coords="5,14,217,42"/>
+<area shape="rect" href="classCori_1_1Core_1_1PossibleErrors.html#a6b4d3d0447eeb7b4d65e04eaa726fe68" title=" " alt="" coords="265,5,450,50"/>
 <area shape="poly" title=" " alt="" coords="217,25,249,25,249,30,217,30"/>
 </map>
 </div>
 
 </div>
 </div>
-<a id="a535c2b33dad65ec4bfe7a5b01d1253c8" name="a535c2b33dad65ec4bfe7a5b01d1253c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a535c2b33dad65ec4bfe7a5b01d1253c8">&#9670;&#160;</a></span>operator=() <span class="overload">[1/2]</span></h2>
+<a id="affee2fd8f95345b27b08e20ce5b3626b" name="affee2fd8f95345b27b08e20ce5b3626b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affee2fd8f95345b27b08e20ce5b3626b">&#9670;&#160;</a></span>operator=() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename... Errors&gt; </div>
+template&lt;typename... Exceptions&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp; <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Errors &gt;::operator= </td>
+          <td class="memname"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp; <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Exceptions &gt;::operator= </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a>&lt; Errors &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a>&lt; Exceptions &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -479,31 +491,31 @@ template&lt;typename... Errors&gt; </div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="classCori_1_1Core_1_1PossibleErrors_a535c2b33dad65ec4bfe7a5b01d1253c8_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1PossibleErrors_a535c2b33dad65ec4bfe7a5b01d1253c8_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Core_1_1PossibleErrors_a535c2b33dad65ec4bfe7a5b01d1253c8_cgraph" id="aclassCori_1_1Core_1_1PossibleErrors_a535c2b33dad65ec4bfe7a5b01d1253c8_cgraph">
+<div class="center"><img src="classCori_1_1Core_1_1PossibleErrors_affee2fd8f95345b27b08e20ce5b3626b_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1PossibleErrors_affee2fd8f95345b27b08e20ce5b3626b_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1Core_1_1PossibleErrors_affee2fd8f95345b27b08e20ce5b3626b_cgraph" id="aclassCori_1_1Core_1_1PossibleErrors_affee2fd8f95345b27b08e20ce5b3626b_cgraph">
 <area shape="rect" title=" " alt="" coords="5,5,191,50"/>
-<area shape="rect" href="classCori_1_1Core_1_1PossibleErrors.html#a10f291bdf9c5766441fa293f8dcec75a" title=" " alt="" coords="239,5,424,50"/>
+<area shape="rect" href="classCori_1_1Core_1_1PossibleErrors.html#a6b4d3d0447eeb7b4d65e04eaa726fe68" title=" " alt="" coords="239,5,424,50"/>
 <area shape="poly" title=" " alt="" coords="191,25,223,25,223,30,191,30"/>
 </map>
 </div>
 
 </div>
 </div>
-<a id="aebc4babf6493f43fb6fa1a9385574e61" name="aebc4babf6493f43fb6fa1a9385574e61"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aebc4babf6493f43fb6fa1a9385574e61">&#9670;&#160;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+<a id="abc2f8b3c7b2bae22f2b0363f1bafdf22" name="abc2f8b3c7b2bae22f2b0363f1bafdf22"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc2f8b3c7b2bae22f2b0363f1bafdf22">&#9670;&#160;</a></span>operator=() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename... Errors&gt; </div>
+template&lt;typename... Exceptions&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp; <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Errors &gt;::operator= </td>
+          <td class="memname"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a> &amp; <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Exceptions &gt;::operator= </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a>&lt; Errors &gt; &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">PossibleErrors</a>&lt; Exceptions &gt; &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>other</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -516,23 +528,23 @@ template&lt;typename... Errors&gt; </div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="classCori_1_1Core_1_1PossibleErrors_aebc4babf6493f43fb6fa1a9385574e61_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1PossibleErrors_aebc4babf6493f43fb6fa1a9385574e61_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Core_1_1PossibleErrors_aebc4babf6493f43fb6fa1a9385574e61_cgraph" id="aclassCori_1_1Core_1_1PossibleErrors_aebc4babf6493f43fb6fa1a9385574e61_cgraph">
+<div class="center"><img src="classCori_1_1Core_1_1PossibleErrors_abc2f8b3c7b2bae22f2b0363f1bafdf22_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1PossibleErrors_abc2f8b3c7b2bae22f2b0363f1bafdf22_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1Core_1_1PossibleErrors_abc2f8b3c7b2bae22f2b0363f1bafdf22_cgraph" id="aclassCori_1_1Core_1_1PossibleErrors_abc2f8b3c7b2bae22f2b0363f1bafdf22_cgraph">
 <area shape="rect" title=" " alt="" coords="5,5,191,50"/>
-<area shape="rect" href="classCori_1_1Core_1_1PossibleErrors.html#a10f291bdf9c5766441fa293f8dcec75a" title=" " alt="" coords="239,5,424,50"/>
+<area shape="rect" href="classCori_1_1Core_1_1PossibleErrors.html#a6b4d3d0447eeb7b4d65e04eaa726fe68" title=" " alt="" coords="239,5,424,50"/>
 <area shape="poly" title=" " alt="" coords="191,25,223,25,223,30,191,30"/>
 </map>
 </div>
 
 </div>
 </div>
-<a id="a1a0e070c29109facfaf1e9032ac9ac55" name="a1a0e070c29109facfaf1e9032ac9ac55"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1a0e070c29109facfaf1e9032ac9ac55">&#9670;&#160;</a></span>Visit() <span class="overload">[1/2]</span></h2>
+<a id="ab4e9731374500d8a9ca480cf90b860e0" name="ab4e9731374500d8a9ca480cf90b860e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4e9731374500d8a9ca480cf90b860e0">&#9670;&#160;</a></span>Visit() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename... Errors&gt; </div>
+template&lt;typename... Exceptions&gt; </div>
 <div class="memtemplate">
 template&lt;typename Visitor&gt; </div>
 <table class="mlabels">
@@ -540,7 +552,7 @@ template&lt;typename Visitor&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Errors &gt;::Visit </td>
+          <td class="memname">void <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Exceptions &gt;::Visit </td>
           <td>(</td>
           <td class="paramtype">Visitor &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>visitor</em></span></td><td>)</td>
           <td> const &amp;</td>
@@ -553,17 +565,25 @@ template&lt;typename Visitor&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00142">142</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
+<p>Visits the variant inside of the object with a callable. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">visitor</td><td>A callable that is valid with any of the possible errors stored. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00196">196</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a329530b2dee25a59934d7f35ed46de92" name="a329530b2dee25a59934d7f35ed46de92"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a329530b2dee25a59934d7f35ed46de92">&#9670;&#160;</a></span>Visit() <span class="overload">[2/2]</span></h2>
+<a id="a6fedc4013e32764d8ab2e15dc352e427" name="a6fedc4013e32764d8ab2e15dc352e427"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6fedc4013e32764d8ab2e15dc352e427">&#9670;&#160;</a></span>Visit() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename... Errors&gt; </div>
+template&lt;typename... Exceptions&gt; </div>
 <div class="memtemplate">
 template&lt;typename Visitor&gt; </div>
 <table class="mlabels">
@@ -571,7 +591,7 @@ template&lt;typename Visitor&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Errors &gt;::Visit </td>
+          <td class="memname">void <a class="el" href="classCori_1_1Core_1_1PossibleErrors.html">Cori::Core::PossibleErrors</a>&lt; Exceptions &gt;::Visit </td>
           <td>(</td>
           <td class="paramtype">Visitor &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em>visitor</em></span></td><td>)</td>
           <td> const &amp;&amp;</td>
@@ -584,7 +604,15 @@ template&lt;typename Visitor&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00148">148</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
+<p>Visits the variant inside of the object with a callable. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">visitor</td><td>A callable that accepts and is valid with any of the possible errors stored. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="Error_8hpp_source.html#l00206">206</a> of file <a class="el" href="Error_8hpp_source.html">Error.hpp</a>.</p>
 
 </div>
 </div>

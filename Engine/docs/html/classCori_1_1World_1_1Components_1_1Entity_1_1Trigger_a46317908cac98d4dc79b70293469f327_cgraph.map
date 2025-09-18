@@ -1,11 +1,21 @@
 <map id="Cori::World::Components::Entity::Trigger::Trigger" name="Cori::World::Components::Entity::Trigger::Trigger">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,75,189,119"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Entity.html#a7b8dc8e2678b0b088fcbc94bad61a931" title=" " alt="" coords="237,5,376,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,72,221,53,223,58,167,77"/>
-<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title=" " alt="" coords="237,75,376,119"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="189,94,221,94,221,100,189,100"/>
-<area shape="rect" id="Node000005" href="$classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title=" " alt="" coords="237,144,376,189"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="167,117,223,136,221,141,166,122"/>
-<area shape="rect" id="Node000004" href="$classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title=" " alt="" coords="424,75,563,119"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="376,94,409,94,409,100,376,100"/>
+<area shape="rect" id="Node000001" title="Constructs the Trigger." alt="" coords="5,195,189,239"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title="Retries the references to the requested components of the entity." alt="" coords="251,131,390,175"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="177,192,235,175,236,180,178,197"/>
+<area shape="rect" id="Node000007" href="$classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="639,213,779,258"/>
+<area shape="poly" id="edge11_Node000001_Node000007" title=" " alt="" coords="189,217,624,230,624,236,189,222"/>
+<area shape="rect" id="Node000008" href="$classCori_1_1World_1_1Entity.html#a4329fc9eb55370a9aa0d4f372e30b03b" title="Retries or adds a component to the entity." alt="" coords="237,255,404,299"/>
+<area shape="poly" id="edge10_Node000001_Node000008" title=" " alt="" coords="183,237,222,248,221,253,182,242"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Entity.html#aa3f3f27e39668c2253dcfd9fbeccb0a5" title="Gets the debuting string for logging." alt="" coords="452,131,591,175"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="391,159,436,159,436,165,391,164"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="639,5,779,50"/>
+<area shape="poly" id="edge9_Node000002_Node000006" title=" " alt="" coords="366,128,451,92,540,64,624,43,625,48,541,70,453,97,368,133"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="452,147,406,147,406,141,452,142"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="485,130,484,121,490,112,503,106,522,104,542,106,554,113,551,117,540,112,522,109,504,111,494,116,489,122,491,130"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="639,144,779,189"/>
+<area shape="poly" id="edge5_Node000003_Node000004" title=" " alt="" coords="592,155,624,158,624,163,592,161"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="639,75,779,119"/>
+<area shape="poly" id="edge6_Node000003_Node000005" title=" " alt="" coords="591,130,623,120,625,125,593,135"/>
+<area shape="poly" id="edge7_Node000003_Node000006" title=" " alt="" coords="548,128,589,95,638,60,645,56,648,60,641,65,592,99,551,132"/>
+<area shape="poly" id="edge8_Node000003_Node000007" title=" " alt="" coords="575,173,644,204,642,209,573,178"/>
 </map>

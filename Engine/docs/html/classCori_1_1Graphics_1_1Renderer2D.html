@@ -93,6 +93,9 @@ $(function(){initNavTree('classCori_1_1Graphics_1_1Renderer2D.html','','classCor
 </div><!--header-->
 <div class="contents">
 
+<p>The main engine renderer.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="Renderer2D_8hpp_source.html">Renderer2D.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
@@ -105,6 +108,7 @@ Public Types</h2></td></tr>
 , <a class="el" href="#aca9bfbe7f940d87d8ae365de1f16bcffa08352984e6324efb936cb5a130becbcb">CENTER</a>
 , <a class="el" href="#aca9bfbe7f940d87d8ae365de1f16bcffa46d0841393c78ec7b940c40a205a3bcc">LEFT</a>
  }</td></tr>
+<tr class="memdesc:aca9bfbe7f940d87d8ae365de1f16bcff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Available text alignment options.  <a href="#aca9bfbe7f940d87d8ae365de1f16bcff">More...</a><br /></td></tr>
 <tr class="memitem:a258957813e5c0269a5f700abcdb435b8" id="r_a258957813e5c0269a5f700abcdb435b8"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a258957813e5c0269a5f700abcdb435b8">DrawSpace</a> : uint8_t { <a class="el" href="#a258957813e5c0269a5f700abcdb435b8a8f5e3535b7c089f71cf0f253a47e5ddf">WORLD_SPACE</a>
 , <a class="el" href="#a258957813e5c0269a5f700abcdb435b8ade2364e7ac2eb0c4bf36536ea79d5c85">SCREEN_SPACE</a>
  }</td></tr>
@@ -114,29 +118,24 @@ Public Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ad43e33fd07665c300907ac8618e0be06" id="r_ad43e33fd07665c300907ac8618e0be06"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad43e33fd07665c300907ac8618e0be06">BeginScene</a> (const <a class="el" href="structCori_1_1World_1_1Components_1_1Scene_1_1Camera.html">World::Components::Scene::Camera</a> &amp;camera)</td></tr>
-<tr class="memitem:a3b3e941fe66f05f856ddc334c890eb7c" id="r_a3b3e941fe66f05f856ddc334c890eb7c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3b3e941fe66f05f856ddc334c890eb7c">EndScene</a> ()</td></tr>
-<tr class="memitem:a8cb879b33c833185aa49aa0d0f44c752" id="r_a8cb879b33c833185aa49aa0d0f44c752"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8cb879b33c833185aa49aa0d0f44c752">DrawScene</a> (<a class="el" href="classCori_1_1World_1_1Scene.html">World::Scene</a> *scene)</td></tr>
-<tr class="memitem:a08238aaeb190bbdee929f1f26fcc37e8" id="r_a08238aaeb190bbdee929f1f26fcc37e8"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a08238aaeb190bbdee929f1f26fcc37e8">FlushRenderQueues</a> ()</td></tr>
-<tr class="memitem:ad02fd3723475c38842c06b9536ecc358" id="r_ad02fd3723475c38842c06b9536ecc358"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad02fd3723475c38842c06b9536ecc358">SubmitQuad</a> (const <a class="el" href="#a258957813e5c0269a5f700abcdb435b8">DrawSpace</a> space, const <a class="el" href="#a8d759d8aeba063decaf91583a7de2f73">ObjectTransparency</a> transparencyMode, const glm::mat3 &amp;transform, const glm::vec2 halfSize, const glm::vec4 &amp;tintColor, const std::shared_ptr&lt; <a class="el" href="classCori_1_1Graphics_1_1Texture2D.html">Texture2D</a> &gt; &amp;texture, const <a class="el" href="structCori_1_1Graphics_1_1UVs.html">UVs</a> &amp;uvs, const uint8_t depth, const bool flipX, const bool flipY, const bool flatColored)</td></tr>
+<tr class="memitem:a9dbfc85edb152a8a68d70c1cb1d06ddd" id="r_a9dbfc85edb152a8a68d70c1cb1d06ddd"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9dbfc85edb152a8a68d70c1cb1d06ddd">SubmitQuad</a> (const <a class="el" href="#a258957813e5c0269a5f700abcdb435b8">DrawSpace</a> space, const <a class="el" href="#a8d759d8aeba063decaf91583a7de2f73">ObjectTransparency</a> transparencyMode, const glm::mat3 &amp;transform, const glm::vec2 halfSize, const glm::vec4 &amp;tintColor, <a class="el" href="classCori_1_1Graphics_1_1Texture2D.html">Texture2D</a> *texture, const <a class="el" href="structCori_1_1Graphics_1_1UVs.html">UVs</a> &amp;uvs, const uint8_t depth, const bool flipX, const bool flipY, const bool flatColored)</td></tr>
+<tr class="memdesc:a9dbfc85edb152a8a68d70c1cb1d06ddd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Submits the quad to the render queue.  <br /></td></tr>
 <tr class="memitem:a7441ab6962608fbfacf28b2f089fd4cb" id="r_a7441ab6962608fbfacf28b2f089fd4cb"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7441ab6962608fbfacf28b2f089fd4cb">SubmitColoredQuad</a> (const <a class="el" href="#a258957813e5c0269a5f700abcdb435b8">DrawSpace</a> space, const glm::vec2 position, const glm::vec2 halfSize, const glm::vec3 &amp;color)</td></tr>
+<tr class="memdesc:a7441ab6962608fbfacf28b2f089fd4cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function mainly for debugging, draws a plain colored quad.  <br /></td></tr>
 <tr class="memitem:a9598ee9081568ac3b1dcfda84c823d54" id="r_a9598ee9081568ac3b1dcfda84c823d54"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9598ee9081568ac3b1dcfda84c823d54">SubmitAABB</a> (const <a class="el" href="structCori_1_1Utility_1_1AABB.html">Utility::AABB</a> &amp;aabb, const float lineThickness, const glm::vec3 &amp;color)</td></tr>
-<tr class="memitem:a0c20cd8591a2143954bbf7197414c7a9" id="r_a0c20cd8591a2143954bbf7197414c7a9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0c20cd8591a2143954bbf7197414c7a9">SubmitText</a> (const <a class="el" href="#a258957813e5c0269a5f700abcdb435b8">DrawSpace</a> space, const <a class="el" href="#aca9bfbe7f940d87d8ae365de1f16bcff">TextAlignment</a> alignment, const glm::mat3 &amp;transform, const float fontSize, const std::u32string_view &amp;text, const glm::vec4 &amp;color, const std::shared_ptr&lt; <a class="el" href="classCori_1_1Graphics_1_1Font.html">Font</a> &gt; &amp;font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning)</td></tr>
-<tr class="memitem:a3ea5c9ecfd1337e84c59d7cb817ae941" id="r_a3ea5c9ecfd1337e84c59d7cb817ae941"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3ea5c9ecfd1337e84c59d7cb817ae941">SubmitText</a> (const <a class="el" href="#a258957813e5c0269a5f700abcdb435b8">DrawSpace</a> space, const <a class="el" href="#aca9bfbe7f940d87d8ae365de1f16bcff">TextAlignment</a> alignment, const glm::mat3 &amp;transform, const float fontSize, const std::string_view &amp;text, const glm::vec4 &amp;color, const std::shared_ptr&lt; <a class="el" href="classCori_1_1Graphics_1_1Font.html">Font</a> &gt; &amp;font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning)</td></tr>
+<tr class="memdesc:a9598ee9081568ac3b1dcfda84c823d54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draws the AABB, also a debug convenience function, always draws in world space.  <br /></td></tr>
+<tr class="memitem:a15d2a4f8c31487b857718c9ee147d858" id="r_a15d2a4f8c31487b857718c9ee147d858"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a15d2a4f8c31487b857718c9ee147d858">SubmitText</a> (const <a class="el" href="#a258957813e5c0269a5f700abcdb435b8">DrawSpace</a> space, const <a class="el" href="#aca9bfbe7f940d87d8ae365de1f16bcff">TextAlignment</a> alignment, const glm::mat3 &amp;transform, const float fontSize, const std::u32string_view &amp;text, const glm::vec4 &amp;color, <a class="el" href="classCori_1_1Graphics_1_1Font.html">Font</a> *font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning)</td></tr>
+<tr class="memdesc:a15d2a4f8c31487b857718c9ee147d858"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draws a UTF-32 fixed length encoded string.  <br /></td></tr>
+<tr class="memitem:a0f75e8119ce61a3d1b4383550a532f92" id="r_a0f75e8119ce61a3d1b4383550a532f92"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0f75e8119ce61a3d1b4383550a532f92">SubmitText</a> (const <a class="el" href="#a258957813e5c0269a5f700abcdb435b8">DrawSpace</a> space, const <a class="el" href="#aca9bfbe7f940d87d8ae365de1f16bcff">TextAlignment</a> alignment, const glm::mat3 &amp;transform, const float fontSize, const std::string_view &amp;text, const glm::vec4 &amp;color, <a class="el" href="classCori_1_1Graphics_1_1Font.html">Font</a> *font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning)</td></tr>
+<tr class="memdesc:a0f75e8119ce61a3d1b4383550a532f92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draws a UTF-32 fixed length encoded string.  <br /></td></tr>
 <tr class="memitem:a8a491c2687235f9d5c90ed67bd4d4ff2" id="r_a8a491c2687235f9d5c90ed67bd4d4ff2"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structCori_1_1Graphics_1_1Renderer2D_1_1Statistics.html">Statistics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8a491c2687235f9d5c90ed67bd4d4ff2">GetStatistics</a> ()</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-pro-static-methods" class="groupheader"><a id="pro-static-methods" name="pro-static-methods"></a>
-Static Protected Member Functions</h2></td></tr>
-<tr class="memitem:af3c9a801f5f325f27963d3dcc83a136c" id="r_af3c9a801f5f325f27963d3dcc83a136c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af3c9a801f5f325f27963d3dcc83a136c">Init</a> ()</td></tr>
-<tr class="memitem:ae0c06c83c39f0fb9b43307e9e5e65758" id="r_ae0c06c83c39f0fb9b43307e9e5e65758"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae0c06c83c39f0fb9b43307e9e5e65758">Shutdown</a> ()</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-pro-attribs" class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
-Protected Attributes</h2></td></tr>
-<tr class="memitem:a28a4f48e177ed2a9e7cdbe79ce1285f4" id="r_a28a4f48e177ed2a9e7cdbe79ce1285f4"><td class="memItemLeft" align="right" valign="top">friend&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a28a4f48e177ed2a9e7cdbe79ce1285f4">API</a></td></tr>
+<tr class="memdesc:a8a491c2687235f9d5c90ed67bd4d4ff2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gives you the rendering stats of the last rendered frame.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="Renderer2D_8hpp_source.html#l00018">18</a> of file <a class="el" href="Renderer2D_8hpp_source.html">Renderer2D.hpp</a>.</p>
+<div class="textblock"><p>The main engine renderer. </p>
+<p>The render is capable of rendering 2D quads, and text for now. It can render in screen space or in world space, supports both opaque object and transparent objects, and also has a layering system to position opaque and transparent objects currently (need to finish it of with a k-way merge). When rendering text it can be aligned to the left, right or center. Render uses instancing. </p>
+
+<p class="definition">Definition at line <a class="el" href="Renderer2D_8hpp_source.html#l00024">24</a> of file <a class="el" href="Renderer2D_8hpp_source.html">Renderer2D.hpp</a>.</p>
 </div><a name="doc-enum-members" id="doc-enum-members"></a><h2 id="header-doc-enum-members" class="groupheader">Member Enumeration Documentation</h2>
 <a id="a258957813e5c0269a5f700abcdb435b8" name="a258957813e5c0269a5f700abcdb435b8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a258957813e5c0269a5f700abcdb435b8">&#9670;&#160;</a></span>DrawSpace</h2>
@@ -154,7 +153,7 @@ Protected Attributes</h2></td></tr>
 <tr><td class="fieldname"><a id="a258957813e5c0269a5f700abcdb435b8ade2364e7ac2eb0c4bf36536ea79d5c85" name="a258957813e5c0269a5f700abcdb435b8ade2364e7ac2eb0c4bf36536ea79d5c85"></a>SCREEN_SPACE&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="Renderer2D_8hpp_source.html#l00068">68</a> of file <a class="el" href="Renderer2D_8hpp_source.html">Renderer2D.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Renderer2D_8hpp_source.html#l00077">77</a> of file <a class="el" href="Renderer2D_8hpp_source.html">Renderer2D.hpp</a>.</p>
 
 </div>
 </div>
@@ -169,12 +168,13 @@ Protected Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="section note"><dt>Note</dt><dd>When directly using the renderer you need to correctly specify if the object you are trying to render has semi transparency or no, opaque and transparent object are processed differently. </dd></dl>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a8d759d8aeba063decaf91583a7de2f73a0c171565c85a9fee7fb7f9f11301979b" name="a8d759d8aeba063decaf91583a7de2f73a0c171565c85a9fee7fb7f9f11301979b"></a>OPAQUE&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a8d759d8aeba063decaf91583a7de2f73a54ec620c11e607ac9a191f02cc3b7432" name="a8d759d8aeba063decaf91583a7de2f73a54ec620c11e607ac9a191f02cc3b7432"></a>SEMI_TRANSPARENT&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="Renderer2D_8hpp_source.html#l00073">73</a> of file <a class="el" href="Renderer2D_8hpp_source.html">Renderer2D.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Renderer2D_8hpp_source.html#l00085">85</a> of file <a class="el" href="Renderer2D_8hpp_source.html">Renderer2D.hpp</a>.</p>
 
 </div>
 </div>
@@ -189,141 +189,19 @@ Protected Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Available text alignment options. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aca9bfbe7f940d87d8ae365de1f16bcffa6f972f63a582cc6e2669e82d024028cd" name="aca9bfbe7f940d87d8ae365de1f16bcffa6f972f63a582cc6e2669e82d024028cd"></a>RIGHT&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="aca9bfbe7f940d87d8ae365de1f16bcffa08352984e6324efb936cb5a130becbcb" name="aca9bfbe7f940d87d8ae365de1f16bcffa08352984e6324efb936cb5a130becbcb"></a>CENTER&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="aca9bfbe7f940d87d8ae365de1f16bcffa46d0841393c78ec7b940c40a205a3bcc" name="aca9bfbe7f940d87d8ae365de1f16bcffa46d0841393c78ec7b940c40a205a3bcc"></a>LEFT&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="Renderer2D_8hpp_source.html#l00020">20</a> of file <a class="el" href="Renderer2D_8hpp_source.html">Renderer2D.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Renderer2D_8hpp_source.html#l00029">29</a> of file <a class="el" href="Renderer2D_8hpp_source.html">Renderer2D.hpp</a>.</p>
 
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="ad43e33fd07665c300907ac8618e0be06" name="ad43e33fd07665c300907ac8618e0be06"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad43e33fd07665c300907ac8618e0be06">&#9670;&#160;</a></span>BeginScene()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::Graphics::Renderer2D::BeginScene </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structCori_1_1World_1_1Components_1_1Scene_1_1Camera.html">World::Components::Scene::Camera</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>camera</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Renderer2D_8cpp_source.html#l00087">87</a> of file <a class="el" href="Renderer2D_8cpp_source.html">Renderer2D.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a8cb879b33c833185aa49aa0d0f44c752" name="a8cb879b33c833185aa49aa0d0f44c752"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8cb879b33c833185aa49aa0d0f44c752">&#9670;&#160;</a></span>DrawScene()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::Graphics::Renderer2D::DrawScene </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classCori_1_1World_1_1Scene.html">World::Scene</a> *</td>          <td class="paramname"><span class="paramname"><em>scene</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Renderer2D_8cpp_source.html#l00115">115</a> of file <a class="el" href="Renderer2D_8cpp_source.html">Renderer2D.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Graphics_1_1Renderer2D_a8cb879b33c833185aa49aa0d0f44c752_cgraph.png" border="0" usemap="#aclassCori_1_1Graphics_1_1Renderer2D_a8cb879b33c833185aa49aa0d0f44c752_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Graphics_1_1Renderer2D_a8cb879b33c833185aa49aa0d0f44c752_cgraph" id="aclassCori_1_1Graphics_1_1Renderer2D_a8cb879b33c833185aa49aa0d0f44c752_cgraph">
-<area shape="rect" title=" " alt="" coords="5,92,193,136"/>
-<area shape="rect" href="namespaceCori_1_1Utility.html#a5e616457526b11d7509529108fb5872d" title=" " alt="" coords="241,5,440,33"/>
-<area shape="poly" title=" " alt="" coords="140,89,187,65,240,42,259,35,261,40,242,47,189,69,142,93"/>
-<area shape="rect" href="classCori_1_1World_1_1Scene.html#a5cc3218e8c136ca433edb49959845c9b" title=" " alt="" coords="251,57,430,102"/>
-<area shape="poly" title=" " alt="" coords="193,98,235,92,236,97,194,103"/>
-<area shape="rect" href="classCori_1_1Graphics_1_1Renderer2D.html#ad02fd3723475c38842c06b9536ecc358" title=" " alt="" coords="247,126,434,171"/>
-<area shape="poly" title=" " alt="" coords="194,125,232,130,231,136,193,130"/>
-<area shape="rect" href="classCori_1_1World_1_1Scene.html#a436eabfa62100263fee4edbb2c63f6e7" title=" " alt="" coords="270,196,410,240"/>
-<area shape="poly" title=" " alt="" coords="144,134,242,181,258,187,256,192,240,186,142,139"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="a3b3e941fe66f05f856ddc334c890eb7c" name="a3b3e941fe66f05f856ddc334c890eb7c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3b3e941fe66f05f856ddc334c890eb7c">&#9670;&#160;</a></span>EndScene()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::Graphics::Renderer2D::EndScene </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Renderer2D_8cpp_source.html#l00111">111</a> of file <a class="el" href="Renderer2D_8cpp_source.html">Renderer2D.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a08238aaeb190bbdee929f1f26fcc37e8" name="a08238aaeb190bbdee929f1f26fcc37e8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a08238aaeb190bbdee929f1f26fcc37e8">&#9670;&#160;</a></span>FlushRenderQueues()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::Graphics::Renderer2D::FlushRenderQueues </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Renderer2D_8cpp_source.html#l00146">146</a> of file <a class="el" href="Renderer2D_8cpp_source.html">Renderer2D.cpp</a>.</p>
-
-</div>
-</div>
 <a id="a8a491c2687235f9d5c90ed67bd4d4ff2" name="a8a491c2687235f9d5c90ed67bd4d4ff2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8a491c2687235f9d5c90ed67bd4d4ff2">&#9670;&#160;</a></span>GetStatistics()</h2>
 
@@ -347,102 +225,10 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Renderer2D_8cpp_source.html#l00335">335</a> of file <a class="el" href="Renderer2D_8cpp_source.html">Renderer2D.cpp</a>.</p>
+<p>Gives you the rendering stats of the last rendered frame. </p>
+<dl class="section return"><dt>Returns</dt><dd>Last frame stats. </dd></dl>
 
-</div>
-</div>
-<a id="af3c9a801f5f325f27963d3dcc83a136c" name="af3c9a801f5f325f27963d3dcc83a136c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af3c9a801f5f325f27963d3dcc83a136c">&#9670;&#160;</a></span>Init()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::Graphics::Renderer2D::Init </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Renderer2D_8cpp_source.html#l00011">11</a> of file <a class="el" href="Renderer2D_8cpp_source.html">Renderer2D.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Graphics_1_1Renderer2D_af3c9a801f5f325f27963d3dcc83a136c_cgraph.png" border="0" usemap="#aclassCori_1_1Graphics_1_1Renderer2D_af3c9a801f5f325f27963d3dcc83a136c_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Graphics_1_1Renderer2D_af3c9a801f5f325f27963d3dcc83a136c_cgraph" id="aclassCori_1_1Graphics_1_1Renderer2D_af3c9a801f5f325f27963d3dcc83a136c_cgraph">
-<area shape="rect" title=" " alt="" coords="5,144,193,189"/>
-<area shape="rect" href="classCori_1_1Graphics_1_1IndexBuffer.html#abdea2e9229af40bf8a99652fc6976ed2" title=" " alt="" coords="253,75,449,119"/>
-<area shape="poly" title=" " alt="" coords="182,141,252,121,254,126,184,146"/>
-<area shape="rect" href="classCori_1_1Graphics_1_1ShaderProgram.html#a52690641b09f5040d9722f7af3addb11" title=" " alt="" coords="241,144,461,189"/>
-<area shape="poly" title=" " alt="" coords="193,164,225,164,225,169,193,169"/>
-<area shape="rect" href="classCori_1_1Graphics_1_1Texture2D.html#acbe765f47b11b1dc332a3afe975aa0de" title=" " alt="" coords="263,213,439,258"/>
-<area shape="poly" title=" " alt="" coords="184,187,254,206,252,211,182,192"/>
-<area shape="rect" href="classCori_1_1Graphics_1_1VertexArray.html#af11aa90c8acee67fb11888d42db8e132" title=" " alt="" coords="252,283,450,327"/>
-<area shape="poly" title=" " alt="" coords="127,187,178,228,242,268,255,274,252,279,239,273,175,232,124,191"/>
-<area shape="rect" href="classCori_1_1Graphics_1_1VertexBuffer.html#a8a7e2e93792b35dd178832773e0ec9c0" title=" " alt="" coords="249,5,452,50"/>
-<area shape="poly" title=" " alt="" coords="124,142,175,100,239,60,252,54,255,59,242,65,178,105,127,146"/>
-<area shape="rect" href="namespaceCori_1_1Graphics.html#ac10cdf39fd3a5b64fb82ad5cd57d4668" title=" " alt="" coords="509,92,740,120"/>
-<area shape="poly" title=" " alt="" coords="449,98,493,99,493,105,449,103"/>
-<area shape="rect" href="classCori_1_1Core_1_1Factory.html#a0eeb110662af3542e9ba9cdd1c86203d" title=" " alt="" coords="554,144,695,189"/>
-<area shape="poly" title=" " alt="" coords="443,117,539,142,538,147,441,123"/>
-<area shape="rect" href="classCori_1_1Core_1_1Window.html#a675130786b522717fb797d28166b1da5" title=" " alt="" coords="552,213,697,258"/>
-<area shape="poly" title=" " alt="" coords="443,118,463,130,479,147,487,165,495,182,511,199,539,214,536,219,507,203,491,185,483,168,475,150,459,134,440,122"/>
-<area shape="rect" href="classCori_1_1Core_1_1Factory.html#a30ad48765e0f34046d7054c5d3985061" title=" " alt="" coords="788,144,930,189"/>
-<area shape="poly" title=" " alt="" coords="696,164,773,164,773,169,696,169"/>
-<area shape="rect" href="classCori_1_1Core_1_1Factory.html#a924e36be422a39be61f8329c2e90cea0" title=" " alt="" coords="978,144,1119,189"/>
-<area shape="poly" title=" " alt="" coords="930,164,962,164,962,169,930,169"/>
-<area shape="poly" title=" " alt="" coords="1012,144,1011,134,1017,125,1030,119,1048,117,1069,120,1081,126,1078,131,1067,125,1048,123,1031,125,1020,129,1016,135,1017,143"/>
-<area shape="poly" title=" " alt="" coords="455,141,543,121,544,127,456,146"/>
-<area shape="poly" title=" " alt="" coords="461,164,538,164,538,169,461,169"/>
-<area shape="poly" title=" " alt="" coords="443,187,538,211,536,216,441,192"/>
-<area shape="poly" title=" " alt="" coords="438,212,459,199,475,182,482,165,490,147,507,130,515,125,518,129,511,134,495,150,487,167,479,185,463,203,440,216"/>
-<area shape="poly" title=" " alt="" coords="439,211,538,185,539,191,440,216"/>
-<area shape="poly" title=" " alt="" coords="439,233,536,233,536,238,439,238"/>
-<area shape="poly" title=" " alt="" coords="444,280,459,268,472,252,479,235,482,200,485,165,493,147,507,130,511,127,514,131,511,134,497,150,490,166,487,200,484,236,477,254,463,272,448,284"/>
-<area shape="poly" title=" " alt="" coords="440,280,459,268,475,252,483,234,491,217,507,199,538,182,540,187,511,203,495,220,487,237,479,255,463,272,443,284"/>
-<area shape="poly" title=" " alt="" coords="441,279,536,255,538,260,443,285"/>
-<area shape="poly" title=" " alt="" coords="432,48,560,85,558,90,431,53"/>
-<area shape="poly" title=" " alt="" coords="443,48,463,60,479,78,487,96,495,113,511,130,540,146,538,150,507,134,491,116,483,98,475,81,459,64,440,53"/>
-<area shape="poly" title=" " alt="" coords="448,49,463,60,477,78,484,96,488,132,491,166,498,183,511,199,539,217,536,222,507,203,493,185,486,167,482,132,479,97,472,81,459,64,444,53"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="ae0c06c83c39f0fb9b43307e9e5e65758" name="ae0c06c83c39f0fb9b43307e9e5e65758"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae0c06c83c39f0fb9b43307e9e5e65758">&#9670;&#160;</a></span>Shutdown()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cori::Graphics::Renderer2D::Shutdown </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Renderer2D_8cpp_source.html#l00078">78</a> of file <a class="el" href="Renderer2D_8cpp_source.html">Renderer2D.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Renderer2D_8cpp_source.html#l00334">334</a> of file <a class="el" href="Renderer2D_8cpp_source.html">Renderer2D.cpp</a>.</p>
 
 </div>
 </div>
@@ -478,16 +264,26 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Renderer2D_8cpp_source.html#l00278">278</a> of file <a class="el" href="Renderer2D_8cpp_source.html">Renderer2D.cpp</a>.</p>
+<p>Draws the AABB, also a debug convenience function, always draws in world space. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">aabb</td><td>AABB to draw. </td></tr>
+    <tr><td class="paramname">lineThickness</td><td>Thickness of the AABB border. </td></tr>
+    <tr><td class="paramname">color</td><td>Border color. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="Renderer2D_8cpp_source.html#l00277">277</a> of file <a class="el" href="Renderer2D_8cpp_source.html">Renderer2D.cpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1Graphics_1_1Renderer2D_a9598ee9081568ac3b1dcfda84c823d54_cgraph.png" border="0" usemap="#aclassCori_1_1Graphics_1_1Renderer2D_a9598ee9081568ac3b1dcfda84c823d54_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1Graphics_1_1Renderer2D_a9598ee9081568ac3b1dcfda84c823d54_cgraph" id="aclassCori_1_1Graphics_1_1Renderer2D_a9598ee9081568ac3b1dcfda84c823d54_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,193,50"/>
-<area shape="rect" href="classCori_1_1Graphics_1_1Renderer2D.html#a7441ab6962608fbfacf28b2f089fd4cb" title=" " alt="" coords="241,5,428,50"/>
+<area shape="rect" title="Draws the AABB, also a debug convenience function, always draws in world space." alt="" coords="5,5,193,50"/>
+<area shape="rect" href="classCori_1_1Graphics_1_1Renderer2D.html#a7441ab6962608fbfacf28b2f089fd4cb" title="Convenience function mainly for debugging, draws a plain colored quad." alt="" coords="241,5,428,50"/>
 <area shape="poly" title=" " alt="" coords="193,25,225,25,225,30,193,30"/>
-<area shape="rect" href="classCori_1_1Graphics_1_1Renderer2D.html#ad02fd3723475c38842c06b9536ecc358" title=" " alt="" coords="476,5,663,50"/>
+<area shape="rect" href="classCori_1_1Graphics_1_1Renderer2D.html#a9dbfc85edb152a8a68d70c1cb1d06ddd" title="Submits the quad to the render queue." alt="" coords="476,5,663,50"/>
 <area shape="poly" title=" " alt="" coords="429,25,460,25,460,30,429,30"/>
 </map>
 </div>
@@ -531,22 +327,33 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Renderer2D_8cpp_source.html#l00273">273</a> of file <a class="el" href="Renderer2D_8cpp_source.html">Renderer2D.cpp</a>.</p>
+<p>Convenience function mainly for debugging, draws a plain colored quad. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">space</td><td><a class="el" href="#a258957813e5c0269a5f700abcdb435b8">DrawSpace</a> to draw the quad. </td></tr>
+    <tr><td class="paramname">position</td><td>Position defined is the center of the quad. </td></tr>
+    <tr><td class="paramname">halfSize</td><td>Half size of the quad. </td></tr>
+    <tr><td class="paramname">color</td><td>Quad color. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="Renderer2D_8cpp_source.html#l00272">272</a> of file <a class="el" href="Renderer2D_8cpp_source.html">Renderer2D.cpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1Graphics_1_1Renderer2D_a7441ab6962608fbfacf28b2f089fd4cb_cgraph.png" border="0" usemap="#aclassCori_1_1Graphics_1_1Renderer2D_a7441ab6962608fbfacf28b2f089fd4cb_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1Graphics_1_1Renderer2D_a7441ab6962608fbfacf28b2f089fd4cb_cgraph" id="aclassCori_1_1Graphics_1_1Renderer2D_a7441ab6962608fbfacf28b2f089fd4cb_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,193,50"/>
-<area shape="rect" href="classCori_1_1Graphics_1_1Renderer2D.html#ad02fd3723475c38842c06b9536ecc358" title=" " alt="" coords="241,5,428,50"/>
+<area shape="rect" title="Convenience function mainly for debugging, draws a plain colored quad." alt="" coords="5,5,193,50"/>
+<area shape="rect" href="classCori_1_1Graphics_1_1Renderer2D.html#a9dbfc85edb152a8a68d70c1cb1d06ddd" title="Submits the quad to the render queue." alt="" coords="241,5,428,50"/>
 <area shape="poly" title=" " alt="" coords="193,25,225,25,225,30,193,30"/>
 </map>
 </div>
 
 </div>
 </div>
-<a id="ad02fd3723475c38842c06b9536ecc358" name="ad02fd3723475c38842c06b9536ecc358"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad02fd3723475c38842c06b9536ecc358">&#9670;&#160;</a></span>SubmitQuad()</h2>
+<a id="a9dbfc85edb152a8a68d70c1cb1d06ddd" name="a9dbfc85edb152a8a68d70c1cb1d06ddd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9dbfc85edb152a8a68d70c1cb1d06ddd">&#9670;&#160;</a></span>SubmitQuad()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -582,7 +389,7 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::shared_ptr&lt; <a class="el" href="classCori_1_1Graphics_1_1Texture2D.html">Texture2D</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>texture</em></span>, </td>
+          <td class="paramtype"><a class="el" href="classCori_1_1Graphics_1_1Texture2D.html">Texture2D</a> *</td>          <td class="paramname"><span class="paramname"><em>texture</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -617,12 +424,31 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Renderer2D_8cpp_source.html#l00153">153</a> of file <a class="el" href="Renderer2D_8cpp_source.html">Renderer2D.cpp</a>.</p>
+<p>Submits the quad to the render queue. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">space</td><td><a class="el" href="#a258957813e5c0269a5f700abcdb435b8">DrawSpace</a> to draw the quad. </td></tr>
+    <tr><td class="paramname">transparencyMode</td><td>Transparency mode, defines how to handle the quad. (hint: you can query a <a class="el" href="classCori_1_1Graphics_1_1Texture2D.html" title="A regular 2D texture with 1 layer.">Texture2D</a> if it has semi transparency or no) </td></tr>
+    <tr><td class="paramname">transform</td><td>Rendering transform. Position defined is the center of the quad. </td></tr>
+    <tr><td class="paramname">halfSize</td><td>Half size of the quad. </td></tr>
+    <tr><td class="paramname">tintColor</td><td>Tint color of the quad, or a color if flatColored=true. </td></tr>
+    <tr><td class="paramname">texture</td><td><a class="el" href="classCori_1_1Graphics_1_1Texture.html" title="Abstract class for textures.">Texture</a> to sample from. </td></tr>
+    <tr><td class="paramname">uvs</td><td><a class="el" href="structCori_1_1Graphics_1_1UVs.html">UVs</a> to sample with. </td></tr>
+    <tr><td class="paramname">depth</td><td>Quad Depth, for layering, the higher the "closer". </td></tr>
+    <tr><td class="paramname">flipX</td><td>Flip quad on X axis. </td></tr>
+    <tr><td class="paramname">flipY</td><td>Flip quad on Y axis. </td></tr>
+    <tr><td class="paramname">flatColored</td><td>Ignore the texture and use a plain white texture. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section warning"><dt>Warning</dt><dd>You need to make sure that texture pointer stays valid until the end of the frame, or this will induce a dangling pointer. Be aware! </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Renderer2D_8cpp_source.html#l00152">152</a> of file <a class="el" href="Renderer2D_8cpp_source.html">Renderer2D.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a3ea5c9ecfd1337e84c59d7cb817ae941" name="a3ea5c9ecfd1337e84c59d7cb817ae941"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3ea5c9ecfd1337e84c59d7cb817ae941">&#9670;&#160;</a></span>SubmitText() <span class="overload">[1/2]</span></h2>
+<a id="a0f75e8119ce61a3d1b4383550a532f92" name="a0f75e8119ce61a3d1b4383550a532f92"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f75e8119ce61a3d1b4383550a532f92">&#9670;&#160;</a></span>SubmitText() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -663,7 +489,7 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::shared_ptr&lt; <a class="el" href="classCori_1_1Graphics_1_1Font.html">Font</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>font</em></span>, </td>
+          <td class="paramtype"><a class="el" href="classCori_1_1Graphics_1_1Font.html">Font</a> *</td>          <td class="paramname"><span class="paramname"><em>font</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -693,12 +519,34 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Renderer2D_8cpp_source.html#l00326">326</a> of file <a class="el" href="Renderer2D_8cpp_source.html">Renderer2D.cpp</a>.</p>
+<p>Draws a UTF-32 fixed length encoded string. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">space</td><td><a class="el" href="#a258957813e5c0269a5f700abcdb435b8">DrawSpace</a> to draw text in. </td></tr>
+    <tr><td class="paramname">alignment</td><td>Text alignment with which to draw the text. </td></tr>
+    <tr><td class="paramname">transform</td><td>Rendering transform. </td></tr>
+    <tr><td class="paramname">fontSize</td><td>Size of the font to render. </td></tr>
+    <tr><td class="paramname">text</td><td>View to the UTF-8 variable length encoded string to render. </td></tr>
+    <tr><td class="paramname">color</td><td>Color of the text to render. </td></tr>
+    <tr><td class="paramname">font</td><td><a class="el" href="classCori_1_1Graphics_1_1Font.html" title="Font asset to be used when rendering text. Pretty expensive to create if not cached,...">Font</a> to use when rendering the text. </td></tr>
+    <tr><td class="paramname">depth</td><td>Depth at which to render the text. </td></tr>
+    <tr><td class="paramname">limitX</td><td>Length limit of the one line. </td></tr>
+    <tr><td class="paramname">lineSpacing</td><td>Additional line spacing. </td></tr>
+    <tr><td class="paramname">kerning</td><td>Additional kerning.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Transform for <a class="el" href="#aca9bfbe7f940d87d8ae365de1f16bcffa46d0841393c78ec7b940c40a205a3bcc">TextAlignment::LEFT</a> is a lower left border of the char in the first line. <br  />
+ For <a class="el" href="#aca9bfbe7f940d87d8ae365de1f16bcffa08352984e6324efb936cb5a130becbcb">TextAlignment::CENTER</a> it's the lower bound on y of the first line, and on x the center between the left border of the char in the first line and the right border of the char in the first line. <br  />
+ For <a class="el" href="#aca9bfbe7f940d87d8ae365de1f16bcffa6f972f63a582cc6e2669e82d024028cd">TextAlignment::RIGHT</a> it's the left lower border of the last char in the line. </p><dl class="section note"><dt>Note</dt><dd>All text is considered semi transparent when rendering. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>You need to make sure that font pointer stays valid until the end of the frame, or this will induce a dangling pointer. Be aware! </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Renderer2D_8cpp_source.html#l00325">325</a> of file <a class="el" href="Renderer2D_8cpp_source.html">Renderer2D.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a0c20cd8591a2143954bbf7197414c7a9" name="a0c20cd8591a2143954bbf7197414c7a9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0c20cd8591a2143954bbf7197414c7a9">&#9670;&#160;</a></span>SubmitText() <span class="overload">[2/2]</span></h2>
+<a id="a15d2a4f8c31487b857718c9ee147d858" name="a15d2a4f8c31487b857718c9ee147d858"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15d2a4f8c31487b857718c9ee147d858">&#9670;&#160;</a></span>SubmitText() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -739,7 +587,7 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::shared_ptr&lt; <a class="el" href="classCori_1_1Graphics_1_1Font.html">Font</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>font</em></span>, </td>
+          <td class="paramtype"><a class="el" href="classCori_1_1Graphics_1_1Font.html">Font</a> *</td>          <td class="paramname"><span class="paramname"><em>font</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -769,32 +617,29 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Renderer2D_8cpp_source.html#l00317">317</a> of file <a class="el" href="Renderer2D_8cpp_source.html">Renderer2D.cpp</a>.</p>
+<p>Draws a UTF-32 fixed length encoded string. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">space</td><td><a class="el" href="#a258957813e5c0269a5f700abcdb435b8">DrawSpace</a> to draw text in. </td></tr>
+    <tr><td class="paramname">alignment</td><td>Text alignment with which to draw the text. </td></tr>
+    <tr><td class="paramname">transform</td><td>Rendering transform. </td></tr>
+    <tr><td class="paramname">fontSize</td><td>Size of the font to render. </td></tr>
+    <tr><td class="paramname">text</td><td>View to the UTF-32 fixed length encoded string to render. </td></tr>
+    <tr><td class="paramname">color</td><td>Color of the text to render. </td></tr>
+    <tr><td class="paramname">font</td><td><a class="el" href="classCori_1_1Graphics_1_1Font.html" title="Font asset to be used when rendering text. Pretty expensive to create if not cached,...">Font</a> to use when rendering the text. </td></tr>
+    <tr><td class="paramname">depth</td><td>Depth at which to render the text. </td></tr>
+    <tr><td class="paramname">limitX</td><td>Length limit of the one line. </td></tr>
+    <tr><td class="paramname">lineSpacing</td><td>Additional line spacing. </td></tr>
+    <tr><td class="paramname">kerning</td><td>Additional kerning.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Transform for <a class="el" href="#aca9bfbe7f940d87d8ae365de1f16bcffa46d0841393c78ec7b940c40a205a3bcc">TextAlignment::LEFT</a> is a lower left border of the char in the first line. <br  />
+ For <a class="el" href="#aca9bfbe7f940d87d8ae365de1f16bcffa08352984e6324efb936cb5a130becbcb">TextAlignment::CENTER</a> it's the lower bound on y of the first line, and on x the center between the left border of the char in the first line and the right border of the char in the first line. <br  />
+ For <a class="el" href="#aca9bfbe7f940d87d8ae365de1f16bcffa6f972f63a582cc6e2669e82d024028cd">TextAlignment::RIGHT</a> it's the left lower border of the last char in the line. </p><dl class="section note"><dt>Note</dt><dd>All text is considered semi transparent when rendering. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>You need to make sure that font pointer stays valid until the end of the frame, or this will induce a dangling pointer. Be aware! </dd></dl>
 
-</div>
-</div>
-<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
-<a id="a28a4f48e177ed2a9e7cdbe79ce1285f4" name="a28a4f48e177ed2a9e7cdbe79ce1285f4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a28a4f48e177ed2a9e7cdbe79ce1285f4">&#9670;&#160;</a></span>API</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">friend Cori::Graphics::Renderer2D::API</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Renderer2D_8hpp_source.html#l00102">102</a> of file <a class="el" href="Renderer2D_8hpp_source.html">Renderer2D.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Renderer2D_8cpp_source.html#l00316">316</a> of file <a class="el" href="Renderer2D_8cpp_source.html">Renderer2D.cpp</a>.</p>
 
 </div>
 </div>

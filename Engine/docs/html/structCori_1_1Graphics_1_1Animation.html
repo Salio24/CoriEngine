@@ -94,16 +94,6 @@ $(function(){initNavTree('structCori_1_1Graphics_1_1Animation.html','','structCo
 <div class="contents">
 
 <p><code>#include &lt;<a class="el" href="AnimationPack_8hpp_source.html">AnimationPack.hpp</a>&gt;</code></p>
-<div class="dynheader">
-Collaboration diagram for Cori::Graphics::Animation:</div>
-<div class="dyncontent">
-<div class="center"><img src="structCori_1_1Graphics_1_1Animation__coll__graph.png" border="0" usemap="#aCori_1_1Graphics_1_1Animation_coll__map" loading="lazy" alt="Collaboration graph"/></div>
-<map name="aCori_1_1Graphics_1_1Animation_coll__map" id="aCori_1_1Graphics_1_1Animation_coll__map">
-<area shape="rect" title=" " alt="" coords="21,106,208,134"/>
-<area shape="rect" href="classCori_1_1Graphics_1_1AnimationData.html" title=" " alt="" coords="5,5,224,33"/>
-<area shape="poly" title=" " alt="" coords="117,49,117,105,112,105,112,49"/>
-</map>
-<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -111,59 +101,42 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a0f4e5632b39b122fe484546c5c1e0316" id="r_a0f4e5632b39b122fe484546c5c1e0316"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCori_1_1Graphics_1_1AnimationData.html">AnimationData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0f4e5632b39b122fe484546c5c1e0316">m_Data</a></td></tr>
-<tr class="memitem:afbad3e63f65e30ece6da8b511232febc" id="r_afbad3e63f65e30ece6da8b511232febc"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classCori_1_1Graphics_1_1Texture2D.html">Texture2D</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afbad3e63f65e30ece6da8b511232febc">m_Texture</a></td></tr>
-<tr class="memitem:a5131655d0975b65d768e179d9194a752" id="r_a5131655d0975b65d768e179d9194a752"><td class="memItemLeft" align="right" valign="top">glm::vec2&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5131655d0975b65d768e179d9194a752">m_Size</a></td></tr>
+<tr class="memitem:a87c595bbc1959b876ecef02de094c586" id="r_a87c595bbc1959b876ecef02de094c586"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classCori_1_1Graphics_1_1AnimationPack.html">AnimationPack</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a87c595bbc1959b876ecef02de094c586">m_Pack</a></td></tr>
+<tr class="memitem:a0333536d4055059c79ccc1a3d0ea57e0" id="r_a0333536d4055059c79ccc1a3d0ea57e0"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0333536d4055059c79ccc1a3d0ea57e0">m_AnimationID</a> { 0 }</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="AnimationPack_8hpp_source.html#l00008">8</a> of file <a class="el" href="AnimationPack_8hpp_source.html">AnimationPack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AnimationPack_8hpp_source.html#l00017">17</a> of file <a class="el" href="AnimationPack_8hpp_source.html">AnimationPack.hpp</a>.</p>
 </div><a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
-<a id="a0f4e5632b39b122fe484546c5c1e0316" name="a0f4e5632b39b122fe484546c5c1e0316"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0f4e5632b39b122fe484546c5c1e0316">&#9670;&#160;</a></span>m_Data</h2>
+<a id="a0333536d4055059c79ccc1a3d0ea57e0" name="a0333536d4055059c79ccc1a3d0ea57e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0333536d4055059c79ccc1a3d0ea57e0">&#9670;&#160;</a></span>m_AnimationID</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classCori_1_1Graphics_1_1AnimationData.html">AnimationData</a> Cori::Graphics::Animation::m_Data</td>
+          <td class="memname">uint32_t Cori::Graphics::Animation::m_AnimationID { 0 }</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AnimationPack_8hpp_source.html#l00019">19</a> of file <a class="el" href="AnimationPack_8hpp_source.html">AnimationPack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AnimationPack_8hpp_source.html#l00033">33</a> of file <a class="el" href="AnimationPack_8hpp_source.html">AnimationPack.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a5131655d0975b65d768e179d9194a752" name="a5131655d0975b65d768e179d9194a752"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5131655d0975b65d768e179d9194a752">&#9670;&#160;</a></span>m_Size</h2>
+<a id="a87c595bbc1959b876ecef02de094c586" name="a87c595bbc1959b876ecef02de094c586"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87c595bbc1959b876ecef02de094c586">&#9670;&#160;</a></span>m_Pack</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">glm::vec2 Cori::Graphics::Animation::m_Size</td>
+          <td class="memname">std::shared_ptr&lt;<a class="el" href="classCori_1_1Graphics_1_1AnimationPack.html">AnimationPack</a>&gt; Cori::Graphics::Animation::m_Pack</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AnimationPack_8hpp_source.html#l00021">21</a> of file <a class="el" href="AnimationPack_8hpp_source.html">AnimationPack.hpp</a>.</p>
-
-</div>
-</div>
-<a id="afbad3e63f65e30ece6da8b511232febc" name="afbad3e63f65e30ece6da8b511232febc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afbad3e63f65e30ece6da8b511232febc">&#9670;&#160;</a></span>m_Texture</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::shared_ptr&lt;<a class="el" href="classCori_1_1Graphics_1_1Texture2D.html">Texture2D</a>&gt; Cori::Graphics::Animation::m_Texture</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="AnimationPack_8hpp_source.html#l00020">20</a> of file <a class="el" href="AnimationPack_8hpp_source.html">AnimationPack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AnimationPack_8hpp_source.html#l00032">32</a> of file <a class="el" href="AnimationPack_8hpp_source.html">AnimationPack.hpp</a>.</p>
 
 </div>
 </div>

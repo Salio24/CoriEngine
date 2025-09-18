@@ -93,33 +93,50 @@ $(function(){initNavTree('classCori_1_1World_1_1Components_1_1Entity_1_1StateMac
 </div><!--header-->
 <div class="contents">
 
+<p>A <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html" title="A StateMachine component is used in combination with custom objects derived from EntityState.">StateMachine</a> component is used in combination with custom objects derived from <a class="el" href="classCori_1_1World_1_1EntityState.html" title="An abstract class designed to be used with StateMachine component.">EntityState</a>.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a230737da28133af55f21cde5aedca017" id="r_a230737da28133af55f21cde5aedca017"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a230737da28133af55f21cde5aedca017">StateMachine</a> (<a class="el" href="classCori_1_1World_1_1Entity.html">World::Entity</a> owner)</td></tr>
+<tr class="memitem:a2e61a6b384370e63d377368d26acbd41" id="r_a2e61a6b384370e63d377368d26acbd41"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2e61a6b384370e63d377368d26acbd41">StateMachine</a> (const <a class="el" href="classCori_1_1World_1_1Entity.html">World::Entity</a> &amp;owner)</td></tr>
+<tr class="memdesc:a2e61a6b384370e63d377368d26acbd41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html" title="A StateMachine component is used in combination with custom objects derived from EntityState.">StateMachine</a>, you need to pass an <a class="el" href="namespaceCori_1_1World_1_1Components_1_1Entity.html" title="Components designed to be used with entities.">Entity</a> that owns this <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html" title="A StateMachine component is used in combination with custom objects derived from EntityState.">StateMachine</a> to the constructor.  <br /></td></tr>
 <tr class="memitem:a9acd4f92ea86a88bc1136946fcbccc85" id="r_a9acd4f92ea86a88bc1136946fcbccc85"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9acd4f92ea86a88bc1136946fcbccc85">~StateMachine</a> ()</td></tr>
 <tr class="memitem:a6eede8c92f0289ad018716d8a8223d3a" id="r_a6eede8c92f0289ad018716d8a8223d3a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6eede8c92f0289ad018716d8a8223d3a">StateMachine</a> (const <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html">StateMachine</a> &amp;)=delete</td></tr>
 <tr class="memitem:aa660e23275bdea150547d4c2293ebdc3" id="r_aa660e23275bdea150547d4c2293ebdc3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html">StateMachine</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa660e23275bdea150547d4c2293ebdc3">operator=</a> (const <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html">StateMachine</a> &amp;)=delete</td></tr>
-<tr class="memitem:aaf926ac2b044d968ea4866ef8b3e9dd7" id="r_aaf926ac2b044d968ea4866ef8b3e9dd7"><td class="memTemplParams" colspan="2">template&lt;typename StateType, typename... Args&gt; </td></tr>
+<tr class="memitem:aed7795eb62c98183d9d419e740a837fe" id="r_aed7795eb62c98183d9d419e740a837fe"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aed7795eb62c98183d9d419e740a837fe">StateMachine</a> (<a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html">StateMachine</a> &amp;&amp;)=delete</td></tr>
+<tr class="memitem:a2c723c360141952deb2438ed2af04949" id="r_a2c723c360141952deb2438ed2af04949"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html">StateMachine</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2c723c360141952deb2438ed2af04949">operator=</a> (<a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html">StateMachine</a> &amp;&amp;)=delete</td></tr>
+<tr class="memitem:aaf926ac2b044d968ea4866ef8b3e9dd7" id="r_aaf926ac2b044d968ea4866ef8b3e9dd7"><td class="memTemplParams" colspan="2">template&lt;std::derived_from&lt; <a class="el" href="classCori_1_1World_1_1EntityState.html">EntityState</a> &gt; StateType, typename... Args&gt; </td></tr>
 <tr class="memitem:aaf926ac2b044d968ea4866ef8b3e9dd7 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaf926ac2b044d968ea4866ef8b3e9dd7">Register</a> (Args &amp;&amp;... args)</td></tr>
+<tr class="memdesc:aaf926ac2b044d968ea4866ef8b3e9dd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers an <a class="el" href="classCori_1_1World_1_1EntityState.html" title="An abstract class designed to be used with StateMachine component.">EntityState</a> with a <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html" title="A StateMachine component is used in combination with custom objects derived from EntityState.">StateMachine</a>, you need to register a state before using it.  <br /></td></tr>
 <tr class="memitem:a4c4e6eefa1fe124f9885d9e23de9f9cb" id="r_a4c4e6eefa1fe124f9885d9e23de9f9cb"><td class="memTemplParams" colspan="2">template&lt;std::derived_from&lt; <a class="el" href="classCori_1_1World_1_1EntityState.html">EntityState</a> &gt; StateType&gt; </td></tr>
 <tr class="memitem:a4c4e6eefa1fe124f9885d9e23de9f9cb template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4c4e6eefa1fe124f9885d9e23de9f9cb">SetState</a> ()</td></tr>
+<tr class="memdesc:a4c4e6eefa1fe124f9885d9e23de9f9cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the current state to the specified one.  <br /></td></tr>
 <tr class="memitem:a7ade330211d6b6df96c1918c8843da5c" id="r_a7ade330211d6b6df96c1918c8843da5c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7ade330211d6b6df96c1918c8843da5c">OnTickUpdate</a> (const float timeStep)</td></tr>
 <tr class="memitem:a45229dfba37f129d88e7feb52d8083f5" id="r_a45229dfba37f129d88e7feb52d8083f5"><td class="memTemplParams" colspan="2">template&lt;std::derived_from&lt; <a class="el" href="classCori_1_1World_1_1EntityState.html">EntityState</a> &gt; StateType&gt; </td></tr>
 <tr class="memitem:a45229dfba37f129d88e7feb52d8083f5 template"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a45229dfba37f129d88e7feb52d8083f5">IsInState</a> () const</td></tr>
+<tr class="memdesc:a45229dfba37f129d88e7feb52d8083f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cheks if an <a class="el" href="namespaceCori_1_1World_1_1Components_1_1Entity.html" title="Components designed to be used with entities.">Entity</a> is in a specific state.  <br /></td></tr>
 <tr class="memitem:a26375a81469c5004f71e38e6f1d033c4" id="r_a26375a81469c5004f71e38e6f1d033c4"><td class="memTemplParams" colspan="2">template&lt;std::derived_from&lt; <a class="el" href="classCori_1_1World_1_1EntityState.html">EntityState</a> &gt; StateType&gt; </td></tr>
 <tr class="memitem:a26375a81469c5004f71e38e6f1d033c4 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a26375a81469c5004f71e38e6f1d033c4">SetStateIfNotInState</a> ()</td></tr>
+<tr class="memdesc:a26375a81469c5004f71e38e6f1d033c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets an <a class="el" href="namespaceCori_1_1World_1_1Components_1_1Entity.html" title="Components designed to be used with entities.">Entity</a> to the state only if it is not currently in that state.  <br /></td></tr>
 <tr class="memitem:a600a2784173791b579c37d9a9335e558" id="r_a600a2784173791b579c37d9a9335e558"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCori_1_1World_1_1EntityState.html">EntityState</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a600a2784173791b579c37d9a9335e558">GetCurrentState</a> () const</td></tr>
+<tr class="memdesc:a600a2784173791b579c37d9a9335e558"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the pointer to the current state. Can be used to get the type_info of the current state.  <br /></td></tr>
 <tr class="memitem:a55a12187a8fea8c1ab9aba147e3e657d" id="r_a55a12187a8fea8c1ab9aba147e3e657d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCori_1_1World_1_1EntityState.html">EntityState</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a55a12187a8fea8c1ab9aba147e3e657d">GetLastState</a> () const</td></tr>
-<tr class="memitem:a694a7fe57b506439b7010968b859f6c5" id="r_a694a7fe57b506439b7010968b859f6c5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCori_1_1World_1_1Entity.html">World::Entity</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a694a7fe57b506439b7010968b859f6c5">GetOwner</a> () const</td></tr>
+<tr class="memdesc:a55a12187a8fea8c1ab9aba147e3e657d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the pointer to the last state. Can be used to get the type_info of the last state.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00009">9</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
+<div class="textblock"><p>A <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html" title="A StateMachine component is used in combination with custom objects derived from EntityState.">StateMachine</a> component is used in combination with custom objects derived from <a class="el" href="classCori_1_1World_1_1EntityState.html" title="An abstract class designed to be used with StateMachine component.">EntityState</a>. </p>
+<p>You declare several types deriver from <a class="el" href="classCori_1_1World_1_1EntityState.html" title="An abstract class designed to be used with StateMachine component.">EntityState</a> and implement the state logic you need, then before using states you need to register them with the <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html" title="A StateMachine component is used in combination with custom objects derived from EntityState.">StateMachine</a> by using <a class="el" href="#aaf926ac2b044d968ea4866ef8b3e9dd7" title="Registers an EntityState with a StateMachine, you need to register a state before using it.">Register&lt;T&gt;()</a> method. <br  />
+ Let's say out <a class="el" href="namespaceCori_1_1World_1_1Components_1_1Entity.html" title="Components designed to be used with entities.">Entity</a> is in a state A then it changed state to B, then at tick N it entered state C. The tick sequence of this will be as follows: <br  />
+ <a class="el" href="namespaceCori_1_1World_1_1Components_1_1Entity.html" title="Components designed to be used with entities.">Entity</a> changes it's state form A to B, tick 1: OnTickUpdate of A is called one last time, then OnExit of A is called, then OnEnter of B is called. <br  />
+ <a class="el" href="namespaceCori_1_1World_1_1Components_1_1Entity.html" title="Components designed to be used with entities.">Entity</a> stays in state B, ticks 2 - (N - 1): Fire OnTickUpdate of B. <br  />
+ <a class="el" href="namespaceCori_1_1World_1_1Components_1_1Entity.html" title="Components designed to be used with entities.">Entity</a> leaves state B and enters state C, tick N: OnTickUpdate of B is fired one last time, then OnExit of B is called, then OnEnder of C is called. </p><dl class="section note"><dt>Note</dt><dd>Always make sure to set some initial state before actually using the FSM. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00018">18</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a230737da28133af55f21cde5aedca017" name="a230737da28133af55f21cde5aedca017"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a230737da28133af55f21cde5aedca017">&#9670;&#160;</a></span>StateMachine() <span class="overload">[1/2]</span></h2>
+<a id="a2e61a6b384370e63d377368d26acbd41" name="a2e61a6b384370e63d377368d26acbd41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2e61a6b384370e63d377368d26acbd41">&#9670;&#160;</a></span>StateMachine() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -130,7 +147,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">Cori::World::Components::Entity::StateMachine::StateMachine </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classCori_1_1World_1_1Entity.html">World::Entity</a></td>          <td class="paramname"><span class="paramname"><em>owner</em></span></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classCori_1_1World_1_1Entity.html">World::Entity</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>owner</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -141,7 +158,15 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00012">12</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
+<p>Constructs the <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html" title="A StateMachine component is used in combination with custom objects derived from EntityState.">StateMachine</a>, you need to pass an <a class="el" href="namespaceCori_1_1World_1_1Components_1_1Entity.html" title="Components designed to be used with entities.">Entity</a> that owns this <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html" title="A StateMachine component is used in combination with custom objects derived from EntityState.">StateMachine</a> to the constructor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">owner</td><td>Owner <a class="el" href="namespaceCori_1_1World_1_1Components_1_1Entity.html" title="Components designed to be used with entities.">Entity</a>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00024">24</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
 
 </div>
 </div>
@@ -168,12 +193,12 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00016">16</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00028">28</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
 
 </div>
 </div>
 <a id="a6eede8c92f0289ad018716d8a8223d3a" name="a6eede8c92f0289ad018716d8a8223d3a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6eede8c92f0289ad018716d8a8223d3a">&#9670;&#160;</a></span>StateMachine() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a6eede8c92f0289ad018716d8a8223d3a">&#9670;&#160;</a></span>StateMachine() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -200,7 +225,42 @@ Here is the call graph for this function:</div>
 <div class="center"><img src="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_a6eede8c92f0289ad018716d8a8223d3a_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_a6eede8c92f0289ad018716d8a8223d3a_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_a6eede8c92f0289ad018716d8a8223d3a_cgraph" id="aclassCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_a6eede8c92f0289ad018716d8a8223d3a_cgraph">
 <area shape="rect" title=" " alt="" coords="5,5,189,67"/>
-<area shape="rect" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html#a230737da28133af55f21cde5aedca017" title=" " alt="" coords="237,5,420,67"/>
+<area shape="rect" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html#a2e61a6b384370e63d377368d26acbd41" title="Constructs the StateMachine, you need to pass an Entity that owns this StateMachine to the constructo..." alt="" coords="237,5,420,67"/>
+<area shape="poly" title=" " alt="" coords="189,34,221,34,221,39,189,39"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="aed7795eb62c98183d9d419e740a837fe" name="aed7795eb62c98183d9d419e740a837fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed7795eb62c98183d9d419e740a837fe">&#9670;&#160;</a></span>StateMachine() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Cori::World::Components::Entity::StateMachine::StateMachine </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html">StateMachine</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_aed7795eb62c98183d9d419e740a837fe_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_aed7795eb62c98183d9d419e740a837fe_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_aed7795eb62c98183d9d419e740a837fe_cgraph" id="aclassCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_aed7795eb62c98183d9d419e740a837fe_cgraph">
+<area shape="rect" title=" " alt="" coords="5,5,189,67"/>
+<area shape="rect" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html#a2e61a6b384370e63d377368d26acbd41" title="Constructs the StateMachine, you need to pass an Entity that owns this StateMachine to the constructo..." alt="" coords="237,5,420,67"/>
 <area shape="poly" title=" " alt="" coords="189,34,221,34,221,39,189,39"/>
 </map>
 </div>
@@ -231,7 +291,10 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00088">88</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
+<p>Gets the pointer to the current state. Can be used to get the type_info of the current state. </p>
+<dl class="section return"><dt>Returns</dt><dd>Pointer of their current state instance. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00124">124</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
 
 </div>
 </div>
@@ -258,34 +321,10 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00093">93</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
+<p>Gets the pointer to the last state. Can be used to get the type_info of the last state. </p>
+<dl class="section return"><dt>Returns</dt><dd>Pointer of their last state instance. </dd></dl>
 
-</div>
-</div>
-<a id="a694a7fe57b506439b7010968b859f6c5" name="a694a7fe57b506439b7010968b859f6c5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a694a7fe57b506439b7010968b859f6c5">&#9670;&#160;</a></span>GetOwner()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classCori_1_1World_1_1Entity.html">World::Entity</a> Cori::World::Components::Entity::StateMachine::GetOwner </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00098">98</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00133">133</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
 
 </div>
 </div>
@@ -314,7 +353,16 @@ template&lt;std::derived_from&lt; <a class="el" href="classCori_1_1World_1_1Enti
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00073">73</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
+<p>Cheks if an <a class="el" href="namespaceCori_1_1World_1_1Components_1_1Entity.html" title="Components designed to be used with entities.">Entity</a> is in a specific state. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">StateType</td><td>State to check for. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if is currently in StateType, false otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00101">101</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
 
 </div>
 </div>
@@ -341,12 +389,12 @@ template&lt;std::derived_from&lt; <a class="el" href="classCori_1_1World_1_1Enti
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00066">66</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00089">89</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
 
 </div>
 </div>
 <a id="aa660e23275bdea150547d4c2293ebdc3" name="aa660e23275bdea150547d4c2293ebdc3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa660e23275bdea150547d4c2293ebdc3">&#9670;&#160;</a></span>operator=()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aa660e23275bdea150547d4c2293ebdc3">&#9670;&#160;</a></span>operator=() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -373,7 +421,42 @@ Here is the call graph for this function:</div>
 <div class="center"><img src="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_aa660e23275bdea150547d4c2293ebdc3_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_aa660e23275bdea150547d4c2293ebdc3_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_aa660e23275bdea150547d4c2293ebdc3_cgraph" id="aclassCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_aa660e23275bdea150547d4c2293ebdc3_cgraph">
 <area shape="rect" title=" " alt="" coords="5,5,189,67"/>
-<area shape="rect" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html#a230737da28133af55f21cde5aedca017" title=" " alt="" coords="237,5,420,67"/>
+<area shape="rect" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html#a2e61a6b384370e63d377368d26acbd41" title="Constructs the StateMachine, you need to pass an Entity that owns this StateMachine to the constructo..." alt="" coords="237,5,420,67"/>
+<area shape="poly" title=" " alt="" coords="189,34,221,34,221,39,189,39"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a2c723c360141952deb2438ed2af04949" name="a2c723c360141952deb2438ed2af04949"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2c723c360141952deb2438ed2af04949">&#9670;&#160;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html">StateMachine</a> &amp; Cori::World::Components::Entity::StateMachine::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html">StateMachine</a> &amp;&amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_a2c723c360141952deb2438ed2af04949_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_a2c723c360141952deb2438ed2af04949_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_a2c723c360141952deb2438ed2af04949_cgraph" id="aclassCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_a2c723c360141952deb2438ed2af04949_cgraph">
+<area shape="rect" title=" " alt="" coords="5,5,189,67"/>
+<area shape="rect" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html#a2e61a6b384370e63d377368d26acbd41" title="Constructs the StateMachine, you need to pass an Entity that owns this StateMachine to the constructo..." alt="" coords="237,5,420,67"/>
 <area shape="poly" title=" " alt="" coords="189,34,221,34,221,39,189,39"/>
 </map>
 </div>
@@ -386,7 +469,7 @@ Here is the call graph for this function:</div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StateType, typename... Args&gt; </div>
+template&lt;std::derived_from&lt; <a class="el" href="classCori_1_1World_1_1EntityState.html">EntityState</a> &gt; StateType, typename... Args&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -405,7 +488,21 @@ template&lt;typename StateType, typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00026">26</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
+<p>Registers an <a class="el" href="classCori_1_1World_1_1EntityState.html" title="An abstract class designed to be used with StateMachine component.">EntityState</a> with a <a class="el" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html" title="A StateMachine component is used in combination with custom objects derived from EntityState.">StateMachine</a>, you need to register a state before using it. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">StateType</td><td>State type to register. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">args</td><td>Arguments to the constructor of the StateType to use. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00045">45</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
 
 </div>
 </div>
@@ -434,7 +531,15 @@ template&lt;std::derived_from&lt; <a class="el" href="classCori_1_1World_1_1Enti
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00039">39</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
+<p>Changes the current state to the specified one. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">StateType</td><td>State to change to. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00062">62</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
 
 </div>
 </div>
@@ -463,16 +568,24 @@ template&lt;std::derived_from&lt; <a class="el" href="classCori_1_1World_1_1Enti
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00082">82</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
+<p>Sets an <a class="el" href="namespaceCori_1_1World_1_1Components_1_1Entity.html" title="Components designed to be used with entities.">Entity</a> to the state only if it is not currently in that state. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">StateType</td><td>State to change to. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="StateMachine_8hpp_source.html#l00114">114</a> of file <a class="el" href="StateMachine_8hpp_source.html">StateMachine.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_a26375a81469c5004f71e38e6f1d033c4_cgraph.png" border="0" usemap="#aclassCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_a26375a81469c5004f71e38e6f1d033c4_cgraph" loading="lazy" alt=""/></div>
 <map name="aclassCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_a26375a81469c5004f71e38e6f1d033c4_cgraph" id="aclassCori_1_1World_1_1Components_1_1Entity_1_1StateMachine_a26375a81469c5004f71e38e6f1d033c4_cgraph">
-<area shape="rect" title=" " alt="" coords="5,48,189,110"/>
-<area shape="rect" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html#a45229dfba37f129d88e7feb52d8083f5" title=" " alt="" coords="237,5,420,67"/>
+<area shape="rect" title="Sets an Entity to the state only if it is not currently in that state." alt="" coords="5,48,189,110"/>
+<area shape="rect" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html#a45229dfba37f129d88e7feb52d8083f5" title="Cheks if an Entity is in a specific state." alt="" coords="237,5,420,67"/>
 <area shape="poly" title=" " alt="" coords="188,59,221,53,222,58,189,65"/>
-<area shape="rect" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html#a4c4e6eefa1fe124f9885d9e23de9f9cb" title=" " alt="" coords="237,91,420,152"/>
+<area shape="rect" href="classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html#a4c4e6eefa1fe124f9885d9e23de9f9cb" title="Changes the current state to the specified one." alt="" coords="237,91,420,152"/>
 <area shape="poly" title=" " alt="" coords="189,93,222,99,221,104,188,98"/>
 </map>
 </div>

@@ -5,97 +5,39 @@
 
 CORI_DECLARE_TAG(Test);
 
-namespace Cori {
-	namespace Texture2Ds {
-		inline const Texture2DDescriptor AtlasTexture{
-			"Test AtlasTexture",
-			"enignedata/engine/textures/testTileset32.png"
-		};
+inline const Cori::Audio::Sound::Descriptor Sound1{
+	"test1",
+	"Troubadeck 01 A Simple Snail.ogg"
+};
 
-		inline const Texture2DDescriptor UVSample{
-			"Test UV text",
-			"enignedata/engine/textures/uv_sample.png"
-		};
-	}
-
-	namespace SpriteAtlases {
-		inline const SpriteAtlasDescriptor Atlas{
-			"Test Atlas",
-			"enignedata/engine/textures/testTileset32.png",
-			{32, 32}
-		};
-
-		inline const SpriteAtlasDescriptor UVsss{
-			"Test UV Atlas",
-			"enignedata/engine/textures/uv_sample.png",
-			{128, 128}
-		};
-
-	}
-
-	namespace Sounds {
-		inline const SoundDescriptor TestSound1{
-			"Test1",
-			"enignedata/engine/sounds/coin.wav"
-		};
-
-		inline const SoundDescriptor TestSound2{
-			"Test2",
-			"enignedata/engine/sounds/power_up.wav"
-		};
-
-		inline const SoundDescriptor TestMusic{
-			"TestMusic",
-			"enignedata/engine/sounds/Try and Solve This Loop.wav"
-		};
-	}
-}
-
-class CustomEvent : public Cori::Event {
-public:
-	CustomEvent(const std::string& somedata) : m_Data(somedata) {}
-
-	std::string ToString() const override {
-		return "UDE";
-	}
-
-	std::string& GetData() {
-		return m_Data;
-	}
-
-	EVENT_CLASS_TYPE(GameUserDefinedEvent)
-	EVENT_CLASS_CATEGORY(Cori::EventCategoryGameplay)
-private:
-	std::string m_Data;
+inline const Cori::Audio::Sound::Descriptor Sound2{
+	"test2",
+	"Troubadeck 02 Leapfrogs.ogg"
 };
 
 
-class ExampleLayer : public Cori::Layer {
+class ExampleLayer : public Cori::Core::Layer {
 public:
 	ExampleLayer() : Layer("Example") { 
-		Cori::API::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
 
-		Cori::SceneManager::CreateScene("Test Scene");
+
+		Cori::World::SceneManager::CreateScene("Test Scene");
 		BindScene("Test Scene");
 		ActiveScene.GetActiveCamera().CreateOrthoCamera(0, 2560, 0, 1080, -50, 0);
 		track = Cori::Audio::Track::Create("Test");
+		sound = Cori::AssetManager::Get(Sound1);
 	}
 
 	~ExampleLayer() {
 
 	}
 	
-	virtual void OnEvent(Cori::Event& event) override {
+	virtual void OnEvent(Cori::Core::Event& event) override {
 
-		Cori::EventDispatcher dispatcher(event);
-		dispatcher.Dispatch<CustomEvent>([](CustomEvent& e) -> bool {
-			CORI_DEBUG("Event data {}", e.GetData());
-			return true;
-			
-		});
+		Cori::Core::EventDispatcher dispatcher(event);
 
 
-		if (!event.IsOfType(Cori::EventType::MouseMoved)) {
+		if (!event.IsOfType(Cori::Core::EventType::MouseMoved)) {
 			CORI_TRACE("| Layer: {0} | Event: {1}", this->GetName(), event);
 		}
 	}
@@ -112,7 +54,6 @@ public:
 
 		static int a = 0;
 
-		static Cori::Entity ent;
 
 		static bool ale = false;
 
@@ -126,58 +67,7 @@ public:
 			ale = true;
 		}
 
-		if (ImGui::Button("Create tree")) {
-			auto atlas1 = Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::UVsss);
-			std::shared_ptr<Cori::SpriteAtlas> atlas;
-			if (atlas1) {
-				atlas = atlas1.value();
-			}
 
-			auto text = atlas->GetTexture();
-
-			auto uvs = atlas->GetSpriteUVsAtIndex(0);
-			auto uvs1 = atlas->GetSpriteUVsAtIndex(7);
-			auto uvs2 = atlas->GetSpriteUVsAtIndex(56);
-			auto uvs3 = atlas->GetSpriteUVsAtIndex(63);
-			auto uvs4 = atlas->GetSpriteUVsAtIndex(4);
-
-			auto player = ActiveScene.CreateEntity("Player", Test);
-			auto& transform = player.GetComponents<Cori::Components::Entity::Transform>();
-			transform.SetLocalDepth(2);
-			transform.SetLocalPosition({ 100.0f, 100.0f });
-			auto& renderer = player.AddComponent<Cori::Components::Entity::QuadRenderer>(glm::vec2(50.0f), text, uvs);
-			//renderer.SetColor({1.0f, 1.0f, 1.0f, 1.0f});
-			ActiveScene.AddEntityToCache(player, "player"_hs32);
-
-			auto player_sprite = ActiveScene.CreateEntity("Sprite", Test);
-			auto& transform1 = player_sprite.GetComponents<Cori::Components::Entity::Transform>();
-			transform1.SetLocalPosition({0.0f, 100.0f});
-			auto& renderer1 = player_sprite.AddComponent<Cori::Components::Entity::QuadRenderer>(glm::vec2(50.0f), text, uvs1);
-			//renderer1.SetColor({0.5f, 1.0f, 1.0f, 1.0f});
-			player_sprite.SetParent(player);
-
-			auto weapon_root = ActiveScene.CreateEntity("Weapon", Test);
-			auto& transform2 = weapon_root.GetComponents<Cori::Components::Entity::Transform>();
-			transform2.SetLocalPosition({0.0f, 200.0f});
-			auto& renderer2 = weapon_root.AddComponent<Cori::Components::Entity::QuadRenderer>(glm::vec2(50.0f), text, uvs2);
-			//renderer2.SetColor({1.0f, 0.5f, 1.0f, 1.0f});
-			weapon_root.SetParent(player);
-			ActiveScene.AddEntityToCache(weapon_root, "weapon"_hs32);
-
-			auto gun_sprite = ActiveScene.CreateEntity("GunSprite", Test);
-			auto& transform3 = gun_sprite.GetComponents<Cori::Components::Entity::Transform>();
-			transform3.SetLocalPosition({0.0f, 300.0f});
-			auto& renderer3 = gun_sprite.AddComponent<Cori::Components::Entity::QuadRenderer>(glm::vec2(50.0f), text, uvs3);
-			//renderer3.SetColor({1.0f, 1.0f, 0.5f, 1.0f});
-			gun_sprite.SetParent(weapon_root);
-
-			auto muzzle_flash = ActiveScene.CreateEntity("MuzzleFlash", Test);
-			auto& transform4 = muzzle_flash.GetComponents<Cori::Components::Entity::Transform>();
-			transform4.SetLocalPosition({0.0f, 400.0f});
-			auto& renderer4 = muzzle_flash.AddComponent<Cori::Components::Entity::QuadRenderer>(glm::vec2(50.0f), text, uvs4);
-			//renderer4.SetColor({1.0f, 0.0f, 1.0f, 1.0f});
-			muzzle_flash.SetParent(weapon_root);
-		}
 
 		if (ImGui::Button("Draw hier")) {
 			auto player = ActiveScene.GetEntityFromCache("player"_hs32);
@@ -188,57 +78,17 @@ public:
 			}
 		}
 
-		auto player = ActiveScene.GetEntityFromCache("player"_hs32);
-		if (player) {
-			auto& transform = player.value().GetComponents<Cori::Components::Entity::Transform>();
-			auto curpos = transform.GetLocalPosition();
-			auto currot = transform.GetLocalRotation();
-			auto curscale = transform.GetLocalScale();
-			if (ImGui::DragFloat("Player Pos", &curpos.x, 1, 1, 1000, "%f", ImGuiSliderFlags_AlwaysClamp)) {
-				transform.SetLocalPosition(curpos);
-			}
-			if (ImGui::DragFloat("Player Rot", &currot, 1.0f, -720.0f, 720.0f, "%f", ImGuiSliderFlags_AlwaysClamp)) {
-				transform.SetLocalRotation(currot);
-			}
-			if (ImGui::DragFloat("Player Scale", &curscale.x, 0.1f, -3.0f, 3, "%f", ImGuiSliderFlags_AlwaysClamp)) {
-				transform.SetLocalScale({curscale.x, 1.0f});
-			}
-		} else {
-			player.error().ignore();
-		}
 
-		auto weapon = ActiveScene.GetEntityFromCache("weapon"_hs32);
-		if (weapon) {
-			auto& transform = weapon.value().GetComponents<Cori::Components::Entity::Transform>();
-			auto curpos = transform.GetLocalPosition();
-			auto currot = transform.GetLocalRotation();
-			auto curscale = transform.GetLocalScale();
-			if (ImGui::DragFloat("weapon Pos", &curpos.x, 1, 1, 1000, "%f", ImGuiSliderFlags_AlwaysClamp)) {
-				transform.SetLocalPosition(curpos);
-			}
-			if (ImGui::DragFloat("weapon Rot", &currot, 1.0f, -720.0f, 720.0f, "%f", ImGuiSliderFlags_AlwaysClamp)) {
-				transform.SetLocalRotation(currot);
-			}
-			if (ImGui::DragFloat("weapon Scale", &curscale.x, 0.1f, -3.0f, 3, "%f", ImGuiSliderFlags_AlwaysClamp)) {
-				transform.SetLocalScale({curscale.x, 1.0f});
-			}
-		} else {
-			weapon.error().ignore();
-		}
 
 		if (ImGui::Button("Play")) {
-			track->Play();
+			track->Start();
 		}
 		if (ImGui::Button("Test1")) {
-			track->SetSound(Cori::AssetManager::GetSound(Cori::Sounds::TestSound1));
+			track->SetSound(sound);
 		}
 
 		if (ImGui::Button("Test2")) {
-			track->SetSound(Cori::AssetManager::GetSound(Cori::Sounds::TestSound2));
-		}
-
-		if (ImGui::Button("TestMusic")) {
-			track->SetSound(Cori::AssetManager::GetSound(Cori::Sounds::TestMusic));
+			track->SetSound(Cori::AssetManager::Get(Sound2));
 		}
 
 		if (ImGui::Button("Stop")) {
@@ -260,9 +110,12 @@ public:
 
 
 		ImGui::End();
+
+
+		Cori::ImGuiPresets::ScreenModeAndResolutionDropdowns();
 	}
 
-	void OnUpdate(const Cori::GameTimer& gameTimer) override {
+	void OnUpdate(const Cori::Core::GameTimer& gameTimer) override {
 		accum++;
 	}
 
@@ -286,6 +139,7 @@ public:
 	}
 
 	std::shared_ptr<Cori::Audio::Track> track;
+	std::shared_ptr<Cori::Audio::Sound> sound;
 
 	float fps;
 	float fps10;
@@ -294,7 +148,7 @@ public:
 
 };
 
-class Sandbox : public Cori::Application {
+class Sandbox : public Cori::Core::Application {
 public:
 	Sandbox(): Application("sandbox") {
 		PushLayer(new ExampleLayer());
@@ -307,6 +161,6 @@ public:
 	}
 };
 
-Cori::Application* Cori::CreateApplication() {
+Cori::Core::Application* Cori::Core::CreateApplication() {
 	return new Sandbox();
 }

@@ -15,8 +15,17 @@
 
 namespace Cori {
 	namespace Graphics {
+		/**
+		 * @brief The main engine renderer.
+		 * @details The render is capable of rendering 2D quads, and text for now. It can render in screen space or in world space,
+		 * supports both opaque object and transparent objects, and also has a layering system to position opaque and transparent objects currently (need to finish it of with a k-way merge).
+		 * When rendering text it can be aligned to the left, right or center. Render uses instancing.
+		 */
 		class Renderer2D {
 		public:
+			/**
+			 * @brief Available text alignment options.
+			 */
 			enum TextAlignment : uint8_t {
 				RIGHT,
 				CENTER,
@@ -27,13 +36,13 @@ namespace Cori {
 				glm::mat3 m_Transform{ 0.0f };
 				glm::vec2 m_Size{ 0.0f };
 				uint8_t m_Layer{ 0 };
-				std::shared_ptr<Texture2D> m_Texture{ nullptr };
+				Texture2D* m_Texture{ nullptr };
 				glm::vec4 m_UVs{ 0.0f };
 				glm::vec4 m_TintColor{ 0.0f };
 
 				QuadInstance() = default;
 
-				QuadInstance(const glm::mat3& transform, const glm::vec2 size, const glm::vec4& tintColor, const std::shared_ptr<Texture2D>& texture, const glm::vec4& uvs, const uint8_t layer) :
+				QuadInstance(const glm::mat3& transform, const glm::vec2 size, const glm::vec4& tintColor, Texture2D* texture, const glm::vec4& uvs, const uint8_t layer) :
 					m_Transform(transform), m_Size(size), m_Layer(layer), m_Texture(texture), m_UVs(uvs), m_TintColor(tintColor) {}
 			};
 
@@ -41,7 +50,7 @@ namespace Cori {
 				glm::mat3 m_Transform{ 0.0f };
 				float m_FontSize{ 0.0f };
 				std::u32string m_Text;
-				std::shared_ptr<Font> m_Font{ nullptr };
+				Font* m_Font{ nullptr };
 				glm::vec4 m_Color{ 0.0f };
 				float m_LineSpacing{ 0.0f };
 				float m_Kerning{ 0.0f };
@@ -51,10 +60,10 @@ namespace Cori {
 
 				TextInstance() = default;
 
-				TextInstance(const TextAlignment alignment, const glm::mat3& transform, const float fontSize,const std::u32string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) :
+				TextInstance(const TextAlignment alignment, const glm::mat3& transform, const float fontSize,const std::u32string_view& text, const glm::vec4& color, Font* font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) :
 					m_Transform(transform), m_FontSize(fontSize), m_Text(text), m_Font(font), m_Color(color), m_LineSpacing(lineSpacing), m_Kerning(kerning), m_LimitX(limitX), m_Depth(depth), m_Alignment(alignment) {}
 
-				TextInstance(const TextAlignment alignment, const glm::mat3& transform, const float fontSize,const std::string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) :
+				TextInstance(const TextAlignment alignment, const glm::mat3& transform, const float fontSize,const std::string_view& text, const glm::vec4& color, Font* font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) :
 					m_Transform(transform), m_FontSize(fontSize), m_Text(Utility::Utf8ToUtf32(text)), m_Font(font), m_Color(color), m_LineSpacing(lineSpacing), m_Kerning(kerning), m_LimitX(limitX), m_Depth(depth), m_Alignment(alignment) {}
 			};
 
@@ -70,40 +79,121 @@ namespace Cori {
 				SCREEN_SPACE
 			};
 
+			/**
+			 * @note When directly using the renderer you need to correctly specify if the object you are trying to render has semi transparency or no, opaque and transparent object are processed differently.
+			 */
 			enum ObjectTransparency : uint8_t {
 				OPAQUE,
 				SEMI_TRANSPARENT
 			};
 
-			static void BeginScene(const World::Components::Scene::Camera& camera);
 
-			static void EndScene();
+			/**
+			 * @brief Submits the quad to the render queue.
+			 * @param space DrawSpace to draw the quad.
+			 * @param transparencyMode Transparency mode, defines how to handle the quad. (hint: you can query a Texture2D if it has semi transparency or no)
+			 * @param transform Rendering transform. Position defined is the center of the quad.
+			 * @param halfSize Half size of the quad.
+			 * @param tintColor Tint color of the quad, or a color if flatColored=true.
+			 * @param texture Texture to sample from.
+			 * @param uvs UVs to sample with.
+			 * @param depth Quad Depth, for layering, the higher the "closer".
+			 * @param flipX Flip quad on X axis.
+			 * @param flipY Flip quad on Y axis.
+			 * @param flatColored Ignore the texture and use a plain white texture.
+			 * @warning You need to make sure that texture pointer stays valid until the end of the frame, or this will induce a dangling pointer. Be aware!
+			 */
+			static void SubmitQuad(const DrawSpace space, const ObjectTransparency transparencyMode,
+			                       const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor,
+			                       Texture2D* texture, const UVs& uvs, const uint8_t depth, const bool flipX,
+			                       const bool flipY, const bool flatColored);
 
-			static void DrawScene(World::Scene* scene);
-
-			static void FlushRenderQueues();
-
-			static void SubmitQuad(const DrawSpace space, const ObjectTransparency transparencyMode, const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor, const std::shared_ptr<Texture2D>& texture, const UVs& uvs, const uint8_t depth, const bool flipX, const bool flipY, const bool flatColored);
-
+			/**
+			 * @brief Convenience function mainly for debugging, draws a plain colored quad.
+			 * @param space DrawSpace to draw the quad.
+			 * @param position Position defined is the center of the quad.
+			 * @param halfSize Half size of the quad.
+			 * @param color Quad color.
+			 */
 			static void SubmitColoredQuad(const DrawSpace space, const glm::vec2 position, const glm::vec2 halfSize, const glm::vec3& color);
 
+			/**
+			 * @brief Draws the AABB, also a debug convenience function, always draws in world space.
+			 * @param aabb AABB to draw.
+			 * @param lineThickness Thickness of the AABB border.
+			 * @param color Border color.
+			 */
 			static void SubmitAABB(const Utility::AABB& aabb, const float lineThickness, const glm::vec3& color);
 
-			static void SubmitText(const DrawSpace space, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::u32string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning);
+			/**
+			 * @brief Draws a UTF-32 fixed length encoded string.
+			 * @param space DrawSpace to draw text in.
+			 * @param alignment Text alignment with which to draw the text.
+			 * @param transform Rendering transform.
+			 * @param fontSize Size of the font to render.
+			 * @param text View to the UTF-32 fixed length encoded string to render.
+			 * @param color Color of the text to render.
+			 * @param font Font to use when rendering the text.
+			 * @param depth Depth at which to render the text.
+			 * @param limitX Length limit of the one line.
+			 * @param lineSpacing Additional line spacing.
+			 * @param kerning Additional kerning.
+			 * @details Transform for TextAlignment::LEFT is a lower left border of the char in the first line.
+			 * \n For TextAlignment::CENTER it's the lower bound on y of the first line, and on x the center between the left border of the char in the first line and the right border of the char in the first line.
+			 * \n For TextAlignment::RIGHT it's the left lower border of the last char in the line.
+			 * @note All text is considered semi transparent when rendering.
+			 * @warning You need to make sure that font pointer stays valid until the end of the frame, or this will induce a dangling pointer. Be aware!
+			 */
+			static void SubmitText(const DrawSpace space, const TextAlignment alignment, const glm::mat3& transform,
+			                       const float fontSize, const std::u32string_view& text, const glm::vec4& color,
+			                       Font* font, const uint8_t depth, const float limitX, const float lineSpacing,
+			                       const float kerning);
 
-			static void SubmitText(const DrawSpace space, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning);
+			/**
+			 * @brief Draws a UTF-32 fixed length encoded string.
+			 * @param space DrawSpace to draw text in.
+			 * @param alignment Text alignment with which to draw the text.
+			 * @param transform Rendering transform.
+			 * @param fontSize Size of the font to render.
+			 * @param text View to the UTF-8 variable length encoded string to render.
+			 * @param color Color of the text to render.
+			 * @param font Font to use when rendering the text.
+			 * @param depth Depth at which to render the text.
+			 * @param limitX Length limit of the one line.
+			 * @param lineSpacing Additional line spacing.
+			 * @param kerning Additional kerning.
+			 * @details Transform for TextAlignment::LEFT is a lower left border of the char in the first line.
+			 * \n For TextAlignment::CENTER it's the lower bound on y of the first line, and on x the center between the left border of the char in the first line and the right border of the char in the first line.
+			 * \n For TextAlignment::RIGHT it's the left lower border of the last char in the line.
+			 * @note All text is considered semi transparent when rendering.
+			 * @warning You need to make sure that font pointer stays valid until the end of the frame, or this will induce a dangling pointer. Be aware!
+			 */
+			static void SubmitText(const DrawSpace space, const TextAlignment alignment, const glm::mat3& transform,
+			                       const float fontSize, const std::string_view& text, const glm::vec4& color,
+			                       Font* font, const uint8_t depth, const float limitX, const float lineSpacing,
+			                       const float kerning);
 
+			/**
+			 * @brief Gives you the rendering stats of the last rendered frame.
+			 * @return Last frame stats.
+			 */
 			static Statistics GetStatistics();
 
 			// void DrawCircle(...);
 			// void DrawLine(...);
 
-		protected:
-			friend API;
+		private:
+			friend World::Scene;
+			friend Internal::API;
+
+			static void EndFrame(const World::Components::Scene::Camera& camera);
+			static void SubmitScene(World::Scene* scene);
 			static void Init();
 			static void Shutdown();
+			static void BeginScene(const World::Components::Scene::Camera& camera);
 
-		private:
+			static void EndScene();
+
 			struct Quad {
 				glm::mat3 m_Transform{ 0.0f };
 				glm::vec4 m_TexturePosition{ 0.0f };
@@ -136,9 +226,9 @@ namespace Cori {
 				static constexpr uint32_t MaxCharInstanceCount{ 16384 };
 
 				Texture2D* CurrentTexture{nullptr};
-				VertexArray* CurrentVertexArray{nullptr};
-				VertexBuffer* CurrentVertexBuffer{nullptr};
-				IndexBuffer* CurrentIndexBuffer{nullptr};
+				Internal::VertexArray* CurrentVertexArray{nullptr};
+				Internal::VertexBuffer* CurrentVertexBuffer{nullptr};
+				Internal::IndexBuffer* CurrentIndexBuffer{nullptr};
 				ShaderProgram* CurrentShader{nullptr};
 				DrawSpace CurrentDrawSpace;
 
@@ -153,9 +243,9 @@ namespace Cori {
 
 				// vvv quad specific
 
-				std::shared_ptr<VertexArray> QuadInstanceVertexArray;
-				std::shared_ptr<VertexBuffer> QuadInstanceVertexBuffer;
-				std::shared_ptr<IndexBuffer> QuadInstanceIndexBuffer;
+				std::shared_ptr<Internal::VertexArray> QuadInstanceVertexArray;
+				std::shared_ptr<Internal::VertexBuffer> QuadInstanceVertexBuffer;
+				std::shared_ptr<Internal::IndexBuffer> QuadInstanceIndexBuffer;
 				std::shared_ptr<ShaderProgram> QuadInstanceShader;
 
 				uint32_t QuadInstanceCount{ 0 };
@@ -174,9 +264,9 @@ namespace Cori {
 
 				// vvv text specific
 
-				std::shared_ptr<VertexArray> CharInstanceVertexArray;
-				std::shared_ptr<VertexBuffer> CharInstanceVertexBuffer;
-				std::shared_ptr<IndexBuffer> CharInstanceIndexBuffer;
+				std::shared_ptr<Internal::VertexArray> CharInstanceVertexArray;
+				std::shared_ptr<Internal::VertexBuffer> CharInstanceVertexBuffer;
+				std::shared_ptr<Internal::IndexBuffer> CharInstanceIndexBuffer;
 				std::shared_ptr<ShaderProgram> CharInstanceShader;
 
 				uint32_t CharInstanceCount{ 0 };
@@ -192,17 +282,19 @@ namespace Cori {
 
 			static RendererData* s_Data;
 
+			static void FlushRenderQueues();
+
 			static void BeginInstancedSet();
 			static void EndInstancedSet();
 
 			static void BeginCharInstancedSet();
 			static void EndCharInstancedSet(Texture2D* atlas, const glm::mat3& modelMatrix);
 
-			static void SubmitQuadToQueue(std::vector<QuadInstance>& queue, const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor, const std::shared_ptr<Texture2D>& texture, const UVs& uvs, const uint8_t depth, const bool flipX, const bool flipY, const bool flatColored);
+			static void SubmitQuadToQueue(std::vector<QuadInstance>& queue, const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor, Texture2D* texture, const UVs& uvs, const uint8_t depth, const bool flipX, const bool flipY, const bool flatColored);
 
-			static void SubmitTextToQueue(std::vector<TextInstance>& queue, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::u32string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning);
+			static void SubmitTextToQueue(std::vector<TextInstance>& queue, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::u32string_view& text, const glm::vec4& color, Font* font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning);
 
-			static void SubmitTextToQueue(std::vector<TextInstance>& queue, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::string_view& text, const glm::vec4& color, const std::shared_ptr<Font>& font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning);
+			static void SubmitTextToQueue(std::vector<TextInstance>& queue, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::string_view& text, const glm::vec4& color, Font* font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning);
 
 			static void BeginWorldSpacePass();
 

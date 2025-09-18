@@ -1,7 +1,7 @@
 var classCori_1_1Core_1_1MouseScrolledEvent =
 [
     [ "MouseScrolledEvent", "classCori_1_1Core_1_1MouseScrolledEvent.html#abac5abba962ca30bc0d6a09c9767246d", null ],
-    [ "GetCategoryFlags", "classCori_1_1Core_1_1MouseScrolledEvent.html#ad0047378d13dbd883f707a8528cfd2d2", null ],
+    [ "GetCategoryFlags", "classCori_1_1Core_1_1MouseScrolledEvent.html#afff58f0c2fb7adaa4ba10ef9c317208c", null ],
     [ "GetEventType", "classCori_1_1Core_1_1MouseScrolledEvent.html#ad77ddd08563da82917f642786d2dcde3", null ],
     [ "GetName", "classCori_1_1Core_1_1MouseScrolledEvent.html#aa29befe8b8f21d62196dc3a9b8ae447a", null ],
     [ "GetStaticType", "classCori_1_1Core_1_1MouseScrolledEvent.html#ad8a0aea4523c4852f013843a9b3a9988", null ],

@@ -4,6 +4,16 @@ project(CoriEngine)
     # hides all compiler warnings caused by subprojects
     get_filename_component(CORI_ENGINE_SOURCE_DIR ${PROJECT_SOURCE_DIR} ABSOLUTE)
 
+    #engine assets
+    set(ENGINE_ASSETS_DIR "${CORI_ENGINE_SOURCE_DIR}/enginedata")
+
+    cmake_path(CONVERT "${ENGINE_ASSETS_DIR}" TO_CMAKE_PATH_LIST ENGINEDATA_PATH)
+
+    set(PATH_DEFINES_HEADER_IN "${CORI_ENGINE_SOURCE_DIR}/cmake/PathDefines.hpp.in")
+    set(PATH_DEFINES_HEADER_OUT "${CMAKE_CURRENT_BINARY_DIR}/generated/PathDefinesGenerated.hpp")
+
+    configure_file(${PATH_DEFINES_HEADER_IN} ${PATH_DEFINES_HEADER_OUT})
+
     set(HIDE_DEPENDENCY_WARNINGS ON CACHE BOOL "")
     
     set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "") 
@@ -24,11 +34,11 @@ project(CoriEngine)
     set(SDLMIXER_OPUS OFF)
     set(SDLMIXER_DEPS_SHARED OFF)
     #find_package(Threads REQUIRED)
-    #set(SDLMIXER_VENDORED ON)
+    set(SDLMIXER_VENDORED OFF)
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/SDL3_mixer EXCLUDE_FROM_ALL)
 
     # SDL_image
-    set(SDLIMAGE_VENDORED ON)
+    set(SDLIMAGE_VENDORED OFF)
     set(SDLIMAGE_AVIF OFF)
     set(SDLIMAGE_JPEG OFF)
     set(SDLIMAGE_WEBP OFF)
@@ -36,7 +46,9 @@ project(CoriEngine)
 
     # glm
     set(GLM_ENABLE_CXX_20 ON CACHE BOOL "")
-    set(GLM_ENABLE_SIMD_AVX2 ON CACHE BOOL "")
+    if(CORI_USE_AVX2)
+        set(GLM_ENABLE_SIMD_AVX2 ON CACHE BOOL "")
+    endif ()
     set(GLM_ENABLE_FAST_MATH OFF CACHE BOOL "")
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/glm EXCLUDE_FROM_ALL)
 
@@ -84,7 +96,7 @@ project(CoriEngine)
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/magic_enum EXCLUDE_FROM_ALL)
 
     #entt
-    set(ENTT_BUILD_DOCS ON CACHE BOOL "")
+    set(ENTT_BUILD_DOCS OFF CACHE BOOL "")
     set(ENTT_INCLUDE_HEADERS ON CACHE BOOL "")
     set(ENTT_INCLUDE_TOOLS ON CACHE BOOL "")
     set(ENTT_INSTALL OFF CACHE BOOL "")
@@ -94,7 +106,9 @@ project(CoriEngine)
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/entt EXCLUDE_FROM_ALL)
 
     #box2d
-    set(BOX2D_AVX2 ON CACHE BOOL "")
+    if(CORI_USE_AVX2)
+        set(BOX2D_AVX2 ON CACHE BOOL "")
+    endif ()
     set(BOX2D_DOCS OFF CACHE BOOL "")
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/box2d EXCLUDE_FROM_ALL)
 
@@ -127,7 +141,15 @@ project(CoriEngine)
     set(MSDF_ATLAS_USE_VCPKG OFF CACHE BOOL "")
     set(MSDF_ATLAS_INSTALL ON CACHE BOOL "")
     set(MSDF_ATLAS_USE_SKIA OFF CACHE BOOL "")
+    set(MSDFGEN_DISABLE_PNG OFF CACHE BOOL "")
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/msdf-atlas-gen EXCLUDE_FROM_ALL)
+
+    #tracy
+    set(TRACY_STATIC ON CACHE BOOL "")
+    set(TRACY_ENABLE ON CACHE BOOL "")
+    set(TRACY_ON_DEMAND ON CACHE BOOL "")
+    add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/tracy EXCLUDE_FROM_ALL)
+
 
 # project's binary setup vvv
 
@@ -145,11 +167,6 @@ project(CoriEngine)
     ${CORI_ENGINE_SOURCE_DIR}/src/*.cpp
     )
 
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        add_compile_options(-g)
-        #add_compile_options(-fsanitize=address)
-    endif()
-
     # my shared lib
     add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES})
 
@@ -159,13 +176,17 @@ project(CoriEngine)
         $<$<CONFIG:Release>:RELEASE_BUILD>
     )
 
-    target_compile_definitions(${ENGINE_LIBRARY_NAME} PUBLIC
-        $<$<CONFIG:Debug>:CORI_ENABLE_PROFILING>
-        $<$<CONFIG:RelWithDebInfo>:CORI_ENABLE_PROFILING>
-    )
+    if (CORI_ENABLE_TRACY_PROFILER)
+        target_compile_definitions(${ENGINE_LIBRARY_NAME} PUBLIC
+            $<$<CONFIG:Debug>:CORI_ENABLE_PROFILING>
+            $<$<CONFIG:RelWithDebInfo>:CORI_ENABLE_PROFILING>
+                $<$<CONFIG:Debug>:TRACY_ENABLE>
+                $<$<CONFIG:RelWithDebInfo>:TRACY_ENABLE>
+        )
+    endif()
 
     # compile flags just for the engine dll
-    target_compile_options(${ENGINE_LIBRARY_NAME} PRIVATE -Wall -Wextra)
+    target_compile_options(${ENGINE_LIBRARY_NAME} PRIVATE -Wall -Wextra -Wpedantic)
 
     # build binary output dir
     set_target_properties(${ENGINE_LIBRARY_NAME} PROPERTIES
@@ -176,14 +197,15 @@ project(CoriEngine)
 
     # includes
     target_include_directories(${ENGINE_LIBRARY_NAME} PUBLIC
-    ${CORI_ENGINE_SOURCE_DIR}/thirdparty/box2cpp/include
-    ${CORI_ENGINE_SOURCE_DIR}/thirdparty/ska_sort
-    ${CORI_ENGINE_SOURCE_DIR}/src
-    ${CORI_INCLUDE_DIR}
+            ${CORI_ENGINE_SOURCE_DIR}/thirdparty/box2cpp/include
+            ${CORI_ENGINE_SOURCE_DIR}/thirdparty/ska_sort
+            ${CORI_ENGINE_SOURCE_DIR}/src
+            ${CORI_INCLUDE_DIR}
     )
 
     target_include_directories(${ENGINE_LIBRARY_NAME} PRIVATE
-    ${CORI_HEADERS_DIR}
+            ${CORI_HEADERS_DIR}
+            ${CMAKE_CURRENT_BINARY_DIR}/generated
     )
 
     # pch
@@ -203,12 +225,12 @@ project(CoriEngine)
         target_compile_options(msdf-atlas-gen PRIVATE -w)
         target_compile_options(msdfgen-core PRIVATE -w)
         target_compile_options(tmxlite PRIVATE -w)
-        if(TARGET TIFF::tiff)
-            set(SDLIMAGE_TIF_TARGET "tiff")
-        else()
-            set(SDLIMAGE_TIF_TARGET "TIFF")
-        endif()
-        target_compile_options(${SDLIMAGE_TIF_TARGET} PRIVATE -w)
+        #if(TARGET TIFF::tiff)
+        #    set(SDLIMAGE_TIF_TARGET "tiff")
+        #else()
+        #    set(SDLIMAGE_TIF_TARGET "TIFF")
+        #endif()
+        #target_compile_options(${SDLIMAGE_TIF_TARGET} PRIVATE -w)
         target_compile_options(spdlog PRIVATE -w)
     endif()
 
@@ -217,8 +239,14 @@ project(CoriEngine)
 
     # lib linking
 
+    if (CORI_SANITIZE)
+        target_compile_options(${ENGINE_LIBRARY_NAME} PUBLIC -fsanitize=address)
+        target_link_options(${ENGINE_LIBRARY_NAME} PUBLIC -fsanitize=address)
+    endif ()
+    #target_link_libraries()
+
     # should be public
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite Tracy::TracyClient)
 
     # can be private 
     target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static msdf-atlas-gen glad_gl_core_46)
@@ -228,3 +256,4 @@ project(CoriEngine)
         add_subdirectory(docs)
         add_dependencies(${ENGINE_LIBRARY_NAME} CoriEngine-docs)
     endif()
+

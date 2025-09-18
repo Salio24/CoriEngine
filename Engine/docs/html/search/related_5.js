@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['quadanimator_0',['QuadAnimator',['../structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#a0ef04065717beba854d7d2d63c9b6c46',1,'Cori::World::Components::Entity::QuadRenderer']]],
-  ['quadanimatornew_1',['QuadAnimatorNew',['../structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#aa3d84e41dcaffb217db0c34037834a20',1,'Cori::World::Components::Entity::QuadRenderer']]]
+  ['scene_0',['Scene',['../classCori_1_1World_1_1Entity.html#a032858ae1fe02d2d1170981c2af2d67c',1,'Cori::World::Entity']]],
+  ['scenehandle_1',['SceneHandle',['../classCori_1_1World_1_1Scene.html#a0af02925f737e3c2849b9614397bcf24',1,'Cori::World::Scene']]],
+  ['scenemanager_2',['SceneManager',['../classCori_1_1World_1_1Scene.html#a284464b0561a6f2915f04b0245b987f0',1,'Cori::World::Scene']]]
 ];

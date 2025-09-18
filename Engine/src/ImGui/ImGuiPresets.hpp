@@ -2,19 +2,36 @@
 #include "Core/Application.hpp"
 
 namespace Cori {
+	/**
+	 * @brief Here are stored all predefined ImGui window presets, you can only use this functions in Layer OnImGuiRender method, using it anywhere else will result in a crash.
+	 */
 	namespace ImGuiPresets {
-		[[maybe_unused]] static void Box2dDebugDraw(const glm::vec2 cameraBounds, const int32_t pixelsPerMeter, Core::Layer* thisPtr, const bool mouseDrag, const glm::vec2 cameraPos, const float mouseForce = 1000.0f) {
-			thisPtr->m_DebugImGuiRenderer.ViewportCalc(cameraBounds, pixelsPerMeter, cameraPos);
-			thisPtr->m_DebugImGuiRenderer.DrawShapes(thisPtr->ActiveScene.GetPhysicsWorld());
+		/**
+		 * @brief Enables the debug draw of Box2D physics.
+		 * @param cameraSize Size of the debug cameras viewport, use GetSize() with your main Graphics::CameraController to align the main camera and debug camera.
+		 * @param cameraPos Position of the debug camera, use GetSize() with your main Graphics::CameraController to align the main camera and debug camera.
+		 * @param pixelsPerMeter Pixels in main camera per meter range. Use CORI_PIXELS_PER_METER.
+		 * @param layer Pointer to the layer you're calling this function from.
+		 * @param mouseDrag Enable or disable dynamic object dragging with a mouse.
+		 * @param mouseForce Force to apply when using mouse drag.
+		 * @note Only usable in Layer OnImGuiRender method.
+		 */
+		[[maybe_unused]] static void Box2dDebugDraw(const glm::vec2 cameraSize, const glm::vec2 cameraPos, const int32_t pixelsPerMeter, Core::Layer* layer, const bool mouseDrag, const float mouseForce = 1000.0f) {
+			layer->m_DebugImGuiRenderer.ViewportCalc(cameraSize, pixelsPerMeter, cameraPos);
+			layer->m_DebugImGuiRenderer.DrawShapes(layer->ActiveScene.GetPhysicsWorld());
 			if (mouseDrag) {
 				if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) && !ImGui::IsAnyItemActive()) {
-					thisPtr->m_DebugImGuiRenderer.HandleMouseDrag(thisPtr->ActiveScene.GetPhysicsWorld(), mouseForce);
+					layer->m_DebugImGuiRenderer.HandleMouseDrag(layer->ActiveScene.GetPhysicsWorld(), mouseForce);
 				}
-				thisPtr->m_DebugImGuiRenderer.DrawModeToggles();
+				layer->m_DebugImGuiRenderer.DrawModeToggles();
 			}
 		}
 
 
+		/**
+		 * @brief Displays a window mode and screen mode selection window.
+		 * @note Only usable in Layer OnImGuiRender method.
+		 */
 		[[maybe_unused]] static void ScreenModeAndResolutionDropdowns() {
 			const char* items[] = {"Windowed", "Borderless Windowed", "Exclusive Fullscreen"};
 

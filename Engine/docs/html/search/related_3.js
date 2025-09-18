@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['imguilayer_0',['ImGuiLayer',['../classCori_1_1Core_1_1Window.html#aac33c3bcb667ff80a3ece6045da4c257',1,'Cori::Core::Window']]]
+  ['quadanimator_0',['QuadAnimator',['../structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#a0ef04065717beba854d7d2d63c9b6c46',1,'Cori::World::Components::Entity::QuadRenderer']]]
 ];
