@@ -2,14 +2,6 @@
 
 namespace Cori {
 	namespace Core {
-		enum class EventType {
-			None = 0,
-			WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
-			GameUserDefinedEvent,
-			KeyPressed, KeyReleased, KeyTyped,
-			MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
-		};
-
 		enum EventCategory {
 			None = 0,
 			EventCategoryApplication = 1 << 0,
@@ -30,22 +22,22 @@ namespace Cori {
 
 			/**
 			 * @brief Gives the return type of the Event.
-			 * @note You shouldn't overload this, it is overloaded by EVENT_CLASS_TYPE macro.
-			 * @return Type of Event.
+			 * @note You shouldn't overload this, it is overloaded by EVENT_CLASS_TYPE macro!
+			 * @return Type index of derived event type.
 			 */
-			[[nodiscard]] virtual EventType GetEventType() const = 0;
+			[[nodiscard]] virtual constexpr std::type_index GetEventType() const = 0;
 
 
 			/**
 			 * @brief This will give you the string version of EventType.
-			 * @note You shouldn't overload this, it is overloaded by EVENT_CLASS_TYPE macro.
+			 * @note You shouldn't overload this, it is overloaded by EVENT_CLASS_TYPE macro!
 			 * @return EventType name.
 			 */
 			[[nodiscard]] virtual const char* GetName() const = 0;
 
 			/**
 			 * @brief Gives the flags of particular Event.
-			 * @note You shouldn't overload this, it is overloaded by EVENT_CLASS_CATEGORY macro.
+			 * @note You shouldn't overload this, it is overloaded by EVENT_CLASS_CATEGORY macro!
 			 * @return Flag variable that stores all the relevant EventCategory flags.
 			 */
 			[[nodiscard]] virtual uint32_t GetCategoryFlags() const = 0;
@@ -68,15 +60,6 @@ namespace Cori {
 				return GetCategoryFlags() & category;
 			}
 
-
-			/**
-			 * @brief Checks if the Event is of specific EventType.
-			 * @param type Type to check the presence of.
-			 * @return True is present, false otherwise.
-			 */
-			[[nodiscard]] bool IsOfType(const EventType type) const {
-				return GetEventType() == type;
-			}
 			bool m_Handled = false;
 		};
 
@@ -100,10 +83,12 @@ namespace Cori {
 			 */
 			template<typename T>
 			bool Dispatch(EventFn<T> func) {
-				if (m_Event.GetEventType() == T::GetStaticType()) {
+				if (m_Event.GetEventType() == std::type_index(typeid(T))) {
 					m_Event.m_Handled = func(*static_cast<T*>(&m_Event));
 					return true;
 				}
+
+
 				return false;
 			}
 		private:
@@ -131,15 +116,17 @@ namespace Cori {
 
 /**
  * @brief Assigns an EventType to the custom event type derived from the Event class. Use it in the public field of the derived class.
- * @param type EventType to be assigned.
+ * @param type Derived from Event typename.
+ * @detals Example:
+ * \n class PlayerDied final : public Cori::Core::Event
+ * \n EVENT_CLASS_TYPE(PlayerDied)
  */
-#define EVENT_CLASS_TYPE(type) static ::Cori::Core::EventType GetStaticType() { return ::Cori::Core::EventType::type; }\
-								virtual ::Cori::Core::EventType GetEventType() const override { return GetStaticType(); }\
-								virtual const char* GetName() const override { return #type; }
+#define EVENT_CLASS_TYPE(type) constexpr std::type_index GetEventType() const override { return std::type_index(typeid(type)); }\
+								const char* GetName() const override { return CORI_CLEAN_TYPE_NAME(type); }
 
 /**
  * @brief Assigns an EventCategory to the custom event type derived from the Event class. Use it in the public field of the derived class.
  * @note Several EventCategories can be assigned to the derived class using an bitwise or operator.
  * @param category EventCategories to be assigned.
  */
-#define EVENT_CLASS_CATEGORY(category) virtual uint32_t GetCategoryFlags() const override { return category; }
+#define EVENT_CLASS_CATEGORY(category) uint32_t GetCategoryFlags() const override { return category; }

@@ -26,7 +26,7 @@ namespace Cori {
 			[[nodiscard]] std::string ToString() const override {
 				return std::string("KeyPressedEvent: ") + CoriGetKeyName(m_KeyCode) + std::string(" ( Repeated: ") + Logger::BoolAlpha(m_Repeat) + std::string(" )");
 			}
-			EVENT_CLASS_TYPE(KeyPressed)
+			EVENT_CLASS_TYPE(KeyPressedEvent)
 		private:
 			bool m_Repeat{ false };
 		};
@@ -40,7 +40,7 @@ namespace Cori {
 			[[nodiscard]] std::string ToString() const override {
 				return std::string("KeyReleasedEvent: ") + CoriGetKeyName(m_KeyCode);
 			}
-			EVENT_CLASS_TYPE(KeyReleased)
+			EVENT_CLASS_TYPE(KeyReleasedEvent)
 		};
 	}
 }

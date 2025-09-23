@@ -15,7 +15,7 @@ namespace Cori {
 				return std::string("WindowResizeEvent: (") + std::to_string(m_Width) + ", " + std::to_string(m_Height) + std::string(")");
 			}
 
-			EVENT_CLASS_TYPE(WindowResize)
+			EVENT_CLASS_TYPE(WindowResizeEvent)
 			EVENT_CLASS_CATEGORY(EventCategoryApplication)
 		private:
 			uint32_t m_Width{ 0 };
@@ -30,7 +30,7 @@ namespace Cori {
 				return "WindowCloseEvent";
 			}
 
-			EVENT_CLASS_TYPE(WindowClose)
+			EVENT_CLASS_TYPE(WindowCloseEvent)
 			EVENT_CLASS_CATEGORY(EventCategoryApplication)
 		};
 	}

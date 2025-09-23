@@ -72,6 +72,9 @@ namespace Cori {
 			 * @brief Enables or disables manual tick step.
 			 * @param state On or off state.
 			 * @details When enabled ticks don't happened on their own, instead you can advance one tick at a time by pressing K, or hold J to enable regular behaviour when enabled.
+			 * @note When using manual step interpolation might look wierd, since m_TickAlpha will be close to 0 all the time.
+			 * \n This is expected behaviour since it relies on per frame logic, but what we do when using manual step is we advance one tick at a time including running the per frame logic not each frame.
+			 * Interpolated position would look like similar to the case if we would run the game at near tickrate FPS.
 			 */
 			void SetManualTickStep(const bool state);
 
