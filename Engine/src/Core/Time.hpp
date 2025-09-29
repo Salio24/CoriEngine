@@ -31,6 +31,11 @@ namespace Cori {
 			[[nodiscard]] float GetTimestep() const { return m_Timestep; }
 
 			/**
+			 * @brief Returns the current tickRate.
+			 */
+			[[nodiscard]] uint16_t GetTickRate() const { return m_Tickrate; }
+
+			/**
 			 * @brief Gets the time in milliseconds since application start.
 			 * @return Milliseconds elapsed.
 			 */
