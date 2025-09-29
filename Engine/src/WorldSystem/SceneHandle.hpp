@@ -220,6 +220,7 @@ namespace Cori {
 			 * @tparam Args Deduced automatically, no need to specify.
 			 * @param args Arguments that will be passed to Create method of your system class.
 			 * @details Scene has full control of the system lifetime, the system will be kept alive for as long as the scene is alive, but you can also explicitly unregister the system.
+			 * @note If Create returns false, the system will not be registered.
 			 */
 			template <typename T, typename... Args> requires IsSystem<T, Args...>
 			void RegisterSystem(Args&&... args) {
@@ -270,30 +271,23 @@ namespace Cori {
 			}
 
 			/**
-			 * @brief Retrieves a reference to the Box2D physics world of the scene.
-			 * @return Reference to the PhysicsWorld.
-			 */
-			[[nodiscard]] Physics::PhysicsWorld& GetPhysicsWorld() {
-				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
-				return m_SceneRaw.lock()->GetPhysicsWorld();
-			}
-
-			/**
-			 * @brief Retrieves a const reference to the Box2D physics world of the scene.
-			 * @return Const reference to the PhysicsWorld.
-			 */
-			[[nodiscard]] const Physics::PhysicsWorld& GetPhysicsWorld() const {
-				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
-				return m_SceneRaw.lock()->GetPhysicsWorld();
-			}
-
-			/**
 			 * @brief Retrieves the name of the scene.
 			 * @return View to the name of the scene.
 			 */
 			[[nodiscard]] std::string_view GetName() const {
 				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
 				return m_SceneRaw.lock()->GetName();
+			}
+
+			/**
+			 * @brief Retrieves the EnTT registry.
+			 * @return Non-const reference to the EnTT registry.
+			 * @details For the most part this is needed if your system need some special behaviour/feature (listeners, reactive storage, etc.) from EnTT that I don't have abstraction over.
+			 * \n Making a feature complete wrapper over EnTT is out of the scope of this project.
+			 */
+			[[nodiscard]] entt::registry& GetRegistry() {
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->m_Registry;
 			}
 
 			/**

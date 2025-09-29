@@ -8,6 +8,26 @@
 #endif
 
 namespace Cori {
+	namespace World {
+		namespace Components {
+			namespace Scene {
+				/**
+				 * @brief Scene context component containing Box2D physics world.
+				 */
+				class PhysicsWorld : public Physics::World {
+				public:
+					explicit PhysicsWorld(const Params& params = {}) : World{ params } {}
+
+					PhysicsWorld(const PhysicsWorld&) = delete;
+					PhysicsWorld& operator=(const PhysicsWorld&) = delete;
+
+					PhysicsWorld(PhysicsWorld&&) noexcept = default;
+					PhysicsWorld& operator=(PhysicsWorld&&) noexcept = default;
+				};
+			}
+		}
+	}
+
 	/**
 	 * @brief Anything connected to physics is in this namespace. Please refer to Box2D docs 'https://box2d.org/' for any details regarding physics.
 	 * @details Cori engine doesn't have a native physics engine and uses Box2D, so refer to Box2D docs 'https://box2d.org/' for any details on physics.
@@ -263,11 +283,6 @@ namespace Cori {
 			}
 		};
 
-		class PhysicsWorld : public World {
-		public:
-			PhysicsWorld() : World{ Params{} } {
-			}
-		};
 	}
 }
 

@@ -18,10 +18,10 @@ namespace Cori {
 		 */
 		[[maybe_unused]] static void Box2dDebugDraw(const glm::vec2 cameraSize, const glm::vec2 cameraPos, const int32_t pixelsPerMeter, Core::Layer* layer, const bool mouseDrag, const float mouseForce = 1000.0f) {
 			layer->m_DebugImGuiRenderer.ViewportCalc(cameraSize, pixelsPerMeter, cameraPos);
-			layer->m_DebugImGuiRenderer.DrawShapes(layer->ActiveScene.GetPhysicsWorld());
+			layer->m_DebugImGuiRenderer.DrawShapes(layer->ActiveScene.GetContextComponent<World::Components::Scene::PhysicsWorld>());
 			if (mouseDrag) {
 				if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) && !ImGui::IsAnyItemActive()) {
-					layer->m_DebugImGuiRenderer.HandleMouseDrag(layer->ActiveScene.GetPhysicsWorld(), mouseForce);
+					layer->m_DebugImGuiRenderer.HandleMouseDrag(layer->ActiveScene.GetContextComponent<World::Components::Scene::PhysicsWorld>(), mouseForce);
 				}
 				layer->m_DebugImGuiRenderer.DrawModeToggles();
 			}

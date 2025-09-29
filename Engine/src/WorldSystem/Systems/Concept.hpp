@@ -6,8 +6,8 @@ namespace Cori {
 		class System;
 
 		template<typename T, typename... Args>
-		concept IsSystem = requires(Args&&... args) {
-			{ T::Create(std::forward<Args>(args)...) } -> std::same_as<std::shared_ptr<T>>;
+		concept IsSystem = requires(T& a, Args&&... args) {
+			{ a.Create(std::forward<Args>(args)...) } -> std::convertible_to<bool>;
 			{ T::Priority } -> std::convertible_to<SystemPriority>;
 			requires std::derived_from<T, System>;
 		};

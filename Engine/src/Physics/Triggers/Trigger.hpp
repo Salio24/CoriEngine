@@ -2,6 +2,7 @@
 #include "TriggerBehaviour.hpp"
 #include "WorldSystem/Components.hpp"
 #include "Core/DataStructures/PackedArray.hpp"
+#include "WorldSystem/Systems/Trigger.hpp"
 
 #ifndef CORI_MAX_TRIGGER_VISITORS
 	#define CORI_MAX_TRIGGER_VISITORS 4
@@ -63,7 +64,7 @@ namespace Cori {
 					}
 
 				private:
-					friend World::Scene;
+					friend Systems::Trigger;
 					void OnEnter(World::Entity& entity);
 
 					void OnTickUpdate(const float timeStep);

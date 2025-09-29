@@ -3,8 +3,6 @@
 #include "Physics/Triggers/Trigger.hpp"
 #include "Graphics/Renderer2D.hpp"
 #include "Graphics/Animator/QuadAnimator.hpp"
-#include "StateSystem/StateMachine.hpp"
-#include "Systems/System.hpp"
 
 namespace Cori {
 	namespace World {
@@ -16,7 +14,7 @@ namespace Cori {
 			AddContextComponent<Components::Scene::Camera>();
 			m_ActiveCamera.BindCameraComponent(&GetContextComponent<Components::Scene::Camera>());
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Scene: '{}' created.", m_Name);
-			m_Registry.on_destroy<Components::Entity::Hierarchy>().connect<&Scene::OnHierarchyComponentDestroyed>(this);
+
 			[[maybe_unused]] auto nameAndTagGroup = m_Registry.group<Components::Entity::Name, Components::Entity::Tag>();
 		}
 
@@ -125,69 +123,18 @@ namespace Cori {
 				m_RegisteredSystems[type]->OnUpdate(gameTimer);
 			}
 
-
-			{
-				CORI_PROFILE_SCOPE("Recursive transform update");
-				UpdateTransform();
-			}
-
 			Graphics::Renderer2D::SubmitScene(this);
 			Graphics::Renderer2D::EndFrame(GetContextComponent<Components::Scene::Camera>());
 		}
 
 		void Scene::OnTickUpdate(Core::GameTimer& gameTimer) {
-			m_PhysicsWorld.Step(gameTimer.GetTimestep(), 4);
+			if (HasContextComponent<Components::Scene::PhysicsWorld>()) {
+				GetContextComponent<Components::Scene::PhysicsWorld>().Step(gameTimer.GetTimestep(), 4);
+			}
 
 			for (auto type : m_SystemPriority | std::views::values) {
 				m_RegisteredSystems[type]->OnTickUpdate(gameTimer);
 			}
-
-			EntityView fsmv = View<Components::Entity::StateMachine>(Exclude<Components::Entity::InactiveLocallyFlag>());
-
-			for (const auto entity : fsmv) {
-				fsmv.Get<Components::Entity::StateMachine>(entity).OnTickUpdate(gameTimer.GetTimestep());
-			}
-
-			EntityView animv = View<Components::Entity::QuadAnimator>(Exclude<Components::Entity::InactiveLocallyFlag>());
-
-			for (const auto entity : animv) {
-				animv.Get<Components::Entity::QuadAnimator>(entity).OnTickUpdate();
-			}
-
-			EntityView trigv = View<Components::Entity::Trigger>(Exclude<Components::Entity::InactiveLocallyFlag>());
-
-			for (const auto entity : trigv) {
-				trigv.Get<Components::Entity::Trigger>(entity).OnTickUpdate(gameTimer.GetTimestep());
-			}
-
-			auto [beginEvents, endEvents, beginCount, endCount] = m_PhysicsWorld.GetSensorEvents();
-
-			for (int32_t i = 0; i < beginCount; ++i)
-			{
-				const b2SensorBeginTouchEvent* beginTouch = beginEvents + i;
-
-				Entity& visitor = static_cast<Physics::BodyUserData*>(static_cast<Physics::ShapeRef>(beginTouch->visitorShapeId).GetBody().GetUserData())->m_Entity;
-
-				Entity& trigger = static_cast<Physics::BodyUserData*>(static_cast<Physics::ShapeRef>(beginTouch->sensorShapeId).GetBody().GetUserData())->m_Entity;
-
-				if (trigger.IsActiveGlobally()) {
-					trigger.GetComponents<Components::Entity::Trigger>().OnEnter(visitor);
-				}
-			}
-
-			for (int32_t i = 0; i < endCount; ++i)
-			{
-				const b2SensorEndTouchEvent* endTouch = endEvents + i;
-
-				Entity& visitor = static_cast<Physics::BodyUserData*>(static_cast<Physics::ShapeRef>(endTouch->visitorShapeId).GetBody().GetUserData())->m_Entity;
-
-				Entity& trigger = static_cast<Physics::BodyUserData*>(static_cast<Physics::ShapeRef>(endTouch->sensorShapeId).GetBody().GetUserData())->m_Entity;
-
-				if (trigger.IsActiveGlobally()) {
-					trigger.GetComponents<Components::Entity::Trigger>().OnExit(visitor);
-				}
-			}
-
 		}
 
 		void Scene::OnImGuiRender(Core::GameTimer& gameTimer) {
@@ -196,67 +143,12 @@ namespace Cori {
 			}
 		}
 
-		// ReSharper disable once CppMemberFunctionMayBeStatic
 		bool Scene::OnBind() {
 			return true;
 		}
 
-		// ReSharper disable once CppMemberFunctionMayBeStatic
 		bool Scene::OnUnbind() {
 			return true;
-		}
-
-		void Scene::UpdateTransform() {
-			const auto view1 = m_Registry.view<Components::Entity::Internal::DirtyTransformFlag>();
-
-			for (const auto entity : view1) {
-				UpdateTransformRecursive(entity, glm::mat3(1.0f), 1, false, false);
-			}
-			m_Registry.clear<Components::Entity::Internal::DirtyTransformFlag>();
-		}
-		void Scene::UpdateTransformRecursive(entt::entity entity, const glm::mat3& parentTransform, const uint8_t parentDepth, const bool parentTransformDirty, const bool parentDepthDirty) {
-			auto& transform = m_Registry.get<Components::Entity::Transform>(entity);
-			const bool transformDirty = transform.m_DirtyTransform || parentTransformDirty;
-			const bool layerDirty = transform.m_DirtyDepth || parentDepthDirty;
-
-			if (transformDirty) {
-				if (!transform.GetDetachedState()) {
-					transform.m_WorldTransform = parentTransform * transform.GetLocalTransform();
-					transform.m_LastParentTransform = parentTransform;
-				} else {
-					transform.m_WorldTransform = transform.m_LastParentTransform * transform.GetLocalTransform();
-				}
-				transform.m_DirtyTransform = false;
-			}
-			if (layerDirty) {
-				int16_t unclamped = parentDepth + transform.GetLocalDepthOffset();
-				if (unclamped < 0 || unclamped > 255) {
-					uint8_t clamped = static_cast<uint8_t>(std::clamp(unclamped, static_cast<int16_t>(0), static_cast<int16_t>(255)));
-					CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Final calculated depth for Entity '{}' is '{}' which is outside of allowed range [0, 255], it will be clamped to '{}'", Entity{ { m_Registry, entity } }.GetDebugData(), unclamped, clamped);
-					transform.m_WorldDepth = clamped;
-					transform.m_DirtyDepth = false;
-				} else {
-					transform.m_WorldDepth = static_cast<uint8_t>(unclamped);
-					transform.m_DirtyDepth = false;
-				}
-			}
-			const auto& hierarchy = m_Registry.get<Components::Entity::Hierarchy>(entity);
-			entt::entity currentChild = hierarchy.m_FirstChild;
-			while (m_Registry.valid(currentChild)) {
-				UpdateTransformRecursive(currentChild, transform.m_WorldTransform, transform.m_WorldDepth, transformDirty, layerDirty);
-				currentChild = m_Registry.get<Components::Entity::Hierarchy>(currentChild).m_NextSibling;
-			}
-
-		}
-
-		void Scene::OnHierarchyComponentDestroyed(entt::registry& registry, entt::entity entity) {
-			const auto& hierarchy = registry.get<Components::Entity::Hierarchy>(entity);
-			entt::entity currentChild = hierarchy.m_FirstChild;
-			while (registry.valid(currentChild)) {
-				const entt::entity nextChild = registry.get<Components::Entity::Hierarchy>(currentChild).m_NextSibling;
-				registry.destroy(currentChild); // This triggers a recursive call for grandchildren.
-				currentChild = nextChild;
-			}
 		}
 	}
 }

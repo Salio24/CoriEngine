@@ -9,8 +9,12 @@ namespace Cori {
 	namespace World {
 		class System {
 		public:
-			System() = default;
 			virtual ~System() = default;
+
+			System(const System&) = delete;
+			System& operator=(const System&) = delete;
+			System(System&&) = delete;
+			System& operator=(System&&) = delete;
 
 			virtual void OnUpdate([[maybe_unused]] Core::GameTimer& gameTimer) {}
 
@@ -20,6 +24,7 @@ namespace Cori {
 
 		protected:
 			SceneHandle m_Owner{ nullptr };
+			System() = default;
 		private:
 			friend Scene;
 			void SetOwnerScene(const Scene* scene);

@@ -26,6 +26,12 @@ namespace Cori {
 	 */
 	namespace World {
 		class Scene;
+
+		namespace Systems {
+			class Transform;
+			class Hierarchy;
+		}
+
 		/**
 		 * @brief Components that are used with the WorldSystem (ECS).
 		 */
@@ -98,7 +104,8 @@ namespace Cori {
 
 				private:
 					friend World::Entity;
-					friend World::Scene;
+					friend Systems::Transform;
+					friend Systems::Hierarchy;
 					friend struct Transform;
 					entt::entity m_Parent { entt::null };
 					entt::entity m_FirstChild { entt::null };
@@ -270,7 +277,7 @@ namespace Cori {
 					}
 
 				private:
-					friend World::Scene;
+					friend Systems::Transform;
 					glm::vec2 m_LocalPosition{ 0.0f, 0.0f };
 					glm::vec2 m_LocalScale{ 1.0f, 1.0f };
 					float m_LocalRotation{ 0.0f };
@@ -551,7 +558,7 @@ namespace Cori {
 				struct RigidBody : Physics::BodyRef {
 					/**
 					 * @brief Creates a RigidBody.
-					 * @param world World to create the RigidBody in. Get it with ActiveScene.GetPhysicsWorld().
+					 * @param world World to create the RigidBody in.
 					 * @param def Parameters to create a RigidBody with.
 					 * @param owner Owner Entity, you need to pass an Entity that owns this RigidBody.
 					 */

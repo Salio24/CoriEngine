@@ -89,19 +89,25 @@ namespace Cori {
 					return;
 				}
 
-				std::shared_ptr<T> system = T::Create(std::forward<Args>(args)...);
+				std::shared_ptr<T> system = std::make_shared<T>();
 				system->SetOwnerScene(this);
-				auto systemType = std::type_index(typeid(T));
-				m_SystemPriority.emplace_back(T::Priority, systemType);
-				ska_sort(
-					m_SystemPriority.begin(),
-					m_SystemPriority.end(),
-					[](const std::pair<SystemPriority, std::type_index>& entry) -> SystemPriority {
-						return entry.first;
-					});
+				const bool success = system->Create(std::forward<Args>(args)...);
+				if (success) {
+					auto systemType = std::type_index(typeid(T));
+					m_SystemPriority.emplace_back(T::Priority, systemType);
+					ska_sort(
+						m_SystemPriority.begin(),
+						m_SystemPriority.end(),
+						[](const std::pair<SystemPriority, std::type_index>& entry) -> SystemPriority {
+							return entry.first;
+						});
 
-				m_RegisteredSystems.insert({ systemType, std::move(system) });
-				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "System '{}' has been registered for scene '{}'", CORI_CLEAN_TYPE_NAME(T), m_Name);
+					m_RegisteredSystems.insert({ systemType, std::move(system) });
+					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "System '{}' has been registered for scene '{}'", CORI_CLEAN_TYPE_NAME(T), m_Name);
+					return;
+				}
+
+				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Failed to register System '{}' with scene '{}', Create returned false.", CORI_CLEAN_TYPE_NAME(T), m_Name);
 			}
 
 			template <typename T, typename... Args> requires IsSystem<T, Args...>
@@ -119,14 +125,6 @@ namespace Cori {
 				}
 
 				return std::unexpected(Core::CoriError("Failed to get system, system is not registered."));
-			}
-
-			[[nodiscard]] Physics::PhysicsWorld& GetPhysicsWorld() {
-				return m_PhysicsWorld;
-			}
-
-			[[nodiscard]] const  Physics::PhysicsWorld& GetPhysicsWorld() const {
-				return m_PhysicsWorld;
 			}
 
 			[[nodiscard]] Graphics::CameraController& GetCameraController() {
@@ -154,22 +152,14 @@ namespace Cori {
 
 			void OnImGuiRender(Core::GameTimer& gameTimer);
 
-
 			[[nodiscard]] static std::shared_ptr<Scene> Create(std::string name);
+
+			entt::registry m_Registry;
 		private:
 			//friend class Entity;
 			explicit Scene(std::string name);
 
-			entt::registry m_Registry;
-
-			void UpdateTransform();
-			void UpdateTransformRecursive(entt::entity entity, const glm::mat3& parentTransform, const uint8_t parentDepth, const bool parentTransformDirty, const bool parentDepthDirty);
-
-			void OnHierarchyComponentDestroyed(entt::registry& registry, entt::entity entity);
-
 			Graphics::CameraController m_ActiveCamera;
-
-			Physics::PhysicsWorld m_PhysicsWorld;
 
 			std::string m_Name;
 

@@ -2,6 +2,11 @@
 #include "Graphics/CameraController.hpp"
 #include "Core/Application.hpp"
 #include "Systems/System.hpp"
+#include "Systems/Trigger.hpp"
+#include "Systems/Animation.hpp"
+#include "Systems/StateMachine.hpp"
+#include "Systems/Hierarchy.hpp"
+#include "Systems/Transform.hpp"
 
 namespace Cori {
 	namespace World {
@@ -62,6 +67,11 @@ namespace Cori {
 
 			std::shared_ptr<Scene> scene = Scene::Create(name);
 			s_Data->m_Scenes.insert({ name, scene });
+			scene->RegisterSystem<Systems::Trigger>();
+			scene->RegisterSystem<Systems::Animation>();
+			scene->RegisterSystem<Systems::StateMachine>();
+			scene->RegisterSystem<Systems::Hierarchy>();
+			scene->RegisterSystem<Systems::Transform>();
 			return SceneHandle(scene);
 		}
 
