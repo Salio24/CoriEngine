@@ -56,3 +56,6 @@
 [submodule "Engine/thirdparty/tracy"]
 	path = Engine/thirdparty/tracy
 	url = https://github.com/wolfpld/tracy.git
+[submodule "Engine/thirdparty/ExprTK"]
+	path = Engine/thirdparty/ExprTK
+	url = https://github.com/ArashPartow/exprtk

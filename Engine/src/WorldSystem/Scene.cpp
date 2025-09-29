@@ -4,6 +4,7 @@
 #include "Graphics/Renderer2D.hpp"
 #include "Graphics/Animator/QuadAnimator.hpp"
 #include "StateSystem/StateMachine.hpp"
+#include "Systems/System.hpp"
 
 namespace Cori {
 	namespace World {
@@ -117,8 +118,13 @@ namespace Cori {
 			m_Registry.destroy(entity.GetRawEntity());
 		}
 
-		void Scene::OnUpdate([[maybe_unused]] const double deltaTime) {
+		void Scene::OnUpdate([[maybe_unused]] Core::GameTimer& gameTimer) {
 			CORI_PROFILE_FUNCTION();
+
+			for (auto type : m_SystemPriority | std::views::values) {
+				m_RegisteredSystems[type]->OnUpdate(gameTimer);
+			}
+
 
 			{
 				CORI_PROFILE_SCOPE("Recursive transform update");
@@ -129,13 +135,17 @@ namespace Cori {
 			Graphics::Renderer2D::EndFrame(GetContextComponent<Components::Scene::Camera>());
 		}
 
-		void Scene::OnTickUpdate(const float timeStep) {
-			m_PhysicsWorld.Step(timeStep, 4);
+		void Scene::OnTickUpdate(Core::GameTimer& gameTimer) {
+			m_PhysicsWorld.Step(gameTimer.GetTimestep(), 4);
+
+			for (auto type : m_SystemPriority | std::views::values) {
+				m_RegisteredSystems[type]->OnTickUpdate(gameTimer);
+			}
 
 			EntityView fsmv = View<Components::Entity::StateMachine>(Exclude<Components::Entity::InactiveLocallyFlag>());
 
 			for (const auto entity : fsmv) {
-				fsmv.Get<Components::Entity::StateMachine>(entity).OnTickUpdate(timeStep);
+				fsmv.Get<Components::Entity::StateMachine>(entity).OnTickUpdate(gameTimer.GetTimestep());
 			}
 
 			EntityView animv = View<Components::Entity::QuadAnimator>(Exclude<Components::Entity::InactiveLocallyFlag>());
@@ -147,7 +157,7 @@ namespace Cori {
 			EntityView trigv = View<Components::Entity::Trigger>(Exclude<Components::Entity::InactiveLocallyFlag>());
 
 			for (const auto entity : trigv) {
-				trigv.Get<Components::Entity::Trigger>(entity).OnTickUpdate(timeStep);
+				trigv.Get<Components::Entity::Trigger>(entity).OnTickUpdate(gameTimer.GetTimestep());
 			}
 
 			auto [beginEvents, endEvents, beginCount, endCount] = m_PhysicsWorld.GetSensorEvents();
@@ -178,6 +188,12 @@ namespace Cori {
 				}
 			}
 
+		}
+
+		void Scene::OnImGuiRender(Core::GameTimer& gameTimer) {
+			for (auto type : m_SystemPriority | std::views::values) {
+				m_RegisteredSystems[type]->OnImGuiRender(gameTimer);
+			}
 		}
 
 		// ReSharper disable once CppMemberFunctionMayBeStatic

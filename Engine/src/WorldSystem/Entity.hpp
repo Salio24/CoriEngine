@@ -18,6 +18,7 @@ namespace Cori {
 			/**
 			 * @brief Adds a component to the entity.
 			 * @tparam T Type of component to add.
+			 * @tparam Args Deduced automatically, no need to specify.
 			 * @param args Arguments passed to the component constructor.
 			 * @return A reference to the newly created component.
 			 */
@@ -29,6 +30,7 @@ namespace Cori {
 			/**
 			 * @brief Replaces the component with a newly created one.
 			 * @tparam T Type of component to replace.
+			 * @tparam Args Deduced automatically, no need to specify.
 			 * @param args Arguments passed to the component constructor.
 			 * @return A reference to the replaced component.
 			 */
@@ -40,6 +42,7 @@ namespace Cori {
 			/**
 			 * @brief Adds a component to the entity, or replaces it if the entity already has this component.
 			 * @tparam T Type of component to add or replace.
+			 * @tparam Args Deduced automatically, no need to specify.
 			 * @param args Arguments passed to the component constructor.
 			 * @return A reference to the newly created or replaced component.
 			 */
@@ -88,6 +91,7 @@ namespace Cori {
 			/**
 			 * @brief Retries or adds a component to the entity.
 			 * @tparam T Type of component to retrieve or add if absent.
+			 * @tparam Args Deduced automatically, no need to specify.
 			 * @param args Arguments passed to the component constructor in case of addition of the component.
 			 * @return Reference to the added or received component.
 			 */

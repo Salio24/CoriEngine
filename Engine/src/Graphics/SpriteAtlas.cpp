@@ -52,6 +52,10 @@ namespace Cori {
 			return m_Success;
 		}
 
+		std::string_view SpriteAtlas::GetName() const {
+			return m_Name;
+		}
+
 		std::shared_ptr<Texture2D> SpriteAtlas::GetTexture() const {
 			return m_Texture;
 		}

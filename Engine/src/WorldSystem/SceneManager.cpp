@@ -1,13 +1,28 @@
 #include "SceneManager.hpp"
 #include "Graphics/CameraController.hpp"
 #include "Core/Application.hpp"
+#include "Systems/System.hpp"
 
 namespace Cori {
 	namespace World {
 		SceneManager::Data* SceneManager::s_Data{ nullptr };
 
 		struct SceneManager::Data {
-			std::unordered_map<std::string, std::shared_ptr<Scene>> m_Scenes;
+			struct TransparentHash {
+				using is_transparent = void;
+				size_t operator()(std::string_view sv) const noexcept {
+					return std::hash<std::string_view>{}(sv);
+				}
+			};
+
+			struct TransparentEqual {
+				using is_transparent = void;
+				bool operator()(std::string_view lhs, std::string_view rhs) const noexcept {
+					return lhs == rhs;
+				}
+			};
+
+			std::unordered_map<std::string, std::shared_ptr<Scene>, TransparentHash, TransparentEqual> m_Scenes;
 		};
 
 		std::expected<SceneHandle, Core::CoriError<>> SceneManager::GetScene(const std::string& name) {
@@ -16,6 +31,14 @@ namespace Cori {
 			}
 
 			return SceneHandle(s_Data->m_Scenes.at(name));
+		}
+
+		std::expected<SceneHandle, Core::CoriError<>> SceneManager::GetScene(const std::string_view name) {
+			if (!s_Data->m_Scenes.contains(name)) {
+				return std::unexpected(Core::CoriError(std::format("No Scene with name '{}' exists.", name)));
+			}
+
+			return SceneHandle(s_Data->m_Scenes.find(name)->second);
 		}
 
 		void SceneManager::Init() {

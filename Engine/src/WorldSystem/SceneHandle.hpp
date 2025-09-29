@@ -158,6 +158,7 @@ namespace Cori {
 			/**
 			 * @brief Adds a component to the scene.
 			 * @tparam T Type of component to add.
+			 * @tparam Args Deduced automatically, no need to specify.
 			 * @param args Arguments passed to the component constructor.
 			 * @return A reference to the newly created component.
 			 */
@@ -211,6 +212,43 @@ namespace Cori {
 			void RemoveContextComponent() {
 				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
 				m_SceneRaw.lock()->RemoveContextComponent<T>();
+			}
+
+			/**
+			 * @brief Registers the system for the scene.
+			 * @tparam T System to register.
+			 * @tparam Args Deduced automatically, no need to specify.
+			 * @param args Arguments that will be passed to Create method of your system class.
+			 * @details Scene has full control of the system lifetime, the system will be kept alive for as long as the scene is alive, but you can also explicitly unregister the system.
+			 */
+			template <typename T, typename... Args> requires IsSystem<T, Args...>
+			void RegisterSystem(Args&&... args) {
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				m_SceneRaw.lock()->RegisterSystem<T>(std::forward<Args>(args)...);
+			}
+
+			/**
+			 * @brief Unregisters the system from the scene.
+			 * @tparam T System to unregister.
+			 * @tparam Args Deduced automatically, no need to specify.
+			 * @note It is safe to call this method with a T system that is not registered.
+			 */
+			template <typename T, typename... Args> requires IsSystem<T, Args...>
+			void UnregisterSystem() {
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				m_SceneRaw.lock()->UnregisterSystem<T>();
+			}
+
+			/**
+			 * @brief Retries a registered system instance from the scene.
+			 * @tparam T System to retrieve.
+			 * @tparam Args Deduced automatically, no need to specify.
+			 * @return Weak pointer to the requested system instance.
+			 */
+			template <typename T, typename... Args> requires IsSystem<T, Args...>
+			[[nodiscard]] std::expected<std::weak_ptr<T>, Core::CoriError<>> GetSystem() {
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->GetSystem<T>();
 			}
 
 			/**
@@ -268,15 +306,21 @@ namespace Cori {
 
 		protected:
 			friend Core::Layer;
-			void OnUpdate(const double deltaTime) {
+			void OnUpdate(Core::GameTimer& gameTimer) {
 				if (!m_SceneRaw.expired()) {
-					m_SceneRaw.lock()->OnUpdate(deltaTime);
+					m_SceneRaw.lock()->OnUpdate(gameTimer);
 				}
 			}
 
-			void OnTickUpdate(const float timeStep) {
+			void OnTickUpdate(Core::GameTimer& gameTimer) {
 				if (!m_SceneRaw.expired()) {
-					m_SceneRaw.lock()->OnTickUpdate(timeStep);
+					m_SceneRaw.lock()->OnTickUpdate(gameTimer);
+				}
+			}
+
+			void OnImGuiRender(Core::GameTimer& gameTimer) {
+				if (!m_SceneRaw.expired()) {
+					m_SceneRaw.lock()->OnImGuiRender(gameTimer);
 				}
 			}
 

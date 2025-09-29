@@ -28,6 +28,7 @@ namespace Cori {
 		public:
 			/**
 			 * @brief Constructs CoriError object and formats the final error message.
+			 * @tparam Args Deduced automatically, no need to specify.
 			 * @param message Main error message.
 			 * @param args Pairs descriptions and values for each DeclaredTypes.
 			 */

@@ -39,6 +39,7 @@ namespace Cori {
 					/**
 					 * @brief Registers an EntityState with a StateMachine, you need to register a state before using it.
 					 * @tparam StateType State type to register.
+					 * @tparam Args Deduced automatically, no need to specify.
 					 * @param args Arguments to the constructor of the StateType to use.
 					 */
 					template<std::derived_from<EntityState> StateType, typename... Args>

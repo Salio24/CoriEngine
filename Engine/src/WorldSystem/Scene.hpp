@@ -4,6 +4,9 @@
 #include "Graphics/CameraController.hpp"
 #include "Physics/Physics.hpp"
 #include "EntityView.hpp"
+#include "Core/Time.hpp"
+#include "Systems/Concept.hpp"
+#include <ska_sort.hpp>
 
 namespace Cori {
 	namespace Core {
@@ -79,6 +82,44 @@ namespace Cori {
 				m_Registry.ctx().erase<T>();
 			}
 
+			template <typename T, typename... Args> requires IsSystem<T, Args...>
+			void RegisterSystem(Args&&... args) {
+				if (m_RegisteredSystems.contains(std::type_index(typeid(T)))) {
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Trying to register '{}' twice for scene '{}', you can't register a system twice.", CORI_CLEAN_TYPE_NAME(T), m_Name);
+					return;
+				}
+
+				std::shared_ptr<T> system = T::Create(std::forward<Args>(args)...);
+				system->SetOwnerScene(this);
+				auto systemType = std::type_index(typeid(T));
+				m_SystemPriority.emplace_back(T::Priority, systemType);
+				ska_sort(
+					m_SystemPriority.begin(),
+					m_SystemPriority.end(),
+					[](const std::pair<SystemPriority, std::type_index>& entry) -> SystemPriority {
+						return entry.first;
+					});
+
+				m_RegisteredSystems.insert({ systemType, std::move(system) });
+				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "System '{}' has been registered for scene '{}'", CORI_CLEAN_TYPE_NAME(T), m_Name);
+			}
+
+			template <typename T, typename... Args> requires IsSystem<T, Args...>
+			void UnregisterSystem() {
+				if (m_RegisteredSystems.contains(std::type_index(typeid(T)))) {
+					m_RegisteredSystems.erase(std::type_index(typeid(T)));
+					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "System '{}' has been unregistered for scene '{}'", CORI_CLEAN_TYPE_NAME(T), m_Name);
+				}
+			}
+
+			template <typename T, typename... Args> requires IsSystem<T, Args...>
+			std::expected<std::weak_ptr<T>, Core::CoriError<>> GetSystem() {
+				if (m_RegisteredSystems.contains(std::type_index(typeid(T)))) {
+					return std::weak_ptr<T>(std::static_pointer_cast<T>(m_RegisteredSystems[std::type_index(typeid(T))]));
+				}
+
+				return std::unexpected(Core::CoriError("Failed to get system, system is not registered."));
+			}
 
 			[[nodiscard]] Physics::PhysicsWorld& GetPhysicsWorld() {
 				return m_PhysicsWorld;
@@ -107,9 +148,11 @@ namespace Cori {
 			[[nodiscard]] bool OnBind();
 			[[nodiscard]] bool OnUnbind();
 
-			void OnUpdate(const double deltaTime);
+			void OnUpdate(Core::GameTimer& gameTimer);
 
-			void OnTickUpdate(const float timeStep);
+			void OnTickUpdate(Core::GameTimer& gameTimer);
+
+			void OnImGuiRender(Core::GameTimer& gameTimer);
 
 
 			[[nodiscard]] static std::shared_ptr<Scene> Create(std::string name);
@@ -129,6 +172,9 @@ namespace Cori {
 			Physics::PhysicsWorld m_PhysicsWorld;
 
 			std::string m_Name;
+
+			std::unordered_map<std::type_index, std::shared_ptr<System>> m_RegisteredSystems;
+			std::vector<std::pair<SystemPriority, std::type_index>> m_SystemPriority;
 
 			std::unordered_map<Core::UUID, entt::entity> m_UUIDToEntity;
 			std::unordered_map<Utility::StringHash32, entt::entity> m_EntityCache;

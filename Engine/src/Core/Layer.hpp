@@ -60,12 +60,10 @@ namespace Cori {
 			 */
 			void SetModal(const bool state) { m_Modal = state; }
 
-
 			/**
 			 * @brief Checks if the Layer is modal.
 			 */
 			[[nodiscard]] bool IsModal() const { return m_Modal; }
-
 
 			/**
 			 * @brief Returns the name of the Layer.
@@ -89,19 +87,23 @@ namespace Cori {
 			/**
 			 * @brief A SceneHandle to the Scene that is currently bound.
 			 */
-			World::SceneHandle ActiveScene{nullptr};
+			World::SceneHandle ActiveScene{ nullptr };
 
 			inline static Physics::DebugImguiRenderer m_DebugImGuiRenderer;
 
 		private:
 			friend class Application;
 
-			void SceneUpdate(const double deltaTime) {
-				ActiveScene.OnUpdate(deltaTime);
+			void SceneUpdate(GameTimer& gameTimer) {
+				ActiveScene.OnUpdate(gameTimer);
 			}
 
-			void SceneTickrateUpdate(const float timeStep) {
-				ActiveScene.OnTickUpdate(timeStep);
+			void SceneTickrateUpdate(GameTimer& gameTimer) {
+				ActiveScene.OnTickUpdate(gameTimer);
+			}
+
+			void SceneImGuiRender(GameTimer& gameTimer) {
+				ActiveScene.OnImGuiRender(gameTimer);
 			}
 
 			bool m_Modal{ false };

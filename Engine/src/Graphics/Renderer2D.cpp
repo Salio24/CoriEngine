@@ -408,7 +408,7 @@ namespace Cori {
 
 			constexpr std::u32string_view SEPARATORS = U" \a\b\t\n\v\f\r";
 
-			static auto FindNextWord = [&](const std::u32string_view textView, const size_t startIndex) -> std::tuple<std::u32string_view, std::u32string_view, size_t> /* skippedPart, wordPart, wordEndIndex */ {
+			auto FindNextWord = [&](const std::u32string_view textView, const size_t startIndex) -> std::tuple<std::u32string_view, std::u32string_view, size_t> /* skippedPart, wordPart, wordEndIndex */ {
 				if (startIndex >= textView.length()) {
 					// nothing beyond startIndex, out of bounds
 					return {{}, {}, std::u32string_view::npos};
@@ -436,7 +436,7 @@ namespace Cori {
 				return {skipped, word, wordEnd};
 			};
 
-			static auto GetNextChar = [&](const uint32_t currentIndex, const std::u32string_view& localView) -> char32_t {
+			auto GetNextChar = [&](const uint32_t currentIndex, const std::u32string_view& localView) -> char32_t {
 				if (currentIndex + 1 < localView.size()) {
 					// not the last from localView
 					return localView[currentIndex + 1];
@@ -452,7 +452,7 @@ namespace Cori {
 				return *(localView.data() + localView.size() + 1);
 			};
 
-			static auto ProcessGlyph = [&](const uint32_t index, const std::u32string_view& localView) {
+			auto ProcessGlyph = [&](const uint32_t index, const std::u32string_view& localView) {
 				if (s_Data->CharInstanceCount > RendererData::MaxCharInstanceCount) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Renderer2D }, "Trying to render more than '{}' in one go. Aborting further rendering of this 'Text' piece.", RendererData::MaxCharInstanceCount);
 					return;
@@ -505,7 +505,7 @@ namespace Cori {
 			};
 
 
-			static auto PreprocessWord = [&](const std::u32string_view& word) -> float {
+			auto PreprocessWord = [&](const std::u32string_view& word) -> float {
 				float totalWordAdvance = 0.0f;
 
 				for (uint32_t i = 0; i < word.size(); i++) {
@@ -520,19 +520,19 @@ namespace Cori {
 				return totalWordAdvance;
 			};
 
-			static auto GoToNewLine = [&] {
+			auto GoToNewLine = [&] {
 				switch (text.m_Alignment) {
 				case LEFT:
 					{
 						const float offset = totalLineLength;
-						//SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
+						//SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 1.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
 
 						break;
 					}
 				case CENTER:
 					{
 						const float offset = -(totalLineLength / 2.0f);
-						//SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
+						//SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 1.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
 						EndCharInstancedSet(atlas.get(), glm::translate(glm::mat3(1.0f), glm::vec2(offset, 0.0f)));
 						BeginCharInstancedSet();
 						break;
@@ -540,7 +540,7 @@ namespace Cori {
 				case RIGHT:
 					{
 						const float offset = -totalLineLength;
-						//SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
+						//SubmitQuad(SCREEN_SPACE, OPAQUE, glm::translate(text.m_Transform, glm::vec2(offset, y)), glm::vec2(0.5f, 0.5f), glm::vec4(0.0f, 1.0f, 1.0f, 1.0f), nullptr, UVs{}, 15, false, false, true);
 						EndCharInstancedSet(atlas.get(), glm::translate(glm::mat3(1.0f), glm::vec2(offset, 0.0f)));
 						BeginCharInstancedSet();
 						break;

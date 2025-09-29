@@ -104,7 +104,7 @@ namespace Cori {
 		};
 
 		/**
-		 * @brief You can use this to manual time something.
+		 * @brief You can use this to manually time something.
 		 */
 		class ManualTimer {
 		public:
@@ -114,14 +114,13 @@ namespace Cori {
 			/**
 			 * @brief Start the manual timer.
 			 */
-
 			void Start();
 
 			/**
 			 * @brief Stops the manual timer.
 			 * @return Elapsed time in milliseconds.
 			 */
-			double End() const;
+			[[nodiscard]] double End() const;
 		private:
 			uint64_t m_Start{ 0 };
 		};

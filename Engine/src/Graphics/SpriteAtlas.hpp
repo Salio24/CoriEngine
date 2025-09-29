@@ -85,6 +85,12 @@ namespace Cori {
 			[[nodiscard]] bool GetSuccessStatus() const;
 
 			/**
+			 * @brief Retrieves the name of the SpriteAtlas.
+			 * @return View to the name of the atlas.
+			 */
+			[[nodiscard]] std::string_view GetName() const;
+
+			/**
 			 * @brief Retrieves the Texture2D stored in the SpriteAtlas.
 			 * @return Shared pointer to the Texture2D.
 			 */

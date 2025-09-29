@@ -31,7 +31,7 @@ namespace Cori {
 			Graphics::Internal::API::Init();
 			Audio::Mixer::Init();
 
-			m_GameTimer.SetTickrate(60);
+			m_GameTimer.SetTickrate(120);
 			m_GameTimer.SetTickrateUpdateFunc(CORI_BIND_EVENT_FN(Application::TickrateUpdate, CORI_PLACEHOLDERS(1)));
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self }, "Cori Engine started.");
 		}
@@ -113,7 +113,7 @@ namespace Cori {
 
 					for (Layer* layer : m_LayerStack) {
 						layer->OnUpdate(m_GameTimer);
-						layer->SceneUpdate(m_GameTimer.GetDeltaTime());
+						layer->SceneUpdate(m_GameTimer);
 						if (layer->IsModal()) {
 							break;
 						}
@@ -124,6 +124,7 @@ namespace Cori {
 					if (m_RenderImGui) {
 						for (Layer* layer : m_LayerStack) {
 							layer->OnImGuiRender(m_GameTimer);
+							layer->SceneImGuiRender(m_GameTimer);
 							if (layer->IsModal()) {
 								break;
 							}
@@ -139,11 +140,9 @@ namespace Cori {
 			}
 		}
 
-
-
 		void Application::TickrateUpdate(GameTimer& gameTimer) {
 			for (Layer* layer : m_LayerStack) {
-				layer->SceneTickrateUpdate(gameTimer.GetTimestep());
+				layer->SceneTickrateUpdate(gameTimer);
 				layer->OnTickUpdate(gameTimer);
 				if (layer->IsModal()) {
 					break;

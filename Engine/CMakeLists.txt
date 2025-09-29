@@ -150,6 +150,9 @@ project(CoriEngine)
     set(TRACY_ON_DEMAND ON CACHE BOOL "")
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/tracy EXCLUDE_FROM_ALL)
 
+    #ExprTK
+    add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/ExprTK EXCLUDE_FROM_ALL)
+
 
 # project's binary setup vvv
 
@@ -246,7 +249,7 @@ project(CoriEngine)
     #target_link_libraries()
 
     # should be public
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite Tracy::TracyClient)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite Tracy::TracyClient exprtk)
 
     # can be private 
     target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static msdf-atlas-gen glad_gl_core_46)

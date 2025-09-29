@@ -102,6 +102,12 @@ namespace Cori {
 
 			};
 
+			struct Math {
+				static constexpr char Self[] = "Math";
+
+				static constexpr char Function[] = "Function";
+			};
+
 			struct World {
 				static constexpr char Self[] = "World";
 

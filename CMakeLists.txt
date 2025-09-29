@@ -32,7 +32,7 @@ option(CORI_BUILD_DOCS "Build CoriEngine documentation" OFF)
 option(CORI_SANITIZE "Enable address sanitization" OFF)
 option(CORI_USE_AVX2 "Allows the use of AVX2 in thirdparty libs" ON)
 option(CORI_FORCE_AVX2 "Force AVX2, default OFF, -march=native is used by default" OFF)
-option(CORI_ENABLE_TRACY_PROFILER "Enables Tracy profiler in debug builds" ON)
+option(CORI_ENABLE_TRACY_PROFILER "Enables Tracy profiler in debug builds" OFF)
 
 if (NOT CORI_USE_AVX2)
     set(CORI_FORCE_AVX2 OFF)
@@ -60,7 +60,8 @@ project(main)
             (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/imgui/LICENSE.txt") AND
             (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/stduuid/CMakeLists.txt") AND
             (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/utfcpp/CMakeLists.txt") AND
-            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/msdf-atlas-gen/CMakeLists.txt")
+            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/msdf-atlas-gen/CMakeLists.txt") AND
+            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/ExprTK/CMakeLists.txt")
             ))
         message(FATAL_ERROR "CoriEngine thirdparty dependencies not found. Are you sure you cloned the repo recursively? Try running 'git submodule update --init --recursive' to download dependencies.")
     endif()

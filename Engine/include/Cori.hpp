@@ -40,11 +40,13 @@
 
 #include "../src/WorldSystem/Scene.hpp"
 #include "../src/WorldSystem/SceneManager.hpp"
+#include "../src/WorldSystem/Systems/System.hpp"
 
 #include "../src/Physics/Physics.hpp"
 #include "../src/Physics/Triggers/Trigger.hpp"
 
-#include "../src/Math/Math.hpp"
+#include "../src/Math/Sign.hpp"
+#include "../src/Math/Function.hpp"
 
 #include "../src/StateSystem/StateMachine.hpp"
 

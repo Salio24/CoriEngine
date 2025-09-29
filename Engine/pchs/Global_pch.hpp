@@ -35,6 +35,7 @@
 #include <fstream>
 #include <concepts>
 #include <numeric>
+#include <numbers>
 #include <bit>
 #include <any>
 #include <variant>
