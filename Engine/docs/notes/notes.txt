@@ -1,11 +1,18 @@
 classes to doc:
 Math::Function
 World::System
+FileSystem::BinaryFileManager
+FileSystem::PathManager
+World::DisposableEntityPool
+
+
+all anim sys
 
 funcs to doc:
-
-
+Entity DestroyChildren
+SceneManager Scene handle
+Entity GetOwnerSceneID
+Trigger HasBehaviour
 
 TODO:
 
-add SceneID

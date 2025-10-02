@@ -48,6 +48,11 @@ namespace Cori {
 						return static_cast<Behavior*>(m_Behavior.get());
 					}
 
+					template<typename Behavior>
+					bool HasBehaviour() const {
+						return m_BehaviourType == std::type_index(typeid(Behavior));
+					}
+
 					/**
 					 * @brief Retries the pointer to the active behaviour instance.
 					 * @tparam Behavior A behavior type derived from TriggerBehaviour. This needs to be the same that you used when setting the behavior with SetBehavior().

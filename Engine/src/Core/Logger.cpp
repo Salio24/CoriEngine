@@ -18,6 +18,8 @@ namespace Cori {
 	std::unordered_set<std::string, Logger::StringHash, std::equal_to<>> Logger::s_CoreInactiveTags;
 	std::unordered_set<std::string, Logger::StringHash, std::equal_to<>> Logger::s_ClientInactiveTags;
 
+	bool Logger::s_Initialized = false;
+
 	void Logger::EnableVirtualTerminalProcessing() {
 #ifdef PLATFORM_WINDOWS
 		HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -81,12 +83,17 @@ namespace Cori {
 		s_ClientLogger->set_level(spdlog::level::trace);
 		s_ClientLogger->flush_on(spdlog::level::warn);
 
+		s_Initialized = true;
 
 		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "------------- NEW LOG SESSION -------------");
 		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "|  Logger initialized. Mode: {} |", async ? "Asynchronous" : "Synchronous ");
 		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "-------------------------------------------");
 		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "|     File logging is: {}           |", fileWrite ? "Enabled " : "Disabled");
 		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "-------------------------------------------");
+	}
+
+	bool Logger::GetStatus() {
+		return s_Initialized;
 	}
 
 	void Logger::SetClientLogLevel(const LogLevel level) {

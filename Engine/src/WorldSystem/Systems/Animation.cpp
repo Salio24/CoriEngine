@@ -15,6 +15,27 @@ namespace Cori {
 			}
 
 			bool Animation::Create() {
+				m_EntityPool.Init(m_Owner,
+				[](SceneHandle& scene) -> Entity {
+					static uint32_t count = 0;
+					Entity entity = scene.CreateEntity(std::format("Temporary entity {}", count), EntityTags::DisposableEntity);
+					entity.AddComponent<Components::Entity::QuadRenderer>();
+					entity.AddComponent<Components::Entity::QuadAnimator>(entity);
+					++count;
+					return entity;
+				},
+				[](Entity& entity) {
+					auto& tr = entity.GetComponents<Components::Entity::Transform>();
+					tr.SetLocalPosition({ 0.0f, 0.0f });
+					tr.SetLocalDepth(0);
+					tr.SetLocalScale({ 1.0f, 1.0f });
+					tr.SetLocalRotation(0.0f);
+
+					entity.UnlinkFromParent();
+					entity.DestroyChildren();
+				});
+
+
 				return true;
 			}
 		}

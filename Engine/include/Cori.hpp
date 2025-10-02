@@ -12,6 +12,7 @@
 #include "../src/Utility/Random.hpp"
 #include "../src/Utility/StringHash.hpp"
 #include "../src/Utility/HashedTag.hpp"
+#include "../src/Utility/AggregateStructUID.hpp"
 
 #include "../src/Core/ImGuiLayer.hpp"
 #include "../src/ImGui/ImGuiPresets.hpp"
@@ -35,12 +36,21 @@
 #include "../src/AssetManager/AssetManager.hpp"
 
 #include "../src/FileSystem/JsonSerializer.hpp"
+#include "../src/FileSystem/BinaryFileManager.hpp"
+#include "../src/FileSystem/FileManager.hpp"
+#include "../src/FileSystem/PathManager.hpp"
 
 #include "../src/Profiling/Profiler.hpp"
 
 #include "../src/WorldSystem/Scene.hpp"
 #include "../src/WorldSystem/SceneManager.hpp"
+#include "../src/WorldSystem/DisposableEntityPool.hpp"
 #include "../src/WorldSystem/Systems/System.hpp"
+#include "../src/WorldSystem/Systems/Animation.hpp"
+#include "../src/WorldSystem/Systems/Hierarchy.hpp"
+#include "../src/WorldSystem/Systems/StateMachine.hpp"
+#include "../src/WorldSystem/Systems/Transform.hpp"
+#include "../src/WorldSystem/Systems/Trigger.hpp"
 
 #include "../src/Physics/Physics.hpp"
 #include "../src/Physics/Triggers/Trigger.hpp"

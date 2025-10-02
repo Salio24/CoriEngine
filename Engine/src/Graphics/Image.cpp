@@ -1,6 +1,6 @@
 #include "Image.hpp"
-#include <PathDefinesGenerated.hpp>
 #include <SDL3_image/SDL_image.h>
+#include "FileSystem/PathManager.hpp"
 
 namespace {
 	[[nodiscard]] Uint32 GetPixel32(const SDL_Surface* surface, const int32_t x, const int32_t y) {
@@ -17,7 +17,7 @@ namespace {
 namespace Cori {
 	namespace Graphics {
 		Image::Image(const std::filesystem::path& path) {
-			const std::filesystem::path placeholder = FileSystem::Internal::PathDefines::GetEngineDataRoot() / "/placeholders/missing_texture32.png";
+			const std::filesystem::path placeholder = FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "placeholders/missing_texture32.png";
 			if (std::filesystem::exists(path)) {
 				m_Surface = IMG_Load(path.string().c_str());
 			} else {

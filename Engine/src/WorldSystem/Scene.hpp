@@ -139,6 +139,10 @@ namespace Cori {
 				return m_Name;
 			}
 
+			[[nodiscard]] uint32_t GetSceneID() const {
+				return m_SceneID;
+			}
+
 		protected:
 			//friend Core::Layer;
 			friend class SceneHandle;
@@ -158,6 +162,8 @@ namespace Cori {
 		private:
 			//friend class Entity;
 			explicit Scene(std::string name);
+
+			uint32_t m_SceneID;
 
 			Graphics::CameraController m_ActiveCamera;
 

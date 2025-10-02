@@ -2,7 +2,7 @@
 #include "Graphics/RenderingContext.hpp"
 #include <backends/imgui_impl_sdl3.h>
 #include <SDL3_image/SDL_image.h>
-#include <PathDefinesGenerated.hpp>
+#include "FileSystem/PathManager.hpp"
 #include "EventSystem/AppEvent.hpp"
 #include "EventSystem/KeyEvent.hpp"
 #include "EventSystem/MouseEvent.hpp"
@@ -95,7 +95,7 @@ namespace Cori {
 
 			CORI_CORE_ASSERT(m_Data->m_Window, "Failed to create Window '{}'. SDL_Error: {}", m_Data->m_WindowTitle, SDL_GetError());
 
-			const auto logoPath = std::filesystem::path(FileSystem::Internal::PathDefines::GetEngineDataRoot()) / std::filesystem::path("ui/logo256.png");
+			const auto logoPath = FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / std::filesystem::path("ui/logo256.png");
 			SDL_Surface* logo = IMG_Load(logoPath.string().c_str());
 
 			if (!logo) {

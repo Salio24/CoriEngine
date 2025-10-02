@@ -25,7 +25,9 @@ namespace Cori {
 
 		Entity Scene::CreateBlankEntity() {
 			entt::entity entity = m_Registry.create();
-			return Entity{{m_Registry, entity}};
+			Entity e = entt::handle{m_Registry, entity};
+			e.m_OwningSceneID = m_SceneID;
+			return e;
 		}
 
 		Entity Scene::CreateEntity(const std::string& name, const Utility::HashedTag64& tag) {
@@ -39,6 +41,7 @@ namespace Cori {
 			CORI_CORE_TRACE_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Created Entity With ID: {}, Version: {}, Name: {}, Tag: {}", entt::to_integral(entity), entt::to_version(entity), name, tag.GetDebugName());
 			Entity e = entt::handle{m_Registry, entity};
 			e.AddComponent<Components::Entity::Transform>(e);
+			e.m_OwningSceneID = m_SceneID;
 			return e;
 		}
 

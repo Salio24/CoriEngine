@@ -1,17 +1,15 @@
 #pragma once
 #include "AnimationPack.hpp"
 #include "WorldSystem/Entity.hpp"
-#include "WorldSystem/Components.hpp"
 
 namespace Cori {
 	namespace World {
+		namespace Systems {
+			class Animation;
+		}
 		namespace Components {
 			namespace Entity {
 				using AnimationStopCallbackFn = std::function<void()>;
-				using AnimationWithParams = std::pair<Graphics::Animation, Graphics::Animation::PlayParams>;
-
-				template<typename T>
-				concept IsAnimationWithParams = std::is_same_v<T, AnimationWithParams>;
 
 				class QuadAnimator {
 				public:
@@ -21,10 +19,8 @@ namespace Cori {
 					~QuadAnimator();
 
 					void SetStopCallback(AnimationStopCallbackFn callback);
-					void SetNextTickCallback(AnimationStopCallbackFn callback);
 
-
-					void Play(const IsAnimationWithParams auto&... sequence) {
+					void Play(const Graphics::IsAnimationWithParams auto&... sequence) {
 						m_AnimationSequence.clear();
 						m_AnimationSequence.reserve(sizeof...(sequence));
 						(m_AnimationSequence.emplace_back(sequence), ...);
@@ -56,9 +52,14 @@ namespace Cori {
 
 					[[nodiscard]] uint64_t GetTicksElapsed() const;
 
+				protected:
+					friend Systems::Animation;
+
+					void SetEngineStopCallback(AnimationStopCallbackFn callback);
+
 				private:
 					AnimationStopCallbackFn m_StopCallBack;
-					AnimationStopCallbackFn m_NextTickCallBack;
+					AnimationStopCallbackFn m_EngineCallBack;
 					bool m_ActiveSequence;
 					float m_SizeScale{ 1.0f };
 					uint16_t m_LoopStartIndex{ 0xFFFF };
@@ -68,7 +69,7 @@ namespace Cori {
 					uint32_t m_CurrentFrameTick{ 0 };
 					uint64_t m_TicksElapsedSinceStart{ 0 };
 
-					std::vector<AnimationWithParams> m_AnimationSequence;
+					std::vector<Graphics::AnimationWithParams> m_AnimationSequence;
 					World::Entity m_Entity{};
 				};
 			}

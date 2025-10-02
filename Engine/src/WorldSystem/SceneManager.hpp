@@ -34,6 +34,8 @@ namespace Cori {
 			 */
 			[[nodiscard]] static std::expected<SceneHandle, Core::CoriError<>> GetScene(const std::string_view name);
 
+			[[nodiscard]] static std::expected<SceneHandle, Core::CoriError<>> GetHandle(const uint32_t sceneID);
+
 			/**
 			 * @brief Destroys a scene with the specified name.
 			 * @param name Name of the scene to delete.

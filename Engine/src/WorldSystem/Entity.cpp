@@ -153,6 +153,21 @@ namespace Cori {
 			return std::unexpected(Core::CoriError("No children found with the specified name."));
 		}
 
+		void Entity::DestroyChildren() {
+			entt::registry* registry = m_EntityHandle.registry();
+			const auto& hierarchy = registry->get<Components::Entity::Hierarchy>(GetRawEntity());
+			if (registry->all_of<Components::Entity::ChildCache>(GetRawEntity())) {
+				auto& cache = registry->get<Components::Entity::ChildCache>(GetRawEntity());
+				cache.m_Children.clear();
+			}
+			entt::entity currentChild = hierarchy.m_FirstChild;
+			while (registry->valid(currentChild)) {
+				const entt::entity nextChild = registry->get<Components::Entity::Hierarchy>(currentChild).m_NextSibling;
+				registry->destroy(currentChild);
+				currentChild = nextChild;
+			}
+		}
+
 		void Entity::PrintHierarchy() const {
 			CORI_CORE_ASSERT((HasComponents<Components::Entity::Hierarchy, Components::Entity::Name>()), "Calling PrintHierarchy on an Entity that doesn't have on of those components <Hierarchy, Name>. This is illegal.");
 			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self }, "Printing full hierarchy tree of '{}'", GetComponents<Components::Entity::Name>().m_Name);
@@ -214,7 +229,6 @@ namespace Cori {
 			const entt::entity parent = hierarchy.m_Parent;
 			if (!registry->valid(parent)) { return; }
 
-
 			auto& cache = registry->get<Components::Entity::ChildCache>(parent);
 			cache.m_Children.erase(GetComponents<Components::Entity::Name>().m_Name);
 
@@ -225,7 +239,9 @@ namespace Cori {
 			if (parentHierarchy.m_FirstChild == m_EntityHandle.entity()) {
 				parentHierarchy.m_FirstChild = nextSibling;
 			} else {
-				registry->get<Components::Entity::Hierarchy>(previousSibling).m_NextSibling = nextSibling;
+				if (registry->valid(previousSibling)) {
+					registry->get<Components::Entity::Hierarchy>(previousSibling).m_NextSibling = nextSibling;
+				}
 			}
 
 			if (registry->valid(nextSibling)) {
@@ -233,8 +249,8 @@ namespace Cori {
 			}
 
 			hierarchy.m_Parent = entt::null;
-			parentHierarchy.m_NextSibling = entt::null;
-			parentHierarchy.m_PreviousSibling = entt::null;
+			hierarchy.m_NextSibling = entt::null;
+			hierarchy.m_PreviousSibling = entt::null;
 			UpdateInactivityFlagsRecursive(m_EntityHandle.entity(), true);
 		}
 

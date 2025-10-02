@@ -61,7 +61,9 @@ project(main)
             (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/stduuid/CMakeLists.txt") AND
             (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/utfcpp/CMakeLists.txt") AND
             (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/msdf-atlas-gen/CMakeLists.txt") AND
-            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/ExprTK/CMakeLists.txt")
+            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/ExprTK/CMakeLists.txt") AND
+            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/pfr/CMakeLists.txt")
+
             ))
         message(FATAL_ERROR "CoriEngine thirdparty dependencies not found. Are you sure you cloned the repo recursively? Try running 'git submodule update --init --recursive' to download dependencies.")
     endif()

@@ -12,33 +12,14 @@ namespace Cori {
 		}
 	}
 	namespace Graphics {
-		class AnimationPack;
-
-		struct Animation {
-			struct PlayParams {
-				// TODO: implement the logic that uses all this parameters
-				uint32_t Loops{ 0 };
-				uint32_t MaxFrames{ 0 };
-				uint32_t StartFrame{ 0 };
-				uint32_t MaxTicks{ 0 };
-				uint32_t StartTick{ 0 };
-				bool LoopedInSequence{ false };
-			};
-
-			//AnimationData m_Data;
-			//std::shared_ptr<Texture2D> m_Texture;
-			//glm::vec2 m_Size;
-
-			std::shared_ptr<AnimationPack> m_Pack;
-			uint32_t m_AnimationID{ 0 };
-		};
-
 
 		class AnimationPack : public Profiling::Trackable<AnimationPack>, public std::enable_shared_from_this<AnimationPack>{
 		public:
 			enum ConfigType : uint8_t {
 				ASEPRITE,
-				CORI
+				CORI_UNIFORM,
+				CORI_VARYING,
+				INVALID
 			};
 
 			class Descriptor {
@@ -81,15 +62,22 @@ namespace Cori {
 			[[nodiscard]] Animation GetAnimation(const uint32_t index);
 
 		protected:
+			friend Animation;
 			friend World::Components::Entity::QuadAnimator;
 			std::vector<AnimationData> m_Animations;
-			std::shared_ptr<SpriteAtlas> m_SpriteAtlas;
-			glm::u16vec2 m_FrameSize{ 0, 0 };
+
+			std::variant<std::shared_ptr<SpriteAtlas>, std::shared_ptr<Texture2D>> m_TextureOrAtlas;
+
 		private:
-			explicit AnimationPack(std::vector<AnimationData> animations, const std::shared_ptr<SpriteAtlas>& spriteAtlas, std::string name, const glm::u16vec2 frameResolution);
+			std::string m_Name;
+		protected:
+			ConfigType m_Type;
+		private:
+			AnimationPack(std::vector<AnimationData> animations, const std::shared_ptr<SpriteAtlas>& spriteAtlas, std::string name, const ConfigType type);
+			AnimationPack(std::vector<AnimationData> animations, const std::shared_ptr<Texture2D>& spriteAtlas, std::string name, const ConfigType type);
+
 			AnimationPack();
 
-			std::string m_Name;
 			bool m_Valid = false;
 		};
 	}

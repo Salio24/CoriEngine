@@ -1,19 +1,10 @@
 cmake_minimum_required(VERSION 3.28)
 
 project(CoriEngine)
-    # hides all compiler warnings caused by subprojects
-    get_filename_component(CORI_ENGINE_SOURCE_DIR ${PROJECT_SOURCE_DIR} ABSOLUTE)
+    #get_filename_component(CORI_ENGINE_SOURCE_DIR ${PROJECT_SOURCE_DIR} ABSOLUTE)
+    set(CORI_ENGINE_SOURCE_DIR ${PROJECT_SOURCE_DIR})
 
-    #engine assets
-    set(ENGINE_ASSETS_DIR "${CORI_ENGINE_SOURCE_DIR}/enginedata")
-
-    cmake_path(CONVERT "${ENGINE_ASSETS_DIR}" TO_CMAKE_PATH_LIST ENGINEDATA_PATH)
-
-    set(PATH_DEFINES_HEADER_IN "${CORI_ENGINE_SOURCE_DIR}/cmake/PathDefines.hpp.in")
-    set(PATH_DEFINES_HEADER_OUT "${CMAKE_CURRENT_BINARY_DIR}/generated/PathDefinesGenerated.hpp")
-
-    configure_file(${PATH_DEFINES_HEADER_IN} ${PATH_DEFINES_HEADER_OUT})
-
+    # hides all compiler warnings caused by thirdparty libs
     set(HIDE_DEPENDENCY_WARNINGS ON CACHE BOOL "")
     
     set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "") 
@@ -153,6 +144,9 @@ project(CoriEngine)
     #ExprTK
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/ExprTK EXCLUDE_FROM_ALL)
 
+    #boost/pfr
+    add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/pfr EXCLUDE_FROM_ALL)
+
 
 # project's binary setup vvv
 
@@ -208,7 +202,6 @@ project(CoriEngine)
 
     target_include_directories(${ENGINE_LIBRARY_NAME} PRIVATE
             ${CORI_HEADERS_DIR}
-            ${CMAKE_CURRENT_BINARY_DIR}/generated
     )
 
     # pch
@@ -249,7 +242,7 @@ project(CoriEngine)
     #target_link_libraries()
 
     # should be public
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite Tracy::TracyClient exprtk)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite Tracy::TracyClient exprtk boost_pfr)
 
     # can be private 
     target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static msdf-atlas-gen glad_gl_core_46)

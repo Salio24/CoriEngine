@@ -1,6 +1,6 @@
 #include "Font.hpp"
 #include "FontData.hpp"
-#include <PathDefinesGenerated.hpp>
+#include "FileSystem/PathManager.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -15,7 +15,7 @@ namespace Cori {
 				CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Loaded Font from '{}' successfully.", path.string());
 				msdfgen::destroyFont(font);
 			} else {
-				const std::filesystem::path placeholder = FileSystem::Internal::PathDefines::GetEngineDataRoot() / "placeholders/unifont-16.0.04.otf";
+				const std::filesystem::path placeholder = FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "placeholders/unifont-16.0.04.otf";
 				msdfgen::FontHandle* fontPlaceholder = msdfgen::loadFont(ft, placeholder.string().c_str());
 				CORI_CORE_ASSERT(fontPlaceholder, "Failed to load placeholder (bundled with the engine) Font. It should've been at bin/'Build Type if any '{}'", placeholder.string());
 				coriFont.reset(new Font(static_cast<void*>(fontPlaceholder), charsets, placeholder, minimalScale, miterLimit));

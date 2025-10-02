@@ -193,6 +193,10 @@ namespace Cori {
 				return static_cast<uint64_t>(GetID()) << 32 | GetVersion();
 			}
 
+			[[nodiscard]] uint32_t GetOwnerSceneID() const {
+				return m_OwningSceneID;
+			}
+
 			/**
 			 * @brief Gets the debuting string for logging.
 			 * @param showUUID Whether to include UUID in the debugging string.
@@ -241,6 +245,8 @@ namespace Cori {
 			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindChildByName(const char* name) const;
+
+			void DestroyChildren();
 
 			/**
 			 * @brief Gets a raw entt::entity if you need to interact with entt directly.
@@ -293,6 +299,8 @@ namespace Cori {
 			void UpdateInactivityFlagsRecursive(entt::entity parent, bool parentIsActive);
 
 			entt::handle m_EntityHandle;
+
+			uint32_t m_OwningSceneID;
 
 			friend class Scene;
 		};

@@ -1,5 +1,4 @@
 #include "Application.hpp"
-#include "Input.hpp"
 #include "Graphics/API.hpp"
 #include "WorldSystem/SceneManager.hpp"
 #include "WorldSystem/Components.hpp"
@@ -7,6 +6,7 @@
 #include "EventSystem/Event.hpp"
 #include "EventSystem/AppEvent.hpp"
 #include "EventSystem/KeyEvent.hpp"
+#include "FileSystem/PathManager.hpp"
 
 namespace Cori {
 	namespace Core {
@@ -16,6 +16,8 @@ namespace Cori {
 			//m_ManualStep = true;
 			CORI_CORE_ASSERT(!s_Instance, "Trying to construct application for the second time. Application already exists!");
 			s_Instance = this;
+
+			FileSystem::PathManager::Get();
 
 			m_Window = Window::Create(windowName, false);
 

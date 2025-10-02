@@ -12,10 +12,10 @@ namespace Cori {
 			 * @return A random uint32_t.
 			 */
 			static uint32_t Gen() {
-				if (!Get().dist_full_range) {
-					Get().dist_full_range.emplace();
+				if (!Get().m_DistFullRange) {
+					Get().m_DistFullRange.emplace();
 				}
-				return (*Get().dist_full_range)(Get().gen);
+				return (*Get().m_DistFullRange)(Get().gen);
 			}
 
 			/**
@@ -38,7 +38,7 @@ namespace Cori {
 			}
 
 			std::mt19937 gen;
-			std::optional<std::uniform_int_distribution<uint32_t>> dist_full_range;
+			std::optional<std::uniform_int_distribution<uint32_t>> m_DistFullRange;
 		};
 	}
 }

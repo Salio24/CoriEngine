@@ -1,8 +1,8 @@
 #include "Renderer2D.hpp"
 #include <ska_sort.hpp>
 #include "Utility/AABB.hpp"
-#include <PathDefinesGenerated.hpp>
 #include "FontData.hpp"
+#include "FileSystem/PathManager.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -38,7 +38,7 @@ namespace Cori {
 
 			s_Data->QuadInstanceBufferBase = new Quad[RendererData::MaxInstanceCount];
 
-			s_Data->QuadInstanceShader = ShaderProgram::Create(FileSystem::Internal::PathDefines::GetEngineDataRoot() / std::filesystem::path("shaders/QuadInstancedVert.glsl"), FileSystem::Internal::PathDefines::GetEngineDataRoot() / std::filesystem::path("shaders/QuadInstancedFrag.glsl"));
+			s_Data->QuadInstanceShader = ShaderProgram::Create(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / std::filesystem::path("shaders/QuadInstancedVert.glsl"), FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / std::filesystem::path("shaders/QuadInstancedFrag.glsl"));
 
 			s_Data->WorldSpaceTransparentQuadQueue.reserve(RendererData::WorldSpaceTransparentQuadQueueInitialSize);
 			s_Data->WorldSpaceOpaqueQuadQueue.reserve(RendererData::WorldSpaceOpaqueQuadQueueInitialSize);
@@ -65,7 +65,7 @@ namespace Cori {
 
 			s_Data->CharInstanceBufferBase = new Char[RendererData::MaxCharInstanceCount];
 
-			s_Data->CharInstanceShader = ShaderProgram::Create(FileSystem::Internal::PathDefines::GetEngineDataRoot() / std::filesystem::path("shaders/TextInstancedVert.glsl"), FileSystem::Internal::PathDefines::GetEngineDataRoot() /  std::filesystem::path("shaders/TextInstancedFrag.glsl"));
+			s_Data->CharInstanceShader = ShaderProgram::Create(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / std::filesystem::path("shaders/TextInstancedVert.glsl"), FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") /  std::filesystem::path("shaders/TextInstancedFrag.glsl"));
 
 			s_Data->WorldSpaceTransparentTextQueue.reserve(RendererData::WorldSpaceTransparentTextQueueInitialSize);
 
