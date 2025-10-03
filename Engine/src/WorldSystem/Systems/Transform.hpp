@@ -17,6 +17,8 @@ namespace Cori {
 			private:
 				void UpdateTransform();
 				void UpdateTransformRecursive(entt::entity entity, const glm::mat3& parentTransform, const uint8_t parentDepth, const bool parentTransformDirty, const bool parentDepthDirty);
+
+				void OnTransformCreate(entt::registry& registry, entt::entity entity);
 			};
 		}
 	}

@@ -15,12 +15,14 @@ namespace Cori {
 			}
 
 			bool Animation::Create() {
+				m_Owner.GetRegistry().on_construct<Components::Entity::QuadAnimator>().connect<&Animation::OnQuadAnimationCreate>(this);
+
 				m_EntityPool.Init(m_Owner,
 				[](SceneHandle& scene) -> Entity {
 					static uint32_t count = 0;
 					Entity entity = scene.CreateEntity(std::format("Temporary entity {}", count), EntityTags::DisposableEntity);
 					entity.AddComponent<Components::Entity::QuadRenderer>();
-					entity.AddComponent<Components::Entity::QuadAnimator>(entity);
+					entity.AddComponent<Components::Entity::QuadAnimator>();
 					++count;
 					return entity;
 				},
@@ -35,8 +37,15 @@ namespace Cori {
 					entity.DestroyChildren();
 				});
 
-
 				return true;
+			}
+
+			void Animation::OnQuadAnimationCreate(entt::registry& registry, entt::entity entity) {
+				Entity e = entt::handle{ registry, entity };
+				auto& qa = e.GetComponents<Components::Entity::QuadAnimator>();
+				qa.m_Entity = e;
+				auto& renderer = e.GetOrAddComponent<Components::Entity::QuadRenderer>();
+				renderer.m_AnimatorBound = true;
 			}
 		}
 	}

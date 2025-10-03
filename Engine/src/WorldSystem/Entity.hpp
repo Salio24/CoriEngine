@@ -4,6 +4,16 @@
 
 namespace Cori {
 	namespace World {
+		class Entity;
+		namespace Internal {
+			struct SceneID {
+				explicit SceneID(const uint32_t id) : m_OwningSceneID(id) {}
+
+			private:
+				friend Entity;
+				uint32_t m_OwningSceneID;
+			};
+		}
 		/**
 		 * @brief Entities are the essential part of WorldSystem.
 		 * @details Entities can have a parent-children hierarchy that is represented by a left-child right-sibling binary tree internally.
@@ -194,7 +204,7 @@ namespace Cori {
 			}
 
 			[[nodiscard]] uint32_t GetOwnerSceneID() const {
-				return m_OwningSceneID;
+				return GetComponents<Internal::SceneID>().m_OwningSceneID;
 			}
 
 			/**
@@ -299,8 +309,6 @@ namespace Cori {
 			void UpdateInactivityFlagsRecursive(entt::entity parent, bool parentIsActive);
 
 			entt::handle m_EntityHandle;
-
-			uint32_t m_OwningSceneID;
 
 			friend class Scene;
 		};

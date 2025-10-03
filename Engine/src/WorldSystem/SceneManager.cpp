@@ -7,6 +7,7 @@
 #include "Systems/StateMachine.hpp"
 #include "Systems/Hierarchy.hpp"
 #include "Systems/Transform.hpp"
+#include "Systems/Physics.hpp"
 
 namespace Cori {
 	namespace World {
@@ -81,11 +82,12 @@ namespace Cori {
 			scene->m_SceneID = id;
 			SceneHandle handle = SceneHandle(scene);
 			s_Data->m_Handles.insert({ id, handle });
-			scene->RegisterSystem<Systems::Trigger>();
+			scene->RegisterSystem<Systems::Transform>();
 			scene->RegisterSystem<Systems::Animation>();
+			scene->RegisterSystem<Systems::Trigger>();
 			scene->RegisterSystem<Systems::StateMachine>();
 			scene->RegisterSystem<Systems::Hierarchy>();
-			scene->RegisterSystem<Systems::Transform>();
+			scene->RegisterSystem<Systems::Physics>();
 			return handle;
 		}
 

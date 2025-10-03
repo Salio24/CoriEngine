@@ -14,7 +14,6 @@ namespace Cori {
 			static constexpr auto in_place_delete = true;
 
 			BodyUserData() = default;
-			explicit BodyUserData(const Cori::World::Entity& entity) : m_Entity(entity) {}
 			Cori::World::Entity m_Entity;
 		};
 	}
@@ -30,6 +29,7 @@ namespace Cori {
 		namespace Systems {
 			class Transform;
 			class Hierarchy;
+			class Animation;
 		}
 
 		/**
@@ -118,7 +118,6 @@ namespace Cori {
 				 */
 				struct Transform {
 					Transform() = default;
-					explicit Transform(const World::Entity& owner) : m_Owner(owner) {}
 
 					Transform(const Transform&) = delete;
 					Transform& operator=(const Transform&) = delete;
@@ -484,6 +483,7 @@ namespace Cori {
 
 				private:
 					friend class QuadAnimator;
+					friend Systems::Animation;
 
 					glm::vec2 m_HalfSize{ 0.0f };
 					Graphics::UVs m_UVs{};
@@ -550,7 +550,7 @@ namespace Cori {
 				};
 
 				/**
-				 * @brief A physics rigit body.
+				 * @brief A physics rigid body.
 				 * @details Cori engine doesn't have a native physics engine and uses Box2D, so refer to Box2D docs 'https://box2d.org/' for any details on physics.
 				 * \n All the engine does is provide a convenient C++ API for it, as Box2D is a C project and the default API is not really convenient in C++ environment.
 				 * \n Big thanks HolyBlackCat for: 'https://github.com/HolyBlackCat/box2cpp/tree/master'
@@ -560,24 +560,15 @@ namespace Cori {
 					 * @brief Creates a RigidBody.
 					 * @param world World to create the RigidBody in.
 					 * @param def Parameters to create a RigidBody with.
-					 * @param owner Owner Entity, you need to pass an Entity that owns this RigidBody.
 					 */
-					RigidBody(Physics::WorldRef world, const std::derived_from<b2BodyDef> auto& def, World::Entity& owner) : Physics::BodyRef{world.CreateBody(Physics::DestroyWithParent, def)} {
-						if (def.type == b2_kinematicBody || def.type == b2_dynamicBody) {
-							if (CORI_CORE_VERIFY(owner.IsValid(), "An invalid entity was passed to the RigidBody constructor, always pass the same entity you're adding a RigidBody to. This can blow up any second now.")) {}
-							else {
-								auto& ud = owner.AddComponent<Physics::BodyUserData>(owner);
-								SetUserData(&ud);
-							}
-						}
-					}
+					RigidBody(Physics::WorldRef world, const std::derived_from<b2BodyDef> auto& def) : Physics::BodyRef{world.CreateBody(Physics::DestroyWithParent, def)} {}
+
+					~RigidBody() { if (IsValid()) { Destroy(); } }
 
 					RigidBody(const RigidBody&) = delete;
 					RigidBody& operator=(const RigidBody&) = delete;
 					RigidBody(RigidBody&&) = delete;
 					RigidBody& operator=(RigidBody&&) = delete;
-
-					~RigidBody() { if (IsValid()) { Destroy(); } }
 				};
 			}
 		}

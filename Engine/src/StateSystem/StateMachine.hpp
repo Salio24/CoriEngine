@@ -4,6 +4,10 @@
 
 namespace Cori {
 	namespace World {
+		namespace Systems {
+			class StateMachine;
+		}
+
 		namespace Components {
 			namespace Entity {
 				/**
@@ -17,13 +21,7 @@ namespace Cori {
 				 */
 				class StateMachine {
 				public:
-					/**
-					 * @brief Constructs the StateMachine, you need to pass an Entity that owns this StateMachine to the constructor.
-					 * @param owner Owner Entity.
-					 */
-					explicit StateMachine(const World::Entity& owner) : m_Owner(owner), m_CurrentState(nullptr), m_LastState(nullptr) {
-						CORI_CORE_ASSERT(m_Owner.IsValid(), "StateMachine owner Entity is not valid!");
-					}
+					StateMachine() = default;
 
 					~StateMachine() {
 						if (m_CurrentState) {
@@ -137,9 +135,10 @@ namespace Cori {
 					}
 
 				private:
+					friend Systems::StateMachine;
 					World::Entity m_Owner;
-					EntityState* m_CurrentState;
-					EntityState* m_LastState;
+					EntityState* m_CurrentState{ nullptr };
+					EntityState* m_LastState{ nullptr };
 
 					std::unordered_map<std::type_index, std::unique_ptr<EntityState>> m_States;
 				};

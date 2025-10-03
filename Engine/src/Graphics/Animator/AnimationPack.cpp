@@ -3,7 +3,6 @@
 #include "Graphics/Image.hpp"
 #include "AssetManager/EngineAssets.hpp"
 #include <nlohmann/json.hpp>
-
 #include "AssetManager/AssetManager.hpp"
 #include "FileSystem/PathManager.hpp"
 

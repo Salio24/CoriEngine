@@ -5,9 +5,7 @@ namespace Cori {
 	namespace World {
 		namespace Components {
 			namespace Entity {
-				QuadAnimator::QuadAnimator(const World::Entity& entity): m_Entity(entity) {
-					auto& renderer = m_Entity.GetOrAddComponent<QuadRenderer>();
-					renderer.m_AnimatorBound = true;
+				QuadAnimator::QuadAnimator() {
 					m_ActiveSequence = false;
 
 					SetStopCallback([]{});
@@ -15,8 +13,10 @@ namespace Cori {
 				}
 
 				QuadAnimator::~QuadAnimator() {
-					auto& renderer = m_Entity.GetComponents<QuadRenderer>();
-					renderer.m_AnimatorBound = false;
+					if (m_Entity.HasComponents<QuadRenderer>()) {
+						auto& renderer = m_Entity.GetComponents<QuadRenderer>();
+						renderer.m_AnimatorBound = false;
+					}
 				}
 
 				void QuadAnimator::SetStopCallback(AnimationStopCallbackFn callback) {

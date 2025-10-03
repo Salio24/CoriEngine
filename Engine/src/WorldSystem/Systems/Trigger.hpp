@@ -12,6 +12,10 @@ namespace Cori {
 				bool Create();
 
 				static constexpr SystemPriority Priority = 300;
+			private:
+				void OnBodyUserDataCreate(entt::registry& registry, entt::entity entity);
+
+				void OnTriggerCreate(entt::registry& registry, entt::entity entity);
 			};
 		}
 	}

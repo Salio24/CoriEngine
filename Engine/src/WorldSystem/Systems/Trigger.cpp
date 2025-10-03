@@ -1,5 +1,6 @@
 #include "Trigger.hpp"
 #include "Physics/Triggers/Trigger.hpp"
+#include "WorldSystem/Components.hpp"
 
 namespace Cori {
 	namespace World {
@@ -43,7 +44,25 @@ namespace Cori {
 			}
 
 			bool Trigger::Create() {
+				m_Owner.GetRegistry().on_construct<Physics::BodyUserData>().connect<&Trigger::OnBodyUserDataCreate>(this);
+				m_Owner.GetRegistry().on_construct<Components::Entity::Trigger>().connect<&Trigger::OnTriggerCreate>(this);
 				return true;
+			}
+
+			void Trigger::OnBodyUserDataCreate(entt::registry& registry, entt::entity entity) {
+				Entity e = entt::handle{ registry, entity };
+				auto& bud = e.GetComponents<Physics::BodyUserData>();
+				bud.m_Entity = e;
+			}
+
+			void Trigger::OnTriggerCreate(entt::registry& registry, entt::entity entity) {
+				Entity e = entt::handle{ registry, entity };
+				auto& tr = e.GetComponents<Components::Entity::Trigger>();
+				auto& ud = e.GetOrAddComponent<Physics::BodyUserData>();
+				ud.m_Entity = e;
+				auto& rb = e.GetComponents<Components::Entity::RigidBody>();
+				rb.SetUserData(&ud);
+				tr.m_Trigger = e;
 			}
 		}
 	}

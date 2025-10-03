@@ -4,17 +4,6 @@ namespace Cori {
 	namespace World {
 		namespace Components {
 			namespace Entity {
-				Trigger::Trigger(World::Entity& trigger) {
-					if (CORI_CORE_VERIFY(trigger.IsValid(), "An invalid entity was passed to the Trigger, always pass the same entity you're adding a Trigger to. This can blow up any second now.")) {}
-					else {
-						auto& ud = trigger.GetOrAddComponent<Physics::BodyUserData>();
-						ud.m_Entity = trigger;
-						auto& rb = trigger.GetComponents<RigidBody>();
-						rb.SetUserData(&ud);
-						m_Trigger = trigger;
-					}
-				}
-
 				void Trigger::OnEnter(World::Entity& entity) {
 					if (m_Behavior) {
 						if (m_VisitorBuffer.size() > CORI_MAX_TRIGGER_VISITORS) {

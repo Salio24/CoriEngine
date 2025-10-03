@@ -16,3 +16,6 @@ Trigger HasBehaviour
 
 TODO:
 
+
+
+update comments about blank entity

@@ -15,7 +15,14 @@ namespace Cori {
 			}
 
 			bool StateMachine::Create() {
+				m_Owner.GetRegistry().on_construct<Components::Entity::StateMachine>().connect<&StateMachine::OnStateMachineCreate>(this);
 				return true;
+			}
+
+			void StateMachine::OnStateMachineCreate(entt::registry& registry, entt::entity entity) {
+				Entity e = entt::handle{ registry, entity };
+				auto& sm = e.GetComponents<Components::Entity::StateMachine>();
+				sm.m_Owner = e;
 			}
 		}
 	}

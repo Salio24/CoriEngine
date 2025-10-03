@@ -40,6 +40,8 @@ namespace Cori {
 
 				static constexpr SystemPriority Priority = 200;
 			private:
+				void OnQuadAnimationCreate(entt::registry& registry, entt::entity entity);
+
 				DisposableEntityPool<32> m_EntityPool;
 			};
 		}

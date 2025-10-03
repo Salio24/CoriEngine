@@ -13,9 +13,7 @@ namespace Cori {
 
 				class QuadAnimator {
 				public:
-
-					explicit QuadAnimator(const World::Entity& entity);
-
+					QuadAnimator();
 					~QuadAnimator();
 
 					void SetStopCallback(AnimationStopCallbackFn callback);
