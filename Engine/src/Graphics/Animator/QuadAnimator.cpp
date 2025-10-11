@@ -37,7 +37,7 @@ namespace Cori {
 
 				void QuadAnimator::OnTickUpdate() {
 					if (m_ActiveSequence) {
-						++m_TicksElapsedSinceStart;
+						//++m_TicksElapsedSinceStart;
 						auto& [anim, params] = m_AnimationSequence[m_CurrentLoopedSequenceIndex];
 						if (m_CurrentFrame == anim.m_Pack->m_Animations[anim.m_AnimationID].m_Frames.size() - 1 && m_CurrentFrameTick >= anim.m_Pack->m_Animations[anim.m_AnimationID].m_Frames[m_CurrentFrame].m_TickDuration) {
 							if (m_CurrentLoopedSequenceIndex == m_AnimationSequence.size() - 1) {
@@ -75,9 +75,9 @@ namespace Cori {
 						const auto& [pack, id] = m_AnimationSequence[m_CurrentLoopedSequenceIndex].first;
 						const auto& m_UVs= pack->m_Animations[id].m_Frames[m_CurrentFrame].m_UVs;
 
-						const glm::vec2 size = pack->m_Animations[id].m_FrameSize;
-						if (size != glm::vec2{std::numeric_limits<float>::max(), std::numeric_limits<float>::max()}) {
-							renderer.m_HalfSize = size * m_SizeScale / 2.0f;
+						const glm::vec2 animationFrameSize = pack->m_Animations[id].m_FrameSize;
+						if (animationFrameSize != glm::vec2{std::numeric_limits<float>::max(), std::numeric_limits<float>::max()}) {
+							renderer.m_HalfSize = animationFrameSize * m_SizeScale / 2.0f;
 						}
 
 						if (pack->m_Type != Graphics::AnimationPack::CORI_VARYING) {
@@ -90,17 +90,17 @@ namespace Cori {
 					}
 				}
 
-				void QuadAnimator::SetSizeScale(const float scale) {
+				void QuadAnimator::SetSizeScale(const glm::vec2 scale) {
 					m_SizeScale = scale;
 				}
 
-				float QuadAnimator::GetSizeScale() const {
+				glm::vec2 QuadAnimator::GetSizeScale() const {
 					return m_SizeScale;
 				}
 
-				uint64_t QuadAnimator::GetTicksElapsed() const {
-					return m_TicksElapsedSinceStart;
-				}
+				//uint64_t QuadAnimator::GetTicksElapsed() const {
+				//	return m_TicksElapsedSinceStart;
+				//}
 
 				void QuadAnimator::SetEngineStopCallback(AnimationStopCallbackFn callback) {
 					m_EngineCallBack = std::move(callback);

@@ -82,7 +82,7 @@ namespace Cori {
 				m_Registry.ctx().erase<T>();
 			}
 
-			template <typename T, typename... Args> requires IsSystem<T, Args...>
+			template <typename T, typename... Args> requires IsSystem<T>
 			void RegisterSystem(Args&&... args) {
 				if (m_RegisteredSystems.contains(std::type_index(typeid(T)))) {
 					CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Trying to register '{}' twice for scene '{}', you can't register a system twice.", CORI_CLEAN_TYPE_NAME(T), m_Name);
@@ -110,7 +110,7 @@ namespace Cori {
 				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Failed to register System '{}' with scene '{}', Create returned false.", CORI_CLEAN_TYPE_NAME(T), m_Name);
 			}
 
-			template <typename T, typename... Args> requires IsSystem<T, Args...>
+			template <typename T> requires IsSystem<T>
 			void UnregisterSystem() {
 				if (m_RegisteredSystems.contains(std::type_index(typeid(T)))) {
 					m_RegisteredSystems.erase(std::type_index(typeid(T)));
@@ -118,7 +118,7 @@ namespace Cori {
 				}
 			}
 
-			template <typename T, typename... Args> requires IsSystem<T, Args...>
+			template <typename T> requires IsSystem<T>
 			std::expected<std::weak_ptr<T>, Core::CoriError<>> GetSystem() {
 				if (m_RegisteredSystems.contains(std::type_index(typeid(T)))) {
 					return std::weak_ptr<T>(std::static_pointer_cast<T>(m_RegisteredSystems[std::type_index(typeid(T))]));
@@ -142,6 +142,10 @@ namespace Cori {
 			[[nodiscard]] uint32_t GetSceneID() const {
 				return m_SceneID;
 			}
+
+			void BeginRender();
+
+			void EndRender();
 
 		protected:
 			//friend Core::Layer;

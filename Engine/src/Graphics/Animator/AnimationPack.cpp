@@ -21,8 +21,9 @@ namespace {
 
 namespace Cori {
 	namespace Graphics {
-		std::shared_ptr<AnimationPack> AnimationPack::Create(const std::filesystem::path& jsonPath, ConfigType type, const float timeStep, const std::string& name) {
+		std::shared_ptr<AnimationPack> AnimationPack::Create(const std::filesystem::path& jsonPath, ConfigType type, const std::string& name) {
 			std::ifstream f(jsonPath);
+			float timeStep = Core::Application::GetGameTimer().GetTimestep();
 
 			if (type == ASEPRITE) {
 				try {
@@ -65,8 +66,8 @@ namespace Cori {
 						return a.first < b.first;
 					});
 
-					std::vector<AnimationFrame> frames;
-					std::vector<AnimationData> animations;
+					std::vector<Internal::AnimationFrame> frames;
+					std::vector<Internal::AnimationData> animations;
 					animations.reserve(initialImageResolution.y / frameResolution.y);
 
 					glm::uvec2 oldPos;
@@ -81,7 +82,7 @@ namespace Cori {
 						oldPos = pos;
 						pos = { frameData["frame"]["x"], frameData["frame"]["y"] };
 						if (pos.y - oldPos.y == frameResolution.y) {
-							AnimationData anim(frameResolution, frames);
+							Internal::AnimationData anim(frameResolution, frames);
 							animations.push_back(anim);
 							frames.clear();
 						}
@@ -89,7 +90,7 @@ namespace Cori {
 						uint32_t col = pos.x / frameResolution.x;
 						uint32_t row = pos.y / frameResolution.y;
 
-						AnimationFrame frame;
+						Internal::AnimationFrame frame;
 
 						frame.m_UVs = atlas->GetSpriteUVsAtPosition({col, row});
 						frame.m_TickDuration = std::round(static_cast<float>(frameData["duration"]) / (timeStep * 1000.0f));
@@ -97,7 +98,7 @@ namespace Cori {
 						frames.push_back(frame);
 
 						if (frameIndex + 1 == sortedFrameItems.size()) {
-							AnimationData anim(frameResolution, frames);
+							Internal::AnimationData anim(frameResolution, frames);
 							animations.push_back(anim);
 						}
 					}
@@ -134,11 +135,11 @@ namespace Cori {
 						throw Core::CoriError(std::format("Failed to load Sprite Atlas from: {}", atlasPath.string()));
 					}
 
-					std::vector<AnimationData> animations;
+					std::vector<Internal::AnimationData> animations;
 					const json& animationsArray = data["animations"];
 
 					for (const auto& animJson : animationsArray) {
-						std::vector<AnimationFrame> frames;
+						std::vector<Internal::AnimationFrame> frames;
 						const json& framesArray = animJson["frames"];
 
 						for (const auto& frameJson : framesArray) {
@@ -147,7 +148,7 @@ namespace Cori {
 							const uint32_t col = pos.x / frameResolution.x;
 							const uint32_t row = pos.y / frameResolution.y;
 
-							AnimationFrame frame;
+							Internal::AnimationFrame frame;
 							frame.m_UVs = atlas->GetSpriteUVsAtPosition({col, row});
 							frame.m_TickDuration = std::round(static_cast<float>(frameJson["ms"]) / (timeStep * 1000.0f));
 							frames.push_back(frame);
@@ -185,18 +186,18 @@ namespace Cori {
 					auto atlas = Texture2D::Create(image);
 					glm::vec2 atlasSize = { atlas->GetWidth(), atlas->GetHeight() };
 
-					std::vector<AnimationData> animations;
+					std::vector<Internal::AnimationData> animations;
 					const json& animationsArray = data["animations"];
 
 					for (const auto& animJson : animationsArray) {
-						std::vector<AnimationFrame> frames;
+						std::vector<Internal::AnimationFrame> frames;
 						const json& framesArray = animJson["frames"];
 						const glm::u16vec2 frameResolution = {animJson["frameSizeX"], animJson["frameSizeY"]};
 
 						for (const auto& frameJson : framesArray) {
 							const glm::vec2 pos = {frameJson["x"], frameJson["y"]};
 
-							AnimationFrame frame;
+							Internal::AnimationFrame frame;
 							const glm::vec2 UVmin = pos / atlasSize;
 							const glm::vec2 UVmax = (pos + glm::vec2(frameResolution)) / atlasSize;
 							frame.m_UVs = { UVmin, UVmax };
@@ -219,7 +220,7 @@ namespace Cori {
 		}
 
 		std::shared_ptr<AnimationPack> AnimationPack::Create(const Descriptor& descriptor) {
-			return Create(descriptor.m_JsonPath, descriptor.m_ConfigType, Core::Application::GetGameTimer().GetTimestep(), descriptor.m_Name);
+			return Create(descriptor.m_JsonPath, descriptor.m_ConfigType, descriptor.m_Name);
 		}
 
 		Animation AnimationPack::GetAnimation(const uint32_t index) {
@@ -229,29 +230,28 @@ namespace Cori {
 			}
 
 			CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::AnimationPack }, "Animation Pack '{}', was created as a placeholder. Requested animation at '{}' doesn't exist, returning a placeholder.", m_Name, index);
-			std::vector<AnimationFrame> frames;
-			constexpr AnimationFrame frame { UVs{}, 2 };
+			std::vector<Internal::AnimationFrame> frames;
+			constexpr Internal::AnimationFrame frame { UVs{}, 2 };
 			frames.push_back(frame);
-			const AnimationData data({ 8, 8 }, frames);
+			const Internal::AnimationData data({ 8, 8 }, frames);
 			return Animation{ shared_from_this(), 0 };
 
 		}
 
-		AnimationPack::AnimationPack(std::vector<AnimationData> animations, const std::shared_ptr<SpriteAtlas>& spriteAtlas, std::string name, const ConfigType type) : m_Animations(std::move(animations)), m_TextureOrAtlas(spriteAtlas), m_Name(std::move(name)), m_Type(type) {
+		AnimationPack::AnimationPack(std::vector<Internal::AnimationData> animations, const std::shared_ptr<SpriteAtlas>& spriteAtlas, std::string name, const ConfigType type) : m_Animations(std::move(animations)), m_TextureOrAtlas(spriteAtlas), m_Name(std::move(name)), m_Type(type) {
 			m_Valid = true;
 		}
 
-		AnimationPack::AnimationPack(std::vector<AnimationData> animations, const std::shared_ptr<Texture2D>& spriteAtlas, std::string name, const ConfigType type) : m_Animations(std::move(animations)), m_TextureOrAtlas(spriteAtlas), m_Name(std::move(name)), m_Type(type) {
+		AnimationPack::AnimationPack(std::vector<Internal::AnimationData> animations, const std::shared_ptr<Texture2D>& spriteAtlas, std::string name, const ConfigType type) : m_Animations(std::move(animations)), m_TextureOrAtlas(spriteAtlas), m_Name(std::move(name)), m_Type(type) {
 			m_Valid = true;
 		}
 
 		AnimationPack::AnimationPack() {
-			// TODO: make it simpler since I can now use Texture2D directly
 			m_Valid = false;
-			std::vector<AnimationFrame> frames;
-			constexpr AnimationFrame frame{ UVs{}, 2 };
+			std::vector<Internal::AnimationFrame> frames;
+			constexpr Internal::AnimationFrame frame{ UVs{}, 2 };
 			frames.push_back(frame);
-			const AnimationData data({ 8, 8 }, frames);
+			const Internal::AnimationData data({ 8, 8 }, frames);
 			m_Animations.clear();
 			m_Animations.push_back(data);
 			m_TextureOrAtlas = SpriteAtlas::Create("placeholder for AnimationPack", Image::Create(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "placeholders/missing_texture32.png"), glm::u16vec2(32));

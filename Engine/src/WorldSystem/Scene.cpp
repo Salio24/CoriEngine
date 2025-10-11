@@ -127,14 +127,9 @@ namespace Cori {
 			}
 
 			Graphics::Renderer2D::SubmitScene(this);
-			Graphics::Renderer2D::EndFrame(GetContextComponent<Components::Scene::Camera>());
 		}
 
 		void Scene::OnTickUpdate(Core::GameTimer& gameTimer) {
-			if (HasContextComponent<Components::Scene::PhysicsWorld>()) {
-				GetContextComponent<Components::Scene::PhysicsWorld>().Step(gameTimer.GetTimestep(), 4);
-			}
-
 			for (auto type : m_SystemPriority | std::views::values) {
 				m_RegisteredSystems[type]->OnTickUpdate(gameTimer);
 			}
@@ -144,6 +139,14 @@ namespace Cori {
 			for (auto type : m_SystemPriority | std::views::values) {
 				m_RegisteredSystems[type]->OnImGuiRender(gameTimer);
 			}
+		}
+
+		void Scene::BeginRender() {
+			Graphics::Renderer2D::BeginScene(GetContextComponent<Components::Scene::Camera>());
+		}
+
+		void Scene::EndRender() {
+			Graphics::Renderer2D::EndScene();
 		}
 
 		bool Scene::OnBind() {

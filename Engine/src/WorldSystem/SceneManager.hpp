@@ -34,6 +34,13 @@ namespace Cori {
 			 */
 			[[nodiscard]] static std::expected<SceneHandle, Core::CoriError<>> GetScene(const std::string_view name);
 
+			/**
+			 * @brief Allows you to get SceneHandle if all you know is scene id.
+			 * @details Each scene is assigned an ID at creation, entities have this ID and you can ask an entity what scene is it from, it will give you the owner scene id,
+			 * you can "convert" this scene id into a useful handle here.
+			 * @param sceneID ID of the scene to get a handle for.
+			 * @return Expected object with SceneHandle on success, CoriError on failure.
+			 */
 			[[nodiscard]] static std::expected<SceneHandle, Core::CoriError<>> GetHandle(const uint32_t sceneID);
 
 			/**

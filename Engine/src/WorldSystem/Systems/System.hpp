@@ -7,6 +7,18 @@
 
 namespace Cori {
 	namespace World {
+		/**
+		 * @brief System part of ECS.
+		 * @details Systems are a crucial part of the world and scene, I'm not going to describe what systems are in an ECS scope, you can google that.
+		 * \n In Cori, you can register, unregister systems for the scene, a scene can only have one instance of a particular system.
+		 * \n Systems can have a specific priority to them, that way you can control what systems are updated first.
+		 * \n To define a system you need to:
+		 * \n 1: Derive from this class.
+		 * \n 2: Create a method 'Create' that can take any amount of arguments and returns a bool.
+		 * If 'Create' returns false the system will not be registered for the scene.
+		 * \n 3: A static public member of type 'SystemPriority' named 'Priority'
+		 * @warning You should put all your initialization code into the 'Create' method, because m_Owner (SceneHandle) is only valid after the constructor has run.
+		 */
 		class System {
 		public:
 			virtual ~System() = default;

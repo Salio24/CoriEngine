@@ -11,7 +11,7 @@ namespace Cori {
 		struct Exclude {};
 
 		/**
-		 * @brief Helper to wrap an entt view into and access an Entity instances instead of entt::entity instances when iterating through the view. Don't use directly, use Scene::View.
+		 * @brief Helper to wrap an EnTT view into and access an Entity instances instead of entt::entity instances when iterating through the view. Don't use directly, use Scene::View.
 		 */
 		template <typename View>
 		class EntityView {

@@ -6,6 +6,8 @@
 #include "ImGuiLayer.hpp"
 #include "WorldSystem/SceneManager.hpp"
 #include "Time.hpp"
+#include "Core/Threading/MainThreadComandQueue.hpp"
+#include "Core/Threading/ThreadPool.hpp"
 
 /**
  * @brief Global engine namespace.
@@ -51,14 +53,14 @@ namespace Cori {
 
 			/**
 			 * @brief Pops the Layer from the LayerStack.
-			 * @details The Layer to be popped is the last that was pushed to the LayerStack. If there is nothing to pop, nothing will happened.
+			 * @details The Layer to be popped is the last that was pushed to the LayerStack. If there is nothing to pop, nothing will happen.
 			 * @note All operations with the LayerStack are processed at the end of the frame.
 			 */
 			static void PopLayer();
 
 			/**
 			 * @brief Pops the overlay Layer from the LayerStack.
-			 * @details The overlay Layer to be popped is the last that was pushed to the LayerStack. If there is nothing to pop, nothing will happened.
+			 * @details The overlay Layer to be popped is the last that was pushed to the LayerStack. If there is nothing to pop, nothing will happen.
 			 * @note All operations with the LayerStack are processed at the end of the frame.
 			 */
 			static void PopOverlay();
@@ -87,6 +89,41 @@ namespace Cori {
 			 */
 			static void EmitEvent(Event& event);
 
+			/**
+			 * @brief Submits a task to be executed on the main thread.
+			 * @details Submitted tasks will be processed in the very beginning of the next frame.
+			 * \n It is safe to call this function from any thread.
+			 * @tparam F Auto deduced callable type.
+			 * @tparam Args Auto deduced callable argument types.
+			 * @param f Task callable, no specific signature required.
+			 * @param args Arguments that will be passed to the callable task upon execution.
+			 * @return Future that will hold the result of invoke result of the passed callable.
+			 */
+			template <class F, class... Args>
+			static std::future<std::invoke_result_t<F, Args...>> SubmitMainTask(F&& f, Args&&... args) {
+				return s_Instance->m_CommandQueue.Submit(std::forward<F>(f), std::forward<Args>(args)...);
+			}
+
+			/**
+			 * @brief Submits a task to be executed on the worker thread.
+			 * @details It is safe to call this function from any thread.
+			 * @tparam F Auto deduced callable type.
+			 * @tparam Args Auto deduced callable argument types.
+			 * @param f Task callable, no specific signature required.
+			 * @param args Arguments that will be passed to the callable task upon execution.
+			 * @return Future that will hold the result of invoke result of the passed callable.
+			 */
+			template <class F, class... Args>
+			static std::future<std::invoke_result_t<F, Args...>> SubmitWorkerTask(F&& f, Args&&... args) {
+				return s_Instance->m_WorkerPool.Submit(std::forward<F>(f), std::forward<Args>(args)...);
+			}
+
+			/**
+			 * @brief Returns a number of available worker threads.
+			 * @return Worker threads count.
+			 */
+			static uint16_t GetWorkerCount();
+
 		private:
 			void OnEvent(Event& event);
 
@@ -101,6 +138,10 @@ namespace Cori {
 			Internal::ImGuiLayer* m_ImGuiLayer;
 
 			LayerStack m_LayerStack;
+
+			Threading::MainThreadQueue m_CommandQueue;
+
+			Threading::ThreadPool m_WorkerPool;
 
 			GameTimer m_GameTimer;
 

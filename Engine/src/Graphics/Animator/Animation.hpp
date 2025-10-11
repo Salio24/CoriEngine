@@ -1,26 +1,24 @@
 #pragma once
-#include "AnimationFrame.hpp"
 
 namespace Cori {
 	namespace Graphics {
-		class AnimationData {
-		public:
-			explicit AnimationData(const glm::u16vec2 frameSize, std::vector<AnimationFrame> frames) : m_FrameSize(frameSize) ,m_Frames(std::move(frames)) {}
-
-			glm::u16vec2 m_FrameSize;
-			std::vector<AnimationFrame> m_Frames;
-		};
-
 		class AnimationPack;
 
+		/**
+		 * @brief Owning handle to the animation inside the AnimationPack, when paired with Animation::PlayParams can be passed to QuadAnimator.
+		 */
 		struct Animation {
+			/**
+			 * @brief Tells the QuadAnimator how to play the animation. More details in the QuadAnimator docs.
+			 * @note Only LoopedInSequence is implemented for now.
+			 */
 			struct PlayParams {
-				// TODO: implement the logic that uses all this parameters
-				uint32_t Loops{ 0 };
-				uint32_t MaxFrames{ 0 };
-				uint32_t StartFrame{ 0 };
-				uint32_t MaxTicks{ 0 };
-				uint32_t StartTick{ 0 };
+				// TODO: implement the logic that uses all this parameters, later
+				//uint32_t Loops{ 0 };
+				//uint32_t MaxFrames{ 0 };
+				//uint32_t StartFrame{ 0 };
+				//uint32_t MaxTicks{ 0 };
+				//uint32_t StartTick{ 0 };
 				bool LoopedInSequence{ false };
 			};
 
@@ -30,6 +28,9 @@ namespace Cori {
 			uint32_t m_AnimationID{ 0 };
 		};
 
+		/**
+		 * @brief Pair of Animation and Animation::PlayParams.
+		 */
 		using AnimationWithParams = std::pair<Animation, Animation::PlayParams>;
 
 		template<typename T>

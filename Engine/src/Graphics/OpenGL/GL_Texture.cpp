@@ -4,13 +4,12 @@
 namespace Cori {
 	namespace Graphics {
 		namespace Internal {
-			bool OpenGLTexture2D::PreCreateHook([[maybe_unused]] const void* pixelData, [[maybe_unused]] const uint32_t width, [[maybe_unused]] const uint32_t height, [[maybe_unused]] const Params& params) {
-				return true;
-			}
-
-			OpenGLTexture2D::OpenGLTexture2D(const void* pixelData, const uint32_t width, const uint32_t height, const Params& params) : m_Width(width), m_Height(height), m_HasSemiTransparency(params.m_HasSemiTransparency) {
+			void OpenGLTexture2D::Upload(const void* pixelData, const uint32_t width, const uint32_t height, const Params& params) {
 				CORI_PROFILE_FUNCTION();
-				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Graphics::Self , Logger::Tags::Graphics::OpenGL, Logger::Tags::Graphics::Texture2D }, "Creating texture from preloaded image.", m_ID);
+				m_Width = width;
+				m_Height = height;
+				m_HasSemiTransparency = params.m_HasSemiTransparency;
+				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Graphics::Self , Logger::Tags::Graphics::OpenGL, Logger::Tags::Graphics::Texture2D }, "Creating Texture2D .");
 
 				GLint previousAlignment = 0;
 
@@ -70,7 +69,12 @@ namespace Cori {
 					glPixelStorei(GL_UNPACK_ALIGNMENT, previousAlignment);
 				}
 
+				m_Status = AssetStatus::READY;
 				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Graphics::Self , Logger::Tags::Graphics::OpenGL, Logger::Tags::Graphics::Texture2D }, "(GL_RuntimeID; {}): Successfully created texture from preloaded image.", m_ID);
+			}
+
+			OpenGLTexture2D::OpenGLTexture2D() {
+				m_Status = AssetStatus::LOADING;
 			}
 
 			OpenGLTexture2D::~OpenGLTexture2D() {

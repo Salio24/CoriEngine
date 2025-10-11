@@ -14,16 +14,16 @@ namespace Cori {
 				/**
 				 * @brief Scene context component containing Box2D physics world.
 				 */
-				class PhysicsWorld : public Physics::World {
-				public:
-					explicit PhysicsWorld(const Params& params = {}) : World{ params } {}
-
-					PhysicsWorld(const PhysicsWorld&) = delete;
-					PhysicsWorld& operator=(const PhysicsWorld&) = delete;
-
-					PhysicsWorld(PhysicsWorld&&) noexcept = default;
-					PhysicsWorld& operator=(PhysicsWorld&&) noexcept = default;
-				};
+				//class PhysicsWorld : public Physics::World {
+				//public:
+				//	explicit PhysicsWorld(const Params& params = {}) : World{ params } {}
+//
+				//	PhysicsWorld(const PhysicsWorld&) = delete;
+				//	PhysicsWorld& operator=(const PhysicsWorld&) = delete;
+//
+				//	PhysicsWorld(PhysicsWorld&&) noexcept = default;
+				//	PhysicsWorld& operator=(PhysicsWorld&&) noexcept = default;
+				//};
 			}
 		}
 	}

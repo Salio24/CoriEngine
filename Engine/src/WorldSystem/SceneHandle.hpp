@@ -222,7 +222,7 @@ namespace Cori {
 			 * @details Scene has full control of the system lifetime, the system will be kept alive for as long as the scene is alive, but you can also explicitly unregister the system.
 			 * @note If Create returns false, the system will not be registered.
 			 */
-			template <typename T, typename... Args> requires IsSystem<T, Args...>
+			template <typename T, typename... Args> requires IsSystem<T>
 			void RegisterSystem(Args&&... args) {
 				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
 				m_SceneRaw.lock()->RegisterSystem<T>(std::forward<Args>(args)...);
@@ -231,10 +231,9 @@ namespace Cori {
 			/**
 			 * @brief Unregisters the system from the scene.
 			 * @tparam T System to unregister.
-			 * @tparam Args Deduced automatically, no need to specify.
 			 * @note It is safe to call this method with a T system that is not registered.
 			 */
-			template <typename T, typename... Args> requires IsSystem<T, Args...>
+			template <typename T> requires IsSystem<T>
 			void UnregisterSystem() {
 				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
 				m_SceneRaw.lock()->UnregisterSystem<T>();
@@ -243,10 +242,9 @@ namespace Cori {
 			/**
 			 * @brief Retries a registered system instance from the scene.
 			 * @tparam T System to retrieve.
-			 * @tparam Args Deduced automatically, no need to specify.
 			 * @return Weak pointer to the requested system instance.
 			 */
-			template <typename T, typename... Args> requires IsSystem<T, Args...>
+			template <typename T> requires IsSystem<T>
 			[[nodiscard]] std::expected<std::weak_ptr<T>, Core::CoriError<>> GetSystem() {
 				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
 				return m_SceneRaw.lock()->GetSystem<T>();
@@ -300,6 +298,20 @@ namespace Cori {
 
 		protected:
 			friend Core::Layer;
+			friend Core::Application;
+
+			void BeginRender() {
+				if (!m_SceneRaw.expired()) {
+					m_SceneRaw.lock()->BeginRender();
+				}
+			}
+
+			void EndRender() {
+				if (!m_SceneRaw.expired()) {
+					m_SceneRaw.lock()->EndRender();
+				}
+			}
+
 			void OnUpdate(Core::GameTimer& gameTimer) {
 				if (!m_SceneRaw.expired()) {
 					m_SceneRaw.lock()->OnUpdate(gameTimer);

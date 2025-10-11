@@ -7,12 +7,14 @@
 #include "EventSystem/AppEvent.hpp"
 #include "EventSystem/KeyEvent.hpp"
 #include "FileSystem/PathManager.hpp"
+#include "Graphics/Renderer2D.hpp"
 
 namespace Cori {
 	namespace Core {
 		Application* Application::s_Instance{ nullptr };
 
-		Application::Application(const char* windowName) {
+		Application::Application(const char* windowName) : m_WorkerPool(std::thread::hardware_concurrency() == 1 ? 1 : std::thread::hardware_concurrency() - 1) {
+
 			//m_ManualStep = true;
 			CORI_CORE_ASSERT(!s_Instance, "Trying to construct application for the second time. Application already exists!");
 			s_Instance = this;
@@ -50,19 +52,14 @@ namespace Cori {
 			s_Instance->OnEvent(event);
 		}
 
+		uint16_t Application::GetWorkerCount() {
+			return s_Instance->m_WorkerPool.GetWorkerCount();
+		}
+
 		void Application::OnEvent(Event& event) {
 			EventDispatcher dispatcher(event);
 			dispatcher.Dispatch<WindowCloseEvent>(CORI_BIND_EVENT_FN(Application::OnWindowClose));
 
-
-#ifdef DEBUG_BUILD
-			dispatcher.Dispatch<KeyReleasedEvent>([](const KeyReleasedEvent& e) -> bool {
-				if (e.GetKeyCode() == CORI_KEY_F8) {
-					//CORI_PROFILER_FRAME_START();
-				}
-				return false;
-			});
-#endif
 			dispatcher.Dispatch<KeyReleasedEvent>([this](const KeyReleasedEvent& e) -> bool {
 				if (e.GetKeyCode() == CORI_KEY_F9) {
 					m_RenderImGui = !m_RenderImGui;
@@ -108,18 +105,22 @@ namespace Cori {
 				CORI_PROFILER_FRAME_START();
 				{
 					CORI_PROFILE_SCOPE("Cori Engine Global Update");
+					m_CommandQueue.Execute();
 					m_GameTimer.Update();
 
 					Graphics::Internal::API::SetClearColor(m_BackgroundColor);
 					Graphics::Internal::API::ClearFramebuffer();
 
+					Graphics::Renderer2D::StartFrame();
+
 					for (Layer* layer : m_LayerStack) {
+						layer->ActiveScene.BeginRender();
 						layer->OnUpdate(m_GameTimer);
 						layer->SceneUpdate(m_GameTimer);
-						if (layer->IsModal()) {
-							break;
-						}
+						layer->ActiveScene.EndRender();
 					}
+
+					Graphics::Renderer2D::EndFrame();
 
 					m_ImGuiLayer->StartFrame();
 

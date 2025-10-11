@@ -18,8 +18,27 @@ namespace Cori {
 			concept Trivial = std::is_trivial_v<T> && !IsVector<T>;
 		}
 
+		/**
+		 * @brief Saves and loads aggregate structs to/from drive.
+		 * @details You can load or save aggregate struct that contain trivial types or std::vector of any type.
+		 * \n It has some safety mechanisms to prevent file corruption or detect it afterward, also it will not allow you to load the data that came from one aggregate struct type into another.
+		 * \n 1: When you create the file it generates 1 128bit UUID and writes it to the header and to the footer of the file,
+		 * if during reading these UUIDs in footer and header mismatch, it means that the file is corrupted, it will try to look for a backup (.bak file), if it exists it will load it.
+		 * \n 2: During compile time an aggregate struct UID is generated for every specialization of SaveAggregateStruct method, this aggregate struct UID is saved in the header of the file,
+		 * later when loading it checks if this saved aggregate struct UID is the same as of the struct type you're trying to load the data in, if it detects missmatch, it will not load the data into that struct and instead look for a backup file.
+		 * \n 3: When saving a file it calculates a checksum of the data, when loading the file it checks the saved checksum in the header to the checksum calculated from the read data, if it detects a mismatch it will look for a backup.
+		 * \n 4: When a file is saved it saves total data size in the header, when reading the file it compares this saved value to the actual size of read data, if it detects a mismatch it will look for a backup.
+		 * @note Aggregate struct UID is sensitive to the order of members in the struct and to the member types.
+		 */
 		class BinaryFileManager {
 		public:
+			/**
+			 * @brief Saves an instance of an aggregate struct onto the disk.
+			 * @tparam T Aggregate struct type to save.
+			 * @param data Instance of the aggregate struct to save.
+			 * @param file File to save to.
+			 * @param safeMode Safe mode selector. When enabled it will create a backup after it writes the target file.
+			 */
 			template<typename T> requires std::is_aggregate_v<T>
 			static void SaveAggregateStruct(const T& data, const std::filesystem::path& file, const bool safeMode = false) {
 				auto uuid = Core::UUID().GetRaw();
@@ -81,6 +100,13 @@ namespace Cori {
 			}
 
 
+			/**
+			 * @brief Loads an aggregate struct from the file on the disk.
+			 * @tparam T Aggregate struct type to load into. Should be the same type you provided in SaveAggregateStruct when saving it.
+			 * @param file File to read from.
+			 * @param backupFallback Whether to look for a backup, or no.
+			 * @return Expected object with aggregate struct instance with loaded data, or CoriError on faliure.
+			 */
 			template<typename T> requires std::is_aggregate_v<T>
 			static std::expected<T, Core::CoriError<>> LoadAggregateStruct(const std::filesystem::path& file, const bool backupFallback = false) {
 				if (backupFallback) {

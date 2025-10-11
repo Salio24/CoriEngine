@@ -535,7 +535,7 @@ namespace Cori {
 					/**
 					 * @brief Retries a Track from the AudioSource cache.
 					 * @param name Name of the Track to retrieve.
-					 * @return Expected object with the shared pointer to the requested Track on success, or CoriError on faliure.
+					 * @return Expected object with the shared pointer to the requested Track on success, or CoriError on failure.
 					 */
 					std::expected<std::shared_ptr<Audio::Track>, Core::CoriError<>> GetTrack(const std::string& name) {
 						if (m_AudioTracks.contains(name)) {

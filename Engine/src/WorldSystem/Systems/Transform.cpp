@@ -60,9 +60,6 @@ namespace Cori {
 			}
 
 			void Transform::OnTransformCreate(entt::registry& registry, entt::entity entity) {
-				if (static_cast<uint32_t>(entity) == 31) {
-					CORI_WARN("W");
-				}
 				Entity e = entt::handle{ registry, entity };
 				auto& tr = e.GetComponents<Components::Entity::Transform>();
 				tr.m_Owner = e;

@@ -12,11 +12,11 @@ namespace Cori {
 			namespace Entity {
 				/**
 				 * @brief A StateMachine component is used in combination with custom objects derived from EntityState.
-				 * @details You declare several types deriver from EntityState and implement the state logic you need, then before using states you need to register them with the StateMachine by using Register<T>() method.
+				 * @details You declare several types deriver from EntityState and implement the state logic you need, then before using states you need to register them with the ```StateMachine``` by using ```Register<T>()``` method.
 				 * \n Let's say out Entity is in a state A then it changed state to B, then at tick N it entered state C. The tick sequence of this will be as follows:
-				 * \n Entity changes it's state form A to B, tick 1: OnTickUpdate of A is called one last time, then OnExit of A is called, then OnEnter of B is called.
-				 * \n Entity stays in state B, ticks 2 - (N - 1): Fire OnTickUpdate of B.
-				 * \n Entity leaves state B and enters state C, tick N: OnTickUpdate of B is fired one last time, then OnExit of B is called, then OnEnder of C is called.
+				 * \n Entity changes it's state form A to B, tick 1: ```OnTickUpdate``` of A is called one last time, then OnExit of A is called, then OnEnter of B is called.
+				 * \n Entity stays in state B, ticks 2 to (N - 1): Fire ```OnTickUpdate``` of B.
+				 * \n Entity leaves state B and enters state C, tick N: ```OnTickUpdate``` of B is fired one last time, then OnExit of B is called, then OnEnder of C is called.
 				 * @note Always make sure to set some initial state before actually using the FSM.
 				 */
 				class StateMachine {

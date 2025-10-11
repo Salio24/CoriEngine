@@ -1,5 +1,6 @@
 #pragma once
 #include "Image.hpp"
+#include "AssetManager/AssetLoadStatus.hpp"
 
 namespace Cori {
 	class AssetManager;
@@ -55,7 +56,6 @@ namespace Cori {
 				 * @brief Whether or no to flag the texture as semi transparent.
 				 */
 				bool m_HasSemiTransparency{ false };
-
 			};
 
 			virtual ~Texture() = default;
@@ -84,6 +84,13 @@ namespace Cori {
 			 * @note Don't touch this if you're not using it outside the provided Renderer2D.
 			 */
 			virtual void Bind(uint32_t slot) const = 0;
+
+			AssetStatus GetStatus() const {
+				return m_Status;
+			}
+
+		protected:
+			AssetStatus m_Status{ AssetStatus::UNSPECIFIED };
 		};
 
 		/**
@@ -97,7 +104,7 @@ namespace Cori {
 			class Descriptor {
 			public:
 				/**
-				 * @brief Constructs a descriptor. It's recommended to use "inline const" when defining the Descriptor in a namespace.
+				 * @brief Constructs a descriptor.
 				 * @param name Name to be used in AssetManager logging.
 				 * @param imagePath Path to the image that will be used to create the Texture2D.
 				 */
@@ -148,6 +155,8 @@ namespace Cori {
 
 		private:
 			friend AssetManager;
+			virtual void Upload(const void* pixelData, const uint32_t width, const uint32_t height, const Params& params) = 0;
+
 			[[nodiscard]] static std::shared_ptr<Texture2D> Create(const Descriptor& descriptor);
 		};
 	}

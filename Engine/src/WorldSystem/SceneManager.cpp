@@ -84,10 +84,8 @@ namespace Cori {
 			s_Data->m_Handles.insert({ id, handle });
 			scene->RegisterSystem<Systems::Transform>();
 			scene->RegisterSystem<Systems::Animation>();
-			scene->RegisterSystem<Systems::Trigger>();
 			scene->RegisterSystem<Systems::StateMachine>();
 			scene->RegisterSystem<Systems::Hierarchy>();
-			scene->RegisterSystem<Systems::Physics>();
 			return handle;
 		}
 
@@ -107,7 +105,6 @@ namespace Cori {
 				s_Data->m_Scenes.erase(name);
 				return {};
 			}
-
 
 			return std::unexpected(Core::CoriError(std::format("Failed to destroy Scene '{}', this scene is active in some layer. (ref count is > 1", name)));
 		}

@@ -162,26 +162,26 @@ namespace Cori {
 			/**
 			 * @brief Changes the activity state of the entity.
 			 * @param state Activity state to set.
-			 * @details When deactivating the entity a InactiveLocallyFlag and InactiveGloballyFlag are assigned to it, it this entity has any children a InactiveGloballyFlag will be added to the whole children tree recursively (to the grandchildren, grand-grandchildren and so on).
+			 * @details When deactivating the entity a ```InactiveLocallyFlag``` and ```InactiveGloballyFlag``` are assigned to it, it this entity has any children a ```InactiveGloballyFlag``` will be added to the whole children tree recursively (to the grandchildren, grand-grandchildren and so on).
 			 */
 			void SetActive(const bool state);
 
 			/**
-			 * @brief Checks if the entity is active locally (doesn't have InactiveLocallyFlag), just a convenience function.
-			 * @return True if it doesn't have InactiveLocallyFlag, false otherwise.
+			 * @brief Checks if the entity is active locally (doesn't have ```InactiveLocallyFlag```), just a convenience function.
+			 * @return True if it doesn't have ```InactiveLocallyFlag```, false otherwise.
 			 */
 			[[nodiscard]] bool IsActiveLocally() const;
 
 			/**
-			 * @brief Checks if the entity is active locally (doesn't have InactiveGloballyFlag), just a convenience function.
-			 * @return True if it doesn't have InactiveGloballyFlag, false otherwise.
+			 * @brief Checks if the entity is active locally (doesn't have ```InactiveGloballyFlag```), just a convenience function.
+			 * @return True if it doesn't have ```InactiveGloballyFlag```, false otherwise.
 			 */
 			[[nodiscard]] bool IsActiveGlobally() const;
 
 			/**
 			 * @brief Gets the entity ID.
 			 * @return Entity ID.
-			 * @note Entity IDs can be reused, to differentiate one entity from the other, you need to compare entity ID and entity version. To get a unique entity ID use GetEUID() method.
+			 * @note Entity IDs can be reused, to differentiate one entity from the other, you need to compare entity ID and entity version. To get a unique entity ID use ```GetEUID()``` method.
 			 */
 			[[nodiscard]] uint32_t GetID() const {
 				return entt::to_integral(m_EntityHandle.entity());
@@ -203,6 +203,10 @@ namespace Cori {
 				return static_cast<uint64_t>(GetID()) << 32 | GetVersion();
 			}
 
+			/**
+			 * @brief Retries the ID of the owner scene. You can get the actual SceneHandle by providing SceneManager with this ID (method: ```GetHandle```).
+			 * @return Owner SceneID.
+			 */
 			[[nodiscard]] uint32_t GetOwnerSceneID() const {
 				return GetComponents<Internal::SceneID>().m_OwningSceneID;
 			}
@@ -256,6 +260,9 @@ namespace Cori {
 			 */
 			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindChildByName(const char* name) const;
 
+			/**
+			 * @brief Destroys all children (and they grandchildren) that the entity has.
+			 */
 			void DestroyChildren();
 
 			/**

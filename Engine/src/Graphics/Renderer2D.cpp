@@ -2,6 +2,7 @@
 #include <ska_sort.hpp>
 #include "Utility/AABB.hpp"
 #include "FontData.hpp"
+#include "AssetManager/AssetManager.hpp"
 #include "FileSystem/PathManager.hpp"
 
 namespace Cori {
@@ -82,34 +83,39 @@ namespace Cori {
 			delete s_Data;
 		}
 
-
-
 		void Renderer2D::BeginScene(const World::Components::Scene::Camera& camera) {
 			CORI_PROFILE_FUNCTION();
+			s_Data->CurrentDrawSpace = UNSPECIFIED;
 
 			s_Data->WorldSpaceViewProjectionMatrix = camera.m_ViewProjectionMatrix;
 			s_Data->ScreenSpaceViewProjectionMatrix = camera.m_ProjectionMatrix;
-
-			s_Data->Stats.DrawCalls = 0;
-			s_Data->Stats.QuadCount = 0;
 		}
 
-		void Renderer2D::BeginWorldSpacePass() {
+		bool Renderer2D::BeginWorldSpacePass() {
+			CORI_PROFILE_FUNCTION();
 			if (s_Data->CurrentDrawSpace != WORLD_SPACE) {
 				s_Data->CurrentViewProjectionMatrix = s_Data->WorldSpaceViewProjectionMatrix;
 				s_Data->CurrentDrawSpace = WORLD_SPACE;
+				return true;
 			}
+
+			return false;
 		}
 
-		void Renderer2D::BeginScreenSpacePass() {
+		bool Renderer2D::BeginScreenSpacePass() {
+			CORI_PROFILE_FUNCTION();
 			if (s_Data->CurrentDrawSpace != SCREEN_SPACE) {
 				s_Data->CurrentViewProjectionMatrix = s_Data->ScreenSpaceViewProjectionMatrix;
 				s_Data->CurrentDrawSpace = SCREEN_SPACE;
+				return true;
 			}
+
+			return false;
 		}
 
 		void Renderer2D::EndScene() {
 			CORI_PROFILE_FUNCTION();
+			FlushRenderQueues();
 		}
 
 		void Renderer2D::SubmitScene(World::Scene* scene) {
@@ -143,9 +149,8 @@ namespace Cori {
 		}
 
 		void Renderer2D::FlushRenderQueues() {
-			BeginWorldSpacePass();
+
 			FlushOpaqueQueues();
-			BeginScreenSpacePass();
 			FlushTransparentQueues();
 		}
 
@@ -168,7 +173,7 @@ namespace Cori {
 			SubmitQuadToQueue(s_Data->ScreenSpaceTransparentQuadQueue, transform, halfSize, tintColor, texture, uvs, depth, flipX, flipY, flatColored);
 		}
 
-		void Renderer2D::BeginInstancedSet() {
+		void Renderer2D::BeginQuadInstancedSet() {
 			CORI_PROFILE_FUNCTION();
 
 			s_Data->QuadInstanceCount = 0;
@@ -176,7 +181,7 @@ namespace Cori {
 
 		}
 
-		void Renderer2D::EndInstancedSet() {
+		void Renderer2D::EndQuadInstancedSet() {
 			if (s_Data->QuadInstanceCount != 0) {
 				if (s_Data->CurrentVertexArray != s_Data->QuadInstanceVertexArray.get()) {
 					s_Data->QuadInstanceVertexArray->Bind();
@@ -226,12 +231,19 @@ namespace Cori {
 		}
 
 		void Renderer2D::SubmitQuadToQueue(std::vector<QuadInstance>& queue, const glm::mat3& transform, const glm::vec2 halfSize, const glm::vec4& tintColor, Texture2D* texture, const UVs& uvs, const uint8_t depth, const bool flipX, const bool flipY, const bool flatColored) {
+			if (flatColored) {
+				texture = s_Data->WhiteTexture.get();
+			}
+			else if (texture->GetStatus() != AssetStatus::READY) {
+				return;
+			}
+
 			if (!flipX && !flipY) {
 				queue.emplace_back(
 					transform,
 					halfSize,
 					tintColor,
-					flatColored ? s_Data->WhiteTexture.get() : texture,
+					texture,
 					static_cast<glm::vec4>(uvs),
 					depth
 				);
@@ -241,7 +253,7 @@ namespace Cori {
 					transform,
 					halfSize,
 					tintColor,
-					flatColored ? s_Data->WhiteTexture.get() : texture,
+					texture,
 					glm::vec4{uvs.UVmax.x, uvs.UVmin.y, uvs.UVmin.x, uvs.UVmax.y},
 					depth
 				);
@@ -251,7 +263,7 @@ namespace Cori {
 					transform,
 					halfSize,
 					tintColor,
-					flatColored ? s_Data->WhiteTexture.get() : texture,
+					texture,
 					glm::vec4{uvs.UVmin.x, uvs.UVmax.y, uvs.UVmax.x, uvs.UVmin.y},
 					depth
 				);
@@ -261,7 +273,7 @@ namespace Cori {
 					transform,
 					halfSize,
 					tintColor,
-					flatColored ? s_Data->WhiteTexture.get() : texture,
+					texture,
 					glm::vec4{uvs.UVmax.x, uvs.UVmax.y, uvs.UVmin.x, uvs.UVmin.y},
 					depth
 				);
@@ -275,12 +287,12 @@ namespace Cori {
 		}
 
 		void Renderer2D::SubmitAABB(const Utility::AABB& aabb, const float lineThickness, const glm::vec3& color) {
-			const glm::vec2 size = {aabb.m_Max.x - aabb.m_Min.x, aabb.m_Max.y - aabb.m_Min.y};
-			SubmitColoredQuad(WORLD_SPACE, {aabb.m_Min.x, aabb.m_Max.y - size.y / 2.0f}, {lineThickness, size.y / 2.0f}, color);
-			SubmitColoredQuad(WORLD_SPACE, {aabb.m_Max.x, aabb.m_Max.y - size.y / 2.0f}, {lineThickness, size.y / 2.0f}, color);
+			const glm::vec2 size = { aabb.m_Max.x - aabb.m_Min.x, aabb.m_Max.y - aabb.m_Min.y };
+			SubmitColoredQuad(WORLD_SPACE, { aabb.m_Min.x, aabb.m_Max.y - size.y / 2.0f }, { lineThickness, size.y / 2.0f }, color);
+			SubmitColoredQuad(WORLD_SPACE, { aabb.m_Max.x, aabb.m_Max.y - size.y / 2.0f }, { lineThickness, size.y / 2.0f }, color);
 
-			SubmitColoredQuad(WORLD_SPACE, {aabb.m_Max.x - size.x / 2.0f, aabb.m_Min.y}, {size.x / 2.0f - lineThickness, lineThickness}, color);
-			SubmitColoredQuad(WORLD_SPACE, {aabb.m_Max.x - size.x / 2.0f, aabb.m_Max.y}, {size.x / 2.0f - lineThickness, lineThickness}, color);
+			SubmitColoredQuad(WORLD_SPACE, { aabb.m_Max.x - size.x / 2.0f, aabb.m_Min.y }, { size.x / 2.0f - lineThickness, lineThickness }, color);
+			SubmitColoredQuad(WORLD_SPACE, { aabb.m_Max.x - size.x / 2.0f, aabb.m_Max.y }, { size.x / 2.0f - lineThickness, lineThickness }, color);
 		}
 
 		void Renderer2D::SubmitTextToQueue(std::vector<TextInstance>& queue, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::u32string_view& text, const glm::vec4& color, Font* font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) {
@@ -314,6 +326,21 @@ namespace Cori {
 		}
 
 		void Renderer2D::SubmitText(const DrawSpace space, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::u32string_view& text, const glm::vec4& color, Font* font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) {
+			if (font->GetStatus() == AssetStatus::LOADING) {
+				return;
+			}
+			if (font->GetStatus() == AssetStatus::PLACEHOLDER) {
+				const auto placeholder = AssetManager::GetPlaceholder<Font>();
+				if (placeholder) {
+					if (placeholder->GetStatus() == AssetStatus::READY) {
+						font = placeholder.get();
+					} else {
+						return;
+					}
+
+				}
+			}
+
 			if (space == WORLD_SPACE) {
 				SubmitTextToQueue(s_Data->WorldSpaceTransparentTextQueue, alignment, transform, fontSize, text, color, font, depth, limitX, lineSpacing, kerning);
 				return;
@@ -323,23 +350,40 @@ namespace Cori {
 		}
 
 		void Renderer2D::SubmitText(const DrawSpace space, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::string_view& text, const glm::vec4& color, Font* font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning) {
+			if (font->GetStatus() == AssetStatus::LOADING) {
+				return;
+			}
+			if (font->GetStatus() == AssetStatus::PLACEHOLDER) {
+				const auto placeholder = AssetManager::GetPlaceholder<Font>();
+				if (placeholder) {
+					if (placeholder->GetStatus() == AssetStatus::READY) {
+						font = placeholder.get();
+					} else {
+						return;
+					}
+
+				}
+			}
+
 			if (space == WORLD_SPACE) {
 				SubmitTextToQueue(s_Data->WorldSpaceTransparentTextQueue, alignment, transform, fontSize, text, color, font, depth, limitX, lineSpacing, kerning);
 				return;
 			}
 
 			SubmitTextToQueue(s_Data->ScreenSpaceTransparentTextQueue, alignment, transform, fontSize, text, color, font, depth, limitX, lineSpacing, kerning);
+
 		}
 
 		Renderer2D::Statistics Renderer2D::GetStatistics() {
 			return s_Data->Stats;
 		}
 
-		void Renderer2D::EndFrame(const World::Components::Scene::Camera& camera) {
-			BeginScene(camera);
-			FlushRenderQueues();
-			EndScene();
+		void Renderer2D::StartFrame() {
+			s_Data->Stats.DrawCalls = 0;
+			s_Data->Stats.QuadCount = 0;
 		}
+
+		void Renderer2D::EndFrame() {}
 
 		void Renderer2D::DrawQuadInstanced(const QuadInstance& quad) {
 			if (!quad.m_Texture) {
@@ -348,7 +392,7 @@ namespace Cori {
 			}
 
 			if (s_Data->QuadInstanceCount >= RendererData::MaxInstanceCount) {
-				StartNewInstancedSet();
+				StartNewQuadInstancedSet();
 			}
 
 			if (s_Data->NecessaryTexture != quad.m_Texture) {
@@ -356,7 +400,7 @@ namespace Cori {
 					s_Data->NecessaryTexture = quad.m_Texture;
 				}
 				else {
-					StartNewInstancedSet();
+					StartNewQuadInstancedSet();
 					s_Data->NecessaryTexture = quad.m_Texture;
 				}
 			}
@@ -365,7 +409,7 @@ namespace Cori {
 			s_Data->QuadInstanceBufferPtr->m_TexturePosition = quad.m_UVs;
 			s_Data->QuadInstanceBufferPtr->m_Size = quad.m_Size;
 			s_Data->QuadInstanceBufferPtr->m_TintColor = quad.m_TintColor;
-			s_Data->QuadInstanceBufferPtr->m_Layer = quad.m_Layer;
+			s_Data->QuadInstanceBufferPtr->m_Layer = quad.m_Depth;
 			s_Data->QuadInstanceBufferPtr++;
 
 			s_Data->QuadInstanceCount++;
@@ -696,237 +740,229 @@ namespace Cori {
 					break;
 				}
 			}
-
 		}
 
-		void Renderer2D::StartNewInstancedSet() {
-			EndInstancedSet();
-			BeginInstancedSet();
+		void Renderer2D::StartNewQuadInstancedSet() {
+			EndQuadInstancedSet();
+			BeginQuadInstancedSet();
 		}
-
 
 		void Renderer2D::FlushOpaqueQueues() {
 			CORI_PROFILE_FUNCTION();
 
-			if (!s_Data->WorldSpaceOpaqueQuadQueue.empty()) {
-				CORI_PROFILE_SCOPE("Opaque instanced quad flush");
-
-				BeginWorldSpacePass();
-
-				{
-					CORI_PROFILE_SCOPE("Opaque instanced quad texture sort");
+			static auto SortOpaqueQuadQueue = [](std::vector<QuadInstance>& queue) {
+				if (!queue.empty()) {
+					CORI_PROFILE_FUNCTION();
 					ska_sort(
-						s_Data->WorldSpaceOpaqueQuadQueue.begin(),
-						s_Data->WorldSpaceOpaqueQuadQueue.end(),
+						queue.begin(),
+						queue.end(),
 						[](const QuadInstance& quad) -> uint64_t {
 							return reinterpret_cast<uint64_t>(quad.m_Texture);
 						}
 					);
 				}
+			};
 
-				{
-					CORI_PROFILE_SCOPE("Opaque instanced quad draw");
-					BeginInstancedSet();
+			SortOpaqueQuadQueue(s_Data->WorldSpaceOpaqueQuadQueue);
+			SortOpaqueQuadQueue(s_Data->ScreenSpaceOpaqueQuadQueue);
 
-					for (const auto& quad : s_Data->WorldSpaceOpaqueQuadQueue) {
-						DrawQuadInstanced(quad);
-					}
+			if (!s_Data->WorldSpaceOpaqueQuadQueue.empty()) {
+				BeginWorldSpacePass();
 
-					EndInstancedSet();
+				BeginQuadInstancedSet();
+
+				for (const auto& quad : s_Data->WorldSpaceOpaqueQuadQueue) {
+					DrawQuadInstanced(quad);
 				}
+
+				EndQuadInstancedSet();
+
 
 				s_Data->WorldSpaceOpaqueQuadQueue.clear();
 			}
-			
-			if (!s_Data->ScreenSpaceOpaqueQuadQueue.empty()) {
-				CORI_PROFILE_SCOPE("Opaque screen space instanced quad flush");
 
+			if (!s_Data->ScreenSpaceOpaqueQuadQueue.empty()) {
 				BeginScreenSpacePass();
 
-				{
-					CORI_PROFILE_SCOPE("Opaque screen space instanced quad texture sort");
-					ska_sort(
-						s_Data->ScreenSpaceOpaqueQuadQueue.begin(),
-						s_Data->ScreenSpaceOpaqueQuadQueue.end(),
-						[](const QuadInstance& quad) -> uint64_t {
-							return reinterpret_cast<uint64_t>(quad.m_Texture);
-						}
-					);
+				BeginQuadInstancedSet();
+
+				for (const auto& quad : s_Data->ScreenSpaceOpaqueQuadQueue) {
+					DrawQuadInstanced(quad);
 				}
 
-				{
-					CORI_PROFILE_SCOPE("Opaque screen space instanced quad draw");
-					BeginInstancedSet();
-
-					for (const auto& quad : s_Data->ScreenSpaceOpaqueQuadQueue) {
-						DrawQuadInstanced(quad);
-					}
-
-					EndInstancedSet();
-				}
+				EndQuadInstancedSet();
 
 				s_Data->ScreenSpaceOpaqueQuadQueue.clear();
 			}
 		}
 
 		void Renderer2D::FlushTransparentQueues() {
-			if (!s_Data->WorldSpaceTransparentQuadQueue.empty()) {
-				CORI_PROFILE_SCOPE("Transparent instanced quad flush");
-
-				BeginWorldSpacePass();
-
-				{
-					CORI_PROFILE_SCOPE("Transparent instanced quad texture sort");
+			static auto SortTransparentQuadQueue = [](std::vector<QuadInstance>& queue) {
+				CORI_PROFILE_FUNCTION();
+				if (!queue.empty()) {
 					ska_sort(
-						s_Data->WorldSpaceTransparentQuadQueue.begin(),
-						s_Data->WorldSpaceTransparentQuadQueue.end(),
+						queue.begin(),
+						queue.end(),
 						[](const QuadInstance& quad) -> uint64_t {
 							return reinterpret_cast<uint64_t>(quad.m_Texture);
 						}
 					);
-				}
 
-				{
-					CORI_PROFILE_SCOPE("Transparent instanced quad layer sort");
 					ska_sort(
-						s_Data->WorldSpaceTransparentQuadQueue.begin(),
-						s_Data->WorldSpaceTransparentQuadQueue.end(),
+						queue.begin(),
+						queue.end(),
 						[](const QuadInstance& quad) -> uint8_t {
-							return quad.m_Layer;
+							return quad.m_Depth;
 						}
 					);
 				}
+			};
 
-				Internal::API::EnableBlending();
-				Internal::API::SetDepthMask(false);
-
-				{
-					CORI_PROFILE_SCOPE("Transparent instanced quad draw");
-					BeginInstancedSet();
-
-					for (const auto& quad : s_Data->WorldSpaceTransparentQuadQueue) {
-						DrawQuadInstanced(quad);
-					}
-
-					EndInstancedSet();
-				}
-
-				Internal::API::SetDepthMask(true);
-				Internal::API::DisableBlending();
-
-				s_Data->WorldSpaceTransparentQuadQueue.clear();
-			}
-
-			if (!s_Data->WorldSpaceTransparentTextQueue.empty()) {
-				CORI_PROFILE_SCOPE("Instanced Text flush");
-
-				BeginWorldSpacePass();
-
-				{
-					CORI_PROFILE_SCOPE("Instanced Text layer sort");
+			static auto SortTextQueue = [](std::vector<TextInstance>& queue) {
+				CORI_PROFILE_FUNCTION();
+				if (!queue.empty()) {
 					ska_sort(
-						s_Data->WorldSpaceTransparentTextQueue.begin(),
-						s_Data->WorldSpaceTransparentTextQueue.end(),
+						queue.begin(),
+						queue.end(),
+						[](const TextInstance& text) -> uint64_t {
+							return reinterpret_cast<uint64_t>(text.m_Font);
+						}
+					);
+
+					ska_sort(
+						queue.begin(),
+						queue.end(),
 						[](const TextInstance& text) -> uint8_t {
 							return text.m_Depth;
 						}
 					);
 				}
+			};
 
-				Internal::API::EnableBlending();
-				Internal::API::SetDepthMask(false);
-
-				{
-					CORI_PROFILE_SCOPE("Instanced Text draw");
-					for (const auto& text : s_Data->WorldSpaceTransparentTextQueue) {
-						DrawTextInstanced(text);
-					}
+			static auto ClearQuadQueue = [](std::vector<QuadInstance>& queue) {
+				CORI_PROFILE_FUNCTION();
+				if (!queue.empty()) {
+					queue.clear();
 				}
+			};
 
-				Internal::API::SetDepthMask(true);
-				Internal::API::DisableBlending();
+			static auto ClearTextQueue = [](std::vector<TextInstance>& queue) {
+				CORI_PROFILE_FUNCTION();
+				if (!queue.empty()) {
+					queue.clear();
+				}
+			};
 
-				s_Data->WorldSpaceTransparentTextQueue.clear();
+			SortTransparentQuadQueue(s_Data->WorldSpaceTransparentQuadQueue);
+			SortTransparentQuadQueue(s_Data->ScreenSpaceTransparentQuadQueue);
+			SortTextQueue(s_Data->WorldSpaceTransparentTextQueue);
+			SortTextQueue(s_Data->ScreenSpaceTransparentTextQueue);
+
+			auto it_wsq = s_Data->WorldSpaceTransparentQuadQueue.begin();
+			auto it_ssq = s_Data->ScreenSpaceTransparentQuadQueue.begin();
+			auto it_wst = s_Data->WorldSpaceTransparentTextQueue.begin();
+			auto it_sst = s_Data->ScreenSpaceTransparentTextQueue.begin();
+
+			const auto end_wsq = s_Data->WorldSpaceTransparentQuadQueue.end();
+			const auto end_ssq = s_Data->ScreenSpaceTransparentQuadQueue.end();
+			const auto end_wst = s_Data->WorldSpaceTransparentTextQueue.end();
+			const auto end_sst = s_Data->ScreenSpaceTransparentTextQueue.end();
+
+			std::priority_queue<ElementView, std::vector<ElementView>, std::greater<>> pq;
+
+			if (it_wsq != end_wsq) pq.push({&*it_wsq, it_wsq->m_Depth, WORLD_SPACE_QUAD});
+			if (it_ssq != end_ssq) pq.push({&*it_ssq, it_ssq->m_Depth, SCREEN_SPACE_QUAD});
+			if (it_wst != end_wst) pq.push({&*it_wst, it_wst->m_Depth, WORLD_SPACE_TEXT});
+			if (it_sst != end_sst) pq.push({&*it_sst, it_sst->m_Depth, SCREEN_SPACE_TEXT});
+
+			if (pq.empty()) {
+				return;
 			}
 
-			if (!s_Data->ScreenSpaceTransparentQuadQueue.empty()) {
-				CORI_PROFILE_SCOPE("Transparent screen space instanced quad flush");
+			Internal::API::EnableBlending();
+			Internal::API::SetDepthMask(false);
 
-				BeginScreenSpacePass();
+			while (!pq.empty()) {
+				ElementView top = pq.top();
+				pq.pop();
 
-				{
-					CORI_PROFILE_SCOPE("Transparent screen space instanced quad texture sort");
-					ska_sort(
-						s_Data->ScreenSpaceTransparentQuadQueue.begin(),
-						s_Data->ScreenSpaceTransparentQuadQueue.end(),
-						[](const QuadInstance& quad) -> uint64_t {
-							return reinterpret_cast<uint64_t>(quad.m_Texture);
+				switch (top.m_QueueType) {
+				case WORLD_SPACE_QUAD:
+					{
+						const auto elem = std::get<const QuadInstance*>(top.m_ElementVariant);
+						if (s_Data->CurrentDrawSpace != WORLD_SPACE && s_Data->QuadInstanceCount != 0) {
+							StartNewQuadInstancedSet();
 						}
-					);
-				}
 
-				{
-					CORI_PROFILE_SCOPE("Transparent screen space instanced quad layer sort");
-					ska_sort(
-						s_Data->ScreenSpaceTransparentQuadQueue.begin(),
-						s_Data->ScreenSpaceTransparentQuadQueue.end(),
-						[](const QuadInstance& quad) -> uint8_t {
-							return quad.m_Layer;
+						BeginWorldSpacePass();
+
+						DrawQuadInstanced(*elem);
+
+						if (++it_wsq != end_wsq) {
+							pq.push({&*it_wsq, it_wsq->m_Depth, WORLD_SPACE_QUAD});
 						}
-					);
-				}
-
-				Internal::API::EnableBlending();
-				Internal::API::SetDepthMask(false);
-
-				{
-					CORI_PROFILE_SCOPE("Transparent screen space instanced quad draw");
-					BeginInstancedSet();
-
-					for (const auto& quad : s_Data->ScreenSpaceTransparentQuadQueue) {
-						DrawQuadInstanced(quad);
+						break;
 					}
+				case SCREEN_SPACE_QUAD:
+					{
+						const auto elem = std::get<const QuadInstance*>(top.m_ElementVariant);
+						if (s_Data->CurrentDrawSpace != SCREEN_SPACE && s_Data->QuadInstanceCount != 0) {
+							StartNewQuadInstancedSet();
+						}
 
-					EndInstancedSet();
+						BeginScreenSpacePass();
+
+						DrawQuadInstanced(*elem);
+
+						if (++it_ssq != end_ssq) {
+							pq.push({&*it_ssq, it_ssq->m_Depth, SCREEN_SPACE_QUAD});
+						}
+						break;
+					}
+				case WORLD_SPACE_TEXT:
+					{
+						const auto elem = std::get<const TextInstance*>(top.m_ElementVariant);
+						if (s_Data->QuadInstanceCount != 0) {
+							EndQuadInstancedSet();
+						}
+
+						BeginWorldSpacePass();
+						DrawTextInstanced(*elem);
+
+						if (++it_wst != end_wst) {
+							pq.push({&*it_wst, it_wst->m_Depth, WORLD_SPACE_TEXT});
+						}
+						break;
+					}
+				case SCREEN_SPACE_TEXT:
+					{
+						const auto elem = std::get<const TextInstance*>(top.m_ElementVariant);
+						if (s_Data->QuadInstanceCount != 0) {
+							EndQuadInstancedSet();
+						}
+
+						BeginScreenSpacePass();
+						DrawTextInstanced(*elem);
+
+						if (++it_sst != end_sst) {
+							pq.push({&*it_sst, it_sst->m_Depth, SCREEN_SPACE_TEXT});
+						}
+						break;
+					}
 				}
-
-				Internal::API::SetDepthMask(true);
-				Internal::API::DisableBlending();
-
-				s_Data->ScreenSpaceTransparentQuadQueue.clear();
 			}
 
-			if (!s_Data->ScreenSpaceTransparentTextQueue.empty()) {
-				CORI_PROFILE_SCOPE("Screen Space instanced Text flush");
-
-				BeginScreenSpacePass();
-
-				{
-					CORI_PROFILE_SCOPE("Screen Space instanced Text layer sort");
-					ska_sort(
-						s_Data->ScreenSpaceTransparentTextQueue.begin(),
-						s_Data->ScreenSpaceTransparentTextQueue.end(),
-						[](const TextInstance& text) -> uint8_t {
-							return text.m_Depth;
-						}
-					);
-				}
-
-				Internal::API::EnableBlending();
-				Internal::API::SetDepthMask(false);
-
-				{
-					CORI_PROFILE_SCOPE("Screen Space instanced Text draw");
-					for (const auto& text : s_Data->ScreenSpaceTransparentTextQueue) {
-						DrawTextInstanced(text);
-					}
-				}
-
-				Internal::API::SetDepthMask(true);
-				Internal::API::DisableBlending();
-
-				s_Data->ScreenSpaceTransparentTextQueue.clear();
+			if (s_Data->QuadInstanceCount != 0) {
+				EndQuadInstancedSet();
 			}
+
+			Internal::API::SetDepthMask(true);
+			Internal::API::DisableBlending();
+
+			ClearQuadQueue(s_Data->WorldSpaceTransparentQuadQueue);
+			ClearQuadQueue(s_Data->ScreenSpaceTransparentQuadQueue);
+			ClearTextQueue(s_Data->WorldSpaceTransparentTextQueue);
+			ClearTextQueue(s_Data->ScreenSpaceTransparentTextQueue);
 		}
 
 		void Renderer2D::FlushInstancedQuads() {

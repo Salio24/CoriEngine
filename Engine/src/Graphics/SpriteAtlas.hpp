@@ -17,7 +17,7 @@ namespace Cori {
 			class Descriptor {
 			public:
 				/**
-				 * @brief Constructs a descriptor. It's recommended to use "inline const" when defining the Descriptor in a namespace
+				 * @brief Constructs a descriptor.
 				 * @param name Name to be used assigned to SpriteAtlas.
 				 * @param imagePath Path to the image that will be used to create the SpriteAtlas.
 				 * @param spriteResolution Resolution of one sprite in an atlas.

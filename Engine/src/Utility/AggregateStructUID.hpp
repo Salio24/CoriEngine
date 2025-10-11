@@ -14,7 +14,7 @@ namespace Cori {
 			consteval auto GenerateTypeSignature(std::index_sequence<Indexes...>) {
 				constexpr size_t finalSize =
 					GetTypeHelper<T>().size() + 1 +
-					((GetTypeHelper<std::tuple_element_t<Indexes, Tuple>>().size() + 1) + ... ) +
+					((GetTypeHelper<std::tuple_element_t<Indexes, Tuple>>().size() + 1) + ...) +
 					(sizeof...(Indexes) > 0 ? -1 : 0) + 1 + 1;
 
 				std::array<char, finalSize> signature{};

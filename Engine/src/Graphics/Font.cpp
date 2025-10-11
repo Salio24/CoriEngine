@@ -1,28 +1,35 @@
 #include "Font.hpp"
 #include "FontData.hpp"
 #include "FileSystem/PathManager.hpp"
+#include "Core/Application.hpp"
+#include "AssetManager/AssetManager.hpp"
 
 namespace Cori {
 	namespace Graphics {
-		std::shared_ptr<Font> Font::Create(const std::filesystem::path& path, const std::vector<CharsetRange>& charsets, const float minimalScale /*48.0f*/, const float miterLimit /*2.0f*/) {
-			CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Loading Font from: {}", path.string());
-			std::shared_ptr<Font> coriFont = nullptr;
-			msdfgen::FreetypeHandle* ft = msdfgen::initializeFreetype();
-			CORI_CORE_ASSERT(ft, "Failed to initialize FreeType when loading Font");
-			msdfgen::FontHandle* font = msdfgen::loadFont(ft, path.string().c_str());
-			if (font) {
-				coriFont.reset(new Font(static_cast<void*>(font), charsets, path, minimalScale, miterLimit));
-				CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Loaded Font from '{}' successfully.", path.string());
-				msdfgen::destroyFont(font);
-			} else {
-				const std::filesystem::path placeholder = FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "placeholders/unifont-16.0.04.otf";
-				msdfgen::FontHandle* fontPlaceholder = msdfgen::loadFont(ft, placeholder.string().c_str());
-				CORI_CORE_ASSERT(fontPlaceholder, "Failed to load placeholder (bundled with the engine) Font. It should've been at bin/'Build Type if any '{}'", placeholder.string());
-				coriFont.reset(new Font(static_cast<void*>(fontPlaceholder), charsets, placeholder, minimalScale, miterLimit));
-				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Failed to load Font from '{}', loaded bundled placeholder font instead.", path.string());
-				msdfgen::destroyFont(fontPlaceholder);
-			}
-			msdfgen::deinitializeFreetype(ft);
+		std::shared_ptr<Font> Font::Create(const std::filesystem::path& path, const std::vector<CharsetRange>& charsets, const float minimalScale /*48.0f*/, const float miterLimit /*1.0f*/) {
+			CORI_PROFILE_FUNCTION();
+			std::shared_ptr<Font> coriFont = std::make_shared<Font>();
+			Core::Application::SubmitWorkerTask([path, charsets, minimalScale, miterLimit, coriFont] {
+				CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Loading Font from: {}", path.string());
+				msdfgen::FreetypeHandle* ft = msdfgen::initializeFreetype();
+				CORI_CORE_ASSERT(ft, "Failed to initialize FreeType when loading Font");
+				msdfgen::FontHandle* font = msdfgen::loadFont(ft, path.string().c_str());
+				if (font) {
+					coriFont->Load(static_cast<void*>(font), charsets, path, minimalScale, miterLimit);
+					CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Loaded Font from '{}' successfully.", path.string());
+					msdfgen::destroyFont(font);
+				} else {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Failed to load Font from '{}', checking if placeholder is available.", path.string());
+					if (AssetManager::HasPlaceholder<Font>()) {
+						CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Placeholder is available for <{}>, asset status set to PLACEHOLDER.", CORI_CLEAN_TYPE_NAME(Font));
+						coriFont->m_Status = AssetStatus::PLACEHOLDER;
+					} else {
+						CORI_CORE_FATAL_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "No placeholder is available for <{}>, asset status set to FAILED.", CORI_CLEAN_TYPE_NAME(Font));
+						coriFont->m_Status = AssetStatus::FAILED;
+					}
+				}
+				msdfgen::deinitializeFreetype(ft);
+			});
 			return coriFont;
 		}
 
@@ -30,7 +37,12 @@ namespace Cori {
 			return Create(descriptor.m_FontPath, descriptor.m_CharsetRanges, descriptor.m_MinimalScale, descriptor.m_MiterLimit);
 		}
 
-		Font::Font(void* font, const std::vector<CharsetRange>& charsets, const std::filesystem::path& fontPath, const float minimalScale, const float miterLimit) {
+		Font::Font() {
+			m_Status = AssetStatus::LOADING;
+		}
+
+		void Font::Load(void* font, const std::vector<CharsetRange>& charsets, const std::filesystem::path& fontPath, const float minimalScale, const float miterLimit) {
+			CORI_PROFILE_FUNCTION();
 			auto font_ = static_cast<msdfgen::FontHandle*>(font);
 
 			m_Data = new Internal::FontData();
@@ -77,7 +89,7 @@ namespace Cori {
 
 			size_t fontFileSize = std::filesystem::file_size(fontPath);
 
-			static auto CheckCached = [&] -> bool {
+			static auto CheckCached = [&]() -> bool {
 				std::ifstream f(target, std::ios::in | std::ios::binary);
 
 				if (!f.is_open()) {
@@ -155,7 +167,19 @@ namespace Cori {
 				void* pixels = &buffer[pixelsOffset];
 
 				Texture::Params params2 { .m_PixelFormat = Texture::RGB888, .m_WrapMode = Texture::CLAMP_TO_EDGE, .m_Filter = Texture::LINEAR, .m_UnpackAlignment = 1, .m_HasSemiTransparency = false, };
-				m_Data->m_Atlas = Texture2D::Create(pixels, widthLoaded, heightLoaded, params2);
+
+				void* data = malloc(assumedAtlasSize);
+				memcpy(data, pixels, assumedAtlasSize);
+
+				std::shared_ptr<Font> subject = shared_from_this();
+
+				Core::Application::SubmitMainTask([data, params2, subject, widthLoaded, heightLoaded] {
+					subject->m_Data->m_Atlas = Texture2D::Create(data, widthLoaded, heightLoaded, params2);
+					subject->m_Status = AssetStatus::READY;
+					free(data);
+				});
+
+				//m_Data->m_Atlas = Texture2D::Create(data, widthLoaded, heightLoaded, params2);
 				return false;
 			};
 
@@ -215,14 +239,32 @@ namespace Cori {
 
 				out.close();
 
-				Texture::Params params{.m_PixelFormat = Texture::RGB888, .m_WrapMode = Texture::CLAMP_TO_EDGE, .m_Filter = Texture::LINEAR, .m_UnpackAlignment = 1, .m_HasSemiTransparency = false,};
-				m_Data->m_Atlas = Texture2D::Create(storage.pixels, storage.width, storage.height, params);
+				void* data = malloc(storage.width * 3 * storage.height);
+				memcpy(data, storage.pixels, storage.width * 3 * storage.height);
+
+				Texture::Params params{.m_PixelFormat = Texture::RGB888, .m_WrapMode = Texture::CLAMP_TO_EDGE, .m_Filter = Texture::LINEAR, .m_UnpackAlignment = 1, .m_HasSemiTransparency = false};
+
+				std::shared_ptr<Font> subject = shared_from_this();
+				int32_t w = storage.width;
+				int32_t h = storage.height;
+
+				Core::Application::SubmitMainTask([data, params, subject, w, h]{
+					subject->m_Data->m_Atlas = Texture2D::Create(data, w, h, params);
+					subject->m_Status = AssetStatus::READY;
+					free(data);
+				});
+
+				//m_Data->m_Atlas = Texture2D::Create(storage.pixels, storage.width, storage.height, params);
 			}
 		}
 
 
 		Font::~Font() {
 			delete m_Data;
+		}
+
+		AssetStatus Font::GetStatus() const {
+			return m_Status;
 		}
 
 		Internal::FontData* Font::GetData() {

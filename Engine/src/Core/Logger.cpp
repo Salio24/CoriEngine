@@ -48,7 +48,7 @@ namespace Cori {
 		int32_t maxSize = 1048576 * 20;
 		int32_t maxFiles = 5;
 		const auto fileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("logs/cori_log.txt", maxSize, maxFiles);
-		fileSink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-6n] [%-8l]: %v%$ %@");
+		fileSink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [Thread %t] [%-6n] [%-8l]: %v%$ %@");
 		std::vector<spdlog::sink_ptr> coreSinks;
 		std::vector<spdlog::sink_ptr> clientSinks;
 
@@ -60,7 +60,7 @@ namespace Cori {
 
 #ifdef DEBUG_BUILD
 		const auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-		consoleSink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-6n] [%-8l]: %v%$ %@");
+		consoleSink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [Thread %t] [%-6n] [%-8l]: %v%$ %@");
 
 		coreSinks.push_back(consoleSink);
 		clientSinks.push_back(consoleSink);

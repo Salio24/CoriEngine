@@ -17,7 +17,7 @@ namespace Cori {
 			class Descriptor {
 			public:
 				/**
-				 * @brief Constructs a descriptor. It's recommended to use "inline const" when defining the Descriptor in a namespace.
+				 * @brief Constructs a descriptor.
 				 * @param name Name to be assigned to the Sound.
 				 * @param path Path to the audio asset.
 				 * @param preDecode Whether to precede the audio or no. Generally you want to leave it at default.

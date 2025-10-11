@@ -6,12 +6,14 @@
 #include "EventSystem/AppEvent.hpp"
 #include "EventSystem/KeyEvent.hpp"
 #include "EventSystem/MouseEvent.hpp"
+#include "FileSystem/BinaryFileManager.hpp"
 
 namespace Cori {
 	namespace Core {
 		struct Window::Data {
-			ScreenMode m_CurrentScreenMode;
-			WindowMode m_CurrentWindowMode = WindowMode::EXCLUSIVE_FULLSCREEN;
+			std::vector<ScreenMode> m_ScreenModes;
+			uint32_t m_CurrentScreenMode;
+			WindowMode m_CurrentWindowMode{ WindowMode::EXCLUSIVE_FULLSCREEN };
 			std::string m_WindowTitle;
 
 			int32_t m_DisplayModeCount;
@@ -50,16 +52,43 @@ namespace Cori {
 				m_Data->m_PrimaryDisplayID = primaryDisplayID;
 			}
 
-			ScreenMode mode;
-
 			m_Data->m_SDLModes = SDL_GetFullscreenDisplayModes(m_Data->m_PrimaryDisplayID, &m_Data->m_DisplayModeCount);
 
 			CORI_CORE_VERIFY(m_Data->m_SDLModes, "Failed to get screen modes, Window '{}' can not be created. SDL_Error: {}",  title, SDL_GetError());
 
-			mode.m_Width = m_Data->m_SDLModes[0]->w;
-			mode.m_Height = m_Data->m_SDLModes[0]->h;
-			mode.m_RefreshRate = m_Data->m_SDLModes[0]->refresh_rate;
-			mode.m_ModeIndex = 0;
+			for (int32_t i = 0; i < m_Data->m_DisplayModeCount; i++) {
+				ScreenMode mode(m_Data->m_SDLModes[i]->w, m_Data->m_SDLModes[i]->h, m_Data->m_SDLModes[i]->refresh_rate, i);
+				m_Data->m_ScreenModes.emplace_back(mode);
+			}
+
+			ScreenMode mode = m_Data->m_ScreenModes[0];
+
+			const std::filesystem::path savePath = FileSystem::PathManager::GetAliasedPath("USER_DATA") / "settings/window.bin";
+			std::filesystem::create_directories(savePath.parent_path());
+
+			bool configLoaded = false;
+
+			if (std::filesystem::exists(savePath)) {
+				auto data = FileSystem::BinaryFileManager::LoadAggregateStruct<WindowSaveData>(savePath);
+				if (data) {
+					if (m_Data->m_DisplayModeCount >= data->m_SDLModeIndex) {
+						if (m_Data->m_SDLModes[data->m_SDLModeIndex]->w == data->m_Width && m_Data->m_SDLModes[data->m_SDLModeIndex]->h == data->m_Height && m_Data->m_SDLModes[data->m_SDLModeIndex]->refresh_rate == data->m_RefreshRate &&
+							m_Data->m_ScreenModes[data->m_ModeIndex].m_Width == data->m_Width && m_Data->m_ScreenModes[data->m_ModeIndex].m_Height == data->m_Height && m_Data->m_ScreenModes[data->m_ModeIndex].m_RefreshRate == data->m_RefreshRate) {
+							mode.m_Width = data->m_Width;
+							mode.m_Height = data->m_Height;
+							mode.m_RefreshRate = data->m_RefreshRate;
+							mode.m_SDLModeIndex = data->m_SDLModeIndex;
+							m_Data->m_CurrentWindowMode = data->m_WindowMode;
+							m_Data->m_CurrentScreenMode = data->m_ModeIndex;
+							configLoaded = true;
+						}
+					}
+				}
+			}
+
+			if (!configLoaded) {
+				m_Data->m_CurrentScreenMode = 0;
+			}
 
 			SDL_Rect displayBounds;
 			const bool success = SDL_GetDisplayBounds(m_Data->m_PrimaryDisplayID, &displayBounds);
@@ -69,13 +98,26 @@ namespace Cori {
 
 			const SDL_PropertiesID props = SDL_CreateProperties();
 			SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, m_Data->m_WindowTitle.c_str());
-			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, mode.m_Width);
-			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, mode.m_Height);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Width);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Height);
 			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, displayBounds.x);
 			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, displayBounds.y);
-			SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_FULLSCREEN_BOOLEAN, true);
-
-			m_Data->m_CurrentScreenMode = mode;
+			switch (m_Data->m_CurrentWindowMode) {
+			case WindowMode::WINDOWED:
+				{
+					break;
+				}
+			case WindowMode::BORDERLESS_WINDOWED:
+				{
+					SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_BORDERLESS_BOOLEAN, true);
+					break;
+				}
+			case WindowMode::EXCLUSIVE_FULLSCREEN:
+				{
+					SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_FULLSCREEN_BOOLEAN, true);
+					break;
+				}
+			}
 
 			switch (s_API) {
 			case Graphics::GraphicsAPIs::None:
@@ -110,6 +152,9 @@ namespace Cori {
 
 			m_Data->m_Context->Init(m_Data->m_Window);
 
+			const WindowSaveData data{ .m_Width = GetWidth(), .m_Height = GetHeight(), .m_RefreshRate = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_RefreshRate, .m_WindowMode = m_Data->m_CurrentWindowMode, .m_SDLModeIndex = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_SDLModeIndex, .m_ModeIndex = m_Data->m_CurrentScreenMode };
+			FileSystem::BinaryFileManager::SaveAggregateStruct(data, savePath);
+
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window '{}' Created", m_Data->m_WindowTitle);
 		}
 
@@ -135,7 +180,7 @@ namespace Cori {
 						}
 
 						if (m_Data->m_CurrentWindowMode != WindowMode::BORDERLESS_WINDOWED) {
-							WindowResizeEvent resizeEvent(m_Data->m_CurrentScreenMode.m_Width, m_Data->m_CurrentScreenMode.m_Height);
+							WindowResizeEvent resizeEvent(GetWidth(), GetHeight());
 							m_Data->m_EventCallback(resizeEvent);
 						} else {
 							WindowResizeEvent resizeEvent(m_Data->m_SDLModes[0]->w, m_Data->m_SDLModes[0]->h);
@@ -193,11 +238,11 @@ namespace Cori {
 		}
 
 		int32_t Window::GetWidth() const {
-			return m_Data->m_CurrentScreenMode.m_Width;
+			return m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Width;
 		}
 
 		int32_t Window::GetHeight() const {
-			return m_Data->m_CurrentScreenMode.m_Height;
+			return m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Height;
 		}
 
 		// ReSharper disable once CppMemberFunctionMayBeConst
@@ -231,22 +276,21 @@ namespace Cori {
 			return m_Data->m_Window;
 		}
 
-		std::vector<ScreenMode> Window::GetScreenModes() const {
-			std::vector<ScreenMode> screenModes;
-			for (int32_t i = 0; i < m_Data->m_DisplayModeCount; i++) {
-				ScreenMode mode(m_Data->m_SDLModes[i]->w, m_Data->m_SDLModes[i]->h, m_Data->m_SDLModes[i]->refresh_rate, i);
-				screenModes.emplace_back(mode);
-			}
-			return screenModes;
+		const std::vector<ScreenMode>& Window::GetScreenModes() const {
+			return m_Data->m_ScreenModes;
 		}
 
-		std::expected<void, CoriError<>> Window::SetScreenMode(const ScreenMode& mode) {
-			m_Data->m_CurrentScreenMode = mode;
+		std::expected<void, CoriError<>> Window::SetScreenMode(const uint32_t modeIndex) {
+			m_Data->m_CurrentScreenMode = modeIndex;
 			return SetWindowMode(m_Data->m_CurrentWindowMode);
 		}
 
 		WindowMode Window::GetWindowMode() const {
 			return m_Data->m_CurrentWindowMode;
+		}
+
+		uint32_t Window::GetCurrentScreenMode() const {
+			return m_Data->m_CurrentScreenMode;
 		}
 
 		// ReSharper disable once CppMemberFunctionMayBeConst
@@ -266,8 +310,8 @@ namespace Cori {
 
 					const SDL_DisplayMode* desktopMode = SDL_GetCurrentDisplayMode(m_Data->m_PrimaryDisplayID);
 
-					if (m_Data->m_CurrentScreenMode.m_Width <= desktopMode->w && m_Data->m_CurrentScreenMode.m_Height <= desktopMode->h) {
-						success = SDL_SetWindowSize(m_Data->m_Window, m_Data->m_CurrentScreenMode.m_Width, m_Data->m_CurrentScreenMode.m_Height);
+					if (GetWidth() <= desktopMode->w && GetHeight() <= desktopMode->h) {
+						success = SDL_SetWindowSize(m_Data->m_Window, GetWidth(), GetHeight());
 						if (!success) {
 							return std::unexpected(CoriError(std::format("Failed to set window mode to 'Windowed'. SDL_Error: {}", SDL_GetError())));
 						}
@@ -287,6 +331,12 @@ namespace Cori {
 					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window set to 'Windowed' mode. Screen mode: (Width: {}, Height: {})", desktopMode->w, desktopMode->h);
 
 					m_Data->m_CurrentWindowMode = mode;
+
+					const std::filesystem::path savePath = FileSystem::PathManager::GetAliasedPath("USER_DATA") / "settings/window.bin";
+					std::filesystem::create_directories(savePath.parent_path());
+					const WindowSaveData data{ .m_Width = GetWidth(), .m_Height = GetHeight(), .m_RefreshRate = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_RefreshRate, .m_WindowMode = m_Data->m_CurrentWindowMode, .m_SDLModeIndex = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_SDLModeIndex, .m_ModeIndex = m_Data->m_CurrentScreenMode };
+					FileSystem::BinaryFileManager::SaveAggregateStruct(data, savePath);
+
 					break;
 				}
 			case WindowMode::BORDERLESS_WINDOWED:
@@ -309,6 +359,11 @@ namespace Cori {
 
 					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window set to 'Borderless Windowed' mode.");
 
+					const std::filesystem::path savePath = FileSystem::PathManager::GetAliasedPath("USER_DATA") / "settings/window.bin";
+					std::filesystem::create_directories(savePath.parent_path());
+					const WindowSaveData data{ .m_Width = GetWidth(), .m_Height = GetHeight(), .m_RefreshRate = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_RefreshRate, .m_WindowMode = m_Data->m_CurrentWindowMode, .m_SDLModeIndex = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_SDLModeIndex, .m_ModeIndex = m_Data->m_CurrentScreenMode };
+					FileSystem::BinaryFileManager::SaveAggregateStruct(data, savePath);
+
 					break;
 				}
 			case WindowMode::EXCLUSIVE_FULLSCREEN:
@@ -318,7 +373,7 @@ namespace Cori {
 						CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to set window position to the center of the main screen. (This is expected on Wayland) SDL_Error: {}", SDL_GetError());
 					}
 
-					const SDL_DisplayMode* sdlMode = m_Data->m_SDLModes[m_Data->m_CurrentScreenMode.m_ModeIndex];
+					const SDL_DisplayMode* sdlMode = m_Data->m_SDLModes[m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_SDLModeIndex];
 					if (!sdlMode) {
 						return std::unexpected(CoriError(std::format("Failed to set window mode to 'Exclusive Fullscreen'. SDL_Error: {}", SDL_GetError())));
 					}
@@ -334,6 +389,12 @@ namespace Cori {
 					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window set to 'Exclusive Fullscreen' mode. Screen mode: (Width: {}, Height: {}, Refresh Rate: {})", sdlMode->w, sdlMode->h, sdlMode->refresh_rate);
 
 					m_Data->m_CurrentWindowMode = mode;
+
+					const std::filesystem::path savePath = FileSystem::PathManager::GetAliasedPath("USER_DATA") / "settings/window.bin";
+					std::filesystem::create_directories(savePath.parent_path());
+					const WindowSaveData data{ .m_Width = GetWidth(), .m_Height = GetHeight(), .m_RefreshRate = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_RefreshRate, .m_WindowMode = m_Data->m_CurrentWindowMode, .m_SDLModeIndex = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_SDLModeIndex, .m_ModeIndex = m_Data->m_CurrentScreenMode };
+					FileSystem::BinaryFileManager::SaveAggregateStruct(data, savePath);
+
 					break;
 				}
 			}
