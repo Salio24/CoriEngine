@@ -69,16 +69,18 @@ namespace Cori {
 
 		void LayerStack::ProcessQueue() {
 			if (m_LayerPushQueue.size() != 0) {
-				for (Layer* layer : std::views::reverse(m_LayerPushQueue)) {
+				std::vector<Layer*> layersToPush = std::move(m_LayerPushQueue);
+				for (Layer* layer : std::views::reverse(layersToPush)) {
 					PushLayer(layer);
-					m_LayerPushQueue.erase(std::ranges::find(m_LayerPushQueue, layer));
+					//m_LayerPushQueue.erase(std::ranges::find(m_LayerPushQueue, layer));
 				}
 			}
 
 			if (m_OverlayPushQueue.size() != 0) {
-				for (Layer* layer : std::views::reverse(m_OverlayPushQueue)) {
+				std::vector<Layer*> layersToPush = std::move(m_OverlayPushQueue);
+				for (Layer* layer : std::views::reverse(layersToPush)) {
 					PushOverlay(layer);
-					m_OverlayPushQueue.erase(std::ranges::find(m_OverlayPushQueue, layer));
+					//m_OverlayPushQueue.erase(std::ranges::find(m_OverlayPushQueue, layer));
 				}
 			}
 

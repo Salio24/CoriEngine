@@ -1,8 +1,8 @@
-# Cori Engine (WIP)
+# Cori Engine
 
-![Cori](https://raw.githubusercontent.com/Salio24/CoriEngine/CoriStable/github/git_logo.png)
+![Cori](https://raw.githubusercontent.com/Salio24/CoriEngine/CoriStable/.github/images/git_logo.png)
 
-Cori is my game engine that I’m actively working on. When building, I took some inspiration from Hazel Engine by The Cherno. The current feature set of the engine is: Basic 2D Batch Renderer, Asset Manager, Event System, Layer System, Input Handler, Logging, ImGui integration, Entity Component System, Scene System, API agnostic window/graphics/rendering abstraction.
+Cori is my game engine that I’m actively working on. When building, I took some inspiration from **Hazel Engine** by **The Cherno** and **Unity**. The engine is still in development and its feature set constantly extends and improves.
 
 ***
 
@@ -11,99 +11,217 @@ Cori is my game engine that I’m actively working on. When building, I took som
 Cori Engine uses CMake as a build system. Currently, it supports only Windows.
 
 <ins>**1. Necessary tools**</ins>
-- CMake 3.28 or newer 
+- CMake 3.28.x - 3.31.x
 - Ninja build system
 - Python 3.9 or newer
-- LLVM toolkit with C++23 support
-	- (Can be found here: `https://github.com/llvm/llvm-project`)
-	- PS: Unfortinatly some thirdparty libararies only support POSIX compiler frontend and do not support MSVC frontend, and because of that some compiler flags are being ignored and not applied when compiling with MSVC frontended compiler.
+- Jinja2 python module
+- Supported compilers:
+  - Clang 20+
+  - GCC 15+
+  - Should work with earlier versions of compilers that also support C++23, but untested.
+  - No support for MSVC and Clang-CL.
 
-<ins>**2. Downloading the repository and dependencies:**</ins>
 
-1. Clone the repository with `git clone -b CoriStable https://github.com/Salio24/CoriEngine.git --recursive`
+<ins>**2. Project configuration:**</ins>
 
-<ins>**3. Compiling:**</ins>
+1. Add Cori as a submodule for you project, recursively init all submodules with: `git submodule update --init --recursive`
+2. Configure CMake, example:
+```CMake
+cmake_minimum_required(VERSION 3.28...3.31)
 
-*Here you have two paths:*
+if(MSVC)
+    message(FATAL_ERROR "MSVC is not supported, use GCC or Clang (not clang-cl)")
+endif()
 
-### Using Visual Studio 2022 CMake integration (the preferred way, i use it):
+if(CMAKE_CXX_COMPILER MATCHES "/msys[36][24]/")
+    set(CLANG_VARIANT "MSYS2" CACHE STRING "Detected MSYS2 environment")
+else()
+    set(CLANG_VARIANT "OTHER" CACHE STRING "Not MSYS2 environment")
+endif()
 
-1. Install CMake tools and the clang-cl toolset for Visual Studio in the Visual Studio Installer.
-2. Replace `CMakePresets.json` file in the root folder with the file `CMakeSettings.json`, it is located in the platform folder.
-	- This step is optional in a way, it will compile with `CMakePresets.json`, but intellisense can behave very weirdly if using `CMakePresets.json` instead of `CMakeSettings.json`.
-3. Open the root folder as a local folder in Visual Studio.
-4. Done.
+set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE INTERNAL "")
 
-Make sure to check compiler paths in `cmake_toolchain.cmake`. It should point to your LLVM installation folder. Although it points to the default installation folder of LLVM, if you changed the install folder, you'll have to specify the correct path in the toolchain file.
+if(CLANG_VARIANT STREQUAL "MSYS2")
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-Bstatic -lc++ -lc++abi -Wl,-Bdynamic")
+    endif()
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc -static")
+    endif()
+endif ()
 
-### Using plain cmake
+project(VoidScape)
+    if(CLANG_VARIANT STREQUAL "OTHER" AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_SYSTEM_NAME STREQUAL "Windows")
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:Debug>")
+    endif ()
 
-- There Are 3 build scripts in the root folder:
-	- `build_x64-clang-debug.bat`
-	- `build_x64-clang-release.bat`
-	- `build_x64-clang-relwithdebinfo.bat`
-- Each will build an engine as a static libarary, and all the available apps. 
-- Built binaries are located in: 
-	- `CoriEngine/bin/PresetName`
-	- `Apps/RendererSandbox/bin/PresetName`
-	- `Apps/Sandbox/bin/PresetName`
+    if (NOT (
+            (EXISTS "${PROJECT_SOURCE_DIR}/CoriEngine/CMakeLists.txt")
+            ))
+        message(FATAL_ERROR "VoidScape thirdparty dependencies not found. Are you sure you cloned the repo recursively? Try running 'git submodule update --init --recursive' to download dependencies.")
+    endif()
 
-Make sure to check compiler paths in `cmake_toolchain.cmake`. It should point to your LLVM installation folder. Although it points to the default installation folder of LLVM, if you changed the install folder, you'll have to specify the correct path in the toolchain file.
+    set(CMAKE_CXX_STANDARD 23)
 
-### Visual Studio Solution IS NOT SUPPORTED!
+    add_compile_options(-march=native)
+
+    add_subdirectory(${PROJECT_SOURCE_DIR}/CoriEngine)
+
+    set(EXECUTABLE_NAME ${PROJECT_NAME})
+
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/$<CONFIG>)
+    file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/src/*.cpp)
+
+    add_executable(${EXECUTABLE_NAME} ${MY_SOURCES})
+
+    target_compile_options(${EXECUTABLE_NAME} PRIVATE -w)
+
+    target_compile_definitions(${EXECUTABLE_NAME} PRIVATE
+        $<$<CONFIG:Debug>:DEBUG_BUILD>
+        $<$<CONFIG:RelWithDebInfo>:DEBUG_BUILD>
+        $<$<CONFIG:Release>:RELEASE_BUILD>
+    )
+
+    target_link_libraries(${EXECUTABLE_NAME} PRIVATE CoriEngine_static)
+```
+
+<ins>**3. Building:**</ins>
+
+### Windows
+
+First install Jinja2 by running: `pip install Jinja2`
+
+Now you have several options: Visual Studio 2022 CMake integration, plain CMake, CLion
+
+#### Visual Studio 2022 CMake integration
+1. Download LLVM toolkit from here: `https://github.com/llvm/llvm-project/releases`
+    - Note: Don't change the default installation folder, and if you did so you need to change paths to the executables in: `clang_toolchain.cmake`
+2. Install CMake tools and the clang-cl toolset for Visual Studio in the Visual Studio installer.
+3. Copy `CMakePresets.json` and `clang_toolchain.cmake` from `(CoriEngineRoot)/platform/Windows/VS2022` to the project root folder.
+4. Open project as a folder in Visual Studio 2022, wait for the CMake generation and choose `VoidScape` target and hit build.
+
+- Note: Syntax highlighting might be working weirdly in VS2022 versions 17.13.0 and higher because as always microsoft broke somthing, and IntelliSense doesn't work great with clang.
+- MSVC and Clang-CL are not supported! As well as visual studio solution!
+
+#### Plain CMake
+
+1. Download LLVM toolkit from here: `https://github.com/llvm/llvm-project/releases`
+    - Note: Don't change the default installation folder, and if you did so you need to change paths to the executables in: `Build_Debug_Windows.bat` `Build_Release_Windows.bat` `Build_RelWithDebInfo_Windows.bat`
+2. Copy build scripts from `(CoriEngineRoot)/platform/Windows` to the project root folder.
+3. Run one of build scrips for windows: `Build_Debug_Windows.bat` `Build_Release_Windows.bat` `Build_RelWithDebInfo_Windows.bat`
+
+#### CLion
+
+1. Open project folder.
+2. By default, CLion will create a `Debug` CMake profile, you can add `Release` and `RelWithDebInfo` if you want.
+3. Wait for CLion to generate CMake config and hit build on `VoidScape` target.
+
+### Linux
+
+First install Jinja2:
+  - For Arch, you need to run: `sudo pacman -S python-jinja`
+  - Idk about other distros.
+
+Now you have several options: CLion, plain CMake and a bunch of other tools Linux can offer.
+
+#### CLion
+
+1. Open project folder.
+2. By default, CLion will create a `Debug` CMake profile, you can add `Release` and `RelWithDebInfo` if you want.
+3. Wait for CLion to generate CMake config and hit build on `VoidScape` target.
+
+#### Plain CMake
+
+1. Make sure you have gcc package installed
+2. Copy build scripts from `(CoriEngineRoot)/platform/Linux` to the project root folder.
+3. Run one of build scripts for linux: `Build_Debug_Linux.sh` `Build_Release_Linux.sh` `Build_RelWithDebInfo_Linux.sh`
+
+## Feature Set
+
+### Core Systems
+- **Modern C++23:** Leverages the latest C++ features for safer and more expressive code.
+- **Layer-Based Architecture:** Applications are built as a stack of layers (e.g., game layer, UI layer), which can be modal to control event and update flow.
+- **Asynchronous Task Handling:** A built-in worker thread pool and a main-thread command queue allow for offloading heavy tasks and safely interacting with engine systems from any thread.
+- **Event System:** A flexible event system with compile-time event dispatching for handling input, window events, and custom gameplay events.
+- **Tag-Based Logging:** A powerful logging system built on `spdlog` that allows for fine-grained filtering of log messages by category (e.g., Graphics, Physics, Asset Manager).
+- **Asset Manager:** Descriptor based asset manager utilizing smart pointers for safe memory management. 
+
+### Rendering
+- **Abstracted Graphics API:** Designed to support multiple graphics backends, with a complete implementation for **OpenGL 4.6**.
+- **High-Performance 2D Batch Renderer:** Utilizes instanced rendering to draw thousands of quads and in minimal amount of draw calls. Utilizes a concept of depth so user doesn't need to worry about rendering order, correctly renders opaque and semi transparent object using depth testing and k-way merge algorythm.
+- **World & Screen Space Rendering:** Easily switch between rendering in camera-relative world coordinates and screen-fixed UI coordinates.
+- **High-Quality Text Rendering:** Uses Multi-channel Signed Distance Fields (MSDF) via `msdf-atlas-gen` to render crisp, scalable text. Font atlases are automatically cached to disk for fast startups. Supports several types of text alignment: Left, Center, Right.
+- **2D Sprite Animation System:** A `QuadAnimator` component plays animation sequences loaded from `AnimationPack` assets. Supports JSON configurations exported from **Aseprite** as well as engine custom formats.
+- **Automatic Texture Padding:** `SpriteAtlas` loading includes automatic padding/extrusion to prevent common "texture bleeding" artifacts.
+
+### Entity Component System (ECS)
+- **Powered by EnTT:** Built on the fast and feature-rich `EnTT` library.
+- **Scene & Entity Management:** Provides a clean `Scene` and `Entity` API for creating, finding, and managing game objects.
+- **Hierarchical Scene Graph:** Entities can be parented to each other, with automatic inheritance of transforms (position, rotation, scale, and depth).
+- **System Architecture:** Game logic is organized into `Systems` that operate on components, with a priority system to control the update order. Includes built-in systems for transforms, physics, animations, and more.
+- **State Management:** A built-in `StateMachine` component allows for robust management of entity states (e.g., idle, walking, attacking), with scriptable states defined by inheriting from an `EntityState` base class.
+
+### Physics
+- **Integrated 2D Physics:** Cori uses `Box2D` for its physics and a `Box2cpp` wrapper for more C++ like API.
+- **Scriptable Triggers:** A powerful `Trigger` component system allows for creating scripted zones that react to entities entering, staying, and exiting, using a custom `TriggerBehaviour` interface.
+- **Multithreading Support:** Physics stepping can optionally be parallelized across multiple threads for performance-heavy simulations.
+
+### Audio
+- **SDL3_mixer Backend:** A capable audio engine for playing sounds and music.
+- **Advanced Playback Control:** The `Track` and `Mixer` system allows for complex audio sequencing, looping, fading, and tag-based group control (e.g., "Stop all `Enemy` sounds").
+
+### File System
+- **Alias-Based Path Management:** A `PathManager` loads a project's file structure from a `fsgame.json` config, allowing for organized, portable, and easily accessible file paths using simple aliases (e.g., `ASSETS, APP_ROOT, etc`).
+- **Robust Binary Serialization:** A `BinaryFileManager` for saving and loading aggregate structs with a strong focus on data integrity. It features automatic corruption detection via header/footer UUIDs, compile-time struct type validation, checksums, and a backup/fallback system.
+- **JSON Serialization:** A simple `JsonSerializer` utility for human-readable configuration and save files, built on the `nlohmann/json` library.
+
+### Tooling & Debugging
+- **Tracy Profiler Integration:** [Tracy Profiler](https://github.com/wolfpld/tracy) integration for incredible insight into performance bottlenecks.
+- **Dear ImGui Integration:** Seamlessly create debug menus, editors, and in-game tools.
+- **Instance Metrics:** A built-in profiling tool to track the currently alive and total created count of any asset type.
+
+### Utilities
+- **Mathematical Expression Parser:** A `Math::Function` class, powered by `ExprTK`, allows for runtime parsing and evaluation of complex mathematical expressions with variable and alias support.
+- **Custom Error Handling:** A robust `CoriError` class provides detailed, context-rich error objects for use with `std::expected`, improving debugging and safe error propagation.
+- **Compile-Time String Hashing:** Generates 64-bit or 32-bit FNV-1a hashes from strings at compile time using user-defined literals (`"my_string"_hs64` for 64-bit hash or `"my_string"_hs32"` for 32-bit hash).
 
 ***
 
-## More detailed feature description:
+## Documentation:
 
-### 2D Batch Renderer:
-
-The 2D Batch Renderer can render flat-color quads, and textured quads. All user needs to do is:
-1. Call `BeginBatch`
-2. Call the specific appropriate `DrawQuad` function, with or without a texture.
-3. Call `EndBatch`
-The renderer will handle everything else. 
-
-### Asset Manager:
-
-Asset Manager uses asset descriptor object. For we create a shader descriptor, passing file paths and shader debug name in the descriptors constructor. Then, when we need the shader, we call `GetShader` and pass the descriptor instance as an argument. The Asset Manager will load the asset upon the first time it is requested. We can also preload an asset with the appropriate `Preload` function. The same functionality also applies to textures.
-
-### Event Manager: 
-
-The Event Manager can dispatch events to a user-defined function, this function should return a bool. when a function that is responsible for handling a specific event returns true, the event is considered handled and will not be passed to lower layers in the Layer Stack. The Layer System is tied to the Event System. When an event occurs, it is sent the `OnEvent` functions of the layers, starting from the top of the Layer Stack and proceeding downwards. It is passed to lower layers until it is handled by a layer, or until it reaches the bottom of the Layer Stack.
-
-### Input Handler:
-
-We can ask the Input Handler, whether a specific key is pressed (held), and we can ask it for the current mouse position. Event Manager also creates `KeyPressed` and `KeyReleased` events, but they serve a different purpose. 
-
-### Logging and ImGui:
-
-Logging and ImGui helps a lot with debugging. The Logger logs everything to the console and also into the log file in debug mode, and in release mode, it logs only into the log file.
-
-### Entity Component System and Scene System
-
-A 2 essential systems for every game and game engine. A flexible game structure is impossible without those 2 systems. ECS is a must have to achieve good performance as it grants that entity components of the same type are stored contiguously in memory, minimizing CPU cache misses. I'm using EnTT on the backend.
-	
-### Abstraction:
-
-Window/graphics/rendering are all abstracted, user code has no direct calls to OpenGL and other libs, the only exceptions being ImGui and GLM. I’m planning to start experimenting with Vulkan in the future, so having a good abstraction will be very handy. 
+- **API Documentation:** Available [Here](https://salio24.github.io/CoriEngine/)
+- **Project Wiki:** Planed, WIP
 
 ***
 
 ## Plans for the future
+Cori is still under active development. Here are some of the major long-term plans:
+- **In-Engine Editor:** Plan is to make an editor with support for C# scripting using `Mono`, custom project format, scene serialization and more.
+- **Vulkan Renderer:** In the future I'm planning to move from OpenGL to Vulkan.
 
-- Make ImGui window templates. For example, instead of the user having to write a custom window to show a frame graph, we just call something like this: 'CoriImGuiPerformanceMetrics();'
-- Box2D physics engine integration. (in process)
-- Improving development tools, adding reference counting and memory tracking to the current debugging toolset.
-- I also want to start experimenting with Vulkan.
-	- I’m planning to make Vulkan the main graphics API for Cori.
-- Separating engine execution into different threads.
-	- Creating a render command que, and a separate render thread.
-- Also, in the near future, I want to implement some kind of Entity Component System. (done)
-- Box2D physics engine integration. (in process)
-- Creating an engine editor.
+***
 
-## Currently available Apps
+## Core Dependencies
+Cori Engine is built on top of several excellent open-source libraries, special thanks to:
 
-- `RendererSandbox` - this is the benchmark for 2D Batch Renderer.
-- `Sandbox` - As the name implies, it is used mainly for testing purposes.
+*   **[EnTT](https://github.com/skypjack/entt):** For the high-performance Entity Component System.
+*   **[Box2D](https://github.com/erincatto/box2d):** For this amazing 2D physics engine.
+*   **[Box2cpp](https://github.com/HolyBlackCat/box2cpp):** For providing a convenient C++ wrapper for `Box2D`. 
+*   **[SDL3](https://github.com/libsdl-org/SDL):** For handling: windowing, input, application events, `OpenGL` context and more.
+*   **[SDL3_mixer](https://github.com/libsdl-org/SDL_mixer):** For handling audio.
+*   **[SDL3_image](https://github.com/libsdl-org/SDL_image):** For helping in loading and later transforming images.
+*   **[Dear ImGui](https://github.com/ocornut/imgui):** For creating debug UIs and tools.
+*   **[spdlog](https://github.com/gabime/spdlog):** For the powerful and flexible logging system.
+*   **[glad2](https://github.com/Dav1dde/glad):** For loading `OpenGL` function pointers.
+*   **[glm](https://github.com/g-truc/glm):** For all mathematics-related functionality.
+*   **[msdf-atlas-gen](https://github.com/Chlumsky/msdf-atlas-gen):** For high-quality font atlas generation.
+*   **[Tracy Profiler](https://github.com/wolfpld/tracy):** For great in-depth performance profiling tool.
+*   **[nlohmann/json](https://github.com/nlohmann/json):**  For `JSON` serialization and deserialization.
+*   **[ExprTK](https://github.com/ArashPartow/exprtk/tree/master):** For mathematical expression parsing.
+*   **[ska_sort](https://github.com/skarupke/ska_sort):** For very fast radix sort implementation.
+*   **[magic_enum](https://github.com/Neargye/magic_enum):** For enum reflection.
+*   **[boostorg/pfr](https://github.com/boostorg/pfr):** For an absolute wizardry with the aggregate struct reflection.
+*   **[stduuid](https://github.com/mariusbancila/stduuid):** For implementing `P0959R3` proposal.
+*   **[utfcpp](https://github.com/nemtrif/utfcpp):** For convenient utility to convert frm `UTF-8` to `UTF-32` and vice versa.
+*   **[tmxlite](https://github.com/fallahn/tmxlite):** For an amazing parser for `Tiled` `TMX` map format.

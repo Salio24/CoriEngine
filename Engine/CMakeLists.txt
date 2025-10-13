@@ -9,7 +9,7 @@ project(CoriEngine)
     
     set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "") 
 
-    #jinja2
+    #python
     find_package(Python 3.9 REQUIRED COMPONENTS Interpreter)
 
     # SDL3
@@ -122,7 +122,15 @@ project(CoriEngine)
             -P ${CORI_ENGINE_SOURCE_DIR}/cmake/patch-freetype.cmake
     )
 
+    option(FT_DISABLE_ZLIB "DO NOT TOUCH" ON)
+    option(FT_DISABLE_BZIP2 "DO NOT TOUCH" ON)
+    option(FT_DISABLE_PNG "DO NOT TOUCH" ON)
+    option(FT_DISABLE_HARFBUZZ "DO NOT TOUCH" ON)
+    option(FT_DISABLE_BROTLI "DO NOT TOUCH" ON)
+
     FetchContent_MakeAvailable(freetype)
+
+    add_library(Freetype::Freetype ALIAS freetype)
 
     #utfcpp
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/utfcpp EXCLUDE_FROM_ALL)
@@ -130,9 +138,9 @@ project(CoriEngine)
     #msdf-atlas-gen
     set(MSDF_ATLAS_BUILD_STANDALONE OFF CACHE BOOL "")
     set(MSDF_ATLAS_USE_VCPKG OFF CACHE BOOL "")
-    set(MSDF_ATLAS_INSTALL ON CACHE BOOL "")
+    set(MSDF_ATLAS_INSTALL OFF CACHE BOOL "")
     set(MSDF_ATLAS_USE_SKIA OFF CACHE BOOL "")
-    set(MSDFGEN_DISABLE_PNG OFF CACHE BOOL "")
+    set(MSDFGEN_DISABLE_PNG ON CACHE BOOL "")
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/msdf-atlas-gen EXCLUDE_FROM_ALL)
 
     #tracy
@@ -147,6 +155,7 @@ project(CoriEngine)
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/ExprTK EXCLUDE_FROM_ALL)
 
     #boost/pfr
+    set(BUILD_TESTING OFF)
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/pfr EXCLUDE_FROM_ALL)
 
 
