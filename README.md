@@ -205,23 +205,23 @@ Cori is still under active development. Here are some of the major long-term pla
 ## Core Dependencies
 Cori Engine is built on top of several excellent open-source libraries, special thanks to:
 
-*   **[EnTT](https://github.com/skypjack/entt):** For the high-performance Entity Component System.
-*   **[Box2D](https://github.com/erincatto/box2d):** For this amazing 2D physics engine.
-*   **[Box2cpp](https://github.com/HolyBlackCat/box2cpp):** For providing a convenient C++ wrapper for `Box2D`. 
-*   **[SDL3](https://github.com/libsdl-org/SDL):** For handling: windowing, input, application events, `OpenGL` context and more.
-*   **[SDL3_mixer](https://github.com/libsdl-org/SDL_mixer):** For handling audio.
-*   **[SDL3_image](https://github.com/libsdl-org/SDL_image):** For helping in loading and later transforming images.
-*   **[Dear ImGui](https://github.com/ocornut/imgui):** For creating debug UIs and tools.
-*   **[spdlog](https://github.com/gabime/spdlog):** For the powerful and flexible logging system.
-*   **[glad2](https://github.com/Dav1dde/glad):** For loading `OpenGL` function pointers.
-*   **[glm](https://github.com/g-truc/glm):** For all mathematics-related functionality.
-*   **[msdf-atlas-gen](https://github.com/Chlumsky/msdf-atlas-gen):** For high-quality font atlas generation.
-*   **[Tracy Profiler](https://github.com/wolfpld/tracy):** For great in-depth performance profiling tool.
-*   **[nlohmann/json](https://github.com/nlohmann/json):**  For `JSON` serialization and deserialization.
-*   **[ExprTK](https://github.com/ArashPartow/exprtk/tree/master):** For mathematical expression parsing.
-*   **[ska_sort](https://github.com/skarupke/ska_sort):** For very fast radix sort implementation.
-*   **[magic_enum](https://github.com/Neargye/magic_enum):** For enum reflection.
-*   **[boostorg/pfr](https://github.com/boostorg/pfr):** For an absolute wizardry with the aggregate struct reflection.
-*   **[stduuid](https://github.com/mariusbancila/stduuid):** For implementing `P0959R3` proposal.
-*   **[utfcpp](https://github.com/nemtrif/utfcpp):** For convenient utility to convert frm `UTF-8` to `UTF-32` and vice versa.
-*   **[tmxlite](https://github.com/fallahn/tmxlite):** For an amazing parser for `Tiled` `TMX` map format.
+- **[EnTT](https://github.com/skypjack/entt):** For the high-performance Entity Component System.
+- **[Box2D](https://github.com/erincatto/box2d):** For this amazing 2D physics engine.
+- **[Box2cpp](https://github.com/HolyBlackCat/box2cpp):** For providing a convenient C++ wrapper for `Box2D`. 
+- **[SDL3](https://github.com/libsdl-org/SDL):** For handling: windowing, input, application events, `OpenGL` context and more.
+- **[SDL3_mixer](https://github.com/libsdl-org/SDL_mixer):** For handling audio.
+- **[SDL3_image](https://github.com/libsdl-org/SDL_image):** For helping in loading and later transforming images.
+- **[Dear ImGui](https://github.com/ocornut/imgui):** For creating debug UIs and tools.
+- **[spdlog](https://github.com/gabime/spdlog):** For the powerful and flexible logging system.
+- **[glad2](https://github.com/Dav1dde/glad):** For loading `OpenGL` function pointers.
+- **[glm](https://github.com/g-truc/glm):** For all mathematics-related functionality.
+- **[msdf-atlas-gen](https://github.com/Chlumsky/msdf-atlas-gen):** For high-quality font atlas generation.
+- **[Tracy Profiler](https://github.com/wolfpld/tracy):** For great in-depth performance profiling tool.
+- **[nlohmann/json](https://github.com/nlohmann/json):**  For `JSON` serialization and deserialization.
+- **[ExprTK](https://github.com/ArashPartow/exprtk/tree/master):** For mathematical expression parsing.
+- **[ska_sort](https://github.com/skarupke/ska_sort):** For very fast radix sort implementation.
+- **[magic_enum](https://github.com/Neargye/magic_enum):** For enum reflection.
+- **[boostorg/pfr](https://github.com/boostorg/pfr):** For an absolute wizardry with the aggregate struct reflection.
+- **[stduuid](https://github.com/mariusbancila/stduuid):** For implementing `P0959R3` proposal.
+- **[utfcpp](https://github.com/nemtrif/utfcpp):** For convenient utility to convert frm `UTF-8` to `UTF-32` and vice versa.
+- **[tmxlite](https://github.com/fallahn/tmxlite):** For an amazing parser for `Tiled` `TMX` map format.

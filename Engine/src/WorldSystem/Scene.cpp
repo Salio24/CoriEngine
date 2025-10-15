@@ -14,8 +14,6 @@ namespace Cori {
 			AddContextComponent<Components::Scene::Camera>();
 			m_ActiveCamera.BindCameraComponent(&GetContextComponent<Components::Scene::Camera>());
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Scene: '{}' created.", m_Name);
-
-			[[maybe_unused]] auto nameAndTagGroup = m_Registry.group<Components::Entity::Name, Components::Entity::Tag>();
 		}
 
 		Scene::~Scene() {
@@ -30,25 +28,11 @@ namespace Cori {
 			return e;
 		}
 
-		Entity Scene::CreateEntity(const std::string& name, const Utility::HashedTag64& tag) {
-			entt::entity entity = m_Registry.create();
-			auto& nameComp = m_Registry.emplace<Components::Entity::Name>(entity);
-			nameComp.m_Name = name;
-			m_Registry.emplace<Components::Entity::Tag>(entity, tag);
-			m_Registry.emplace<Components::Entity::Hierarchy>(entity);
-			const auto& uuidComp = m_Registry.emplace<Components::Entity::UUID>(entity);
-			m_UUIDToEntity.insert({ uuidComp.m_UUID, entity });
-			CORI_CORE_TRACE_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Created Entity With ID: {}, Version: {}, Name: {}, Tag: {}", entt::to_integral(entity), entt::to_version(entity), name, tag.GetDebugName());
-			Entity e = entt::handle{m_Registry, entity};
-			e.AddComponent<Components::Entity::Transform>();
-			e.AddComponent<Internal::SceneID>(m_SceneID);
-			return e;
-		}
-
 		std::expected<void, Core::CoriError<>> Scene::AddEntityToCache(const Entity entity, const Utility::StringHash32 key) {
 			if (m_EntityCache.contains(key)) {
 				return std::unexpected(Core::CoriError("Entry with the given key already exists, make sure you're not reusing the key. It's also possible (but very unlikely), that you got a hash collision, try to change the key a bit."));
 			}
+
 			m_EntityCache.insert({ key, entity.GetRawEntity() });
 			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Entity '{}' added to scene local cache, key: '{}'", entity.GetDebugData(), key);
 			return{};
@@ -72,41 +56,6 @@ namespace Cori {
 				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Entity '{}' removed from scene local cache, key: '{}'", entity.GetDebugData(), key);
 			}
 			CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Trying to remove an Entity from scene local cache, provided key: '{}', but cache has no such entry.", key);
-		}
-
-		std::expected<Entity, Core::CoriError<>> Scene::FindEntity(const std::string& name) {
-			CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Performing slow scene-wide search for entity named: '{}'. Consider caching it. This shouldn't be called every frame! Be aware.", name);
-			const auto view = m_Registry.view<Components::Entity::Name>();
-			for (auto entity : view) {
-				if (name == view.get<Components::Entity::Name>(entity).m_Name) {
-					return Entity{ { m_Registry, entity } };
-				}
-			}
-			return std::unexpected(Core::CoriError("No entity found with the specified name."));
-		}
-		std::expected<Entity, Core::CoriError<>> Scene::FindEntity(const std::string& name, const Utility::HashedTag64& tag) {
-			CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Performing slow scene-wide search for entity with tag: '{}', named: '{}'. Consider caching it. This shouldn't be called every frame! Be aware.", tag.GetDebugName(), name);
-			const auto group = m_Registry.group<Components::Entity::Name, Components::Entity::Tag>();
-			for (auto entity : group) {
-				auto [nameComp , tagComp] = group.get<Components::Entity::Name, Components::Entity::Tag>(entity);
-				if (name == nameComp.m_Name && tag == tagComp.m_Tag) {
-					return Entity{ { m_Registry, entity } };
-				}
-			}
-			return std::unexpected(Core::CoriError("No entity found with the specified name and tag."));
-		}
-
-		std::vector<Entity> Scene::GetEntitiesWithTag(const Utility::HashedTag64& tag) {
-			std::vector<Entity> entities;
-			CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Performing slow scene-wide collection of all entities with tag: '{}'. Consider caching it. This shouldn't be called every frame! Be aware.", tag.GetDebugName());
-			const auto view = m_Registry.view<Components::Entity::Tag>();
-			for (const auto entity : view) {
-				auto& tagComp = view.get<Components::Entity::Tag>(entity);
-				if (tag == tagComp.m_Tag) {
-					entities.emplace_back(entt::handle{ m_Registry, entity });
-				}
-			}
-			return entities;
 		}
 
 		void Scene::DestroyEntity(Entity entity) {

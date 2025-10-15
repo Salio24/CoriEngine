@@ -123,7 +123,7 @@ namespace Cori {
 
 			const auto& camera = scene->GetContextComponent<World::Components::Scene::Camera>();
 			//Utility::AABB cameraBounds = { camera.m_CameraMinBound, camera.m_CameraMaxBound };
-			World::EntityView view = scene->View<World::Components::Entity::QuadRenderer, World::Components::Entity::Transform>(World::Exclude<World::Components::Entity::InactiveLocallyFlag>());
+			World::StaticEntityView view = scene->StaticView<World::Components::Entity::QuadRenderer, World::Components::Entity::Transform>(World::Exclude<World::Components::Entity::InactiveLocallyFlag>());
 			for (const auto entity : view) {
 				auto& renderer = view.Get<World::Components::Entity::QuadRenderer>(entity);
 				if (__builtin_expect(renderer.m_Visible, 1)) {

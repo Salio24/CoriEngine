@@ -4,7 +4,5 @@ funcs to doc:
 
 TODO:
 
-* move hierarchy logic from entity to hierarchy system
 * make some parallax background for voidscape scene
-* create runtime view wrapper
-* add component based entity tagging instead of the crap I have now
+* mix character sounds for voidscape

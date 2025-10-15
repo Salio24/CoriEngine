@@ -52,6 +52,9 @@ rmSub.sh
 /Sandboxes/Sandbox/bin/*
 /Sandboxes/RendererSandbox/bin/*
 /Sandboxes/PhysicsSandbox/bin/*
+/Sandboxes/Sandbox/userdata/*
+/Sandboxes/RendererSandbox/userdata/*
+/Sandboxes/PhysicsSandbox/userdata/*
 /notes.txt
 
 *.a

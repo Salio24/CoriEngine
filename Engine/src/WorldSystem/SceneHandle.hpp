@@ -21,7 +21,7 @@ namespace Cori {
 			/**
 			 * @brief Creates a blank Entity with no components attached.
 			 * @return A handle to the blank entity.
-			 * @warning Be very carefully when using entities that don't have a default set of components, when you create an entity with CreateEntity it has <Name, Tag, Hierarchy, UUID, Transform> components by default.
+			 * @warning Be very carefully when using entities that don't have a default set of components, when you create an entity with CreateEntity it has <Name, Hierarchy, UUID, Transform> components by default.
 			 * \n Some engine systems expect an entity to have some of those components.
 			 * \n Entity::SetName() and Entity::GetName() expects Entity to have a Name component.
 			 * \n Anything connected to the Entity hierarchy system expects an Entity to have Hierarchy and Name components.
@@ -35,13 +35,14 @@ namespace Cori {
 			/**
 			 * @brief Creates an Entity with a default set of components.
 			 * @param name Name to assign to the Entity.
-			 * @param tag Tag to assign to the Entity.
+			 * @tparam T Optional set of components or tags that will be added to the entity at creation.
 			 * @return A handle to the created entity.
-			 * @details Unlike Scene::CreateBlankEntity() it is safe to use an Entity created with this method anywhere you like. Default set of components is <Name, Tag, Hierarchy, UUID, Transform>.
+			 * @details Unlike Scene::CreateBlankEntity() it is safe to use an Entity created with this method anywhere you like. Default set of components is <Name, Hierarchy, UUID, Transform>.
 			 */
-			[[nodiscard]] Entity CreateEntity(const std::string& name, const Utility::HashedTag64& tag) {
+			template<typename... T>
+			[[nodiscard]] Entity CreateEntity(const std::string& name) {
 				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
-				return m_SceneRaw.lock()->CreateEntity(name, tag);
+				return m_SceneRaw.lock()->CreateEntity<T...>(name);
 			}
 
 			/**
@@ -57,7 +58,6 @@ namespace Cori {
 			 * @brief Adds entity to the local scene cache.
 			 * @param entity Handle of the entity to add to cache.
 			 * @param key 32bit FNV-1a hashed string, you can use ""_hs32 operator to create a compile time hash.
-			 * @details Key used for adding/retriving an entity from scene local cache has nothing to do with the entities name or tag stored in Name and Tag components.
 			 * \n The only purpose of a scene local entity cache is to store entities that you plan to access very frequently but don't have a good place on the client side to store the handle.
 			 * @return Expected object with void on success or CoriError<> on failure.
 			 */
@@ -86,39 +86,17 @@ namespace Cori {
 			}
 
 			/**
-			 * @brief Conducts a scene wide search for the entity with a particular name.
+			 * @brief Conducts a scene wide search for the entity with a particular name and optionally a set of components.
 			 * @param name Name of the entity you're searching for.
-			 * @note As the entity names doesn't have to be unique, it returns the first entity with the given name it finds.
+			 * @tparam T Optional set of components or tags the desired entity should be filtered by.
+			 * @note As the entity names doesn't have to be unique, it returns the first entity with the given name and set of components it finds.
 			 * @return Expected object with an entity handle on success, or CoriError<> on failure.
 			 * @warning This is pretty slow as it is a scene wide linear search and absolutely should not be used in a tight loop, each frame/tick or during gameplay!
 			 */
+			template<typename... T>
 			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindEntity(const std::string& name) {
 				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
-				return m_SceneRaw.lock()->FindEntity(name);
-			}
-
-			/**
-			 * @brief Conducts a scene wide search for the entity with a particular name and tag.
-			 * @param name Name of the entity you're searching for.
-			 * @param tag Tag of the entity you're searching for.
-			 * @note As the entity names and tags doesn't have to be unique, it returns the first entity with the given name and tag it finds.
-			 * @return Expected object with an entity handle on success, or CoriError<> on failure.
-			 * @warning This is pretty slow as it is a scene wide linear search and absolutely should not be used in a tight loop, each frame/tick or during gameplay!
-			 */
-			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindEntity(const std::string& name, const Utility::HashedTag64& tag) {
-				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
-				return m_SceneRaw.lock()->FindEntity(name, tag);
-			}
-
-			/**
-			 * @brief Combines all entities that have a particular tag into a vector.
-			 * @param tag Particular tag to filter entities by.
-			 * @return A vector that has all the entities that have this tag.
-			 * @warning This is pretty slow as it is a scene wide linear search and absolutely should not be used in a tight loop, each frame/tick or during gameplay!
-			 */
-			[[nodiscard]] std::vector<Entity> GetEntitiesWithTag(const Utility::HashedTag64& tag) {
-				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
-				return m_SceneRaw.lock()->GetEntitiesWithTag(tag);
+				return m_SceneRaw.lock()->FindEntity<T...>(name);
 			}
 
 			/**
@@ -129,13 +107,13 @@ namespace Cori {
 			 * @return Newly constructed view.
 			 */
 			template<typename... T>
-			[[nodiscard]] auto View() {
+			[[nodiscard]] auto StaticView() {
 				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
-				return m_SceneRaw.lock()->View<T...>();
+				return m_SceneRaw.lock()->StaticView<T...>();
 			}
 
 			/**
-			 * @brief Constructs a view of the entities that have a particular set of components. Variant with component exclusion.
+			 * @brief Constructs a static view of the entities that have a particular set of components. Variant with component exclusion.
 			 * @tparam T A set of components of the entities in the view.
 			 * @tparam ExcludeT Component types to exclude from the view.
 			 * @param excludeList Instance of Exclude with ExcludeT components.
@@ -144,9 +122,20 @@ namespace Cori {
 			 * @return Newly constructed view.
 			 */
 			template<typename... T, typename... ExcludeT>
-			[[nodiscard]] auto View(Exclude<ExcludeT...> excludeList) {
+			[[nodiscard]] auto StaticView(Exclude<ExcludeT...> excludeList) {
 				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
-				return m_SceneRaw.lock()->View<T...>(excludeList);
+				return m_SceneRaw.lock()->StaticView<T...>(excludeList);
+			}
+
+			/**
+			 * @brief Constructs a dynamic view which can be configured at runtime.
+			 * @details Use this when the exact set of components a view should have is not known at compile time.
+			 * @note Dynamic views are slightly slower to iterate than static views.
+			 * @return An instance of dynamic entity view for the creator scene.
+			 */
+			[[nodiscard]] DynamicEntityView DynamicView() {
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				return m_SceneRaw.lock()->DynamicView();
 			}
 
 			//template<typename... T, typename Func>

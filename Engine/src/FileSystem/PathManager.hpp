@@ -63,7 +63,8 @@ namespace Cori {
 		 * }
 		 * \endcode
 		 * By default you have alias 'BIN' defined, it points to the directory of the binary executable of your app.
-		 * Cori expects you to define 'ENGINE_DATA' alias, it should point to the 'enginedata' path in the engine root folder.
+		 * Cori expects you to define 'ENGINE_DATA' alias, it should point to the 'enginedata' path in the engine root folder,
+		 * and a 'USER_DATA' alias to some folder that will hold saves (engine saves the last window and screen mode there)
 		 * \n Let's examine how to define aliases correctly:
 		 * \code
 		 * {

@@ -5,7 +5,6 @@
 #include "Graphics/Texture.hpp"
 #include <glm/gtx/matrix_transform_2d.hpp>
 #include <utility>
-#include "Utility/HashedTag.hpp"
 #include "Audio/Track.hpp"
 
 namespace Cori {
@@ -50,7 +49,7 @@ namespace Cori {
 
 					private:
 						// entt cant create fully empty components
-						[[maybe_unused]] uint8_t nice{ 69 };
+						[[maybe_unused]] bool bober{};
 					};
 				}
 
@@ -63,16 +62,6 @@ namespace Cori {
 					friend World::Entity;
 					friend World::Scene;
 					std::string m_Name;
-				};
-
-				/**
-				 * @brief Every Entity by default has a tag component, it holds a non-unique entity 64bit hashed tag.
-				 */
-				struct Tag {
-					Tag() = default;
-					explicit Tag(const Utility::HashedTag64& tag) : m_Tag(tag) {}
-
-					Utility::HashedTag64 m_Tag;
 				};
 
 				/**
@@ -305,6 +294,7 @@ namespace Cori {
 
 				private:
 					friend World::Entity;
+					friend Systems::Hierarchy;
 					struct TransparentHash {
 						using is_transparent = void;
 						size_t operator()(std::string_view sv) const noexcept {
@@ -330,7 +320,7 @@ namespace Cori {
 					InactiveLocallyFlag() = default;
 				private:
 					// entt cant create fully empty components
-					[[maybe_unused]] uint8_t nice{ 69 };
+					[[maybe_unused]] bool bober{};
 				};
 
 				/**
@@ -341,7 +331,7 @@ namespace Cori {
 					InactiveGloballyFlag() = default;
 				private:
 					// entt cant create fully empty components
-					[[maybe_unused]] uint8_t nice{ 69 };
+					[[maybe_unused]] bool bober{};
 				};
 
 				/**

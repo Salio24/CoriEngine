@@ -7,7 +7,7 @@ namespace Cori {
 			void Animation::OnTickUpdate([[maybe_unused]] Core::GameTimer& gameTimer) {
 				CORI_PROFILE_FUNCTION();
 
-				EntityView view = m_Owner.View<Components::Entity::QuadAnimator>(Exclude<Components::Entity::InactiveLocallyFlag>());
+				StaticEntityView view = m_Owner.StaticView<Components::Entity::QuadAnimator>(Exclude<Components::Entity::InactiveLocallyFlag>());
 
 				for (const auto entity : view) {
 					view.Get<Components::Entity::QuadAnimator>(entity).OnTickUpdate();
@@ -20,7 +20,7 @@ namespace Cori {
 				m_EntityPool.Init(m_Owner,
 				[](SceneHandle& scene) -> Entity {
 					static uint32_t count = 0;
-					Entity entity = scene.CreateEntity(std::format("Temporary entity {}", count), EntityTags::DisposableEntity);
+					Entity entity = scene.CreateEntity<EntityTags::DisposableEntityTag>(std::format("Temporary entity {}", count));
 					entity.AddComponent<Components::Entity::QuadRenderer>();
 					entity.AddComponent<Components::Entity::QuadAnimator>();
 					++count;

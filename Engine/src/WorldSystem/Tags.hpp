@@ -1,5 +1,6 @@
 #pragma once
-#include "Utility/HashedTag.hpp"
+#include "EntityTag.hpp"
+
 
 namespace Cori {
 	namespace World {

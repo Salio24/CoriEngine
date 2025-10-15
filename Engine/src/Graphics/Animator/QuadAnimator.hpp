@@ -10,7 +10,6 @@ namespace Cori {
 
 		namespace Components {
 			namespace Entity {
-				using AnimationStopCallbackFn = std::function<void()>;
 
 				/**
 				 * @brief Responsible for playing animations when attached to an entity.
@@ -19,6 +18,8 @@ namespace Cori {
 				 */
 				class QuadAnimator {
 				public:
+					using StopCallbackFn = std::function<void()>;
+
 					QuadAnimator();
 					~QuadAnimator();
 
@@ -26,7 +27,7 @@ namespace Cori {
 					 * @brief Sets a callback that will be fired when any animation sequence stops.
 					 * @param callback Functor to use as a callback.
 					 */
-					void SetStopCallback(AnimationStopCallbackFn callback);
+					void SetStopCallback(StopCallbackFn callback);
 
 					/**
 					 * @brief Plays a sequence of animations.
@@ -87,11 +88,11 @@ namespace Cori {
 
 					void OnTickUpdate();
 
-					void SetEngineStopCallback(AnimationStopCallbackFn callback);
+					void SetEngineStopCallback(StopCallbackFn callback);
 
 				private:
-					AnimationStopCallbackFn m_StopCallBack;
-					AnimationStopCallbackFn m_EngineCallBack;
+					StopCallbackFn m_StopCallBack;
+					StopCallbackFn m_EngineCallBack;
 					bool m_ActiveSequence;
 					glm::vec2 m_SizeScale{ 1.0f, 1.0f };
 					uint16_t m_LoopStartIndex{ 0xFFFF };

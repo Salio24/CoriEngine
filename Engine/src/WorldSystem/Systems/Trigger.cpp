@@ -12,7 +12,7 @@ namespace Cori {
 				auto system = m_Owner.GetSystem<PhysicsSystem>();
 				if (system) {
 					auto locked = system->lock();
-						EntityView view = m_Owner.View<Components::Entity::Trigger>(Exclude<Components::Entity::InactiveLocallyFlag>());
+						StaticEntityView view = m_Owner.StaticView<Components::Entity::Trigger>(Exclude<Components::Entity::InactiveLocallyFlag>());
 
 						for (const auto entity : view) {
 							view.Get<Components::Entity::Trigger>(entity).OnTickUpdate(gameTimer.GetTimestep());

@@ -19,7 +19,7 @@ namespace Cori {
 					}
 				}
 
-				void QuadAnimator::SetStopCallback(AnimationStopCallbackFn callback) {
+				void QuadAnimator::SetStopCallback(StopCallbackFn callback) {
 					m_StopCallBack = std::move(callback);
 				}
 
@@ -102,7 +102,7 @@ namespace Cori {
 				//	return m_TicksElapsedSinceStart;
 				//}
 
-				void QuadAnimator::SetEngineStopCallback(AnimationStopCallbackFn callback) {
+				void QuadAnimator::SetEngineStopCallback(StopCallbackFn callback) {
 					m_EngineCallBack = std::move(callback);
 				}
 			}

@@ -7,7 +7,7 @@ namespace Cori {
 			void StateMachine::OnTickUpdate(Core::GameTimer& gameTimer) {
 				CORI_PROFILE_FUNCTION();
 
-				EntityView view = m_Owner.View<Components::Entity::StateMachine>(Exclude<Components::Entity::InactiveLocallyFlag>());
+				StaticEntityView view = m_Owner.StaticView<Components::Entity::StateMachine>(Exclude<Components::Entity::InactiveLocallyFlag>());
 
 				for (const auto entity : view) {
 					view.Get<Components::Entity::StateMachine>(entity).OnTickUpdate(gameTimer.GetTimestep());

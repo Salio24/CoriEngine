@@ -22,27 +22,55 @@ namespace Cori {
 			~Scene();
 
 			Entity CreateBlankEntity();
-			Entity CreateEntity(const std::string& name, const Utility::HashedTag64& tag);
+
+			template<typename... T>
+			Entity CreateEntity(const std::string& name) {
+				entt::entity entity = m_Registry.create();
+				auto& nameComp = m_Registry.emplace<Components::Entity::Name>(entity);
+				nameComp.m_Name = name;
+				m_Registry.emplace<Components::Entity::Hierarchy>(entity);
+				((m_Registry.emplace<T>(entity)), ...);
+				const auto& uuidComp = m_Registry.emplace<Components::Entity::UUID>(entity);
+				m_UUIDToEntity.insert({ uuidComp.m_UUID, entity });
+				CORI_CORE_TRACE_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Created Entity With ID: {}, Version: {}, Name: {}", entt::to_integral(entity), entt::to_version(entity), name);
+				Entity e = entt::handle{m_Registry, entity};
+				e.AddComponent<Components::Entity::Transform>();
+				e.AddComponent<Internal::SceneID>(m_SceneID);
+				return e;
+			}
+
 			void DestroyEntity(Entity entity);
 
 			std::expected<void, Core::CoriError<>> AddEntityToCache(const Entity entity, const Utility::StringHash32 key);
 			[[nodiscard]] std::expected<Entity, Core::CoriError<>> GetEntityFromCache(const Utility::StringHash32 key);
 			void RemoveEntityFromCache(const Utility::StringHash32 key);
 
-			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindEntity(const std::string& name);
-			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindEntity(const std::string& name, const Utility::HashedTag64& tag);
-			[[nodiscard]] std::vector<Entity> GetEntitiesWithTag(const Utility::HashedTag64& tag);
+			template<typename... T>
+			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindEntity(const std::string& name) {
+				CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Performing slow scene-wide search for entity named: '{}'. Consider caching it. This shouldn't be called every frame! Be aware.", name);
+				const auto view = m_Registry.view<Components::Entity::Name, T...>();
+				for (auto entity : view) {
+					if (name == view.template get<Components::Entity::Name>(entity).m_Name) {
+						return Entity{ { m_Registry, entity } };
+					}
+				}
+				return std::unexpected(Core::CoriError("No entity found with the specified name."));
+			}
 
 			template<typename... T>
-			[[nodiscard]] auto View() {
+			[[nodiscard]] auto StaticView() {
 				auto view = m_Registry.view<T...>();
-				return EntityView(view, m_Registry);
+				return StaticEntityView(view, m_Registry);
 			}
 
 			template<typename... T, typename... ExcludeT>
-			[[nodiscard]] auto View(Exclude<ExcludeT...>) {
+			[[nodiscard]] auto StaticView(Exclude<ExcludeT...>) {
 				auto view = m_Registry.view<T...>(entt::exclude<ExcludeT...>);
-				return EntityView(view, m_Registry);
+				return StaticEntityView(view, m_Registry);
+			}
+
+			[[nodiscard]] DynamicEntityView DynamicView() {
+				return DynamicEntityView(m_Registry);
 			}
 
 			// untested and unused for now

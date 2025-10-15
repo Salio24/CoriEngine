@@ -4,6 +4,9 @@
 
 namespace Cori {
 	namespace World {
+		namespace Systems {
+			class Hierarchy;
+		}
 		class Entity;
 		namespace Internal {
 			struct SceneID {
@@ -65,7 +68,7 @@ namespace Cori {
 			 * @brief Retries the references to the requested components of the entity.
 			 * @tparam T Types of components to retrieve.
 			 * @note When retrieving multiple components use structured binding. Also make sure you use receive by reference not by value.
-			 * @return Referenced to the requested component(s).
+			 * @return References to the requested component(s).
 			 */
 			template<typename... T>
 			[[nodiscard]] decltype(auto) GetComponents() {
@@ -83,7 +86,7 @@ namespace Cori {
 			 * @brief Retries the references to the requested components of the entity. Const variant.
 			 * @tparam T Types of components to retrieve.
 			 * @note When retrieving multiple components use structured binding. Also make sure you use receive by const reference not by value.
-			 * @return Referenced to the requested component(s).
+			 * @return References to the requested component(s).
 			 */
 			template<typename... T>
 			[[nodiscard]] decltype(auto) GetComponents() const {
@@ -222,32 +225,24 @@ namespace Cori {
 			 * @brief Links the entity to a parent entity.
 			 * @param parent Parent entity to link the entity to.
 			 * @return Expected object with void on success or CoriError<> on failure.
-			 * @warning It's illegal to call SetParent if entity or parent entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release.
-			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			std::expected<void, Core::CoriError<>> SetParent(Entity parent);
 
 			/**
 			 * @brief Creates and returns a vector containing all entity siblings.
 			 * @return Expected object with a vector of siblings, or CoriError<> on failure.
-			 * @warning It's illegal to call GetSiblings if entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release.
-			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			[[nodiscard]] std::expected<std::vector<Entity>, Core::CoriError<>> GetSiblings() const;
 
 			/**
 			 * @brief Retries the parent entity of the entity if any.
 			 * @return Expected object with the parent entity, or CoriError<> on failure.
-			 * @warning It's illegal to call GetParent if entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release.
-			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			[[nodiscard]] std::expected<Entity, Core::CoriError<>> GetParent() const;
 
 			/**
 			 * @brief Creates and returns a vector containing all entity children (does not include grandchildren and so on, not recursive).
 			 * @return Expected object with a vector of all children, or CoriError<> on failure.
-			 * @warning It's illegal to call GetChildren if entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release.
-			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			[[nodiscard]] std::expected<std::vector<Entity>, Core::CoriError<>> GetChildren() const;
 
@@ -255,10 +250,22 @@ namespace Cori {
 			 * @brief Finds a children entity by name.
 			 * @param name Name of the children to find.
 			 * @return Expected object with child entity with the specified name, or CoriError<> on failure.
-			 * @warning It's illegal to call FindChildByName if entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release.
-			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindChildByName(const char* name) const;
+
+			/**
+			 * @brief Finds a children entity by name.
+			 * @param name Name of the children to find.
+			 * @return Expected object with child entity with the specified name, or CoriError<> on failure.
+			 */
+			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindChildByName(const std::string_view name) const;
+
+			/**
+			 * @brief Finds a children entity by name.
+			 * @param name Name of the children to find.
+			 * @return Expected object with child entity with the specified name, or CoriError<> on failure.
+			 */
+			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindChildByName(const std::string& name) const;
 
 			/**
 			 * @brief Destroys all children (and they grandchildren) that the entity has.
@@ -281,39 +288,31 @@ namespace Cori {
 
 			/**
 			 * @brief Prints the full entity hierarchy tree in the console.
-			 * @warning It's illegal to call PrintHierarchy if entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release.
-			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			void PrintHierarchy() const;
 
 			/**
 			 * @brief Retrieves the name of the entity.
 			 * @return A view to the current entity name.
-			 * @warning It's illegal to call GetName if entity doesn't have Name component, this will lead to an assert in debug build and a crash in release.
-			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			[[nodiscard]] std::string_view GetName() const;
 
 			/**
 			 * @brief Changes the entity name.
 			 * @param name Name to change to.
-			 * @warning It's illegal to call SetName if entity doesn't have Name component, this will lead to an assert in debug build and a crash in release.
-			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			void SetName(const std::string& name);
 
 			/**
 			 * @brief Unlinks the entity from its parent if it has one.
-			 * @warning It's illegal to call UnlinkFromParent if entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release.
-			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			void UnlinkFromParent();
+		protected:
+			friend Systems::Hierarchy;
+			void UpdateInactivityFlagsRecursive(entt::entity parent, bool parentIsActive);
 		private:
-			std::expected<void, Core::CoriError<>> LinkToParent(Entity parent);
 
 			static void DrawHierarchyRecursive(const Entity& entity, const std::string& prefix, const bool isLast);
-
-			void UpdateInactivityFlagsRecursive(entt::entity parent, bool parentIsActive);
 
 			entt::handle m_EntityHandle;
 

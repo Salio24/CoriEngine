@@ -25,6 +25,26 @@ struct Testttt {
 	std::vector<int> floats;
 };
 
+struct TagOne {
+	uint8_t t = 1;
+};
+
+struct TagTwo {
+	uint8_t t = 2;
+};
+
+struct TagThree {
+	uint8_t t = 3;
+};
+
+struct TagFour {
+	uint8_t t = 4;
+};
+
+struct TagFive {
+	uint8_t t = 5;
+};
+
 class ExampleLayer : public Cori::Core::Layer {
 public:
 	ExampleLayer() : Layer("Example") {
@@ -101,6 +121,51 @@ public:
 				CORI_ERROR("Failed to load aggregate struct, {}", result.error().what());
 			}
 		}
+
+		if (ImGui::Button("Create Ents")) {
+			auto e = ActiveScene.CreateEntity<TestTag>("135");
+			e.AddComponent<TagOne>();
+			e.AddComponent<TagThree>();
+			e.AddComponent<TagFive>();
+
+
+			auto ee = ActiveScene.CreateEntity<TestTag>("1235");
+			ee.AddComponent<TagOne>();
+			ee.AddComponent<TagThree>();
+			ee.AddComponent<TagFive>();
+			ee.AddComponent<TagTwo>();
+		}
+
+
+		if (ImGui::Button("Stat view")) {
+			auto v = ActiveScene.StaticView<TagOne, TagThree>(Cori::World::Exclude<TagTwo>());
+			for (auto e : v) {
+				CORI_DEBUG("{}", e.GetName());
+				auto [one, three] = v.Get<TagOne, TagThree>(e);
+				CORI_DEBUG("{}, {}", one.t, three.t);
+			}
+		}
+
+		if (ImGui::Button("Dyn view")) {
+			Cori::World::DynamicEntityView v = ActiveScene.DynamicView();
+			v.With<TagOne>().With<TagThree>();
+			for (auto e : v) {
+				CORI_DEBUG("{}", e.GetName());
+			}
+			v.With<TagTwo>();
+			for (auto e : v) {
+				CORI_INFO("{}", e.GetName());
+			}
+		}
+
+
+		if (ImGui::Button("Tag f")) {
+			auto e = ActiveScene.FindEntity<TestTag>("135");
+			if (e) {
+				CORI_WARN("{}", e->GetName());
+			}
+		}
+
 
 
 
