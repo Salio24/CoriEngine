@@ -6,7 +6,6 @@ namespace Cori {
 		namespace Systems {
 			void Transform::OnUpdate([[maybe_unused]] Core::GameTimer& gameTimer) {
 				CORI_PROFILE_FUNCTION();
-
 				UpdateTransform();
 			}
 

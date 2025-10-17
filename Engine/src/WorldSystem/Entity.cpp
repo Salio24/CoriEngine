@@ -149,6 +149,7 @@ namespace Cori {
 		}
 
 		void Entity::UpdateInactivityFlagsRecursive(entt::entity parent, const bool parentIsActive) {
+			CORI_PROFILE_FUNCTION();
 			entt::registry* registry = m_EntityHandle.registry();
 
 			const bool finalEffectiveState = parentIsActive && !registry->all_of<Components::Entity::InactiveLocallyFlag>(parent);

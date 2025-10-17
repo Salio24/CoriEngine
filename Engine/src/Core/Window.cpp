@@ -216,7 +216,10 @@ namespace Cori {
 				}
 			}
 
-			m_Data->m_Context->SwapBuffers();
+			{
+				CORI_PROFILE_SCOPE("Swap Buffers");
+				m_Data->m_Context->SwapBuffers();
+			}
 		}
 
 		int32_t Window::GetWidth() const {

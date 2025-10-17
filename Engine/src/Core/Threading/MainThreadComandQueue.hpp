@@ -19,13 +19,16 @@ namespace Cori {
 					{
 						std::unique_lock lock(m_Mutex);
 
-						m_Tasks.emplace_back([task]() { (*task)(); });
+						m_Tasks.emplace_back([task]() {
+							(*task)();
+						});
 					}
 
 					return res;
 				}
 
 				void Execute() {
+					CORI_PROFILE_FUNCTION();
 					std::deque<std::function<void()>> copy;
 					{
 						std::lock_guard lock(m_Mutex);

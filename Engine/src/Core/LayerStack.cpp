@@ -68,6 +68,7 @@ namespace Cori {
 		}
 
 		void LayerStack::ProcessQueue() {
+			CORI_PROFILE_FUNCTION();
 			if (m_LayerPushQueue.size() != 0) {
 				std::vector<Layer*> layersToPush = std::move(m_LayerPushQueue);
 				for (Layer* layer : std::views::reverse(layersToPush)) {

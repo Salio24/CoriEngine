@@ -108,8 +108,11 @@ namespace Cori {
 					m_CommandQueue.Execute();
 					m_GameTimer.Update();
 
-					Graphics::Internal::API::SetClearColor(m_BackgroundColor);
-					Graphics::Internal::API::ClearFramebuffer();
+					{
+						CORI_PROFILE_SCOPE("Clear Color and Clear Framebuffer");
+						Graphics::Internal::API::SetClearColor(m_BackgroundColor);
+						Graphics::Internal::API::ClearFramebuffer();
+					}
 
 					Graphics::Renderer2D::StartFrame();
 
@@ -122,19 +125,22 @@ namespace Cori {
 
 					Graphics::Renderer2D::EndFrame();
 
-					m_ImGuiLayer->StartFrame();
+					{
+						CORI_PROFILE_SCOPE("ImGui Render");
+						m_ImGuiLayer->StartFrame();
 
-					if (m_RenderImGui) {
-						for (Layer* layer : m_LayerStack) {
-							layer->OnImGuiRender(m_GameTimer);
-							layer->SceneImGuiRender(m_GameTimer);
-							if (layer->IsModal()) {
-								break;
+						if (m_RenderImGui) {
+							for (Layer* layer : m_LayerStack) {
+								layer->OnImGuiRender(m_GameTimer);
+								layer->SceneImGuiRender(m_GameTimer);
+								if (layer->IsModal()) {
+									break;
+								}
 							}
 						}
-					}
 
-					m_ImGuiLayer->EndFrame();
+						m_ImGuiLayer->EndFrame();
+					}
 
 					m_Window->OnUpdate();
 

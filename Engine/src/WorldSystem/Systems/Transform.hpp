@@ -9,7 +9,6 @@ namespace Cori {
 
 				void OnUpdate(Core::GameTimer& gameTimer) override;
 
-
 				bool Create();
 
 				static constexpr SystemPriority Priority = 50;
