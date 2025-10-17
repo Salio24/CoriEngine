@@ -121,6 +121,7 @@ namespace Cori {
 			 * @param position Position defined is the center of the quad.
 			 * @param halfSize Half size of the quad.
 			 * @param color Quad color.
+			 * @note Draws on the depth 255.
 			 */
 			static void SubmitColoredQuad(const DrawSpace space, const glm::vec2 position, const glm::vec2 halfSize, const glm::vec3& color);
 

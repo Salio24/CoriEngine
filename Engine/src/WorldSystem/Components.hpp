@@ -320,7 +320,7 @@ namespace Cori {
 					InactiveLocallyFlag() = default;
 				private:
 					// entt cant create fully empty components
-					[[maybe_unused]] bool bober{};
+					[[maybe_unused]] bool pingvin{};
 				};
 
 				/**
@@ -331,7 +331,7 @@ namespace Cori {
 					InactiveGloballyFlag() = default;
 				private:
 					// entt cant create fully empty components
-					[[maybe_unused]] bool bober{};
+					[[maybe_unused]] bool homik{};
 				};
 
 				/**
@@ -512,11 +512,33 @@ namespace Cori {
 					}
 
 					/**
+					 * @brief Adds a Track to the AudioSource cache.
+					 * @param name Name of the track, will be later used to retrieve the created track from the AudioSource cache.
+					 * @return Shared pointer to the created Track object.
+					 */
+					std::shared_ptr<Audio::Track> AddTrack(const char* name) {
+						std::shared_ptr<Audio::Track> track = Audio::Track::Create(name);
+						m_AudioTracks.insert({name, track});
+						return track;
+					}
+
+					/**
 					 * @brief Removes a Track from the AudioSource, and deletes it if it is not referenced anywhere.
 					 * @param name Name of the Track remove.
 					 * @note If a track with the specified name is not found in AudioSource cache, nothing will happen.
 					 */
 					void RemoveTrack(const std::string& name) {
+						if (m_AudioTracks.contains(name)) {
+							m_AudioTracks.erase(name);
+						}
+					}
+
+					/**
+					 * @brief Removes a Track from the AudioSource, and deletes it if it is not referenced anywhere.
+					 * @param name Name of the Track remove.
+					 * @note If a track with the specified name is not found in AudioSource cache, nothing will happen.
+					 */
+					void RemoveTrack(const char* name) {
 						if (m_AudioTracks.contains(name)) {
 							m_AudioTracks.erase(name);
 						}
@@ -535,8 +557,35 @@ namespace Cori {
 						return std::unexpected(Core::CoriError(std::format("No audio Track is found with the specified name '{}'", name)));
 					}
 
+					/**
+					 * @brief Retries a Track from the AudioSource cache.
+					 * @param name Name of the Track to retrieve.
+					 * @return Expected object with the shared pointer to the requested Track on success, or CoriError on failure.
+					 */
+					std::expected<std::shared_ptr<Audio::Track>, Core::CoriError<>> GetTrack(const char* name) {
+						if (m_AudioTracks.contains(name)) {
+							return m_AudioTracks.at(name);
+						}
+
+						return std::unexpected(Core::CoriError(std::format("No audio Track is found with the specified name '{}'", name)));
+					}
+
 				private:
-					std::unordered_map<std::string, std::shared_ptr<Audio::Track>> m_AudioTracks;
+					struct TransparentHash {
+						using is_transparent = void;
+						size_t operator()(std::string_view sv) const noexcept {
+							return std::hash<std::string_view>{}(sv);
+						}
+					};
+
+					struct TransparentEqual {
+						using is_transparent = void;
+						bool operator()(std::string_view lhs, std::string_view rhs) const noexcept {
+							return lhs == rhs;
+						}
+					};
+
+					std::unordered_map<std::string, std::shared_ptr<Audio::Track>, TransparentHash, TransparentEqual> m_AudioTracks;
 				};
 
 				/**

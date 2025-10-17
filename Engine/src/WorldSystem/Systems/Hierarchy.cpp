@@ -54,7 +54,13 @@ namespace Cori {
 				}
 				auto& hierarchy = subject.GetComponents<Components::Entity::Hierarchy>();
 				const entt::entity parent = hierarchy.m_Parent;
-				if (!registry->valid(parent)) { return; }
+				if (!registry->valid(parent)) {
+					return;
+				}
+
+				if (!registry->all_of<Components::Entity::ChildCache, Components::Entity::Hierarchy>(parent)) {
+					return;
+				}
 
 				auto& cache = registry->get<Components::Entity::ChildCache>(parent);
 				cache.m_Children.erase(std::string(subject.GetName()));

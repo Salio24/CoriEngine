@@ -50,8 +50,7 @@ namespace Cori {
 						return StopInternal(fadeOutMS);
 					}
 				}
-
-				return std::unexpected(Core::CoriError(std::format("Failed to stop sequence on Track '{} (TrackID: {})'. No sequence is currently playing on this track.", m_Name, m_ID)));
+				return {};
 			}
 
 			return std::unexpected(Core::CoriError(std::format("Failed to stop sequence on Track '{} (TrackID: {})'. Track object is invalid.", m_Name, m_ID)));

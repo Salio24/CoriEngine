@@ -283,7 +283,7 @@ namespace Cori {
 
 		void Renderer2D::SubmitColoredQuad(const DrawSpace space, const glm::vec2 position, const glm::vec2 halfSize, const glm::vec3& color) {
 			const glm::mat3 transform = glm::translate(glm::mat3(1.0f), position);
-			SubmitQuad(space, OPAQUE, transform, halfSize, glm::vec4(color, 1.0f), nullptr, {}, 30, false, false, true);
+			SubmitQuad(space, OPAQUE, transform, halfSize, glm::vec4(color, 1.0f), nullptr, {}, 255, false, false, true);
 		}
 
 		void Renderer2D::SubmitAABB(const Utility::AABB& aabb, const float lineThickness, const glm::vec3& color) {

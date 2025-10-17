@@ -38,7 +38,7 @@ namespace Cori {
 
 			/**
 			 * @brief Plays a single or a sequence of SoundWithParams objects.
-			 * @param sequence A sequence of object of type SoundWithParams.
+			 * @param sequence A sequence of objects of type SoundWithParams.
 			 * @details It creates a looped sequence of Sounds each with its own Mixer::PlayParams, in params there is a variable called LoopedInSequence, it defines the looping point of the sequence,
 			 * the function will play all sequenced sounds once until it sees a LoopedInSequence=true in the sequence, object it belongs to becomes a looping point.
 			 * Looping begins at the looping point and ends at the end if the sequence and then restarts, all LoopedInSequence variables in the SoundWithParams after the looping point has no affect on the looping behaviour.
@@ -47,107 +47,109 @@ namespace Cori {
 			 * @return Expected object with void on success or CoriError<> on failure.
 			 */
 			std::expected<void, Core::CoriError<>> Play(const IsSoundWithParams auto&... sequence) {
-				static_assert(sizeof...(sequence) > 2, "Sequence should contain at least 2 SoundWithParams objects.");
-					if (m_Valid) {
-						if (!m_ActiveSequence) {
-							m_SoundSequence.clear();
-							m_SoundSequence.reserve(sizeof...(sequence));
-							(..., m_SoundSequence.push_back(sequence));
-							m_EraseLastInSequence = false;
-							m_SequenceIntroFinished = false;
+				if (m_Valid) {
+					if (!m_ActiveSequence) {
+						m_SoundSequence.clear();
+						m_SoundSequence.reserve(sizeof...(sequence));
+						(..., m_SoundSequence.push_back(sequence));
+						m_EraseLastInSequence = false;
+						m_SequenceIntroFinished = false;
 
-							m_CurrentLoopedSequenceIndex = 0;
-							auto& initialPart = m_SoundSequence.back();
+						m_CurrentLoopedSequenceIndex = 0;
+						auto& initialPart = m_SoundSequence.back();
 
-							const auto success = PlaySoundWithParams(initialPart);
-							if (!success) {
-								CORI_CORE_ERROR_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "An error occurred when trying to play a part of sequence. Details: {}", success.error().what());
-							}
-
-							m_ActiveSequence = true;
-							if constexpr (sizeof...(sequence) > 2) {
-								if (!initialPart.second.LoopedInSequence) {
-									m_EraseLastInSequence = true;
-								} else {
-									m_SequenceIntroFinished = true;
-									m_CurrentLoopedSequenceIndex = m_SoundSequence.size() - 2;
-								}
-
-								SetTrackStopCallbackInternal([this] {
-									if (m_EraseLastInSequence) {
-										m_SoundSequence.pop_back();
-										m_EraseLastInSequence = false;
-									}
-									if (!m_SoundSequence.empty()) {
-											SoundWithParams* part;
-
-											if (m_SequenceIntroFinished) {
-												part = &m_SoundSequence.at(m_CurrentLoopedSequenceIndex);
-											}
-											else {
-												part = &m_SoundSequence.back();
-											}
-
-											m_ActiveSequence = false;
-											const auto success_ = PlaySoundWithParams(*part);
-											if (!success_) {
-												CORI_CORE_ERROR_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "An error occurred when trying to play a part of sequence. Details: {}", success_.error().what());
-											}
-											m_ActiveSequence = true;
-
-											if (!part->second.LoopedInSequence && !m_SequenceIntroFinished) {
-												m_EraseLastInSequence = true;
-											}
-											else {
-												if (m_SequenceIntroFinished) {
-													if (m_CurrentLoopedSequenceIndex == 0) {
-														m_CurrentLoopedSequenceIndex = m_SoundSequence.size() - 1;
-													}
-													else {
-														--m_CurrentLoopedSequenceIndex;
-													}
-												}
-												else {
-													m_SequenceIntroFinished = true;
-													if (m_CurrentLoopedSequenceIndex == 0) {
-														m_CurrentLoopedSequenceIndex = m_SoundSequence.size() - 2;
-													} else {
-														--m_CurrentLoopedSequenceIndex;
-													}
-												}
-											}
-									} else {
-										const auto success_ = Stop(false);
-										if (!success_) {
-											CORI_CORE_ERROR_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "An error occurred when trying to stop a sequence inside of Engine side Callback. Details: {}", success_.error().what());
-										}
-									}
-								});
-								return {};
-							}
-							else {
-								if (initialPart.second.LoopedInSequence) {
-									SetTrackStopCallbackInternal([this] {
-										SoundWithParams* part = &m_SoundSequence.at(0);
-										m_ActiveSequence = false;
-										const auto success_ = PlaySoundWithParams(*part);
-										if (!success_) {
-											CORI_CORE_ERROR_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "An error occurred when trying to play a part of sequence. Details: {}", success_.error().what());
-										}
-										m_ActiveSequence = true;
-									});
-								} else {
-									m_ActiveSequence = false;
-									return PlaySoundWithParams(initialPart);
-								}
-							}
+						const auto success = PlaySoundWithParams(initialPart);
+						if (!success) {
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "An error occurred when trying to play a part of sequence. Details: {}", success.error().what());
 						}
 
-						return std::unexpected(Core::CoriError(std::format("Failed to play sequence on Track '{} (TrackID: {})'. A sequence is already playing on this track.", m_Name, m_ID)));
+						m_ActiveSequence = true;
+						if constexpr (sizeof...(sequence) > 2) {
+							if (!initialPart.second.LoopedInSequence) {
+								m_EraseLastInSequence = true;
+							}
+							else {
+								m_SequenceIntroFinished = true;
+								m_CurrentLoopedSequenceIndex = m_SoundSequence.size() - 2;
+							}
+
+							SetTrackStopCallbackInternal([this] {
+								if (m_EraseLastInSequence) {
+									m_SoundSequence.pop_back();
+									m_EraseLastInSequence = false;
+								}
+								if (!m_SoundSequence.empty()) {
+									SoundWithParams* part;
+
+									if (m_SequenceIntroFinished) {
+										part = &m_SoundSequence.at(m_CurrentLoopedSequenceIndex);
+									}
+									else {
+										part = &m_SoundSequence.back();
+									}
+
+									m_ActiveSequence = false;
+									const auto success_ = PlaySoundWithParams(*part);
+									if (!success_) {
+										CORI_CORE_ERROR_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "An error occurred when trying to play a part of sequence. Details: {}", success_.error().what());
+									}
+									m_ActiveSequence = true;
+
+									if (!part->second.LoopedInSequence && !m_SequenceIntroFinished) {
+										m_EraseLastInSequence = true;
+									}
+									else {
+										if (m_SequenceIntroFinished) {
+											if (m_CurrentLoopedSequenceIndex == 0) {
+												m_CurrentLoopedSequenceIndex = m_SoundSequence.size() - 1;
+											}
+											else {
+												--m_CurrentLoopedSequenceIndex;
+											}
+										}
+										else {
+											m_SequenceIntroFinished = true;
+											if (m_CurrentLoopedSequenceIndex == 0) {
+												m_CurrentLoopedSequenceIndex = m_SoundSequence.size() - 2;
+											}
+											else {
+												--m_CurrentLoopedSequenceIndex;
+											}
+										}
+									}
+								}
+								else {
+									const auto success_ = Stop(false);
+									if (!success_) {
+										CORI_CORE_ERROR_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "An error occurred when trying to stop a sequence inside of Engine side Callback. Details: {}", success_.error().what());
+									}
+								}
+							});
+							return {};
+						}
+						else {
+							if (initialPart.second.LoopedInSequence) {
+								SetTrackStopCallbackInternal([this] {
+									SoundWithParams* part = &m_SoundSequence.at(0);
+									m_ActiveSequence = false;
+									const auto success_ = PlaySoundWithParams(*part);
+									if (!success_) {
+										CORI_CORE_ERROR_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "An error occurred when trying to play a part of sequence. Details: {}", success_.error().what());
+									}
+									m_ActiveSequence = true;
+								});
+							}
+							else {
+								m_ActiveSequence = false;
+								return PlaySoundWithParams(initialPart);
+							}
+						}
 					}
 
-					return std::unexpected(Core::CoriError(std::format("Failed to play sequence on Track '{} (TrackID: {})'. Track object is invalid.", m_Name, m_ID)));
+					return std::unexpected(Core::CoriError(std::format("Failed to play sequence on Track '{} (TrackID: {})'. A sequence is already playing on this track.", m_Name, m_ID)));
+				}
 
+				return std::unexpected(Core::CoriError(std::format("Failed to play sequence on Track '{} (TrackID: {})'. Track object is invalid.", m_Name, m_ID)));
 			}
 
 			/**
