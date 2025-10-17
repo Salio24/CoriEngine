@@ -138,11 +138,19 @@ namespace Cori {
 									}
 									m_ActiveSequence = true;
 								});
-							}
-							else {
+
+								SoundWithParams* part = &m_SoundSequence.at(0);
 								m_ActiveSequence = false;
-								return PlaySoundWithParams(initialPart);
+								const auto success_ = PlaySoundWithParams(*part);
+								if (!success_) {
+									CORI_CORE_ERROR_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "An error occurred when trying to play a part of sequence. Details: {}", success_.error().what());
+								}
+								m_ActiveSequence = true;
+								return {};
 							}
+
+							m_ActiveSequence = false;
+							return PlaySoundWithParams(initialPart);
 						}
 					}
 
