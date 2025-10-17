@@ -17,7 +17,7 @@ namespace Cori {
 			class Descriptor {
 			public:
 				/**
-				 * @brief Constructs a descriptor. It's recommended to use "inline const" when defining the Descriptor in a namespace
+				 * @brief Constructs a descriptor.
 				 * @param name Name to be used assigned to SpriteAtlas.
 				 * @param imagePath Path to the image that will be used to create the SpriteAtlas.
 				 * @param spriteResolution Resolution of one sprite in an atlas.
@@ -83,6 +83,12 @@ namespace Cori {
 			 * @return True if successful, false otherwise.
 			 */
 			[[nodiscard]] bool GetSuccessStatus() const;
+
+			/**
+			 * @brief Retrieves the name of the SpriteAtlas.
+			 * @return View to the name of the atlas.
+			 */
+			[[nodiscard]] std::string_view GetName() const;
 
 			/**
 			 * @brief Retrieves the Texture2D stored in the SpriteAtlas.

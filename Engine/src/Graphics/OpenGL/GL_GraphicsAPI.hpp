@@ -1,14 +1,11 @@
 #pragma once
 #include "../CoriGraphicsAPI.hpp"
-#include "Graphics/GraphicsAPIs.hpp"
-#include "Core/AutoRegisteringFactory.hpp"
 
 namespace Cori {
 	namespace Graphics {
 		namespace Internal {
-			class OpenGLGraphicsAPI final : public CoriGraphicsAPI, public Core::RegisterInFactory<CoriGraphicsAPI, OpenGLGraphicsAPI, GraphicsAPIs, GraphicsAPIs::OpenGL> {
+			class OpenGLGraphicsAPI final : public CoriGraphicsAPI {
 			public:
-				static bool PreCreateHook();
 				OpenGLGraphicsAPI();
 
 				void Init() override;
@@ -29,8 +26,6 @@ namespace Cori {
 				void DisableBlending() override;
 
 				void SetDepthMask(const bool mode) override;
-
-				CORI_REGISTERED_FACTORY_INIT;
 			};
 		}
 	}

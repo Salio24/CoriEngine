@@ -8,6 +8,26 @@
 #endif
 
 namespace Cori {
+	namespace World {
+		namespace Components {
+			namespace Scene {
+				/**
+				 * @brief Scene context component containing Box2D physics world.
+				 */
+				//class PhysicsWorld : public Physics::World {
+				//public:
+				//	explicit PhysicsWorld(const Params& params = {}) : World{ params } {}
+//
+				//	PhysicsWorld(const PhysicsWorld&) = delete;
+				//	PhysicsWorld& operator=(const PhysicsWorld&) = delete;
+//
+				//	PhysicsWorld(PhysicsWorld&&) noexcept = default;
+				//	PhysicsWorld& operator=(PhysicsWorld&&) noexcept = default;
+				//};
+			}
+		}
+	}
+
 	/**
 	 * @brief Anything connected to physics is in this namespace. Please refer to Box2D docs 'https://box2d.org/' for any details regarding physics.
 	 * @details Cori engine doesn't have a native physics engine and uses Box2D, so refer to Box2D docs 'https://box2d.org/' for any details on physics.
@@ -171,20 +191,20 @@ namespace Cori {
 
 			ConvexHull(const b2Hull& hull) : m_Hull(hull) {} // NOLINT
 
-			[[nodiscard]] ConvexHull Create(const std::vector<Vec2>& vertices) {
+			[[nodiscard]] static ConvexHull Create(const std::vector<Vec2>& vertices) {
 #ifdef DEBUG_BUILD
-				m_Hull = b2ComputeHull(vertices.data(), vertices.size());
-				if (m_Hull.count == 0) {
+				const b2Hull hull = b2ComputeHull(vertices.data(), vertices.size());
+				if (hull.count == 0) {
 					std::string str_vertices;
 					for (auto [x, y] : vertices) {
 						str_vertices += "(" + std::to_string(x) + ", " + std::to_string(x) + ")";
 					}
-					CORI_CORE_CHECK(m_Hull.count != 0, "Failed to create ConvexHull. Vertices: {}", str_vertices);
+					CORI_CORE_CHECK(hull.count != 0, "Failed to create ConvexHull. Vertices: {}", str_vertices);
 				}
-				return m_Hull;
+				return hull;
 #endif
 #ifndef DEBUG_BUILD
-				return m_Hull = b2ComputeHull(vertices.data(), vertices.size());
+				return b2ComputeHull(vertices.data(), vertices.size());
 #endif
 			}
 
@@ -263,10 +283,11 @@ namespace Cori {
 			}
 		};
 
-		class PhysicsWorld : public World {
-		public:
-			PhysicsWorld() : World{ Params{} } {
-			}
-		};
 	}
+}
+
+inline void operator*=(Cori::Physics::Vec2& a, Cori::Physics::Vec2 b)
+{
+	a.x *= b.x;
+	a.y *= b.y;
 }

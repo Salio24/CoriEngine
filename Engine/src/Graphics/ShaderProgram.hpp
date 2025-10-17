@@ -2,9 +2,6 @@
 
 namespace Cori {
 	namespace Graphics {
-		/**
-		 * @brief There is no use for it on the client side for now.
-		 */
 		class ShaderProgram {
 		public:
 			class Descriptor {

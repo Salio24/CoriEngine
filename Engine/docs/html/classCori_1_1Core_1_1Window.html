@@ -133,12 +133,14 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ac844103c29392f145f760cf9f6fab6cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the VSync state.  <br /></td></tr>
 <tr class="memitem:accaaf8dee723ddf78ff5eadda5b27d51" id="r_accaaf8dee723ddf78ff5eadda5b27d51"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#accaaf8dee723ddf78ff5eadda5b27d51">IsVSync</a> () const</td></tr>
 <tr class="memdesc:accaaf8dee723ddf78ff5eadda5b27d51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks is VSynch is currently enabled.  <br /></td></tr>
-<tr class="memitem:a337ad17d98810547e15d4c0711b166aa" id="r_a337ad17d98810547e15d4c0711b166aa"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a337ad17d98810547e15d4c0711b166aa">GetScreenModes</a> () const</td></tr>
-<tr class="memdesc:a337ad17d98810547e15d4c0711b166aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves a list of all available <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a>.  <br /></td></tr>
-<tr class="memitem:a6ecba393a8a84ce0f4c7d30d0fc6c08e" id="r_a6ecba393a8a84ce0f4c7d30d0fc6c08e"><td class="memItemLeft" align="right" valign="top">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6ecba393a8a84ce0f4c7d30d0fc6c08e">SetScreenMode</a> (const <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a> &amp;mode)</td></tr>
-<tr class="memdesc:a6ecba393a8a84ce0f4c7d30d0fc6c08e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the current <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a>.  <br /></td></tr>
+<tr class="memitem:a550e0439ddd00e283877f5b488277999" id="r_a550e0439ddd00e283877f5b488277999"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a550e0439ddd00e283877f5b488277999">GetScreenModes</a> () const</td></tr>
+<tr class="memdesc:a550e0439ddd00e283877f5b488277999"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves a list of all available <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a>.  <br /></td></tr>
+<tr class="memitem:a3487530d140e0fbf7f2f4b6c9e6e5bba" id="r_a3487530d140e0fbf7f2f4b6c9e6e5bba"><td class="memItemLeft" align="right" valign="top">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3487530d140e0fbf7f2f4b6c9e6e5bba">SetScreenMode</a> (const uint32_t modeIndex)</td></tr>
+<tr class="memdesc:a3487530d140e0fbf7f2f4b6c9e6e5bba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the current <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a>.  <br /></td></tr>
 <tr class="memitem:ab051f165e8a834ef0df43154f64672fd" id="r_ab051f165e8a834ef0df43154f64672fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceCori_1_1Core.html#a4058f0d1174cf6b294dfc0a31642cb95">WindowMode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab051f165e8a834ef0df43154f64672fd">GetWindowMode</a> () const</td></tr>
 <tr class="memdesc:ab051f165e8a834ef0df43154f64672fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the current <a class="el" href="namespaceCori_1_1Core.html#a4058f0d1174cf6b294dfc0a31642cb95">WindowMode</a>;.  <br /></td></tr>
+<tr class="memitem:a602b2e0ad4989ee44ff2a7083dfa7d7e" id="r_a602b2e0ad4989ee44ff2a7083dfa7d7e"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a602b2e0ad4989ee44ff2a7083dfa7d7e">GetCurrentScreenMode</a> () const</td></tr>
+<tr class="memdesc:a602b2e0ad4989ee44ff2a7083dfa7d7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the current screen mode index.  <br /></td></tr>
 <tr class="memitem:adf479affc833e89a9275b708d7c24572" id="r_adf479affc833e89a9275b708d7c24572"><td class="memItemLeft" align="right" valign="top">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adf479affc833e89a9275b708d7c24572">SetWindowMode</a> (<a class="el" href="namespaceCori_1_1Core.html#a4058f0d1174cf6b294dfc0a31642cb95">WindowMode</a> mode)</td></tr>
 <tr class="memdesc:adf479affc833e89a9275b708d7c24572"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the current <a class="el" href="namespaceCori_1_1Core.html#a4058f0d1174cf6b294dfc0a31642cb95">WindowMode</a>.  <br /></td></tr>
 </table><table class="memberdecls">
@@ -171,7 +173,7 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00116">116</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00148">148</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
 
 </div>
 </div>
@@ -206,6 +208,36 @@ Friends</h2></td></tr>
 
 </div>
 </div>
+<a id="a602b2e0ad4989ee44ff2a7083dfa7d7e" name="a602b2e0ad4989ee44ff2a7083dfa7d7e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a602b2e0ad4989ee44ff2a7083dfa7d7e">&#9670;&#160;</a></span>GetCurrentScreenMode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t Cori::Core::Window::GetCurrentScreenMode </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel nodiscard">nodiscard</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieves the current screen mode index. </p>
+<dl class="section return"><dt>Returns</dt><dd>Index of the current screen mode in the screen modes vector (obtainable via GetScreenModes). </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00283">283</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a1219353bd026ce777945452057bdd921" name="a1219353bd026ce777945452057bdd921"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1219353bd026ce777945452057bdd921">&#9670;&#160;</a></span>GetHeight()</h2>
 
@@ -232,12 +264,12 @@ Friends</h2></td></tr>
 <p>Give the current window height. </p>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="classCori_1_1Core_1_1Window.html" title="This class manages everything that is connected with physical Window management, i might add multiwin...">Window</a> height in pixels. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00199">199</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00232">232</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a337ad17d98810547e15d4c0711b166aa" name="a337ad17d98810547e15d4c0711b166aa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a337ad17d98810547e15d4c0711b166aa">&#9670;&#160;</a></span>GetScreenModes()</h2>
+<a id="a550e0439ddd00e283877f5b488277999" name="a550e0439ddd00e283877f5b488277999"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a550e0439ddd00e283877f5b488277999">&#9670;&#160;</a></span>GetScreenModes()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -246,7 +278,7 @@ Friends</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a> &gt; Cori::Core::Window::GetScreenModes </td>
+          <td class="memname">const std::vector&lt; <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a> &gt; &amp; Cori::Core::Window::GetScreenModes </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
@@ -260,9 +292,9 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Retrieves a list of all available <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a>. </p>
-<dl class="section return"><dt>Returns</dt><dd>A vector containing all available <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a>. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A const reference to the vector containing all available <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00234">234</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00270">270</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
 
 </div>
 </div>
@@ -292,7 +324,7 @@ Friends</h2></td></tr>
 <p>Give the current window width. </p>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="classCori_1_1Core_1_1Window.html" title="This class manages everything that is connected with physical Window management, i might add multiwin...">Window</a> width in pixels. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00195">195</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00225">225</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
 
 </div>
 </div>
@@ -322,7 +354,7 @@ Friends</h2></td></tr>
 <p>Gets the current <a class="el" href="namespaceCori_1_1Core.html#a4058f0d1174cf6b294dfc0a31642cb95">WindowMode</a>;. </p>
 <dl class="section return"><dt>Returns</dt><dd>Enumerator of the current <a class="el" href="namespaceCori_1_1Core.html#a4058f0d1174cf6b294dfc0a31642cb95">WindowMode</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00248">248</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00279">279</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
 
 </div>
 </div>
@@ -352,12 +384,12 @@ Friends</h2></td></tr>
 <p>Checks is VSynch is currently enabled. </p>
 <dl class="section return"><dt>Returns</dt><dd>True enabled, false disabled. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00221">221</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00257">257</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a6ecba393a8a84ce0f4c7d30d0fc6c08e" name="a6ecba393a8a84ce0f4c7d30d0fc6c08e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6ecba393a8a84ce0f4c7d30d0fc6c08e">&#9670;&#160;</a></span>SetScreenMode()</h2>
+<a id="a3487530d140e0fbf7f2f4b6c9e6e5bba" name="a3487530d140e0fbf7f2f4b6c9e6e5bba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3487530d140e0fbf7f2f4b6c9e6e5bba">&#9670;&#160;</a></span>SetScreenMode()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -365,7 +397,7 @@ Friends</h2></td></tr>
         <tr>
           <td class="memname">std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">CoriError</a>&lt;&gt; &gt; Cori::Core::Window::SetScreenMode </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>mode</em></span></td><td>)</td>
+          <td class="paramtype">const uint32_t</td>          <td class="paramname"><span class="paramname"><em>modeIndex</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -374,21 +406,40 @@ Friends</h2></td></tr>
 <p>Changes the current <a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">mode</td><td><a class="el" href="structCori_1_1Core_1_1ScreenMode.html">ScreenMode</a> to change to. </td></tr>
+    <tr><td class="paramname">modeIndex</td><td>Index of the screen mode in the screen modes vector (obtainable via GetScreenModes). </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Expected object with void on success or <a class="el" href="classCori_1_1Core_1_1CoriError.html" title="Custom error class mainly used in std::expected.">CoriError&lt;&gt;</a> on failure. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00243">243</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00274">274</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="classCori_1_1Core_1_1Window_a6ecba393a8a84ce0f4c7d30d0fc6c08e_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1Window_a6ecba393a8a84ce0f4c7d30d0fc6c08e_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Core_1_1Window_a6ecba393a8a84ce0f4c7d30d0fc6c08e_cgraph" id="aclassCori_1_1Core_1_1Window_a6ecba393a8a84ce0f4c7d30d0fc6c08e_cgraph">
-<area shape="rect" title="Changes the current ScreenMode." alt="" coords="5,5,151,50"/>
-<area shape="rect" href="classCori_1_1Core_1_1Window.html#adf479affc833e89a9275b708d7c24572" title="Changes the current WindowMode." alt="" coords="199,5,344,50"/>
-<area shape="poly" title=" " alt="" coords="151,25,183,25,183,30,151,30"/>
+<div class="center"><img src="classCori_1_1Core_1_1Window_a3487530d140e0fbf7f2f4b6c9e6e5bba_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1Window_a3487530d140e0fbf7f2f4b6c9e6e5bba_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1Core_1_1Window_a3487530d140e0fbf7f2f4b6c9e6e5bba_cgraph" id="aclassCori_1_1Core_1_1Window_a3487530d140e0fbf7f2f4b6c9e6e5bba_cgraph">
+<area shape="rect" title="Changes the current ScreenMode." alt="" coords="5,53,151,98"/>
+<area shape="rect" href="classCori_1_1Core_1_1Window.html#adf479affc833e89a9275b708d7c24572" title="Changes the current WindowMode." alt="" coords="199,53,344,98"/>
+<area shape="poly" title=" " alt="" coords="151,72,183,72,183,78,151,78"/>
+<area shape="rect" href="classCori_1_1FileSystem_1_1PathManager.html#a70c92136e32723b75a6a44cbbf8bdec7" title="Retries the full aliased path defined in fsgame.json." alt="" coords="404,8,625,52"/>
+<area shape="poly" title=" " alt="" coords="344,59,389,51,390,56,345,64"/>
+<area shape="rect" href="classCori_1_1FileSystem_1_1BinaryFileManager.html#ae43b1979ebab8a97a5ddfb13c14f4129" title="Saves an instance of an aggregate struct onto the disk." alt="" coords="392,88,637,132"/>
+<area shape="poly" title=" " alt="" coords="345,83,377,87,376,93,344,88"/>
+<area shape="rect" href="classCori_1_1Logger.html#a7e782f29b9eebd80d6a801e80d074318" title=" " alt="" coords="696,5,867,33"/>
+<area shape="poly" title=" " alt="" coords="625,23,680,21,681,26,625,28"/>
+<area shape="rect" href="namespaceCori_1_1Utility.html#aadae1036bd08323331712cb16b48813e" title="Computes the 64bit FNV&#45;1a string hash." alt="" coords="926,56,1081,84"/>
+<area shape="poly" title=" " alt="" coords="637,97,685,93,910,74,910,80,686,98,638,102"/>
+<area shape="rect" href="namespaceCori_1_1Utility.html#aca6f01473d2cc64923d437335438aa44" title="Generates a stable, unique ID for an aggregate struct at compile&#45;time." alt="" coords="685,108,878,152"/>
+<area shape="poly" title=" " alt="" coords="638,116,670,119,669,124,637,122"/>
+<area shape="rect" href="classCori_1_1Core_1_1UUID.html#ae7543c82e2aac1352d77a7d85ba8e435" title=" " alt="" coords="688,176,875,204"/>
+<area shape="poly" title=" " alt="" coords="585,130,686,162,710,169,709,174,685,167,583,135"/>
+<area shape="poly" title=" " alt="" coords="866,104,934,86,935,91,867,110"/>
+<area shape="rect" href="namespaceCori_1_1Utility_1_1Internal.html#a9337758a0302ac0fc6b64644e5f1b4ce" title=" " alt="" coords="927,108,1080,152"/>
+<area shape="poly" title=" " alt="" coords="878,127,911,127,911,132,878,132"/>
+<area shape="rect" href="namespaceCori_1_1Utility_1_1Internal.html#a52092d326bf9b42dd65b632131a3748f" title=" " alt="" coords="1129,108,1310,152"/>
+<area shape="poly" title=" " alt="" coords="1080,127,1113,127,1113,132,1080,132"/>
+<area shape="rect" href="namespaceCori_1_1Utility_1_1Internal.html#a3915b814d3c7b0d4b5a7920c4cd9d597" title=" " alt="" coords="1358,108,1511,152"/>
+<area shape="poly" title=" " alt="" coords="1311,127,1343,127,1343,132,1311,132"/>
 </map>
 </div>
 
@@ -417,7 +468,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00209">209</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00245">245</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
 
 </div>
 </div>
@@ -445,7 +496,34 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Expected object with void on success or <a class="el" href="classCori_1_1Core_1_1CoriError.html" title="Custom error class mainly used in std::expected.">CoriError&lt;&gt;</a> on failure. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00253">253</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Window_8cpp_source.html#l00288">288</a> of file <a class="el" href="Window_8cpp_source.html">Window.cpp</a>.</p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classCori_1_1Core_1_1Window_adf479affc833e89a9275b708d7c24572_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1Window_adf479affc833e89a9275b708d7c24572_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1Core_1_1Window_adf479affc833e89a9275b708d7c24572_cgraph" id="aclassCori_1_1Core_1_1Window_adf479affc833e89a9275b708d7c24572_cgraph">
+<area shape="rect" title="Changes the current WindowMode." alt="" coords="5,53,151,98"/>
+<area shape="rect" href="classCori_1_1FileSystem_1_1PathManager.html#a70c92136e32723b75a6a44cbbf8bdec7" title="Retries the full aliased path defined in fsgame.json." alt="" coords="211,8,432,52"/>
+<area shape="poly" title=" " alt="" coords="150,59,196,51,197,56,151,64"/>
+<area shape="rect" href="classCori_1_1FileSystem_1_1BinaryFileManager.html#ae43b1979ebab8a97a5ddfb13c14f4129" title="Saves an instance of an aggregate struct onto the disk." alt="" coords="199,88,444,132"/>
+<area shape="poly" title=" " alt="" coords="151,83,183,87,183,93,151,88"/>
+<area shape="rect" href="classCori_1_1Logger.html#a7e782f29b9eebd80d6a801e80d074318" title=" " alt="" coords="502,5,674,33"/>
+<area shape="poly" title=" " alt="" coords="432,23,487,21,487,26,432,28"/>
+<area shape="rect" href="namespaceCori_1_1Utility.html#aadae1036bd08323331712cb16b48813e" title="Computes the 64bit FNV&#45;1a string hash." alt="" coords="732,56,888,84"/>
+<area shape="poly" title=" " alt="" coords="444,97,492,93,716,74,717,80,492,98,445,102"/>
+<area shape="rect" href="namespaceCori_1_1Utility.html#aca6f01473d2cc64923d437335438aa44" title="Generates a stable, unique ID for an aggregate struct at compile&#45;time." alt="" coords="492,108,684,152"/>
+<area shape="poly" title=" " alt="" coords="445,116,476,119,476,124,444,122"/>
+<area shape="rect" href="classCori_1_1Core_1_1UUID.html#ae7543c82e2aac1352d77a7d85ba8e435" title=" " alt="" coords="495,176,681,204"/>
+<area shape="poly" title=" " alt="" coords="392,130,493,162,517,169,516,174,491,167,390,135"/>
+<area shape="poly" title=" " alt="" coords="672,104,741,86,742,91,674,110"/>
+<area shape="rect" href="namespaceCori_1_1Utility_1_1Internal.html#a9337758a0302ac0fc6b64644e5f1b4ce" title=" " alt="" coords="734,108,886,152"/>
+<area shape="poly" title=" " alt="" coords="685,127,718,127,718,132,685,132"/>
+<area shape="rect" href="namespaceCori_1_1Utility_1_1Internal.html#a52092d326bf9b42dd65b632131a3748f" title=" " alt="" coords="936,108,1117,152"/>
+<area shape="poly" title=" " alt="" coords="887,127,920,127,920,132,887,132"/>
+<area shape="rect" href="namespaceCori_1_1Utility_1_1Internal.html#a3915b814d3c7b0d4b5a7920c4cd9d597" title=" " alt="" coords="1165,108,1317,152"/>
+<area shape="poly" title=" " alt="" coords="1118,127,1149,127,1149,132,1118,132"/>
+</map>
+</div>
 
 </div>
 </div>
@@ -470,7 +548,7 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Window_8hpp_source.html#l00109">109</a> of file <a class="el" href="Window_8hpp_source.html">Window.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Window_8hpp_source.html#l00124">124</a> of file <a class="el" href="Window_8hpp_source.html">Window.hpp</a>.</p>
 
 </div>
 </div>

@@ -4,6 +4,19 @@
 
 namespace Cori {
 	namespace World {
+		namespace Systems {
+			class Hierarchy;
+		}
+		class Entity;
+		namespace Internal {
+			struct SceneID {
+				explicit SceneID(const uint32_t id) : m_OwningSceneID(id) {}
+
+			private:
+				friend Entity;
+				uint32_t m_OwningSceneID;
+			};
+		}
 		/**
 		 * @brief Entities are the essential part of WorldSystem.
 		 * @details Entities can have a parent-children hierarchy that is represented by a left-child right-sibling binary tree internally.
@@ -18,6 +31,7 @@ namespace Cori {
 			/**
 			 * @brief Adds a component to the entity.
 			 * @tparam T Type of component to add.
+			 * @tparam Args Deduced automatically, no need to specify.
 			 * @param args Arguments passed to the component constructor.
 			 * @return A reference to the newly created component.
 			 */
@@ -29,6 +43,7 @@ namespace Cori {
 			/**
 			 * @brief Replaces the component with a newly created one.
 			 * @tparam T Type of component to replace.
+			 * @tparam Args Deduced automatically, no need to specify.
 			 * @param args Arguments passed to the component constructor.
 			 * @return A reference to the replaced component.
 			 */
@@ -40,6 +55,7 @@ namespace Cori {
 			/**
 			 * @brief Adds a component to the entity, or replaces it if the entity already has this component.
 			 * @tparam T Type of component to add or replace.
+			 * @tparam Args Deduced automatically, no need to specify.
 			 * @param args Arguments passed to the component constructor.
 			 * @return A reference to the newly created or replaced component.
 			 */
@@ -52,7 +68,7 @@ namespace Cori {
 			 * @brief Retries the references to the requested components of the entity.
 			 * @tparam T Types of components to retrieve.
 			 * @note When retrieving multiple components use structured binding. Also make sure you use receive by reference not by value.
-			 * @return Referenced to the requested component(s).
+			 * @return References to the requested component(s).
 			 */
 			template<typename... T>
 			[[nodiscard]] decltype(auto) GetComponents() {
@@ -70,7 +86,7 @@ namespace Cori {
 			 * @brief Retries the references to the requested components of the entity. Const variant.
 			 * @tparam T Types of components to retrieve.
 			 * @note When retrieving multiple components use structured binding. Also make sure you use receive by const reference not by value.
-			 * @return Referenced to the requested component(s).
+			 * @return References to the requested component(s).
 			 */
 			template<typename... T>
 			[[nodiscard]] decltype(auto) GetComponents() const {
@@ -88,6 +104,7 @@ namespace Cori {
 			/**
 			 * @brief Retries or adds a component to the entity.
 			 * @tparam T Type of component to retrieve or add if absent.
+			 * @tparam Args Deduced automatically, no need to specify.
 			 * @param args Arguments passed to the component constructor in case of addition of the component.
 			 * @return Reference to the added or received component.
 			 */
@@ -148,26 +165,26 @@ namespace Cori {
 			/**
 			 * @brief Changes the activity state of the entity.
 			 * @param state Activity state to set.
-			 * @details When deactivating the entity a InactiveLocallyFlag and InactiveGloballyFlag are assigned to it, it this entity has any children a InactiveGloballyFlag will be added to the whole children tree recursively (to the grandchildren, grand-grandchildren and so on).
+			 * @details When deactivating the entity a ```InactiveLocallyFlag``` and ```InactiveGloballyFlag``` are assigned to it, it this entity has any children a ```InactiveGloballyFlag``` will be added to the whole children tree recursively (to the grandchildren, grand-grandchildren and so on).
 			 */
 			void SetActive(const bool state);
 
 			/**
-			 * @brief Checks if the entity is active locally (doesn't have InactiveLocallyFlag), just a convenience function.
-			 * @return True if it doesn't have InactiveLocallyFlag, false otherwise.
+			 * @brief Checks if the entity is active locally (doesn't have ```InactiveLocallyFlag```), just a convenience function.
+			 * @return True if it doesn't have ```InactiveLocallyFlag```, false otherwise.
 			 */
 			[[nodiscard]] bool IsActiveLocally() const;
 
 			/**
-			 * @brief Checks if the entity is active locally (doesn't have InactiveGloballyFlag), just a convenience function.
-			 * @return True if it doesn't have InactiveGloballyFlag, false otherwise.
+			 * @brief Checks if the entity is active locally (doesn't have ```InactiveGloballyFlag```), just a convenience function.
+			 * @return True if it doesn't have ```InactiveGloballyFlag```, false otherwise.
 			 */
 			[[nodiscard]] bool IsActiveGlobally() const;
 
 			/**
 			 * @brief Gets the entity ID.
 			 * @return Entity ID.
-			 * @note Entity IDs can be reused, to differentiate one entity from the other, you need to compare entity ID and entity version. To get a unique entity ID use GetEUID() method.
+			 * @note Entity IDs can be reused, to differentiate one entity from the other, you need to compare entity ID and entity version. To get a unique entity ID use ```GetEUID()``` method.
 			 */
 			[[nodiscard]] uint32_t GetID() const {
 				return entt::to_integral(m_EntityHandle.entity());
@@ -190,6 +207,14 @@ namespace Cori {
 			}
 
 			/**
+			 * @brief Retries the ID of the owner scene. You can get the actual SceneHandle by providing SceneManager with this ID (method: ```GetHandle```).
+			 * @return Owner SceneID.
+			 */
+			[[nodiscard]] uint32_t GetOwnerSceneID() const {
+				return GetComponents<Internal::SceneID>().m_OwningSceneID;
+			}
+
+			/**
 			 * @brief Gets the debuting string for logging.
 			 * @param showUUID Whether to include UUID in the debugging string.
 			 * @return Formated debugging string.
@@ -200,32 +225,24 @@ namespace Cori {
 			 * @brief Links the entity to a parent entity.
 			 * @param parent Parent entity to link the entity to.
 			 * @return Expected object with void on success or CoriError<> on failure.
-			 * @warning It's illegal to call SetParent if entity or parent entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release.
-			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			std::expected<void, Core::CoriError<>> SetParent(Entity parent);
 
 			/**
 			 * @brief Creates and returns a vector containing all entity siblings.
 			 * @return Expected object with a vector of siblings, or CoriError<> on failure.
-			 * @warning It's illegal to call GetSiblings if entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release.
-			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			[[nodiscard]] std::expected<std::vector<Entity>, Core::CoriError<>> GetSiblings() const;
 
 			/**
 			 * @brief Retries the parent entity of the entity if any.
 			 * @return Expected object with the parent entity, or CoriError<> on failure.
-			 * @warning It's illegal to call GetParent if entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release.
-			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			[[nodiscard]] std::expected<Entity, Core::CoriError<>> GetParent() const;
 
 			/**
 			 * @brief Creates and returns a vector containing all entity children (does not include grandchildren and so on, not recursive).
 			 * @return Expected object with a vector of all children, or CoriError<> on failure.
-			 * @warning It's illegal to call GetChildren if entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release.
-			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			[[nodiscard]] std::expected<std::vector<Entity>, Core::CoriError<>> GetChildren() const;
 
@@ -233,10 +250,27 @@ namespace Cori {
 			 * @brief Finds a children entity by name.
 			 * @param name Name of the children to find.
 			 * @return Expected object with child entity with the specified name, or CoriError<> on failure.
-			 * @warning It's illegal to call FindChildByName if entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release.
-			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindChildByName(const char* name) const;
+
+			/**
+			 * @brief Finds a children entity by name.
+			 * @param name Name of the children to find.
+			 * @return Expected object with child entity with the specified name, or CoriError<> on failure.
+			 */
+			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindChildByName(const std::string_view name) const;
+
+			/**
+			 * @brief Finds a children entity by name.
+			 * @param name Name of the children to find.
+			 * @return Expected object with child entity with the specified name, or CoriError<> on failure.
+			 */
+			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindChildByName(const std::string& name) const;
+
+			/**
+			 * @brief Destroys all children (and they grandchildren) that the entity has.
+			 */
+			void DestroyChildren();
 
 			/**
 			 * @brief Gets a raw entt::entity if you need to interact with entt directly.
@@ -254,39 +288,31 @@ namespace Cori {
 
 			/**
 			 * @brief Prints the full entity hierarchy tree in the console.
-			 * @warning It's illegal to call PrintHierarchy if entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release.
-			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			void PrintHierarchy() const;
 
 			/**
 			 * @brief Retrieves the name of the entity.
 			 * @return A view to the current entity name.
-			 * @warning It's illegal to call GetName if entity doesn't have Name component, this will lead to an assert in debug build and a crash in release.
-			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			[[nodiscard]] std::string_view GetName() const;
 
 			/**
 			 * @brief Changes the entity name.
 			 * @param name Name to change to.
-			 * @warning It's illegal to call SetName if entity doesn't have Name component, this will lead to an assert in debug build and a crash in release.
-			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			void SetName(const std::string& name);
 
 			/**
 			 * @brief Unlinks the entity from its parent if it has one.
-			 * @warning It's illegal to call UnlinkFromParent if entity doesn't have Hierarchy and Name components, this will lead to an assert in debug build and a crash in release.
-			 * \n When creating an entity with Scene::CreateEntity you don't have to worry about it, applies only when you create an entity with Scene::CreateBlankEntity.
 			 */
 			void UnlinkFromParent();
+		protected:
+			friend Systems::Hierarchy;
+			void UpdateInactivityFlagsRecursive(entt::entity parent, bool parentIsActive);
 		private:
-			std::expected<void, Core::CoriError<>> LinkToParent(Entity parent);
 
 			static void DrawHierarchyRecursive(const Entity& entity, const std::string& prefix, const bool isLast);
-
-			void UpdateInactivityFlagsRecursive(entt::entity parent, bool parentIsActive);
 
 			entt::handle m_EntityHandle;
 

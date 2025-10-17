@@ -3,12 +3,14 @@ var classCori_1_1Graphics_1_1AnimationPack =
     [ "Descriptor", "classCori_1_1Graphics_1_1AnimationPack_1_1Descriptor.html", "classCori_1_1Graphics_1_1AnimationPack_1_1Descriptor" ],
     [ "ConfigType", "classCori_1_1Graphics_1_1AnimationPack.html#a8758011a58b3e50bc28d1651bd5741ac", [
       [ "ASEPRITE", "classCori_1_1Graphics_1_1AnimationPack.html#a8758011a58b3e50bc28d1651bd5741acafac06e3c8b2c74148eec8e301b4a3644", null ],
-      [ "CORI", "classCori_1_1Graphics_1_1AnimationPack.html#a8758011a58b3e50bc28d1651bd5741acaf7bde3d1604e956f9d25e1d75dfb1895", null ]
+      [ "CORI_UNIFORM", "classCori_1_1Graphics_1_1AnimationPack.html#a8758011a58b3e50bc28d1651bd5741acaf5d83ab301b5e8eb4473596b3a83fa15", null ],
+      [ "CORI_VARYING", "classCori_1_1Graphics_1_1AnimationPack.html#a8758011a58b3e50bc28d1651bd5741acae2f27b516dcf9c10522ec9c4401273a7", null ],
+      [ "INVALID", "classCori_1_1Graphics_1_1AnimationPack.html#a8758011a58b3e50bc28d1651bd5741aca3d2434ff3f7248857fe2448ae203a5e3", null ]
     ] ],
-    [ "Create", "classCori_1_1Graphics_1_1AnimationPack.html#ac01ce6803c34809be6fbf483a9311b03", null ],
-    [ "Create", "classCori_1_1Graphics_1_1AnimationPack.html#a9d7eb51b6b9f0267d84fc1f29751f961", null ],
+    [ "Create", "classCori_1_1Graphics_1_1AnimationPack.html#abf8ebc495d7ffc5278c53e3e7759aca6", null ],
     [ "GetAnimation", "classCori_1_1Graphics_1_1AnimationPack.html#a12289a28ef75895d9831bc4c45d99439", null ],
-    [ "m_Animations", "classCori_1_1Graphics_1_1AnimationPack.html#a577f0419b8d9572ad256e37024e3e7df", null ],
-    [ "m_FrameSize", "classCori_1_1Graphics_1_1AnimationPack.html#aa622c866b80d3cad85ec3a6a00e42d18", null ],
-    [ "m_SpriteAtlas", "classCori_1_1Graphics_1_1AnimationPack.html#ab167abed91ee9aeb11bb84d40b163e35", null ]
+    [ "Animation", "classCori_1_1Graphics_1_1AnimationPack.html#aa093bc72ffb0e9c3dc17d10990bbd80e", null ],
+    [ "m_Animations", "classCori_1_1Graphics_1_1AnimationPack.html#aaf2b28a544914fb54eda13d28a33c449", null ],
+    [ "m_TextureOrAtlas", "classCori_1_1Graphics_1_1AnimationPack.html#a0fbad03ccac9701d55cf788f9aceadac", null ],
+    [ "m_Type", "classCori_1_1Graphics_1_1AnimationPack.html#ad7220815dc3d8865e4491cca5db5bfff", null ]
 ];

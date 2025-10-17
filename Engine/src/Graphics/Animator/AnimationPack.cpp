@@ -3,7 +3,9 @@
 #include "Graphics/Image.hpp"
 #include "AssetManager/EngineAssets.hpp"
 #include <nlohmann/json.hpp>
-#include <PathDefinesGenerated.hpp>
+#include "AssetManager/AssetManager.hpp"
+#include "FileSystem/PathManager.hpp"
+
 using json = nlohmann::json;
 
 namespace {
@@ -19,14 +21,15 @@ namespace {
 
 namespace Cori {
 	namespace Graphics {
-		std::shared_ptr<AnimationPack> AnimationPack::Create(const std::filesystem::path& jsonPath, ConfigType type, const float timeStep, const std::string& name) {
+		std::shared_ptr<AnimationPack> AnimationPack::Create(const std::filesystem::path& jsonPath, ConfigType type, const std::string& name) {
 			std::ifstream f(jsonPath);
+			float timeStep = Core::Application::GetGameTimer().GetTimestep();
 
 			if (type == ASEPRITE) {
 				try {
-					CORI_CORE_INFO_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadAnimator }, "Loading AnimationPack from: {}", jsonPath.string());
+					CORI_CORE_INFO_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadAnimator }, "Loading aseprite AnimationPack from: {}", jsonPath.string());
 					if (!f.good()) {
-						throw Core::CoriError(std::format("Failed to open json file.", jsonPath.string()));
+						throw Core::CoriError(std::format("Failed to open json file {}", jsonPath.string()));
 					}
 
 					json data = json::parse(f);
@@ -63,8 +66,8 @@ namespace Cori {
 						return a.first < b.first;
 					});
 
-					std::vector<AnimationFrame> frames;
-					std::vector<AnimationData> animations;
+					std::vector<Internal::AnimationFrame> frames;
+					std::vector<Internal::AnimationData> animations;
 					animations.reserve(initialImageResolution.y / frameResolution.y);
 
 					glm::uvec2 oldPos;
@@ -79,7 +82,7 @@ namespace Cori {
 						oldPos = pos;
 						pos = { frameData["frame"]["x"], frameData["frame"]["y"] };
 						if (pos.y - oldPos.y == frameResolution.y) {
-							AnimationData anim(frames);
+							Internal::AnimationData anim(frameResolution, frames);
 							animations.push_back(anim);
 							frames.clear();
 						}
@@ -87,7 +90,7 @@ namespace Cori {
 						uint32_t col = pos.x / frameResolution.x;
 						uint32_t row = pos.y / frameResolution.y;
 
-						AnimationFrame frame;
+						Internal::AnimationFrame frame;
 
 						frame.m_UVs = atlas->GetSpriteUVsAtPosition({col, row});
 						frame.m_TickDuration = std::round(static_cast<float>(frameData["duration"]) / (timeStep * 1000.0f));
@@ -95,22 +98,117 @@ namespace Cori {
 						frames.push_back(frame);
 
 						if (frameIndex + 1 == sortedFrameItems.size()) {
-							AnimationData anim(frames);
+							Internal::AnimationData anim(frameResolution, frames);
 							animations.push_back(anim);
 						}
 					}
 
 					CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::AnimationPack }, "Loaded Animation Pack '{}' from ASEPRITE config: {}", name, jsonPath.string());
-					return std::shared_ptr<AnimationPack>(new AnimationPack(animations, atlas, name, frameResolution));
+					return std::shared_ptr<AnimationPack>(new AnimationPack(animations, atlas, name, type));
 				}
 				catch (std::exception& e) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::AnimationPack }, "Failed to parse json file: {1}, and create the Animation Pack '{3}'. \n{0}Error: {2}. \n{0}Created a placeholder Animation Pack.", CORI_SECOND_LINE_SPACING, jsonPath.string(), e.what(), name);
 					return std::shared_ptr<AnimationPack>(new AnimationPack());
 				}
 			}
-			if (type == CORI) {
+			if (type == CORI_UNIFORM) {
 				try {
-					throw Core::CoriError("Cori animation pack config type is not yet implemented.");
+					CORI_CORE_INFO_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadAnimator }, "Loading native AnimationPack from: {}", jsonPath.string());
+					if (!f.good()) {
+						throw Core::CoriError(std::format("Failed to open json file {}", jsonPath.string()));
+					}
+
+					json data = json::parse(f);
+
+					const json& meta = data["meta"];
+					const glm::u16vec2 frameResolution = {meta["frameSizeX"], meta["frameSizeY"]};
+					const std::string& textureFile = meta["textureFile"];
+					const std::filesystem::path atlasPath = jsonPath.parent_path() / textureFile;
+
+					auto image = Image::Create(atlasPath);
+					if (!image->GetSuccessStatus()) {
+						throw Core::CoriError(std::format("Failed to load image: {}", atlasPath.string()));
+					}
+
+					auto atlas = SpriteAtlas::Create(textureFile, image, frameResolution);
+					if (!atlas->GetSuccessStatus()) {
+						throw Core::CoriError(std::format("Failed to load Sprite Atlas from: {}", atlasPath.string()));
+					}
+
+					std::vector<Internal::AnimationData> animations;
+					const json& animationsArray = data["animations"];
+
+					for (const auto& animJson : animationsArray) {
+						std::vector<Internal::AnimationFrame> frames;
+						const json& framesArray = animJson["frames"];
+
+						for (const auto& frameJson : framesArray) {
+							const glm::uvec2 pos = {frameJson["x"], frameJson["y"]};
+
+							const uint32_t col = pos.x / frameResolution.x;
+							const uint32_t row = pos.y / frameResolution.y;
+
+							Internal::AnimationFrame frame;
+							frame.m_UVs = atlas->GetSpriteUVsAtPosition({col, row});
+							frame.m_TickDuration = std::round(static_cast<float>(frameJson["ms"]) / (timeStep * 1000.0f));
+							frames.push_back(frame);
+						}
+						animations.emplace_back(frameResolution, frames);
+					}
+
+					CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::AnimationPack }, "Loaded Animation Pack '{}' from CORI config: {}", name, jsonPath.string());
+					return std::shared_ptr<AnimationPack>(new AnimationPack(animations, atlas, name, type));
+				}
+				catch (std::exception& e) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::AnimationPack }, "Failed to parse json file: {1}, and create the Animation Pack '{3}'. \n{0}Error: {2}. \n{0}Created a placeholder Animation Pack.", CORI_SECOND_LINE_SPACING, jsonPath.string(), e.what(), name);
+					return std::shared_ptr<AnimationPack>(new AnimationPack());
+				}
+			}
+
+			if (type == CORI_VARYING) {
+				try {
+					CORI_CORE_INFO_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Entity::Self, Logger::Tags::World::Entity::QuadAnimator }, "Loading native AnimationPack from: {}", jsonPath.string());
+					if (!f.good()) {
+						throw Core::CoriError(std::format("Failed to open json file {}", jsonPath.string()));
+					}
+
+					json data = json::parse(f);
+
+					const json& meta = data["meta"];
+					const std::string& textureFile = meta["textureFile"];
+					const std::filesystem::path atlasPath = jsonPath.parent_path() / textureFile;
+
+					auto image = Image::Create(atlasPath);
+					if (!image->GetSuccessStatus()) {
+						throw Core::CoriError(std::format("Failed to load image: {}", atlasPath.string()));
+					}
+
+					auto atlas = Texture2D::Create(image);
+					glm::vec2 atlasSize = { atlas->GetWidth(), atlas->GetHeight() };
+
+					std::vector<Internal::AnimationData> animations;
+					const json& animationsArray = data["animations"];
+
+					for (const auto& animJson : animationsArray) {
+						std::vector<Internal::AnimationFrame> frames;
+						const json& framesArray = animJson["frames"];
+						const glm::u16vec2 frameResolution = {animJson["frameSizeX"], animJson["frameSizeY"]};
+
+						for (const auto& frameJson : framesArray) {
+							const glm::vec2 pos = {frameJson["x"], frameJson["y"]};
+
+							Internal::AnimationFrame frame;
+							const glm::vec2 UVmin = pos / atlasSize;
+							const glm::vec2 UVmax = (pos + glm::vec2(frameResolution)) / atlasSize;
+							frame.m_UVs = { UVmin, UVmax };
+							frame.m_TickDuration = std::round(static_cast<float>(frameJson["ms"]) / (timeStep * 1000.0f));
+							frames.push_back(frame);
+						}
+						animations.emplace_back(frameResolution, frames);
+					}
+
+					CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::AnimationPack }, "Loaded Animation Pack '{}' from CORI config: {}", name, jsonPath.string());
+					return std::shared_ptr<AnimationPack>(new AnimationPack(animations, atlas, name, type));
 				}
 				catch (std::exception& e) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::AnimationPack }, "Failed to parse json file: {1}, and create the Animation Pack '{3}'. \n{0}Error: {2}. \n{0}Created a placeholder Animation Pack.", CORI_SECOND_LINE_SPACING, jsonPath.string(), e.what(), name);
@@ -122,40 +220,42 @@ namespace Cori {
 		}
 
 		std::shared_ptr<AnimationPack> AnimationPack::Create(const Descriptor& descriptor) {
-			return Create(descriptor.m_JsonPath, descriptor.m_ConfigType, Core::Application::GetGameTimer().GetTimestep(), descriptor.m_Name);
+			return Create(descriptor.m_JsonPath, descriptor.m_ConfigType, descriptor.m_Name);
 		}
 
 		Animation AnimationPack::GetAnimation(const uint32_t index) {
 			if (m_Valid) {
 				if (CORI_CORE_CHECK(index + 1 <= m_Animations.size(), "Animation Pack '{}' doesn't have an animation at index '{}', returning animation at index '0'. Total animation cound '{}'", m_Name, index, m_Animations.size())) { return Animation{ shared_from_this(), 0 }; }
-				//return Animation(m_Animations[index], m_SpriteAtlas->GetTexture(), m_FrameSize);
 				return Animation{ shared_from_this(), index };
 			}
 
 			CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::AnimationPack }, "Animation Pack '{}', was created as a placeholder. Requested animation at '{}' doesn't exist, returning a placeholder.", m_Name, index);
-			std::vector<AnimationFrame> frames;
-			constexpr AnimationFrame frame { UVs{}, 2 };
+			std::vector<Internal::AnimationFrame> frames;
+			constexpr Internal::AnimationFrame frame { UVs{}, 2 };
 			frames.push_back(frame);
-			const AnimationData data(frames);
-			//return Animation(data, AssetManager::GetTexture2D(AssetPlaceholders::Texture2D), glm::vec2{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max() });
-			//return Animation(data, AssetManager::Get(Cori::Internal::AssetPlaceholders::Texture2DPlaceholder), glm::vec2{ std::numeric_limits<float>::max(), std::numeric_limits<float>::max() });
+			const Internal::AnimationData data({ 8, 8 }, frames);
 			return Animation{ shared_from_this(), 0 };
 
 		}
 
-		AnimationPack::AnimationPack(std::vector<AnimationData> animations, const std::shared_ptr<SpriteAtlas>& spriteAtlas, std::string name, const glm::u16vec2 frameResolution) : m_Animations(std::move(animations)), m_SpriteAtlas(spriteAtlas), m_FrameSize(frameResolution), m_Name(std::move(name)) {
+		AnimationPack::AnimationPack(std::vector<Internal::AnimationData> animations, const std::shared_ptr<SpriteAtlas>& spriteAtlas, std::string name, const ConfigType type) : m_Animations(std::move(animations)), m_TextureOrAtlas(spriteAtlas), m_Name(std::move(name)), m_Type(type) {
+			m_Valid = true;
+		}
+
+		AnimationPack::AnimationPack(std::vector<Internal::AnimationData> animations, const std::shared_ptr<Texture2D>& spriteAtlas, std::string name, const ConfigType type) : m_Animations(std::move(animations)), m_TextureOrAtlas(spriteAtlas), m_Name(std::move(name)), m_Type(type) {
 			m_Valid = true;
 		}
 
 		AnimationPack::AnimationPack() {
 			m_Valid = false;
-			std::vector<AnimationFrame> frames;
-			constexpr AnimationFrame frame{ UVs{}, 2 };
+			std::vector<Internal::AnimationFrame> frames;
+			constexpr Internal::AnimationFrame frame{ UVs{}, 2 };
 			frames.push_back(frame);
-			const AnimationData data(frames);
+			const Internal::AnimationData data({ 8, 8 }, frames);
 			m_Animations.clear();
 			m_Animations.push_back(data);
-			m_SpriteAtlas = SpriteAtlas::Create("placeholder for AnimationPack", Image::Create(FileSystem::Internal::PathDefines::GetEngineDataRoot() / "/placeholders/missing_texture32.png"), glm::u16vec2(32));
+			m_TextureOrAtlas = SpriteAtlas::Create("placeholder for AnimationPack", Image::Create(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "placeholders/missing_texture32.png"), glm::u16vec2(32));
+			m_Type = INVALID;
 		}
 	}
 }

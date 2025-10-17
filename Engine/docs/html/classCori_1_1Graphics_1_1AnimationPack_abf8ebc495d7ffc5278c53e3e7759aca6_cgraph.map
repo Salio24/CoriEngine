@@ -1,0 +1,20 @@
+<map id="Cori::Graphics::AnimationPack::Create" name="Cori::Graphics::AnimationPack::Create">
+<area shape="rect" id="Node000001" title="Creates an AnimationPack." alt="" coords="5,175,193,219"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Image.html#a8a1e6ccfa0bed29acbb6f2d1136398b5" title="Creates an Image from the picture at the specified path." alt="" coords="510,5,671,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,173,132,142,160,105,197,70,240,43,303,21,370,10,435,8,494,11,494,16,435,13,370,16,304,26,242,47,200,74,164,109,136,145,115,176"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Graphics_1_1SpriteAtlas.html#a48a37d8964aa80bd73576cd5a8aaf9a2" title="Creates a SpriteAtlas." alt="" coords="241,81,432,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="152,172,240,136,256,129,258,134,242,141,154,177"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1Graphics_1_1Texture2D.html#acbe765f47b11b1dc332a3afe975aa0de" title="Creates a Texture2D from the Image." alt="" coords="248,175,424,219"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="193,194,232,194,232,200,193,200"/>
+<area shape="rect" id="Node000007" href="$classCori_1_1Core_1_1Application.html#a5c5b313999b3ab9f5089f79345a8bf8d" title="Getter for the GameTimer." alt="" coords="253,244,420,289"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="179,217,243,236,242,242,177,222"/>
+<area shape="rect" id="Node000008" href="$classCori_1_1Core_1_1GameTimer.html#a85a5157b39dd5a07ce8a342c65c87b36" title="Returns the current timeStep, scale is in seconds." alt="" coords="252,313,421,358"/>
+<area shape="poly" id="edge10_Node000001_Node000008" title=" " alt="" coords="128,218,179,258,242,299,253,304,250,309,239,303,176,262,125,222"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="413,78,498,52,499,58,414,83"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="291,81,290,71,297,62,313,57,336,55,362,57,377,64,375,69,361,62,336,60,314,62,300,67,295,73,296,80"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1FileSystem_1_1PathManager.html#a70c92136e32723b75a6a44cbbf8bdec7" title="Retries the full aliased path defined in fsgame.json." alt="" coords="480,81,700,126"/>
+<area shape="poly" id="edge5_Node000003_Node000004" title=" " alt="" coords="433,101,464,101,464,106,433,106"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1Logger.html#a7e782f29b9eebd80d6a801e80d074318" title=" " alt="" coords="748,90,920,118"/>
+<area shape="poly" id="edge6_Node000004_Node000005" title=" " alt="" coords="701,101,733,101,733,106,701,106"/>
+<area shape="poly" id="edge8_Node000006_Node000006" title=" " alt="" coords="291,175,290,165,297,156,313,150,336,148,362,151,377,157,375,162,361,156,336,153,314,155,300,160,295,166,296,174"/>
+</map>

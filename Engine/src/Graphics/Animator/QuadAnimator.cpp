@@ -1,34 +1,35 @@
 #include "QuadAnimator.hpp"
+#include "WorldSystem/Components.hpp"
 
 namespace Cori {
 	namespace World {
 		namespace Components {
 			namespace Entity {
-				QuadAnimator::QuadAnimator(const World::Entity& entity): m_Entity(entity) {
-					auto& renderer = m_Entity.GetOrAddComponent<QuadRenderer>();
-					renderer.m_AnimatorBound = true;
+				QuadAnimator::QuadAnimator() {
 					m_ActiveSequence = false;
 
 					SetStopCallback([]{});
-					SetNextTickCallback([]{});
+					SetEngineStopCallback([]{});
 				}
 
 				QuadAnimator::~QuadAnimator() {
-					auto& renderer = m_Entity.GetComponents<QuadRenderer>();
-					renderer.m_AnimatorBound = false;
+					if (m_Entity.HasComponents<QuadRenderer>()) {
+						auto& renderer = m_Entity.GetComponents<QuadRenderer>();
+						renderer.m_AnimatorBound = false;
+					}
 				}
 
-				void QuadAnimator::SetStopCallback(AnimationStopCallbackFn callback) {
+				void QuadAnimator::SetStopCallback(StopCallbackFn callback) {
 					m_StopCallBack = std::move(callback);
-				}
-
-				void QuadAnimator::SetNextTickCallback(AnimationStopCallbackFn callback) {
-					m_NextTickCallBack = std::move(callback);
 				}
 
 				void QuadAnimator::Stop(const bool abruptStop) {
 					if (abruptStop) {
 						m_ActiveSequence = false;
+						m_CurrentFrame = 0;
+						m_CurrentFrameTick = 1;
+						m_StopCallBack();
+						m_EngineCallBack();
 					}
 
 					m_LoopStartIndex = 0xFFFF;
@@ -36,10 +37,7 @@ namespace Cori {
 
 				void QuadAnimator::OnTickUpdate() {
 					if (m_ActiveSequence) {
-						if (m_TicksElapsedSinceStart == 1) {
-							m_NextTickCallBack();
-						}
-						++m_TicksElapsedSinceStart;
+						//++m_TicksElapsedSinceStart;
 						auto& [anim, params] = m_AnimationSequence[m_CurrentLoopedSequenceIndex];
 						if (m_CurrentFrame == anim.m_Pack->m_Animations[anim.m_AnimationID].m_Frames.size() - 1 && m_CurrentFrameTick >= anim.m_Pack->m_Animations[anim.m_AnimationID].m_Frames[m_CurrentFrame].m_TickDuration) {
 							if (m_CurrentLoopedSequenceIndex == m_AnimationSequence.size() - 1) {
@@ -53,6 +51,7 @@ namespace Cori {
 									m_CurrentFrameTick = 1;
 									Stop(true);
 									m_StopCallBack();
+									m_EngineCallBack();
 									return;
 								}
 							}
@@ -73,30 +72,38 @@ namespace Cori {
 						}
 
 						auto& renderer = m_Entity.GetComponents<QuadRenderer>();
-						// animation with the final state for the rendering
 						const auto& [pack, id] = m_AnimationSequence[m_CurrentLoopedSequenceIndex].first;
 						const auto& m_UVs= pack->m_Animations[id].m_Frames[m_CurrentFrame].m_UVs;
 
-						const glm::vec2 size = pack->m_FrameSize;
-						if (size != glm::vec2{std::numeric_limits<float>::max(), std::numeric_limits<float>::max()}) {
-							renderer.m_HalfSize = size * m_SizeScale / 2.0f;
+						const glm::vec2 animationFrameSize = pack->m_Animations[id].m_FrameSize;
+						if (animationFrameSize != glm::vec2{std::numeric_limits<float>::max(), std::numeric_limits<float>::max()}) {
+							renderer.m_HalfSize = animationFrameSize * m_SizeScale / 2.0f;
 						}
 
-						renderer.m_Texture = pack->m_SpriteAtlas->GetTexture();
+						if (pack->m_Type != Graphics::AnimationPack::CORI_VARYING) {
+							renderer.m_Texture = std::get<std::shared_ptr<Graphics::SpriteAtlas>>(pack->m_TextureOrAtlas)->GetTexture();
+						} else {
+							renderer.m_Texture = std::get<std::shared_ptr<Graphics::Texture2D>>(pack->m_TextureOrAtlas);
+						}
+
 						renderer.m_UVs = m_UVs;
 					}
 				}
 
-				void QuadAnimator::SetSizeScale(const float scale) {
+				void QuadAnimator::SetSizeScale(const glm::vec2 scale) {
 					m_SizeScale = scale;
 				}
 
-				float QuadAnimator::GetSizeScale() const {
+				glm::vec2 QuadAnimator::GetSizeScale() const {
 					return m_SizeScale;
 				}
 
-				uint64_t QuadAnimator::GetTicksElapsed() const {
-					return m_TicksElapsedSinceStart;
+				//uint64_t QuadAnimator::GetTicksElapsed() const {
+				//	return m_TicksElapsedSinceStart;
+				//}
+
+				void QuadAnimator::SetEngineStopCallback(StopCallbackFn callback) {
+					m_EngineCallBack = std::move(callback);
 				}
 			}
 		}

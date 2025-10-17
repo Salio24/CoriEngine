@@ -1,5 +1,5 @@
 <map id="Cori::ImGuiPresets::Box2dDebugDraw" name="Cori::ImGuiPresets::Box2dDebugDraw">
 <area shape="rect" id="Node000001" title="Enables the debug draw of Box2D physics." alt="" coords="5,5,152,50"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1SceneHandle.html#a18e2be46d524a816b64344222bb6bec4" title="Retrieves a reference to the Box2D physics world of the scene." alt="" coords="200,5,386,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1SceneHandle.html#a06a1b4526f367f65c9da9f8dff415dc1" title="Retries a registered system instance from the scene." alt="" coords="200,5,386,50"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,25,184,25,184,30,152,30"/>
 </map>

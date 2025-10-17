@@ -5,7 +5,6 @@
 #include "Graphics/Texture.hpp"
 #include <glm/gtx/matrix_transform_2d.hpp>
 #include <utility>
-#include "Utility/HashedTag.hpp"
 #include "Audio/Track.hpp"
 
 namespace Cori {
@@ -14,7 +13,6 @@ namespace Cori {
 			static constexpr auto in_place_delete = true;
 
 			BodyUserData() = default;
-			explicit BodyUserData(const Cori::World::Entity& entity) : m_Entity(entity) {}
 			Cori::World::Entity m_Entity;
 		};
 	}
@@ -26,6 +24,13 @@ namespace Cori {
 	 */
 	namespace World {
 		class Scene;
+
+		namespace Systems {
+			class Transform;
+			class Hierarchy;
+			class Animation;
+		}
+
 		/**
 		 * @brief Components that are used with the WorldSystem (ECS).
 		 */
@@ -44,7 +49,7 @@ namespace Cori {
 
 					private:
 						// entt cant create fully empty components
-						[[maybe_unused]] uint8_t nice{ 69 };
+						[[maybe_unused]] bool bober{};
 					};
 				}
 
@@ -57,16 +62,6 @@ namespace Cori {
 					friend World::Entity;
 					friend World::Scene;
 					std::string m_Name;
-				};
-
-				/**
-				 * @brief Every Entity by default has a tag component, it holds a non-unique entity 64bit hashed tag.
-				 */
-				struct Tag {
-					Tag() = default;
-					explicit Tag(const Utility::HashedTag64& tag) : m_Tag(tag) {}
-
-					Utility::HashedTag64 m_Tag;
 				};
 
 				/**
@@ -98,7 +93,8 @@ namespace Cori {
 
 				private:
 					friend World::Entity;
-					friend World::Scene;
+					friend Systems::Transform;
+					friend Systems::Hierarchy;
 					friend struct Transform;
 					entt::entity m_Parent { entt::null };
 					entt::entity m_FirstChild { entt::null };
@@ -111,7 +107,6 @@ namespace Cori {
 				 */
 				struct Transform {
 					Transform() = default;
-					explicit Transform(const World::Entity& owner) : m_Owner(owner) {}
 
 					Transform(const Transform&) = delete;
 					Transform& operator=(const Transform&) = delete;
@@ -270,7 +265,7 @@ namespace Cori {
 					}
 
 				private:
-					friend World::Scene;
+					friend Systems::Transform;
 					glm::vec2 m_LocalPosition{ 0.0f, 0.0f };
 					glm::vec2 m_LocalScale{ 1.0f, 1.0f };
 					float m_LocalRotation{ 0.0f };
@@ -299,6 +294,7 @@ namespace Cori {
 
 				private:
 					friend World::Entity;
+					friend Systems::Hierarchy;
 					struct TransparentHash {
 						using is_transparent = void;
 						size_t operator()(std::string_view sv) const noexcept {
@@ -324,7 +320,7 @@ namespace Cori {
 					InactiveLocallyFlag() = default;
 				private:
 					// entt cant create fully empty components
-					[[maybe_unused]] uint8_t nice{ 69 };
+					[[maybe_unused]] bool pingvin{};
 				};
 
 				/**
@@ -335,7 +331,7 @@ namespace Cori {
 					InactiveGloballyFlag() = default;
 				private:
 					// entt cant create fully empty components
-					[[maybe_unused]] uint8_t nice{ 69 };
+					[[maybe_unused]] bool homik{};
 				};
 
 				/**
@@ -477,6 +473,7 @@ namespace Cori {
 
 				private:
 					friend class QuadAnimator;
+					friend Systems::Animation;
 
 					glm::vec2 m_HalfSize{ 0.0f };
 					Graphics::UVs m_UVs{};
@@ -515,6 +512,17 @@ namespace Cori {
 					}
 
 					/**
+					 * @brief Adds a Track to the AudioSource cache.
+					 * @param name Name of the track, will be later used to retrieve the created track from the AudioSource cache.
+					 * @return Shared pointer to the created Track object.
+					 */
+					std::shared_ptr<Audio::Track> AddTrack(const char* name) {
+						std::shared_ptr<Audio::Track> track = Audio::Track::Create(name);
+						m_AudioTracks.insert({name, track});
+						return track;
+					}
+
+					/**
 					 * @brief Removes a Track from the AudioSource, and deletes it if it is not referenced anywhere.
 					 * @param name Name of the Track remove.
 					 * @note If a track with the specified name is not found in AudioSource cache, nothing will happen.
@@ -526,9 +534,20 @@ namespace Cori {
 					}
 
 					/**
+					 * @brief Removes a Track from the AudioSource, and deletes it if it is not referenced anywhere.
+					 * @param name Name of the Track remove.
+					 * @note If a track with the specified name is not found in AudioSource cache, nothing will happen.
+					 */
+					void RemoveTrack(const char* name) {
+						if (m_AudioTracks.contains(name)) {
+							m_AudioTracks.erase(name);
+						}
+					}
+
+					/**
 					 * @brief Retries a Track from the AudioSource cache.
 					 * @param name Name of the Track to retrieve.
-					 * @return Expected object with the shared pointer to the requested Track on success, or CoriError on faliure.
+					 * @return Expected object with the shared pointer to the requested Track on success, or CoriError on failure.
 					 */
 					std::expected<std::shared_ptr<Audio::Track>, Core::CoriError<>> GetTrack(const std::string& name) {
 						if (m_AudioTracks.contains(name)) {
@@ -538,12 +557,39 @@ namespace Cori {
 						return std::unexpected(Core::CoriError(std::format("No audio Track is found with the specified name '{}'", name)));
 					}
 
+					/**
+					 * @brief Retries a Track from the AudioSource cache.
+					 * @param name Name of the Track to retrieve.
+					 * @return Expected object with the shared pointer to the requested Track on success, or CoriError on failure.
+					 */
+					std::expected<std::shared_ptr<Audio::Track>, Core::CoriError<>> GetTrack(const char* name) {
+						if (m_AudioTracks.contains(name)) {
+							return m_AudioTracks.at(name);
+						}
+
+						return std::unexpected(Core::CoriError(std::format("No audio Track is found with the specified name '{}'", name)));
+					}
+
 				private:
-					std::unordered_map<std::string, std::shared_ptr<Audio::Track>> m_AudioTracks;
+					struct TransparentHash {
+						using is_transparent = void;
+						size_t operator()(std::string_view sv) const noexcept {
+							return std::hash<std::string_view>{}(sv);
+						}
+					};
+
+					struct TransparentEqual {
+						using is_transparent = void;
+						bool operator()(std::string_view lhs, std::string_view rhs) const noexcept {
+							return lhs == rhs;
+						}
+					};
+
+					std::unordered_map<std::string, std::shared_ptr<Audio::Track>, TransparentHash, TransparentEqual> m_AudioTracks;
 				};
 
 				/**
-				 * @brief A physics rigit body.
+				 * @brief A physics rigid body.
 				 * @details Cori engine doesn't have a native physics engine and uses Box2D, so refer to Box2D docs 'https://box2d.org/' for any details on physics.
 				 * \n All the engine does is provide a convenient C++ API for it, as Box2D is a C project and the default API is not really convenient in C++ environment.
 				 * \n Big thanks HolyBlackCat for: 'https://github.com/HolyBlackCat/box2cpp/tree/master'
@@ -551,26 +597,17 @@ namespace Cori {
 				struct RigidBody : Physics::BodyRef {
 					/**
 					 * @brief Creates a RigidBody.
-					 * @param world World to create the RigidBody in. Get it with ActiveScene.GetPhysicsWorld().
+					 * @param world World to create the RigidBody in.
 					 * @param def Parameters to create a RigidBody with.
-					 * @param owner Owner Entity, you need to pass an Entity that owns this RigidBody.
 					 */
-					RigidBody(Physics::WorldRef world, const std::derived_from<b2BodyDef> auto& def, World::Entity& owner) : Physics::BodyRef{world.CreateBody(Physics::DestroyWithParent, def)} {
-						if (def.type == b2_kinematicBody || def.type == b2_dynamicBody) {
-							if (CORI_CORE_VERIFY(owner.IsValid(), "An invalid entity was passed to the RigidBody constructor, always pass the same entity you're adding a RigidBody to. This can blow up any second now.")) {}
-							else {
-								auto& ud = owner.AddComponent<Physics::BodyUserData>(owner);
-								SetUserData(&ud);
-							}
-						}
-					}
+					RigidBody(Physics::WorldRef world, const std::derived_from<b2BodyDef> auto& def) : Physics::BodyRef{world.CreateBody(Physics::DestroyWithParent, def)} {}
+
+					~RigidBody() { if (IsValid()) { Destroy(); } }
 
 					RigidBody(const RigidBody&) = delete;
 					RigidBody& operator=(const RigidBody&) = delete;
 					RigidBody(RigidBody&&) = delete;
 					RigidBody& operator=(RigidBody&&) = delete;
-
-					~RigidBody() { if (IsValid()) { Destroy(); } }
 				};
 			}
 		}

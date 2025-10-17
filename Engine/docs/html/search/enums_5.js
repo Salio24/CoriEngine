@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['loglevel_0',['LogLevel',['../classCori_1_1Logger.html#a0433e103adbeb9b1521b08af4a9d3b16',1,'Cori::Logger']]]
+  ['graphicsapis_0',['GraphicsAPIs',['../namespaceCori_1_1Graphics.html#a506205d247975afdf34efa0392771312',1,'Cori::Graphics']]]
 ];

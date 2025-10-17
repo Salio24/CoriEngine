@@ -28,6 +28,22 @@ namespace Cori {
 			[[nodiscard]] static std::expected<SceneHandle, Core::CoriError<>> GetScene(const std::string& name);
 
 			/**
+			 * @brief Retries the scene with the specified name from the cache.
+			 * @param name Name of the scene to retrieve from cache.
+			 * @return Expected object with a non owning handle to the created scene on success or a CoriError<> on failure.
+			 */
+			[[nodiscard]] static std::expected<SceneHandle, Core::CoriError<>> GetScene(const std::string_view name);
+
+			/**
+			 * @brief Allows you to get SceneHandle if all you know is scene id.
+			 * @details Each scene is assigned an ID at creation, entities have this ID and you can ask an entity what scene is it from, it will give you the owner scene id,
+			 * you can "convert" this scene id into a useful handle here.
+			 * @param sceneID ID of the scene to get a handle for.
+			 * @return Expected object with SceneHandle on success, CoriError on failure.
+			 */
+			[[nodiscard]] static std::expected<SceneHandle, Core::CoriError<>> GetHandle(const uint32_t sceneID);
+
+			/**
 			 * @brief Destroys a scene with the specified name.
 			 * @param name Name of the scene to delete.
 			 * @return Expected object with void on success or CoriError<> on failure.

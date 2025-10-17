@@ -1,7 +1,6 @@
 #pragma once
 #include "Profiling/Trackable.hpp"
-
-
+#include "AssetManager/AssetLoadStatus.hpp"
 
 namespace Cori {
 	class AssetManager;
@@ -13,7 +12,7 @@ namespace Cori {
 		/**
 		 * @brief Font asset to be used when rendering text. Pretty expensive to create if not cached, always preload it.
 		 */
-		class Font : public Profiling::Trackable<Font> {
+		class Font : public Profiling::Trackable<Font>, public std::enable_shared_from_this<Font> {
 		public:
 			/**
 			 * @brief A UTF-32 charset range.
@@ -43,7 +42,7 @@ namespace Cori {
 			class Descriptor {
 			public:
 				/**
-				 * @brief Constructs a descriptor. It's recommended to use "inline const" when defining the Descriptor in a namespace.
+				 * @brief Constructs a descriptor.
 				 * @param name Name to be used in AssetManager logging.
 				 * @param fontPath Path to the font file.
 				 * @param charsetRanges An vector with CharsetRanges to be loaded from the font.
@@ -94,15 +93,19 @@ namespace Cori {
 			 */
 			[[nodiscard]] static std::shared_ptr<Font> Create(const std::filesystem::path& path, const std::vector<CharsetRange>& charsets, const float minimalScale = 48.0f, const float miterLimit = 1.0f);
 
+			Font();
 			~Font();
+
+			AssetStatus GetStatus() const;
 
 		private:
 			friend AssetManager;
 			friend class Renderer2D;
 			[[nodiscard]] static std::shared_ptr<Font> Create(const Descriptor& descriptor);
 			Internal::FontData* GetData();
+			AssetStatus m_Status;
 
-			Font(void* font, const std::vector<CharsetRange>& charsets, const std::filesystem::path& fontPath, const float minimalScale, const float miterLimit);
+			void Load(void* font, const std::vector<CharsetRange>& charsets, const std::filesystem::path& fontPath, const float minimalScale, const float miterLimit);
 			Internal::FontData* m_Data{ nullptr };
 		};
 	}

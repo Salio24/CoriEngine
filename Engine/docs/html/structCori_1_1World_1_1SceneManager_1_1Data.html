@@ -93,27 +93,66 @@ $(function(){initNavTree('structCori_1_1World_1_1SceneManager_1_1Data.html','','
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:TransparentEqual" id="r_TransparentEqual"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCori_1_1World_1_1SceneManager_1_1Data_1_1TransparentEqual.html">TransparentEqual</a></td></tr>
+<tr class="memitem:TransparentHash" id="r_TransparentHash"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCori_1_1World_1_1SceneManager_1_1Data_1_1TransparentHash.html">TransparentHash</a></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a73fbfccbf6714010ba07b7b27ec851d2" id="r_a73fbfccbf6714010ba07b7b27ec851d2"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; std::string, std::shared_ptr&lt; <a class="el" href="classCori_1_1World_1_1Scene.html">Scene</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a73fbfccbf6714010ba07b7b27ec851d2">m_Scenes</a></td></tr>
+<tr class="memitem:a3b8963c461ef284ce7db5251d9fba8c1" id="r_a3b8963c461ef284ce7db5251d9fba8c1"><td class="memItemLeft" align="right" valign="top">std::atomic&lt; uint32_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3b8963c461ef284ce7db5251d9fba8c1">s_NextSceneID</a> { 1 }</td></tr>
+<tr class="memitem:a9cf5454d00746fe21cde797285222c66" id="r_a9cf5454d00746fe21cde797285222c66"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; uint32_t, <a class="el" href="classCori_1_1World_1_1SceneHandle.html">SceneHandle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9cf5454d00746fe21cde797285222c66">m_Handles</a></td></tr>
+<tr class="memitem:acd8d3f67837fcd6189e0cd6bd2e7a0e0" id="r_acd8d3f67837fcd6189e0cd6bd2e7a0e0"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; std::string, std::shared_ptr&lt; <a class="el" href="classCori_1_1World_1_1Scene.html">Scene</a> &gt;, <a class="el" href="structCori_1_1World_1_1SceneManager_1_1Data_1_1TransparentHash.html">TransparentHash</a>, <a class="el" href="structCori_1_1World_1_1SceneManager_1_1Data_1_1TransparentEqual.html">TransparentEqual</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acd8d3f67837fcd6189e0cd6bd2e7a0e0">m_Scenes</a></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="SceneManager_8cpp_source.html#l00009">9</a> of file <a class="el" href="SceneManager_8cpp_source.html">SceneManager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SceneManager_8cpp_source.html#l00016">16</a> of file <a class="el" href="SceneManager_8cpp_source.html">SceneManager.cpp</a>.</p>
 </div><a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
-<a id="a73fbfccbf6714010ba07b7b27ec851d2" name="a73fbfccbf6714010ba07b7b27ec851d2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a73fbfccbf6714010ba07b7b27ec851d2">&#9670;&#160;</a></span>m_Scenes</h2>
+<a id="a9cf5454d00746fe21cde797285222c66" name="a9cf5454d00746fe21cde797285222c66"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9cf5454d00746fe21cde797285222c66">&#9670;&#160;</a></span>m_Handles</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::unordered_map&lt;std::string, std::shared_ptr&lt;<a class="el" href="classCori_1_1World_1_1Scene.html">Scene</a>&gt; &gt; Cori::World::SceneManager::Data::m_Scenes</td>
+          <td class="memname">std::unordered_map&lt;uint32_t, <a class="el" href="classCori_1_1World_1_1SceneHandle.html">SceneHandle</a>&gt; Cori::World::SceneManager::Data::m_Handles</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SceneManager_8cpp_source.html#l00010">10</a> of file <a class="el" href="SceneManager_8cpp_source.html">SceneManager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SceneManager_8cpp_source.html#l00032">32</a> of file <a class="el" href="SceneManager_8cpp_source.html">SceneManager.cpp</a>.</p>
+
+</div>
+</div>
+<a id="acd8d3f67837fcd6189e0cd6bd2e7a0e0" name="acd8d3f67837fcd6189e0cd6bd2e7a0e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd8d3f67837fcd6189e0cd6bd2e7a0e0">&#9670;&#160;</a></span>m_Scenes</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unordered_map&lt;std::string, std::shared_ptr&lt;<a class="el" href="classCori_1_1World_1_1Scene.html">Scene</a>&gt;, <a class="el" href="structCori_1_1World_1_1SceneManager_1_1Data_1_1TransparentHash.html">TransparentHash</a>, <a class="el" href="structCori_1_1World_1_1SceneManager_1_1Data_1_1TransparentEqual.html">TransparentEqual</a>&gt; Cori::World::SceneManager::Data::m_Scenes</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="SceneManager_8cpp_source.html#l00033">33</a> of file <a class="el" href="SceneManager_8cpp_source.html">SceneManager.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a3b8963c461ef284ce7db5251d9fba8c1" name="a3b8963c461ef284ce7db5251d9fba8c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b8963c461ef284ce7db5251d9fba8c1">&#9670;&#160;</a></span>s_NextSceneID</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::atomic&lt;uint32_t&gt; Cori::World::SceneManager::Data::s_NextSceneID { 1 }</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="SceneManager_8cpp_source.html#l00031">31</a> of file <a class="el" href="SceneManager_8cpp_source.html">SceneManager.cpp</a>.</p>
 
 </div>
 </div>

@@ -1,0 +1,7 @@
+<map id="Cori::World::Components::Entity::QuadAnimator::QuadAnimator" name="Cori::World::Components::Entity::QuadAnimator::QuadAnimator">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,48,189,110"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#aed1ea0046fb09bdbcf2165eeb7ab93f9" title=" " alt="" coords="237,5,420,67"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="188,59,221,53,222,58,189,65"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#a123b95f8c840b1eb1352e717cbcdd7e1" title="Sets a callback that will be fired when any animation sequence stops." alt="" coords="237,91,420,152"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="189,93,222,99,221,104,188,98"/>
+</map>

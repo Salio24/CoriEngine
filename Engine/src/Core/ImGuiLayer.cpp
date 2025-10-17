@@ -85,7 +85,6 @@ namespace Cori {
 					ImGui::UpdatePlatformWindows();
 					ImGui::RenderPlatformWindowsDefault();
 					SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
-					CORI_CORE_DEBUG("ImGuiLayer rendering");
 				}
 			}
 		}

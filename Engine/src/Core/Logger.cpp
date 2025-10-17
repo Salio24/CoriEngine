@@ -18,6 +18,8 @@ namespace Cori {
 	std::unordered_set<std::string, Logger::StringHash, std::equal_to<>> Logger::s_CoreInactiveTags;
 	std::unordered_set<std::string, Logger::StringHash, std::equal_to<>> Logger::s_ClientInactiveTags;
 
+	bool Logger::s_Initialized = false;
+
 	void Logger::EnableVirtualTerminalProcessing() {
 #ifdef PLATFORM_WINDOWS
 		HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -46,7 +48,7 @@ namespace Cori {
 		int32_t maxSize = 1048576 * 20;
 		int32_t maxFiles = 5;
 		const auto fileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("logs/cori_log.txt", maxSize, maxFiles);
-		fileSink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-6n] [%-8l]: %v%$ %@");
+		fileSink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [Thread %t] [%-6n] [%-8l]: %v%$ %@");
 		std::vector<spdlog::sink_ptr> coreSinks;
 		std::vector<spdlog::sink_ptr> clientSinks;
 
@@ -58,7 +60,7 @@ namespace Cori {
 
 #ifdef DEBUG_BUILD
 		const auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-		consoleSink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [%-6n] [%-8l]: %v%$ %@");
+		consoleSink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [Thread %t] [%-6n] [%-8l]: %v%$ %@");
 
 		coreSinks.push_back(consoleSink);
 		clientSinks.push_back(consoleSink);
@@ -81,12 +83,17 @@ namespace Cori {
 		s_ClientLogger->set_level(spdlog::level::trace);
 		s_ClientLogger->flush_on(spdlog::level::warn);
 
+		s_Initialized = true;
 
 		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "------------- NEW LOG SESSION -------------");
 		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "|  Logger initialized. Mode: {} |", async ? "Asynchronous" : "Synchronous ");
 		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "-------------------------------------------");
 		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "|     File logging is: {}           |", fileWrite ? "Enabled " : "Disabled");
 		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "-------------------------------------------");
+	}
+
+	bool Logger::GetStatus() {
+		return s_Initialized;
 	}
 
 	void Logger::SetClientLogLevel(const LogLevel level) {

@@ -1,15 +1,12 @@
 #pragma once
 #include "../VertexArray.hpp"
 #include "Profiling/Trackable.hpp"
-#include "Core/AutoRegisteringFactory.hpp"
-#include "Graphics/GraphicsAPIs.hpp"
 
 namespace Cori {
 	namespace Graphics {
 		namespace Internal {
-			class OpenGLVertexArray final : public VertexArray, public Profiling::Trackable<OpenGLVertexArray, VertexArray>, public Core::RegisterInFactory<VertexArray, OpenGLVertexArray, GraphicsAPIs, GraphicsAPIs::OpenGL> {
+			class OpenGLVertexArray final : public VertexArray, public Profiling::Trackable<OpenGLVertexArray, VertexArray> {
 			public:
-				static bool PreCreateHook();
 				OpenGLVertexArray();
 				~OpenGLVertexArray() override;
 				void Bind() const override;
@@ -25,8 +22,6 @@ namespace Cori {
 				uint32_t m_ID;
 				std::vector<std::shared_ptr<VertexBuffer>> m_VertexBuffers;
 				std::shared_ptr<IndexBuffer> m_IndexBuffer;
-
-				CORI_REGISTERED_FACTORY_INIT;
 			};
 		}
 	}

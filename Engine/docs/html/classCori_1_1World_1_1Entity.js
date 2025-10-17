@@ -4,8 +4,11 @@ var classCori_1_1World_1_1Entity =
     [ "Entity", "classCori_1_1World_1_1Entity.html#ae2059d74ebf511cfb17568566048dd0c", null ],
     [ "AddComponent", "classCori_1_1World_1_1Entity.html#a7b8dc8e2678b0b088fcbc94bad61a931", null ],
     [ "AddOrReplaceComponent", "classCori_1_1World_1_1Entity.html#acd37f1058bbcf434dcd150a8bcdc4f45", null ],
+    [ "DestroyChildren", "classCori_1_1World_1_1Entity.html#a47400f92c3b5831a8dd61cb2fb116add", null ],
     [ "EraseComponents", "classCori_1_1World_1_1Entity.html#a72066bf37a511027fc3c1b6f107b1383", null ],
     [ "FindChildByName", "classCori_1_1World_1_1Entity.html#afba911635cbf93da2831cefc2cbb8fa8", null ],
+    [ "FindChildByName", "classCori_1_1World_1_1Entity.html#ae2677181c6fce8b640495b52ef959cdd", null ],
+    [ "FindChildByName", "classCori_1_1World_1_1Entity.html#ad8edaf85018b7eb2fde7f7e72c43fd9b", null ],
     [ "GetChildren", "classCori_1_1World_1_1Entity.html#a3a9f02681e535ca7dec7da55aa6522df", null ],
     [ "GetComponents", "classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18", null ],
     [ "GetComponents", "classCori_1_1World_1_1Entity.html#af953fa2f1e3329fb5935e106c687a127", null ],
@@ -14,6 +17,7 @@ var classCori_1_1World_1_1Entity =
     [ "GetID", "classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292", null ],
     [ "GetName", "classCori_1_1World_1_1Entity.html#a30781f71b31406df4a5176779ae088e9", null ],
     [ "GetOrAddComponent", "classCori_1_1World_1_1Entity.html#a4329fc9eb55370a9aa0d4f372e30b03b", null ],
+    [ "GetOwnerSceneID", "classCori_1_1World_1_1Entity.html#ac1cda1ce0601258e4849fed32547f0ad", null ],
     [ "GetParent", "classCori_1_1World_1_1Entity.html#a5bbdb3ec21fce171a65ca7ff1d7a4962", null ],
     [ "GetRawEntity", "classCori_1_1World_1_1Entity.html#ac9d21daa112e64d4f43f54715aef21b2", null ],
     [ "GetRawHandle", "classCori_1_1World_1_1Entity.html#a37ec856a07cae6aab81663ef9bf44ee1", null ],
@@ -33,5 +37,6 @@ var classCori_1_1World_1_1Entity =
     [ "SetName", "classCori_1_1World_1_1Entity.html#ae60b5c856550b3a9545b81fafc92bc93", null ],
     [ "SetParent", "classCori_1_1World_1_1Entity.html#a62b8ef79065a6f0625986ef5a99e521e", null ],
     [ "UnlinkFromParent", "classCori_1_1World_1_1Entity.html#a1a15764b67e9c8a661b3cf308634fa1f", null ],
+    [ "UpdateInactivityFlagsRecursive", "classCori_1_1World_1_1Entity.html#afafaa4c15887dfcdd2166814b0c54d53", null ],
     [ "Scene", "classCori_1_1World_1_1Entity.html#a032858ae1fe02d2d1170981c2af2d67c", null ]
 ];

@@ -93,11 +93,19 @@ $(function(){initNavTree('structCori_1_1Graphics_1_1Animation.html','','structCo
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="AnimationPack_8hpp_source.html">AnimationPack.hpp</a>&gt;</code></p>
+<p>Owning handle to the animation inside the <a class="el" href="classCori_1_1Graphics_1_1AnimationPack.html" title="Represents a pack of sprite animations that were loaded from the drive from the pair of an image file...">AnimationPack</a>, when paired with <a class="el" href="structCori_1_1Graphics_1_1Animation_1_1PlayParams.html" title="Tells the QuadAnimator how to play the animation. More details in the QuadAnimator docs.">Animation::PlayParams</a> can be passed to QuadAnimator.  
+ <a href="#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="Graphics_2Animator_2Animation_8hpp_source.html">Animation.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:PlayParams" id="r_PlayParams"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCori_1_1Graphics_1_1Animation_1_1PlayParams.html">PlayParams</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tells the QuadAnimator how to play the animation. More details in the QuadAnimator docs.  <a href="structCori_1_1Graphics_1_1Animation_1_1PlayParams.html#details">More...</a><br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:abd2e62eddc213f0d77c107451f2a5c62" id="r_abd2e62eddc213f0d77c107451f2a5c62"><td class="memItemLeft" align="right" valign="top">glm::u16vec2&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abd2e62eddc213f0d77c107451f2a5c62">GetFrameSize</a> () const</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -105,9 +113,38 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a0333536d4055059c79ccc1a3d0ea57e0" id="r_a0333536d4055059c79ccc1a3d0ea57e0"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0333536d4055059c79ccc1a3d0ea57e0">m_AnimationID</a> { 0 }</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="AnimationPack_8hpp_source.html#l00017">17</a> of file <a class="el" href="AnimationPack_8hpp_source.html">AnimationPack.hpp</a>.</p>
-</div><a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
+<div class="textblock"><p>Owning handle to the animation inside the <a class="el" href="classCori_1_1Graphics_1_1AnimationPack.html" title="Represents a pack of sprite animations that were loaded from the drive from the pair of an image file...">AnimationPack</a>, when paired with <a class="el" href="structCori_1_1Graphics_1_1Animation_1_1PlayParams.html" title="Tells the QuadAnimator how to play the animation. More details in the QuadAnimator docs.">Animation::PlayParams</a> can be passed to QuadAnimator. </p>
+
+<p class="definition">Definition at line <a class="el" href="Graphics_2Animator_2Animation_8hpp_source.html#l00010">10</a> of file <a class="el" href="Graphics_2Animator_2Animation_8hpp_source.html">Graphics/Animator/Animation.hpp</a>.</p>
+</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
+<a id="abd2e62eddc213f0d77c107451f2a5c62" name="abd2e62eddc213f0d77c107451f2a5c62"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abd2e62eddc213f0d77c107451f2a5c62">&#9670;&#160;</a></span>GetFrameSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">glm::u16vec2 Cori::Graphics::Animation::GetFrameSize </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel nodiscard">nodiscard</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="Graphics_2Animator_2Animation_8cpp_source.html#l00006">6</a> of file <a class="el" href="Graphics_2Animator_2Animation_8cpp_source.html">Graphics/Animator/Animation.cpp</a>.</p>
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
 <a id="a0333536d4055059c79ccc1a3d0ea57e0" name="a0333536d4055059c79ccc1a3d0ea57e0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0333536d4055059c79ccc1a3d0ea57e0">&#9670;&#160;</a></span>m_AnimationID</h2>
 
@@ -120,7 +157,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AnimationPack_8hpp_source.html#l00033">33</a> of file <a class="el" href="AnimationPack_8hpp_source.html">AnimationPack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Graphics_2Animator_2Animation_8hpp_source.html#l00028">28</a> of file <a class="el" href="Graphics_2Animator_2Animation_8hpp_source.html">Graphics/Animator/Animation.hpp</a>.</p>
 
 </div>
 </div>
@@ -136,12 +173,13 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AnimationPack_8hpp_source.html#l00032">32</a> of file <a class="el" href="AnimationPack_8hpp_source.html">AnimationPack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Graphics_2Animator_2Animation_8hpp_source.html#l00027">27</a> of file <a class="el" href="Graphics_2Animator_2Animation_8hpp_source.html">Graphics/Animator/Animation.hpp</a>.</p>
 
 </div>
 </div>
-<hr/>The documentation for this struct was generated from the following file:<ul>
-<li><a class="el" href="AnimationPack_8hpp_source.html">AnimationPack.hpp</a></li>
+<hr/>The documentation for this struct was generated from the following files:<ul>
+<li><a class="el" href="Graphics_2Animator_2Animation_8hpp_source.html">Graphics/Animator/Animation.hpp</a></li>
+<li><a class="el" href="Graphics_2Animator_2Animation_8cpp_source.html">Graphics/Animator/Animation.cpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

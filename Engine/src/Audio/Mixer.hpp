@@ -13,7 +13,6 @@ namespace Cori {
 		class Track;
 		class Sound;
 
-		// Note: sub millisecond data will be discarded when params are passed to Mixer::PlayTag, it only works with Mixer::PlayTrack
 		/**
 		 * @brief Parameters to be used when playing sound, you can mix your audio playback however you want with these.
 		 * @note Sub millisecond data will be discarded when params are passed to Mixer::PlayTag, it only works with Mixer::PlayTrack
@@ -157,7 +156,7 @@ namespace Cori {
 			 * @param gain Specified gain, negative values are illegal.
 			 * @details Gain of 0.0f will completely silence the Tracks, value of 1.0f will not change the Tracks volume, values higher than 1.0f will increase the volume. There is no gain limit specified.
 			 * @return Expected object with void on success or CoriError<> on failure.
-			 * @note Because there is no limit, this can get very load very quickly, be carefully.
+			 * @note Because there is no limit, this can get very loud very quickly, be carefully.
 			 */
 			static std::expected<void, Core::CoriError<>> SetTagGain(const char* tag, const float gain);
 
@@ -169,37 +168,37 @@ namespace Cori {
 			static void Init();
 			static void Shutdown();
 
-			[[nodiscard]] static std::expected<void, Core::CoriError<std::filesystem::path>> LoadSound(const std::filesystem::path& path, const bool preDecode, const SoundID soundID);
+			static std::expected<void, Core::CoriError<std::filesystem::path>> LoadSound(const std::filesystem::path& path, const bool preDecode, const SoundID soundID);
 
 			static void UnloadSound(const SoundID soundID);
 
-			[[nodiscard]] static std::expected<void, Core::CoriError<>> CreateTrack(Track* track);
+			static std::expected<void, Core::CoriError<>> CreateTrack(Track* track);
 
 			static void DestroyTrack(const TrackID trackID);
 
-			[[nodiscard]] static std::expected<void, Core::CoriError<>> SetTrackSound(const TrackID trackID, const Sound* sound);
+			static std::expected<void, Core::CoriError<>> SetTrackSound(const TrackID trackID, const Sound* sound);
 
-			[[nodiscard]] static std::expected<void, Core::CoriError<>> PlayTrack(const TrackID trackID, const PlayParams& params = {});
+			static std::expected<void, Core::CoriError<>> PlayTrack(const TrackID trackID, const PlayParams& params = {});
 
-			[[nodiscard]] static std::expected<void, Core::CoriError<>> StopTrack(const TrackID trackID, const int64_t fadeOutMS = 0);
+			static std::expected<void, Core::CoriError<>> StopTrack(const TrackID trackID, const int64_t fadeOutMS = 0);
 
-			[[nodiscard]] static std::expected<void, Core::CoriError<>> PauseTrack(const TrackID trackID);
+			static std::expected<void, Core::CoriError<>> PauseTrack(const TrackID trackID);
 
-			[[nodiscard]] static std::expected<void, Core::CoriError<>> ResumeTrack(const TrackID trackID);
+			static std::expected<void, Core::CoriError<>> ResumeTrack(const TrackID trackID);
 
-			[[nodiscard]] static bool IsTrackPaused(const TrackID trackID);
+			static bool IsTrackPaused(const TrackID trackID);
 
-			[[nodiscard]] static bool IsTrackPlaying(const TrackID trackID);
+			static bool IsTrackPlaying(const TrackID trackID);
 
-			[[nodiscard]] static std::expected<void, Core::CoriError<>> SetTrackGain(const TrackID trackID, const float gain);
+			static std::expected<void, Core::CoriError<>> SetTrackGain(const TrackID trackID, const float gain);
 
-			[[nodiscard]] static float GetTrackGain(const TrackID trackID);
+			static float GetTrackGain(const TrackID trackID);
 
-			[[nodiscard]] static std::expected<void, Core::CoriError<>> TagTrack(const TrackID trackID, const char* tag);
+			static std::expected<void, Core::CoriError<>> TagTrack(const TrackID trackID, const char* tag);
 
 			static void UntagTrack(const TrackID trackID, const char* tag);
 
-			[[nodiscard]] static std::expected<int64_t, Core::CoriError<>> MillisecondsToFrames(const TrackID trackID, const float milliseconds);
+			static std::expected<int64_t, Core::CoriError<>> MillisecondsToFrames(const TrackID trackID, const float milliseconds);
 
 			struct Data;
 			static Data* s_Data;

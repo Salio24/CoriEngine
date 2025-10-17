@@ -1,5 +1,4 @@
 #include "Application.hpp"
-#include "Input.hpp"
 #include "Graphics/API.hpp"
 #include "WorldSystem/SceneManager.hpp"
 #include "WorldSystem/Components.hpp"
@@ -7,15 +6,20 @@
 #include "EventSystem/Event.hpp"
 #include "EventSystem/AppEvent.hpp"
 #include "EventSystem/KeyEvent.hpp"
+#include "FileSystem/PathManager.hpp"
+#include "Graphics/Renderer2D.hpp"
 
 namespace Cori {
 	namespace Core {
 		Application* Application::s_Instance{ nullptr };
 
-		Application::Application(const char* windowName) {
+		Application::Application(const char* windowName) : m_WorkerPool(std::thread::hardware_concurrency() == 1 ? 1 : std::thread::hardware_concurrency() - 1) {
+
 			//m_ManualStep = true;
 			CORI_CORE_ASSERT(!s_Instance, "Trying to construct application for the second time. Application already exists!");
 			s_Instance = this;
+
+			FileSystem::PathManager::Get();
 
 			m_Window = Window::Create(windowName, false);
 
@@ -31,7 +35,7 @@ namespace Cori {
 			Graphics::Internal::API::Init();
 			Audio::Mixer::Init();
 
-			m_GameTimer.SetTickrate(60);
+			m_GameTimer.SetTickrate(120);
 			m_GameTimer.SetTickrateUpdateFunc(CORI_BIND_EVENT_FN(Application::TickrateUpdate, CORI_PLACEHOLDERS(1)));
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self }, "Cori Engine started.");
 		}
@@ -48,19 +52,14 @@ namespace Cori {
 			s_Instance->OnEvent(event);
 		}
 
+		uint16_t Application::GetWorkerCount() {
+			return s_Instance->m_WorkerPool.GetWorkerCount();
+		}
+
 		void Application::OnEvent(Event& event) {
 			EventDispatcher dispatcher(event);
 			dispatcher.Dispatch<WindowCloseEvent>(CORI_BIND_EVENT_FN(Application::OnWindowClose));
 
-
-#ifdef DEBUG_BUILD
-			dispatcher.Dispatch<KeyReleasedEvent>([](const KeyReleasedEvent& e) -> bool {
-				if (e.GetKeyCode() == CORI_KEY_F8) {
-					//CORI_PROFILER_FRAME_START();
-				}
-				return false;
-			});
-#endif
 			dispatcher.Dispatch<KeyReleasedEvent>([this](const KeyReleasedEvent& e) -> bool {
 				if (e.GetKeyCode() == CORI_KEY_F9) {
 					m_RenderImGui = !m_RenderImGui;
@@ -106,31 +105,42 @@ namespace Cori {
 				CORI_PROFILER_FRAME_START();
 				{
 					CORI_PROFILE_SCOPE("Cori Engine Global Update");
+					m_CommandQueue.Execute();
 					m_GameTimer.Update();
 
-					Graphics::Internal::API::SetClearColor(m_BackgroundColor);
-					Graphics::Internal::API::ClearFramebuffer();
+					{
+						CORI_PROFILE_SCOPE("Clear Color and Clear Framebuffer");
+						Graphics::Internal::API::SetClearColor(m_BackgroundColor);
+						Graphics::Internal::API::ClearFramebuffer();
+					}
+
+					Graphics::Renderer2D::StartFrame();
 
 					for (Layer* layer : m_LayerStack) {
+						layer->ActiveScene.BeginRender();
 						layer->OnUpdate(m_GameTimer);
-						layer->SceneUpdate(m_GameTimer.GetDeltaTime());
-						if (layer->IsModal()) {
-							break;
-						}
+						layer->SceneUpdate(m_GameTimer);
+						layer->ActiveScene.EndRender();
 					}
 
-					m_ImGuiLayer->StartFrame();
+					Graphics::Renderer2D::EndFrame();
 
-					if (m_RenderImGui) {
-						for (Layer* layer : m_LayerStack) {
-							layer->OnImGuiRender(m_GameTimer);
-							if (layer->IsModal()) {
-								break;
+					{
+						CORI_PROFILE_SCOPE("ImGui Render");
+						m_ImGuiLayer->StartFrame();
+
+						if (m_RenderImGui) {
+							for (Layer* layer : m_LayerStack) {
+								layer->OnImGuiRender(m_GameTimer);
+								layer->SceneImGuiRender(m_GameTimer);
+								if (layer->IsModal()) {
+									break;
+								}
 							}
 						}
-					}
 
-					m_ImGuiLayer->EndFrame();
+						m_ImGuiLayer->EndFrame();
+					}
 
 					m_Window->OnUpdate();
 
@@ -139,11 +149,9 @@ namespace Cori {
 			}
 		}
 
-
-
 		void Application::TickrateUpdate(GameTimer& gameTimer) {
 			for (Layer* layer : m_LayerStack) {
-				layer->SceneTickrateUpdate(gameTimer.GetTimestep());
+				layer->SceneTickrateUpdate(gameTimer);
 				layer->OnTickUpdate(gameTimer);
 				if (layer->IsModal()) {
 					break;

@@ -4,12 +4,26 @@
 
 namespace Cori {
 	namespace Graphics {
-		namespace Internal {
-			std::unique_ptr<CoriGraphicsAPI> CoriGraphicsAPI::Create() {
-				std::unique_ptr<CoriGraphicsAPI> api = Core::Factory<CoriGraphicsAPI, GraphicsAPIs>::CreateUnique(Core::Window::GetCurrentAPI());
-				CORI_CORE_ASSERT(api, "Failed to create CoriGraphicsAPI for API: {}. Check registrations and API validity.", APIEnumToName(Core::Window::GetCurrentAPI()));
-				return api;
+		std::unique_ptr<CoriGraphicsAPI> CoriGraphicsAPI::Create() {
+			switch (Core::Window::GetCurrentAPI()) {
+			case GraphicsAPIs::OpenGL:
+				{
+					auto api = std::make_unique<Internal::OpenGLGraphicsAPI>();
+					CORI_CORE_ASSERT(api, "Failed to create Texture2D for API: {}. Check registrations and API validity.", APIEnumToName(Core::Window::GetCurrentAPI()));
+					return api;
+					break;
+				}
+			case GraphicsAPIs::Vulkan:
+				{
+					CORI_CORE_ASSERT(false, "Unsupported Graphics API.");
+				}
+			case GraphicsAPIs::None:
+				{
+					break;
+				}
 			}
+
+			return nullptr;
 		}
 	}
 }

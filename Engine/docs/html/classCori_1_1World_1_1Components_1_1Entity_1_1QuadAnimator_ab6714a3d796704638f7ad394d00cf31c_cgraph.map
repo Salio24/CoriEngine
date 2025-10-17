@@ -1,7 +1,5 @@
 <map id="Cori::World::Components::Entity::QuadAnimator::OnTickUpdate" name="Cori::World::Components::Entity::QuadAnimator::OnTickUpdate">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,44,189,106"/>
-<area shape="rect" id="Node000002" href="$structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#a2c96fd69fc8673157f92eb55f5ccb36f" title="Returns a const reference to the currently active texture." alt="" coords="248,5,431,67"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="189,58,232,51,233,56,190,63"/>
-<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#a36b3901d92e7d6db30f8142c352c3154" title=" " alt="" coords="237,91,442,136"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="190,87,222,92,221,97,189,92"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,189,67"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#a36b3901d92e7d6db30f8142c352c3154" title="Stops the current animation." alt="" coords="237,14,442,58"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="189,34,221,34,221,39,189,39"/>
 </map>

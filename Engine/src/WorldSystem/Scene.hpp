@@ -4,6 +4,9 @@
 #include "Graphics/CameraController.hpp"
 #include "Physics/Physics.hpp"
 #include "EntityView.hpp"
+#include "Core/Time.hpp"
+#include "Systems/Concept.hpp"
+#include <ska_sort.hpp>
 
 namespace Cori {
 	namespace Core {
@@ -19,27 +22,55 @@ namespace Cori {
 			~Scene();
 
 			Entity CreateBlankEntity();
-			Entity CreateEntity(const std::string& name, const Utility::HashedTag64& tag);
+
+			template<typename... T>
+			Entity CreateEntity(const std::string& name) {
+				entt::entity entity = m_Registry.create();
+				auto& nameComp = m_Registry.emplace<Components::Entity::Name>(entity);
+				nameComp.m_Name = name;
+				m_Registry.emplace<Components::Entity::Hierarchy>(entity);
+				((m_Registry.emplace<T>(entity)), ...);
+				const auto& uuidComp = m_Registry.emplace<Components::Entity::UUID>(entity);
+				m_UUIDToEntity.insert({ uuidComp.m_UUID, entity });
+				CORI_CORE_TRACE_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Created Entity With ID: {}, Version: {}, Name: {}", entt::to_integral(entity), entt::to_version(entity), name);
+				Entity e = entt::handle{m_Registry, entity};
+				e.AddComponent<Components::Entity::Transform>();
+				e.AddComponent<Internal::SceneID>(m_SceneID);
+				return e;
+			}
+
 			void DestroyEntity(Entity entity);
 
 			std::expected<void, Core::CoriError<>> AddEntityToCache(const Entity entity, const Utility::StringHash32 key);
 			[[nodiscard]] std::expected<Entity, Core::CoriError<>> GetEntityFromCache(const Utility::StringHash32 key);
 			void RemoveEntityFromCache(const Utility::StringHash32 key);
 
-			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindEntity(const std::string& name);
-			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindEntity(const std::string& name, const Utility::HashedTag64& tag);
-			[[nodiscard]] std::vector<Entity> GetEntitiesWithTag(const Utility::HashedTag64& tag);
+			template<typename... T>
+			[[nodiscard]] std::expected<Entity, Core::CoriError<>> FindEntity(const std::string& name) {
+				CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Performing slow scene-wide search for entity named: '{}'. Consider caching it. This shouldn't be called every frame! Be aware.", name);
+				const auto view = m_Registry.view<Components::Entity::Name, T...>();
+				for (auto entity : view) {
+					if (name == view.template get<Components::Entity::Name>(entity).m_Name) {
+						return Entity{ { m_Registry, entity } };
+					}
+				}
+				return std::unexpected(Core::CoriError("No entity found with the specified name."));
+			}
 
 			template<typename... T>
-			[[nodiscard]] auto View() {
+			[[nodiscard]] auto StaticView() {
 				auto view = m_Registry.view<T...>();
-				return EntityView(view, m_Registry);
+				return StaticEntityView(view, m_Registry);
 			}
 
 			template<typename... T, typename... ExcludeT>
-			[[nodiscard]] auto View(Exclude<ExcludeT...>) {
+			[[nodiscard]] auto StaticView(Exclude<ExcludeT...>) {
 				auto view = m_Registry.view<T...>(entt::exclude<ExcludeT...>);
-				return EntityView(view, m_Registry);
+				return StaticEntityView(view, m_Registry);
+			}
+
+			[[nodiscard]] DynamicEntityView DynamicView() {
+				return DynamicEntityView(m_Registry);
 			}
 
 			// untested and unused for now
@@ -79,13 +110,49 @@ namespace Cori {
 				m_Registry.ctx().erase<T>();
 			}
 
+			template <typename T, typename... Args> requires IsSystem<T>
+			void RegisterSystem(Args&&... args) {
+				if (m_RegisteredSystems.contains(std::type_index(typeid(T)))) {
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Trying to register '{}' twice for scene '{}', you can't register a system twice.", CORI_CLEAN_TYPE_NAME(T), m_Name);
+					return;
+				}
 
-			[[nodiscard]] Physics::PhysicsWorld& GetPhysicsWorld() {
-				return m_PhysicsWorld;
+				std::shared_ptr<T> system = std::make_shared<T>();
+				system->SetOwnerScene(this);
+				const bool success = system->Create(std::forward<Args>(args)...);
+				if (success) {
+					auto systemType = std::type_index(typeid(T));
+					m_SystemPriority.emplace_back(T::Priority, systemType);
+					ska_sort(
+						m_SystemPriority.begin(),
+						m_SystemPriority.end(),
+						[](const std::pair<SystemPriority, std::type_index>& entry) -> SystemPriority {
+							return entry.first;
+						});
+
+					m_RegisteredSystems.insert({ systemType, std::move(system) });
+					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "System '{}' has been registered for scene '{}'", CORI_CLEAN_TYPE_NAME(T), m_Name);
+					return;
+				}
+
+				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "Failed to register System '{}' with scene '{}', Create returned false.", CORI_CLEAN_TYPE_NAME(T), m_Name);
 			}
 
-			[[nodiscard]] const  Physics::PhysicsWorld& GetPhysicsWorld() const {
-				return m_PhysicsWorld;
+			template <typename T> requires IsSystem<T>
+			void UnregisterSystem() {
+				if (m_RegisteredSystems.contains(std::type_index(typeid(T)))) {
+					m_RegisteredSystems.erase(std::type_index(typeid(T)));
+					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::World::Self, Logger::Tags::World::Scene::Self }, "System '{}' has been unregistered for scene '{}'", CORI_CLEAN_TYPE_NAME(T), m_Name);
+				}
+			}
+
+			template <typename T> requires IsSystem<T>
+			std::expected<std::weak_ptr<T>, Core::CoriError<>> GetSystem() {
+				if (m_RegisteredSystems.contains(std::type_index(typeid(T)))) {
+					return std::weak_ptr<T>(std::static_pointer_cast<T>(m_RegisteredSystems[std::type_index(typeid(T))]));
+				}
+
+				return std::unexpected(Core::CoriError("Failed to get system, system is not registered."));
 			}
 
 			[[nodiscard]] Graphics::CameraController& GetCameraController() {
@@ -100,6 +167,14 @@ namespace Cori {
 				return m_Name;
 			}
 
+			[[nodiscard]] uint32_t GetSceneID() const {
+				return m_SceneID;
+			}
+
+			void BeginRender();
+
+			void EndRender();
+
 		protected:
 			//friend Core::Layer;
 			friend class SceneHandle;
@@ -107,28 +182,27 @@ namespace Cori {
 			[[nodiscard]] bool OnBind();
 			[[nodiscard]] bool OnUnbind();
 
-			void OnUpdate(const double deltaTime);
+			void OnUpdate(Core::GameTimer& gameTimer);
 
-			void OnTickUpdate(const float timeStep);
+			void OnTickUpdate(Core::GameTimer& gameTimer);
 
+			void OnImGuiRender(Core::GameTimer& gameTimer);
 
 			[[nodiscard]] static std::shared_ptr<Scene> Create(std::string name);
+
+			entt::registry m_Registry;
 		private:
 			//friend class Entity;
 			explicit Scene(std::string name);
 
-			entt::registry m_Registry;
-
-			void UpdateTransform();
-			void UpdateTransformRecursive(entt::entity entity, const glm::mat3& parentTransform, const uint8_t parentDepth, const bool parentTransformDirty, const bool parentDepthDirty);
-
-			void OnHierarchyComponentDestroyed(entt::registry& registry, entt::entity entity);
+			uint32_t m_SceneID;
 
 			Graphics::CameraController m_ActiveCamera;
 
-			Physics::PhysicsWorld m_PhysicsWorld;
-
 			std::string m_Name;
+
+			std::unordered_map<std::type_index, std::shared_ptr<System>> m_RegisteredSystems;
+			std::vector<std::pair<SystemPriority, std::type_index>> m_SystemPriority;
 
 			std::unordered_map<Core::UUID, entt::entity> m_UUIDToEntity;
 			std::unordered_map<Utility::StringHash32, entt::entity> m_EntityCache;

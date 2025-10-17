@@ -102,6 +102,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:a0a39a6f3fbbebe5e933a613b6396450c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enables the debug draw of Box2D physics.  <br /></td></tr>
 <tr class="memitem:a8dd9d314670bee7f21553063201e2c31" id="r_a8dd9d314670bee7f21553063201e2c31"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8dd9d314670bee7f21553063201e2c31">ScreenModeAndResolutionDropdowns</a> ()</td></tr>
 <tr class="memdesc:a8dd9d314670bee7f21553063201e2c31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Displays a window mode and screen mode selection window.  <br /></td></tr>
+<tr class="memitem:a59d08b4b73918aada617309f0847cdd3" id="r_a59d08b4b73918aada617309f0847cdd3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59d08b4b73918aada617309f0847cdd3">FpsCounter</a> (const <a class="el" href="classCori_1_1Core_1_1GameTimer.html">Core::GameTimer</a> &amp;timer)</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Here are stored all predefined ImGui window presets, you can only use this functions in Layer OnImGuiRender method, using it anywhere else will result in a crash. </p>
@@ -167,15 +168,52 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Only usable in Layer OnImGuiRender method. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ImGuiPresets_8hpp_source.html#l00019">19</a> of file <a class="el" href="ImGuiPresets_8hpp_source.html">ImGuiPresets.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ImGuiPresets_8hpp_source.html#l00021">21</a> of file <a class="el" href="ImGuiPresets_8hpp_source.html">ImGuiPresets.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespaceCori_1_1ImGuiPresets_a0a39a6f3fbbebe5e933a613b6396450c_cgraph.png" border="0" usemap="#anamespaceCori_1_1ImGuiPresets_a0a39a6f3fbbebe5e933a613b6396450c_cgraph" loading="lazy" alt=""/></div>
 <map name="anamespaceCori_1_1ImGuiPresets_a0a39a6f3fbbebe5e933a613b6396450c_cgraph" id="anamespaceCori_1_1ImGuiPresets_a0a39a6f3fbbebe5e933a613b6396450c_cgraph">
 <area shape="rect" title="Enables the debug draw of Box2D physics." alt="" coords="5,5,152,50"/>
-<area shape="rect" href="classCori_1_1World_1_1SceneHandle.html#a18e2be46d524a816b64344222bb6bec4" title="Retrieves a reference to the Box2D physics world of the scene." alt="" coords="200,5,386,50"/>
+<area shape="rect" href="classCori_1_1World_1_1SceneHandle.html#a06a1b4526f367f65c9da9f8dff415dc1" title="Retries a registered system instance from the scene." alt="" coords="200,5,386,50"/>
 <area shape="poly" title=" " alt="" coords="152,25,184,25,184,30,152,30"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a59d08b4b73918aada617309f0847cdd3" name="a59d08b4b73918aada617309f0847cdd3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59d08b4b73918aada617309f0847cdd3">&#9670;&#160;</a></span>FpsCounter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Cori::ImGuiPresets::FpsCounter </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classCori_1_1Core_1_1GameTimer.html">Core::GameTimer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>timer</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="ImGuiPresets_8hpp_source.html#l00116">116</a> of file <a class="el" href="ImGuiPresets_8hpp_source.html">ImGuiPresets.hpp</a>.</p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespaceCori_1_1ImGuiPresets_a59d08b4b73918aada617309f0847cdd3_cgraph.png" border="0" usemap="#anamespaceCori_1_1ImGuiPresets_a59d08b4b73918aada617309f0847cdd3_cgraph" loading="lazy" alt=""/></div>
+<map name="anamespaceCori_1_1ImGuiPresets_a59d08b4b73918aada617309f0847cdd3_cgraph" id="anamespaceCori_1_1ImGuiPresets_a59d08b4b73918aada617309f0847cdd3_cgraph">
+<area shape="rect" title=" " alt="" coords="5,5,148,50"/>
+<area shape="rect" href="classCori_1_1Core_1_1GameTimer.html#af909d0acb3d2af9f219b0c650cdd70db" title="Gets the time in seconds since application start." alt="" coords="196,5,365,50"/>
+<area shape="poly" title=" " alt="" coords="148,25,180,25,180,30,148,30"/>
 </map>
 </div>
 
@@ -207,24 +245,45 @@ Here is the call graph for this function:</div>
 <p>Displays a window mode and screen mode selection window. </p>
 <dl class="section note"><dt>Note</dt><dd>Only usable in Layer OnImGuiRender method. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ImGuiPresets_8hpp_source.html#l00035">35</a> of file <a class="el" href="ImGuiPresets_8hpp_source.html">ImGuiPresets.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ImGuiPresets_8hpp_source.html#l00040">40</a> of file <a class="el" href="ImGuiPresets_8hpp_source.html">ImGuiPresets.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespaceCori_1_1ImGuiPresets_a8dd9d314670bee7f21553063201e2c31_cgraph.png" border="0" usemap="#anamespaceCori_1_1ImGuiPresets_a8dd9d314670bee7f21553063201e2c31_cgraph" loading="lazy" alt=""/></div>
 <map name="anamespaceCori_1_1ImGuiPresets_a8dd9d314670bee7f21553063201e2c31_cgraph" id="anamespaceCori_1_1ImGuiPresets_a8dd9d314670bee7f21553063201e2c31_cgraph">
-<area shape="rect" title="Displays a window mode and screen mode selection window." alt="" coords="5,144,282,189"/>
-<area shape="rect" href="classCori_1_1Core_1_1Window.html#a337ad17d98810547e15d4c0711b166aa" title="Retrieves a list of all available ScreenMode." alt="" coords="340,5,486,50"/>
-<area shape="poly" title=" " alt="" coords="181,141,249,102,328,60,340,54,343,59,331,65,252,107,184,146"/>
-<area shape="rect" href="classCori_1_1Core_1_1Application.html#ab0aa424cc7dd313c6b342b4c9710a022" title="Getter for the main Window." alt="" coords="330,75,496,119"/>
-<area shape="poly" title=" " alt="" coords="233,141,314,120,315,125,234,146"/>
-<area shape="rect" href="classCori_1_1Core_1_1Window.html#ab051f165e8a834ef0df43154f64672fd" title="Gets the current WindowMode;." alt="" coords="340,144,486,189"/>
-<area shape="poly" title=" " alt="" coords="282,164,325,164,325,169,282,169"/>
-<area shape="rect" href="classCori_1_1Core_1_1Window.html#a6ecba393a8a84ce0f4c7d30d0fc6c08e" title="Changes the current ScreenMode." alt="" coords="340,213,486,258"/>
-<area shape="poly" title=" " alt="" coords="234,187,326,211,324,216,233,192"/>
-<area shape="rect" href="classCori_1_1Core_1_1Window.html#adf479affc833e89a9275b708d7c24572" title="Changes the current WindowMode." alt="" coords="544,244,689,289"/>
-<area shape="poly" title=" " alt="" coords="176,187,244,231,286,252,330,268,381,277,432,281,529,277,529,282,432,286,380,282,329,273,284,257,241,236,173,191"/>
-<area shape="poly" title=" " alt="" coords="486,244,529,250,528,256,485,249"/>
+<area shape="rect" title="Displays a window mode and screen mode selection window." alt="" coords="5,179,282,223"/>
+<area shape="rect" href="classCori_1_1Core_1_1Window.html#a602b2e0ad4989ee44ff2a7083dfa7d7e" title="Retrieves the current screen mode index." alt="" coords="330,5,510,50"/>
+<area shape="poly" title=" " alt="" coords="169,176,238,120,282,88,328,60,339,55,341,59,331,65,285,93,241,124,172,180"/>
+<area shape="rect" href="classCori_1_1Core_1_1Window.html#a550e0439ddd00e283877f5b488277999" title="Retrieves a list of all available ScreenMode." alt="" coords="347,75,492,119"/>
+<area shape="poly" title=" " alt="" coords="204,176,343,123,345,128,206,181"/>
+<area shape="rect" href="classCori_1_1Core_1_1Application.html#ab0aa424cc7dd313c6b342b4c9710a022" title="Getter for the main Window." alt="" coords="337,144,503,189"/>
+<area shape="poly" title=" " alt="" coords="282,181,321,176,321,181,282,186"/>
+<area shape="rect" href="classCori_1_1Core_1_1Window.html#ab051f165e8a834ef0df43154f64672fd" title="Gets the current WindowMode;." alt="" coords="347,213,492,258"/>
+<area shape="poly" title=" " alt="" coords="282,216,332,222,332,227,282,221"/>
+<area shape="rect" href="classCori_1_1Core_1_1Window.html#a3487530d140e0fbf7f2f4b6c9e6e5bba" title="Changes the current ScreenMode." alt="" coords="347,283,492,327"/>
+<area shape="poly" title=" " alt="" coords="206,221,345,274,343,279,204,226"/>
+<area shape="rect" href="classCori_1_1Core_1_1Window.html#adf479affc833e89a9275b708d7c24572" title="Changes the current WindowMode." alt="" coords="558,313,703,358"/>
+<area shape="poly" title=" " alt="" coords="167,222,196,251,235,283,281,314,331,337,384,350,439,355,493,354,542,349,543,354,493,359,439,360,383,355,329,342,278,319,232,288,193,255,164,226"/>
+<area shape="poly" title=" " alt="" coords="493,313,543,320,542,326,492,318"/>
+<area shape="rect" href="classCori_1_1FileSystem_1_1PathManager.html#a70c92136e32723b75a6a44cbbf8bdec7" title="Retries the full aliased path defined in fsgame.json." alt="" coords="764,268,984,313"/>
+<area shape="poly" title=" " alt="" coords="703,320,748,311,749,316,704,325"/>
+<area shape="rect" href="classCori_1_1FileSystem_1_1BinaryFileManager.html#ae43b1979ebab8a97a5ddfb13c14f4129" title="Saves an instance of an aggregate struct onto the disk." alt="" coords="751,348,997,393"/>
+<area shape="poly" title=" " alt="" coords="704,343,736,348,735,353,703,349"/>
+<area shape="rect" href="classCori_1_1Logger.html#a7e782f29b9eebd80d6a801e80d074318" title=" " alt="" coords="1055,266,1226,294"/>
+<area shape="poly" title=" " alt="" coords="985,283,1040,281,1040,286,985,289"/>
+<area shape="rect" href="namespaceCori_1_1Utility.html#aadae1036bd08323331712cb16b48813e" title="Computes the 64bit FNV&#45;1a string hash." alt="" coords="1285,316,1440,344"/>
+<area shape="poly" title=" " alt="" coords="997,357,1044,353,1269,335,1270,340,1045,358,997,362"/>
+<area shape="rect" href="namespaceCori_1_1Utility.html#aca6f01473d2cc64923d437335438aa44" title="Generates a stable, unique ID for an aggregate struct at compile&#45;time." alt="" coords="1045,368,1237,413"/>
+<area shape="poly" title=" " alt="" coords="997,377,1029,379,1029,385,997,382"/>
+<area shape="rect" href="classCori_1_1Core_1_1UUID.html#ae7543c82e2aac1352d77a7d85ba8e435" title=" " alt="" coords="1048,436,1234,464"/>
+<area shape="poly" title=" " alt="" coords="944,391,1045,422,1070,429,1068,435,1044,428,943,396"/>
+<area shape="poly" title=" " alt="" coords="1225,365,1293,346,1295,351,1226,370"/>
+<area shape="rect" href="namespaceCori_1_1Utility_1_1Internal.html#a9337758a0302ac0fc6b64644e5f1b4ce" title=" " alt="" coords="1286,368,1439,413"/>
+<area shape="poly" title=" " alt="" coords="1238,388,1271,388,1271,393,1238,393"/>
+<area shape="rect" href="namespaceCori_1_1Utility_1_1Internal.html#a52092d326bf9b42dd65b632131a3748f" title=" " alt="" coords="1488,368,1670,413"/>
+<area shape="poly" title=" " alt="" coords="1439,388,1473,388,1473,393,1439,393"/>
+<area shape="rect" href="namespaceCori_1_1Utility_1_1Internal.html#a3915b814d3c7b0d4b5a7920c4cd9d597" title=" " alt="" coords="1718,368,1870,413"/>
+<area shape="poly" title=" " alt="" coords="1670,388,1702,388,1702,393,1670,393"/>
 </map>
 </div>
 

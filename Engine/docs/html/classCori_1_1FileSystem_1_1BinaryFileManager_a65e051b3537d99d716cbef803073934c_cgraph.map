@@ -1,0 +1,5 @@
+<map id="Cori::FileSystem::BinaryFileManager::LoadAggregateStruct" name="Cori::FileSystem::BinaryFileManager::LoadAggregateStruct">
+<area shape="rect" id="Node000001" title="Loads an aggregate struct from the file on the disk." alt="" coords="5,5,250,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1CoriError.html#ac035b7444bbd435105aebe026f3b465c" title="Returns the formated message and if called the CoriError is considered &#39;seen&#39;." alt="" coords="298,5,448,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="250,25,282,25,282,30,250,30"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="Cori::World::Scene::BeginRender" name="Cori::World::Scene::BeginRender">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,40,146,85"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Renderer2D.html#ad43e33fd07665c300907ac8618e0be06" title=" " alt="" coords="194,5,381,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,48,178,43,179,48,146,54"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Scene.html#a5cc3218e8c136ca433edb49959845c9b" title=" " alt="" coords="198,75,376,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="146,71,183,77,182,82,145,76"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1World_1_1Scene.html#af3014439c8efb1ec2556a44f3f725819" title=" " alt="" coords="429,75,609,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="377,94,414,94,414,100,377,100"/>
+</map>

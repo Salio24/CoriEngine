@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structCori_1_1Graphics_1_1Font_1_1CharsetRanges.html" title="These are predefined UTF&#45;32 charset ranges to be used when creating a Font." alt="" coords="5,5,154,50"/>
+<area shape="rect" id="Node000000" href="$classCori_1_1Graphics_1_1IndexBuffer.html" title=" " alt="" coords="38,5,235,33"/>
+<area shape="rect" id="Node000001" href="$classCori_1_1Graphics_1_1Internal_1_1OpenGLIndexBuffer.html" title=" " alt="" coords="316,28,486,72"/>
+<area shape="poly" id="edge17_Node000000_Node000001" title=" " alt="" coords="251,30,316,37,315,43,250,35"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Profiling_1_1Trackable.html" title=" " alt="" coords="5,57,268,102"/>
+<area shape="poly" id="edge18_Node000002_Node000001" title=" " alt="" coords="283,60,315,57,316,62,284,66"/>
 </map>

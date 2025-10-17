@@ -107,7 +107,7 @@ Public Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a7f4f7d2daae85aae30d587a105c189dd" id="r_a7f4f7d2daae85aae30d587a105c189dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceCori_1_1Utility.html#a0874b91f7005b49504a8d44a4fa1d3d2">StringHash64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7f4f7d2daae85aae30d587a105c189dd">m_Hash</a> { 0 }</td></tr>
-<tr class="memitem:ad9af99e97d7cc9ed661e4981e79f5c7e" id="r_ad9af99e97d7cc9ed661e4981e79f5c7e"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad9af99e97d7cc9ed661e4981e79f5c7e">m_DebugName</a></td></tr>
+<tr class="memitem:ad9af99e97d7cc9ed661e4981e79f5c7e" id="r_ad9af99e97d7cc9ed661e4981e79f5c7e"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad9af99e97d7cc9ed661e4981e79f5c7e">m_DebugName</a> {}</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>HashedTag that uses a 64bit string hash (FNV-1a). </p>
@@ -132,13 +132,13 @@ Public Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Gets the name the tag was declared with. </p>
-<dl class="section return"><dt>Returns</dt><dd>c </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Initial unhashed name. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="HashedTag_8hpp_source.html#l00014">14</a> of file <a class="el" href="HashedTag_8hpp_source.html">HashedTag.hpp</a>.</p>
 
@@ -179,7 +179,7 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const char* Cori::Utility::HashedTag64::m_DebugName</td>
+          <td class="memname">const char* Cori::Utility::HashedTag64::m_DebugName {}</td>
         </tr>
       </table>
 </div><div class="memdoc">

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['shaderdatatype_0',['ShaderDataType',['../namespaceCori_1_1Graphics_1_1Internal.html#a96aec463b1fa56fb55c76e35547cd47b',1,'Cori::Graphics::Internal']]]
+  ['pixelformat_0',['PixelFormat',['../classCori_1_1Graphics_1_1Texture.html#a7f6233a071b2957ce2d5d472c36680ce',1,'Cori::Graphics::Texture']]]
 ];

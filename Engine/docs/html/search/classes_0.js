@@ -1,9 +1,9 @@
 var searchData=
 [
   ['aabb_0',['AABB',['../structCori_1_1Utility_1_1AABB.html',1,'Cori::Utility']]],
-  ['animation_1',['Animation',['../structCori_1_1Graphics_1_1Animation.html',1,'Cori::Graphics']]],
-  ['animationdata_2',['AnimationData',['../classCori_1_1Graphics_1_1AnimationData.html',1,'Cori::Graphics']]],
-  ['animationframe_3',['AnimationFrame',['../structCori_1_1Graphics_1_1AnimationFrame.html',1,'Cori::Graphics']]],
+  ['animation_1',['Animation',['../structCori_1_1Graphics_1_1Animation.html',1,'Cori::Graphics::Animation'],['../classCori_1_1World_1_1Systems_1_1Animation.html',1,'Cori::World::Systems::Animation']]],
+  ['animationdata_2',['AnimationData',['../classCori_1_1Graphics_1_1Internal_1_1AnimationData.html',1,'Cori::Graphics::Internal']]],
+  ['animationframe_3',['AnimationFrame',['../structCori_1_1Graphics_1_1Internal_1_1AnimationFrame.html',1,'Cori::Graphics::Internal']]],
   ['animationpack_4',['AnimationPack',['../classCori_1_1Graphics_1_1AnimationPack.html',1,'Cori::Graphics']]],
   ['api_5',['API',['../classCori_1_1Graphics_1_1Internal_1_1API.html',1,'Cori::Graphics::Internal']]],
   ['application_6',['Application',['../classCori_1_1Core_1_1Application.html',1,'Cori::Core']]],

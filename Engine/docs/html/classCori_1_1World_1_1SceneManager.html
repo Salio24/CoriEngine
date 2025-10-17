@@ -108,6 +108,10 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memdesc:ab1f66f8050aed0a442e2c91a51e0ac18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a scene with the specified name and adds it to the cache.  <br /></td></tr>
 <tr class="memitem:a7e7150d32b69eb1657eec703a24df688" id="r_a7e7150d32b69eb1657eec703a24df688"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; <a class="el" href="classCori_1_1World_1_1SceneHandle.html">SceneHandle</a>, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7e7150d32b69eb1657eec703a24df688">GetScene</a> (const std::string &amp;name)</td></tr>
 <tr class="memdesc:a7e7150d32b69eb1657eec703a24df688"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retries the scene with the specified name from the cache.  <br /></td></tr>
+<tr class="memitem:ad37c0a8413b6c176234b00de582030fa" id="r_ad37c0a8413b6c176234b00de582030fa"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; <a class="el" href="classCori_1_1World_1_1SceneHandle.html">SceneHandle</a>, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad37c0a8413b6c176234b00de582030fa">GetScene</a> (const std::string_view name)</td></tr>
+<tr class="memdesc:ad37c0a8413b6c176234b00de582030fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retries the scene with the specified name from the cache.  <br /></td></tr>
+<tr class="memitem:a63965b0314cb57c22ff5c3e47acae79a" id="r_a63965b0314cb57c22ff5c3e47acae79a"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; <a class="el" href="classCori_1_1World_1_1SceneHandle.html">SceneHandle</a>, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a63965b0314cb57c22ff5c3e47acae79a">GetHandle</a> (const uint32_t sceneID)</td></tr>
+<tr class="memdesc:a63965b0314cb57c22ff5c3e47acae79a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allows you to get <a class="el" href="classCori_1_1World_1_1SceneHandle.html" title="A handle for the scene, checks for scene validity before any call to the scene, if scene is invalid a...">SceneHandle</a> if all you know is scene id.  <br /></td></tr>
 <tr class="memitem:a9b332137f57c2327055c8ce420ba8320" id="r_a9b332137f57c2327055c8ce420ba8320"><td class="memItemLeft" align="right" valign="top">static std::expected&lt; void, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9b332137f57c2327055c8ce420ba8320">DestroyScene</a> (const std::string &amp;name)</td></tr>
 <tr class="memdesc:a9b332137f57c2327055c8ce420ba8320"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys a scene with the specified name.  <br /></td></tr>
 </table>
@@ -148,7 +152,7 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <p>Duplicate scene names are illegal. </p><dl class="section return"><dt>Returns</dt><dd>Expected object with a non owning handle to the created scene on success or a CoriError&lt;&gt; on failure. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="SceneManager_8cpp_source.html#l00029">29</a> of file <a class="el" href="SceneManager_8cpp_source.html">SceneManager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SceneManager_8cpp_source.html#l00068">68</a> of file <a class="el" href="SceneManager_8cpp_source.html">SceneManager.cpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -194,12 +198,48 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Expected object with void on success or CoriError&lt;&gt; on failure. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="SceneManager_8cpp_source.html#l00045">45</a> of file <a class="el" href="SceneManager_8cpp_source.html">SceneManager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SceneManager_8cpp_source.html#l00092">92</a> of file <a class="el" href="SceneManager_8cpp_source.html">SceneManager.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a63965b0314cb57c22ff5c3e47acae79a" name="a63965b0314cb57c22ff5c3e47acae79a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63965b0314cb57c22ff5c3e47acae79a">&#9670;&#160;</a></span>GetHandle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::expected&lt; <a class="el" href="classCori_1_1World_1_1SceneHandle.html">SceneHandle</a>, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt; Cori::World::SceneManager::GetHandle </td>
+          <td>(</td>
+          <td class="paramtype">const uint32_t</td>          <td class="paramname"><span class="paramname"><em>sceneID</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Allows you to get <a class="el" href="classCori_1_1World_1_1SceneHandle.html" title="A handle for the scene, checks for scene validity before any call to the scene, if scene is invalid a...">SceneHandle</a> if all you know is scene id. </p>
+<p>Each scene is assigned an ID at creation, entities have this ID and you can ask an entity what scene is it from, it will give you the owner scene id, you can "convert" this scene id into a useful handle here. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">sceneID</td><td>ID of the scene to get a handle for. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with <a class="el" href="classCori_1_1World_1_1SceneHandle.html" title="A handle for the scene, checks for scene validity before any call to the scene, if scene is invalid a...">SceneHandle</a> on success, CoriError on failure. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="SceneManager_8cpp_source.html#l00052">52</a> of file <a class="el" href="SceneManager_8cpp_source.html">SceneManager.cpp</a>.</p>
 
 </div>
 </div>
 <a id="a7e7150d32b69eb1657eec703a24df688" name="a7e7150d32b69eb1657eec703a24df688"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7e7150d32b69eb1657eec703a24df688">&#9670;&#160;</a></span>GetScene()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e7150d32b69eb1657eec703a24df688">&#9670;&#160;</a></span>GetScene() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -230,7 +270,43 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Expected object with a non owning handle to the created scene on success or a CoriError&lt;&gt; on failure. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="SceneManager_8cpp_source.html#l00013">13</a> of file <a class="el" href="SceneManager_8cpp_source.html">SceneManager.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SceneManager_8cpp_source.html#l00036">36</a> of file <a class="el" href="SceneManager_8cpp_source.html">SceneManager.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ad37c0a8413b6c176234b00de582030fa" name="ad37c0a8413b6c176234b00de582030fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad37c0a8413b6c176234b00de582030fa">&#9670;&#160;</a></span>GetScene() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::expected&lt; <a class="el" href="classCori_1_1World_1_1SceneHandle.html">SceneHandle</a>, <a class="el" href="classCori_1_1Core_1_1CoriError.html">Core::CoriError</a>&lt;&gt; &gt; Cori::World::SceneManager::GetScene </td>
+          <td>(</td>
+          <td class="paramtype">const std::string_view</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retries the scene with the specified name from the cache. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>Name of the scene to retrieve from cache. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Expected object with a non owning handle to the created scene on success or a CoriError&lt;&gt; on failure. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="SceneManager_8cpp_source.html#l00044">44</a> of file <a class="el" href="SceneManager_8cpp_source.html">SceneManager.cpp</a>.</p>
 
 </div>
 </div>

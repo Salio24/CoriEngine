@@ -1,11 +1,13 @@
 #pragma once
 #include "Core/Application.hpp"
+#include "WorldSystem/Systems/Physics.hpp"
 
 namespace Cori {
 	/**
 	 * @brief Here are stored all predefined ImGui window presets, you can only use this functions in Layer OnImGuiRender method, using it anywhere else will result in a crash.
 	 */
 	namespace ImGuiPresets {
+
 		/**
 		 * @brief Enables the debug draw of Box2D physics.
 		 * @param cameraSize Size of the debug cameras viewport, use GetSize() with your main Graphics::CameraController to align the main camera and debug camera.
@@ -18,12 +20,15 @@ namespace Cori {
 		 */
 		[[maybe_unused]] static void Box2dDebugDraw(const glm::vec2 cameraSize, const glm::vec2 cameraPos, const int32_t pixelsPerMeter, Core::Layer* layer, const bool mouseDrag, const float mouseForce = 1000.0f) {
 			layer->m_DebugImGuiRenderer.ViewportCalc(cameraSize, pixelsPerMeter, cameraPos);
-			layer->m_DebugImGuiRenderer.DrawShapes(layer->ActiveScene.GetPhysicsWorld());
-			if (mouseDrag) {
-				if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) && !ImGui::IsAnyItemActive()) {
-					layer->m_DebugImGuiRenderer.HandleMouseDrag(layer->ActiveScene.GetPhysicsWorld(), mouseForce);
+			auto system = layer->ActiveScene.GetSystem<World::Systems::PhysicsSystem>();
+			if (system) {
+				layer->m_DebugImGuiRenderer.DrawShapes(system->lock()->GetWorld());
+				if (mouseDrag) {
+					if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) && !ImGui::IsAnyItemActive()) {
+						layer->m_DebugImGuiRenderer.HandleMouseDrag(system->lock()->GetWorld(), mouseForce);
+					}
+					layer->m_DebugImGuiRenderer.DrawModeToggles();
 				}
-				layer->m_DebugImGuiRenderer.DrawModeToggles();
 			}
 		}
 
@@ -85,27 +90,15 @@ namespace Cori {
 				ImGui::EndCombo();
 			}
 
-
-			static std::vector<Core::ScreenMode> screenModes;
-
-			{
-				static bool oneshot = true;
-				if (oneshot) {
-					screenModes = Core::Application::GetWindow().GetScreenModes();
-					oneshot = false;
-				}
-			}
-
-			static int32_t resolutionDropdownIdx = 0;
+			Core::Window& window = Core::Application::GetWindow();
 
 			ImGui::BeginDisabled(currentMode == Core::WindowMode::BORDERLESS_WINDOWED);
-			const char* resolutionDropdownPreview = screenModes.at(resolutionDropdownIdx).m_ModeName.c_str();
+			const char* resolutionDropdownPreview = window.GetScreenModes().at(window.GetCurrentScreenMode()).m_ModeName.c_str();
 			if (ImGui::BeginCombo("Resolution", resolutionDropdownPreview)) {
-				for (int32_t i = 0; i < screenModes.size(); i++) {
-					const bool isSelected = resolutionDropdownIdx == i;
-					if (ImGui::Selectable(screenModes[i].m_ModeName.c_str(), isSelected)) {
-						resolutionDropdownIdx = i;
-						const auto result = Core::Application::GetWindow().SetScreenMode(screenModes[resolutionDropdownIdx]);
+				for (int32_t i = 0; i < window.GetScreenModes().size(); i++) {
+					const bool isSelected = window.GetCurrentScreenMode() == i;
+					if (ImGui::Selectable(window.GetScreenModes()[i].m_ModeName.c_str(), isSelected)) {
+						const auto result = window.SetScreenMode(i);
 						if (!result) {
 							CORI_ERROR("Failed to set screen mode. Error: {}", result.error().what());
 						}
@@ -118,6 +111,29 @@ namespace Cori {
 			}
 
 			ImGui::EndDisabled();
+		}
+
+		[[maybe_unused]] static void FpsCounter(const Core::GameTimer& timer) {
+			static int frameCount = 0;
+			static double lastTime = 0.0;
+			static float fps = 0.0f;
+
+			frameCount++;
+			double currentTime = timer.GetElapsedSeconds();
+			double elapsed = currentTime - lastTime;
+
+			if (elapsed >= 1.0) {
+				fps = static_cast<float>(frameCount / elapsed);
+				frameCount = 0;
+				lastTime = currentTime;
+			}
+
+			ImGui::Separator();
+
+			ImGui::Text("FPS: %.2f", fps);
+
+			ImGui::Separator();
+
 		}
 	}
 }

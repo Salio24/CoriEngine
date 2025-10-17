@@ -17,6 +17,8 @@ var classCori_1_1Graphics_1_1Texture =
     [ "~Texture", "classCori_1_1Graphics_1_1Texture.html#a0723a9544d0b97ec28f42c38bb68e549", null ],
     [ "Bind", "classCori_1_1Graphics_1_1Texture.html#a1d775e8f22b2b24f70c55aedc713fef0", null ],
     [ "GetHeight", "classCori_1_1Graphics_1_1Texture.html#a6a26ce62697f9a927af9ed399b8aab00", null ],
+    [ "GetStatus", "classCori_1_1Graphics_1_1Texture.html#a9762a6f7b53cca693915a43a3aab8b8c", null ],
     [ "GetWidth", "classCori_1_1Graphics_1_1Texture.html#ad7d48996669c7e3a46f830425fe43503", null ],
-    [ "HasSemiTransparency", "classCori_1_1Graphics_1_1Texture.html#ab614b20506886933d8e3b44351f02ce3", null ]
+    [ "HasSemiTransparency", "classCori_1_1Graphics_1_1Texture.html#ab614b20506886933d8e3b44351f02ce3", null ],
+    [ "m_Status", "classCori_1_1Graphics_1_1Texture.html#af3d133c1cc5a96a3f9044011ef0a15a5", null ]
 ];

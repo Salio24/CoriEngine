@@ -1,6 +1,7 @@
 var namespaceCori_1_1Core =
 [
     [ "Internal", "namespaceCori_1_1Core_1_1Internal.html", "namespaceCori_1_1Core_1_1Internal" ],
+    [ "Threading", "namespaceCori_1_1Core_1_1Threading.html", "namespaceCori_1_1Core_1_1Threading" ],
     [ "Application", "classCori_1_1Core_1_1Application.html", "classCori_1_1Core_1_1Application" ],
     [ "CoriError", "classCori_1_1Core_1_1CoriError.html", "classCori_1_1Core_1_1CoriError" ],
     [ "Event", "classCori_1_1Core_1_1Event.html", "classCori_1_1Core_1_1Event" ],
@@ -298,22 +299,6 @@ var namespaceCori_1_1Core =
       [ "EventCategoryKeyboard", "namespaceCori_1_1Core.html#a0f06acce81d71ecdca15612fa8ecaa18a6930fd4709c408c02e67c36cb4a38564", null ],
       [ "EventCategoryMouse", "namespaceCori_1_1Core.html#a0f06acce81d71ecdca15612fa8ecaa18a262243fa4fd4ba0a3efa9ea0b9f3f57a", null ],
       [ "EventCategoryMouseButton", "namespaceCori_1_1Core.html#a0f06acce81d71ecdca15612fa8ecaa18abe04583851d565a04d8b9b541156fde2", null ]
-    ] ],
-    [ "EventType", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10d", [
-      [ "None", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da6adf97f83acf6453d4a6a4b1070f3754", null ],
-      [ "WindowClose", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10dac984201d37197ab297a14d19efee4b07", null ],
-      [ "WindowResize", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da9f8f27bff2915738c4fe1b970e12f89c", null ],
-      [ "WindowFocus", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da1c68d5453b28d52622bf5486a5fd95ca", null ],
-      [ "WindowLostFocus", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da1c2119b9d61e623975f13f1029f1d97c", null ],
-      [ "WindowMoved", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10dab94473d9dfc85f8fdbf5cb3b1d992bda", null ],
-      [ "GameUserDefinedEvent", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10dacc0f5f07e3e37fbe671e9eb7b53efb9c", null ],
-      [ "KeyPressed", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10dac17e6984c1e5a887a49831beadee6bca", null ],
-      [ "KeyReleased", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da4a77f07c8ad223b71ab4ce78a63841ab", null ],
-      [ "KeyTyped", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da9afbfd35b289eb4fc7f1bc148d7b422e", null ],
-      [ "MouseButtonPressed", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da7349f643d689997b7c54bf93e4095f5c", null ],
-      [ "MouseButtonReleased", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da7584c169de594c27f00084b93186fd7c", null ],
-      [ "MouseMoved", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10dac2770ad109c8063ce69a3608a9a16c08", null ],
-      [ "MouseScrolled", "namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10da50edb169910041bb3c06f6e8322d74c1", null ]
     ] ],
     [ "WindowMode", "namespaceCori_1_1Core.html#a4058f0d1174cf6b294dfc0a31642cb95", [
       [ "WINDOWED", "namespaceCori_1_1Core.html#a4058f0d1174cf6b294dfc0a31642cb95adaa43822b2c6abbb5d4eaf867ff6e4a4", null ],

@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['description_3a_0',['More detailed feature description:',['../index.html#more-detailed-feature-description',1,'']]],
-  ['detailed_20feature_20description_3a_1',['More detailed feature description:',['../index.html#more-detailed-feature-description',1,'']]]
+  ['feature_20set_0',['Feature Set',['../index.html#feature-set',1,'']]],
+  ['file_20system_1',['File System',['../index.html#file-system',1,'']]],
+  ['for_20the_20future_2',['Plans for the future',['../index.html#plans-for-the-future',1,'']]],
+  ['future_3',['Plans for the future',['../index.html#plans-for-the-future',1,'']]]
 ];

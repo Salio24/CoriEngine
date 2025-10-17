@@ -120,6 +120,7 @@ Public Types</h2></td></tr>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ad54a7f43253539a16a7f84a203c08317" id="r_ad54a7f43253539a16a7f84a203c08317"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad54a7f43253539a16a7f84a203c08317">EnableVirtualTerminalProcessing</a> ()</td></tr>
 <tr class="memitem:ad5aa72017ebaac8fc14bf673492b5efb" id="r_ad5aa72017ebaac8fc14bf673492b5efb"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad5aa72017ebaac8fc14bf673492b5efb">Init</a> (bool async, bool fileWrite)</td></tr>
+<tr class="memitem:a7e782f29b9eebd80d6a801e80d074318" id="r_a7e782f29b9eebd80d6a801e80d074318"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7e782f29b9eebd80d6a801e80d074318">GetStatus</a> ()</td></tr>
 <tr class="memitem:a6fde89b5ed00a6e37cbb808a4206c7ad" id="r_a6fde89b5ed00a6e37cbb808a4206c7ad"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; spdlog::logger &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6fde89b5ed00a6e37cbb808a4206c7ad">GetCoreLogger</a> ()</td></tr>
 <tr class="memitem:a4d84ca33d5d85a4bc2525ae6d6c01dad" id="r_a4d84ca33d5d85a4bc2525ae6d6c01dad"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; spdlog::logger &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4d84ca33d5d85a4bc2525ae6d6c01dad">GetClientLogger</a> ()</td></tr>
 <tr class="memitem:aaa24afcaa708100672fd07020866f071" id="r_aaa24afcaa708100672fd07020866f071"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaa24afcaa708100672fd07020866f071">SetCoreLogLevel</a> (<a class="el" href="#a0433e103adbeb9b1521b08af4a9d3b16">LogLevel</a> level)</td></tr>
@@ -268,7 +269,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00160">160</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00181">181</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -297,7 +298,7 @@ Static Public Member Functions</h2></td></tr>
 
 <p>Clears the client tag filter, all tags that were disabled become enabled again as a result. </p>
 
-<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00223">223</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00230">230</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>
@@ -326,7 +327,7 @@ Static Public Member Functions</h2></td></tr>
 
 <p>Clears the core tag filter, all tags that were disabled become enabled again as a result. </p>
 
-<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00179">179</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00186">186</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>
@@ -359,7 +360,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00719">719</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00740">740</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -397,7 +398,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00451">451</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00472">472</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -430,7 +431,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00773">773</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00794">794</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -468,7 +469,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00532">532</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00553">553</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -501,7 +502,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00791">791</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00812">812</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -539,7 +540,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00559">559</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00580">580</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -572,7 +573,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00737">737</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00758">758</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -610,7 +611,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00478">478</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00499">499</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -643,7 +644,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00701">701</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00722">722</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -681,7 +682,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00424">424</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00445">445</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -714,7 +715,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00755">755</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00776">776</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -752,7 +753,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00505">505</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00526">526</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -790,7 +791,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00151">151</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00172">172</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -823,7 +824,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00607">607</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00628">628</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -861,7 +862,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00286">286</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00307">307</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -894,7 +895,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00663">663</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00684">684</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -932,7 +933,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00368">368</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00389">389</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -965,7 +966,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00681">681</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00702">702</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -1003,7 +1004,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00395">395</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00416">416</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -1036,7 +1037,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00626">626</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00647">647</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -1074,7 +1075,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00313">313</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00334">334</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -1107,7 +1108,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00588">588</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00609">609</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -1145,7 +1146,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00259">259</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00280">280</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -1178,7 +1179,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00645">645</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00666">666</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -1216,7 +1217,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00341">341</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00362">362</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -1251,7 +1252,7 @@ template&lt;typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00204">204</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00211">211</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>
@@ -1286,7 +1287,7 @@ template&lt;typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00209">209</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00216">216</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>
@@ -1321,7 +1322,7 @@ template&lt;typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00162">162</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00169">169</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>
@@ -1356,7 +1357,7 @@ template&lt;typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00167">167</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00174">174</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>
@@ -1392,7 +1393,7 @@ template&lt;typename... Args&gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>All client tags are enabled by default, you only need to enable a tag if you disabled it earlier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00192">192</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00199">199</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>
@@ -1428,7 +1429,7 @@ template&lt;typename... Args&gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>All client tags are enabled by default, you only need to enable a tag if you disabled it earlier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00197">197</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00204">204</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>
@@ -1464,7 +1465,7 @@ template&lt;typename... Args&gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>All core tags are enabled by default, you only need to enable a tag if you disabled it earlier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00150">150</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00157">157</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>
@@ -1500,7 +1501,7 @@ template&lt;typename... Args&gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>All core tags are enabled by default, you only need to enable a tag if you disabled it earlier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00155">155</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00162">162</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>
@@ -1527,7 +1528,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00021">21</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00023">23</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>
@@ -1557,7 +1558,7 @@ template&lt;typename... Args&gt; </div>
 <p>Gies a list of all currently disabled client tags. </p>
 <dl class="section return"><dt>Returns</dt><dd>Vector with all disabled client tags. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00229">229</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00236">236</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>
@@ -1584,7 +1585,7 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00145">145</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00166">166</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -1614,7 +1615,7 @@ template&lt;typename... Args&gt; </div>
 <p>Gies a list of all currently disabled core tags. </p>
 <dl class="section return"><dt>Returns</dt><dd>Vector with all disabled core tags. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00185">185</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00192">192</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>
@@ -1641,7 +1642,34 @@ template&lt;typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00144">144</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00165">165</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a7e782f29b9eebd80d6a801e80d074318" name="a7e782f29b9eebd80d6a801e80d074318"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e782f29b9eebd80d6a801e80d074318">&#9670;&#160;</a></span>GetStatus()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Cori::Logger::GetStatus </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00095">95</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>
@@ -1679,7 +1707,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00156">156</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00177">177</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 
 </div>
 </div>
@@ -1710,7 +1738,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00041">41</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00043">43</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>
@@ -1746,7 +1774,7 @@ template&lt;typename T&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if enabled, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00218">218</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00225">225</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>
@@ -1782,7 +1810,7 @@ template&lt;typename T&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if enabled, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00174">174</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00181">181</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>
@@ -1809,7 +1837,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00809">809</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8hpp_source.html#l00830">830</a> of file <a class="el" href="Logger_8hpp_source.html">Logger.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -1848,7 +1876,7 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00092">92</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00099">99</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>
@@ -1875,7 +1903,7 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00121">121</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Logger_8cpp_source.html#l00128">128</a> of file <a class="el" href="Logger_8cpp_source.html">Logger.cpp</a>.</p>
 
 </div>
 </div>

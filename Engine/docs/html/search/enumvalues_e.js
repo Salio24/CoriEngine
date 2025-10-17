@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['screen_5fspace_0',['SCREEN_SPACE',['../classCori_1_1Graphics_1_1Renderer2D.html#a258957813e5c0269a5f700abcdb435b8ade2364e7ac2eb0c4bf36536ea79d5c85',1,'Cori::Graphics::Renderer2D']]],
-  ['semi_5ftransparent_1',['SEMI_TRANSPARENT',['../classCori_1_1Graphics_1_1Renderer2D.html#a8d759d8aeba063decaf91583a7de2f73a54ec620c11e607ac9a191f02cc3b7432',1,'Cori::Graphics::Renderer2D']]],
-  ['sensorbit_2',['SensorBit',['../namespaceCori_1_1Physics.html#a8047a4c99b5cdee7471cf1381a812e55a9678882043a597331a194f1e1b317d09',1,'Cori::Physics']]],
-  ['static_3',['STATIC',['../namespaceCori_1_1Graphics_1_1Internal.html#a9be0c279edd36adc6bc3dfa49eff5f8dafe6f99ef1ec99efbdc19a9786cf1facc',1,'Cori::Graphics::Internal']]],
-  ['staticbit_4',['StaticBit',['../namespaceCori_1_1Physics.html#a8047a4c99b5cdee7471cf1381a812e55a80c04c665f6c0be5f959e9ffb3d18785',1,'Cori::Physics']]]
+  ['uint_0',['UInt',['../namespaceCori_1_1Graphics.html#a6ce448ab7018a509762af1db6ad63232a0b1291eded63143ac04709711274785a',1,'Cori::Graphics']]],
+  ['uint2_1',['UInt2',['../namespaceCori_1_1Graphics.html#a6ce448ab7018a509762af1db6ad63232a003b50e47c23c2f841dd2b21452f7ec4',1,'Cori::Graphics']]],
+  ['uint3_2',['UInt3',['../namespaceCori_1_1Graphics.html#a6ce448ab7018a509762af1db6ad63232a424aaa556a2950e0b98713136b7e6439',1,'Cori::Graphics']]],
+  ['uint4_3',['UInt4',['../namespaceCori_1_1Graphics.html#a6ce448ab7018a509762af1db6ad63232a146988b242dbb9ed1e323e309789115a',1,'Cori::Graphics']]],
+  ['unspecified_4',['UNSPECIFIED',['../classCori_1_1Graphics_1_1Renderer2D.html#a258957813e5c0269a5f700abcdb435b8ac0eb92c00314fb82ef2f90d3430fae77',1,'Cori::Graphics::Renderer2D::UNSPECIFIED'],['../namespaceCori.html#a115b3da1fdbb404148ae31984a492833a1c04cc3823d476c3017238679a0fdf52',1,'Cori::UNSPECIFIED']]]
 ];

@@ -17,7 +17,7 @@ namespace Cori {
 				return std::string("MouseMovedEvent: (") + std::to_string(m_MouseX) + std::string(", ") + std::to_string(m_MouseY) + std::string(")");
 			}
 
-			EVENT_CLASS_TYPE(MouseMoved)
+			EVENT_CLASS_TYPE(MouseMovedEvent)
 			EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 		private:
 			int32_t m_MouseX{ 0 };
@@ -35,7 +35,7 @@ namespace Cori {
 			std::string ToString() const override {
 				return std::string("MouseScrolledEvent: (") + std::to_string(m_xDirection) + std::string(", ") + std::to_string(m_yDirection) + std::string(")");
 			}
-			EVENT_CLASS_TYPE(MouseScrolled)
+			EVENT_CLASS_TYPE(MouseScrolledEvent)
 			EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 		private:
 			int16_t m_xDirection{ 0 };
@@ -61,7 +61,7 @@ namespace Cori {
 			std::string ToString() const override {
 				return std::string("MouseButtonPressedEvent: ") + CoriGetKeyName(m_Button);
 			}
-			EVENT_CLASS_TYPE(MouseButtonPressed)
+			EVENT_CLASS_TYPE(MouseButtonEvent)
 		};
 
 		class MouseButtonReleasedEvent final : public MouseButtonEvent {
@@ -73,7 +73,7 @@ namespace Cori {
 				return std::string("MouseButtonReleasedEvent: ") + CoriGetKeyName(m_Button);
 
 			}
-			EVENT_CLASS_TYPE(MouseButtonReleased)
+			EVENT_CLASS_TYPE(MouseButtonReleasedEvent)
 		};
 	}
 }

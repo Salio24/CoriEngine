@@ -1,8 +1,10 @@
 <map id="Cori::Graphics::SpriteAtlas::Create" name="Cori::Graphics::SpriteAtlas::Create">
 <area shape="rect" id="Node000001" title="Creates a SpriteAtlas." alt="" coords="5,40,197,85"/>
-<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="51,40,49,30,58,21,75,15,101,13,130,16,147,22,145,27,128,21,101,19,76,21,60,25,54,31,56,39"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Image.html#a8a1e6ccfa0bed29acbb6f2d1136398b5" title="Creates an Image from the picture at the specified path." alt="" coords="286,5,448,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,47,270,38,271,43,197,53"/>
-<area shape="rect" id="Node000003" href="$structCori_1_1FileSystem_1_1Internal_1_1PathDefines.html#a764405f16de7bfaa989d3cbc2e9b0279" title=" " alt="" coords="245,75,489,119"/>
-<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="197,72,230,76,229,82,197,77"/>
+<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="53,40,51,30,60,21,76,15,101,13,128,16,145,22,143,27,127,21,101,19,77,21,62,25,56,31,58,39"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Image.html#a8a1e6ccfa0bed29acbb6f2d1136398b5" title="Creates an Image from the picture at the specified path." alt="" coords="274,5,436,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,47,258,38,259,43,198,52"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1FileSystem_1_1PathManager.html#a70c92136e32723b75a6a44cbbf8bdec7" title="Retries the full aliased path defined in fsgame.json." alt="" coords="245,75,465,119"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="198,73,229,77,229,82,197,78"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1Logger.html#a7e782f29b9eebd80d6a801e80d074318" title=" " alt="" coords="513,83,684,111"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="465,94,497,94,497,100,465,100"/>
 </map>

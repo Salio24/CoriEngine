@@ -7,15 +7,30 @@ namespace Cori {
 		std::shared_ptr<Texture2D> Texture2D::Create(const std::shared_ptr<Image>& image) {
 			image->FlipVertically();
 			const Params params { .m_HasSemiTransparency = image->HasSemiTransparency() };
-			std::shared_ptr<Texture2D> texture = Core::Factory<Texture2D, GraphicsAPIs, const void*, const uint32_t, const uint32_t, const Params&>::CreateShared(Core::Window::GetCurrentAPI(), image->GetPixelData(), image->GetWidth(), image->GetHeight(), params);
-			CORI_CORE_ASSERT(texture, "Failed to create Texture2D for API: {}. Check registrations and API validity.", APIEnumToName(Core::Window::GetCurrentAPI()));
-			return texture;
+			return Create(image->GetPixelData(), image->GetWidth(), image->GetHeight(), params);
 		}
 
 		std::shared_ptr<Texture2D> Texture2D::Create(const void* pixelData, const uint32_t width, const uint32_t height, const Params& params) {
-			std::shared_ptr<Texture2D> texture = Core::Factory<Texture2D, GraphicsAPIs, const void*, const uint32_t, const uint32_t, const Params&>::CreateShared(Core::Window::GetCurrentAPI(), pixelData, width, height, params);
-			CORI_CORE_ASSERT(texture, "Failed to create Texture2D for API: {}. Check registrations and API validity.", APIEnumToName(Core::Window::GetCurrentAPI()));
-			return texture;
+			switch (Core::Window::GetCurrentAPI()) {
+			case GraphicsAPIs::OpenGL:
+				{
+					auto texture = std::make_shared<Internal::OpenGLTexture2D>();
+					texture->Upload(pixelData, width, height, params);
+					CORI_CORE_ASSERT(texture->GetStatus() == AssetStatus::READY, "Failed to create Texture2D for API: {}. Check registrations and API validity.", APIEnumToName(Core::Window::GetCurrentAPI()));
+					return texture;
+					break;
+				}
+			case GraphicsAPIs::Vulkan:
+				{
+					CORI_CORE_ASSERT(false, "Unsupported Graphics API.");
+				}
+			case GraphicsAPIs::None:
+				{
+					break;
+				}
+			}
+
+			return nullptr;
 		}
 
 		std::shared_ptr<Texture2D> Texture2D::Create(const Descriptor& descriptor) {

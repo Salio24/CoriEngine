@@ -1,7 +1,7 @@
 <map id="Cori::Graphics::Internal::OpenGLVertexArray::AddVertexBuffer" name="Cori::Graphics::Internal::OpenGLVertexArray::AddVertexBuffer">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,32,238,93"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Internal_1_1VBLayout.html#a4f40a1be64df9581c0f3346628ae10f9" title=" " alt="" coords="314,5,484,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="238,45,299,37,299,43,239,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1VBLayout.html#adf5aed2e016a5e269d082227e6886a50" title=" " alt="" coords="308,5,490,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="238,45,293,38,293,44,239,50"/>
 <area shape="rect" id="Node000003" href="$namespaceCori_1_1Graphics_1_1Internal.html#a5dee56182197b68295f08e8563dc2a3d" title=" " alt="" coords="286,75,513,119"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="239,74,271,78,270,84,238,80"/>
 </map>

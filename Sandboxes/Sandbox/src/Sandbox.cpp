@@ -15,17 +15,50 @@ inline const Cori::Audio::Sound::Descriptor Sound2{
 	"Troubadeck 02 Leapfrogs.ogg"
 };
 
+struct Testttt {
+	uint32_t id = 123;
+	float fps = 5;
+	uint32_t accum = 1;
+	float fps10 = 856;
+	uint32_t accum10 = 123;
+	glm::vec2 pos = {125.0f, 85.0f};
+	std::vector<int> floats;
+};
+
+struct TagOne {
+	uint8_t t = 1;
+};
+
+struct TagTwo {
+	uint8_t t = 2;
+};
+
+struct TagThree {
+	uint8_t t = 3;
+};
+
+struct TagFour {
+	uint8_t t = 4;
+};
+
+struct TagFive {
+	uint8_t t = 5;
+};
 
 class ExampleLayer : public Cori::Core::Layer {
 public:
-	ExampleLayer() : Layer("Example") { 
+	ExampleLayer() : Layer("Example") {
 
 
 		Cori::World::SceneManager::CreateScene("Test Scene");
 		BindScene("Test Scene");
-		ActiveScene.GetActiveCamera().CreateOrthoCamera(0, 2560, 0, 1080, -50, 0);
+		ActiveScene.GetActiveCamera().CreateOrthoCamera(0, 2560, 0, 1080, 50);
 		track = Cori::Audio::Track::Create("Test");
 		sound = Cori::AssetManager::Get(Sound1);
+
+		for (int i = 0; i < 100; i++) {
+			inst.floats.emplace_back(i);
+		}
 	}
 
 	~ExampleLayer() {
@@ -37,9 +70,6 @@ public:
 		Cori::Core::EventDispatcher dispatcher(event);
 
 
-		if (!event.IsOfType(Cori::Core::EventType::MouseMoved)) {
-			CORI_TRACE("| Layer: {0} | Event: {1}", this->GetName(), event);
-		}
 	}
 
 	template<typename T>
@@ -49,7 +79,7 @@ public:
 		//CORI_CORE_ASSERT_DEBUG(false, "lol {}", def);
 	}
 
-	virtual void OnImGuiRender(const double deltaTime) override {
+	virtual void OnImGuiRender(Cori::Core::GameTimer& gameTimer) override {
 		ImGui::Begin("Test");
 
 		static int a = 0;
@@ -62,45 +92,79 @@ public:
 			ale = false;
 		}
 
-		if (ImGui::Button("Trace")) {
-			CORI_PROFILE_REQUEST_NEXT_FRAME();
-			ale = true;
+
+		if (ImGui::Button("Save")) {
+			Cori::FileSystem::BinaryFileManager::SaveAggregateStruct(inst, "test/inst.bin", true);
+		}
+
+		if (ImGui::Button("Load")) {
+			auto result = Cori::FileSystem::BinaryFileManager::LoadAggregateStruct<Testttt>("test/inst.bin", true);
+			if (result) {
+				Testttt& loaded = *result;
+
+				CORI_INFO("{}", loaded.id);
+				CORI_INFO("{}", loaded.fps);
+				CORI_INFO("{}", loaded.accum);
+				CORI_INFO("{}", loaded.fps10);
+				CORI_INFO("{}", loaded.accum10);
+				CORI_INFO("{} {}", loaded.pos.x, loaded.pos.y);
+
+				std::string fts;
+
+				for (const auto& ft : loaded.floats) {
+					fts.append(std::to_string(ft));
+				}
+
+				CORI_INFO("{}", fts);
+			}
+			else {
+				CORI_ERROR("Failed to load aggregate struct, {}", result.error().what());
+			}
+		}
+
+		if (ImGui::Button("Create Ents")) {
+			auto e = ActiveScene.CreateEntity<TestTag>("135");
+			e.AddComponent<TagOne>();
+			e.AddComponent<TagThree>();
+			e.AddComponent<TagFive>();
+
+
+			auto ee = ActiveScene.CreateEntity<TestTag>("1235");
+			ee.AddComponent<TagOne>();
+			ee.AddComponent<TagThree>();
+			ee.AddComponent<TagFive>();
+			ee.AddComponent<TagTwo>();
 		}
 
 
+		if (ImGui::Button("Stat view")) {
+			auto v = ActiveScene.StaticView<TagOne, TagThree>(Cori::World::Exclude<TagTwo>());
+			for (auto e : v) {
+				CORI_DEBUG("{}", e.GetName());
+				auto [one, three] = v.Get<TagOne, TagThree>(e);
+				CORI_DEBUG("{}, {}", one.t, three.t);
+			}
+		}
 
-		if (ImGui::Button("Draw hier")) {
-			auto player = ActiveScene.GetEntityFromCache("player"_hs32);
-			if (player) {
-				player.value().PrintHierarchy();
-			} else {
-				player.error().ignore();
+		if (ImGui::Button("Dyn view")) {
+			Cori::World::DynamicEntityView v = ActiveScene.DynamicView();
+			v.With<TagOne>().With<TagThree>();
+			for (auto e : v) {
+				CORI_DEBUG("{}", e.GetName());
+			}
+			v.With<TagTwo>();
+			for (auto e : v) {
+				CORI_INFO("{}", e.GetName());
 			}
 		}
 
 
-
-		if (ImGui::Button("Play")) {
-			track->Start();
+		if (ImGui::Button("Tag f")) {
+			auto e = ActiveScene.FindEntity<TestTag>("135");
+			if (e) {
+				CORI_WARN("{}", e->GetName());
+			}
 		}
-		if (ImGui::Button("Test1")) {
-			track->SetSound(sound);
-		}
-
-		if (ImGui::Button("Test2")) {
-			track->SetSound(Cori::AssetManager::Get(Sound2));
-		}
-
-		if (ImGui::Button("Stop")) {
-			track->Stop(300);
-		}
-
-		if (ImGui::Button("callback")) {
-
-
-		}
-
-
 
 
 
@@ -115,11 +179,11 @@ public:
 		Cori::ImGuiPresets::ScreenModeAndResolutionDropdowns();
 	}
 
-	void OnUpdate(const Cori::Core::GameTimer& gameTimer) override {
+	void OnUpdate(Cori::Core::GameTimer& gameTimer) override {
 		accum++;
 	}
 
-	virtual void OnTickUpdate(const float timeStep) override {
+	virtual void OnTickUpdate(Cori::Core::GameTimer& gameTimer) override {
 		static uint8_t tic = 0;
 		tic++;
 		static uint8_t tic10 = 0;
@@ -146,6 +210,7 @@ public:
 	uint32_t accum{ 0 };
 	uint32_t accum10{ 0 };
 
+	Testttt inst;
 };
 
 class Sandbox : public Cori::Core::Application {

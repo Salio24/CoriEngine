@@ -1,0 +1,7 @@
+<map id="Cori::Graphics::RenderingContext::Create" name="Cori::Graphics::RenderingContext::Create">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,28,192,72"/>
+<area shape="rect" id="Node000002" href="$namespaceCori_1_1Graphics.html#ac10cdf39fd3a5b64fb82ad5cd57d4668" title=" " alt="" coords="240,5,471,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="192,36,224,32,224,38,193,41"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1Window.html#a675130786b522717fb797d28166b1da5" title="Returns the graphical API used by this window." alt="" coords="283,57,428,102"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="193,58,268,67,267,72,192,63"/>
+</map>

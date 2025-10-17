@@ -8,7 +8,7 @@ namespace Cori {
 		/**
 		 * @brief Checks T can be considered a descriptor.
 		 */
-		template <typename T>
+		template<typename T>
 		concept IsDescriptor = requires(const T& a, const T& b) {
 			{ a.GetRuntimeID() } -> std::same_as<uint32_t>;
 			{ a.m_Name } -> std::convertible_to<std::string>;
@@ -20,11 +20,19 @@ namespace Cori {
 		/**
 		 * @brief Checks if AssetType of Descriptor can be loaded by the AssetManager.
 		 */
-		template <typename Descriptor>
+		template<typename Descriptor>
 		concept CanBeLoaded = IsDescriptor<Descriptor> && requires(const Descriptor& d) {
 			{ Descriptor::AssetType::Create(d) } -> std::same_as<std::shared_ptr<typename Descriptor::AssetType>>;
 		};
+
+		/**
+		 * @brief Checks if Asset is an asset type that AssetManager can work with.
+		 */
+		template<typename Asset>
+		concept IsAsset = CanBeLoaded<typename Asset::Descriptor>;
 	}
+
+	//PS: This is ass, need to move to using handles + uuid/metadata + hub-and-spoke model. And this will allow async loading.
 
 	/**
 	 * @brief Used when you want to manually control the asset lifetime, loading, preloading, unloading.
@@ -32,11 +40,13 @@ namespace Cori {
 	 * \n For example: Fonts, AnimationPacks, Sounds, etc. Because all asset lifetimes in Cori are managed by a shared pointers,
 	 * if not for the AssetManager these asset would be unloaded as soon as some object is done with them and refcount dropped to 0,
 	 * AssetManger is a convenient place to keep these objects loaded and alive.
-	 * \n For loading and later reviving the asset AssetManger uses descriptors that describe how to load a particular asset. "TODO: link here the wiki page about descriptors"
+	 * \n For loading and later reviving the asset AssetManger uses descriptors that describe how to load a particular asset.
 	 */
 	class AssetManager {
 		struct Cache {
 			std::unordered_map<std::type_index, std::any> m_Caches;
+			std::mutex m_CacheMutex;
+			std::unordered_map<std::type_index, std::any> m_Placeholders;
 		};
 
 	public:
@@ -49,6 +59,7 @@ namespace Cori {
 		template <Internal::CanBeLoaded Descriptor>
 		static std::shared_ptr<typename Descriptor::AssetType> Get(const Descriptor& descriptor) {
 			CORI_PROFILE_FUNCTION();
+			std::lock_guard lock(s_Cache->m_CacheMutex);
 
 			auto& cache = GetCache<typename Descriptor::AssetType>();
 			if (const auto it = cache.find(descriptor.GetRuntimeID()); it != cache.end()) {
@@ -71,6 +82,7 @@ namespace Cori {
 		 */
 		template <Internal::CanBeLoaded Descriptor>
 		static void Preload(const std::initializer_list<Descriptor> descriptors) {
+
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::AssetManager::Self }, "Preloading {} <{}(s/es)>", descriptors.size(), CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType));
 			for (const auto& descriptor : descriptors) {
 				Get(descriptor);
@@ -86,6 +98,8 @@ namespace Cori {
 		 */
 		template <Internal::IsDescriptor Descriptor>
 		static void Unload(const std::initializer_list<Descriptor>& descriptors) {
+			std::lock_guard lock(s_Cache->m_CacheMutex);
+
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::AssetManager::Self }, "Unloading {} <{}(s/es)>", descriptors.size(), CORI_CLEAN_TYPE_NAME(typename Descriptor::AssetType));
 			for (const auto& descriptor : descriptors) {
 				auto& cache = GetCache<typename Descriptor::AssetType>();
@@ -108,12 +122,56 @@ namespace Cori {
 		}
 
 		/**
+		 * @brief This allows you to register a placeholder for a specific asset that you can later retrieve.
+		 * @tparam AssetType Type of asset to register placeholder for.
+		 * @param placeholderInstance Asset instance that we will consider a placeholder.
+		 */
+		template<Internal::IsAsset AssetType>
+		static void RegisterPlaceholder(const std::shared_ptr<AssetType>& placeholderInstance) {
+			CORI_CORE_INFO_TAGGED({ Logger::Tags::AssetManager::Self }, "Registering placeholder for type <{}>", CORI_CLEAN_TYPE_NAME(AssetType));
+			if (!s_Cache->m_Placeholders.contains(std::type_index(typeid(AssetType)))) {
+				s_Cache->m_Placeholders[std::type_index(typeid(AssetType))] = placeholderInstance;
+				CORI_CORE_INFO_TAGGED({ Logger::Tags::AssetManager::Self }, "Registered placeholder for type <{}>", CORI_CLEAN_TYPE_NAME(AssetType));
+				return;
+			}
+
+			CORI_CORE_WARN_TAGGED({ Logger::Tags::AssetManager::Self }, "Placeholder for type <{}> already exists.", CORI_CLEAN_TYPE_NAME(AssetType));
+		}
+
+		/**
+		 * @brief Retrieves the instance of placeholder for a specified asset type.
+		 * @tparam AssetType Asset type to retrieve a placeholder for.
+		 * @return Asset placeholder instnace of success, nullptr if placeholder for this asset wasn't registered.
+		 */
+		template<Internal::IsAsset AssetType>
+		static std::shared_ptr<AssetType> GetPlaceholder() {
+			if (s_Cache->m_Placeholders.contains(std::type_index(typeid(AssetType)))) {
+				return std::any_cast<std::shared_ptr<AssetType>>(s_Cache->m_Placeholders[std::type_index(typeid(AssetType))]);
+			}
+
+			CORI_CORE_ERROR_TAGGED({ Logger::Tags::AssetManager::Self }, "Placeholder for type <{}> doesnt exists, returned nullptr.", CORI_CLEAN_TYPE_NAME(AssetType));
+			return nullptr;
+		}
+
+		/**
+		 * @brief Checks if an asset type have placeholder registered.
+		 * @tparam AssetType Asset type to check the existence of placeholder for.
+		 * @return True if there is a placeholder registered, false otherwise.
+		 */
+		template<Internal::IsAsset AssetType>
+		static bool HasPlaceholder() {
+			return s_Cache->m_Placeholders.contains(std::type_index(typeid(AssetType)));
+		}
+
+		/**
 		 * @brief Clears cache for o specified asset type.
 		 * @tparam AssetType The type os asset that we want to clear cache for.
 		 * @note If an asset is still used somewhere (ref count > 1) it will be removed from cache, but freed only when the ref count drops to 0.
 		 */
 		template <typename AssetType>
 		static void ClearCache() {
+			std::lock_guard lock(s_Cache->m_CacheMutex);
+
 			if (s_Cache->m_Caches.contains(std::type_index(typeid(AssetType)))) {
 				GetCache<AssetType>().clear();
 				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::AssetManager::Self }, "Cleared cache for type <{}>", CORI_CLEAN_TYPE_NAME(AssetType));
@@ -123,6 +181,7 @@ namespace Cori {
 		friend Core::Application;
 		static void Init();
 		static void Shutdown();
+		static void RegisterPlaceholders();
 
 		template <typename AssetType>
 		static std::unordered_map<uint32_t, std::shared_ptr<AssetType>>& GetCache() {

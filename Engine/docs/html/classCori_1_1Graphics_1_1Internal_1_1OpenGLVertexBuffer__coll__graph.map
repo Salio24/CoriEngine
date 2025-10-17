@@ -1,9 +1,7 @@
 <map id="Cori::Graphics::Internal::OpenGLVertexBuffer" name="Cori::Graphics::Internal::OpenGLVertexBuffer">
-<area shape="rect" id="Node000001" title=" " alt="" coords="331,75,501,119"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Internal_1_1VertexBuffer.html" title=" " alt="" coords="59,5,229,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="245,50,283,60,331,72,329,77,282,65,243,55"/>
-<area shape="rect" id="Node000003" href="$classCori_1_1Profiling_1_1Trackable.html" title=" " alt="" coords="6,75,282,119"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="298,94,330,94,330,100,298,100"/>
-<area shape="rect" id="Node000004" href="$classCori_1_1Core_1_1RegisterInFactory.html" title=" " alt="" coords="5,144,283,205"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="269,136,334,117,336,122,270,141"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="329,28,499,72"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1VertexBuffer.html" title=" " alt="" coords="41,5,245,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="260,30,329,38,328,43,260,35"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Profiling_1_1Trackable.html" title=" " alt="" coords="5,57,281,102"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="296,60,328,56,328,62,296,65"/>
 </map>

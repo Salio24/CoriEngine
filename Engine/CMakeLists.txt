@@ -1,24 +1,15 @@
 cmake_minimum_required(VERSION 3.28)
 
 project(CoriEngine)
-    # hides all compiler warnings caused by subprojects
-    get_filename_component(CORI_ENGINE_SOURCE_DIR ${PROJECT_SOURCE_DIR} ABSOLUTE)
+    #get_filename_component(CORI_ENGINE_SOURCE_DIR ${PROJECT_SOURCE_DIR} ABSOLUTE)
+    set(CORI_ENGINE_SOURCE_DIR ${PROJECT_SOURCE_DIR})
 
-    #engine assets
-    set(ENGINE_ASSETS_DIR "${CORI_ENGINE_SOURCE_DIR}/enginedata")
-
-    cmake_path(CONVERT "${ENGINE_ASSETS_DIR}" TO_CMAKE_PATH_LIST ENGINEDATA_PATH)
-
-    set(PATH_DEFINES_HEADER_IN "${CORI_ENGINE_SOURCE_DIR}/cmake/PathDefines.hpp.in")
-    set(PATH_DEFINES_HEADER_OUT "${CMAKE_CURRENT_BINARY_DIR}/generated/PathDefinesGenerated.hpp")
-
-    configure_file(${PATH_DEFINES_HEADER_IN} ${PATH_DEFINES_HEADER_OUT})
-
+    # hides all compiler warnings caused by thirdparty libs
     set(HIDE_DEPENDENCY_WARNINGS ON CACHE BOOL "")
     
     set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "") 
 
-    #jinja2
+    #python
     find_package(Python 3.9 REQUIRED COMPONENTS Interpreter)
 
     # SDL3
@@ -131,7 +122,15 @@ project(CoriEngine)
             -P ${CORI_ENGINE_SOURCE_DIR}/cmake/patch-freetype.cmake
     )
 
+    option(FT_DISABLE_ZLIB "DO NOT TOUCH" ON)
+    option(FT_DISABLE_BZIP2 "DO NOT TOUCH" ON)
+    option(FT_DISABLE_PNG "DO NOT TOUCH" ON)
+    option(FT_DISABLE_HARFBUZZ "DO NOT TOUCH" ON)
+    option(FT_DISABLE_BROTLI "DO NOT TOUCH" ON)
+
     FetchContent_MakeAvailable(freetype)
+
+    add_library(Freetype::Freetype ALIAS freetype)
 
     #utfcpp
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/utfcpp EXCLUDE_FROM_ALL)
@@ -139,16 +138,25 @@ project(CoriEngine)
     #msdf-atlas-gen
     set(MSDF_ATLAS_BUILD_STANDALONE OFF CACHE BOOL "")
     set(MSDF_ATLAS_USE_VCPKG OFF CACHE BOOL "")
-    set(MSDF_ATLAS_INSTALL ON CACHE BOOL "")
+    set(MSDF_ATLAS_INSTALL OFF CACHE BOOL "")
     set(MSDF_ATLAS_USE_SKIA OFF CACHE BOOL "")
-    set(MSDFGEN_DISABLE_PNG OFF CACHE BOOL "")
+    set(MSDFGEN_DISABLE_PNG ON CACHE BOOL "")
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/msdf-atlas-gen EXCLUDE_FROM_ALL)
 
     #tracy
-    set(TRACY_STATIC ON CACHE BOOL "")
-    set(TRACY_ENABLE ON CACHE BOOL "")
-    set(TRACY_ON_DEMAND ON CACHE BOOL "")
-    add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/tracy EXCLUDE_FROM_ALL)
+    if (CORI_ENABLE_TRACY_PROFILER)
+        set(TRACY_STATIC ON CACHE BOOL "")
+        set(TRACY_ENABLE ON CACHE BOOL "")
+        set(TRACY_ON_DEMAND ON CACHE BOOL "")
+        add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/tracy EXCLUDE_FROM_ALL)
+    endif ()
+
+    #ExprTK
+    add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/ExprTK EXCLUDE_FROM_ALL)
+
+    #boost/pfr
+    set(BUILD_TESTING OFF)
+    add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/pfr EXCLUDE_FROM_ALL)
 
 
 # project's binary setup vvv
@@ -205,7 +213,6 @@ project(CoriEngine)
 
     target_include_directories(${ENGINE_LIBRARY_NAME} PRIVATE
             ${CORI_HEADERS_DIR}
-            ${CMAKE_CURRENT_BINARY_DIR}/generated
     )
 
     # pch
@@ -246,7 +253,11 @@ project(CoriEngine)
     #target_link_libraries()
 
     # should be public
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite Tracy::TracyClient)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite exprtk boost_pfr)
+
+    if (CORI_ENABLE_TRACY_PROFILER)
+        target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC Tracy::TracyClient)
+    endif ()
 
     # can be private 
     target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static msdf-atlas-gen glad_gl_core_46)

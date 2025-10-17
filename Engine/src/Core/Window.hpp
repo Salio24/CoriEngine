@@ -24,11 +24,11 @@ namespace Cori {
 			ScreenMode() = default;
 
 			ScreenMode(const int32_t width, const int32_t height, const float refreshRate, const uint32_t modeIndex)
-				: m_Width(width), m_Height(height), m_RefreshRate(refreshRate), m_ModeIndex(modeIndex) {
+				: m_Width(width), m_Height(height), m_RefreshRate(refreshRate), m_SDLModeIndex(modeIndex) {
 				m_ModeName = std::to_string(m_Width) + "x" + std::to_string(m_Height) + " " + std::to_string(m_RefreshRate) + " Hz";
 			}
 
-			uint32_t m_ModeIndex{ 1000 }; //impossible initial number
+			uint32_t m_SDLModeIndex{ 1000 }; //impossible initial number
 		};
 
 		enum class WindowMode {
@@ -76,22 +76,28 @@ namespace Cori {
 
 			/**
 			 * @brief Retrieves a list of all available ScreenMode.
-			 * @return A vector containing all available ScreenMode.
+			 * @return A const reference to the vector containing all available ScreenMode.
 			 */
-			[[nodiscard]] std::vector<ScreenMode> GetScreenModes() const;
+			[[nodiscard]] const std::vector<ScreenMode>& GetScreenModes() const;
 
 			/**
 			 * @brief Changes the current ScreenMode.
-			 * @param mode ScreenMode to change to.
+			 * @param modeIndex Index of the screen mode in the screen modes vector (obtainable via GetScreenModes).
 			 * @return Expected object with void on success or CoriError<> on failure.
 			 */
-			std::expected<void, CoriError<>> SetScreenMode(const ScreenMode& mode);
+			std::expected<void, CoriError<>> SetScreenMode(const uint32_t modeIndex);
 
 			/**
 			 * @brief Gets the current WindowMode;
 			 * @return Enumerator of the current WindowMode.
 			 */
 			[[nodiscard]] WindowMode GetWindowMode() const;
+
+			/**
+			 * @brief Retrieves the current screen mode index.
+			 * @return Index of the current screen mode in the screen modes vector (obtainable via GetScreenModes).
+			 */
+			[[nodiscard]] uint32_t GetCurrentScreenMode() const;
 
 			/**
 			 * @brief Changes the current WindowMode.
@@ -105,6 +111,15 @@ namespace Cori {
 			friend Graphics::Internal::OpenGLContext;
 			[[nodiscard]] void* GetNativeContext() const;
 			[[nodiscard]] void* GetNativeWindow() const;
+
+			struct WindowSaveData {
+				int32_t m_Width{};
+				int32_t m_Height{};
+				float m_RefreshRate{};
+				WindowMode m_WindowMode{};
+				uint32_t m_SDLModeIndex{};
+				uint32_t m_ModeIndex{};
+			};
 
 			friend class Application;
 			[[nodiscard]] static std::unique_ptr<Window> Create(std::string name, const bool vsync = false);

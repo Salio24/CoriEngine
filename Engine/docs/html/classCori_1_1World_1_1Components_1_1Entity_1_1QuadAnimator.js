@@ -1,13 +1,13 @@
 var classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator =
 [
-    [ "QuadAnimator", "classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#acc552db35e3fc2534ae34256d0593343", null ],
+    [ "StopCallbackFn", "classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#ac0d42275c2f80ff5f868927d14a913a9", null ],
+    [ "QuadAnimator", "classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#a22277dc749682939b2c4faf570f62fb2", null ],
     [ "~QuadAnimator", "classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#a72c6d000abc75a44d4424e313973d66c", null ],
-    [ "GetSizeScale", "classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#af89dfa57ce70dad5a91c91c90e54cfa5", null ],
-    [ "GetTicksElapsed", "classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#a34cedd33dfdc9e8d38951d5d4c58d9f4", null ],
+    [ "GetSizeScale", "classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#a30c95d62dc555f565ffb35da8df3233c", null ],
     [ "OnTickUpdate", "classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#ab6714a3d796704638f7ad394d00cf31c", null ],
-    [ "Play", "classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#a05300ec3effbbd78458ae808ee97c910", null ],
-    [ "SetNextTickCallback", "classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#a906b0eb45843aeb09444ef1633c92978", null ],
-    [ "SetSizeScale", "classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#ab5aa5784aa4ef5bd05fa97cf71d39770", null ],
-    [ "SetStopCallback", "classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#a084ee87b35849d4f8988c3e536273dbc", null ],
+    [ "Play", "classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#af689d043f4e794006318b01a4f2b5351", null ],
+    [ "SetEngineStopCallback", "classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#aed1ea0046fb09bdbcf2165eeb7ab93f9", null ],
+    [ "SetSizeScale", "classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#afd394534d94615ef59d547f3a086d491", null ],
+    [ "SetStopCallback", "classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#a123b95f8c840b1eb1352e717cbcdd7e1", null ],
     [ "Stop", "classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#a36b3901d92e7d6db30f8142c352c3154", null ]
 ];

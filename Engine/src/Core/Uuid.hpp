@@ -30,6 +30,13 @@ namespace Cori {
 				return uuids::to_string(m_ID);
 			}
 
+			[[nodiscard]] std::pair<uint64_t, uint64_t> GetRaw() const {
+				const auto span = m_ID.as_bytes();
+				const uint64_t left = *reinterpret_cast<const uint64_t*>(&span[0]);
+				const uint64_t right = *reinterpret_cast<const uint64_t*>(&span[8]);
+				return std::make_pair(left, right);
+			}
+
 			/**
 			 * @brief Do really i need to explain this?
 			 */

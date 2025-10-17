@@ -1,0 +1,8 @@
+<map id="Cori::World::Systems::Animation::OnTickUpdate" name="Cori::World::Systems::Animation::OnTickUpdate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,201,74"/>
+<area shape="poly" id="edge3_Node000001_Node000001" title=" " alt="" coords="58,29,57,19,65,10,80,5,103,3,128,5,143,12,141,17,127,10,103,8,81,10,68,15,62,21,64,28"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1StaticEntityView.html#ae61621099836e05910d413d34af697e5" title="Retries the components from an entity, both the components and the entity should be in a view,..." alt="" coords="249,29,425,74"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="201,49,233,49,233,54,201,54"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Entity.html#ac9d21daa112e64d4f43f54715aef21b2" title="Gets a raw entt::entity if you need to interact with entt directly." alt="" coords="473,29,612,74"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="426,49,457,49,457,54,426,54"/>
+</map>

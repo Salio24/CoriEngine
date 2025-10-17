@@ -42,7 +42,7 @@ namespace Cori {
 					return false;
 				}
 
-				T* it = std::find(begin(), end(), value);
+				auto it = std::find(begin(), end(), value);
 				if (it == end()) {
 					return false;
 				}
@@ -74,30 +74,30 @@ namespace Cori {
 			iterator end() { return m_Data.begin() + m_Size; }
 			const_iterator cend() const { return m_Data.cbegin() + m_Size; }
 
-			SizeT size() const {
+			[[nodiscard]] SizeT size() const {
 				return m_Size;
 			}
 
-			constexpr SizeT capacity() const {
+			[[nodiscard]] constexpr SizeT capacity() const {
 				return MaxSize;
 			}
 
-			bool empty() const {
+			[[nodiscard]] bool empty() const {
 				return m_Size == 0;
 			}
 
-			bool full() const {
+			[[nodiscard]] bool full() const {
 				return m_Size >= MaxSize;
 			}
 
-			T& operator[](SizeT index) {
+			[[nodiscard]] T& operator[](SizeT index) {
 				return m_Data[index];
 			}
 			const T& operator[](SizeT index) const {
 				return m_Data[index];
 			}
 
-			T& at(SizeT index) {
+			[[nodiscard]] T& at(SizeT index) {
 				if (index >= m_Size) {
 					throw std::out_of_range("PackedArray index out of range");
 				}

@@ -35,7 +35,7 @@ namespace Cori {
 			struct QuadInstance {
 				glm::mat3 m_Transform{ 0.0f };
 				glm::vec2 m_Size{ 0.0f };
-				uint8_t m_Layer{ 0 };
+				uint8_t m_Depth{ 0 };
 				Texture2D* m_Texture{ nullptr };
 				glm::vec4 m_UVs{ 0.0f };
 				glm::vec4 m_TintColor{ 0.0f };
@@ -43,7 +43,7 @@ namespace Cori {
 				QuadInstance() = default;
 
 				QuadInstance(const glm::mat3& transform, const glm::vec2 size, const glm::vec4& tintColor, Texture2D* texture, const glm::vec4& uvs, const uint8_t layer) :
-					m_Transform(transform), m_Size(size), m_Layer(layer), m_Texture(texture), m_UVs(uvs), m_TintColor(tintColor) {}
+					m_Transform(transform), m_Size(size), m_Depth(layer), m_Texture(texture), m_UVs(uvs), m_TintColor(tintColor) {}
 			};
 
 			struct TextInstance {
@@ -74,9 +74,16 @@ namespace Cori {
 				uint32_t CharCount{ 0 };
 			};
 
+			/**
+			 * @brief Defines where to draw the object, in what space.
+			 * @details Basically if WORLD_SPACE is selected it will use the position, rotation, scale applied to orthographic camera,
+			 * and if SCREEN_SPACE it will ignore the camera position, rotation, scale and use the initial projection matrix.
+			 * @note Never use UNSPECIFIED it is the default value and should not be used by the user.
+			 */
 			enum DrawSpace : uint8_t {
 				WORLD_SPACE,
-				SCREEN_SPACE
+				SCREEN_SPACE,
+				UNSPECIFIED
 			};
 
 			/**
@@ -114,6 +121,7 @@ namespace Cori {
 			 * @param position Position defined is the center of the quad.
 			 * @param halfSize Half size of the quad.
 			 * @param color Quad color.
+			 * @note Draws on the depth 255.
 			 */
 			static void SubmitColoredQuad(const DrawSpace space, const glm::vec2 position, const glm::vec2 halfSize, const glm::vec3& color);
 
@@ -181,18 +189,19 @@ namespace Cori {
 
 			// void DrawCircle(...);
 			// void DrawLine(...);
+			static void StartFrame();
+			static void EndFrame();
+
+			static void BeginScene(const World::Components::Scene::Camera& camera);
+			static void EndScene();
 
 		private:
 			friend World::Scene;
 			friend Internal::API;
 
-			static void EndFrame(const World::Components::Scene::Camera& camera);
 			static void SubmitScene(World::Scene* scene);
 			static void Init();
 			static void Shutdown();
-			static void BeginScene(const World::Components::Scene::Camera& camera);
-
-			static void EndScene();
 
 			struct Quad {
 				glm::mat3 m_Transform{ 0.0f };
@@ -226,11 +235,11 @@ namespace Cori {
 				static constexpr uint32_t MaxCharInstanceCount{ 16384 };
 
 				Texture2D* CurrentTexture{nullptr};
-				Internal::VertexArray* CurrentVertexArray{nullptr};
-				Internal::VertexBuffer* CurrentVertexBuffer{nullptr};
-				Internal::IndexBuffer* CurrentIndexBuffer{nullptr};
+				VertexArray* CurrentVertexArray{nullptr};
+				VertexBuffer* CurrentVertexBuffer{nullptr};
+				IndexBuffer* CurrentIndexBuffer{nullptr};
 				ShaderProgram* CurrentShader{nullptr};
-				DrawSpace CurrentDrawSpace;
+				DrawSpace CurrentDrawSpace{ UNSPECIFIED };
 
 				Statistics Stats;
 
@@ -243,9 +252,9 @@ namespace Cori {
 
 				// vvv quad specific
 
-				std::shared_ptr<Internal::VertexArray> QuadInstanceVertexArray;
-				std::shared_ptr<Internal::VertexBuffer> QuadInstanceVertexBuffer;
-				std::shared_ptr<Internal::IndexBuffer> QuadInstanceIndexBuffer;
+				std::shared_ptr<VertexArray> QuadInstanceVertexArray;
+				std::shared_ptr<VertexBuffer> QuadInstanceVertexBuffer;
+				std::shared_ptr<IndexBuffer> QuadInstanceIndexBuffer;
 				std::shared_ptr<ShaderProgram> QuadInstanceShader;
 
 				uint32_t QuadInstanceCount{ 0 };
@@ -264,9 +273,9 @@ namespace Cori {
 
 				// vvv text specific
 
-				std::shared_ptr<Internal::VertexArray> CharInstanceVertexArray;
-				std::shared_ptr<Internal::VertexBuffer> CharInstanceVertexBuffer;
-				std::shared_ptr<Internal::IndexBuffer> CharInstanceIndexBuffer;
+				std::shared_ptr<VertexArray> CharInstanceVertexArray;
+				std::shared_ptr<VertexBuffer> CharInstanceVertexBuffer;
+				std::shared_ptr<IndexBuffer> CharInstanceIndexBuffer;
 				std::shared_ptr<ShaderProgram> CharInstanceShader;
 
 				uint32_t CharInstanceCount{ 0 };
@@ -280,12 +289,31 @@ namespace Cori {
 				std::vector<TextInstance> ScreenSpaceTransparentTextQueue;
 			};
 
+			enum TransparentQueueTypes : uint8_t {
+				WORLD_SPACE_QUAD,
+				SCREEN_SPACE_QUAD,
+				WORLD_SPACE_TEXT,
+				SCREEN_SPACE_TEXT
+			};
+
+			using ElementVariantPtr = std::variant<const QuadInstance*, const TextInstance*>;
+
+			struct ElementView {
+				ElementVariantPtr m_ElementVariant;
+				uint8_t m_Depth;
+				TransparentQueueTypes m_QueueType;
+
+				bool operator>(const ElementView& other) const {
+					return m_Depth > other.m_Depth;
+				}
+			};
+
 			static RendererData* s_Data;
 
 			static void FlushRenderQueues();
 
-			static void BeginInstancedSet();
-			static void EndInstancedSet();
+			static void BeginQuadInstancedSet();
+			static void EndQuadInstancedSet();
 
 			static void BeginCharInstancedSet();
 			static void EndCharInstancedSet(Texture2D* atlas, const glm::mat3& modelMatrix);
@@ -296,15 +324,15 @@ namespace Cori {
 
 			static void SubmitTextToQueue(std::vector<TextInstance>& queue, const TextAlignment alignment, const glm::mat3& transform, const float fontSize, const std::string_view& text, const glm::vec4& color, Font* font, const uint8_t depth, const float limitX, const float lineSpacing, const float kerning);
 
-			static void BeginWorldSpacePass();
+			static bool BeginWorldSpacePass();
 
-			static void BeginScreenSpacePass();
+			static bool BeginScreenSpacePass();
 
 			static void DrawQuadInstanced(const QuadInstance& quad);
 
 			static void DrawTextInstanced(const TextInstance& text);
 
-			static void StartNewInstancedSet();
+			static void StartNewQuadInstancedSet();
 
 			static void FlushOpaqueQueues();
 

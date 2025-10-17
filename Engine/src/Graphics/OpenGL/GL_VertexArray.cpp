@@ -32,10 +32,6 @@ namespace Cori {
 				return sizes[static_cast<GLenum>(type)];
 			}
 
-			bool OpenGLVertexArray::PreCreateHook() {
-				return true;
-			}
-
 			OpenGLVertexArray::OpenGLVertexArray() {
 				glGenVertexArrays(1, &m_ID);
 			}

@@ -1,5 +1,5 @@
 <map id="Cori::Graphics::Font::Descriptor::operator==" name="Cori::Graphics::Font::Descriptor::operator==">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,5,187,50"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Font_1_1Descriptor.html#a7e708f51e2a647d6cc4b04a5aa35247b" title="Constructs a descriptor. It&#39;s recommended to use &quot;inline const&quot; when defining the Descriptor in a nam..." alt="" coords="235,5,406,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Font_1_1Descriptor.html#a7e708f51e2a647d6cc4b04a5aa35247b" title="Constructs a descriptor." alt="" coords="235,5,406,50"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,25,219,25,219,30,187,30"/>
 </map>

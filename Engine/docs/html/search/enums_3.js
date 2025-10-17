@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['filter_0',['Filter',['../classCori_1_1Graphics_1_1Texture.html#ac5339b8f9aa643fa8ff1e1f20000d003',1,'Cori::Graphics::Texture']]]
+  ['eventcategory_0',['EventCategory',['../namespaceCori_1_1Core.html#a0f06acce81d71ecdca15612fa8ecaa18',1,'Cori::Core']]]
 ];

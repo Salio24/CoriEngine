@@ -71,7 +71,6 @@ namespace Cori {
 				static constexpr char AnimationPack[] = "Animation Pack";
 
 			};
-
 			struct Audio {
 				static constexpr char Self[] = "Audio";
 
@@ -102,6 +101,20 @@ namespace Cori {
 
 			};
 
+			struct FileSystem {
+				static constexpr char Self[] = "FileSystem";
+
+				static constexpr char BinaryFileManager[] = "Binary File Manager";
+				static constexpr char PathManager[] = "Path Manager";
+
+			};
+
+			struct Math {
+				static constexpr char Self[] = "Math";
+
+				static constexpr char Function[] = "Function";
+			};
+
 			struct World {
 				static constexpr char Self[] = "World";
 
@@ -118,6 +131,12 @@ namespace Cori {
 					static constexpr char QuadRenderer[] = "Quad Renderer";
 					static constexpr char QuadAnimator[] = "Quad Animator";
 
+				};
+
+				struct Systems {
+					static constexpr char Self[] = "Entity";
+
+					static constexpr char Animation[] = "Animation";
 				};
 			};
 
@@ -140,6 +159,8 @@ namespace Cori {
 		static void EnableVirtualTerminalProcessing();
 
 		static void Init(bool async, bool fileWrite);
+
+		static bool GetStatus();
 
 		static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
 		static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
@@ -954,6 +975,8 @@ namespace Cori {
 	private:
 		static bool ShouldCoreLog(std::initializer_list<const char*> tags);
 		static bool ShouldClientLog(std::initializer_list<const char*> tags);
+
+		static bool s_Initialized;
 
 		struct StringHash {
 			using is_transparent = void;
