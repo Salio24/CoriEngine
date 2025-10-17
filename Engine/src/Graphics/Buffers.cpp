@@ -4,18 +4,48 @@
 
 namespace Cori {
 	namespace Graphics {
-		namespace Internal {
-			std::shared_ptr<VertexBuffer> VertexBuffer::Create() {
-				std::shared_ptr<VertexBuffer> vbo = Core::Factory<VertexBuffer, GraphicsAPIs>::CreateShared(Core::Window::GetCurrentAPI());
-				CORI_CORE_ASSERT(vbo, "Failed to create VertexBuffer for API: {}. Check registrations and API validity.", APIEnumToName(Core::Window::GetCurrentAPI()));
-				return vbo;
+		std::shared_ptr<VertexBuffer> VertexBuffer::Create() {
+			switch (Core::Window::GetCurrentAPI()) {
+			case GraphicsAPIs::OpenGL:
+				{
+					auto vbo = std::make_shared<Internal::OpenGLVertexBuffer>();
+					CORI_CORE_ASSERT(vbo, "Failed to create Texture2D for API: {}. Check registrations and API validity.", APIEnumToName(Core::Window::GetCurrentAPI()));
+					return vbo;
+					break;
+				}
+			case GraphicsAPIs::Vulkan:
+				{
+					CORI_CORE_ASSERT(false, "Unsupported Graphics API.");
+				}
+			case GraphicsAPIs::None:
+				{
+					break;
+				}
 			}
 
-			std::shared_ptr<IndexBuffer> IndexBuffer::Create(uint32_t* indices, const uint32_t count) {
-				std::shared_ptr<IndexBuffer> ibo = Core::Factory<IndexBuffer, GraphicsAPIs, uint32_t*, uint32_t>::CreateShared(Core::Window::GetCurrentAPI(), indices, count);
-				CORI_CORE_ASSERT(ibo, "Failed to create IndexBuffer for API: {}. Check registrations and API validity.", APIEnumToName(Core::Window::GetCurrentAPI()));
-				return ibo;
+			return nullptr;
+		}
+
+		std::shared_ptr<IndexBuffer> IndexBuffer::Create(uint32_t* indices, const uint32_t count) {
+			switch (Core::Window::GetCurrentAPI()) {
+			case GraphicsAPIs::OpenGL:
+				{
+					auto ibo = std::make_shared<Internal::OpenGLIndexBuffer>(indices, count);
+					CORI_CORE_ASSERT(ibo, "Failed to create Texture2D for API: {}. Check registrations and API validity.", APIEnumToName(Core::Window::GetCurrentAPI()));
+					return ibo;
+					break;
+				}
+			case GraphicsAPIs::Vulkan:
+				{
+					CORI_CORE_ASSERT(false, "Unsupported Graphics API.");
+				}
+			case GraphicsAPIs::None:
+				{
+					break;
+				}
 			}
+
+			return nullptr;
 		}
 	}
 }

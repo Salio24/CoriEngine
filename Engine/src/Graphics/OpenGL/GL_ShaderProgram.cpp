@@ -5,7 +5,13 @@
 namespace Cori {
 	namespace Graphics {
 		namespace Internal {
-			bool OpenGLShaderProgram::PreCreateHook(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath, const std::filesystem::path& geometryPath) {
+			OpenGLShaderProgram::OpenGLShaderProgram(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath, const std::filesystem::path& geometryPath) {
+				bool geometryShaderPresent = false;
+
+				if (!geometryPath.empty()) {
+					geometryShaderPresent = true;
+				}
+
 				if (!std::filesystem::exists(vertexPath)) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::OpenGL, Logger::Tags::Graphics::ShaderProgram }, "Could not find vertex shader at the specified path: '{}', file does not exist. This will likely not crash the application but will seriously mess up with rendering.", vertexPath.string());
 				}
@@ -16,15 +22,6 @@ namespace Cori {
 					if (!std::filesystem::exists(geometryPath)) {
 						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::OpenGL, Logger::Tags::Graphics::ShaderProgram }, "Could not find geometry shader at the specified path: '{}', file does not exist. This will likely not crash the application but will seriously mess up with rendering.", geometryPath.string());
 					}
-				}
-				return true;
-			}
-
-			OpenGLShaderProgram::OpenGLShaderProgram(const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath, const std::filesystem::path& geometryPath) {
-				bool geometryShaderPresent = false;
-
-				if (!geometryPath.empty()) {
-					geometryShaderPresent = true;
 				}
 
 #ifdef DEBUG_BUILD

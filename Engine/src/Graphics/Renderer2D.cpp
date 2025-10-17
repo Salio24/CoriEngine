@@ -20,21 +20,21 @@ namespace Cori {
 
 			// quad setup
 
-			s_Data->QuadInstanceVertexArray = Internal::VertexArray::Create();
-			s_Data->QuadInstanceVertexBuffer = Internal::VertexBuffer::Create();
+			s_Data->QuadInstanceVertexArray = VertexArray::Create();
+			s_Data->QuadInstanceVertexBuffer = VertexBuffer::Create();
 			s_Data->QuadInstanceVertexBuffer->SetLayout({
-					{Internal::ShaderDataType::Mat3, "a_Transform", 1},
-					{Internal::ShaderDataType::Vec4, "a_TexturePosition", 1},
-					{Internal::ShaderDataType::Vec2, "a_Size", 1},
-					{Internal::ShaderDataType::Vec4, "a_TintColor", 1},
-					{Internal::ShaderDataType::Float, "a_Layer", 1},
+					{ShaderDataType::Mat3, "a_Transform", 1},
+					{ShaderDataType::Vec4, "a_TexturePosition", 1},
+					{ShaderDataType::Vec2, "a_Size", 1},
+					{ShaderDataType::Vec4, "a_TintColor", 1},
+					{ShaderDataType::Float, "a_Layer", 1},
 				});
 
-			s_Data->QuadInstanceVertexBuffer->Init(nullptr, RendererData::MaxInstanceCount * s_Data->QuadInstanceVertexBuffer->GetLayout().GetStride(), Internal::DRAW_TYPE::DYNAMIC);
+			s_Data->QuadInstanceVertexBuffer->Init(nullptr, RendererData::MaxInstanceCount * s_Data->QuadInstanceVertexBuffer->GetLayout().GetStride(), VertexBuffer::DRAW_TYPE::DYNAMIC);
 			s_Data->QuadInstanceVertexArray->AddVertexBuffer(s_Data->QuadInstanceVertexBuffer);
 
 			uint32_t quadIndices[6] = { 0, 1, 2, 2, 3, 0 };
-			s_Data->QuadInstanceIndexBuffer = Internal::IndexBuffer::Create(quadIndices, 6);
+			s_Data->QuadInstanceIndexBuffer = IndexBuffer::Create(quadIndices, 6);
 			s_Data->QuadInstanceVertexArray->AddIndexBuffer(s_Data->QuadInstanceIndexBuffer);
 
 			s_Data->QuadInstanceBufferBase = new Quad[RendererData::MaxInstanceCount];
@@ -48,20 +48,20 @@ namespace Cori {
 
 			// text setup
 
-			s_Data->CharInstanceVertexArray = Internal::VertexArray::Create();
-			s_Data->CharInstanceVertexBuffer = Internal::VertexBuffer::Create();
+			s_Data->CharInstanceVertexArray = VertexArray::Create();
+			s_Data->CharInstanceVertexBuffer = VertexBuffer::Create();
 			s_Data->CharInstanceVertexBuffer->SetLayout({
-					{Internal::ShaderDataType::Mat3, "a_Transform", 1},
-					{Internal::ShaderDataType::Vec4, "a_TexturePosition", 1},
-					{Internal::ShaderDataType::Vec4, "a_CharQuad", 1},
-					{Internal::ShaderDataType::Vec4, "a_Color", 1},
-					{Internal::ShaderDataType::Float, "a_Layer", 1}
+					{ShaderDataType::Mat3, "a_Transform", 1},
+					{ShaderDataType::Vec4, "a_TexturePosition", 1},
+					{ShaderDataType::Vec4, "a_CharQuad", 1},
+					{ShaderDataType::Vec4, "a_Color", 1},
+					{ShaderDataType::Float, "a_Layer", 1}
 				});
 
-			s_Data->CharInstanceVertexBuffer->Init(nullptr, RendererData::MaxCharInstanceCount * s_Data->CharInstanceVertexBuffer->GetLayout().GetStride(), Internal::DRAW_TYPE::DYNAMIC);
+			s_Data->CharInstanceVertexBuffer->Init(nullptr, RendererData::MaxCharInstanceCount * s_Data->CharInstanceVertexBuffer->GetLayout().GetStride(), VertexBuffer::DRAW_TYPE::DYNAMIC);
 			s_Data->CharInstanceVertexArray->AddVertexBuffer(s_Data->CharInstanceVertexBuffer);
 
-			s_Data->CharInstanceIndexBuffer = Internal::IndexBuffer::Create(quadIndices, 6);
+			s_Data->CharInstanceIndexBuffer = IndexBuffer::Create(quadIndices, 6);
 			s_Data->CharInstanceVertexArray->AddIndexBuffer(s_Data->CharInstanceIndexBuffer);
 
 			s_Data->CharInstanceBufferBase = new Char[RendererData::MaxCharInstanceCount];

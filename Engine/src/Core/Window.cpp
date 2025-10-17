@@ -21,7 +21,7 @@ namespace Cori {
 			SDL_DisplayID m_PrimaryDisplayID{};
 
 			SDL_Window* m_Window{ nullptr };
-			std::unique_ptr<Graphics::Internal::RenderingContext> m_Context;
+			std::unique_ptr<Graphics::RenderingContext> m_Context;
 			bool m_VSync{ false };
 
 			EventCallbackFn m_EventCallback;
@@ -41,7 +41,7 @@ namespace Cori {
 			m_Data->m_WindowTitle = std::move(title);
 			m_Data->m_VSync = vsync;
 
-			m_Data->m_Context = Graphics::Internal::RenderingContext::Create(s_API);
+			m_Data->m_Context = Graphics::RenderingContext::Create(s_API);
 
 
 			const SDL_DisplayID primaryDisplayID = SDL_GetPrimaryDisplay();

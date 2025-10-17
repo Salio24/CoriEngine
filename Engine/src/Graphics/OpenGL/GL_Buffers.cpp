@@ -5,10 +5,6 @@
 namespace Cori {
 	namespace Graphics {
 		namespace Internal {
-			bool OpenGLVertexBuffer::PreCreateHook() {
-				return true;
-			}
-
 			OpenGLVertexBuffer::OpenGLVertexBuffer() {
 				CORI_PROFILE_FUNCTION();
 				glCreateBuffers(1, &m_ID);
@@ -89,10 +85,6 @@ namespace Cori {
 			void OpenGLVertexBuffer::SetLayout(const VBLayout& layout)
 			{
 				m_Layout = layout;
-			}
-
-			bool OpenGLIndexBuffer::PreCreateHook([[maybe_unused]] uint32_t* indices, [[maybe_unused]] uint32_t count) {
-				return true;
 			}
 
 			OpenGLIndexBuffer::OpenGLIndexBuffer(const uint32_t* indices, uint32_t count) : m_Count(count) {

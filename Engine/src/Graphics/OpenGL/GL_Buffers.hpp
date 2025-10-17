@@ -1,17 +1,14 @@
 #pragma once
 #include "../Buffers.hpp"
 #include "Profiling/Trackable.hpp"
-#include "Core/AutoRegisteringFactory.hpp"
-#include "Graphics/GraphicsAPIs.hpp"
 
 namespace Cori {
 	namespace Graphics {
 		namespace Internal {
 			class OpenGLVertexArray;
 
-			class OpenGLVertexBuffer final : public VertexBuffer, public Profiling::Trackable<OpenGLVertexBuffer, VertexBuffer>, public Core::RegisterInFactory<VertexBuffer, OpenGLVertexBuffer, GraphicsAPIs, GraphicsAPIs::OpenGL> {
+			class OpenGLVertexBuffer final : public VertexBuffer, public Profiling::Trackable<OpenGLVertexBuffer, VertexBuffer> {
 			public:
-				static bool PreCreateHook();
 				OpenGLVertexBuffer();
 				~OpenGLVertexBuffer() override;
 				void Init(const float* vertices, uint32_t size, const DRAW_TYPE drawType) override;
@@ -28,13 +25,10 @@ namespace Cori {
 
 				uint32_t m_ID;
 				VBLayout m_Layout;
-
-				CORI_REGISTERED_FACTORY_INIT;
 			};
 
-			class OpenGLIndexBuffer final : public IndexBuffer, public Profiling::Trackable<OpenGLIndexBuffer, IndexBuffer>, public Core::RegisterInFactory<IndexBuffer, OpenGLIndexBuffer, GraphicsAPIs, GraphicsAPIs::OpenGL, uint32_t*, uint32_t> {
+			class OpenGLIndexBuffer final : public IndexBuffer, public Profiling::Trackable<OpenGLIndexBuffer, IndexBuffer> {
 			public:
-				static bool PreCreateHook(uint32_t* indices, uint32_t count);
 				OpenGLIndexBuffer(const uint32_t* indices, uint32_t count);
 				~OpenGLIndexBuffer() override;
 				void Bind() const override;
@@ -47,8 +41,6 @@ namespace Cori {
 
 				uint32_t m_ID;
 				uint32_t m_Count{ 0 };
-
-				CORI_REGISTERED_FACTORY_INIT;
 			};
 		}
 	}

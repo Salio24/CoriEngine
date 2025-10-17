@@ -235,9 +235,9 @@ namespace Cori {
 				static constexpr uint32_t MaxCharInstanceCount{ 16384 };
 
 				Texture2D* CurrentTexture{nullptr};
-				Internal::VertexArray* CurrentVertexArray{nullptr};
-				Internal::VertexBuffer* CurrentVertexBuffer{nullptr};
-				Internal::IndexBuffer* CurrentIndexBuffer{nullptr};
+				VertexArray* CurrentVertexArray{nullptr};
+				VertexBuffer* CurrentVertexBuffer{nullptr};
+				IndexBuffer* CurrentIndexBuffer{nullptr};
 				ShaderProgram* CurrentShader{nullptr};
 				DrawSpace CurrentDrawSpace{ UNSPECIFIED };
 
@@ -252,9 +252,9 @@ namespace Cori {
 
 				// vvv quad specific
 
-				std::shared_ptr<Internal::VertexArray> QuadInstanceVertexArray;
-				std::shared_ptr<Internal::VertexBuffer> QuadInstanceVertexBuffer;
-				std::shared_ptr<Internal::IndexBuffer> QuadInstanceIndexBuffer;
+				std::shared_ptr<VertexArray> QuadInstanceVertexArray;
+				std::shared_ptr<VertexBuffer> QuadInstanceVertexBuffer;
+				std::shared_ptr<IndexBuffer> QuadInstanceIndexBuffer;
 				std::shared_ptr<ShaderProgram> QuadInstanceShader;
 
 				uint32_t QuadInstanceCount{ 0 };
@@ -273,9 +273,9 @@ namespace Cori {
 
 				// vvv text specific
 
-				std::shared_ptr<Internal::VertexArray> CharInstanceVertexArray;
-				std::shared_ptr<Internal::VertexBuffer> CharInstanceVertexBuffer;
-				std::shared_ptr<Internal::IndexBuffer> CharInstanceIndexBuffer;
+				std::shared_ptr<VertexArray> CharInstanceVertexArray;
+				std::shared_ptr<VertexBuffer> CharInstanceVertexBuffer;
+				std::shared_ptr<IndexBuffer> CharInstanceIndexBuffer;
 				std::shared_ptr<ShaderProgram> CharInstanceShader;
 
 				uint32_t CharInstanceCount{ 0 };

@@ -50,6 +50,9 @@ namespace Cori {
 						return StopInternal(fadeOutMS);
 					}
 				}
+
+				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "Track '{}' (ID: {}) has been stopped.", m_Name, m_ID);
+
 				return {};
 			}
 
@@ -167,7 +170,7 @@ namespace Cori {
 				if (coriTrack->m_ClientCallBack) {
 					coriTrack->m_ClientCallBack();
 				} else {
-					CORI_CORE_DEBUG("Track '{}' (ID: {}) stopped.", coriTrack->m_Name, coriTrack->m_ID);
+					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "Track '{}' (ID: {}) finished playing.", coriTrack->m_Name, coriTrack->m_ID);
 				}
 			}
 			catch (const std::exception& e) {
@@ -195,7 +198,7 @@ namespace Cori {
 		std::expected<void, Core::CoriError<>> Track::StopInternal(const int64_t fadeOutMS) const {
 			if (m_Valid) {
 				if (!m_ActiveSequence) {
-					CORI_CORE_TRACE_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "Stopping Track '{} (TrackID: {})'", m_Name, m_ID);
+					//CORI_CORE_TRACE_TAGGED({ Logger::Tags::Audio::Self, Logger::Tags::Audio::Track }, "Stopping Track Stopping Track '{} (TrackID: {})'", m_Name, m_ID);
 					return Mixer::StopTrack(m_ID, fadeOutMS);
 				}
 

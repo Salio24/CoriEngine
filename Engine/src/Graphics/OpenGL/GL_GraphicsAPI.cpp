@@ -135,10 +135,6 @@ namespace Cori {
 			OpenGLGraphicsAPI::OpenGLGraphicsAPI() {
 
 			}
-
-			bool OpenGLGraphicsAPI::PreCreateHook() {
-				return true;
-			}
 		}
 	}
 }
