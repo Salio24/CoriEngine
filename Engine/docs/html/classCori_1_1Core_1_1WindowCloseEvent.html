@@ -120,20 +120,14 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a745266a33541d3e5ff5dbc7b74b40af6" id="r_a745266a33541d3e5ff5dbc7b74b40af6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a745266a33541d3e5ff5dbc7b74b40af6">WindowCloseEvent</a> ()=default</td></tr>
 <tr class="memitem:a28638c18d87d181aae567cedb54f7436" id="r_a28638c18d87d181aae567cedb54f7436"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a28638c18d87d181aae567cedb54f7436">ToString</a> () const override</td></tr>
 <tr class="memdesc:a28638c18d87d181aae567cedb54f7436"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the name of the <a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a>.  <br /></td></tr>
-<tr class="memitem:aa2697aa527c9af18bca4a37eb0d038f1" id="r_aa2697aa527c9af18bca4a37eb0d038f1"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10d">::Cori::Core::EventType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa2697aa527c9af18bca4a37eb0d038f1">GetEventType</a> () const override</td></tr>
-<tr class="memdesc:aa2697aa527c9af18bca4a37eb0d038f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gives the return type of the <a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a>.  <br /></td></tr>
-<tr class="memitem:a25b1159208fcdf75934ea32474e3a279" id="r_a25b1159208fcdf75934ea32474e3a279"><td class="memItemLeft" align="right" valign="top">virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a25b1159208fcdf75934ea32474e3a279">GetName</a> () const override</td></tr>
-<tr class="memdesc:a25b1159208fcdf75934ea32474e3a279"><td class="mdescLeft">&#160;</td><td class="mdescRight">This will give you the string version of <a class="el" href="namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10d">EventType</a>.  <br /></td></tr>
-<tr class="memitem:ad88fb9eff9dff25c765168b992f17137" id="r_ad88fb9eff9dff25c765168b992f17137"><td class="memItemLeft" align="right" valign="top">virtual uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad88fb9eff9dff25c765168b992f17137">GetCategoryFlags</a> () const override</td></tr>
-<tr class="memdesc:ad88fb9eff9dff25c765168b992f17137"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gives the flags of particular <a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a>.  <br /></td></tr>
+<tr class="memitem:a92e3bc947ec989c3fb63ec1cc7e4581f" id="r_a92e3bc947ec989c3fb63ec1cc7e4581f"><td class="memItemLeft" align="right" valign="top">constexpr std::type_index&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a92e3bc947ec989c3fb63ec1cc7e4581f">GetEventType</a> () const override</td></tr>
+<tr class="memdesc:a92e3bc947ec989c3fb63ec1cc7e4581f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gives the return type of the <a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a>.  <br /></td></tr>
+<tr class="memitem:ac1e446e23307771c7ba4f3c9be303ce3" id="r_ac1e446e23307771c7ba4f3c9be303ce3"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac1e446e23307771c7ba4f3c9be303ce3">GetName</a> () const override</td></tr>
+<tr class="memdesc:ac1e446e23307771c7ba4f3c9be303ce3"><td class="mdescLeft">&#160;</td><td class="mdescRight">This will give you the string version of EventType.  <br /></td></tr>
+<tr class="memitem:ac241b6e0da1360cc01f5a9bcbc125aad" id="r_ac241b6e0da1360cc01f5a9bcbc125aad"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac241b6e0da1360cc01f5a9bcbc125aad">GetCategoryFlags</a> () const override</td></tr>
+<tr class="memdesc:ac241b6e0da1360cc01f5a9bcbc125aad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gives the flags of particular <a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a>.  <br /></td></tr>
 <tr class="memitem:a2bdec15b54fdab9f56e72d7144df34ba" id="r_a2bdec15b54fdab9f56e72d7144df34ba"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCori_1_1Core_1_1Event.html#a2bdec15b54fdab9f56e72d7144df34ba">IsInCategory</a> (const <a class="el" href="namespaceCori_1_1Core.html#a0f06acce81d71ecdca15612fa8ecaa18">EventCategory</a> category) const</td></tr>
 <tr class="memdesc:a2bdec15b54fdab9f56e72d7144df34ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the <a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a> is in specific category.  <br /></td></tr>
-<tr class="memitem:ad5158204e65e6ec9243543a463d76e6f" id="r_ad5158204e65e6ec9243543a463d76e6f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCori_1_1Core_1_1Event.html#ad5158204e65e6ec9243543a463d76e6f">IsOfType</a> (const <a class="el" href="namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10d">EventType</a> type) const</td></tr>
-<tr class="memdesc:ad5158204e65e6ec9243543a463d76e6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the <a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a> is of specific <a class="el" href="namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10d">EventType</a>.  <br /></td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
-Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ae3cf68d4926732421b3e0deb12d25d4a" id="r_ae3cf68d4926732421b3e0deb12d25d4a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10d">::Cori::Core::EventType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae3cf68d4926732421b3e0deb12d25d4a">GetStaticType</a> ()</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -169,8 +163,8 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="ad88fb9eff9dff25c765168b992f17137" name="ad88fb9eff9dff25c765168b992f17137"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad88fb9eff9dff25c765168b992f17137">&#9670;&#160;</a></span>GetCategoryFlags()</h2>
+<a id="ac241b6e0da1360cc01f5a9bcbc125aad" name="ac241b6e0da1360cc01f5a9bcbc125aad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac241b6e0da1360cc01f5a9bcbc125aad">&#9670;&#160;</a></span>GetCategoryFlags()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -179,7 +173,7 @@ Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual uint32_t Cori::Core::WindowCloseEvent::GetCategoryFlags </td>
+          <td class="memname">uint32_t Cori::Core::WindowCloseEvent::GetCategoryFlags </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
@@ -193,7 +187,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Gives the flags of particular <a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a>. </p>
-<dl class="section note"><dt>Note</dt><dd>You shouldn't overload this, it is overloaded by EVENT_CLASS_CATEGORY macro. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>You shouldn't overload this, it is overloaded by EVENT_CLASS_CATEGORY macro! </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>Flag variable that stores all the relevant <a class="el" href="namespaceCori_1_1Core.html#a0f06acce81d71ecdca15612fa8ecaa18">EventCategory</a> flags. </dd></dl>
 
 <p>Implements <a class="el" href="classCori_1_1Core_1_1Event.html#a9bb2f80b8728972db28bbccec0b64e55">Cori::Core::Event</a>.</p>
@@ -202,8 +196,8 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aa2697aa527c9af18bca4a37eb0d038f1" name="aa2697aa527c9af18bca4a37eb0d038f1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa2697aa527c9af18bca4a37eb0d038f1">&#9670;&#160;</a></span>GetEventType()</h2>
+<a id="a92e3bc947ec989c3fb63ec1cc7e4581f" name="a92e3bc947ec989c3fb63ec1cc7e4581f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92e3bc947ec989c3fb63ec1cc7e4581f">&#9670;&#160;</a></span>GetEventType()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -212,7 +206,7 @@ Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10d">::Cori::Core::EventType</a> Cori::Core::WindowCloseEvent::GetEventType </td>
+          <td class="memname">std::type_index Cori::Core::WindowCloseEvent::GetEventType </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
@@ -220,23 +214,33 @@ Public Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel constexpr">constexpr</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Gives the return type of the <a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a>. </p>
-<dl class="section note"><dt>Note</dt><dd>You shouldn't overload this, it is overloaded by EVENT_CLASS_TYPE macro. </dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>Type of <a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a>. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>You shouldn't overload this, it is overloaded by EVENT_CLASS_TYPE macro! </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Type index of derived event type. </dd></dl>
 
-<p>Implements <a class="el" href="classCori_1_1Core_1_1Event.html#a7f81583c73ebcb5f95e0e15162df5e5a">Cori::Core::Event</a>.</p>
+<p>Implements <a class="el" href="classCori_1_1Core_1_1Event.html#a5cccbe7fa24778393b6edeb1f2190576">Cori::Core::Event</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="AppEvent_8hpp_source.html#l00033">33</a> of file <a class="el" href="AppEvent_8hpp_source.html">AppEvent.hpp</a>.</p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classCori_1_1Core_1_1WindowCloseEvent_a92e3bc947ec989c3fb63ec1cc7e4581f_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1WindowCloseEvent_a92e3bc947ec989c3fb63ec1cc7e4581f_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1Core_1_1WindowCloseEvent_a92e3bc947ec989c3fb63ec1cc7e4581f_cgraph" id="aclassCori_1_1Core_1_1WindowCloseEvent_a92e3bc947ec989c3fb63ec1cc7e4581f_cgraph">
+<area shape="rect" title="Gives the return type of the Event." alt="" coords="5,5,224,50"/>
+<area shape="rect" href="classCori_1_1Core_1_1WindowCloseEvent.html#a745266a33541d3e5ff5dbc7b74b40af6" title=" " alt="" coords="272,5,490,50"/>
+<area shape="poly" title=" " alt="" coords="224,25,256,25,256,30,224,30"/>
+</map>
+</div>
 
 </div>
 </div>
-<a id="a25b1159208fcdf75934ea32474e3a279" name="a25b1159208fcdf75934ea32474e3a279"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a25b1159208fcdf75934ea32474e3a279">&#9670;&#160;</a></span>GetName()</h2>
+<a id="ac1e446e23307771c7ba4f3c9be303ce3" name="ac1e446e23307771c7ba4f3c9be303ce3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1e446e23307771c7ba4f3c9be303ce3">&#9670;&#160;</a></span>GetName()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -245,7 +249,7 @@ Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual const char * Cori::Core::WindowCloseEvent::GetName </td>
+          <td class="memname">const char * Cori::Core::WindowCloseEvent::GetName </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
@@ -258,38 +262,11 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>This will give you the string version of <a class="el" href="namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10d">EventType</a>. </p>
-<dl class="section note"><dt>Note</dt><dd>You shouldn't overload this, it is overloaded by EVENT_CLASS_TYPE macro. </dd></dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10d">EventType</a> name. </dd></dl>
+<p>This will give you the string version of EventType. </p>
+<dl class="section note"><dt>Note</dt><dd>You shouldn't overload this, it is overloaded by EVENT_CLASS_TYPE macro! </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>EventType name. </dd></dl>
 
 <p>Implements <a class="el" href="classCori_1_1Core_1_1Event.html#a2b72405936a555efbfa708452eecb325">Cori::Core::Event</a>.</p>
-
-<p class="definition">Definition at line <a class="el" href="AppEvent_8hpp_source.html#l00033">33</a> of file <a class="el" href="AppEvent_8hpp_source.html">AppEvent.hpp</a>.</p>
-
-</div>
-</div>
-<a id="ae3cf68d4926732421b3e0deb12d25d4a" name="ae3cf68d4926732421b3e0deb12d25d4a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae3cf68d4926732421b3e0deb12d25d4a">&#9670;&#160;</a></span>GetStaticType()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10d">::Cori::Core::EventType</a> Cori::Core::WindowCloseEvent::GetStaticType </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="AppEvent_8hpp_source.html#l00033">33</a> of file <a class="el" href="AppEvent_8hpp_source.html">AppEvent.hpp</a>.</p>
 
@@ -327,7 +304,7 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True is present, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Event_8hpp_source.html#l00067">67</a> of file <a class="el" href="Event_8hpp_source.html">Event.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Event_8hpp_source.html#l00059">59</a> of file <a class="el" href="Event_8hpp_source.html">Event.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -335,52 +312,6 @@ Here is the call graph for this function:</div>
 <map name="aclassCori_1_1Core_1_1Event_a2bdec15b54fdab9f56e72d7144df34ba_cgraph" id="aclassCori_1_1Core_1_1Event_a2bdec15b54fdab9f56e72d7144df34ba_cgraph">
 <area shape="rect" title="Checks if the Event is in specific category." alt="" coords="5,5,144,50"/>
 <area shape="rect" href="classCori_1_1Core_1_1Event.html#a9bb2f80b8728972db28bbccec0b64e55" title="Gives the flags of particular Event." alt="" coords="192,5,330,50"/>
-<area shape="poly" title=" " alt="" coords="144,25,176,25,176,30,144,30"/>
-</map>
-</div>
-
-</div>
-</div>
-<a id="ad5158204e65e6ec9243543a463d76e6f" name="ad5158204e65e6ec9243543a463d76e6f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad5158204e65e6ec9243543a463d76e6f">&#9670;&#160;</a></span>IsOfType()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool Cori::Core::Event::IsOfType </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10d">EventType</a></td>          <td class="paramname"><span class="paramname"><em>type</em></span></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel nodiscard">nodiscard</span><span class="mlabel inherited">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Checks if the <a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a> is of specific <a class="el" href="namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10d">EventType</a>. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">type</td><td>Type to check the presence of. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>True is present, false otherwise. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="Event_8hpp_source.html#l00077">77</a> of file <a class="el" href="Event_8hpp_source.html">Event.hpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCori_1_1Core_1_1Event_ad5158204e65e6ec9243543a463d76e6f_cgraph.png" border="0" usemap="#aclassCori_1_1Core_1_1Event_ad5158204e65e6ec9243543a463d76e6f_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Core_1_1Event_ad5158204e65e6ec9243543a463d76e6f_cgraph" id="aclassCori_1_1Core_1_1Event_ad5158204e65e6ec9243543a463d76e6f_cgraph">
-<area shape="rect" title="Checks if the Event is of specific EventType." alt="" coords="5,5,144,50"/>
-<area shape="rect" href="classCori_1_1Core_1_1Event.html#a7f81583c73ebcb5f95e0e15162df5e5a" title="Gives the return type of the Event." alt="" coords="192,5,330,50"/>
 <area shape="poly" title=" " alt="" coords="144,25,176,25,176,30,144,30"/>
 </map>
 </div>
@@ -411,7 +342,7 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Returns the name of the <a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a>. </p>
-<dl class="section note"><dt>Note</dt><dd>This is up to the user to overload, by default return the same thing <a class="el" href="#a25b1159208fcdf75934ea32474e3a279" title="This will give you the string version of EventType.">GetName()</a> does. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This is up to the user to overload, by default return the same thing <a class="el" href="#ac1e446e23307771c7ba4f3c9be303ce3" title="This will give you the string version of EventType.">GetName()</a> does. </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events.">Event</a> name. </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classCori_1_1Core_1_1Event.html#a26d0871fc6502150a001352a47bdbc3f">Cori::Core::Event</a>.</p>
@@ -441,7 +372,7 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Event_8hpp_source.html#l00080">80</a> of file <a class="el" href="Event_8hpp_source.html">Event.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Event_8hpp_source.html#l00063">63</a> of file <a class="el" href="Event_8hpp_source.html">Event.hpp</a>.</p>
 
 </div>
 </div>

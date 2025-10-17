@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['manager_3a_0',['Manager:',['../index.html#asset-manager',1,'Asset Manager:'],['../index.html#event-manager',1,'Event Manager:']]],
-  ['more_20detailed_20feature_20description_3a_1',['More detailed feature description:',['../index.html#more-detailed-feature-description',1,'']]]
+  ['the_20future_0',['Plans for the future',['../index.html#plans-for-the-future',1,'']]],
+  ['through_20cmake_1',['through CMake',['../index.html#directly-through-cmake',1,'Directly through CMake'],['../index.html#directly-through-cmake-1',1,'Directly through CMake']]],
+  ['tooling_20debugging_2',['Tooling &amp;amp; Debugging',['../index.html#tooling--debugging',1,'']]]
 ];

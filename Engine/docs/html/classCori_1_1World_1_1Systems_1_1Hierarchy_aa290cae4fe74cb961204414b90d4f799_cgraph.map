@@ -1,0 +1,7 @@
+<map id="Cori::World::Systems::Hierarchy::DestroyChildren" name="Cori::World::Systems::Hierarchy::DestroyChildren">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,40,210,85"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Entity.html#ac9d21daa112e64d4f43f54715aef21b2" title="Gets a raw entt::entity if you need to interact with entt directly." alt="" coords="258,5,397,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="209,44,242,38,243,44,210,49"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Entity.html#a37ec856a07cae6aab81663ef9bf44ee1" title="Gets a raw entt::handle if you need to interact with entt directly." alt="" coords="258,75,397,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="210,76,243,81,242,86,209,81"/>
+</map>

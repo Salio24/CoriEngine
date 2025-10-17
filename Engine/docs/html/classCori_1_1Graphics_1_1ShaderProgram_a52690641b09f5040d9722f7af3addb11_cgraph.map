@@ -1,14 +1,7 @@
 <map id="Cori::Graphics::ShaderProgram::Create" name="Cori::Graphics::ShaderProgram::Create">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,57,226,102"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,28,226,72"/>
 <area shape="rect" id="Node000002" href="$namespaceCori_1_1Graphics.html#ac10cdf39fd3a5b64fb82ad5cd57d4668" title=" " alt="" coords="274,5,505,33"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="220,54,307,34,309,39,221,59"/>
-<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1Factory.html#a0eeb110662af3542e9ba9cdd1c86203d" title=" " alt="" coords="319,57,460,102"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="226,76,303,76,303,82,226,82"/>
-<area shape="rect" id="Node000006" href="$classCori_1_1Core_1_1Window.html#a675130786b522717fb797d28166b1da5" title="Returns the graphical API used by this window." alt="" coords="317,126,462,171"/>
-<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="207,100,302,124,301,129,206,105"/>
-<area shape="rect" id="Node000004" href="$classCori_1_1Core_1_1Factory.html#a30ad48765e0f34046d7054c5d3985061" title=" " alt="" coords="553,57,694,102"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="460,76,537,76,537,82,460,82"/>
-<area shape="rect" id="Node000005" href="$classCori_1_1Core_1_1Factory.html#a924e36be422a39be61f8329c2e90cea0" title=" " alt="" coords="742,57,884,102"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="695,76,727,76,727,82,695,82"/>
-<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="776,57,775,47,781,38,794,32,813,30,833,33,846,39,843,44,832,38,813,35,796,37,785,42,780,48,782,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="226,35,258,31,258,36,226,40"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1Window.html#a675130786b522717fb797d28166b1da5" title="Returns the graphical API used by this window." alt="" coords="317,57,462,102"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="226,59,301,67,301,72,226,64"/>
 </map>

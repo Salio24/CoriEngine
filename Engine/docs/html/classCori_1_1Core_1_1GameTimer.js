@@ -9,6 +9,7 @@ var classCori_1_1Core_1_1GameTimer =
     [ "GetElapsedMinutes", "classCori_1_1Core_1_1GameTimer.html#a4328acf5f42b1442ea98d32bf1244680", null ],
     [ "GetElapsedSeconds", "classCori_1_1Core_1_1GameTimer.html#af909d0acb3d2af9f219b0c650cdd70db", null ],
     [ "GetTickAlpha", "classCori_1_1Core_1_1GameTimer.html#a574d093d4af47439981e65fdfc40c846", null ],
+    [ "GetTickRate", "classCori_1_1Core_1_1GameTimer.html#aa2476372236e624cd80314822f49ebdc", null ],
     [ "GetTimestep", "classCori_1_1Core_1_1GameTimer.html#a85a5157b39dd5a07ce8a342c65c87b36", null ],
     [ "SetManualTickStep", "classCori_1_1Core_1_1GameTimer.html#a94cedc782a46f5568293a72b0fcc0448", null ],
     [ "SetTickrate", "classCori_1_1Core_1_1GameTimer.html#a1e91d03f0822001ef3689c3b6039e524", null ],

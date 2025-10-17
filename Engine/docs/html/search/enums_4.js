@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['graphicsapis_0',['GraphicsAPIs',['../namespaceCori_1_1Graphics.html#a506205d247975afdf34efa0392771312',1,'Cori::Graphics']]]
+  ['filter_0',['Filter',['../classCori_1_1Graphics_1_1Texture.html#ac5339b8f9aa643fa8ff1e1f20000d003',1,'Cori::Graphics::Texture']]]
 ];

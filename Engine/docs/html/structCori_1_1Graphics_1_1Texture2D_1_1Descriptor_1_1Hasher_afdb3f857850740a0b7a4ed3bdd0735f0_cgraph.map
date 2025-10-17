@@ -1,5 +1,5 @@
 <map id="Cori::Graphics::Texture2D::Descriptor::Hasher::operator()" name="Cori::Graphics::Texture2D::Descriptor::Hasher::operator()">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,5,182,67"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Texture2D_1_1Descriptor.html#af06e1c1a726f9fc6b1020b2e815053d8" title="Constructs a descriptor. It&#39;s recommended to use &quot;inline const&quot; when defining the Descriptor in a nam..." alt="" coords="230,14,411,58"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Texture2D_1_1Descriptor.html#af06e1c1a726f9fc6b1020b2e815053d8" title="Constructs a descriptor." alt="" coords="230,14,411,58"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="182,34,214,34,214,39,182,39"/>
 </map>

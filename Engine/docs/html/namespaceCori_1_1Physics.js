@@ -5,7 +5,6 @@ var namespaceCori_1_1Physics =
     [ "CastResult", "structCori_1_1Physics_1_1CastResult.html", "structCori_1_1Physics_1_1CastResult" ],
     [ "Circle", "classCori_1_1Physics_1_1Circle.html", "classCori_1_1Physics_1_1Circle" ],
     [ "ConvexHull", "classCori_1_1Physics_1_1ConvexHull.html", "classCori_1_1Physics_1_1ConvexHull" ],
-    [ "PhysicsWorld", "classCori_1_1Physics_1_1PhysicsWorld.html", "classCori_1_1Physics_1_1PhysicsWorld" ],
     [ "Polygon", "classCori_1_1Physics_1_1Polygon.html", "classCori_1_1Physics_1_1Polygon" ],
     [ "Segment", "classCori_1_1Physics_1_1Segment.html", "classCori_1_1Physics_1_1Segment" ],
     [ "ShapeUserData", "structCori_1_1Physics_1_1ShapeUserData.html", "structCori_1_1Physics_1_1ShapeUserData" ],

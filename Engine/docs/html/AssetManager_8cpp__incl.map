@@ -1,5 +1,25 @@
 <map id="AssetManager.cpp" name="AssetManager.cpp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="6,5,147,33"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="255,5,396,33"/>
 <area shape="rect" id="Node000002" href="$AssetManager_8hpp.html" title=" " alt="" coords="5,81,148,109"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="79,34,79,65,74,65,74,34"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="282,36,136,79,135,74,281,31"/>
+<area shape="rect" id="Node000003" href="$Font_8hpp.html" title=" " alt="" coords="171,81,310,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="312,36,269,73,266,69,309,32"/>
+<area shape="rect" id="Node000007" href="$Texture_8hpp.html" title=" " alt="" coords="333,81,492,109"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="343,32,387,69,384,73,340,36"/>
+<area shape="rect" id="Node000009" href="$PathManager_8hpp.html" title=" " alt="" coords="515,81,726,109"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="379,31,553,74,552,79,378,36"/>
+<area shape="rect" id="Node000004" href="$Trackable_8hpp.html" title=" " alt="" coords="189,232,359,260"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="194,112,161,125,133,141,123,151,117,161,116,171,121,183,146,208,178,224,175,229,143,212,117,186,111,172,112,159,119,148,129,137,159,120,192,107"/>
+<area shape="rect" id="Node000006" href="$AssetLoadStatus_8hpp.html" title=" " alt="" coords="131,157,385,184"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="246,109,254,141,249,142,241,110"/>
+<area shape="rect" id="Node000005" href="$InstanceMetrics_8hpp.html" title=" " alt="" coords="198,308,350,336"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="276,261,276,292,271,292,271,261"/>
+<area shape="poly" id="edge9_Node000007_Node000006" title=" " alt="" coords="386,112,300,152,298,147,384,107"/>
+<area shape="rect" id="Node000008" href="$Image_8hpp.html" title=" " alt="" coords="409,157,499,184"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="422,108,441,142,437,144,418,111"/>
+<area shape="poly" id="edge8_Node000008_Node000004" title=" " alt="" coords="423,187,321,229,319,224,421,182"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="558,157,648,184"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="620,110,612,142,607,141,615,109"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="672,157,796,184"/>
+<area shape="poly" id="edge12_Node000009_Node000011" title=" " alt="" coords="642,107,703,146,700,150,639,111"/>
 </map>

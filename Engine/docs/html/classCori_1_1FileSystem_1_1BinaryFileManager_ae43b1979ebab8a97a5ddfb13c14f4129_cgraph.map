@@ -1,0 +1,16 @@
+<map id="Cori::FileSystem::BinaryFileManager::SaveAggregateStruct" name="Cori::FileSystem::BinaryFileManager::SaveAggregateStruct">
+<area shape="rect" id="Node000001" title="Saves an instance of an aggregate struct onto the disk." alt="" coords="5,57,251,102"/>
+<area shape="rect" id="Node000002" href="$namespaceCori_1_1Utility.html#aadae1036bd08323331712cb16b48813e" title="Computes the 64bit FNV&#45;1a string hash." alt="" coords="539,5,694,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="231,54,298,42,415,29,524,21,524,26,416,34,299,47,232,59"/>
+<area shape="rect" id="Node000003" href="$namespaceCori_1_1Utility.html#aca6f01473d2cc64923d437335438aa44" title="Generates a stable, unique ID for an aggregate struct at compile&#45;time." alt="" coords="299,57,491,102"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="251,76,283,76,283,82,251,82"/>
+<area shape="rect" id="Node000007" href="$classCori_1_1Core_1_1UUID.html#ae7543c82e2aac1352d77a7d85ba8e435" title=" " alt="" coords="302,125,488,153"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="231,100,316,119,315,124,230,105"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="479,54,547,35,549,40,480,59"/>
+<area shape="rect" id="Node000004" href="$namespaceCori_1_1Utility_1_1Internal.html#a9337758a0302ac0fc6b64644e5f1b4ce" title=" " alt="" coords="540,57,693,102"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="492,76,525,76,525,82,492,82"/>
+<area shape="rect" id="Node000005" href="$namespaceCori_1_1Utility_1_1Internal.html#a52092d326bf9b42dd65b632131a3748f" title=" " alt="" coords="742,57,924,102"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="693,76,727,76,727,82,693,82"/>
+<area shape="rect" id="Node000006" href="$namespaceCori_1_1Utility_1_1Internal.html#a3915b814d3c7b0d4b5a7920c4cd9d597" title=" " alt="" coords="972,57,1124,102"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="924,76,956,76,956,82,924,82"/>
+</map>

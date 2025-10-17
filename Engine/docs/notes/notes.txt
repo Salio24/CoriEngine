@@ -3,6 +3,3 @@ classes to doc:
 funcs to doc:
 
 TODO:
-
-* make some parallax background for voidscape scene
-* mix character sounds for voidscape

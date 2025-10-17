@@ -25,7 +25,7 @@
 var NAVTREE =
 [
   [ "CoriEngine", "index.html", [
-    [ "Cori Engine (WIP)", "index.html", "index" ],
+    [ "Cori Engine", "index.html", "index" ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
       [ "Namespace Members", "namespacemembers.html", [
@@ -68,19 +68,21 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "AABB_8hpp.html",
-"RenderingContext_8hpp_source.html",
-"classCori_1_1Core_1_1Factory.html#a281256de6831a87c8826d946399794ab",
-"classCori_1_1Core_1_1MouseButtonPressedEvent.html#a83843774027d247abe6c19f10906c670",
-"classCori_1_1Core_1_1WindowResizeEvent.html#af158badc23358a872d8c6c5a9a94b042",
-"classCori_1_1Graphics_1_1Internal_1_1OpenGLGraphicsAPI.html#ad4ac1236f6e051ceb17fa0e11cb86f68",
-"classCori_1_1Graphics_1_1Internal_1_1VertexArray.html#a970979b7af5a03f17a54b337abc90a0a",
-"classCori_1_1Logger.html#a187304017b8501b556fe29e5c7343c2c",
-"classCori_1_1World_1_1Components_1_1Entity_1_1Trigger.html#a46317908cac98d4dc79b70293469f327",
-"classCori_1_1World_1_1TriggerBehaviour.html#ae4b150ece885345ef5ca593d4beafaaf",
-"namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416aa5163601d31a87cef670c8f051637d3ad",
-"namespaceCori_1_1Physics.html#a8047a4c99b5cdee7471cf1381a812e55a761e78373f8ddf15326346566ee3df4a",
-"structCori_1_1Graphics_1_1ShaderProgram_1_1Descriptor_1_1Hasher.html#a1b591d6271041466e6458f0e1f7f7144",
-"structCori_1_1World_1_1Components_1_1Entity_1_1Name.html#a46919615e3003d27edbe1bab89fd8a8f"
+"PackedArray_8hpp_source.html",
+"classCori_1_1Core_1_1Application.html#a5c5b313999b3ab9f5089f79345a8bf8d",
+"classCori_1_1Core_1_1Layer.html#a6c2b8c6aad9e8f4550a0bb45f7f04f99",
+"classCori_1_1Core_1_1Window.html",
+"classCori_1_1Graphics_1_1Internal_1_1API.html#a12937d27b79460e8c7e9bdc3eae77688",
+"classCori_1_1Graphics_1_1Renderer2D.html#aca9bfbe7f940d87d8ae365de1f16bcff",
+"classCori_1_1Graphics_1_1VBLayout.html#af96f3a35a2d4692620e30b3d671136f1",
+"classCori_1_1Profiling_1_1InstanceMetrics.html#a0e04c41fd656780c7d912ffefaca898b",
+"classCori_1_1World_1_1EntityState.html#a17516fc7aea99dc8b38f5bf780592669",
+"classCori_1_1World_1_1Systems_1_1Hierarchy.html#a601f9ca81b6f04f0412874217de5d3a7",
+"namespaceCori_1_1Core.html#a0f06acce81d71ecdca15612fa8ecaa18ab36c913f14afcba26e88f2d5c4e77722",
+"namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416aaed04ee17bf9a3f2c3a5d3bb36a529488",
+"structCori_1_1Core_1_1ScreenMode.html#a905dc86c552181d82daad916be23445d",
+"structCori_1_1Logger_1_1Tags_1_1World_1_1Entity.html#a9001f5b3a3c7763e9d8c50129c172647",
+"structCori_1_1World_1_1Components_1_1Scene_1_1Camera.html#a677497a3bf5324f0ce10961c2d5f9ad9"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

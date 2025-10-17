@@ -135,7 +135,7 @@ $(function(){initNavTree('PackedArray_8hpp_source.html','',''); });
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>                    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>                }</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>                T* it = std::find(<a class="code hl_function" href="classCori_1_1Core_1_1PackedArray.html#ad9289fdc51d648941332831fb4dfec13">begin</a>(), <a class="code hl_function" href="classCori_1_1Core_1_1PackedArray.html#a8cd1bde5f7ac4f988ba898395a77109f">end</a>(), value);</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>                <span class="keyword">auto</span> it = std::find(<a class="code hl_function" href="classCori_1_1Core_1_1PackedArray.html#ad9289fdc51d648941332831fb4dfec13">begin</a>(), <a class="code hl_function" href="classCori_1_1Core_1_1PackedArray.html#a8cd1bde5f7ac4f988ba898395a77109f">end</a>(), value);</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>                <span class="keywordflow">if</span> (it == <a class="code hl_function" href="classCori_1_1Core_1_1PackedArray.html#a8cd1bde5f7ac4f988ba898395a77109f">end</a>()) {</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>                    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>                }</div>
@@ -171,31 +171,31 @@ $(function(){initNavTree('PackedArray_8hpp_source.html','',''); });
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno"><a class="line" href="classCori_1_1Core_1_1PackedArray.html#adfc200b9812916b1e47d82d27cd15033">   75</a></span>            <a class="code hl_typedef" href="classCori_1_1Core_1_1PackedArray.html#acef15fa45f1fc37f325a9b0160908bef">const_iterator</a> <a class="code hl_function" href="classCori_1_1Core_1_1PackedArray.html#adfc200b9812916b1e47d82d27cd15033">cend</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_Data.cbegin() + m_Size; }</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span> </div>
 <div class="foldopen" id="foldopen00077" data-start="{" data-end="}">
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno"><a class="line" href="classCori_1_1Core_1_1PackedArray.html#a593d763f08f1145705fcb0776edad8a8">   77</a></span>            SizeT <a class="code hl_function" href="classCori_1_1Core_1_1PackedArray.html#a593d763f08f1145705fcb0776edad8a8">size</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno"><a class="line" href="classCori_1_1Core_1_1PackedArray.html#a593d763f08f1145705fcb0776edad8a8">   77</a></span>            [[nodiscard]] SizeT <a class="code hl_function" href="classCori_1_1Core_1_1PackedArray.html#a593d763f08f1145705fcb0776edad8a8">size</a>()<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>                <span class="keywordflow">return</span> m_Size;</div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>            }</div>
 </div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
 <div class="foldopen" id="foldopen00081" data-start="{" data-end="}">
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno"><a class="line" href="classCori_1_1Core_1_1PackedArray.html#acc8069be47de84d0c8cfce6cfd807de7">   81</a></span>            <span class="keyword">constexpr</span> SizeT <a class="code hl_function" href="classCori_1_1Core_1_1PackedArray.html#acc8069be47de84d0c8cfce6cfd807de7">capacity</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno"><a class="line" href="classCori_1_1Core_1_1PackedArray.html#acc8069be47de84d0c8cfce6cfd807de7">   81</a></span>            [[nodiscard]] <span class="keyword">constexpr</span> SizeT <a class="code hl_function" href="classCori_1_1Core_1_1PackedArray.html#acc8069be47de84d0c8cfce6cfd807de7">capacity</a>()<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>                <span class="keywordflow">return</span> MaxSize;</div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>            }</div>
 </div>
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span> </div>
 <div class="foldopen" id="foldopen00085" data-start="{" data-end="}">
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="classCori_1_1Core_1_1PackedArray.html#afa1fc3cbbb20eaf7deb6bb0f1bbd7fde">   85</a></span>            <span class="keywordtype">bool</span> <a class="code hl_function" href="classCori_1_1Core_1_1PackedArray.html#afa1fc3cbbb20eaf7deb6bb0f1bbd7fde">empty</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="classCori_1_1Core_1_1PackedArray.html#afa1fc3cbbb20eaf7deb6bb0f1bbd7fde">   85</a></span>            [[nodiscard]] <span class="keywordtype">bool</span> <a class="code hl_function" href="classCori_1_1Core_1_1PackedArray.html#afa1fc3cbbb20eaf7deb6bb0f1bbd7fde">empty</a>()<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>                <span class="keywordflow">return</span> m_Size == 0;</div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>            }</div>
 </div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span> </div>
 <div class="foldopen" id="foldopen00089" data-start="{" data-end="}">
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno"><a class="line" href="classCori_1_1Core_1_1PackedArray.html#a728edc3c2fa578519db94ec237a6590b">   89</a></span>            <span class="keywordtype">bool</span> <a class="code hl_function" href="classCori_1_1Core_1_1PackedArray.html#a728edc3c2fa578519db94ec237a6590b">full</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno"><a class="line" href="classCori_1_1Core_1_1PackedArray.html#a728edc3c2fa578519db94ec237a6590b">   89</a></span>            [[nodiscard]] <span class="keywordtype">bool</span> <a class="code hl_function" href="classCori_1_1Core_1_1PackedArray.html#a728edc3c2fa578519db94ec237a6590b">full</a>()<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>                <span class="keywordflow">return</span> m_Size &gt;= MaxSize;</div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>            }</div>
 </div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
 <div class="foldopen" id="foldopen00093" data-start="{" data-end="}">
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno"><a class="line" href="classCori_1_1Core_1_1PackedArray.html#ade6288532924a45cb5a67ef6d27a724b">   93</a></span>            T&amp; <a class="code hl_function" href="classCori_1_1Core_1_1PackedArray.html#ade6288532924a45cb5a67ef6d27a724b">operator[]</a>(SizeT index) {</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno"><a class="line" href="classCori_1_1Core_1_1PackedArray.html#ade6288532924a45cb5a67ef6d27a724b">   93</a></span>            [[nodiscard]] T&amp; <a class="code hl_function" href="classCori_1_1Core_1_1PackedArray.html#ade6288532924a45cb5a67ef6d27a724b">operator[]</a>(SizeT index) {</div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>                <span class="keywordflow">return</span> m_Data[index];</div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>            }</div>
 </div>
@@ -206,7 +206,7 @@ $(function(){initNavTree('PackedArray_8hpp_source.html','',''); });
 </div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span> </div>
 <div class="foldopen" id="foldopen00100" data-start="{" data-end="}">
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno"><a class="line" href="classCori_1_1Core_1_1PackedArray.html#aa65ae4accb53bf074be3d4a35f8818f3">  100</a></span>            T&amp; <a class="code hl_function" href="classCori_1_1Core_1_1PackedArray.html#aa65ae4accb53bf074be3d4a35f8818f3">at</a>(SizeT index) {</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno"><a class="line" href="classCori_1_1Core_1_1PackedArray.html#aa65ae4accb53bf074be3d4a35f8818f3">  100</a></span>            [[nodiscard]] T&amp; <a class="code hl_function" href="classCori_1_1Core_1_1PackedArray.html#aa65ae4accb53bf074be3d4a35f8818f3">at</a>(SizeT index) {</div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>                <span class="keywordflow">if</span> (index &gt;= m_Size) {</div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>                    <span class="keywordflow">throw</span> std::out_of_range(<span class="stringliteral">&quot;PackedArray index out of range&quot;</span>);</div>
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>                }</div>
@@ -257,7 +257,7 @@ $(function(){initNavTree('PackedArray_8hpp_source.html','',''); });
 <div class="ttc" id="aclassCori_1_1Core_1_1PackedArray_html_adfc200b9812916b1e47d82d27cd15033"><div class="ttname"><a href="classCori_1_1Core_1_1PackedArray.html#adfc200b9812916b1e47d82d27cd15033">Cori::Core::PackedArray::cend</a></div><div class="ttdeci">const_iterator cend() const</div><div class="ttdef"><b>Definition</b> <a href="#l00075">PackedArray.hpp:75</a></div></div>
 <div class="ttc" id="aclassCori_1_1Core_1_1PackedArray_html_afa1fc3cbbb20eaf7deb6bb0f1bbd7fde"><div class="ttname"><a href="classCori_1_1Core_1_1PackedArray.html#afa1fc3cbbb20eaf7deb6bb0f1bbd7fde">Cori::Core::PackedArray::empty</a></div><div class="ttdeci">bool empty() const</div><div class="ttdef"><b>Definition</b> <a href="#l00085">PackedArray.hpp:85</a></div></div>
 <div class="ttc" id="anamespaceCori_1_1Core_html"><div class="ttname"><a href="namespaceCori_1_1Core.html">Cori::Core</a></div><div class="ttdoc">Core systems of the engine are here.</div><div class="ttdef"><b>Definition</b> <a href="AssetManager_8hpp_source.html#l00003">AssetManager.hpp:3</a></div></div>
-<div class="ttc" id="anamespaceCori_html"><div class="ttname"><a href="namespaceCori.html">Cori</a></div><div class="ttdoc">Global engine namespace.</div><div class="ttdef"><b>Definition</b> <a href="AssetManager_8cpp_source.html#l00003">AssetManager.cpp:3</a></div></div>
+<div class="ttc" id="anamespaceCori_html"><div class="ttname"><a href="namespaceCori.html">Cori</a></div><div class="ttdoc">Global engine namespace.</div><div class="ttdef"><b>Definition</b> <a href="AssetLoadStatus_8hpp_source.html#l00003">AssetLoadStatus.hpp:3</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 </div><!-- container -->

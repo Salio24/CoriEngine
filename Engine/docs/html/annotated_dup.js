@@ -12,6 +12,10 @@ var annotated_dup =
           [ "Engine", "classCori_1_1Core_1_1Internal_1_1Engine.html", "classCori_1_1Core_1_1Internal_1_1Engine" ],
           [ "ImGuiLayer", "classCori_1_1Core_1_1Internal_1_1ImGuiLayer.html", "classCori_1_1Core_1_1Internal_1_1ImGuiLayer" ]
         ] ],
+        [ "Threading", "namespaceCori_1_1Core_1_1Threading.html", [
+          [ "MainThreadQueue", "classCori_1_1Core_1_1Threading_1_1MainThreadQueue.html", "classCori_1_1Core_1_1Threading_1_1MainThreadQueue" ],
+          [ "ThreadPool", "classCori_1_1Core_1_1Threading_1_1ThreadPool.html", "classCori_1_1Core_1_1Threading_1_1ThreadPool" ]
+        ] ],
         [ "Application", "classCori_1_1Core_1_1Application.html", "classCori_1_1Core_1_1Application" ],
         [ "CoriError", "classCori_1_1Core_1_1CoriError.html", "classCori_1_1Core_1_1CoriError" ],
         [ "Event", "classCori_1_1Core_1_1Event.html", "classCori_1_1Core_1_1Event" ],
@@ -41,43 +45,49 @@ var annotated_dup =
       ] ],
       [ "FileSystem", "namespaceCori_1_1FileSystem.html", [
         [ "Internal", "namespaceCori_1_1FileSystem_1_1Internal.html", [
-          [ "PathDefines", "structCori_1_1FileSystem_1_1Internal_1_1PathDefines.html", "structCori_1_1FileSystem_1_1Internal_1_1PathDefines" ]
+          [ "is_vector", "structCori_1_1FileSystem_1_1Internal_1_1is__vector.html", null ],
+          [ "is_vector< std::vector< T, Alloc > >", "structCori_1_1FileSystem_1_1Internal_1_1is__vector_3_01std_1_1vector_3_01T_00_01Alloc_01_4_01_4.html", null ]
         ] ],
+        [ "BinaryFileManager", "classCori_1_1FileSystem_1_1BinaryFileManager.html", "classCori_1_1FileSystem_1_1BinaryFileManager" ],
         [ "FileManager", "classCori_1_1FileSystem_1_1FileManager.html", "classCori_1_1FileSystem_1_1FileManager" ],
-        [ "JsonSerializer", "classCori_1_1FileSystem_1_1JsonSerializer.html", "classCori_1_1FileSystem_1_1JsonSerializer" ]
+        [ "JsonSerializer", "classCori_1_1FileSystem_1_1JsonSerializer.html", "classCori_1_1FileSystem_1_1JsonSerializer" ],
+        [ "PathManager", "classCori_1_1FileSystem_1_1PathManager.html", "classCori_1_1FileSystem_1_1PathManager" ]
       ] ],
       [ "Graphics", "namespaceCori_1_1Graphics.html", [
         [ "Internal", "namespaceCori_1_1Graphics_1_1Internal.html", [
+          [ "AnimationData", "classCori_1_1Graphics_1_1Internal_1_1AnimationData.html", "classCori_1_1Graphics_1_1Internal_1_1AnimationData" ],
+          [ "AnimationFrame", "structCori_1_1Graphics_1_1Internal_1_1AnimationFrame.html", "structCori_1_1Graphics_1_1Internal_1_1AnimationFrame" ],
           [ "API", "classCori_1_1Graphics_1_1Internal_1_1API.html", "classCori_1_1Graphics_1_1Internal_1_1API" ],
-          [ "CoriGraphicsAPI", "classCori_1_1Graphics_1_1Internal_1_1CoriGraphicsAPI.html", "classCori_1_1Graphics_1_1Internal_1_1CoriGraphicsAPI" ],
           [ "FontData", "structCori_1_1Graphics_1_1Internal_1_1FontData.html", "structCori_1_1Graphics_1_1Internal_1_1FontData" ],
-          [ "IndexBuffer", "classCori_1_1Graphics_1_1Internal_1_1IndexBuffer.html", "classCori_1_1Graphics_1_1Internal_1_1IndexBuffer" ],
           [ "OpenGLContext", "classCori_1_1Graphics_1_1Internal_1_1OpenGLContext.html", "classCori_1_1Graphics_1_1Internal_1_1OpenGLContext" ],
           [ "OpenGLGraphicsAPI", "classCori_1_1Graphics_1_1Internal_1_1OpenGLGraphicsAPI.html", "classCori_1_1Graphics_1_1Internal_1_1OpenGLGraphicsAPI" ],
           [ "OpenGLIndexBuffer", "classCori_1_1Graphics_1_1Internal_1_1OpenGLIndexBuffer.html", "classCori_1_1Graphics_1_1Internal_1_1OpenGLIndexBuffer" ],
           [ "OpenGLShaderProgram", "classCori_1_1Graphics_1_1Internal_1_1OpenGLShaderProgram.html", "classCori_1_1Graphics_1_1Internal_1_1OpenGLShaderProgram" ],
           [ "OpenGLTexture2D", "classCori_1_1Graphics_1_1Internal_1_1OpenGLTexture2D.html", "classCori_1_1Graphics_1_1Internal_1_1OpenGLTexture2D" ],
           [ "OpenGLVertexArray", "classCori_1_1Graphics_1_1Internal_1_1OpenGLVertexArray.html", "classCori_1_1Graphics_1_1Internal_1_1OpenGLVertexArray" ],
-          [ "OpenGLVertexBuffer", "classCori_1_1Graphics_1_1Internal_1_1OpenGLVertexBuffer.html", "classCori_1_1Graphics_1_1Internal_1_1OpenGLVertexBuffer" ],
-          [ "RenderingContext", "classCori_1_1Graphics_1_1Internal_1_1RenderingContext.html", "classCori_1_1Graphics_1_1Internal_1_1RenderingContext" ],
-          [ "VBElement", "classCori_1_1Graphics_1_1Internal_1_1VBElement.html", "classCori_1_1Graphics_1_1Internal_1_1VBElement" ],
-          [ "VBLayout", "classCori_1_1Graphics_1_1Internal_1_1VBLayout.html", "classCori_1_1Graphics_1_1Internal_1_1VBLayout" ],
-          [ "VertexArray", "classCori_1_1Graphics_1_1Internal_1_1VertexArray.html", "classCori_1_1Graphics_1_1Internal_1_1VertexArray" ],
-          [ "VertexBuffer", "classCori_1_1Graphics_1_1Internal_1_1VertexBuffer.html", "classCori_1_1Graphics_1_1Internal_1_1VertexBuffer" ]
+          [ "OpenGLVertexBuffer", "classCori_1_1Graphics_1_1Internal_1_1OpenGLVertexBuffer.html", "classCori_1_1Graphics_1_1Internal_1_1OpenGLVertexBuffer" ]
         ] ],
         [ "Animation", "structCori_1_1Graphics_1_1Animation.html", "structCori_1_1Graphics_1_1Animation" ],
-        [ "AnimationData", "classCori_1_1Graphics_1_1AnimationData.html", "classCori_1_1Graphics_1_1AnimationData" ],
-        [ "AnimationFrame", "structCori_1_1Graphics_1_1AnimationFrame.html", "structCori_1_1Graphics_1_1AnimationFrame" ],
         [ "AnimationPack", "classCori_1_1Graphics_1_1AnimationPack.html", "classCori_1_1Graphics_1_1AnimationPack" ],
         [ "CameraController", "classCori_1_1Graphics_1_1CameraController.html", "classCori_1_1Graphics_1_1CameraController" ],
+        [ "CoriGraphicsAPI", "classCori_1_1Graphics_1_1CoriGraphicsAPI.html", "classCori_1_1Graphics_1_1CoriGraphicsAPI" ],
         [ "Font", "classCori_1_1Graphics_1_1Font.html", "classCori_1_1Graphics_1_1Font" ],
         [ "Image", "classCori_1_1Graphics_1_1Image.html", "classCori_1_1Graphics_1_1Image" ],
+        [ "IndexBuffer", "classCori_1_1Graphics_1_1IndexBuffer.html", "classCori_1_1Graphics_1_1IndexBuffer" ],
         [ "Renderer2D", "classCori_1_1Graphics_1_1Renderer2D.html", "classCori_1_1Graphics_1_1Renderer2D" ],
+        [ "RenderingContext", "classCori_1_1Graphics_1_1RenderingContext.html", "classCori_1_1Graphics_1_1RenderingContext" ],
         [ "ShaderProgram", "classCori_1_1Graphics_1_1ShaderProgram.html", "classCori_1_1Graphics_1_1ShaderProgram" ],
         [ "SpriteAtlas", "classCori_1_1Graphics_1_1SpriteAtlas.html", "classCori_1_1Graphics_1_1SpriteAtlas" ],
         [ "Texture", "classCori_1_1Graphics_1_1Texture.html", "classCori_1_1Graphics_1_1Texture" ],
         [ "Texture2D", "classCori_1_1Graphics_1_1Texture2D.html", "classCori_1_1Graphics_1_1Texture2D" ],
-        [ "UVs", "structCori_1_1Graphics_1_1UVs.html", "structCori_1_1Graphics_1_1UVs" ]
+        [ "UVs", "structCori_1_1Graphics_1_1UVs.html", "structCori_1_1Graphics_1_1UVs" ],
+        [ "VBElement", "classCori_1_1Graphics_1_1VBElement.html", "classCori_1_1Graphics_1_1VBElement" ],
+        [ "VBLayout", "classCori_1_1Graphics_1_1VBLayout.html", "classCori_1_1Graphics_1_1VBLayout" ],
+        [ "VertexArray", "classCori_1_1Graphics_1_1VertexArray.html", "classCori_1_1Graphics_1_1VertexArray" ],
+        [ "VertexBuffer", "classCori_1_1Graphics_1_1VertexBuffer.html", "classCori_1_1Graphics_1_1VertexBuffer" ]
+      ] ],
+      [ "Math", "namespaceCori_1_1Math.html", [
+        [ "Function", "classCori_1_1Math_1_1Function.html", "classCori_1_1Math_1_1Function" ]
       ] ],
       [ "Physics", "namespaceCori_1_1Physics.html", [
         [ "BodyUserData", "structCori_1_1Physics_1_1BodyUserData.html", "structCori_1_1Physics_1_1BodyUserData" ],
@@ -85,7 +95,6 @@ var annotated_dup =
         [ "CastResult", "structCori_1_1Physics_1_1CastResult.html", "structCori_1_1Physics_1_1CastResult" ],
         [ "Circle", "classCori_1_1Physics_1_1Circle.html", "classCori_1_1Physics_1_1Circle" ],
         [ "ConvexHull", "classCori_1_1Physics_1_1ConvexHull.html", "classCori_1_1Physics_1_1ConvexHull" ],
-        [ "PhysicsWorld", "classCori_1_1Physics_1_1PhysicsWorld.html", "classCori_1_1Physics_1_1PhysicsWorld" ],
         [ "Polygon", "classCori_1_1Physics_1_1Polygon.html", "classCori_1_1Physics_1_1Polygon" ],
         [ "Segment", "classCori_1_1Physics_1_1Segment.html", "classCori_1_1Physics_1_1Segment" ],
         [ "ShapeUserData", "structCori_1_1Physics_1_1ShapeUserData.html", "structCori_1_1Physics_1_1ShapeUserData" ]
@@ -115,7 +124,6 @@ var annotated_dup =
             [ "QuadRenderer", "structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html", "structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer" ],
             [ "RigidBody", "structCori_1_1World_1_1Components_1_1Entity_1_1RigidBody.html", "structCori_1_1World_1_1Components_1_1Entity_1_1RigidBody" ],
             [ "StateMachine", "classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html", "classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine" ],
-            [ "Tag", "structCori_1_1World_1_1Components_1_1Entity_1_1Tag.html", "structCori_1_1World_1_1Components_1_1Entity_1_1Tag" ],
             [ "Transform", "structCori_1_1World_1_1Components_1_1Entity_1_1Transform.html", "structCori_1_1World_1_1Components_1_1Entity_1_1Transform" ],
             [ "Trigger", "classCori_1_1World_1_1Components_1_1Entity_1_1Trigger.html", "classCori_1_1World_1_1Components_1_1Entity_1_1Trigger" ],
             [ "UUID", "structCori_1_1World_1_1Components_1_1Entity_1_1UUID.html", "structCori_1_1World_1_1Components_1_1Entity_1_1UUID" ]
@@ -124,13 +132,30 @@ var annotated_dup =
             [ "Camera", "structCori_1_1World_1_1Components_1_1Scene_1_1Camera.html", "structCori_1_1World_1_1Components_1_1Scene_1_1Camera" ]
           ] ]
         ] ],
+        [ "EntityTags", "namespaceCori_1_1World_1_1EntityTags.html", [
+          [ "DisposableEntityTag", "structCori_1_1World_1_1EntityTags_1_1DisposableEntityTag.html", null ]
+        ] ],
+        [ "Internal", "namespaceCori_1_1World_1_1Internal.html", [
+          [ "SceneID", "structCori_1_1World_1_1Internal_1_1SceneID.html", "structCori_1_1World_1_1Internal_1_1SceneID" ]
+        ] ],
+        [ "Systems", "namespaceCori_1_1World_1_1Systems.html", [
+          [ "Animation", "classCori_1_1World_1_1Systems_1_1Animation.html", "classCori_1_1World_1_1Systems_1_1Animation" ],
+          [ "Hierarchy", "classCori_1_1World_1_1Systems_1_1Hierarchy.html", "classCori_1_1World_1_1Systems_1_1Hierarchy" ],
+          [ "PhysicsSystem", "classCori_1_1World_1_1Systems_1_1PhysicsSystem.html", "classCori_1_1World_1_1Systems_1_1PhysicsSystem" ],
+          [ "StateMachine", "classCori_1_1World_1_1Systems_1_1StateMachine.html", "classCori_1_1World_1_1Systems_1_1StateMachine" ],
+          [ "Transform", "classCori_1_1World_1_1Systems_1_1Transform.html", "classCori_1_1World_1_1Systems_1_1Transform" ],
+          [ "Trigger", "classCori_1_1World_1_1Systems_1_1Trigger.html", "classCori_1_1World_1_1Systems_1_1Trigger" ]
+        ] ],
+        [ "DisposableEntityPool", "classCori_1_1World_1_1DisposableEntityPool.html", "classCori_1_1World_1_1DisposableEntityPool" ],
+        [ "DynamicEntityView", "classCori_1_1World_1_1DynamicEntityView.html", "classCori_1_1World_1_1DynamicEntityView" ],
         [ "Entity", "classCori_1_1World_1_1Entity.html", "classCori_1_1World_1_1Entity" ],
         [ "EntityState", "classCori_1_1World_1_1EntityState.html", "classCori_1_1World_1_1EntityState" ],
-        [ "EntityView", "classCori_1_1World_1_1EntityView.html", "classCori_1_1World_1_1EntityView" ],
         [ "Exclude", "structCori_1_1World_1_1Exclude.html", null ],
         [ "Scene", "classCori_1_1World_1_1Scene.html", "classCori_1_1World_1_1Scene" ],
         [ "SceneHandle", "classCori_1_1World_1_1SceneHandle.html", "classCori_1_1World_1_1SceneHandle" ],
         [ "SceneManager", "classCori_1_1World_1_1SceneManager.html", "classCori_1_1World_1_1SceneManager" ],
+        [ "StaticEntityView", "classCori_1_1World_1_1StaticEntityView.html", "classCori_1_1World_1_1StaticEntityView" ],
+        [ "System", "classCori_1_1World_1_1System.html", "classCori_1_1World_1_1System" ],
         [ "TriggerBehaviour", "classCori_1_1World_1_1TriggerBehaviour.html", "classCori_1_1World_1_1TriggerBehaviour" ]
       ] ],
       [ "AssetManager", "classCori_1_1AssetManager.html", "classCori_1_1AssetManager" ],

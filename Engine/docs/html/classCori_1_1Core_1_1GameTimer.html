@@ -109,6 +109,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a574d093d4af47439981e65fdfc40c846"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the tickAlpha, scale is in seconds. Used for between tick interpolation.  <br /></td></tr>
 <tr class="memitem:a85a5157b39dd5a07ce8a342c65c87b36" id="r_a85a5157b39dd5a07ce8a342c65c87b36"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a85a5157b39dd5a07ce8a342c65c87b36">GetTimestep</a> () const</td></tr>
 <tr class="memdesc:a85a5157b39dd5a07ce8a342c65c87b36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current timeStep, scale is in seconds.  <br /></td></tr>
+<tr class="memitem:aa2476372236e624cd80314822f49ebdc" id="r_aa2476372236e624cd80314822f49ebdc"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa2476372236e624cd80314822f49ebdc">GetTickRate</a> () const</td></tr>
+<tr class="memdesc:aa2476372236e624cd80314822f49ebdc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current tickRate.  <br /></td></tr>
 <tr class="memitem:a175e14eb38b6451bf624c8e9d509dced" id="r_a175e14eb38b6451bf624c8e9d509dced"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a175e14eb38b6451bf624c8e9d509dced">GetElapsedMilliseconds</a> () const</td></tr>
 <tr class="memdesc:a175e14eb38b6451bf624c8e9d509dced"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the time in milliseconds since application start.  <br /></td></tr>
 <tr class="memitem:af909d0acb3d2af9f219b0c650cdd70db" id="r_af909d0acb3d2af9f219b0c650cdd70db"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af909d0acb3d2af9f219b0c650cdd70db">GetElapsedSeconds</a> () const</td></tr>
@@ -299,7 +301,7 @@ Here is the call graph for this function:</div>
 <p>Gets the time in hours since application start. </p>
 <dl class="section return"><dt>Returns</dt><dd>Hours elapsed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00055">55</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00060">60</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
 
 </div>
 </div>
@@ -329,7 +331,7 @@ Here is the call graph for this function:</div>
 <p>Gets the time in milliseconds since application start. </p>
 <dl class="section return"><dt>Returns</dt><dd>Milliseconds elapsed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00037">37</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00042">42</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
 
 </div>
 </div>
@@ -359,7 +361,7 @@ Here is the call graph for this function:</div>
 <p>Gets the time in minutes since application start. </p>
 <dl class="section return"><dt>Returns</dt><dd>Minutes elapsed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00049">49</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00054">54</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
 
 </div>
 </div>
@@ -389,7 +391,7 @@ Here is the call graph for this function:</div>
 <p>Gets the time in seconds since application start. </p>
 <dl class="section return"><dt>Returns</dt><dd>Seconds elapsed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00043">43</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00048">48</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
 
 </div>
 </div>
@@ -419,6 +421,35 @@ Here is the call graph for this function:</div>
 <p>Returns the tickAlpha, scale is in seconds. Used for between tick interpolation. </p>
 
 <p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00026">26</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aa2476372236e624cd80314822f49ebdc" name="aa2476372236e624cd80314822f49ebdc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2476372236e624cd80314822f49ebdc">&#9670;&#160;</a></span>GetTickRate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t Cori::Core::GameTimer::GetTickRate </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel nodiscard">nodiscard</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the current tickRate. </p>
+
+<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00036">36</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
 
 </div>
 </div>
@@ -473,7 +504,8 @@ Here is the call graph for this function:</div>
   </table>
   </dd>
 </dl>
-<p>When enabled ticks don't happened on their own, instead you can advance one tick at a time by pressing K, or hold J to enable regular behaviour when enabled. </p>
+<p>When enabled ticks don't happened on their own, instead you can advance one tick at a time by pressing K, or hold J to enable regular behaviour when enabled. </p><dl class="section note"><dt>Note</dt><dd>When using manual step interpolation might look wierd, since m_TickAlpha will be close to 0 all the time. <br  />
+ This is expected behaviour since it relies on per frame logic, but what we do when using manual step is we advance one tick at a time including running the per frame logic not each frame. Interpolated position would look like similar to the case if we would run the game at near tickrate FPS. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="Time_8cpp_source.html#l00024">24</a> of file <a class="el" href="Time_8cpp_source.html">Time.cpp</a>.</p>
 
@@ -527,7 +559,7 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00079">79</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Time_8hpp_source.html#l00087">87</a> of file <a class="el" href="Time_8hpp_source.html">Time.hpp</a>.</p>
 
 </div>
 </div>

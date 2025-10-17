@@ -11,5 +11,5 @@ var searchData=
   ['convexhull_8',['ConvexHull',['../classCori_1_1Physics_1_1ConvexHull.html',1,'Cori::Physics']]],
   ['core_9',['Core',['../structCori_1_1Logger_1_1Tags_1_1Core.html',1,'Cori::Logger::Tags']]],
   ['corierror_10',['CoriError',['../classCori_1_1Core_1_1CoriError.html',1,'Cori::Core']]],
-  ['corigraphicsapi_11',['CoriGraphicsAPI',['../classCori_1_1Graphics_1_1Internal_1_1CoriGraphicsAPI.html',1,'Cori::Graphics::Internal']]]
+  ['corigraphicsapi_11',['CoriGraphicsAPI',['../classCori_1_1Graphics_1_1CoriGraphicsAPI.html',1,'Cori::Graphics']]]
 ];

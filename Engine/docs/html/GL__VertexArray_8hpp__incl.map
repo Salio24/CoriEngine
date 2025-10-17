@@ -1,13 +1,9 @@
 <map id="GL_VertexArray.hpp" name="GL_VertexArray.hpp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="289,5,438,33"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="87,5,237,33"/>
 <area shape="rect" id="Node000002" href="$VertexArray_8hpp.html" title=" " alt="" coords="5,81,143,109"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="312,36,142,79,140,74,311,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,36,103,73,99,69,145,31"/>
 <area shape="rect" id="Node000004" href="$Trackable_8hpp.html" title=" " alt="" coords="166,81,336,109"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="345,36,285,75,282,70,342,31"/>
-<area shape="rect" id="Node000006" href="$AutoRegisteringFactory_8hpp.html" title=" " alt="" coords="360,81,593,109"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="385,31,445,70,443,75,382,36"/>
-<area shape="rect" id="Node000007" href="$GraphicsAPIs_8hpp.html" title=" " alt="" coords="618,81,813,109"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="427,31,638,75,637,80,426,36"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="180,31,225,69,222,73,176,36"/>
 <area shape="rect" id="Node000003" href="$Buffers_8hpp.html" title=" " alt="" coords="26,157,122,184"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="77,109,77,141,71,141,71,109"/>
 <area shape="rect" id="Node000005" href="$InstanceMetrics_8hpp.html" title=" " alt="" coords="175,157,328,184"/>

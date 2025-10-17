@@ -18,6 +18,8 @@ var classCori_1_1Graphics_1_1Texture2D =
     [ "Create", "classCori_1_1Graphics_1_1Texture2D.html#acbe765f47b11b1dc332a3afe975aa0de", null ],
     [ "Create", "classCori_1_1Graphics_1_1Texture2D.html#a3904eedddef47d387c4bc06df85fb2c7", null ],
     [ "GetHeight", "classCori_1_1Graphics_1_1Texture2D.html#a6a26ce62697f9a927af9ed399b8aab00", null ],
+    [ "GetStatus", "classCori_1_1Graphics_1_1Texture2D.html#a9762a6f7b53cca693915a43a3aab8b8c", null ],
     [ "GetWidth", "classCori_1_1Graphics_1_1Texture2D.html#ad7d48996669c7e3a46f830425fe43503", null ],
-    [ "HasSemiTransparency", "classCori_1_1Graphics_1_1Texture2D.html#ab614b20506886933d8e3b44351f02ce3", null ]
+    [ "HasSemiTransparency", "classCori_1_1Graphics_1_1Texture2D.html#ab614b20506886933d8e3b44351f02ce3", null ],
+    [ "m_Status", "classCori_1_1Graphics_1_1Texture2D.html#af3d133c1cc5a96a3f9044011ef0a15a5", null ]
 ];

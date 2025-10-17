@@ -50,6 +50,7 @@ var classCori_1_1Logger =
     [ "GetClientLogger", "classCori_1_1Logger.html#a4d84ca33d5d85a4bc2525ae6d6c01dad", null ],
     [ "GetCoreInactiveTags", "classCori_1_1Logger.html#abff96735adc8def33e5dc2de760b8f71", null ],
     [ "GetCoreLogger", "classCori_1_1Logger.html#a6fde89b5ed00a6e37cbb808a4206c7ad", null ],
+    [ "GetStatus", "classCori_1_1Logger.html#a7e782f29b9eebd80d6a801e80d074318", null ],
     [ "HighlightedText", "classCori_1_1Logger.html#a0a07c998f61d6a4728a21efad5e60986", null ],
     [ "Init", "classCori_1_1Logger.html#ad5aa72017ebaac8fc14bf673492b5efb", null ],
     [ "IsClientTagDisabled", "classCori_1_1Logger.html#a228d3debeaf17ea93b011fd91b5c1e8b", null ],

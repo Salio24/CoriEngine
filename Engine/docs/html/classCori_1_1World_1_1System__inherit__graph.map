@@ -1,0 +1,15 @@
+<map id="Cori::World::System" name="Cori::World::System">
+<area shape="rect" id="Node000001" title="System part of ECS." alt="" coords="5,187,156,215"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Systems_1_1Animation.html" title="System that is responsible for Animations, every Scene has it by default." alt="" coords="204,5,361,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="98,172,142,117,170,87,202,60,221,48,224,53,205,64,174,91,146,120,102,176"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Systems_1_1Hierarchy.html" title=" " alt="" coords="204,75,361,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="117,177,202,129,227,117,229,122,205,134,120,181"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1World_1_1Systems_1_1PhysicsSystem.html" title="System responsible for physics." alt="" coords="204,144,361,189"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="171,183,203,177,204,183,171,188"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1World_1_1Systems_1_1StateMachine.html" title=" " alt="" coords="204,213,361,258"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="171,214,204,219,203,225,171,219"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1World_1_1Systems_1_1Transform.html" title=" " alt="" coords="204,283,361,327"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="120,221,205,268,229,280,227,285,202,273,117,225"/>
+<area shape="rect" id="Node000007" href="$classCori_1_1World_1_1Systems_1_1Trigger.html" title="System responsible for handling physical triggers." alt="" coords="204,352,361,397"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="102,226,146,282,174,311,205,338,224,349,221,354,202,342,170,315,142,285,98,230"/>
+</map>

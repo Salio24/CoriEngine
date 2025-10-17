@@ -1,0 +1,9 @@
+<map id="Tags.hpp" name="Tags.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="100,5,178,33"/>
+<area shape="rect" id="Node000002" href="$WorldSystem_2Systems_2Animation_8hpp.html" title=" " alt="" coords="81,81,197,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,49,142,81,136,81,136,49"/>
+<area shape="rect" id="Node000003" href="$WorldSystem_2Systems_2Animation_8cpp.html" title=" " alt="" coords="5,157,121,184"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="116,121,78,158,75,154,113,118"/>
+<area shape="rect" id="Node000004" href="$SceneManager_8cpp.html" title=" " alt="" coords="144,157,288,184"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="166,118,204,154,201,158,162,121"/>
+</map>

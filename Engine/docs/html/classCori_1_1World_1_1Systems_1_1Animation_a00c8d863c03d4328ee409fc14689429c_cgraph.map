@@ -1,0 +1,9 @@
+<map id="Cori::World::Systems::Animation::Create" name="Cori::World::Systems::Animation::Create">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,75,163,119"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Entity.html#a7b8dc8e2678b0b088fcbc94bad61a931" title="Adds a component to the entity." alt="" coords="260,5,400,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,72,244,49,246,54,164,77"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1SceneHandle.html#a723e1ba8e3063397da31bee28a56b5b2" title="Creates an Entity with a default set of components." alt="" coords="237,75,423,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="163,94,221,94,221,100,163,100"/>
+<area shape="rect" id="Node000004" href="$structCori_1_1World_1_1Components_1_1Entity_1_1Transform.html#a79f932caf72a51ff4c7006312c00de41" title="Changes the local scale of the Entity." alt="" coords="211,144,449,189"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="164,117,234,137,233,142,163,122"/>
+</map>

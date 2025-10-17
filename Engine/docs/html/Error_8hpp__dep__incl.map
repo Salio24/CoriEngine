@@ -1,0 +1,11 @@
+<map id="Error.hpp" name="Error.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="99,5,179,33"/>
+<area shape="rect" id="Node000002" href="$DisposableEntityPool_8hpp.html" title=" " alt="" coords="45,81,233,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,49,142,81,136,81,136,49"/>
+<area shape="rect" id="Node000003" href="$WorldSystem_2Systems_2Animation_8hpp.html" title=" " alt="" coords="81,157,197,184"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="142,124,142,156,136,156,136,124"/>
+<area shape="rect" id="Node000004" href="$WorldSystem_2Systems_2Animation_8cpp.html" title=" " alt="" coords="5,232,121,260"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="116,197,78,234,75,230,113,193"/>
+<area shape="rect" id="Node000005" href="$SceneManager_8cpp.html" title=" " alt="" coords="144,232,288,260"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="166,193,204,230,201,234,162,197"/>
+</map>

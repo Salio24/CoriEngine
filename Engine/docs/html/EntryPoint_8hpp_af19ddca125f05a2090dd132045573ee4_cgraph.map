@@ -1,19 +1,23 @@
 <map id="main" name="main">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,120,60,148"/>
-<area shape="rect" id="Node000002" href="$namespaceCori_1_1Core.html#a660de86b4342b4de453e28d25ff418db" title=" " alt="" coords="108,34,317,62"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="46,118,73,94,106,72,123,65,125,70,109,77,76,98,50,122"/>
-<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1Application.html#a8755f2d4b93f79f760688246a54a5f7f" title="Run loop, internal." alt="" coords="113,86,312,114"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="59,127,122,114,123,120,60,132"/>
-<area shape="rect" id="Node000006" href="$classCori_1_1Core_1_1Internal_1_1Engine.html#a0779298179e3b2d130a8103a62eaa7af" title=" " alt="" coords="141,141,284,186"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="60,136,126,147,125,152,60,141"/>
-<area shape="rect" id="Node000009" href="$classCori_1_1Core_1_1Internal_1_1Engine.html#a66b6c6aeddb2f5d947dafa1f1dd13257" title=" " alt="" coords="141,211,284,255"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="49,146,75,172,109,196,128,205,126,210,106,201,72,176,45,150"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,222,60,250"/>
+<area shape="rect" id="Node000002" href="$namespaceCori_1_1Core.html#a660de86b4342b4de453e28d25ff418db" title=" " alt="" coords="108,135,317,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="46,219,73,196,106,173,123,166,125,171,109,178,76,200,50,223"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1Application.html#a8755f2d4b93f79f760688246a54a5f7f" title="Run loop, internal." alt="" coords="113,187,312,215"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="59,228,122,216,123,221,60,233"/>
+<area shape="rect" id="Node000008" href="$classCori_1_1Core_1_1Internal_1_1Engine.html#a0779298179e3b2d130a8103a62eaa7af" title=" " alt="" coords="141,243,284,287"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="60,237,126,248,125,253,60,243"/>
+<area shape="rect" id="Node000011" href="$classCori_1_1Core_1_1Internal_1_1Engine.html#a66b6c6aeddb2f5d947dafa1f1dd13257" title=" " alt="" coords="141,312,284,357"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="49,248,75,273,109,297,128,307,126,312,106,302,72,277,45,252"/>
 <area shape="rect" id="Node000004" href="$classCori_1_1Graphics_1_1Internal_1_1API.html#ad4ecc279089140697c8e3ee36494fcc4" title=" " alt="" coords="376,5,548,50"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="271,83,316,70,375,53,377,58,318,76,272,88"/>
-<area shape="rect" id="Node000005" href="$classCori_1_1Graphics_1_1Internal_1_1API.html#a0288773b385ae7e77e42147a0fdf4fc7" title=" " alt="" coords="377,75,547,119"/>
-<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="312,96,361,95,361,101,312,101"/>
-<area shape="rect" id="Node000007" href="$classCori_1_1Logger.html#ad54a7f43253539a16a7f84a203c08317" title=" " alt="" coords="365,144,559,189"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="285,162,350,162,349,168,284,167"/>
-<area shape="rect" id="Node000008" href="$classCori_1_1Logger.html#ad5aa72017ebaac8fc14bf673492b5efb" title=" " alt="" coords="398,212,526,240"/>
-<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="285,179,390,206,388,211,284,184"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="296,184,315,172,327,159,334,146,339,119,344,90,351,75,363,60,367,57,370,61,367,64,356,78,349,91,344,120,339,148,331,162,319,176,299,189"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1Graphics_1_1Renderer2D.html#af5d46d8865e7c580574d531e70465053" title=" " alt="" coords="368,75,556,119"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="287,184,316,172,330,162,339,152,349,141,364,129,373,124,376,129,366,134,353,145,343,155,333,166,318,177,289,189"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1Graphics_1_1Internal_1_1API.html#a0288773b385ae7e77e42147a0fdf4fc7" title=" " alt="" coords="377,144,547,189"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="312,185,361,178,362,183,313,190"/>
+<area shape="rect" id="Node000007" href="$classCori_1_1Graphics_1_1Renderer2D.html#ac911791f6d240ba21dc6ac3cc2326894" title=" " alt="" coords="368,213,556,258"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="313,212,353,218,352,223,312,217"/>
+<area shape="rect" id="Node000009" href="$classCori_1_1Logger.html#ad54a7f43253539a16a7f84a203c08317" title=" " alt="" coords="365,283,559,327"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="285,274,351,284,350,290,284,279"/>
+<area shape="rect" id="Node000010" href="$classCori_1_1Logger.html#ad5aa72017ebaac8fc14bf673492b5efb" title=" " alt="" coords="398,351,526,379"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="286,282,318,297,333,308,343,318,352,328,366,337,384,345,382,350,364,342,349,332,339,322,330,312,316,302,284,287"/>
 </map>

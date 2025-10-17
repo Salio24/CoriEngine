@@ -1,14 +1,4 @@
 <map id="Cori::Graphics::Texture2D::Create" name="Cori::Graphics::Texture2D::Create">
-<area shape="rect" id="Node000001" title="Creates a Texture2D from the Image." alt="" coords="5,57,182,102"/>
-<area shape="rect" id="Node000002" href="$namespaceCori_1_1Graphics.html#ac10cdf39fd3a5b64fb82ad5cd57d4668" title=" " alt="" coords="230,5,461,33"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,54,229,42,261,34,263,40,230,47,183,59"/>
-<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1Factory.html#a0eeb110662af3542e9ba9cdd1c86203d" title=" " alt="" coords="275,57,416,102"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,76,259,76,259,82,182,82"/>
-<area shape="rect" id="Node000006" href="$classCori_1_1Core_1_1Window.html#a675130786b522717fb797d28166b1da5" title="Returns the graphical API used by this window." alt="" coords="273,126,418,171"/>
-<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="178,100,258,122,257,127,177,105"/>
-<area shape="rect" id="Node000004" href="$classCori_1_1Core_1_1Factory.html#a30ad48765e0f34046d7054c5d3985061" title=" " alt="" coords="509,57,650,102"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="416,76,493,76,493,82,416,82"/>
-<area shape="rect" id="Node000005" href="$classCori_1_1Core_1_1Factory.html#a924e36be422a39be61f8329c2e90cea0" title=" " alt="" coords="698,57,840,102"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="651,76,683,76,683,82,651,82"/>
-<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="732,57,731,47,737,38,750,32,769,30,789,33,802,39,799,44,788,38,769,35,752,37,741,42,736,48,738,56"/>
+<area shape="rect" id="Node000001" title="Creates a Texture2D from the Image." alt="" coords="5,29,182,74"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="59,29,58,19,64,10,76,5,94,3,113,5,124,11,121,16,111,10,93,8,77,10,67,14,63,21,64,28"/>
 </map>

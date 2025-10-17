@@ -109,6 +109,15 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a0ce9dbdd459266dfdbdca5f61331a68b" id="r_a0ce9dbdd459266dfdbdca5f61331a68b"><td class="memTemplParams" colspan="2">template&lt;Internal::IsDescriptor Descriptor&gt; </td></tr>
 <tr class="memitem:a0ce9dbdd459266dfdbdca5f61331a68b template"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0ce9dbdd459266dfdbdca5f61331a68b">Unload</a> (const std::initializer_list&lt; Descriptor &gt; &amp;descriptors)</td></tr>
 <tr class="memdesc:a0ce9dbdd459266dfdbdca5f61331a68b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unloads a group (or one) of assets from the cache.  <br /></td></tr>
+<tr class="memitem:a84bf510be640d897524f9d8515cdc8b4" id="r_a84bf510be640d897524f9d8515cdc8b4"><td class="memTemplParams" colspan="2">template&lt;Internal::IsAsset AssetType&gt; </td></tr>
+<tr class="memitem:a84bf510be640d897524f9d8515cdc8b4 template"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a84bf510be640d897524f9d8515cdc8b4">RegisterPlaceholder</a> (const std::shared_ptr&lt; AssetType &gt; &amp;placeholderInstance)</td></tr>
+<tr class="memdesc:a84bf510be640d897524f9d8515cdc8b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">This allows you to register a placeholder for a specific asset that you can later retrieve.  <br /></td></tr>
+<tr class="memitem:a3ff7ff1e32563f96a85f70b2af4cc0c6" id="r_a3ff7ff1e32563f96a85f70b2af4cc0c6"><td class="memTemplParams" colspan="2">template&lt;Internal::IsAsset AssetType&gt; </td></tr>
+<tr class="memitem:a3ff7ff1e32563f96a85f70b2af4cc0c6 template"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; AssetType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3ff7ff1e32563f96a85f70b2af4cc0c6">GetPlaceholder</a> ()</td></tr>
+<tr class="memdesc:a3ff7ff1e32563f96a85f70b2af4cc0c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the instance of placeholder for a specified asset type.  <br /></td></tr>
+<tr class="memitem:a7f17c96404a7eeae4f4bcebfae691abc" id="r_a7f17c96404a7eeae4f4bcebfae691abc"><td class="memTemplParams" colspan="2">template&lt;Internal::IsAsset AssetType&gt; </td></tr>
+<tr class="memitem:a7f17c96404a7eeae4f4bcebfae691abc template"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7f17c96404a7eeae4f4bcebfae691abc">HasPlaceholder</a> ()</td></tr>
+<tr class="memdesc:a7f17c96404a7eeae4f4bcebfae691abc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if an asset type have placeholder registered.  <br /></td></tr>
 <tr class="memitem:a3db3959ea2b22cbba60a8d20de3e9afd" id="r_a3db3959ea2b22cbba60a8d20de3e9afd"><td class="memTemplParams" colspan="2">template&lt;typename AssetType&gt; </td></tr>
 <tr class="memitem:a3db3959ea2b22cbba60a8d20de3e9afd template"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3db3959ea2b22cbba60a8d20de3e9afd">ClearCache</a> ()</td></tr>
 <tr class="memdesc:a3db3959ea2b22cbba60a8d20de3e9afd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears cache for o specified asset type.  <br /></td></tr>
@@ -117,9 +126,9 @@ Static Public Member Functions</h2></td></tr>
 <div class="textblock"><p>Used when you want to manually control the asset lifetime, loading, preloading, unloading. </p>
 <p>Mainly used for assets that are not bound to any particular object, but you want to keep them alive. <br  />
  For example: Fonts, AnimationPacks, Sounds, etc. Because all asset lifetimes in <a class="el" href="namespaceCori.html" title="Global engine namespace.">Cori</a> are managed by a shared pointers, if not for the <a class="el" href="classCori_1_1AssetManager.html" title="Used when you want to manually control the asset lifetime, loading, preloading, unloading.">AssetManager</a> these asset would be unloaded as soon as some object is done with them and refcount dropped to 0, AssetManger is a convenient place to keep these objects loaded and alive. <br  />
- For loading and later reviving the asset AssetManger uses descriptors that describe how to load a particular asset. "TODO: link here the wiki page about descriptors" </p>
+ For loading and later reviving the asset AssetManger uses descriptors that describe how to load a particular asset. </p>
 
-<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00037">37</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00045">45</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a3db3959ea2b22cbba60a8d20de3e9afd" name="a3db3959ea2b22cbba60a8d20de3e9afd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3db3959ea2b22cbba60a8d20de3e9afd">&#9670;&#160;</a></span>ClearCache()</h2>
@@ -155,7 +164,7 @@ template&lt;typename AssetType&gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>If an asset is still used somewhere (ref count &gt; 1) it will be removed from cache, but freed only when the ref count drops to 0. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00116">116</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00172">172</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
 
 </div>
 </div>
@@ -199,7 +208,83 @@ template&lt;Internal::CanBeLoaded Descriptor&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A shared pointer to the loaded asset. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00050">50</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00060">60</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a3ff7ff1e32563f96a85f70b2af4cc0c6" name="a3ff7ff1e32563f96a85f70b2af4cc0c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ff7ff1e32563f96a85f70b2af4cc0c6">&#9670;&#160;</a></span>GetPlaceholder()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;Internal::IsAsset AssetType&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; AssetType &gt; Cori::AssetManager::GetPlaceholder </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieves the instance of placeholder for a specified asset type. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">AssetType</td><td>Asset type to retrieve a placeholder for. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Asset placeholder instnace of success, nullptr if placeholder for this asset wasn't registered. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00147">147</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a7f17c96404a7eeae4f4bcebfae691abc" name="a7f17c96404a7eeae4f4bcebfae691abc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f17c96404a7eeae4f4bcebfae691abc">&#9670;&#160;</a></span>HasPlaceholder()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;Internal::IsAsset AssetType&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Cori::AssetManager::HasPlaceholder </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks if an asset type have placeholder registered. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">AssetType</td><td>Asset type to check the existence of placeholder for. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if there is a placeholder registered, false otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00162">162</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
 
 </div>
 </div>
@@ -243,7 +328,7 @@ template&lt;Internal::CanBeLoaded Descriptor&gt; </div>
 </dl>
 <p>It is needed to avoid the stutter that will be caused when the asset is requested but not yet loaded. </p>
 
-<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00073">73</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00084">84</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -254,6 +339,49 @@ Here is the call graph for this function:</div>
 <area shape="poly" title=" " alt="" coords="154,25,186,25,186,30,154,30"/>
 </map>
 </div>
+
+</div>
+</div>
+<a id="a84bf510be640d897524f9d8515cdc8b4" name="a84bf510be640d897524f9d8515cdc8b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84bf510be640d897524f9d8515cdc8b4">&#9670;&#160;</a></span>RegisterPlaceholder()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;Internal::IsAsset AssetType&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Cori::AssetManager::RegisterPlaceholder </td>
+          <td>(</td>
+          <td class="paramtype">const std::shared_ptr&lt; AssetType &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>placeholderInstance</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>This allows you to register a placeholder for a specific asset that you can later retrieve. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">AssetType</td><td>Type of asset to register placeholder for. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">placeholderInstance</td><td>Asset instance that we will consider a placeholder. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00130">130</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
 
 </div>
 </div>
@@ -297,7 +425,7 @@ template&lt;Internal::IsDescriptor Descriptor&gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>If an asset is still used somewhere (ref count &gt; 1) it will be removed from cache, but freed only when the ref count drops to 0. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00088">88</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AssetManager_8hpp_source.html#l00100">100</a> of file <a class="el" href="AssetManager_8hpp_source.html">AssetManager.hpp</a>.</p>
 
 </div>
 </div>

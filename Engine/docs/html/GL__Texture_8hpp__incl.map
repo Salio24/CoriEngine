@@ -1,16 +1,14 @@
 <map id="GL_Texture.hpp" name="GL_Texture.hpp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="206,5,328,33"/>
-<area shape="rect" id="Node000002" href="$Texture_8hpp.html" title=" " alt="" coords="5,81,164,109"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="235,36,132,77,130,72,234,31"/>
-<area shape="rect" id="Node000004" href="$Trackable_8hpp.html" title=" " alt="" coords="58,232,228,260"/>
-<area shape="poly" id="edge6_Node000001_Node000004" title=" " alt="" coords="260,35,228,82,188,156,158,219,153,217,184,154,224,80,255,32"/>
-<area shape="rect" id="Node000006" href="$GraphicsAPIs_8hpp.html" title=" " alt="" coords="238,81,433,109"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="281,32,315,68,311,71,277,35"/>
-<area shape="rect" id="Node000007" href="$AutoRegisteringFactory_8hpp.html" title=" " alt="" coords="457,81,690,109"/>
-<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="323,31,505,74,503,79,322,36"/>
-<area shape="rect" id="Node000003" href="$Image_8hpp.html" title=" " alt="" coords="57,157,147,184"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="90,109,98,141,93,142,85,110"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="112,184,131,217,126,220,107,186"/>
-<area shape="rect" id="Node000005" href="$InstanceMetrics_8hpp.html" title=" " alt="" coords="67,308,219,336"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="146,261,146,292,140,292,140,261"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="267,5,388,33"/>
+<area shape="rect" id="Node000002" href="$Texture_8hpp.html" title=" " alt="" coords="167,81,326,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="315,36,274,73,270,69,312,32"/>
+<area shape="rect" id="Node000004" href="$Trackable_8hpp.html" title=" " alt="" coords="145,232,316,260"/>
+<area shape="poly" id="edge6_Node000001_Node000004" title=" " alt="" coords="342,32,365,61,387,100,395,122,399,144,397,165,387,186,361,212,329,229,326,224,358,208,383,183,391,164,393,144,390,123,382,102,360,64,338,35"/>
+<area shape="rect" id="Node000003" href="$Image_8hpp.html" title=" " alt="" coords="5,157,96,184"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="212,112,100,153,98,148,211,107"/>
+<area shape="rect" id="Node000006" href="$AssetLoadStatus_8hpp.html" title=" " alt="" coords="119,157,374,184"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="249,109,249,141,244,141,244,109"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="84,182,186,224,184,229,82,187"/>
+<area shape="rect" id="Node000005" href="$InstanceMetrics_8hpp.html" title=" " alt="" coords="154,308,307,336"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="233,261,233,292,228,292,228,261"/>
 </map>

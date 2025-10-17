@@ -1,19 +1,27 @@
 var index =
 [
     [ "Getting Started", "index.html#getting-started", [
-      [ "Using Visual Studio 2022 CMake integration (the preferred way, i use it):", "index.html#using-visual-studio-2022-cmake-integration-the-preferred-way-i-use-it", null ],
-      [ "Using plain cmake", "index.html#using-plain-cmake", null ],
-      [ "Visual Studio Solution IS NOT SUPPORTED!", "index.html#visual-studio-solution-is-not-supported", null ]
+      [ "Windows", "index.html#windows", [
+        [ "Visual Studio 2022 CMake integration", "index.html#visual-studio-2022-cmake-integration", null ],
+        [ "Directly through CMake", "index.html#directly-through-cmake", null ],
+        [ "CLion", "index.html#clion", null ]
+      ] ],
+      [ "Linux", "index.html#linux", [
+        [ "CLion", "index.html#clion-1", null ],
+        [ "Directly through CMake", "index.html#directly-through-cmake-1", null ]
+      ] ]
     ] ],
-    [ "More detailed feature description:", "index.html#more-detailed-feature-description", [
-      [ "2D Batch Renderer:", "index.html#autotoc_md2d-batch-renderer", null ],
-      [ "Asset Manager:", "index.html#asset-manager", null ],
-      [ "Event Manager:", "index.html#event-manager", null ],
-      [ "Input Handler:", "index.html#input-handler", null ],
-      [ "Logging and ImGui:", "index.html#logging-and-imgui", null ],
-      [ "Entity Component System and Scene System", "index.html#entity-component-system-and-scene-system", null ],
-      [ "Abstraction:", "index.html#abstraction", null ]
+    [ "Feature Set", "index.html#feature-set", [
+      [ "Core Systems", "index.html#core-systems", null ],
+      [ "Rendering", "index.html#rendering", null ],
+      [ "Entity Component System (ECS)", "index.html#entity-component-system-ecs", null ],
+      [ "Physics", "index.html#physics", null ],
+      [ "Audio", "index.html#audio", null ],
+      [ "File System", "index.html#file-system", null ],
+      [ "Tooling &amp; Debugging", "index.html#tooling--debugging", null ],
+      [ "Utilities", "index.html#utilities", null ]
     ] ],
+    [ "Documentation:", "index.html#documentation", null ],
     [ "Plans for the future", "index.html#plans-for-the-future", null ],
-    [ "Currently available Apps", "index.html#currently-available-apps", null ]
+    [ "Core Dependencies", "index.html#core-dependencies", null ]
 ];

@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['left_0',['LEFT',['../classCori_1_1Graphics_1_1Renderer2D.html#aca9bfbe7f940d87d8ae365de1f16bcffa46d0841393c78ec7b940c40a205a3bcc',1,'Cori::Graphics::Renderer2D']]],
-  ['linear_1',['LINEAR',['../classCori_1_1Graphics_1_1Texture.html#ac5339b8f9aa643fa8ff1e1f20000d003aab00ba95e5af37b01f11baaf33708fba',1,'Cori::Graphics::Texture']]]
+  ['nearest_0',['NEAREST',['../classCori_1_1Graphics_1_1Texture.html#ac5339b8f9aa643fa8ff1e1f20000d003a3f3ecdabb12df0be77a5f21f23952928',1,'Cori::Graphics::Texture']]],
+  ['none_1',['None',['../namespaceCori_1_1Core.html#a0f06acce81d71ecdca15612fa8ecaa18a3c76b11f929c9f32398f4800ccd562a0',1,'Cori::Core::None'],['../namespaceCori_1_1Graphics.html#a6ce448ab7018a509762af1db6ad63232a6adf97f83acf6453d4a6a4b1070f3754',1,'Cori::Graphics::None'],['../namespaceCori_1_1Graphics.html#a506205d247975afdf34efa0392771312a6adf97f83acf6453d4a6a4b1070f3754',1,'Cori::Graphics::None']]]
 ];

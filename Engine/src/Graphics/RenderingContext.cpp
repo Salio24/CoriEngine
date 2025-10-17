@@ -4,8 +4,8 @@
 
 namespace Cori {
 	namespace Graphics {
-		std::unique_ptr<RenderingContext> RenderingContext::Create(GraphicsAPIs api) {
-			switch (Core::Window::GetCurrentAPI()) {
+		std::unique_ptr<RenderingContext> RenderingContext::Create(const GraphicsAPIs api) {
+			switch (api) {
 			case GraphicsAPIs::OpenGL:
 				{
 					auto contex = std::make_unique<Internal::OpenGLContext>();

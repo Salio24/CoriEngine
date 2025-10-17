@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['eventcategory_0',['EventCategory',['../namespaceCori_1_1Core.html#a0f06acce81d71ecdca15612fa8ecaa18',1,'Cori::Core']]],
-  ['eventtype_1',['EventType',['../namespaceCori_1_1Core.html#abcfaf65cf7455cdc2b49a7fee4c5d10d',1,'Cori::Core']]]
+  ['draw_5ftype_0',['DRAW_TYPE',['../classCori_1_1Graphics_1_1VertexBuffer.html#a425efdc31439652b5dfb9a0a496a1392',1,'Cori::Graphics::VertexBuffer']]],
+  ['drawspace_1',['DrawSpace',['../classCori_1_1Graphics_1_1Renderer2D.html#a258957813e5c0269a5f700abcdb435b8',1,'Cori::Graphics::Renderer2D']]]
 ];
