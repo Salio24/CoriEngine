@@ -20,6 +20,11 @@ void operator delete(void* ptr) noexcept
 extern Cori::Core::Application* Cori::Core::CreateApplication();
 
 int32_t main([[maybe_unused]] int32_t argc, [[maybe_unused]] char** argv) {
+	#ifdef CORI_ENABLE_PROFILING
+		{
+			ZoneScopedN("Warmup Zone");
+		}
+	#endif
 
 	bool asyncLogging = false;
 	#ifdef CORI_ASYNC_LOGGING

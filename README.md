@@ -207,7 +207,7 @@ Cori Engine is built on top of several excellent open-source libraries, special 
 
 - **[EnTT](https://github.com/skypjack/entt):** For the high-performance Entity Component System.
 - **[Box2D](https://github.com/erincatto/box2d):** For this amazing 2D physics engine.
-- **[Box2cpp](https://github.com/HolyBlackCat/box2cpp):** For providing a convenient C++ wrapper for `Box2D`
+- **[Box2cpp](https://github.com/HolyBlackCat/box2cpp):** For providing a convenient C++ wrapper for `Box2D`.
 - **[SDL3](https://github.com/libsdl-org/SDL):** For handling: windowing, input, application events, `OpenGL` context and more.
 - **[SDL3_mixer](https://github.com/libsdl-org/SDL_mixer):** For handling audio.
 - **[SDL3_image](https://github.com/libsdl-org/SDL_image):** For helping in loading and later transforming images.
