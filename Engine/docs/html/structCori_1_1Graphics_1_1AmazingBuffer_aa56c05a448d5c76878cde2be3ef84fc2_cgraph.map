@@ -1,0 +1,7 @@
+<map id="Cori::Graphics::AmazingBuffer::GetCurrentFrameLocalBuffer" name="Cori::Graphics::AmazingBuffer::GetCurrentFrameLocalBuffer">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,223,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1VulkanEngine.html#a7a5eb2d8cf64c0ae3f6a52fcdfa27fa0" title=" " alt="" coords="271,5,480,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="223,25,257,28,252,28,223,30"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Graphics_1_1VulkanEngine.html#ac70cdae6697f813884bae383d2ef2854" title=" " alt="" coords="528,14,768,42"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="480,25,515,28,510,28,480,30"/>
+</map>

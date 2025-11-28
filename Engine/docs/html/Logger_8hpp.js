@@ -4,6 +4,7 @@ var Logger_8hpp =
     [ "Cori::Logger::Tags", "structCori_1_1Logger_1_1Tags.html", "structCori_1_1Logger_1_1Tags" ],
     [ "Cori::Logger::Tags::AssetManager", "structCori_1_1Logger_1_1Tags_1_1AssetManager.html", "structCori_1_1Logger_1_1Tags_1_1AssetManager" ],
     [ "Cori::Logger::Tags::Graphics", "structCori_1_1Logger_1_1Tags_1_1Graphics.html", "structCori_1_1Logger_1_1Tags_1_1Graphics" ],
+    [ "Cori::Logger::Tags::Graphics::Vulkan", "structCori_1_1Logger_1_1Tags_1_1Graphics_1_1Vulkan.html", "structCori_1_1Logger_1_1Tags_1_1Graphics_1_1Vulkan" ],
     [ "Cori::Logger::Tags::Audio", "structCori_1_1Logger_1_1Tags_1_1Audio.html", "structCori_1_1Logger_1_1Tags_1_1Audio" ],
     [ "Cori::Logger::Tags::Core", "structCori_1_1Logger_1_1Tags_1_1Core.html", "structCori_1_1Logger_1_1Tags_1_1Core" ],
     [ "Cori::Logger::Tags::Core::Factory", "structCori_1_1Logger_1_1Tags_1_1Core_1_1Factory.html", "structCori_1_1Logger_1_1Tags_1_1Core_1_1Factory" ],

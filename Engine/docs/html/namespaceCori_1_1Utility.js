@@ -19,6 +19,10 @@ var namespaceCori_1_1Utility =
     [ "CalculateAABB", "namespaceCori_1_1Utility.html#a5e616457526b11d7509529108fb5872d", null ],
     [ "fnv1a64", "namespaceCori_1_1Utility.html#aadae1036bd08323331712cb16b48813e", null ],
     [ "GetAggregateStructUID", "namespaceCori_1_1Utility.html#aca6f01473d2cc64923d437335438aa44", null ],
+    [ "HashString32", "namespaceCori_1_1Utility.html#a861dbe52f53f4d50e0598153eecfe243", null ],
+    [ "HashString32", "namespaceCori_1_1Utility.html#a6c6193fe8919c3e2666e9888093b2e82", null ],
+    [ "HashString64", "namespaceCori_1_1Utility.html#a930c340e3766c04c6a5bf3fdf107346d", null ],
+    [ "HashString64", "namespaceCori_1_1Utility.html#a55938575ab499eeee9c2256e088f3098", null ],
     [ "Utf8ToUtf32", "namespaceCori_1_1Utility.html#ac5820c8e25f3cb94a8ae653ba8c5684e", null ],
     [ "Utf8ToUtf32", "namespaceCori_1_1Utility.html#a2ca568b96e0b073554a58bdbef0f9140", null ]
 ];

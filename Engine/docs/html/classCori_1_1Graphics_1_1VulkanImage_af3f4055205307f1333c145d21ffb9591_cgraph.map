@@ -1,0 +1,18 @@
+<map id="Cori::Graphics::VulkanImage::Create" name="Cori::Graphics::VulkanImage::Create">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,75,212,119"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1VulkanEngine.html#aaed9b0edc784d741956c060cff2af038" title=" " alt="" coords="268,5,477,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,72,272,53,268,56,197,76"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1Graphics_1_1VulkanResourceTracker.html#a39fcbd9af57dcb4a19872714805c346c" title=" " alt="" coords="260,144,485,189"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="197,117,273,139,268,140,196,123"/>
+<area shape="rect" id="Node000008" href="$classCori_1_1Graphics_1_1VulkanEngine.html#a2d50028b61f33eb2a6025b6e199b63c8" title=" " alt="" coords="268,75,477,119"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="212,94,255,96,250,98,213,100"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Graphics_1_1VulkanEngine.html#ac70cdae6697f813884bae383d2ef2854" title=" " alt="" coords="533,34,773,62"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="477,32,520,38,515,38,478,38"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1Graphics_1_1VulkanResourceTracker.html#a6b254d712ae978f5b4a3c14d2dfc50b2" title=" " alt="" coords="540,104,766,149"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="485,148,523,145,528,144,486,153"/>
+<area shape="rect" id="Node000007" href="$classCori_1_1Graphics_1_1VulkanImage.html#a3b0a672273f2570a27ef9f707d463b4e" title=" " alt="" coords="550,173,756,218"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="486,175,537,183,532,183,486,181"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1Graphics_1_1VulkanResourceTracker.html#aed82f4c1c0653d779180f2c6e78a723f" title=" " alt="" coords="821,104,1050,149"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="766,124,808,126,803,127,766,129"/>
+<area shape="poly" id="edge8_Node000008_Node000003" title=" " alt="" coords="477,76,558,64,553,65,478,81"/>
+</map>

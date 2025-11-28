@@ -1,0 +1,15 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$classCori_1_1World_1_1System.html" title="System part of ECS." alt="" coords="5,187,156,215"/>
+<area shape="rect" id="Node000001" href="$classCori_1_1World_1_1Systems_1_1Animation.html" title="System that is responsible for Animations, every Scene has it by default." alt="" coords="204,5,361,50"/>
+<area shape="poly" id="edge23_Node000000_Node000001" title=" " alt="" coords="98,173,142,117,170,87,202,60,224,49,221,53,205,64,174,91,146,120,102,176"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Systems_1_1Hierarchy.html" title=" " alt="" coords="204,75,361,119"/>
+<area shape="poly" id="edge24_Node000000_Node000002" title=" " alt="" coords="117,177,202,129,230,118,226,122,205,134,120,181"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Systems_1_1PhysicsSystem.html" title="System responsible for physics." alt="" coords="204,144,361,189"/>
+<area shape="poly" id="edge25_Node000000_Node000003" title=" " alt="" coords="170,183,205,178,201,181,172,188"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1World_1_1Systems_1_1StateMachine.html" title=" " alt="" coords="204,213,361,258"/>
+<area shape="poly" id="edge26_Node000000_Node000004" title=" " alt="" coords="170,214,206,221,201,223,172,219"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1World_1_1Systems_1_1Transform.html" title=" " alt="" coords="204,283,361,327"/>
+<area shape="poly" id="edge27_Node000000_Node000005" title=" " alt="" coords="119,220,205,268,231,282,226,282,202,273,118,226"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1World_1_1Systems_1_1Trigger.html" title="System responsible for handling physical triggers." alt="" coords="204,352,361,397"/>
+<area shape="poly" id="edge28_Node000000_Node000006" title=" " alt="" coords="101,225,146,282,174,311,205,338,225,352,220,351,202,342,170,315,142,285,99,230"/>
+</map>

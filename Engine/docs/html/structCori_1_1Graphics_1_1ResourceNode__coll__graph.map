@@ -1,0 +1,7 @@
+<map id="Cori::Graphics::ResourceNode" name="Cori::Graphics::ResourceNode">
+<area shape="rect" id="Node000001" title=" " alt="" coords="140,106,354,134"/>
+<area shape="rect" id="Node000002" href="$structCori_1_1Graphics_1_1ImageCreateInfo.html" title=" " alt="" coords="5,5,235,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,40,231,103,228,107,147,45"/>
+<area shape="rect" id="Node000003" href="$structCori_1_1Graphics_1_1BufferCreateInfo.html" title=" " alt="" coords="259,5,488,33"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="346,45,265,107,262,103,343,40"/>
+</map>

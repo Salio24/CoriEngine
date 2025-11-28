@@ -4,11 +4,6 @@
 #include "Profiling/Trackable.hpp"
 
 namespace Cori {
-	namespace Graphics {
-		namespace Internal {
-			class OpenGLContext;
-		}
-	}
 	namespace Core {
 		namespace Internal {
 			class ImGuiLayer;
@@ -108,8 +103,6 @@ namespace Cori {
 
 		private:
 			friend Internal::ImGuiLayer;
-			friend Graphics::Internal::OpenGLContext;
-			[[nodiscard]] void* GetNativeContext() const;
 			[[nodiscard]] void* GetNativeWindow() const;
 
 			struct WindowSaveData {

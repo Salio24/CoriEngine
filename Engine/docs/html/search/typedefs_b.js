@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['value_5ftype_0',['value_type',['../classCori_1_1World_1_1StaticEntityView_1_1Iterator.html#a4fdf17b8580ddc434bd4a149ed1d3aee',1,'Cori::World::StaticEntityView::Iterator::value_type'],['../classCori_1_1World_1_1DynamicEntityView_1_1Iterator.html#a30b184d04c0a71bfcd190aac007051ea',1,'Cori::World::DynamicEntityView::Iterator::value_type']]],
-  ['vec2_1',['Vec2',['../namespaceCori_1_1Physics.html#a2bfbc259fe8557a7496e269f19b7dd22',1,'Cori::Physics']]]
+  ['trackid_0',['TrackID',['../namespaceCori_1_1Audio.html#a4c85af61d0cca300c2efe5c9c6a5febf',1,'Cori::Audio']]],
+  ['trackstopcallbackfn_1',['TrackStopCallbackFn',['../namespaceCori_1_1Audio.html#a51e51f06ea07b84a76ab851b98bb6c3c',1,'Cori::Audio']]],
+  ['transform_2',['Transform',['../namespaceCori_1_1Physics.html#a8133f217e5ac3348f15842be77a00291',1,'Cori::Physics']]]
 ];

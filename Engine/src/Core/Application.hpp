@@ -8,6 +8,7 @@
 #include "Time.hpp"
 #include "Core/Threading/MainThreadComandQueue.hpp"
 #include "Core/Threading/ThreadPool.hpp"
+#include "Graphics/Vulkan/VulkanEngine.hpp"
 
 /**
  * @brief Global engine namespace.
@@ -134,6 +135,8 @@ namespace Cori {
 			bool m_RenderImGui{ true };
 
 			std::unique_ptr<Window> m_Window;
+
+			std::unique_ptr<Graphics::VulkanEngine> m_VulkanEngine;
 
 			Internal::ImGuiLayer* m_ImGuiLayer;
 

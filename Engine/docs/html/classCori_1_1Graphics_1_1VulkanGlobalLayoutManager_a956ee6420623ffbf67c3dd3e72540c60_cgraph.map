@@ -1,0 +1,9 @@
+<map id="Cori::Graphics::VulkanGlobalLayoutManager::BindDescriptorBuffer" name="Cori::Graphics::VulkanGlobalLayoutManager::BindDescriptorBuffer">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,40,272,85"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1VulkanGlobalLayoutManager.html#a7329a8dfed6bbe1856b6a6e9796c1cbe" title=" " alt="" coords="322,5,529,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="271,44,309,42,303,43,272,49"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Graphics_1_1VulkanUploadManager.html#a7f99ced6992535d7125942230e1102ad" title=" " alt="" coords="320,75,531,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="272,76,307,82,301,82,272,81"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1Graphics_1_1VulkanUploadManager.html#a7cd299b6956aab9a382aef320450cc17" title=" " alt="" coords="579,75,790,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="531,94,566,97,561,97,531,100"/>
+</map>

@@ -1,0 +1,43 @@
+<map id="Cori::Graphics::VulkanUploadManager::SubmitStaging" name="Cori::Graphics::VulkanUploadManager::SubmitStaging">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,317,217,362"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1VulkanEngine.html#a578da70233c6083b1a4efa21437515c3" title=" " alt="" coords="274,5,483,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,316,133,264,163,195,206,123,232,89,263,60,272,56,268,60,266,64,236,93,210,126,168,197,138,266,121,318"/>
+<area shape="rect" id="Node000004" href="$namespaceCori_1_1Graphics.html#ab4ea3b49f9608030e2f409d1ba5eaac4" title=" " alt="" coords="293,420,464,448"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="155,360,208,384,266,406,291,415,286,417,264,412,206,389,157,365"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1Graphics_1_1VulkanEngine.html#aaed9b0edc784d741956c060cff2af038" title=" " alt="" coords="274,75,483,119"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="120,316,141,276,173,226,214,174,263,130,274,125,270,129,266,134,218,178,177,229,146,279,125,318"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1Graphics_1_1VulkanEngine.html#a7a5eb2d8cf64c0ae3f6a52fcdfa27fa0" title=" " alt="" coords="274,144,483,189"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="129,316,186,257,223,226,263,199,277,193,274,197,266,203,226,230,189,261,133,319"/>
+<area shape="rect" id="Node000007" href="$classCori_1_1Graphics_1_1VulkanEngine.html#ada26e81d970762cae5f3b93a084374a9" title=" " alt="" coords="274,213,483,258"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="157,315,264,268,286,262,282,265,266,273,160,319"/>
+<area shape="rect" id="Node000008" href="$classCori_1_1Graphics_1_1VulkanEngine.html#a18e0a1eb7e0b3fb6763d95ce9df2bbd2" title=" " alt="" coords="274,283,483,327"/>
+<area shape="poly" id="edge10_Node000001_Node000008" title=" " alt="" coords="216,324,260,319,256,322,219,328"/>
+<area shape="rect" id="Node000009" href="$classCori_1_1Graphics_1_1VulkanEngine.html#a1699cf8069f8f0942bc43b63c501b5dc" title=" " alt="" coords="265,352,492,397"/>
+<area shape="poly" id="edge12_Node000001_Node000009" title=" " alt="" coords="216,351,252,356,247,359,218,356"/>
+<area shape="rect" id="Node000010" href="$classCori_1_1Graphics_1_1VulkanResourceTracker.html#ad2947df3316519fbcec6fe94467d1e48" title=" " alt="" coords="266,472,491,517"/>
+<area shape="poly" id="edge14_Node000001_Node000010" title=" " alt="" coords="136,360,194,409,229,435,266,457,280,465,275,466,263,462,226,439,190,413,136,365"/>
+<area shape="rect" id="Node000014" href="$classCori_1_1Graphics_1_1VulkanResourceTracker.html#a02e5c2875af3c7824bcc64a6c35bde81" title=" " alt="" coords="266,541,491,586"/>
+<area shape="poly" id="edge18_Node000001_Node000014" title=" " alt="" coords="125,360,149,398,180,442,220,488,266,527,275,534,270,534,263,531,216,492,176,446,144,401,125,365"/>
+<area shape="rect" id="Node000015" href="$classCori_1_1Graphics_1_1VulkanResourceTracker.html#aa158695035d3b14f7a389a2a90de94dc" title=" " alt="" coords="266,611,491,655"/>
+<area shape="poly" id="edge21_Node000001_Node000015" title=" " alt="" coords="120,360,140,410,170,474,212,540,238,570,266,596,273,603,267,602,263,600,234,574,208,543,165,476,135,413,119,365"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Graphics_1_1VulkanEngine.html#ac70cdae6697f813884bae383d2ef2854" title=" " alt="" coords="540,187,780,215"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="466,48,493,60,536,87,575,117,638,176,632,176,572,121,533,91,491,65,467,53"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="457,117,493,129,615,180,610,181,491,134,458,122"/>
+<area shape="poly" id="edge7_Node000006_Node000003" title=" " alt="" coords="483,177,529,184,525,186,484,182"/>
+<area shape="poly" id="edge9_Node000007_Node000003" title=" " alt="" coords="483,220,529,216,525,219,485,225"/>
+<area shape="poly" id="edge11_Node000008_Node000003" title=" " alt="" coords="456,280,491,268,615,220,611,223,493,273,459,284"/>
+<area shape="poly" id="edge13_Node000009_Node000003" title=" " alt="" coords="465,349,491,337,533,311,572,281,633,228,637,224,575,285,536,315,493,342,468,354"/>
+<area shape="rect" id="Node000011" href="$classCori_1_1Graphics_1_1VulkanResourceTracker.html#a6b254d712ae978f5b4a3c14d2dfc50b2" title=" " alt="" coords="548,541,773,586"/>
+<area shape="poly" id="edge15_Node000010_Node000011" title=" " alt="" coords="472,515,554,537,549,537,472,520"/>
+<area shape="rect" id="Node000013" href="$classCori_1_1Graphics_1_1VulkanBuffer.html#a01265f768596d605cc8e2e6e4807aab8" title=" " alt="" coords="558,472,763,517"/>
+<area shape="poly" id="edge17_Node000010_Node000013" title=" " alt="" coords="491,492,545,494,539,495,492,497"/>
+<area shape="rect" id="Node000012" href="$classCori_1_1Graphics_1_1VulkanResourceTracker.html#aed82f4c1c0653d779180f2c6e78a723f" title=" " alt="" coords="828,541,1057,586"/>
+<area shape="poly" id="edge16_Node000011_Node000012" title=" " alt="" coords="773,561,815,563,810,564,773,566"/>
+<area shape="poly" id="edge19_Node000014_Node000011" title=" " alt="" coords="491,561,534,563,529,564,492,566"/>
+<area shape="poly" id="edge20_Node000014_Node000013" title=" " alt="" coords="471,538,554,520,549,522,473,543"/>
+<area shape="poly" id="edge22_Node000015_Node000011" title=" " alt="" coords="472,607,549,591,554,590,473,613"/>
+<area shape="rect" id="Node000016" href="$classCori_1_1Graphics_1_1VulkanImage.html#a979b07071d6d95b60b78720af2b175d3" title=" " alt="" coords="557,680,763,725"/>
+<area shape="poly" id="edge23_Node000015_Node000016" title=" " alt="" coords="472,653,554,676,549,676,472,659"/>
+<area shape="rect" id="Node000017" href="$classCori_1_1Graphics_1_1VulkanImage.html#a3b0a672273f2570a27ef9f707d463b4e" title=" " alt="" coords="557,611,763,655"/>
+<area shape="poly" id="edge24_Node000015_Node000017" title=" " alt="" coords="491,630,544,633,539,633,492,636"/>
+</map>

@@ -5,5 +5,6 @@ var searchData=
   ['filesystem_2',['FileSystem',['../structCori_1_1Logger_1_1Tags_1_1FileSystem.html',1,'Cori::Logger::Tags']]],
   ['font_3',['Font',['../classCori_1_1Graphics_1_1Font.html',1,'Cori::Graphics']]],
   ['fontdata_4',['FontData',['../structCori_1_1Graphics_1_1Internal_1_1FontData.html',1,'Cori::Graphics::Internal']]],
-  ['function_5',['Function',['../classCori_1_1Math_1_1Function.html',1,'Cori::Math']]]
+  ['framedata_5',['FrameData',['../structCori_1_1Graphics_1_1VulkanEngine_1_1FrameData.html',1,'Cori::Graphics::VulkanEngine']]],
+  ['function_6',['Function',['../classCori_1_1Math_1_1Function.html',1,'Cori::Math']]]
 ];

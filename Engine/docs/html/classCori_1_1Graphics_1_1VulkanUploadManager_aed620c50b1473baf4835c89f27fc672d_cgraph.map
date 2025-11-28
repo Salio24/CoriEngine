@@ -1,0 +1,16 @@
+<map id="Cori::Graphics::VulkanUploadManager::SubmitAmazing" name="Cori::Graphics::VulkanUploadManager::SubmitAmazing">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,109,217,154"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1VulkanEngine.html#a578da70233c6083b1a4efa21437515c3" title=" " alt="" coords="265,5,474,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,106,264,60,285,54,280,57,266,65,161,111"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1Graphics_1_1VulkanEngine.html#a7a5eb2d8cf64c0ae3f6a52fcdfa27fa0" title=" " alt="" coords="265,75,474,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="216,115,252,112,247,114,218,120"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1Graphics_1_1VulkanEngine.html#ada26e81d970762cae5f3b93a084374a9" title=" " alt="" coords="265,144,474,189"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="217,143,252,150,247,151,217,149"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1Graphics_1_1VulkanEngine.html#a18e0a1eb7e0b3fb6763d95ce9df2bbd2" title=" " alt="" coords="265,213,474,258"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="160,152,266,199,285,208,280,208,264,203,159,157"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Graphics_1_1VulkanEngine.html#ac70cdae6697f813884bae383d2ef2854" title=" " alt="" coords="522,118,762,146"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="441,48,475,60,597,111,592,112,473,65,441,53"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="474,108,516,115,510,116,475,113"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="474,150,516,148,510,149,475,156"/>
+<area shape="poly" id="edge8_Node000006_Node000003" title=" " alt="" coords="440,210,473,199,592,152,597,151,475,203,442,215"/>
+</map>

@@ -1,5 +1,6 @@
 var structCori_1_1Logger_1_1Tags_1_1Graphics =
 [
+    [ "Vulkan", "structCori_1_1Logger_1_1Tags_1_1Graphics_1_1Vulkan.html", "structCori_1_1Logger_1_1Tags_1_1Graphics_1_1Vulkan" ],
     [ "AnimationPack", "structCori_1_1Logger_1_1Tags_1_1Graphics.html#ad3f06207b9474a849520d4e650108d92", null ],
     [ "Camera", "structCori_1_1Logger_1_1Tags_1_1Graphics.html#a79ba30fd75b623d631b0beed096fa80a", null ],
     [ "Font", "structCori_1_1Logger_1_1Tags_1_1Graphics.html#a90d0c29b6c0700bb3d481cde45e07c68", null ],
@@ -13,6 +14,5 @@ var structCori_1_1Logger_1_1Tags_1_1Graphics =
     [ "SpriteAtlas", "structCori_1_1Logger_1_1Tags_1_1Graphics.html#aab151d739e4f9959c898d4b9cec31b62", null ],
     [ "Texture2D", "structCori_1_1Logger_1_1Tags_1_1Graphics.html#a49012f810a4c094e3085a9962d3ff64f", null ],
     [ "VertexArray", "structCori_1_1Logger_1_1Tags_1_1Graphics.html#a8cb7b2e05bdade7bb6292b62f7b6b421", null ],
-    [ "VertexBuffer", "structCori_1_1Logger_1_1Tags_1_1Graphics.html#a9f575bfb4d42f5629c277b7b487b0a8c", null ],
-    [ "Vulkan", "structCori_1_1Logger_1_1Tags_1_1Graphics.html#aab00e6433649ec1658efb8608dc37520", null ]
+    [ "VertexBuffer", "structCori_1_1Logger_1_1Tags_1_1Graphics.html#a9f575bfb4d42f5629c277b7b487b0a8c", null ]
 ];

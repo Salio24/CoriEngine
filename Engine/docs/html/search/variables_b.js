@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['normal_0',['normal',['../structCori_1_1Physics_1_1CastResult.html#a6ed1fdfc560364f52840fce7fc17824d',1,'Cori::Physics::CastResult']]]
+  ['name_0',['name',['../structCori_1_1Graphics_1_1ImageCreateInfo.html#ac97a0c436452627acdf6112b74dd3e61',1,'Cori::Graphics::ImageCreateInfo::name'],['../structCori_1_1Graphics_1_1BufferCreateInfo.html#aadf7b2182e7d055c6a93a6c403e49a5c',1,'Cori::Graphics::BufferCreateInfo::name'],['../structCori_1_1Graphics_1_1ResourceNode.html#a67beb93f58cbdac36d5d502e49eb53c7',1,'Cori::Graphics::ResourceNode::name'],['../structCori_1_1Graphics_1_1VulkanBuffer_1_1CreateInfo.html#a42870ae4684f3f4c73f94dc67982c4c6',1,'Cori::Graphics::VulkanBuffer::CreateInfo::name'],['../structCori_1_1Graphics_1_1VulkanImage_1_1CreateInfo.html#a799be3117defae03d16466bd2af800ee',1,'Cori::Graphics::VulkanImage::CreateInfo::name'],['../structCori_1_1Graphics_1_1AmazingBuffer_1_1CreateInfo.html#ae4e4e4a790fd59fc6089911f7c5b39d1',1,'Cori::Graphics::AmazingBuffer::CreateInfo::name']]],
+  ['normal_1',['normal',['../structCori_1_1Graphics_1_1Vertex.html#ad98bd4350cd8ceff4088372f30c8e7b6',1,'Cori::Graphics::Vertex::normal'],['../structCori_1_1Physics_1_1CastResult.html#a6ed1fdfc560364f52840fce7fc17824d',1,'Cori::Physics::CastResult::normal']]]
 ];

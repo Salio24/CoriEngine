@@ -1,3 +1,4 @@
+#if 0
 #include "Renderer2D.hpp"
 #include <ska_sort.hpp>
 #include "Utility/AABB.hpp"
@@ -1014,3 +1015,4 @@ namespace Cori {
 		}
 	}
 }
+#endif

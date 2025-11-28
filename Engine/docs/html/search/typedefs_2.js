@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['derivedmetricsprovider_0',['DerivedMetricsProvider',['../classCori_1_1Profiling_1_1InstanceMetrics.html#a652af7a2d1e179db5158e787e32a6a4f',1,'Cori::Profiling::InstanceMetrics']]],
-  ['derivedmetricsreporter_1',['DerivedMetricsReporter',['../classCori_1_1Profiling_1_1InstanceMetrics.html#a378c090cf5fcda8fa2ce269473494211',1,'Cori::Profiling::InstanceMetrics']]],
-  ['difference_5ftype_2',['difference_type',['../classCori_1_1World_1_1StaticEntityView_1_1Iterator.html#a09ac761dadb1e22f7c96391a242f5d2d',1,'Cori::World::StaticEntityView::Iterator::difference_type'],['../classCori_1_1World_1_1DynamicEntityView_1_1Iterator.html#a359d6150b797fb4e9d06a598355a9f68',1,'Cori::World::DynamicEntityView::Iterator::difference_type']]]
+  ['collisionplane_0',['CollisionPlane',['../namespaceCori_1_1Physics.html#ab1d234b71010c1fc81be2f9c8b8777a3',1,'Cori::Physics']]],
+  ['const_5fiterator_1',['const_iterator',['../classCori_1_1Core_1_1PackedArray.html#acef15fa45f1fc37f325a9b0160908bef',1,'Cori::Core::PackedArray']]],
+  ['corikeycode_2',['CoriKeycode',['../namespaceCori_1_1Core.html#afc36a1b3e23811692c4ee44e864d7736',1,'Cori::Core']]],
+  ['corimousekeycode_3',['CoriMouseKeycode',['../namespaceCori_1_1Core.html#ae658b0790213083fc41eebb5076698a5',1,'Cori::Core']]]
 ];

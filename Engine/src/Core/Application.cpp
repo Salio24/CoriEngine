@@ -8,13 +8,13 @@
 #include "EventSystem/KeyEvent.hpp"
 #include "FileSystem/PathManager.hpp"
 #include "Graphics/Renderer2D.hpp"
+#include "Graphics/Renderer.hpp"
 
 namespace Cori {
 	namespace Core {
 		Application* Application::s_Instance{ nullptr };
 
 		Application::Application(const char* windowName) : m_WorkerPool(std::thread::hardware_concurrency() == 1 ? 1 : std::thread::hardware_concurrency() - 1) {
-
 			//m_ManualStep = true;
 			CORI_CORE_ASSERT(!s_Instance, "Trying to construct application for the second time. Application already exists!");
 			s_Instance = this;
@@ -22,17 +22,16 @@ namespace Cori {
 			FileSystem::PathManager::Get();
 
 			m_Window = Window::Create(windowName, false);
+			m_VulkanEngine = Graphics::VulkanEngine::Create(m_Window->GetNativeWindow(), true);
 
 			m_Window->SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent, CORI_PLACEHOLDERS(1)));
 			m_Window->SetVSync(false);
 
-			m_ImGuiLayer = new Internal::ImGuiLayer();
-
-			m_LayerStack.PushOverlay(m_ImGuiLayer);
+			//m_ImGuiLayer = new Internal::ImGuiLayer();
+			//m_LayerStack.PushOverlay(m_ImGuiLayer);
 
 			AssetManager::Init();
 			World::SceneManager::Init();
-			Graphics::Internal::API::Init();
 			Audio::Mixer::Init();
 
 			m_GameTimer.SetTickrate(120);
@@ -44,7 +43,6 @@ namespace Cori {
 			m_LayerStack.ClearStack();
 			AssetManager::Shutdown();
 			World::SceneManager::Shutdown();
-			Graphics::Internal::API::Shutdown();
 			Audio::Mixer::Shutdown();
 		}
 
@@ -108,14 +106,6 @@ namespace Cori {
 					m_CommandQueue.Execute();
 					m_GameTimer.Update();
 
-					{
-						CORI_PROFILE_SCOPE("Clear Color and Clear Framebuffer");
-						Graphics::Internal::API::SetClearColor(m_BackgroundColor);
-						Graphics::Internal::API::ClearFramebuffer();
-					}
-
-					Graphics::Renderer2D::StartFrame();
-
 					for (Layer* layer : m_LayerStack) {
 						layer->ActiveScene.BeginRender();
 						layer->OnUpdate(m_GameTimer);
@@ -123,23 +113,23 @@ namespace Cori {
 						layer->ActiveScene.EndRender();
 					}
 
-					Graphics::Renderer2D::EndFrame();
+					Graphics::Renderer::Render();
 
 					{
 						CORI_PROFILE_SCOPE("ImGui Render");
-						m_ImGuiLayer->StartFrame();
+						//m_ImGuiLayer->StartFrame();
 
 						if (m_RenderImGui) {
 							for (Layer* layer : m_LayerStack) {
-								layer->OnImGuiRender(m_GameTimer);
-								layer->SceneImGuiRender(m_GameTimer);
+								//layer->OnImGuiRender(m_GameTimer);
+								//layer->SceneImGuiRender(m_GameTimer);
 								if (layer->IsModal()) {
 									break;
 								}
 							}
 						}
 
-						m_ImGuiLayer->EndFrame();
+						//m_ImGuiLayer->EndFrame();
 					}
 
 					m_Window->OnUpdate();

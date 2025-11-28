@@ -1,7 +1,7 @@
 var namespaceCori_1_1Audio =
 [
-    [ "Mixer", "classCori_1_1Audio_1_1Mixer.html", "classCori_1_1Audio_1_1Mixer" ],
     [ "PlayParams", "structCori_1_1Audio_1_1PlayParams.html", "structCori_1_1Audio_1_1PlayParams" ],
+    [ "Mixer", "classCori_1_1Audio_1_1Mixer.html", "classCori_1_1Audio_1_1Mixer" ],
     [ "Sound", "classCori_1_1Audio_1_1Sound.html", "classCori_1_1Audio_1_1Sound" ],
     [ "Track", "classCori_1_1Audio_1_1Track.html", "classCori_1_1Audio_1_1Track" ],
     [ "IsSoundWithParams", "conceptCori_1_1Audio_1_1IsSoundWithParams.html", null ],

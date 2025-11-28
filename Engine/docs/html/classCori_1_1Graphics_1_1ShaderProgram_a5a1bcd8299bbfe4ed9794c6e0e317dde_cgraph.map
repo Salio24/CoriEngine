@@ -1,9 +1,5 @@
 <map id="Cori::Graphics::ShaderProgram::Create" name="Cori::Graphics::ShaderProgram::Create">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,28,226,72"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1ShaderProgram.html#a52690641b09f5040d9722f7af3addb11" title=" " alt="" coords="274,28,494,72"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="226,47,258,47,258,52,226,52"/>
-<area shape="rect" id="Node000003" href="$namespaceCori_1_1Graphics.html#ac10cdf39fd3a5b64fb82ad5cd57d4668" title=" " alt="" coords="542,5,773,33"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="494,35,526,31,527,36,495,40"/>
-<area shape="rect" id="Node000004" href="$classCori_1_1Core_1_1Window.html#a675130786b522717fb797d28166b1da5" title="Returns the graphical API used by this window." alt="" coords="585,57,730,102"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="495,59,570,67,569,72,494,64"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,226,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1ShaderProgram.html#a52690641b09f5040d9722f7af3addb11" title=" " alt="" coords="274,5,494,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="226,25,258,25,258,30,226,30"/>
 </map>

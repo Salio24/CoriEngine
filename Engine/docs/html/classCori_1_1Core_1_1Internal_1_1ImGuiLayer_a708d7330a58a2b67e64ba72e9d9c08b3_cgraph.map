@@ -1,7 +1,5 @@
 <map id="Cori::Core::Internal::ImGuiLayer::ImGuiLayer" name="Cori::Core::Internal::ImGuiLayer::ImGuiLayer">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,40,193,85"/>
-<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1Application.html#ab0aa424cc7dd313c6b342b4c9710a022" title="Getter for the main Window." alt="" coords="241,5,407,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="193,45,225,40,226,45,194,50"/>
-<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1Layer.html#a89ce1cc1e98e0dbd2d5dc1068780258e" title=" " alt="" coords="255,75,392,119"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="194,74,240,81,239,87,193,79"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,193,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1Layer.html#a89ce1cc1e98e0dbd2d5dc1068780258e" title=" " alt="" coords="241,5,378,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="193,25,225,25,225,30,193,30"/>
 </map>

@@ -26,7 +26,7 @@ namespace Cori {
 					style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 				}
 
-				ImGui_ImplSDL3_InitForOpenGL(static_cast<SDL_Window*>(Core::Application::GetWindow().GetNativeWindow()), Core::Application::GetWindow().GetNativeContext());
+				//ImGui_ImplSDL3_InitForOpenGL(static_cast<SDL_Window*>(Core::Application::GetWindow().GetNativeWindow()), Core::Application::GetWindow().GetNativeContext());
 
 				const bool success = ImGui_ImplOpenGL3_Init("#version 460");
 				CORI_CORE_ASSERT(success, "Failed to initialize ImGui with OpenGL.");

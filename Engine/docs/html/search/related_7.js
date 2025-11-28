@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['window_0',['Window',['../structCori_1_1Core_1_1ScreenMode.html#a553f958a25683445088050a69d3de8e9',1,'Cori::Core::ScreenMode']]]
+  ['vulkanshadermanager_0',['VulkanShaderManager',['../classCori_1_1Graphics_1_1ShaderObject.html#a9e5446a5b98ba47de5b68f525a207f2d',1,'Cori::Graphics::ShaderObject']]],
+  ['vulkanuploadmanager_1',['VulkanUploadManager',['../structCori_1_1Graphics_1_1AmazingBuffer.html#adebe27afdbbe6be04fc8ec341478692a',1,'Cori::Graphics::AmazingBuffer']]]
 ];

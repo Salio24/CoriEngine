@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['vbelement_0',['VBElement',['../classCori_1_1Graphics_1_1VBElement.html',1,'Cori::Graphics']]],
-  ['vblayout_1',['VBLayout',['../classCori_1_1Graphics_1_1VBLayout.html',1,'Cori::Graphics']]],
-  ['vertexarray_2',['VertexArray',['../classCori_1_1Graphics_1_1VertexArray.html',1,'Cori::Graphics']]],
-  ['vertexbuffer_3',['VertexBuffer',['../classCori_1_1Graphics_1_1VertexBuffer.html',1,'Cori::Graphics']]]
+  ['window_0',['Window',['../classCori_1_1Core_1_1Window.html',1,'Cori::Core']]],
+  ['windowcloseevent_1',['WindowCloseEvent',['../classCori_1_1Core_1_1WindowCloseEvent.html',1,'Cori::Core']]],
+  ['windowresizeevent_2',['WindowResizeEvent',['../classCori_1_1Core_1_1WindowResizeEvent.html',1,'Cori::Core']]],
+  ['world_3',['World',['../structCori_1_1Logger_1_1Tags_1_1World.html',1,'Cori::Logger::Tags']]]
 ];

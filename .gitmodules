@@ -62,3 +62,18 @@
 [submodule "Engine/thirdparty/pfr"]
 	path = Engine/thirdparty/pfr
 	url = https://github.com/boostorg/pfr
+[submodule "Engine/thirdparty/Vulkan-Loader"]
+	path = Engine/thirdparty/Vulkan-Loader
+	url = https://github.com/KhronosGroup/Vulkan-Loader
+[submodule "Engine/thirdparty/VulkanMemoryAllocator-Hpp"]
+	path = Engine/thirdparty/VulkanMemoryAllocator-Hpp
+	url = https://github.com/YaaZ/VulkanMemoryAllocator-Hpp
+[submodule "Engine/thirdparty/Vulkan-Headers"]
+	path = Engine/thirdparty/Vulkan-Headers
+	url = https://github.com/KhronosGroup/Vulkan-Headers
+[submodule "Engine/thirdparty/small_vector"]
+	path = Engine/thirdparty/small_vector
+	url = https://github.com/gharveymn/small_vector
+[submodule "Engine/thirdparty/dynamic_bitset"]
+	path = Engine/thirdparty/dynamic_bitset
+	url = https://github.com/Salio24/dynamic_bitset

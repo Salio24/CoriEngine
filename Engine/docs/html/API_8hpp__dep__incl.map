@@ -1,15 +1,7 @@
 <map id="API.hpp" name="API.hpp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="108,5,178,33"/>
-<area shape="rect" id="Node000002" href="$API_8cpp.html" title=" " alt="" coords="5,157,75,184"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,47,51,158,47,155,123,44"/>
-<area shape="rect" id="Node000003" href="$Application_8cpp.html" title=" " alt="" coords="99,157,221,184"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="149,48,161,156,156,156,143,49"/>
-<area shape="rect" id="Node000004" href="$Renderer2D_8hpp.html" title=" " alt="" coords="180,81,306,109"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="174,40,227,78,223,83,171,45"/>
-<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="193,117,76,159,74,154,191,112"/>
-<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="218,121,176,158,173,154,215,117"/>
-<area shape="rect" id="Node000005" href="$Renderer2D_8cpp.html" title=" " alt="" coords="245,157,371,184"/>
-<area shape="poly" id="edge6_Node000004_Node000005" title=" " alt="" coords="266,119,298,154,294,158,262,122"/>
-<area shape="rect" id="Node000006" href="$Scene_8cpp.html" title=" " alt="" coords="395,157,482,184"/>
-<area shape="poly" id="edge7_Node000004_Node000006" title=" " alt="" coords="293,112,405,154,403,159,291,117"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="65,5,135,33"/>
+<area shape="rect" id="Node000002" href="$API_8cpp.html" title=" " alt="" coords="5,81,75,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,47,53,82,49,79,77,44"/>
+<area shape="rect" id="Node000003" href="$Application_8cpp.html" title=" " alt="" coords="99,81,221,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="123,44,151,79,147,82,118,47"/>
 </map>

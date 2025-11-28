@@ -1,0 +1,15 @@
+<map id="Cori::Graphics::VulkanMeshManager::GetFrameLocal" name="Cori::Graphics::VulkanMeshManager::GetFrameLocal">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,75,206,119"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1VulkanMeshManager.html#a00d17e700381cd1dbe7b179be85c7848" title=" " alt="" coords="262,5,462,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,72,265,53,260,56,192,77"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Graphics_1_1VulkanUploadManager.html#a7f99ced6992535d7125942230e1102ad" title=" " alt="" coords="257,75,468,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="206,94,244,96,238,98,207,100"/>
+<area shape="rect" id="Node000005" href="$structCori_1_1Graphics_1_1AmazingBuffer.html#aa56c05a448d5c76878cde2be3ef84fc2" title=" " alt="" coords="254,144,471,189"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="191,117,265,139,260,140,191,123"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1Graphics_1_1VulkanUploadManager.html#a7cd299b6956aab9a382aef320450cc17" title=" " alt="" coords="519,75,730,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="468,94,506,97,501,97,469,100"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1Graphics_1_1VulkanEngine.html#a7a5eb2d8cf64c0ae3f6a52fcdfa27fa0" title=" " alt="" coords="520,144,729,189"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="471,164,507,166,502,166,472,169"/>
+<area shape="rect" id="Node000007" href="$classCori_1_1Graphics_1_1VulkanEngine.html#ac70cdae6697f813884bae383d2ef2854" title=" " alt="" coords="778,152,1019,180"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="730,164,765,166,760,166,730,169"/>
+</map>

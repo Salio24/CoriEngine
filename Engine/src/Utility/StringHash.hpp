@@ -18,13 +18,21 @@ namespace Cori {
 		using StringHash64 = uint64_t;
 		using StringHash32 = entt::hashed_string::hash_type;
 
-		//constexpr StringHash32 HashString(const char* str) {
-		//	return entt::hashed_string(str).value();
-		//}
-//
-		//constexpr StringHash32 HashString(const std::string& str) {
-		//	return entt::hashed_string(str.c_str()).value();
-		//}
+		constexpr StringHash32 HashString32(const char* str) {
+			return entt::hashed_string(str).value();
+		}
+
+		constexpr StringHash32 HashString32(const std::string& str) {
+			return entt::hashed_string(str.c_str()).value();
+		}
+
+		constexpr StringHash64 HashString64(const char* str) {
+			return fnv1a64(str, strlen(str));
+		}
+
+		constexpr StringHash64 HashString64(const std::string& str) {
+			return fnv1a64(str.c_str(), str.size());
+		}
 	}
 }
 

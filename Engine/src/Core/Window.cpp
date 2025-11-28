@@ -21,7 +21,6 @@ namespace Cori {
 			SDL_DisplayID m_PrimaryDisplayID{};
 
 			SDL_Window* m_Window{ nullptr };
-			std::unique_ptr<Graphics::RenderingContext> m_Context;
 			bool m_VSync{ false };
 
 			EventCallbackFn m_EventCallback;
@@ -40,9 +39,6 @@ namespace Cori {
 			m_Data = new Data();
 			m_Data->m_WindowTitle = std::move(title);
 			m_Data->m_VSync = vsync;
-
-			m_Data->m_Context = Graphics::RenderingContext::Create(s_API);
-
 
 			const SDL_DisplayID primaryDisplayID = SDL_GetPrimaryDisplay();
 			if (primaryDisplayID == 0) {
@@ -103,18 +99,7 @@ namespace Cori {
 			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, displayBounds.x);
 			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, displayBounds.y);
 			SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_FULLSCREEN_BOOLEAN, true);
-
-			switch (s_API) {
-			case Graphics::GraphicsAPIs::None:
-				CORI_CORE_ASSERT(false, "No graphics API selected");
-				break;
-			case Graphics::GraphicsAPIs::OpenGL:
-				SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_OPENGL_BOOLEAN, true);
-				break;
-			case Graphics::GraphicsAPIs::Vulkan:
-				CORI_CORE_ASSERT(false, "Vulkan is not supported,                                                  yet");
-				break;
-			}
+			SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_VULKAN_BOOLEAN, true);
 
 			m_Data->m_Window = SDL_CreateWindowWithProperties(props);
 
@@ -135,8 +120,6 @@ namespace Cori {
 
 			SDL_SetWindowPosition(m_Data->m_Window, SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID), SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID));
 
-			m_Data->m_Context->Init(m_Data->m_Window);
-
 			SetScreenMode(m_Data->m_CurrentScreenMode);
 
 			const WindowSaveData data{ .m_Width = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Width, .m_Height = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Height, .m_RefreshRate = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_RefreshRate, .m_WindowMode = m_Data->m_CurrentWindowMode, .m_SDLModeIndex = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_SDLModeIndex, .m_ModeIndex = m_Data->m_CurrentScreenMode };
@@ -156,7 +139,7 @@ namespace Cori {
 			SDL_Event e;
 
 			while (SDL_PollEvent(&e)) {
-				ImGui_ImplSDL3_ProcessEvent(&e);
+				//ImGui_ImplSDL3_ProcessEvent(&e);
 
 				// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
 				switch (e.type) {
@@ -215,11 +198,6 @@ namespace Cori {
 					}
 				}
 			}
-
-			{
-				CORI_PROFILE_SCOPE("Swap Buffers");
-				m_Data->m_Context->SwapBuffers();
-			}
 		}
 
 		int32_t Window::GetWidth() const {
@@ -256,11 +234,6 @@ namespace Cori {
 
 		bool Window::IsVSync() const {
 			return m_Data->m_VSync;
-		}
-
-
-		void* Window::GetNativeContext() const {
-			return m_Data->m_Context->GetNativeContext();
 		}
 
 		void* Window::GetNativeWindow() const {

@@ -1,24 +1,4 @@
 var searchData=
 [
-  ['placeholder_5fimpl_5f1_0',['PLACEHOLDER_IMPL_1',['../Macros_8hpp.html#acb416c2db0f969c1aa811f2d3e5e70aa',1,'Macros.hpp']]],
-  ['placeholder_5fimpl_5f10_1',['PLACEHOLDER_IMPL_10',['../Macros_8hpp.html#a8ca66012dbe2b524dc059f5ffcf0fd3d',1,'Macros.hpp']]],
-  ['placeholder_5fimpl_5f11_2',['PLACEHOLDER_IMPL_11',['../Macros_8hpp.html#a071bda90b5df968f56b6513ab132ff49',1,'Macros.hpp']]],
-  ['placeholder_5fimpl_5f12_3',['PLACEHOLDER_IMPL_12',['../Macros_8hpp.html#a44894bc7f058f09f730fca21dc9a7190',1,'Macros.hpp']]],
-  ['placeholder_5fimpl_5f13_4',['PLACEHOLDER_IMPL_13',['../Macros_8hpp.html#a38158ae9b59719d87ea3d70172da5a5a',1,'Macros.hpp']]],
-  ['placeholder_5fimpl_5f14_5',['PLACEHOLDER_IMPL_14',['../Macros_8hpp.html#a0ac0aafa4f11c63034eaa109522dc670',1,'Macros.hpp']]],
-  ['placeholder_5fimpl_5f15_6',['PLACEHOLDER_IMPL_15',['../Macros_8hpp.html#a44d4a1658d3ddbabb75ce4404f4f3850',1,'Macros.hpp']]],
-  ['placeholder_5fimpl_5f16_7',['PLACEHOLDER_IMPL_16',['../Macros_8hpp.html#a54af0208ca9198f57a4404942081163c',1,'Macros.hpp']]],
-  ['placeholder_5fimpl_5f17_8',['PLACEHOLDER_IMPL_17',['../Macros_8hpp.html#a7aec17dc879602abe8c274d548de474f',1,'Macros.hpp']]],
-  ['placeholder_5fimpl_5f18_9',['PLACEHOLDER_IMPL_18',['../Macros_8hpp.html#ab9d7fb681460e7e3077545a9de96e917',1,'Macros.hpp']]],
-  ['placeholder_5fimpl_5f19_10',['PLACEHOLDER_IMPL_19',['../Macros_8hpp.html#a24623d76ca3163e982cbc4fca356c90a',1,'Macros.hpp']]],
-  ['placeholder_5fimpl_5f2_11',['PLACEHOLDER_IMPL_2',['../Macros_8hpp.html#a845c8ee381c9de0591bfc5ef05d41de3',1,'Macros.hpp']]],
-  ['placeholder_5fimpl_5f3_12',['PLACEHOLDER_IMPL_3',['../Macros_8hpp.html#a0c8813e0b1e3b24222df4a18d9316656',1,'Macros.hpp']]],
-  ['placeholder_5fimpl_5f4_13',['PLACEHOLDER_IMPL_4',['../Macros_8hpp.html#a283c4ad6520477deef7cb8ffc1382dc3',1,'Macros.hpp']]],
-  ['placeholder_5fimpl_5f5_14',['PLACEHOLDER_IMPL_5',['../Macros_8hpp.html#a7591d1b708919308a58346d779506087',1,'Macros.hpp']]],
-  ['placeholder_5fimpl_5f6_15',['PLACEHOLDER_IMPL_6',['../Macros_8hpp.html#aea9fdffb22f32c8aabf3ffd74284b33b',1,'Macros.hpp']]],
-  ['placeholder_5fimpl_5f7_16',['PLACEHOLDER_IMPL_7',['../Macros_8hpp.html#aa4da63840a299829119231675603c9e2',1,'Macros.hpp']]],
-  ['placeholder_5fimpl_5f8_17',['PLACEHOLDER_IMPL_8',['../Macros_8hpp.html#a7b4f5eb9cdbc659eb7efc35ceb9e2507',1,'Macros.hpp']]],
-  ['placeholder_5fimpl_5f9_18',['PLACEHOLDER_IMPL_9',['../Macros_8hpp.html#a7b4662aabf0a9d4f3c3b67ecdd4dfce0',1,'Macros.hpp']]],
-  ['placeholder_5fselect_19',['PLACEHOLDER_SELECT',['../Macros_8hpp.html#aa55edf730e7f26614318b4ac0ee99eec',1,'Macros.hpp']]],
-  ['platform_5flinux_20',['PLATFORM_LINUX',['../Macros_8hpp.html#affcc3790504b838f9ce56a008cce0950',1,'Macros.hpp']]]
+  ['low_5fpriority_5fstaging_5fsize_0',['LOW_PRIORITY_STAGING_SIZE',['../VulkanUploadManager_8hpp.html#ad33a5fb498e749a1f9583662c640b88f',1,'VulkanUploadManager.hpp']]]
 ];

@@ -74,8 +74,6 @@ namespace Cori {
 			for (auto type : m_SystemPriority | std::views::values) {
 				m_RegisteredSystems[type]->OnUpdate(gameTimer);
 			}
-
-			Graphics::Renderer2D::SubmitScene(this);
 		}
 
 		void Scene::OnTickUpdate(Core::GameTimer& gameTimer) {
@@ -91,11 +89,11 @@ namespace Cori {
 		}
 
 		void Scene::BeginRender() {
-			Graphics::Renderer2D::BeginScene(GetContextComponent<Components::Scene::Camera>());
+
 		}
 
 		void Scene::EndRender() {
-			Graphics::Renderer2D::EndScene();
+
 		}
 
 		bool Scene::OnBind() {

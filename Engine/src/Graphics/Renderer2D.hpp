@@ -1,3 +1,4 @@
+#if 0
 #pragma once
 #include "Buffers.hpp"
 #include "VertexArray.hpp"
@@ -344,3 +345,4 @@ namespace Cori {
 		};
 	}
 }
+#endif

@@ -66,13 +66,6 @@ project(CoriEngine)
     target_include_directories(imgui PUBLIC ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui)
     target_link_libraries(imgui PRIVATE SDL3::SDL3-static)
 
-    # glad 2
-    set(GLAD_SOURCES_DIR ${CORI_ENGINE_SOURCE_DIR}/thirdparty/glad2)
-
-    add_subdirectory(${GLAD_SOURCES_DIR}/cmake glad_cmake)
-
-    glad_add_library(glad_gl_core_46 STATIC API gl:core=4.6)
-
     # spdlog
     set(SPDLOG_BUILD_SHARED OFF CACHE BOOL "")
     if (CORI_CLANG_TIDY)
@@ -159,6 +152,28 @@ project(CoriEngine)
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/pfr EXCLUDE_FROM_ALL)
 
 
+    #add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/Vulkan-Headers)
+
+    #vma
+    add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/VulkanMemoryAllocator-Hpp EXCLUDE_FROM_ALL)
+    #note: this implicitly includes vulkan headers
+
+    #vulkan loader
+    set(LOADER_CODEGEN ON)
+    set(LOADER_ENABLE_ADDRESS_SANITIZER OFF)
+    set(LOADER_ENABLE_THREAD_SANITIZER OFF)
+
+    add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/Vulkan-Loader EXCLUDE_FROM_ALL)
+
+    #small_vector
+    add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/small_vector EXCLUDE_FROM_ALL)
+
+    #dynamic_bitset
+    add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/dynamic_bitset EXCLUDE_FROM_ALL)
+
+
+#find_package (Vulkan REQUIRED)
+
 # project's binary setup vvv
 
     # varible sets
@@ -228,10 +243,11 @@ project(CoriEngine)
         target_compile_options(glm PRIVATE -w)
         target_compile_options(tmxlite PRIVATE -w)
         target_compile_options(imgui PRIVATE -w)
-        target_compile_options(glad_gl_core_46 PRIVATE -w)
         target_compile_options(msdf-atlas-gen PRIVATE -w)
         target_compile_options(msdfgen-core PRIVATE -w)
         target_compile_options(tmxlite PRIVATE -w)
+        #target_compile_options(vulkan PRIVATE -w)
+
         #if(TARGET TIFF::tiff)
         #    set(SDLIMAGE_TIF_TARGET "tiff")
         #else()
@@ -253,14 +269,14 @@ project(CoriEngine)
     #target_link_libraries()
 
     # should be public
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite exprtk boost_pfr)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite exprtk boost_pfr Vulkan::Headers GPUOpen::VulkanMemoryAllocator VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp Vulkan::Loader gch::small_vector sul::dynamic_bitset)
 
     if (CORI_ENABLE_TRACY_PROFILER)
         target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC Tracy::TracyClient)
     endif ()
 
     # can be private 
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static msdf-atlas-gen glad_gl_core_46)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3::SDL3-static SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static msdf-atlas-gen)
 
     if(CORI_BUILD_DOCS)
         message(STATUS "CoriEngine documentation build is enabled.")

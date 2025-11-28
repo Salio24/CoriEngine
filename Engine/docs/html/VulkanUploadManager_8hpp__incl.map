@@ -1,0 +1,36 @@
+<map id="VulkanUploadManager.hpp" name="VulkanUploadManager.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="580,5,777,33"/>
+<area shape="rect" id="Node000002" href="$VulkanEngine_8hpp.html" title=" " alt="" coords="532,232,670,260"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="777,31,818,42,850,58,861,69,868,81,868,95,862,110,845,133,825,154,779,188,728,213,679,230,677,225,726,208,776,183,822,150,841,130,858,107,863,94,863,82,857,72,847,63,816,47,777,36"/>
+<area shape="rect" id="Node000008" href="$VulkanImage_8hpp.html" title=" " alt="" coords="291,157,426,184"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="577,27,514,35,449,46,394,62,374,72,361,83,354,96,350,111,353,143,348,141,345,110,348,94,357,79,371,67,392,57,448,41,513,30,582,25"/>
+<area shape="rect" id="Node000012" href="$VulkanBuffer_8hpp.html" title=" " alt="" coords="534,157,668,184"/>
+<area shape="poly" id="edge12_Node000001_Node000012" title=" " alt="" coords="670,32,638,82,612,144,608,140,634,80,666,35"/>
+<area shape="rect" id="Node000013" href="$ResourceType_8hpp.html" title=" " alt="" coords="648,81,848,109"/>
+<area shape="poly" id="edge14_Node000001_Node000013" title=" " alt="" coords="692,31,728,70,723,69,690,36"/>
+<area shape="rect" id="Node000014" href="$VulkanResourceTracker_8hpp.html" title=" " alt="" coords="371,81,573,109"/>
+<area shape="poly" id="edge15_Node000001_Node000014" title=" " alt="" coords="639,35,524,78,522,73,644,32"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="923,81,1096,109"/>
+<area shape="poly" id="edge19_Node000001_Node000015" title=" " alt="" coords="738,31,937,77,932,78,738,36"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="787,316,957,344"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="645,258,817,312,812,312,644,263"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="981,316,1142,344"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="671,255,810,277,970,305,995,313,989,312,969,311,809,282,671,260"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="200,316,405,344"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="556,260,366,315,365,309,551,261"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="430,308,594,353"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="589,260,548,299,546,295,585,262"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="618,316,763,344"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="617,258,668,307,663,305,615,263"/>
+<area shape="poly" id="edge8_Node000008_Node000002" title=" " alt="" coords="402,182,546,227,541,228,402,188"/>
+<area shape="rect" id="Node000009" href="$DeletionQueue_8hpp.html" title=" " alt="" coords="60,232,206,260"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="316,187,189,230,187,225,320,183"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="5,316,67,344"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="120,260,64,309,61,305,115,261"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="90,316,176,344"/>
+<area shape="poly" id="edge11_Node000009_Node000011" title=" " alt="" coords="135,259,136,302,131,300,132,263"/>
+<area shape="poly" id="edge13_Node000012_Node000002" title=" " alt="" coords="603,183,603,218,599,215,600,187"/>
+<area shape="poly" id="edge16_Node000014_Node000002" title=" " alt="" coords="478,107,498,143,525,183,546,203,570,224,565,223,543,207,521,186,493,146,476,112"/>
+<area shape="poly" id="edge17_Node000014_Node000008" title=" " alt="" coords="454,108,393,150,390,146,449,111"/>
+<area shape="poly" id="edge18_Node000014_Node000012" title=" " alt="" coords="495,107,568,149,563,149,495,112"/>
+</map>

@@ -1,0 +1,38 @@
+<map id="ResourceType.hpp" name="ResourceType.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="274,5,413,33"/>
+<area shape="rect" id="Node000002" href="$RenderGraph_8hpp.html" title=" " alt="" coords="21,81,156,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="282,40,135,83,133,78,285,35"/>
+<area shape="rect" id="Node000007" href="$VulkanUploadManager_8hpp.html" title=" " alt="" coords="601,81,798,109"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="422,34,637,79,633,82,422,39"/>
+<area shape="rect" id="Node000003" href="$RenderGraph_8cpp.html" title=" " alt="" coords="22,157,155,184"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="89,122,91,157,86,156,88,127"/>
+<area shape="rect" id="Node000004" href="$Renderer_8hpp.html" title=" " alt="" coords="169,308,277,336"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="47,119,31,133,16,149,9,165,12,183,28,206,46,227,91,262,139,287,183,307,178,308,136,292,88,266,43,231,23,209,7,185,4,165,12,146,28,129,50,115"/>
+<area shape="rect" id="Node000005" href="$Application_8cpp.html" title=" " alt="" coords="93,384,215,411"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="203,346,168,385,165,381,198,348"/>
+<area shape="rect" id="Node000006" href="$Renderer_8cpp.html" title=" " alt="" coords="239,384,346,411"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="247,345,283,384,278,383,245,350"/>
+<area shape="poly" id="edge7_Node000007_Node000004" title=" " alt="" coords="582,99,499,112,407,135,361,152,318,174,278,201,243,234,232,251,226,271,224,309,220,307,221,271,227,249,238,231,274,197,315,170,359,147,405,130,499,106,587,97"/>
+<area shape="rect" id="Node000008" href="$VulkanEngine_8cpp.html" title=" " alt="" coords="665,308,803,336"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="781,110,833,127,886,152,934,186,955,207,972,231,978,246,972,262,950,274,908,286,803,310,802,305,906,281,948,269,968,258,972,246,968,234,951,211,930,190,883,157,831,132,781,116"/>
+<area shape="rect" id="Node000009" href="$VulkanLayoutManager_8hpp.html" title=" " alt="" coords="502,157,697,184"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="672,117,618,159,616,154,667,119"/>
+<area shape="rect" id="Node000013" href="$VulkanMeshManager_8hpp.html" title=" " alt="" coords="771,232,958,260"/>
+<area shape="poly" id="edge17_Node000007_Node000013" title=" " alt="" coords="725,116,853,232,847,232,724,121"/>
+<area shape="rect" id="Node000015" href="$VulkanUploadManager_8cpp.html" title=" " alt="" coords="1033,157,1229,184"/>
+<area shape="poly" id="edge21_Node000007_Node000015" title=" " alt="" coords="792,109,1056,155,1051,157,792,115"/>
+<area shape="poly" id="edge10_Node000009_Node000004" title=" " alt="" coords="484,183,360,204,306,218,270,235,254,251,242,271,228,309,224,306,237,268,250,248,267,230,305,213,359,198,489,181"/>
+<area shape="poly" id="edge11_Node000009_Node000008" title=" " alt="" coords="653,188,684,206,711,231,722,250,730,271,735,309,731,306,724,272,717,252,706,234,681,211,652,194"/>
+<area shape="rect" id="Node000010" href="$VulkanLayoutManager_8cpp.html" title=" " alt="" coords="502,232,696,260"/>
+<area shape="poly" id="edge12_Node000009_Node000010" title=" " alt="" coords="601,198,601,233,597,230,598,202"/>
+<area shape="rect" id="Node000011" href="$VulkanShaderManager_8hpp.html" title=" " alt="" coords="281,232,477,260"/>
+<area shape="poly" id="edge13_Node000009_Node000011" title=" " alt="" coords="543,191,419,234,418,229,548,189"/>
+<area shape="poly" id="edge14_Node000011_Node000004" title=" " alt="" coords="340,266,252,310,250,305,335,268"/>
+<area shape="poly" id="edge15_Node000011_Node000008" title=" " alt="" coords="458,261,673,307,667,308,458,266"/>
+<area shape="rect" id="Node000012" href="$VulkanShaderManager_8cpp.html" title=" " alt="" coords="302,308,497,336"/>
+<area shape="poly" id="edge16_Node000011_Node000012" title=" " alt="" coords="388,273,398,309,393,306,385,277"/>
+<area shape="poly" id="edge18_Node000013_Node000004" title=" " alt="" coords="753,257,540,280,290,311,278,312,277,307,290,305,540,274,759,256"/>
+<area shape="poly" id="edge19_Node000013_Node000008" title=" " alt="" coords="830,267,758,310,756,305,825,269"/>
+<area shape="rect" id="Node000014" href="$VulkanMeshManager_8cpp.html" title=" " alt="" coords="827,308,1012,336"/>
+<area shape="poly" id="edge20_Node000013_Node000014" title=" " alt="" coords="885,270,912,309,907,307,882,275"/>
+</map>

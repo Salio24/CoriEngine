@@ -45,7 +45,7 @@ var NAVTREE =
       [ "Class Members", "functions.html", [
         [ "All", "functions.html", "functions_dup" ],
         [ "Functions", "functions_func.html", "functions_func" ],
-        [ "Variables", "functions_vars.html", null ],
+        [ "Variables", "functions_vars.html", "functions_vars" ],
         [ "Typedefs", "functions_type.html", null ],
         [ "Enumerations", "functions_enum.html", null ],
         [ "Enumerator", "functions_eval.html", null ],
@@ -68,21 +68,23 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "AABB_8hpp.html",
-"PackedArray_8hpp_source.html",
-"classCori_1_1Core_1_1Application.html#a5c5b313999b3ab9f5089f79345a8bf8d",
-"classCori_1_1Core_1_1Layer.html#a6c2b8c6aad9e8f4550a0bb45f7f04f99",
-"classCori_1_1Core_1_1Window.html",
-"classCori_1_1Graphics_1_1Internal_1_1API.html#a12937d27b79460e8c7e9bdc3eae77688",
-"classCori_1_1Graphics_1_1Renderer2D.html#aca9bfbe7f940d87d8ae365de1f16bcff",
+"Profiler_8hpp.html#aa53de898494f4cb5a2ab24fd8d597d36",
+"classCori_1_1Audio_1_1Track.html#a38d02b0f007b1dd5c18b9ac2d1fb866f",
+"classCori_1_1Core_1_1KeyPressedEvent.html#a7e02714a2b195b77112b5955fa495ca8",
+"classCori_1_1Core_1_1RegisterInFactory.html#a3f9a229d15994278f3b93926f0621376",
+"classCori_1_1Graphics_1_1Font_1_1Descriptor.html#a7e708f51e2a647d6cc4b04a5aa35247b",
+"classCori_1_1Graphics_1_1RenderingContext.html#aca4a2989488c5c05ae60c0a9e9d6a2d1",
 "classCori_1_1Graphics_1_1VBLayout.html#af96f3a35a2d4692620e30b3d671136f1",
-"classCori_1_1Profiling_1_1InstanceMetrics.html#a0e04c41fd656780c7d912ffefaca898b",
-"classCori_1_1World_1_1EntityState.html#a17516fc7aea99dc8b38f5bf780592669",
-"classCori_1_1World_1_1Systems_1_1Hierarchy.html#a601f9ca81b6f04f0412874217de5d3a7",
-"namespaceCori_1_1Core.html#a0f06acce81d71ecdca15612fa8ecaa18ab36c913f14afcba26e88f2d5c4e77722",
-"namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416aaed04ee17bf9a3f2c3a5d3bb36a529488",
-"structCori_1_1Core_1_1ScreenMode.html#a905dc86c552181d82daad916be23445d",
-"structCori_1_1Logger_1_1Tags_1_1World_1_1Entity.html#a9001f5b3a3c7763e9d8c50129c172647",
-"structCori_1_1World_1_1Components_1_1Scene_1_1Camera.html#a677497a3bf5324f0ce10961c2d5f9ad9"
+"classCori_1_1Graphics_1_1VulkanUploadManager.html",
+"classCori_1_1Profiling_1_1InstanceMetrics.html#a875c4dc67107ded0da845487144b985f",
+"classCori_1_1World_1_1Scene.html#a10d132c36dd8e25869cc879d010d5bb5",
+"classCori_1_1World_1_1Systems_1_1Hierarchy.html#aaf92f651d83873d7bbacd3f0546682c2",
+"namespaceCori_1_1Core.html#a0f06acce81d71ecdca15612fa8ecaa18",
+"namespaceCori_1_1Core.html#ac30a2dd14b7822e0fa5173507ca9416aae4afa12c1b79c3cf3de7135bbfa54d43",
+"structCori_1_1Audio_1_1PlayParams.html#a88cbcd811f59e5e32f36440c815a7da8",
+"structCori_1_1Graphics_1_1PooledImage.html#a7263e129ff185a45a646fe836f190710",
+"structCori_1_1Logger_1_1Tags_1_1Graphics.html",
+"structCori_1_1World_1_1Components_1_1Entity_1_1RigidBody.html#a2a0cd69e0f4676a0cfab1aae1f6c51b4"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

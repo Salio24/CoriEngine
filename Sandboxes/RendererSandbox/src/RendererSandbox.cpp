@@ -1,305 +1,51 @@
+#define CORI_ASYNC_LOGGING
+#define CORI_NO_FILE_LOGGING
 #include <Cori.hpp>
 #include <CoriEntry.hpp>
-#include <glm/ext/matrix_transform.hpp>
-#include <imgui_internal.h>
 
-namespace Cori {
-	namespace Shaders {
-
-	}
-	
-	namespace Texture2Ds {
-		inline const Texture2DDescriptor TestBrickTexture {
-			"Test Brick Texture",
-			"enignedata/engine/textures/brick.png"
-		};
-		inline const Texture2DDescriptor TestTileset {
-			"Test Tileset 32",
-			"enignedata/engine/textures/testTileset32.png"
-		};
-	}
-	
-	namespace Images {
-
-	}
-	
-	namespace SpriteAtlases {
-		inline const SpriteAtlasDescriptor test {
-			"test sprite atlas",
-			Texture2Ds::TestTileset,
-			{32, 32}
-		};
-	}
-}
-
-class ExampleLayer : public Cori::Layer {
+class ExampleLayer : public Cori::Core::Layer {
 public:
-	ExampleLayer() : Layer("Example") { 
-		Cori::API::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
-
-		Cori::SceneManager::CreateScene("Test Scene");
+	ExampleLayer() : Layer("Example") {
+		Cori::World::SceneManager::CreateScene("Test Scene");
 		BindScene("Test Scene");
-		ActiveScene.GetActiveCamera().CreateOrthoCamera(0, 640, 0, 360, -10, 10);
+		ActiveScene.GetActiveCamera().CreateOrthoCamera(0, 2560, 0, 1080, 50);
 
-		// can also preload enignedata like this vvv
-		Cori::AssetManager::PreloadTexture2Ds({
-			Cori::Texture2Ds::TestBrickTexture
-			});
-
-		Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::test);
-
-		// if the asset is not preloaded it will be loaded the first time it is requested via appropriate
-		// Get function from the Asset Manager
-		Cori::API::SetViewport(0, 0, Cori::Application::GetWindow().GetWidth(), Cori::Application::GetWindow().GetHeight());
-		//Cori::Logger::DisableCoreTags({ "Graphics" });
-
-		Cori::API::EnableBlending();
 	}
 
-	virtual void OnEvent(Cori::Event& event) override {
-		if (!event.IsOfType(Cori::EventType::MouseMoved)) {
-			CORI_TRACE("| Layer: {0} | Event: {1}", this->GetName(), event);
-		}
+	~ExampleLayer() {
 
-		Cori::EventDispatcher dispatcher(event);
-		dispatcher.Dispatch<Cori::MouseScrolledEvent>([this](const Cori::MouseScrolledEvent& e) -> bool {
-			ActiveScene->ActiveCamera.SetZoomLevel(std::clamp((ActiveScene->ActiveCamera.GetZoomLevel() + e.GetYOffset() * 0.0625f), 0.0625f, 1000.0f));
-			ActiveScene->ActiveCamera.RecalculateVP();
-			return true;
-		});
 	}
 
-	virtual void OnImGuiRender(const double deltaTime) override {
-		CORI_PROFILE_FUNCTION();
-		ImGui::Begin("Performance metrics");
+	void OnEvent(Cori::Core::Event& event) override {
 
-		ImGui::SeparatorText("Frametime graph (of last 500 frames)");
+		Cori::Core::EventDispatcher dispatcher(event);
 
-		// peak production code is happening here, lmao
-		ImVec2 avail = ImGui::GetContentRegionAvail();
+	}
 
-		float width = avail.x;
-		float height = width / (14.0f / 5.0f);
-		if (height > avail.y) {
-			height = avail.y;
-			width = height * (14.0f / 5.0f);
-		}
-
-		static const int HISTORY_SIZE = 500;
-		static float frametimeHistory[HISTORY_SIZE] = {};
-		static int frametimeHistoryOffset = 0;
-		static int frametimeHistoryCount = 0;
-
-		frametimeHistory[frametimeHistoryOffset] = deltaTime * 1000.0f;
-		frametimeHistoryOffset = (frametimeHistoryOffset + 1) % HISTORY_SIZE;
-		if (frametimeHistoryCount < HISTORY_SIZE) {
-			frametimeHistoryCount++;
-		}
-
-		static float max_scale = 33.0f;
-		float true_max = 0.0f;
-		for (float v : frametimeHistory) true_max = ImMax(true_max, v);
-		float target = ImMax(true_max * 1.2f, 1.0f);
-		max_scale = ImMax(ImLerp(max_scale, target, ImClamp((float)deltaTime * 3.0f, 0.0f, 1.0f)), 4.0f);
-
-		{
-			char overlay[16];
-			sprintf(overlay, "##");
-			ImGui::PlotLines("##", frametimeHistory, frametimeHistoryCount, (frametimeHistoryCount == HISTORY_SIZE) ? frametimeHistoryOffset : 0, overlay, 0.0f, max_scale, ImVec2(width - 60.0f, height));
-		}
-
-		ImDrawList* drawList = ImGui::GetWindowDrawList();
-		ImVec2 pos0 = ImGui::GetItemRectMin();
-		ImVec2 pos1 = ImGui::GetItemRectMax();
-
-		const int numLines = 8;
-		float step = (max_scale) / numLines;
-
-		for (int i = 0; i <= numLines; i++) {
-			float t = (float)i / (float)numLines;
-			float y = ImLerp(pos1.y, pos0.y, t);
-
-			drawList->AddLine(
-				ImVec2(pos0.x, y),
-				ImVec2(pos1.x, y),
-				IM_COL32(200, 200, 200, 100)
-			);
-
-			float value = step * i;
-
-			char buf[16];
-			sprintf(buf, "%.2f ms", value);
-			ImVec2 text_size = ImGui::CalcTextSize(buf);
-			drawList->AddText(
-				ImVec2(pos1.x + 5, y - text_size.y * 0.5f),
-				IM_COL32(180, 180, 180, 255),
-				buf
-			);
-		}
-
-		static double accumulator = 0.0;
-		static double avgDeltaTime = 0.0;
-		static double avgFPS = 0.0;
-		static double timer = 0.0;
-
-		static int frameCount = 0;
-
-		accumulator += deltaTime;
-		frameCount++;
-		timer += deltaTime;
-
-		if (timer >= 0.1f) {
-			avgDeltaTime = accumulator / frameCount;
-			avgFPS = frameCount / timer;
-
-			timer = 0.0;
-			accumulator = 0.0;
-			frameCount = 0;
-		}
-
-		ImGui::SeparatorText("Performance averages from last 100ms");
-		ImGui::Text("Avg Frametime: %.3f ms", avgDeltaTime * 1000);
-		ImGui::Text("Avg FPS: %.3f", avgFPS);
+	void OnImGuiRender(Cori::Core::GameTimer& gameTimer) override {
+		ImGui::Begin("Test");
 
 		ImGui::End();
 
-		ImGui::Begin("Renderer");
-		ImGui::SeparatorText("Renderer stats");
-		ImGui::Text("Total Draw Calls: %i", Cori::Renderer2D::GetDrawCallCount());
-		ImGui::Text("Drawing %i textured quads", m_QuadRows * m_QuadColumns);
-		ImGui::SeparatorText("Here you can manipulate how many quads are being drawn");
-		ImGui::DragInt("Number of rows", &m_QuadRows, 1, 1, 2000, "%d", ImGuiSliderFlags_AlwaysClamp);
-		ImGui::DragInt("Number of columns", &m_QuadColumns, 1, 1, 2000, "%d", ImGuiSliderFlags_AlwaysClamp);
 
-		ImGui::End();
-		ImGui::Begin("Some Notes");
-
-		ImGui::TextWrapped("You can drag ui (ImGui) floating windows outside of the main window, but be aware that doing this will slightly impact performance. \n"
-							"Controls: WASD to move camera, mouse scroll-wheel to zoom in and out");
-
-		
-
-		ImGui::End();
+		//Cori::ImGuiPresets::ScreenModeAndResolutionDropdowns();
 	}
 
-//#define OLD
-
-	void OnUpdate(const double deltaTime, const double tickAlpha) override {
-		CORI_PROFILE_FUNCTION();
-		//Cori::GraphicsCall::SetClearColor({ 0.875f, 0.6875f, 1.0f, 1.0f });
-		//Cori::GraphicsCall::ClearFramebuffer();
-
-#ifdef OLD
-
-		Cori::Renderer2D::ResetDebugStats();
-
-		Cori::Renderer2D::BeginBatch(ActiveScene->GetContextComponent<Cori::Components::Scene::Camera>().m_ViewProjectionMatrix);
-
-		float offset = 5.0f;
-
-		auto atlas = Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::test);
-
-
-		for (int i = 0; i < m_QuadRows; i++) {
-			for (int y = 0; y < m_QuadColumns; y++) {
-				//Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset , i * 30.0f + offset), glm::vec2(25.0f, 25.0f), Cori::AssetManager::GetTexture2D(Cori::Texture2Ds::TestBrickTexture));
-				Cori::Renderer2D::DrawQuad(glm::vec2(y * 30.0f + offset, i * 30.0f + offset), glm::vec2(25.0f, 25.0f), atlas, 23);
-			}
-		}
-
-		Cori::Renderer2D::EndBatch();
-
-#else 
-		Cori::Test::Renderer2D::BeginScene(ActiveScene.GetContextComponent<Cori::Components::Scene::Camera>());
-
-		float offset = 5.0f;
-
-		auto atlas = Cori::AssetManager::GetSpriteAtlas(Cori::SpriteAtlases::test);
-
-		auto text = atlas->GetTexture().get();
-
-		auto uvs = atlas->GetSpriteUVsAtIndex(23);
-		auto uvs1 = atlas->GetSpriteUVsAtIndex(26);
-
-
-
-		{
-			CORI_PROFILE_SCOPE("Quad Submit");
-			for (int i = 0; i < m_QuadRows; i++) {
-				for (int y = 0; y < m_QuadColumns; y++) {
-					//Cori::Test::Renderer2D::SubmitOpaqueQuad(glm::vec2(y * 30.0f + offset, i * 30.0f + offset), glm::vec2(25.0f, 25.0f), 1, text, uvs, glm::vec4(1.0f, 1.0f, 1.0f, 0.5f), 0, false);
-					//Cori::Test::Renderer2D::s_Data->OpaqueQuadQueue.emplace_back(glm::vec2(y * 30.0f + offset, i * 30.0f + offset), glm::vec2(25.0f, 25.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), text, uvs, 0, 1);
-				}
-			}
-		}
-
-
-
-
-
-
-					//const glm::vec4 finalColor = tintColor.a < 1.0f ? glm::vec4{ tintColor.x, tintColor.y, tintColor.y, 1.0f } : tintColor;
-					//Texture2D* finalTexture = texture ? texture : s_Data->WhiteTexture.get();
-					//const UVs finalUVs = flipped ? UVs{ {uvs.UVmax.x, uvs.UVmin.y}, {uvs.UVmin.x, uvs.UVmax.y} } : uvs;
-
-
-					//Cori::Test::Renderer2D::s_Data->OpaqueQuadQueue.emplace_back(Cori::Test::Renderer2D::Quad{
-					//	.position = glm::vec2(y * 30.0f + offset, i * 30.0f + offset),
-					//	.size = glm::vec2(25.0f, 25.0f),
-					//	.tintColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
-					//	.texture = atlas->GetTexture().get(),
-					//	.uvs = atlas->GetSpriteUVsAtIndex(23),
-					//	.rotation = 0,
-					//	.layer = 1
-					//});
-
-#endif
-
+	void OnUpdate(Cori::Core::GameTimer& gameTimer) override {
 
 	}
 
-	virtual void OnTickUpdate(const float timeStep) override {
-		CORI_PROFILE_FUNCTION();
-		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_8)) {
-			Cori::Profiling::InstanceMetrics<Cori::SpriteAtlas>::Report();
-		}
+	void OnTickUpdate(Cori::Core::GameTimer& gameTimer) override {
 
-		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_9)) {
-			Cori::Profiling::InstanceMetrics<Cori::VertexArray>::Report();
-		}
-		
-		glm::vec2 cameraPosDelta = glm::vec2(0.0f);
 
-		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_W)) {
-			cameraPosDelta.y += m_CameraMoveSpeed * ActiveScene->ActiveCamera.GetZoomLevel();
-		}
-		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_S)) {
-			cameraPosDelta.y -= m_CameraMoveSpeed * ActiveScene->ActiveCamera.GetZoomLevel();
-		}
-		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_A)) {
-			cameraPosDelta.x -= m_CameraMoveSpeed * ActiveScene->ActiveCamera.GetZoomLevel();
-		}
-		if (Cori::Input::IsKeyPressed(Cori::CORI_KEY_D)) {
-			cameraPosDelta.x += m_CameraMoveSpeed * ActiveScene->ActiveCamera.GetZoomLevel();
-		}
-
-		if (cameraPosDelta != glm::vec2(0.0f)) {
-			ActiveScene->ActiveCamera.SetPosition(ActiveScene->ActiveCamera.GetPosition() + cameraPosDelta);
-			ActiveScene->ActiveCamera.RecalculateVP();
-		}
 	}
-
-	int m_QuadColumns{ 1000 };
-	int m_QuadRows{ 100 };
-
-	float m_CameraMoveSpeed = 10.0f;
-
 };
 
-class Sandbox : public Cori::Application {
+class Sandbox : public Cori::Core::Application {
 public:
-	Sandbox() {
+	Sandbox(): Application("renderer sandbox") {
 		PushLayer(new ExampleLayer());
+
 		CORI_INFO("Sandbox application created");
 	}
 
@@ -308,6 +54,6 @@ public:
 	}
 };
 
-Cori::Application* Cori::CreateApplication() {
+Cori::Core::Application* Cori::Core::CreateApplication() {
 	return new Sandbox();
 }

@@ -31,6 +31,7 @@
 /Engine/thirdparty/entt/*
 /Engine/thirdparty/box2d/*
 /Engine/thirdparty/box2cpp/box2d/*
+/Engine/111.cpp
 
 # build directory for libs and tmp files
 /out

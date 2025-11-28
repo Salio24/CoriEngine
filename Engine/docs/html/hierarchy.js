@@ -1,6 +1,7 @@
 var hierarchy =
 [
     [ "Cori::Utility::AABB", "structCori_1_1Utility_1_1AABB.html", null ],
+    [ "Cori::Graphics::AmazingBuffer", "structCori_1_1Graphics_1_1AmazingBuffer.html", null ],
     [ "Cori::Graphics::Animation", "structCori_1_1Graphics_1_1Animation.html", null ],
     [ "Cori::Graphics::Internal::AnimationData", "classCori_1_1Graphics_1_1Internal_1_1AnimationData.html", null ],
     [ "Cori::Graphics::Internal::AnimationFrame", "structCori_1_1Graphics_1_1Internal_1_1AnimationFrame.html", null ],
@@ -27,20 +28,27 @@ var hierarchy =
       [ "Cori::World::Components::Entity::RigidBody", "structCori_1_1World_1_1Components_1_1Entity_1_1RigidBody.html", null ]
     ] ],
     [ "Cori::Physics::BodyUserData", "structCori_1_1Physics_1_1BodyUserData.html", null ],
+    [ "Cori::Graphics::BufferCreateInfo", "structCori_1_1Graphics_1_1BufferCreateInfo.html", null ],
+    [ "Cori::Graphics::BufferRange", "structCori_1_1Graphics_1_1BufferRange.html", null ],
+    [ "Cori::Graphics::VulkanUploadManager::BufferUploadRange", "structCori_1_1Graphics_1_1VulkanUploadManager_1_1BufferUploadRange.html", null ],
     [ "Cori::World::Components::Scene::Camera", "structCori_1_1World_1_1Components_1_1Scene_1_1Camera.html", null ],
     [ "Cori::Graphics::CameraController", "classCori_1_1Graphics_1_1CameraController.html", null ],
     [ "Cori::Physics::CastResult", "structCori_1_1Physics_1_1CastResult.html", null ],
     [ "Cori::Graphics::Font::CharsetRange", "structCori_1_1Graphics_1_1Font_1_1CharsetRange.html", null ],
     [ "Cori::Graphics::Font::CharsetRanges", "structCori_1_1Graphics_1_1Font_1_1CharsetRanges.html", null ],
     [ "Cori::World::Components::Entity::ChildCache", "structCori_1_1World_1_1Components_1_1Entity_1_1ChildCache.html", null ],
+    [ "Cori::Graphics::CompleteMeshInfo", "structCori_1_1Graphics_1_1CompleteMeshInfo.html", null ],
     [ "Cori::Physics::ConvexHull", "classCori_1_1Physics_1_1ConvexHull.html", null ],
     [ "Cori::Logger::Tags::Core", "structCori_1_1Logger_1_1Tags_1_1Core.html", null ],
-    [ "Cori::Graphics::CoriGraphicsAPI", "classCori_1_1Graphics_1_1CoriGraphicsAPI.html", [
-      [ "Cori::Graphics::Internal::OpenGLGraphicsAPI", "classCori_1_1Graphics_1_1Internal_1_1OpenGLGraphicsAPI.html", null ]
-    ] ],
+    [ "Cori::Graphics::CoriGraphicsAPI", "classCori_1_1Graphics_1_1CoriGraphicsAPI.html", null ],
+    [ "Cori::Graphics::CompleteMeshInfo::CPUMeshInfo", "structCori_1_1Graphics_1_1CompleteMeshInfo_1_1CPUMeshInfo.html", null ],
+    [ "Cori::Graphics::AmazingBuffer::CreateInfo", "structCori_1_1Graphics_1_1AmazingBuffer_1_1CreateInfo.html", null ],
+    [ "Cori::Graphics::VulkanBuffer::CreateInfo", "structCori_1_1Graphics_1_1VulkanBuffer_1_1CreateInfo.html", null ],
+    [ "Cori::Graphics::VulkanImage::CreateInfo", "structCori_1_1Graphics_1_1VulkanImage_1_1CreateInfo.html", null ],
     [ "Cori::Audio::Mixer::Data", "structCori_1_1Audio_1_1Mixer_1_1Data.html", null ],
     [ "Cori::Core::Window::Data", "structCori_1_1Core_1_1Window_1_1Data.html", null ],
     [ "Cori::World::SceneManager::Data", "structCori_1_1World_1_1SceneManager_1_1Data.html", null ],
+    [ "Cori::Graphics::DeletionQueue", "classCori_1_1Graphics_1_1DeletionQueue.html", null ],
     [ "Cori::Audio::Sound::Descriptor", "classCori_1_1Audio_1_1Sound_1_1Descriptor.html", null ],
     [ "Cori::Graphics::AnimationPack::Descriptor", "classCori_1_1Graphics_1_1AnimationPack_1_1Descriptor.html", null ],
     [ "Cori::Graphics::Font::Descriptor", "classCori_1_1Graphics_1_1Font_1_1Descriptor.html", null ],
@@ -48,7 +56,7 @@ var hierarchy =
     [ "Cori::Graphics::SpriteAtlas::Descriptor", "classCori_1_1Graphics_1_1SpriteAtlas_1_1Descriptor.html", null ],
     [ "Cori::Graphics::Texture2D::Descriptor", "classCori_1_1Graphics_1_1Texture2D_1_1Descriptor.html", null ],
     [ "Cori::World::Components::Entity::Internal::DirtyTransformFlag", "structCori_1_1World_1_1Components_1_1Entity_1_1Internal_1_1DirtyTransformFlag.html", null ],
-    [ "Cori::World::DisposableEntityPool< PoolSize >", "classCori_1_1World_1_1DisposableEntityPool.html", null ],
+    [ "Cori::World::DisposableEntityPool&lt; PoolSize &gt;", "classCori_1_1World_1_1DisposableEntityPool.html", null ],
     [ "Cori::World::EntityTags::DisposableEntityTag", "structCori_1_1World_1_1EntityTags_1_1DisposableEntityTag.html", null ],
     [ "Cori::World::DynamicEntityView", "classCori_1_1World_1_1DynamicEntityView.html", null ],
     [ "std::enable_shared_from_this", null, [
@@ -77,8 +85,8 @@ var hierarchy =
     [ "std::exception", null, [
       [ "Cori::Core::CoriError< DeclaredTypes >", "classCori_1_1Core_1_1CoriError.html", null ]
     ] ],
-    [ "Cori::World::Exclude< T >", "structCori_1_1World_1_1Exclude.html", null ],
-    [ "Cori::Core::Factory< BaseType, KeyType, CtorArgs >", "classCori_1_1Core_1_1Factory.html", null ],
+    [ "Cori::World::Exclude&lt; T &gt;", "structCori_1_1World_1_1Exclude.html", null ],
+    [ "Cori::Core::Factory&lt; BaseType, KeyType, CtorArgs &gt;", "classCori_1_1Core_1_1Factory.html", null ],
     [ "Cori::Logger::Tags::Core::Factory", "structCori_1_1Logger_1_1Tags_1_1Core_1_1Factory.html", null ],
     [ "std::false_type", null, [
       [ "Cori::FileSystem::Internal::is_vector< std::vector< T, Alloc > >", "structCori_1_1FileSystem_1_1Internal_1_1is__vector_3_01std_1_1vector_3_01T_00_01Alloc_01_4_01_4.html", null ],
@@ -87,10 +95,11 @@ var hierarchy =
     [ "Cori::FileSystem::FileManager", "classCori_1_1FileSystem_1_1FileManager.html", null ],
     [ "Cori::Logger::Tags::FileSystem", "structCori_1_1Logger_1_1Tags_1_1FileSystem.html", null ],
     [ "Cori::Graphics::Internal::FontData", "structCori_1_1Graphics_1_1Internal_1_1FontData.html", null ],
-    [ "Cori::Math::Function< NumericType, ArgumentAmount >", "classCori_1_1Math_1_1Function.html", null ],
+    [ "Cori::Graphics::VulkanEngine::FrameData", "structCori_1_1Graphics_1_1VulkanEngine_1_1FrameData.html", null ],
+    [ "Cori::Math::Function&lt; NumericType, ArgumentAmount &gt;", "classCori_1_1Math_1_1Function.html", null ],
     [ "Cori::Core::GameTimer", "classCori_1_1Core_1_1GameTimer.html", null ],
     [ "Cori::Logger::Tags::Graphics", "structCori_1_1Logger_1_1Tags_1_1Graphics.html", null ],
-    [ "std::hash< Cori::Core::UUID >", "structstd_1_1hash_3_01Cori_1_1Core_1_1UUID_01_4.html", null ],
+    [ "std::hash&lt; Cori::Core::UUID &gt;", "structstd_1_1hash_3_01Cori_1_1Core_1_1UUID_01_4.html", null ],
     [ "Cori::Utility::HashedTag64", "structCori_1_1Utility_1_1HashedTag64.html", null ],
     [ "Cori::Audio::Sound::Descriptor::Hasher", "structCori_1_1Audio_1_1Sound_1_1Descriptor_1_1Hasher.html", null ],
     [ "Cori::Graphics::AnimationPack::Descriptor::Hasher", "structCori_1_1Graphics_1_1AnimationPack_1_1Descriptor_1_1Hasher.html", null ],
@@ -99,15 +108,17 @@ var hierarchy =
     [ "Cori::Graphics::SpriteAtlas::Descriptor::Hasher", "structCori_1_1Graphics_1_1SpriteAtlas_1_1Descriptor_1_1Hasher.html", null ],
     [ "Cori::Graphics::Texture2D::Descriptor::Hasher", "structCori_1_1Graphics_1_1Texture2D_1_1Descriptor_1_1Hasher.html", null ],
     [ "Cori::World::Components::Entity::Hierarchy", "structCori_1_1World_1_1Components_1_1Entity_1_1Hierarchy.html", null ],
+    [ "Cori::Graphics::ImageCreateInfo", "structCori_1_1Graphics_1_1ImageCreateInfo.html", null ],
+    [ "Cori::Graphics::ImageSubresourceKey", "structCori_1_1Graphics_1_1ImageSubresourceKey.html", null ],
+    [ "Cori::Graphics::VulkanUploadManager::ImageUploadRange", "structCori_1_1Graphics_1_1VulkanUploadManager_1_1ImageUploadRange.html", null ],
+    [ "Cori::Graphics::VulkanImage::ImageViewKey", "structCori_1_1Graphics_1_1VulkanImage_1_1ImageViewKey.html", null ],
     [ "Cori::World::Components::Entity::InactiveGloballyFlag", "structCori_1_1World_1_1Components_1_1Entity_1_1InactiveGloballyFlag.html", null ],
     [ "Cori::World::Components::Entity::InactiveLocallyFlag", "structCori_1_1World_1_1Components_1_1Entity_1_1InactiveLocallyFlag.html", null ],
-    [ "Cori::Graphics::IndexBuffer", "classCori_1_1Graphics_1_1IndexBuffer.html", [
-      [ "Cori::Graphics::Internal::OpenGLIndexBuffer", "classCori_1_1Graphics_1_1Internal_1_1OpenGLIndexBuffer.html", null ]
-    ] ],
+    [ "Cori::Graphics::IndexBuffer", "classCori_1_1Graphics_1_1IndexBuffer.html", null ],
     [ "Cori::Core::Input", "classCori_1_1Core_1_1Input.html", null ],
-    [ "Cori::Profiling::InstanceMetrics< T >", "classCori_1_1Profiling_1_1InstanceMetrics.html", null ],
+    [ "Cori::Profiling::InstanceMetrics&lt; T &gt;", "classCori_1_1Profiling_1_1InstanceMetrics.html", null ],
     [ "Cori::World::DynamicEntityView::Iterator", "classCori_1_1World_1_1DynamicEntityView_1_1Iterator.html", null ],
-    [ "Cori::World::StaticEntityView< View >::Iterator", "classCori_1_1World_1_1StaticEntityView_1_1Iterator.html", null ],
+    [ "Cori::World::StaticEntityView&lt; View &gt;::Iterator", "classCori_1_1World_1_1StaticEntityView_1_1Iterator.html", null ],
     [ "Cori::FileSystem::JsonSerializer", "classCori_1_1FileSystem_1_1JsonSerializer.html", null ],
     [ "Cori::Core::Layer", "classCori_1_1Core_1_1Layer.html", [
       [ "Cori::Core::Internal::ImGuiLayer", "classCori_1_1Core_1_1Internal_1_1ImGuiLayer.html", null ]
@@ -117,35 +128,46 @@ var hierarchy =
     [ "Cori::Core::Threading::MainThreadQueue", "classCori_1_1Core_1_1Threading_1_1MainThreadQueue.html", null ],
     [ "Cori::Core::ManualTimer", "classCori_1_1Core_1_1ManualTimer.html", null ],
     [ "Cori::Logger::Tags::Math", "structCori_1_1Logger_1_1Tags_1_1Math.html", null ],
+    [ "Cori::Graphics::MeshAssetInfo", "structCori_1_1Graphics_1_1MeshAssetInfo.html", null ],
     [ "Cori::Audio::Mixer", "classCori_1_1Audio_1_1Mixer.html", null ],
     [ "Cori::World::Components::Entity::Name", "structCori_1_1World_1_1Components_1_1Entity_1_1Name.html", null ],
-    [ "Cori::Core::PackedArray< T, SizeT, MaxSize >", "classCori_1_1Core_1_1PackedArray.html", null ],
+    [ "Cori::Core::PackedArray&lt; T, SizeT, MaxSize &gt;", "classCori_1_1Core_1_1PackedArray.html", null ],
     [ "Cori::Graphics::Texture::Params", "structCori_1_1Graphics_1_1Texture_1_1Params.html", null ],
+    [ "Cori::Graphics::Pass", "classCori_1_1Graphics_1_1Pass.html", null ],
+    [ "Cori::Graphics::PassPassDependency", "structCori_1_1Graphics_1_1PassPassDependency.html", null ],
+    [ "Cori::Graphics::PassResourceDependency", "structCori_1_1Graphics_1_1PassResourceDependency.html", null ],
     [ "Cori::FileSystem::PathManager", "classCori_1_1FileSystem_1_1PathManager.html", null ],
     [ "Cori::Audio::PlayParams", "structCori_1_1Audio_1_1PlayParams.html", null ],
     [ "Cori::Graphics::Animation::PlayParams", "structCori_1_1Graphics_1_1Animation_1_1PlayParams.html", null ],
-    [ "Cori::Core::PossibleErrors< Exceptions >", "classCori_1_1Core_1_1PossibleErrors.html", null ],
+    [ "Cori::Graphics::PooledBuffer", "structCori_1_1Graphics_1_1PooledBuffer.html", null ],
+    [ "Cori::Graphics::PooledBufferDescription", "structCori_1_1Graphics_1_1PooledBufferDescription.html", null ],
+    [ "Cori::Graphics::PooledImage", "structCori_1_1Graphics_1_1PooledImage.html", null ],
+    [ "Cori::Graphics::PooledImageDescription", "structCori_1_1Graphics_1_1PooledImageDescription.html", null ],
+    [ "Cori::Core::PossibleErrors&lt; Exceptions &gt;", "classCori_1_1Core_1_1PossibleErrors.html", null ],
     [ "Cori::Logger::Tags::Profiler", "structCori_1_1Logger_1_1Tags_1_1Profiler.html", null ],
     [ "Cori::World::Components::Entity::QuadAnimator", "classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html", null ],
     [ "Cori::World::Components::Entity::QuadRenderer", "structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html", null ],
     [ "Cori::Utility::RandomUint32", "classCori_1_1Utility_1_1RandomUint32.html", null ],
-    [ "Cori::Core::RegisterInFactory< BaseType, DerivedType, KeyType, KeyValue, CtorArgs >", "classCori_1_1Core_1_1RegisterInFactory.html", null ],
-    [ "Cori::Graphics::Renderer2D", "classCori_1_1Graphics_1_1Renderer2D.html", null ],
-    [ "Cori::Graphics::RenderingContext", "classCori_1_1Graphics_1_1RenderingContext.html", [
-      [ "Cori::Graphics::Internal::OpenGLContext", "classCori_1_1Graphics_1_1Internal_1_1OpenGLContext.html", null ]
-    ] ],
+    [ "Cori::Core::RegisterInFactory&lt; BaseType, DerivedType, KeyType, KeyValue, CtorArgs &gt;", "classCori_1_1Core_1_1RegisterInFactory.html", null ],
+    [ "Cori::Graphics::Renderer", "classCori_1_1Graphics_1_1Renderer.html", null ],
+    [ "Cori::Graphics::RenderGraph", "classCori_1_1Graphics_1_1RenderGraph.html", null ],
+    [ "Cori::Graphics::RenderGraphPassRegistry", "classCori_1_1Graphics_1_1RenderGraphPassRegistry.html", null ],
+    [ "Cori::Graphics::RenderGraphResourceRegistry", "classCori_1_1Graphics_1_1RenderGraphResourceRegistry.html", null ],
+    [ "Cori::Graphics::RenderingContext", "classCori_1_1Graphics_1_1RenderingContext.html", null ],
+    [ "Cori::Graphics::ResourceNode", "structCori_1_1Graphics_1_1ResourceNode.html", null ],
+    [ "Cori::Graphics::ResourceState", "structCori_1_1Graphics_1_1ResourceState.html", null ],
+    [ "Cori::Graphics::ResourceUsage", "structCori_1_1Graphics_1_1ResourceUsage.html", null ],
     [ "Cori::Logger::Tags::World::Scene", "structCori_1_1Logger_1_1Tags_1_1World_1_1Scene.html", null ],
     [ "Cori::World::SceneHandle", "classCori_1_1World_1_1SceneHandle.html", null ],
     [ "Cori::World::Internal::SceneID", "structCori_1_1World_1_1Internal_1_1SceneID.html", null ],
     [ "Cori::World::SceneManager", "classCori_1_1World_1_1SceneManager.html", null ],
     [ "Cori::Core::ScreenMode", "structCori_1_1Core_1_1ScreenMode.html", null ],
-    [ "Cori::Graphics::ShaderProgram", "classCori_1_1Graphics_1_1ShaderProgram.html", [
-      [ "Cori::Graphics::Internal::OpenGLShaderProgram", "classCori_1_1Graphics_1_1Internal_1_1OpenGLShaderProgram.html", null ]
-    ] ],
+    [ "Cori::Graphics::ShaderObject", "classCori_1_1Graphics_1_1ShaderObject.html", null ],
+    [ "Cori::Graphics::ShaderProgram", "classCori_1_1Graphics_1_1ShaderProgram.html", null ],
     [ "Cori::Physics::ShapeUserData", "structCori_1_1Physics_1_1ShapeUserData.html", null ],
     [ "Cori::World::Components::Entity::StateMachine", "classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html", null ],
-    [ "Cori::World::StaticEntityView< View >", "classCori_1_1World_1_1StaticEntityView.html", null ],
-    [ "Cori::Graphics::Renderer2D::Statistics", "structCori_1_1Graphics_1_1Renderer2D_1_1Statistics.html", null ],
+    [ "Cori::World::StaticEntityView&lt; View &gt;", "classCori_1_1World_1_1StaticEntityView.html", null ],
+    [ "Cori::Graphics::SwapChainImageData", "structCori_1_1Graphics_1_1SwapChainImageData.html", null ],
     [ "Cori::World::System", "classCori_1_1World_1_1System.html", [
       [ "Cori::World::Systems::Animation", "classCori_1_1World_1_1Systems_1_1Animation.html", null ],
       [ "Cori::World::Systems::Hierarchy", "classCori_1_1World_1_1Systems_1_1Hierarchy.html", null ],
@@ -157,52 +179,32 @@ var hierarchy =
     [ "Cori::Logger::Tags::World::Systems", "structCori_1_1Logger_1_1Tags_1_1World_1_1Systems.html", null ],
     [ "Cori::Logger::Tags", "structCori_1_1Logger_1_1Tags.html", null ],
     [ "Cori::Graphics::Texture", "classCori_1_1Graphics_1_1Texture.html", [
-      [ "Cori::Graphics::Texture2D", "classCori_1_1Graphics_1_1Texture2D.html", [
-        [ "Cori::Graphics::Internal::OpenGLTexture2D", "classCori_1_1Graphics_1_1Internal_1_1OpenGLTexture2D.html", null ]
-      ] ]
+      [ "Cori::Graphics::Texture2D", "classCori_1_1Graphics_1_1Texture2D.html", null ]
     ] ],
     [ "Cori::Core::Threading::ThreadPool", "classCori_1_1Core_1_1Threading_1_1ThreadPool.html", null ],
-    [ "Cori::Profiling::Trackable< DerivedType, BasePack >", "classCori_1_1Profiling_1_1Trackable.html", null ],
-    [ "Cori::Profiling::Trackable< AnimationPack >", "classCori_1_1Profiling_1_1Trackable.html", [
+    [ "Cori::Profiling::Trackable&lt; DerivedType, BasePack &gt;", "classCori_1_1Profiling_1_1Trackable.html", null ],
+    [ "Cori::Profiling::Trackable&lt; AnimationPack &gt;", "classCori_1_1Profiling_1_1Trackable.html", [
       [ "Cori::Graphics::AnimationPack", "classCori_1_1Graphics_1_1AnimationPack.html", null ]
     ] ],
-    [ "Cori::Profiling::Trackable< Font >", "classCori_1_1Profiling_1_1Trackable.html", [
+    [ "Cori::Profiling::Trackable&lt; Font &gt;", "classCori_1_1Profiling_1_1Trackable.html", [
       [ "Cori::Graphics::Font", "classCori_1_1Graphics_1_1Font.html", null ]
     ] ],
-    [ "Cori::Profiling::Trackable< Image >", "classCori_1_1Profiling_1_1Trackable.html", [
+    [ "Cori::Profiling::Trackable&lt; Image &gt;", "classCori_1_1Profiling_1_1Trackable.html", [
       [ "Cori::Graphics::Image", "classCori_1_1Graphics_1_1Image.html", null ]
     ] ],
-    [ "Cori::Profiling::Trackable< OpenGLContext, RenderingContext >", "classCori_1_1Profiling_1_1Trackable.html", [
-      [ "Cori::Graphics::Internal::OpenGLContext", "classCori_1_1Graphics_1_1Internal_1_1OpenGLContext.html", null ]
-    ] ],
-    [ "Cori::Profiling::Trackable< OpenGLIndexBuffer, IndexBuffer >", "classCori_1_1Profiling_1_1Trackable.html", [
-      [ "Cori::Graphics::Internal::OpenGLIndexBuffer", "classCori_1_1Graphics_1_1Internal_1_1OpenGLIndexBuffer.html", null ]
-    ] ],
-    [ "Cori::Profiling::Trackable< OpenGLShaderProgram, ShaderProgram >", "classCori_1_1Profiling_1_1Trackable.html", [
-      [ "Cori::Graphics::Internal::OpenGLShaderProgram", "classCori_1_1Graphics_1_1Internal_1_1OpenGLShaderProgram.html", null ]
-    ] ],
-    [ "Cori::Profiling::Trackable< OpenGLTexture2D, Texture2D, Texture >", "classCori_1_1Profiling_1_1Trackable.html", [
-      [ "Cori::Graphics::Internal::OpenGLTexture2D", "classCori_1_1Graphics_1_1Internal_1_1OpenGLTexture2D.html", null ]
-    ] ],
-    [ "Cori::Profiling::Trackable< OpenGLVertexArray, VertexArray >", "classCori_1_1Profiling_1_1Trackable.html", [
-      [ "Cori::Graphics::Internal::OpenGLVertexArray", "classCori_1_1Graphics_1_1Internal_1_1OpenGLVertexArray.html", null ]
-    ] ],
-    [ "Cori::Profiling::Trackable< OpenGLVertexBuffer, VertexBuffer >", "classCori_1_1Profiling_1_1Trackable.html", [
-      [ "Cori::Graphics::Internal::OpenGLVertexBuffer", "classCori_1_1Graphics_1_1Internal_1_1OpenGLVertexBuffer.html", null ]
-    ] ],
-    [ "Cori::Profiling::Trackable< Scene >", "classCori_1_1Profiling_1_1Trackable.html", [
+    [ "Cori::Profiling::Trackable&lt; Scene &gt;", "classCori_1_1Profiling_1_1Trackable.html", [
       [ "Cori::World::Scene", "classCori_1_1World_1_1Scene.html", null ]
     ] ],
-    [ "Cori::Profiling::Trackable< Sound >", "classCori_1_1Profiling_1_1Trackable.html", [
+    [ "Cori::Profiling::Trackable&lt; Sound &gt;", "classCori_1_1Profiling_1_1Trackable.html", [
       [ "Cori::Audio::Sound", "classCori_1_1Audio_1_1Sound.html", null ]
     ] ],
-    [ "Cori::Profiling::Trackable< SpriteAtlas >", "classCori_1_1Profiling_1_1Trackable.html", [
+    [ "Cori::Profiling::Trackable&lt; SpriteAtlas &gt;", "classCori_1_1Profiling_1_1Trackable.html", [
       [ "Cori::Graphics::SpriteAtlas", "classCori_1_1Graphics_1_1SpriteAtlas.html", null ]
     ] ],
-    [ "Cori::Profiling::Trackable< Track >", "classCori_1_1Profiling_1_1Trackable.html", [
+    [ "Cori::Profiling::Trackable&lt; Track &gt;", "classCori_1_1Profiling_1_1Trackable.html", [
       [ "Cori::Audio::Track", "classCori_1_1Audio_1_1Track.html", null ]
     ] ],
-    [ "Cori::Profiling::Trackable< Window >", "classCori_1_1Profiling_1_1Trackable.html", [
+    [ "Cori::Profiling::Trackable&lt; Window &gt;", "classCori_1_1Profiling_1_1Trackable.html", [
       [ "Cori::Core::Window", "classCori_1_1Core_1_1Window.html", null ]
     ] ],
     [ "Cori::World::Components::Entity::Transform", "structCori_1_1World_1_1Components_1_1Entity_1_1Transform.html", null ],
@@ -213,17 +215,27 @@ var hierarchy =
     [ "std::true_type", null, [
       [ "Cori::FileSystem::Internal::is_vector< std::vector< T, Alloc > >", "structCori_1_1FileSystem_1_1Internal_1_1is__vector_3_01std_1_1vector_3_01T_00_01Alloc_01_4_01_4.html", null ]
     ] ],
+    [ "Cori::Graphics::AmazingBuffer::UpdateData", "structCori_1_1Graphics_1_1AmazingBuffer_1_1UpdateData.html", null ],
+    [ "Cori::Graphics::VulkanUploadManager::UploadPart", "structCori_1_1Graphics_1_1VulkanUploadManager_1_1UploadPart.html", null ],
+    [ "Cori::Graphics::VulkanUploadManager::UploadRequest", "structCori_1_1Graphics_1_1VulkanUploadManager_1_1UploadRequest.html", null ],
     [ "Cori::Logger::Tags::Utility", "structCori_1_1Logger_1_1Tags_1_1Utility.html", null ],
     [ "Cori::Core::UUID", "classCori_1_1Core_1_1UUID.html", null ],
     [ "Cori::World::Components::Entity::UUID", "structCori_1_1World_1_1Components_1_1Entity_1_1UUID.html", null ],
     [ "Cori::Graphics::UVs", "structCori_1_1Graphics_1_1UVs.html", null ],
     [ "Cori::Graphics::VBElement", "classCori_1_1Graphics_1_1VBElement.html", null ],
     [ "Cori::Graphics::VBLayout", "classCori_1_1Graphics_1_1VBLayout.html", null ],
-    [ "Cori::Graphics::VertexArray", "classCori_1_1Graphics_1_1VertexArray.html", [
-      [ "Cori::Graphics::Internal::OpenGLVertexArray", "classCori_1_1Graphics_1_1Internal_1_1OpenGLVertexArray.html", null ]
-    ] ],
-    [ "Cori::Graphics::VertexBuffer", "classCori_1_1Graphics_1_1VertexBuffer.html", [
-      [ "Cori::Graphics::Internal::OpenGLVertexBuffer", "classCori_1_1Graphics_1_1Internal_1_1OpenGLVertexBuffer.html", null ]
-    ] ],
+    [ "Cori::Graphics::Vertex", "structCori_1_1Graphics_1_1Vertex.html", null ],
+    [ "Cori::Graphics::VertexArray", "classCori_1_1Graphics_1_1VertexArray.html", null ],
+    [ "Cori::Graphics::VertexBuffer", "classCori_1_1Graphics_1_1VertexBuffer.html", null ],
+    [ "Cori::Logger::Tags::Graphics::Vulkan", "structCori_1_1Logger_1_1Tags_1_1Graphics_1_1Vulkan.html", null ],
+    [ "Cori::Graphics::VulkanBuffer", "classCori_1_1Graphics_1_1VulkanBuffer.html", null ],
+    [ "Cori::Graphics::VulkanEngine", "classCori_1_1Graphics_1_1VulkanEngine.html", null ],
+    [ "Cori::Graphics::VulkanGlobalLayoutManager", "classCori_1_1Graphics_1_1VulkanGlobalLayoutManager.html", null ],
+    [ "Cori::Graphics::VulkanImage", "classCori_1_1Graphics_1_1VulkanImage.html", null ],
+    [ "Cori::Graphics::VulkanImageViewManager", "classCori_1_1Graphics_1_1VulkanImageViewManager.html", null ],
+    [ "Cori::Graphics::VulkanMeshManager", "classCori_1_1Graphics_1_1VulkanMeshManager.html", null ],
+    [ "Cori::Graphics::VulkanResourceTracker", "classCori_1_1Graphics_1_1VulkanResourceTracker.html", null ],
+    [ "Cori::Graphics::VulkanShaderManager", "classCori_1_1Graphics_1_1VulkanShaderManager.html", null ],
+    [ "Cori::Graphics::VulkanUploadManager", "classCori_1_1Graphics_1_1VulkanUploadManager.html", null ],
     [ "Cori::Logger::Tags::World", "structCori_1_1Logger_1_1Tags_1_1World.html", null ]
 ];

@@ -45,7 +45,7 @@ namespace Cori {
 				 * @brief Returns a number of threads allocated for this thread pool.
 				 * @return Number of threads.
 				 */
-				uint16_t GetWorkerCount() const {
+				[[nodiscard]] uint16_t GetWorkerCount() const {
 					return m_WorkerCount;
 				}
 

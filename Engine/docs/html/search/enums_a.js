@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['textalignment_0',['TextAlignment',['../classCori_1_1Graphics_1_1Renderer2D.html#aca9bfbe7f940d87d8ae365de1f16bcff',1,'Cori::Graphics::Renderer2D']]]
+  ['shaderdatatype_0',['ShaderDataType',['../namespaceCori_1_1Graphics.html#a6ce448ab7018a509762af1db6ad63232',1,'Cori::Graphics']]]
 ];
