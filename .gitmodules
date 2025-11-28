@@ -22,10 +22,6 @@
 	path = Engine/thirdparty/tmxlite
 	url = https://github.com/fallahn/tmxlite.git
 	branch = master
-[submodule "Engine/thirdparty/glad2"]
-	path = Engine/thirdparty/glad2
-	url = https://github.com/Dav1dde/glad.git
-	branch = glad2
 [submodule "Engine/thirdparty/spdlog"]
 	path = Engine/thirdparty/spdlog
 	url = https://github.com/gabime/spdlog.git
