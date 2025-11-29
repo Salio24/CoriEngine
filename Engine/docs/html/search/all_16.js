@@ -50,7 +50,10 @@ var searchData=
   ['vulkanshadermanager_47',['VulkanShaderManager',['../classCori_1_1Graphics_1_1VulkanShaderManager.html',1,'Cori::Graphics::VulkanShaderManager'],['../classCori_1_1Graphics_1_1ShaderObject.html#a9e5446a5b98ba47de5b68f525a207f2d',1,'Cori::Graphics::ShaderObject::VulkanShaderManager()']]],
   ['vulkanshadermanager_2ecpp_48',['VulkanShaderManager.cpp',['../VulkanShaderManager_8cpp.html',1,'']]],
   ['vulkanshadermanager_2ehpp_49',['VulkanShaderManager.hpp',['../VulkanShaderManager_8hpp.html',1,'']]],
-  ['vulkanuploadmanager_50',['VulkanUploadManager',['../classCori_1_1Graphics_1_1VulkanUploadManager.html',1,'Cori::Graphics::VulkanUploadManager'],['../structCori_1_1Graphics_1_1AmazingBuffer.html#adebe27afdbbe6be04fc8ec341478692a',1,'Cori::Graphics::AmazingBuffer::VulkanUploadManager()']]],
-  ['vulkanuploadmanager_2ecpp_51',['VulkanUploadManager.cpp',['../VulkanUploadManager_8cpp.html',1,'']]],
-  ['vulkanuploadmanager_2ehpp_52',['VulkanUploadManager.hpp',['../VulkanUploadManager_8hpp.html',1,'']]]
+  ['vulkantexturemanager_50',['VulkanTextureManager',['../classCori_1_1Graphics_1_1VulkanTextureManager.html',1,'Cori::Graphics']]],
+  ['vulkantexturemanager_2ecpp_51',['VulkanTextureManager.cpp',['../VulkanTextureManager_8cpp.html',1,'']]],
+  ['vulkantexturemanager_2ehpp_52',['VulkanTextureManager.hpp',['../VulkanTextureManager_8hpp.html',1,'']]],
+  ['vulkanuploadmanager_53',['VulkanUploadManager',['../classCori_1_1Graphics_1_1VulkanUploadManager.html',1,'Cori::Graphics::VulkanUploadManager'],['../structCori_1_1Graphics_1_1AmazingBuffer.html#adebe27afdbbe6be04fc8ec341478692a',1,'Cori::Graphics::AmazingBuffer::VulkanUploadManager()']]],
+  ['vulkanuploadmanager_2ecpp_54',['VulkanUploadManager.cpp',['../VulkanUploadManager_8cpp.html',1,'']]],
+  ['vulkanuploadmanager_2ehpp_55',['VulkanUploadManager.hpp',['../VulkanUploadManager_8hpp.html',1,'']]]
 ];

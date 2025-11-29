@@ -107,6 +107,8 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a6c30ad4a136c5c8fd67c78e7a24f1f81" id="r_a6c30ad4a136c5c8fd67c78e7a24f1f81"><td class="memItemLeft" align="right" valign="top">static vk::DescriptorSetLayout &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6c30ad4a136c5c8fd67c78e7a24f1f81">GetGlobalDescriptorSetLayout</a> ()</td></tr>
 <tr class="memitem:ae45559616d59521baf221e799d9f6d96" id="r_ae45559616d59521baf221e799d9f6d96"><td class="memItemLeft" align="right" valign="top">static vk::PipelineLayout &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae45559616d59521baf221e799d9f6d96">GetGlobalPipelineLayout</a> ()</td></tr>
 <tr class="memitem:a9a32ad3eb3367872322a8b168be8a4a7" id="r_a9a32ad3eb3367872322a8b168be8a4a7"><td class="memItemLeft" align="right" valign="top">static vk::PushConstantRange &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9a32ad3eb3367872322a8b168be8a4a7">GetGlobalPushConstantRange</a> ()</td></tr>
+<tr class="memitem:abc403ebbea8569308dd6ea0dba8bea87" id="r_abc403ebbea8569308dd6ea0dba8bea87"><td class="memItemLeft" align="right" valign="top">static uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abc403ebbea8569308dd6ea0dba8bea87">GetMaxTextures</a> ()</td></tr>
+<tr class="memitem:a0587dbc3a674424e90cd547b234328b3" id="r_a0587dbc3a674424e90cd547b234328b3"><td class="memItemLeft" align="right" valign="top">static uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0587dbc3a674424e90cd547b234328b3">GetMaxSamplers</a> ()</td></tr>
 <tr class="memitem:a0895c6207cbc6de5cdde49543d931c57" id="r_a0895c6207cbc6de5cdde49543d931c57"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0895c6207cbc6de5cdde49543d931c57">UpdateSamplerDescriptor</a> (const uint32_t slot, const vk::Sampler sampler)</td></tr>
 <tr class="memitem:a3a35e0e21c0a606c28fae121e0725a4b" id="r_a3a35e0e21c0a606c28fae121e0725a4b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3a35e0e21c0a606c28fae121e0725a4b">UpdateSampledTextureDescriptor</a> (const uint32_t slot, const vk::ImageView view)</td></tr>
 <tr class="memitem:a956ee6420623ffbf67c3dd3e72540c60" id="r_a956ee6420623ffbf67c3dd3e72540c60"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a956ee6420623ffbf67c3dd3e72540c60">BindDescriptorBuffer</a> (vk::CommandBuffer &amp;cmb)</td></tr>
@@ -138,7 +140,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="VulkanLayoutManager_8hpp_source.html#l00095">95</a> of file <a class="el" href="VulkanLayoutManager_8hpp_source.html">VulkanLayoutManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="VulkanLayoutManager_8hpp_source.html#l00103">103</a> of file <a class="el" href="VulkanLayoutManager_8hpp_source.html">VulkanLayoutManager.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -182,7 +184,7 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="VulkanLayoutManager_8hpp_source.html#l00078">78</a> of file <a class="el" href="VulkanLayoutManager_8hpp_source.html">VulkanLayoutManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="VulkanLayoutManager_8hpp_source.html#l00086">86</a> of file <a class="el" href="VulkanLayoutManager_8hpp_source.html">VulkanLayoutManager.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -338,6 +340,60 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
+<a id="a0587dbc3a674424e90cd547b234328b3" name="a0587dbc3a674424e90cd547b234328b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0587dbc3a674424e90cd547b234328b3">&#9670;&#160;</a></span>GetMaxSamplers()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t Cori::Graphics::VulkanGlobalLayoutManager::GetMaxSamplers </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="VulkanLayoutManager_8hpp_source.html#l00031">31</a> of file <a class="el" href="VulkanLayoutManager_8hpp_source.html">VulkanLayoutManager.hpp</a>.</p>
+
+</div>
+</div>
+<a id="abc403ebbea8569308dd6ea0dba8bea87" name="abc403ebbea8569308dd6ea0dba8bea87"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc403ebbea8569308dd6ea0dba8bea87">&#9670;&#160;</a></span>GetMaxTextures()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t Cori::Graphics::VulkanGlobalLayoutManager::GetMaxTextures </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="VulkanLayoutManager_8hpp_source.html#l00027">27</a> of file <a class="el" href="VulkanLayoutManager_8hpp_source.html">VulkanLayoutManager.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a80642ed507305ceeb5cf32e95e07d014" name="a80642ed507305ceeb5cf32e95e07d014"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a80642ed507305ceeb5cf32e95e07d014">&#9670;&#160;</a></span>Init()</h2>
 
@@ -419,7 +475,7 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="VulkanLayoutManager_8hpp_source.html#l00050">50</a> of file <a class="el" href="VulkanLayoutManager_8hpp_source.html">VulkanLayoutManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="VulkanLayoutManager_8hpp_source.html#l00058">58</a> of file <a class="el" href="VulkanLayoutManager_8hpp_source.html">VulkanLayoutManager.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -468,7 +524,7 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="VulkanLayoutManager_8hpp_source.html#l00027">27</a> of file <a class="el" href="VulkanLayoutManager_8hpp_source.html">VulkanLayoutManager.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="VulkanLayoutManager_8hpp_source.html#l00035">35</a> of file <a class="el" href="VulkanLayoutManager_8hpp_source.html">VulkanLayoutManager.hpp</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

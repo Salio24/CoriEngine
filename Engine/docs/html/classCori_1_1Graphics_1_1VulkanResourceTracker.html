@@ -105,7 +105,7 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:aa158695035d3b14f7a389a2a90de94dc" id="r_aa158695035d3b14f7a389a2a90de94dc"><td class="memItemLeft" align="right" valign="top">static std::optional&lt; std::vector&lt; vk::ImageMemoryBarrier2 &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa158695035d3b14f7a389a2a90de94dc">TransitionImage</a> (<a class="el" href="classCori_1_1Graphics_1_1VulkanImage.html">VulkanImage</a> &amp;image, const vk::ImageSubresourceRange &amp;subresourceRange, const <a class="el" href="structCori_1_1Graphics_1_1ResourceState.html">ResourceState</a> &amp;desiredState)</td></tr>
 <tr class="memitem:a02e5c2875af3c7824bcc64a6c35bde81" id="r_a02e5c2875af3c7824bcc64a6c35bde81"><td class="memItemLeft" align="right" valign="top">static std::optional&lt; std::vector&lt; vk::BufferMemoryBarrier2 &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a02e5c2875af3c7824bcc64a6c35bde81">TransitionBuffer</a> (<a class="el" href="classCori_1_1Graphics_1_1VulkanBuffer.html">VulkanBuffer</a> &amp;buffer, const uint64_t offset, const uint64_t size, const <a class="el" href="structCori_1_1Graphics_1_1ResourceState.html">ResourceState</a> &amp;desiredState)</td></tr>
 <tr class="memitem:ad2947df3316519fbcec6fe94467d1e48" id="r_ad2947df3316519fbcec6fe94467d1e48"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad2947df3316519fbcec6fe94467d1e48">OverrideBufferState</a> (<a class="el" href="classCori_1_1Graphics_1_1VulkanBuffer.html">VulkanBuffer</a> &amp;buffer, const uint64_t offset, const uint64_t size, const <a class="el" href="structCori_1_1Graphics_1_1ResourceState.html">ResourceState</a> &amp;desiredState)</td></tr>
-<tr class="memitem:a39fcbd9af57dcb4a19872714805c346c" id="r_a39fcbd9af57dcb4a19872714805c346c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a39fcbd9af57dcb4a19872714805c346c">RegisterImage</a> (<a class="el" href="classCori_1_1Graphics_1_1VulkanImage.html">VulkanImage</a> &amp;image)</td></tr>
+<tr class="memitem:a67f397c346f5139710f7e902908e4cdd" id="r_a67f397c346f5139710f7e902908e4cdd"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a67f397c346f5139710f7e902908e4cdd">RegisterImage</a> (<a class="el" href="classCori_1_1Graphics_1_1VulkanImage.html">VulkanImage</a> &amp;image, vk::ImageLayout initialLayout)</td></tr>
 <tr class="memitem:af1f6624e20ac6f7b67d1f1737ba786e4" id="r_af1f6624e20ac6f7b67d1f1737ba786e4"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af1f6624e20ac6f7b67d1f1737ba786e4">RegisterBuffer</a> (<a class="el" href="classCori_1_1Graphics_1_1VulkanBuffer.html">VulkanBuffer</a> &amp;buffer)</td></tr>
 <tr class="memitem:a479ea98b000501c709efc728863e80aa" id="r_a479ea98b000501c709efc728863e80aa"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a479ea98b000501c709efc728863e80aa">UnregisterImage</a> (<a class="el" href="classCori_1_1Graphics_1_1VulkanImage.html">VulkanImage</a> &amp;image)</td></tr>
 <tr class="memitem:aec26fa27ced3a7a4dd2442f4f08349d8" id="r_aec26fa27ced3a7a4dd2442f4f08349d8"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aec26fa27ced3a7a4dd2442f4f08349d8">UnregisterBuffer</a> (<a class="el" href="classCori_1_1Graphics_1_1VulkanBuffer.html">VulkanBuffer</a> &amp;buffer)</td></tr>
@@ -275,8 +275,8 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
-<a id="a39fcbd9af57dcb4a19872714805c346c" name="a39fcbd9af57dcb4a19872714805c346c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a39fcbd9af57dcb4a19872714805c346c">&#9670;&#160;</a></span>RegisterImage()</h2>
+<a id="a67f397c346f5139710f7e902908e4cdd" name="a67f397c346f5139710f7e902908e4cdd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a67f397c346f5139710f7e902908e4cdd">&#9670;&#160;</a></span>RegisterImage()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -287,8 +287,12 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="memname">void Cori::Graphics::VulkanResourceTracker::RegisterImage </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classCori_1_1Graphics_1_1VulkanImage.html">VulkanImage</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>image</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classCori_1_1Graphics_1_1VulkanImage.html">VulkanImage</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>image</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">vk::ImageLayout</td>          <td class="paramname"><span class="paramname"><em>initialLayout</em></span>&#160;)</td>
         </tr>
       </table>
   </td>
@@ -302,8 +306,8 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="classCori_1_1Graphics_1_1VulkanResourceTracker_a39fcbd9af57dcb4a19872714805c346c_cgraph.png" border="0" usemap="#aclassCori_1_1Graphics_1_1VulkanResourceTracker_a39fcbd9af57dcb4a19872714805c346c_cgraph" loading="lazy" alt=""/></div>
-<map name="aclassCori_1_1Graphics_1_1VulkanResourceTracker_a39fcbd9af57dcb4a19872714805c346c_cgraph" id="aclassCori_1_1Graphics_1_1VulkanResourceTracker_a39fcbd9af57dcb4a19872714805c346c_cgraph">
+<div class="center"><img src="classCori_1_1Graphics_1_1VulkanResourceTracker_a67f397c346f5139710f7e902908e4cdd_cgraph.png" border="0" usemap="#aclassCori_1_1Graphics_1_1VulkanResourceTracker_a67f397c346f5139710f7e902908e4cdd_cgraph" loading="lazy" alt=""/></div>
+<map name="aclassCori_1_1Graphics_1_1VulkanResourceTracker_a67f397c346f5139710f7e902908e4cdd_cgraph" id="aclassCori_1_1Graphics_1_1VulkanResourceTracker_a67f397c346f5139710f7e902908e4cdd_cgraph">
 <area shape="rect" title=" " alt="" coords="5,40,231,85"/>
 <area shape="rect" href="classCori_1_1Graphics_1_1VulkanResourceTracker.html#a6b254d712ae978f5b4a3c14d2dfc50b2" title=" " alt="" coords="279,5,504,50"/>
 <area shape="poly" title=" " alt="" coords="230,45,266,43,260,45,232,51"/>

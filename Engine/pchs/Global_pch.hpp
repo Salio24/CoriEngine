@@ -57,6 +57,6 @@
 #include "../src/Core/Uuid.hpp"
 #include "../src/Core/Error.hpp"
 #include "../src/GlobalDefines.hpp"
-
+#include "../src/Core/ByteType.hpp"
 
 #endif

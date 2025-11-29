@@ -13,9 +13,9 @@ namespace Cori {
 			};
 
 			struct ImageViewKey {
-				vk::ImageViewCreateFlags flags;
+				vk::ImageViewCreateFlags flags{};
 				vk::ImageViewType type;
-				vk::ComponentMapping components;
+				vk::ComponentMapping components{};
 				vk::ImageSubresourceRange subresourceRange;
 
 				bool operator==(const ImageViewKey& other) const = default;
@@ -57,7 +57,6 @@ namespace Cori {
 			vma::Allocation m_Allocation = nullptr;
 			vk::Extent3D m_Extent3D;
 			vk::Format m_Format;
-			vk::ImageLayout m_InitialLayout;
 			uint32_t m_MipLevels{ 0 };
 			uint32_t m_ArrayLayers{ 0 };
 			const char* m_Name{ "Unnamed Image" };

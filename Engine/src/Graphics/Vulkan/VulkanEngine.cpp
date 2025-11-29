@@ -11,6 +11,7 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include "VulkanLayoutManager.hpp"
 #include "VulkanImageViewManager.hpp"
 #include "VulkanShaderManager.hpp"
+#include "VulkanTextureManager.hpp"
 
 const std::vector g_ValidationLayers = {
 	"VK_LAYER_KHRONOS_validation"
@@ -115,12 +116,14 @@ namespace Cori {
 			VulkanGlobalLayoutManager::Init();
 			VulkanImageViewManager::Init();
 			VulkanShaderManager::Init();
+			VulkanTextureManager::Init();
 		}
 
 		VulkanEngine::~VulkanEngine() {
 			auto result = m_Device.waitIdle();
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Calling wait idle on device has failed. Error: {}", vk::to_string(result));
 
+			VulkanTextureManager::Shutdown();
 			VulkanShaderManager::Shutdown();
 			VulkanImageViewManager::Shutdown();
 			VulkanGlobalLayoutManager::Shutdown();
@@ -548,7 +551,7 @@ namespace Cori {
 			                   vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT,
 			                   vk::PhysicalDeviceMemoryPriorityFeaturesEXT,
 			                   vk::PhysicalDeviceShaderObjectFeaturesEXT,
-								vk::PhysicalDeviceDescriptorBufferFeaturesEXT> featureChain = {
+			                   vk::PhysicalDeviceDescriptorBufferFeaturesEXT> featureChain = {
 					{
 						.features = {
 							.multiDrawIndirect = true,

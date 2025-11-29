@@ -20,6 +20,8 @@ var dir_55baf8aab8caba4772959abd875b9c75 =
     [ "VulkanResourceTracker.hpp", "VulkanResourceTracker_8hpp.html", "VulkanResourceTracker_8hpp" ],
     [ "VulkanShaderManager.cpp", "VulkanShaderManager_8cpp.html", null ],
     [ "VulkanShaderManager.hpp", "VulkanShaderManager_8hpp.html", "VulkanShaderManager_8hpp" ],
+    [ "VulkanTextureManager.cpp", "VulkanTextureManager_8cpp.html", null ],
+    [ "VulkanTextureManager.hpp", "VulkanTextureManager_8hpp.html", "VulkanTextureManager_8hpp" ],
     [ "VulkanUploadManager.cpp", "VulkanUploadManager_8cpp.html", null ],
     [ "VulkanUploadManager.hpp", "VulkanUploadManager_8hpp.html", "VulkanUploadManager_8hpp" ]
 ];

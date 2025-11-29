@@ -25,5 +25,7 @@ var searchData=
   ['buffers_2ehpp_22',['Buffers.hpp',['../Buffers_8hpp.html',1,'']]],
   ['buffersubresourcekey_23',['BufferSubresourceKey',['../namespaceCori_1_1Graphics.html#ab6760bcc025d67fc150b19b3a3024c22',1,'Cori::Graphics']]],
   ['bufferuploadrange_24',['BufferUploadRange',['../structCori_1_1Graphics_1_1VulkanUploadManager_1_1BufferUploadRange.html',1,'Cori::Graphics::VulkanUploadManager']]],
-  ['bugtrap_25',['BUGTRAP',['../Logger_8hpp.html#a9dd52672779b84dddeaaa99342974d9b',1,'Logger.hpp']]]
+  ['bugtrap_25',['BUGTRAP',['../Logger_8hpp.html#a9dd52672779b84dddeaaa99342974d9b',1,'Logger.hpp']]],
+  ['byte_26',['Byte',['../namespaceCori.html#a487797438282164d33051bec6d35c4b5',1,'Cori']]],
+  ['bytetype_2ehpp_27',['ByteType.hpp',['../ByteType_8hpp.html',1,'']]]
 ];

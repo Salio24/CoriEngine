@@ -51,6 +51,7 @@ var namespaceCori_1_1Graphics =
     [ "VulkanResourceTracker", "classCori_1_1Graphics_1_1VulkanResourceTracker.html", "classCori_1_1Graphics_1_1VulkanResourceTracker" ],
     [ "ShaderObject", "classCori_1_1Graphics_1_1ShaderObject.html", "classCori_1_1Graphics_1_1ShaderObject" ],
     [ "VulkanShaderManager", "classCori_1_1Graphics_1_1VulkanShaderManager.html", "classCori_1_1Graphics_1_1VulkanShaderManager" ],
+    [ "VulkanTextureManager", "classCori_1_1Graphics_1_1VulkanTextureManager.html", "classCori_1_1Graphics_1_1VulkanTextureManager" ],
     [ "AmazingBuffer", "structCori_1_1Graphics_1_1AmazingBuffer.html", "structCori_1_1Graphics_1_1AmazingBuffer" ],
     [ "VulkanUploadManager", "classCori_1_1Graphics_1_1VulkanUploadManager.html", "classCori_1_1Graphics_1_1VulkanUploadManager" ],
     [ "IsAnimationWithParams", "conceptCori_1_1Graphics_1_1IsAnimationWithParams.html", null ],
@@ -61,6 +62,7 @@ var namespaceCori_1_1Graphics =
     [ "PassHandle", "namespaceCori_1_1Graphics.html#a5bde7818bd4b0806123f949d6eedbc20", null ],
     [ "ResourceHandle", "namespaceCori_1_1Graphics.html#aaa34421f7f12fbaa1396f4c2fcaeaf72", null ],
     [ "ShaderObjectHandle", "namespaceCori_1_1Graphics.html#a7cef96da1accdb47beeb4ab61e34487b", null ],
+    [ "TextureHandle", "namespaceCori_1_1Graphics.html#aae6f63bd9dcf91ea4078bf516fc05ce3", null ],
     [ "GraphicsAPIs", "namespaceCori_1_1Graphics.html#a506205d247975afdf34efa0392771312", [
       [ "None", "namespaceCori_1_1Graphics.html#a506205d247975afdf34efa0392771312a6adf97f83acf6453d4a6a4b1070f3754", null ],
       [ "OpenGL", "namespaceCori_1_1Graphics.html#a506205d247975afdf34efa0392771312a760716b590ee7c0adc25f434f577d8be", null ],
@@ -105,7 +107,6 @@ var namespaceCori_1_1Graphics =
     [ "APIEnumToName", "namespaceCori_1_1Graphics.html#ac10cdf39fd3a5b64fb82ad5cd57d4668", null ],
     [ "NormalizeHexColor24", "namespaceCori_1_1Graphics.html#afb9496cc11dd3c05adb7de2b77aaaf13", null ],
     [ "NormalizeHexColor32", "namespaceCori_1_1Graphics.html#ab838c4d0238ad1e6516a149272881c26", null ],
-    [ "RunImageTest", "namespaceCori_1_1Graphics.html#a4b1c24725064fd8baa84b03a187f5909", null ],
     [ "ShaderDataTypeComponentCount", "namespaceCori_1_1Graphics.html#a3463b4e555081bf0193c70ad975fc537", null ],
     [ "ShaderDataTypeSize", "namespaceCori_1_1Graphics.html#adf2bd155dc3cf3912d2dc7eb0057b1c8", null ],
     [ "StateA", "namespaceCori_1_1Graphics.html#a19556b2eee8b940dc0e194ec45fac0f4", null ],

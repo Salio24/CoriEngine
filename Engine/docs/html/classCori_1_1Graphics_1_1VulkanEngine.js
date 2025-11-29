@@ -20,7 +20,6 @@ var classCori_1_1Graphics_1_1VulkanEngine =
     [ "GetTransferQueueFamilyIndex", "classCori_1_1Graphics_1_1VulkanEngine.html#a1699cf8069f8f0942bc43b63c501b5dc", null ],
     [ "RequestDeviceExtension", "classCori_1_1Graphics_1_1VulkanEngine.html#a11a627106f70c12b2eab130417517c21", null ],
     [ "RequestInstanceExtension", "classCori_1_1Graphics_1_1VulkanEngine.html#a5b2ed1dafbc4ccfeea08e1bd32a714b1", null ],
-    [ "ResizeDrawImages", "classCori_1_1Graphics_1_1VulkanEngine.html#a7a1d658c58b91c173ced683f06d1b952", null ],
     [ "SetDebugName", "classCori_1_1Graphics_1_1VulkanEngine.html#aaa66947d085e2a8d87a793af71908aa5", null ],
     [ "SetDebugName", "classCori_1_1Graphics_1_1VulkanEngine.html#a2d50028b61f33eb2a6025b6e199b63c8", null ],
     [ "s_VerboseValidationLayerLogging", "classCori_1_1Graphics_1_1VulkanEngine.html#a60aff31a20f609591926e9b30325331d", null ]

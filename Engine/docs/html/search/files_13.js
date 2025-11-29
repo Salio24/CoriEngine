@@ -20,6 +20,8 @@ var searchData=
   ['vulkanresourcetracker_2ehpp_17',['VulkanResourceTracker.hpp',['../VulkanResourceTracker_8hpp.html',1,'']]],
   ['vulkanshadermanager_2ecpp_18',['VulkanShaderManager.cpp',['../VulkanShaderManager_8cpp.html',1,'']]],
   ['vulkanshadermanager_2ehpp_19',['VulkanShaderManager.hpp',['../VulkanShaderManager_8hpp.html',1,'']]],
-  ['vulkanuploadmanager_2ecpp_20',['VulkanUploadManager.cpp',['../VulkanUploadManager_8cpp.html',1,'']]],
-  ['vulkanuploadmanager_2ehpp_21',['VulkanUploadManager.hpp',['../VulkanUploadManager_8hpp.html',1,'']]]
+  ['vulkantexturemanager_2ecpp_20',['VulkanTextureManager.cpp',['../VulkanTextureManager_8cpp.html',1,'']]],
+  ['vulkantexturemanager_2ehpp_21',['VulkanTextureManager.hpp',['../VulkanTextureManager_8hpp.html',1,'']]],
+  ['vulkanuploadmanager_2ecpp_22',['VulkanUploadManager.cpp',['../VulkanUploadManager_8cpp.html',1,'']]],
+  ['vulkanuploadmanager_2ehpp_23',['VulkanUploadManager.hpp',['../VulkanUploadManager_8hpp.html',1,'']]]
 ];

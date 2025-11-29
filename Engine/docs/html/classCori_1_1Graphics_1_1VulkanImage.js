@@ -13,7 +13,6 @@ var classCori_1_1Graphics_1_1VulkanImage =
     [ "m_Extent3D", "classCori_1_1Graphics_1_1VulkanImage.html#ab66978bce657ee1349759dc86df1d3f6", null ],
     [ "m_Format", "classCori_1_1Graphics_1_1VulkanImage.html#a28b2eec81e6fc35117df83a5a9754f71", null ],
     [ "m_Image", "classCori_1_1Graphics_1_1VulkanImage.html#aa888b3ed981a1a797f633631d7785c26", null ],
-    [ "m_InitialLayout", "classCori_1_1Graphics_1_1VulkanImage.html#a2d0b6e7e9b0009f1f4ed40bed898bdbd", null ],
     [ "m_MipLevels", "classCori_1_1Graphics_1_1VulkanImage.html#a56c112a7de8368234acc4674bcecaa2c", null ],
     [ "m_Name", "classCori_1_1Graphics_1_1VulkanImage.html#a3e17ba9262dfbad85c8fcb20df3b63db", null ]
 ];

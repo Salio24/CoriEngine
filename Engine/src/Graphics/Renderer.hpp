@@ -7,6 +7,9 @@
 #include "Vulkan/VulkanMeshManager.hpp"
 #include "Vulkan/VulkanShaderManager.hpp"
 #include "Vulkan/VulkanLayoutManager.hpp"
+#include "Vulkan/VulkanTextureManager.hpp"
+#include "FileSystem/PathManager.hpp"
+#include "Image.hpp"
 
 //FIXME: need explicit Renderer lifetime control, its deleted after VulkanEngine has been shutdown
 
@@ -20,12 +23,12 @@ namespace Cori {
 		class Renderer {
 		public:
 			Renderer() {
-				std::ifstream file("shader.spv", std::ios::ate | std::ios::binary);
+				std::ifstream file(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "shaders/shader.spv", std::ios::ate | std::ios::binary);
 				if (!file.is_open()) {
 					throw std::runtime_error("failed to open file!");
 				}
 
-				std::vector<std::byte> buffer(file.tellg());
+				std::vector<Byte> buffer(file.tellg());
 				file.seekg(0, std::ios::beg);
 				file.read(reinterpret_cast<char*>(buffer.data()), static_cast<std::streamsize>(buffer.size()));
 				file.close();
@@ -55,6 +58,10 @@ namespace Cori {
 				};
 
 				quad = VulkanMeshManager::CreateMesh(vertices.data(), vertices.size() * sizeof(Vertex), indices.data(), indices.size() * sizeof(uint32_t));
+
+				auto image = Image::Create(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "placeholders/uv_sample.png");
+
+				texture = VulkanTextureManager::CreateTexture(image->GetPixelData(), image->GetHeight() * image->GetWidth() * 4, vk::Format::eR8G8B8A8Srgb, { image->GetHeight(), image->GetWidth() }, "Test Texture");
 			}
 
 			~Renderer() {
@@ -217,6 +224,7 @@ namespace Cori {
 			MeshHandle quad;
 			VulkanBuffer buffer;
 			VulkanImage image;
+			TextureHandle texture;
 			RenderGraphResourceRegistry m_GraphResourceRegistry;
 			RenderGraphPassRegistry m_GraphPassRegistry;
 		};

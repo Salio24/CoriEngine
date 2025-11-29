@@ -38,6 +38,7 @@ var searchData=
   ['_7evulkanimageviewmanager_35',['~VulkanImageViewManager',['../classCori_1_1Graphics_1_1VulkanImageViewManager.html#ace14c824e398926d15172cb74aea9b03',1,'Cori::Graphics::VulkanImageViewManager']]],
   ['_7evulkanmeshmanager_36',['~VulkanMeshManager',['../classCori_1_1Graphics_1_1VulkanMeshManager.html#a0e87cd6b3d380bde49dcaec598be4818',1,'Cori::Graphics::VulkanMeshManager']]],
   ['_7evulkanshadermanager_37',['~VulkanShaderManager',['../classCori_1_1Graphics_1_1VulkanShaderManager.html#a1bfcafcd42150591ab53caaf1ecc043a',1,'Cori::Graphics::VulkanShaderManager']]],
-  ['_7evulkanuploadmanager_38',['~VulkanUploadManager',['../classCori_1_1Graphics_1_1VulkanUploadManager.html#aed3e3fcd140e0f8d19f6d956e29f5cd8',1,'Cori::Graphics::VulkanUploadManager']]],
-  ['_7ewindow_39',['~Window',['../classCori_1_1Core_1_1Window.html#a3aefba0f81afbd93cfe4a30c31599753',1,'Cori::Core::Window']]]
+  ['_7evulkantexturemanager_38',['~VulkanTextureManager',['../classCori_1_1Graphics_1_1VulkanTextureManager.html#a3d4296f48bb54bc2180f735544d5cde1',1,'Cori::Graphics::VulkanTextureManager']]],
+  ['_7evulkanuploadmanager_39',['~VulkanUploadManager',['../classCori_1_1Graphics_1_1VulkanUploadManager.html#aed3e3fcd140e0f8d19f6d956e29f5cd8',1,'Cori::Graphics::VulkanUploadManager']]],
+  ['_7ewindow_40',['~Window',['../classCori_1_1Core_1_1Window.html#a3aefba0f81afbd93cfe4a30c31599753',1,'Cori::Core::Window']]]
 ];

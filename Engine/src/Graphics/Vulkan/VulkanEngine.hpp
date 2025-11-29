@@ -29,10 +29,6 @@ namespace Cori {
 				bool m_SkippedFrame;
 			};
 
-			void ResizeDrawImages(glm::uvec2 size) {
-
-			}
-
 			static void RequestDeviceExtension(const char* extension) {
 				m_DeviceExtensions.push_back(extension);
 			}

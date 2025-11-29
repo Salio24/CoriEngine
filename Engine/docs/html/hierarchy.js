@@ -236,6 +236,7 @@ var hierarchy =
     [ "Cori::Graphics::VulkanMeshManager", "classCori_1_1Graphics_1_1VulkanMeshManager.html", null ],
     [ "Cori::Graphics::VulkanResourceTracker", "classCori_1_1Graphics_1_1VulkanResourceTracker.html", null ],
     [ "Cori::Graphics::VulkanShaderManager", "classCori_1_1Graphics_1_1VulkanShaderManager.html", null ],
+    [ "Cori::Graphics::VulkanTextureManager", "classCori_1_1Graphics_1_1VulkanTextureManager.html", null ],
     [ "Cori::Graphics::VulkanUploadManager", "classCori_1_1Graphics_1_1VulkanUploadManager.html", null ],
     [ "Cori::Logger::Tags::World", "structCori_1_1Logger_1_1Tags_1_1World.html", null ]
 ];

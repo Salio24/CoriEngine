@@ -23,7 +23,7 @@ var searchData=
   ['statemachine_20',['StateMachine',['../structCori_1_1Logger_1_1Tags_1_1World_1_1Entity.html#a294ac862308bb95f35685dba7b9a4e45',1,'Cori::Logger::Tags::World::Entity']]],
   ['status_21',['status',['../structCori_1_1Graphics_1_1CompleteMeshInfo_1_1CPUMeshInfo.html#aee9e31548b427841919c619008098ae1',1,'Cori::Graphics::CompleteMeshInfo::CPUMeshInfo']]],
   ['subrange_22',['subrange',['../structCori_1_1Graphics_1_1ResourceUsage.html#a0becde4dff1819fc0f587f37bba76a8c',1,'Cori::Graphics::ResourceUsage']]],
-  ['subresource_23',['subresource',['../structCori_1_1Graphics_1_1VulkanUploadManager_1_1ImageUploadRange.html#acb9b6ecc1dc28b6b93fd09e7f9b4459c',1,'Cori::Graphics::VulkanUploadManager::ImageUploadRange']]],
+  ['subresourcelayers_23',['subresourceLayers',['../structCori_1_1Graphics_1_1VulkanUploadManager_1_1ImageUploadRange.html#a5edd6ec3ed8de6a991c074a6d152b770',1,'Cori::Graphics::VulkanUploadManager::ImageUploadRange']]],
   ['subresourcerange_24',['subresourceRange',['../structCori_1_1Graphics_1_1VulkanImage_1_1ImageViewKey.html#af8cfb9cce9115a86b417340ee77fdb32',1,'Cori::Graphics::VulkanImage::ImageViewKey']]],
   ['swapchainimage_25',['swapChainImage',['../structCori_1_1Graphics_1_1SwapChainImageData.html#a744a34db45213b60c234eff27609ed96',1,'Cori::Graphics::SwapChainImageData']]],
   ['swapchainimageview_26',['swapChainImageView',['../structCori_1_1Graphics_1_1SwapChainImageData.html#abc2ec2c37eb4dbe6ad17da9bab58230e',1,'Cori::Graphics::SwapChainImageData']]]

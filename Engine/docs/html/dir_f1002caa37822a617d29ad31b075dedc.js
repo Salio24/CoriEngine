@@ -6,6 +6,7 @@ var dir_f1002caa37822a617d29ad31b075dedc =
     [ "Application.cpp", "Application_8cpp.html", null ],
     [ "Application.hpp", "Application_8hpp.html", "Application_8hpp" ],
     [ "AutoRegisteringFactory.hpp", "AutoRegisteringFactory_8hpp.html", "AutoRegisteringFactory_8hpp" ],
+    [ "ByteType.hpp", "ByteType_8hpp.html", "ByteType_8hpp" ],
     [ "CoriKeycodes.hpp", "CoriKeycodes_8hpp.html", "CoriKeycodes_8hpp" ],
     [ "CoriMouseCodes.hpp", "CoriMouseCodes_8hpp.html", "CoriMouseCodes_8hpp" ],
     [ "Engine.cpp", "Engine_8cpp.html", null ],

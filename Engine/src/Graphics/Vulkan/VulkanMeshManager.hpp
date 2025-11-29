@@ -43,8 +43,8 @@ namespace Cori {
 		class VulkanMeshManager {
 		public:
 			static MeshHandle CreateMesh(const void* vertexData, const uint64_t vertexDataSize, const void* indexData, const uint64_t indexDataSize) {
-				std::vector<std::byte> vertices(vertexDataSize);
-				std::vector<std::byte> indices(indexDataSize);
+				std::vector<Byte> vertices(vertexDataSize);
+				std::vector<Byte> indices(indexDataSize);
 
 				memcpy(vertices.data(), vertexData, vertexDataSize);
 				memcpy(indices.data(), indexData, indexDataSize);
@@ -52,7 +52,7 @@ namespace Cori {
 				return CreateMesh(std::move(vertices), std::move(indices));
 			}
 
-			static MeshHandle CreateMesh(std::vector<std::byte>&& vertices, std::vector<std::byte>&& indices) {
+			static MeshHandle CreateMesh(std::vector<Byte>&& vertices, std::vector<Byte>&& indices) {
 				uint64_t vertexDataSize = vertices.size();
 				uint64_t indexDataSize = indices.size();
 
@@ -63,7 +63,7 @@ namespace Cori {
 					Get().m_Holes.pop_back();
 				} else {
 					freeHandle = Get().m_NextMeshHandle++;
-					CORI_CORE_ASSERT(freeHandle < MESH_ASSET_COUNT_LIMIT, "VulkanMeshManager out of mesh handle slots.");
+					CORI_CORE_ASSERT(freeHandle < MESH_ASSET_COUNT_LIMIT - 1, "VulkanMeshManager out of mesh slots.");
 				}
 
 				vma::VirtualAllocationCreateInfo verticesAllocInfo {
@@ -109,7 +109,7 @@ namespace Cori {
 					.uploadParts = std::vector<VulkanUploadManager::UploadPart>{ vertexPart, indexPart },
 					.callback = VulkanMeshManager::UpdateLoadedMesh,
 					.uploadType = VulkanUploadManager::UploadType::Streaming,
-					.userData = reinterpret_cast<void*>(freeHandle)
+					.userData = reinterpret_cast<void*>(static_cast<uint64_t>(freeHandle))
 				};
 
 				VulkanUploadManager::SubmitUploadRequest(std::move(request));
@@ -121,7 +121,7 @@ namespace Cori {
 				AmazingBuffer::UpdateData patch {
 					.offset = freeHandle * sizeof(MeshAssetInfo),
 					.alignment = alignof(MeshAssetInfo),
-					.data = std::move(std::vector<std::byte>(sizeof(MeshAssetInfo))),
+					.data = std::move(std::vector<Byte>(sizeof(MeshAssetInfo))),
 					.size = sizeof(MeshAssetInfo),
 				};
 
@@ -134,6 +134,7 @@ namespace Cori {
 			}
 
 			static void DestroyMesh(MeshHandle handle) {
+				CORI_CORE_ASSERT(handle < Get().m_MeshAssets.size(), "Invalid MeshHandle was passed to VulkanMeshManager::DestroyMesh.");
 				uint32_t frameIndex = VulkanEngine::GetCurrentFrameInFlight();
 				uint32_t prevFrame = (frameIndex + FRAMES_IN_FLIGHT - 1) % FRAMES_IN_FLIGHT;
 				Get().m_DestructionQueue[prevFrame].emplace_back(handle);
@@ -148,7 +149,7 @@ namespace Cori {
 					AmazingBuffer::UpdateData patch {
 						.offset = handle * sizeof(MeshAssetInfo),
 						.alignment = alignof(MeshAssetInfo),
-						.data = std::move(std::vector<std::byte>(sizeof(MeshAssetInfo)))
+						.data = std::vector<Byte>(sizeof(MeshAssetInfo))
 					};
 
 					memcpy(patch.data.data(), &mtData, sizeof(MeshAssetInfo));
@@ -191,7 +192,7 @@ namespace Cori {
 				AmazingBuffer::UpdateData patch {
 					.offset = handle * sizeof(MeshAssetInfo),
 					.alignment = alignof(MeshAssetInfo),
-					.data = std::move(std::vector<std::byte>(sizeof(MeshAssetInfo)))
+					.data = std::vector<Byte>(sizeof(MeshAssetInfo))
 				};
 
 				memcpy(patch.data.data(), &cpuMesh.meshAssetInfo, sizeof(MeshAssetInfo));
@@ -223,18 +224,44 @@ namespace Cori {
 					.name = "MeshManager mesh asset buffer"
 				};
 
+				uint32_t transferQueueFamilyIndex = VulkanEngine::GetTransferQueueFamilyIndex();
+
+				std::vector<uint32_t> queueFamilyIndices{ VulkanEngine::GetGraphicsQueueFamilyIndex() };
+
+				bool transferQueueInVector = false;
+				for (auto familyIndex : queueFamilyIndices) {
+					if (familyIndex == transferQueueFamilyIndex) {
+						transferQueueInVector = true;
+					}
+				}
+
+				if (transferQueueInVector && queueFamilyIndices.size() == 1) {
+					m_MeshSharingMode = vk::SharingMode::eExclusive;
+				} else if (transferQueueInVector && queueFamilyIndices.size() != 1) {
+					m_MeshSharingMode = vk::SharingMode::eConcurrent;
+					m_QueueFamilyIndices = queueFamilyIndices;
+				} else {
+					queueFamilyIndices.emplace_back(transferQueueFamilyIndex);
+					m_MeshSharingMode = vk::SharingMode::eConcurrent;
+					m_QueueFamilyIndices = queueFamilyIndices;
+				}
+
 				m_MeshAssetBufferHandle = VulkanUploadManager::CreateAmazingBuffer(amazingBufferInfo);
 
 				vk::BufferCreateInfo vertexSSBOInfo {
 					.size = BUFFER_VERTEX_COUNT * sizeof(Vertex),
 					.usage = vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eStorageBuffer | vk::BufferUsageFlagBits::eShaderDeviceAddress,
-					.sharingMode = vk::SharingMode::eExclusive
+					.sharingMode = m_MeshSharingMode,
+					.queueFamilyIndexCount = static_cast<uint32_t>(m_QueueFamilyIndices.size()),
+					.pQueueFamilyIndices = m_QueueFamilyIndices.data()
 				};
 
 				vk::BufferCreateInfo indexBufferInfo {
 					.size = static_cast<uint32_t>(BUFFER_VERTEX_COUNT * INDICES_PER_VERTEX * sizeof(uint32_t)),
 					.usage = vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eIndexBuffer,
-					.sharingMode = vk::SharingMode::eExclusive
+					.sharingMode = m_MeshSharingMode,
+					.queueFamilyIndexCount = static_cast<uint32_t>(m_QueueFamilyIndices.size()),
+					.pQueueFamilyIndices = m_QueueFamilyIndices.data()
 				};
 
 				vma::AllocationCreateInfo allocCreateInfo {
@@ -275,6 +302,9 @@ namespace Cori {
 				m_IndexBufferBlock = indexBufferBlock;
 
 				m_MeshAssets.resize(MESH_ASSET_COUNT_LIMIT);
+				for (auto& queue : m_DestructionQueue) {
+					queue.reserve(64);
+				}
 			}
 
 			AmazingBufferHandle m_MeshAssetBufferHandle;
@@ -287,6 +317,9 @@ namespace Cori {
 
 			std::vector<CompleteMeshInfo> m_MeshAssets;
 			std::vector<MeshHandle> m_Holes;
+
+			vk::SharingMode m_MeshSharingMode;
+			std::vector<uint32_t> m_QueueFamilyIndices;
 
 			MeshHandle m_NextMeshHandle{ 0 };
 

@@ -319,14 +319,14 @@ namespace Cori {
 				return true;
 			}
 
-			static void RegisterImage(VulkanImage& image) {
+			static void RegisterImage(VulkanImage& image, vk::ImageLayout initialLayout) {
 				CORI_PROFILE_FUNCTION();
 				uint64_t handle = image.GetRawHandle();
 
 				const ResourceState initialState = {
 					.stageMask = vk::PipelineStageFlagBits2::eTopOfPipe,
 					.accessMask = vk::AccessFlagBits2::eNone,
-					.imageLayout = image.m_InitialLayout
+					.imageLayout = initialLayout
 				};
 
 				auto& stateMap = Get().m_ImageStates[handle];

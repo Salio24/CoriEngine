@@ -33,7 +33,7 @@ namespace Cori {
 			struct UpdateData {
 				uint64_t offset{ 0 };
 				uint64_t alignment{ 4 };
-				std::vector<std::byte> data;
+				std::vector<Byte> data;
 			};
 
 			void SubmitUpdate(UpdateData&& update) {
@@ -143,7 +143,6 @@ namespace Cori {
 				}
 
 				CORI_CORE_ASSERT(createInfo.size != 0, "Trying to create AmazingBuffer '{}' with size of 0, this is illegal.", m_Name);
-				uint32_t transferQueueFamilyIndex = VulkanEngine::GetTransferQueueFamilyIndex();
 
 				//m_Size = AlignUp(createInfo.size, m_SectorSize);
 				m_Size = createInfo.size;
@@ -162,19 +161,21 @@ namespace Cori {
 					.requiredFlags = vk::MemoryPropertyFlagBits::eHostVisible
 				};
 
-				bool transferQueueInVector = false;
-
-				for (auto familyIndex : createInfo.queueFamilyIndices) {
-					if (familyIndex == transferQueueFamilyIndex) {
-						transferQueueInVector = true;
-					}
-				}
 
 				vk::BufferCreateInfo frameLocalBufferCreateInfo {
 					.flags = createInfo.flags,
 					.size = m_Size,
 					.usage = createInfo.usage | vk::BufferUsageFlagBits::eTransferDst
 				};
+
+				uint32_t transferQueueFamilyIndex = VulkanEngine::GetTransferQueueFamilyIndex();
+
+				bool transferQueueInVector = false;
+				for (auto familyIndex : createInfo.queueFamilyIndices) {
+					if (familyIndex == transferQueueFamilyIndex) {
+						transferQueueInVector = true;
+					}
+				}
 
 				if (transferQueueInVector && createInfo.queueFamilyIndices.size() == 1) {
 					frameLocalBufferCreateInfo.sharingMode = vk::SharingMode::eExclusive;
@@ -318,7 +319,7 @@ namespace Cori {
 			struct ImageUploadRange {
 				vk::Offset3D offset;
 				vk::Extent3D extent;
-				vk::ImageSubresourceLayers subresource;
+				vk::ImageSubresourceLayers subresourceLayers;
 			};
 
 			struct BufferUploadRange {
@@ -329,20 +330,20 @@ namespace Cori {
 			enum class UploadType {
 				Undefined,
 				FrameCritical,
-				Streaming,
+				Streaming
 			};
 
 			struct UploadPart {
 				std::variant<VulkanImage, VulkanBuffer> resource;
 				std::variant<ImageUploadRange, BufferUploadRange> range;
-				std::vector<std::byte> data;
+				std::vector<Byte> data;
 			};
 
 			struct UploadRequest {
 				std::variant<std::vector<UploadPart>, UploadPart> uploadParts;
-				std::function<void(void*)> callback;
-				UploadType uploadType;
-				void* userData;
+				std::function<void(void*)> callback{};
+				UploadType uploadType{};
+				void* userData{};
 			};
 
 			static void Init();
@@ -501,7 +502,7 @@ namespace Cori {
 							vk::BufferImageCopy region{
 								.bufferRowLength = 0,
 								.bufferImageHeight = 0,
-								.imageSubresource = range.subresource,
+								.imageSubresource = range.subresourceLayers,
 							};
 
 							std::array<uint8_t, 3> blockExtent = vk::blockExtent(image.m_Format);
@@ -510,17 +511,16 @@ namespace Cori {
 									static_cast<int32_t>(std::clamp(static_cast<uint32_t>(AlignUp(range.offset.y, blockExtent[1])), 0u, image.m_Extent3D.height)),
 									static_cast<int32_t>(std::clamp(static_cast<uint32_t>(AlignUp(range.offset.z, blockExtent[2])), 0u, image.m_Extent3D.depth)) };
 
-							CORI_CORE_ASSERT(!(region.imageOffset.x == image.m_Extent3D.width || region.imageOffset.y == image.m_Extent3D.height || region.imageOffset.z == image.m_Extent3D.depth), "Invalid ImageUploadRange no upload will be made, frame critical queue -> aborting. Image offset ended up at the image edge after block extent alignment. Requested offset: '{} {} {}', aligned offset '{} {} {}', Image '{}'", range.offset.x, range.offset.y, range.offset.z, region.imageOffset.x, region.imageOffset.y, region.imageOffset.z, image.m_Name);
+							CORI_CORE_ASSERT(!(region.imageOffset.x == static_cast<int32_t>(image.m_Extent3D.width) || region.imageOffset.y == static_cast<int32_t>(image.m_Extent3D.height) || region.imageOffset.z == static_cast<int32_t>(image.m_Extent3D.depth)), "Invalid ImageUploadRange no upload will be made, frame critical queue -> aborting. Image offset ended up at the image edge after block extent alignment. Requested offset: '{} {} {}', aligned offset '{} {} {}', Image '{}'", range.offset.x, range.offset.y, range.offset.z, region.imageOffset.x, region.imageOffset.y, region.imageOffset.z, image.m_Name);
 
 							region.imageExtent = vk::Extent3D{ std::clamp(static_cast<uint32_t>(AlignUp(range.extent.width, blockExtent[0])), 0u, image.m_Extent3D.width - region.imageOffset.x),
 																std::clamp(static_cast<uint32_t>(AlignUp(range.extent.height, blockExtent[1])), 0u, image.m_Extent3D.height - region.imageOffset.y),
 																std::clamp(static_cast<uint32_t>(AlignUp(range.extent.depth, blockExtent[2])), 0u, image.m_Extent3D.depth - region.imageOffset.z) };
 
 							std::optional<Allocation> alloc = AllocateHighPriority(part.data.size(), std::max<uint64_t>(4, vk::blockSize(image.m_Format)));
-
+							CORI_CORE_ASSERT(alloc, "High priority ring staging buffer out of space, failed to allocate memory for uploading frame critical data.");
 							region.bufferOffset = alloc->offset;
 
-							CORI_CORE_ASSERT(alloc, "High priority ring staging buffer out of space, failed to allocate memory for uploading frame critical data.");
 							m_PendingHighPriorityUploads.emplace(alloc.value().virtualAllocation, frameIndex);
 
 							VulkanResourceTracker::OverrideBufferState(m_HighPriorityRingStagingBuffer, alloc->offset, part.data.size(), {vk::PipelineStageFlagBits2::eHost, vk::AccessFlagBits2::eHostWrite});
@@ -528,14 +528,14 @@ namespace Cori {
 							CORI_CORE_ASSERT(result_ == vk::Result::eSuccess, "Failed to copy frame critical data to the staging buffer. Error: {}", vk::to_string(result_));
 
 							vk::ImageSubresourceRange vkRange{
-								.aspectMask = range.subresource.aspectMask,
-								.baseMipLevel = range.subresource.mipLevel,
+								.aspectMask = range.subresourceLayers.aspectMask,
+								.baseMipLevel = range.subresourceLayers.mipLevel,
 								.levelCount = 1,
-								.baseArrayLayer = range.subresource.baseArrayLayer,
-								.layerCount = range.subresource.layerCount
+								.baseArrayLayer = range.subresourceLayers.baseArrayLayer,
+								.layerCount = range.subresourceLayers.layerCount
 							};
 
-							auto dstBarrier = VulkanResourceTracker::TransitionImage(image, vkRange, {vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite, vk::ImageLayout::eGeneral, transferQueueFamilyIndex });
+							auto dstBarrier = VulkanResourceTracker::TransitionImage(image, vkRange, {vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite, vk::ImageLayout::eGeneral });
 
 							if (dstBarrier) {
 								std::ranges::move(*dstBarrier.value(), std::back_inserter(m_ImageBarriersCache));
@@ -564,8 +564,7 @@ namespace Cori {
 
 							ResourceState dstState{
 								.stageMask = vk::PipelineStageFlagBits2::eTransfer,
-								.accessMask = vk::AccessFlagBits2::eTransferWrite,
-								.queueFamilyIndex = transferQueueFamilyIndex,
+								.accessMask = vk::AccessFlagBits2::eTransferWrite
 							};
 
 							auto dstBarrier = VulkanResourceTracker::TransitionBuffer(buffer, range.offset, part.data.size(), dstState);
@@ -655,7 +654,7 @@ namespace Cori {
 							vk::BufferImageCopy region{
 								.bufferRowLength = 0,
 								.bufferImageHeight = 0,
-								.imageSubresource = range.subresource,
+								.imageSubresource = range.subresourceLayers,
 							};
 
 							std::array<uint8_t, 3> blockExtent = vk::blockExtent(image.m_Format);
@@ -664,7 +663,7 @@ namespace Cori {
 									static_cast<int32_t>(std::clamp(static_cast<uint32_t>(AlignUp(range.offset.y, blockExtent[1])), 0u, image.m_Extent3D.height)),
 									static_cast<int32_t>(std::clamp(static_cast<uint32_t>(AlignUp(range.offset.z, blockExtent[2])), 0u, image.m_Extent3D.depth)) };
 
-							if (region.imageOffset.x == image.m_Extent3D.width || region.imageOffset.y == image.m_Extent3D.height || region.imageOffset.z == image.m_Extent3D.depth) {
+							if (region.imageOffset.x == static_cast<int32_t>(image.m_Extent3D.width) || region.imageOffset.y == static_cast<int32_t>(image.m_Extent3D.height) || region.imageOffset.z == static_cast<int32_t>(image.m_Extent3D.depth)) {
 								CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::UploadManager }, "Invalid ImageUploadRange no upload will be made. Image offset ended up at the image edge after block extent alignment. Requested offset: '{} {} {}', aligned offset '{} {} {}', Image '{}'", range.offset.x, range.offset.y, range.offset.z, region.imageOffset.x, region.imageOffset.y, region.imageOffset.z, image.m_Name);
 								return;
 							}
@@ -681,14 +680,14 @@ namespace Cori {
 							CORI_CORE_ASSERT(result_ == vk::Result::eSuccess, "Failed to copy streaming data to the staging buffer. Error: {}", vk::to_string(result_));
 
 							vk::ImageSubresourceRange vkRange{
-								.aspectMask = range.subresource.aspectMask,
-								.baseMipLevel = range.subresource.mipLevel,
+								.aspectMask = range.subresourceLayers.aspectMask,
+								.baseMipLevel = range.subresourceLayers.mipLevel,
 								.levelCount = 1,
-								.baseArrayLayer = range.subresource.baseArrayLayer,
-								.layerCount = range.subresource.layerCount
+								.baseArrayLayer = range.subresourceLayers.baseArrayLayer,
+								.layerCount = range.subresourceLayers.layerCount
 							};
 
-							auto dstBarrier = VulkanResourceTracker::TransitionImage(image, vkRange, {vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite, vk::ImageLayout::eGeneral});
+							auto dstBarrier = VulkanResourceTracker::TransitionImage(image, vkRange, {vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite, vk::ImageLayout::eGeneral });
 
 							if (dstBarrier) {
 								std::ranges::move(*dstBarrier.value(), std::back_inserter(m_ImageBarriersCache));
@@ -713,7 +712,12 @@ namespace Cori {
 							auto result_ = VulkanEngine::GetAllocator().copyMemoryToAllocation(part.data.data(), m_LowPriorityRingStagingBuffer.m_Allocation, alloc.offset, part.data.size());
 							CORI_CORE_ASSERT(result_ == vk::Result::eSuccess, "Failed to copy streaming data to the staging buffer. Error: {}", vk::to_string(result_));
 
-							auto dstBarrier = VulkanResourceTracker::TransitionBuffer(buffer, range.offset, part.data.size(), {vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite});
+							ResourceState dstState{
+								.stageMask = vk::PipelineStageFlagBits2::eTransfer,
+								.accessMask = vk::AccessFlagBits2::eTransferWrite
+							};
+
+							auto dstBarrier = VulkanResourceTracker::TransitionBuffer(buffer, range.offset, part.data.size(), dstState);
 
 							if (dstBarrier) {
 								std::ranges::move(*dstBarrier.value(), std::back_inserter(m_BufferBarriersCache));
@@ -789,7 +793,9 @@ namespace Cori {
 							}
 						}
 
-						upload.callback(upload.userData);
+						if (upload.callback) {
+							upload.callback(upload.userData);
+						}
 
 						m_LowPriorityUploads.pop();
 					}
@@ -1084,7 +1090,7 @@ namespace Cori {
 			};
 
 			std::optional<Allocation> AllocateHighPriority(uint64_t size, uint64_t alignment) {
-				if (size > m_HighPriorityHeapSize) {
+				if (size > 1024 * 1024 * m_HighPriorityHeapSize) {
 					return std::nullopt;
 				}
 
@@ -1108,7 +1114,7 @@ namespace Cori {
 			}
 
 			std::optional<Allocation> AllocateLowPriority(uint64_t size, uint64_t alignment) {
-				if (size > m_LowPriorityHeapSize) {
+				if (size > 1024 * 1024 * m_LowPriorityHeapSize) {
 					return std::nullopt;
 				}
 

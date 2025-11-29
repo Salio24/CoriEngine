@@ -15,8 +15,7 @@ namespace Cori {
 			image.m_Format = info.imageCreateInfo->format;
 			image.m_MipLevels = info.imageCreateInfo->mipLevels;
 			image.m_ArrayLayers = info.imageCreateInfo->arrayLayers;
-			image.m_InitialLayout = info.imageCreateInfo->initialLayout;
-			VulkanResourceTracker::RegisterImage(image);
+			VulkanResourceTracker::RegisterImage(image, info.imageCreateInfo->initialLayout);
 
 			if (strcmp(info.name, "") != 0) {
 				image.m_Name = info.name;
@@ -34,6 +33,7 @@ namespace Cori {
 
 			m_Image = VK_NULL_HANDLE;
 
+			m_Name = "";
 			m_Extent3D = vk::Extent3D();
 			m_Format = vk::Format();
 			m_MipLevels = 0;

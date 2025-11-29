@@ -1,5 +1,11 @@
 var NAVTREEINDEX6 =
 {
+"classCori_1_1Graphics_1_1RenderingContext.html#a18909e2b2780c3683a775e89e7457da8":[1,0,0,4,29,1],
+"classCori_1_1Graphics_1_1RenderingContext.html#a18909e2b2780c3683a775e89e7457da8":[3,0,0,3,28,1],
+"classCori_1_1Graphics_1_1RenderingContext.html#a3bea35b6015a78e6fb6a73bfbafbaaa2":[1,0,0,4,29,4],
+"classCori_1_1Graphics_1_1RenderingContext.html#a3bea35b6015a78e6fb6a73bfbafbaaa2":[3,0,0,3,28,4],
+"classCori_1_1Graphics_1_1RenderingContext.html#a42e1b21b996419bab6c09f393776b66a":[1,0,0,4,29,0],
+"classCori_1_1Graphics_1_1RenderingContext.html#a42e1b21b996419bab6c09f393776b66a":[3,0,0,3,28,0],
 "classCori_1_1Graphics_1_1RenderingContext.html#aca4a2989488c5c05ae60c0a9e9d6a2d1":[1,0,0,4,29,3],
 "classCori_1_1Graphics_1_1RenderingContext.html#aca4a2989488c5c05ae60c0a9e9d6a2d1":[3,0,0,3,28,3],
 "classCori_1_1Graphics_1_1RenderingContext.html#afe28d6d2fad5e15d5e5193fb7f3cf17b":[1,0,0,4,29,2],
@@ -243,11 +249,5 @@ var NAVTREEINDEX6 =
 "classCori_1_1Graphics_1_1VBLayout.html#a5ae9cd9cda4ba89d43d4797fe5c806be":[1,0,0,4,5,6],
 "classCori_1_1Graphics_1_1VBLayout.html#a5ae9cd9cda4ba89d43d4797fe5c806be":[3,0,0,3,4,6],
 "classCori_1_1Graphics_1_1VBLayout.html#abea3cd6bac36b83d0ed4193bb15a4fd4":[1,0,0,4,5,0],
-"classCori_1_1Graphics_1_1VBLayout.html#abea3cd6bac36b83d0ed4193bb15a4fd4":[3,0,0,3,4,0],
-"classCori_1_1Graphics_1_1VBLayout.html#acc05c524a43a122294c951784f58132b":[1,0,0,4,5,5],
-"classCori_1_1Graphics_1_1VBLayout.html#acc05c524a43a122294c951784f58132b":[3,0,0,3,4,5],
-"classCori_1_1Graphics_1_1VBLayout.html#ace6e00ed4394c1e2fe668c4548426198":[1,0,0,4,5,7],
-"classCori_1_1Graphics_1_1VBLayout.html#ace6e00ed4394c1e2fe668c4548426198":[3,0,0,3,4,7],
-"classCori_1_1Graphics_1_1VBLayout.html#adf5aed2e016a5e269d082227e6886a50":[1,0,0,4,5,13],
-"classCori_1_1Graphics_1_1VBLayout.html#adf5aed2e016a5e269d082227e6886a50":[3,0,0,3,4,13]
+"classCori_1_1Graphics_1_1VBLayout.html#abea3cd6bac36b83d0ed4193bb15a4fd4":[3,0,0,3,4,0]
 };

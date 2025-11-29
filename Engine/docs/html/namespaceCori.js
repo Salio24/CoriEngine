@@ -17,6 +17,7 @@ var namespaceCori =
     [ "Utility", "namespaceCori_1_1Utility.html", "namespaceCori_1_1Utility" ],
     [ "AssetManager", "classCori_1_1AssetManager.html", "classCori_1_1AssetManager" ],
     [ "Logger", "classCori_1_1Logger.html", "classCori_1_1Logger" ],
+    [ "Byte", "namespaceCori.html#a487797438282164d33051bec6d35c4b5", null ],
     [ "AssetStatus", "namespaceCori.html#a115b3da1fdbb404148ae31984a492833", [
       [ "LOADING", "namespaceCori.html#a115b3da1fdbb404148ae31984a492833af9f6955ebca09a484157c05f80acd65e", null ],
       [ "PLACEHOLDER", "namespaceCori.html#a115b3da1fdbb404148ae31984a492833ae54e6f6ba0c7cbb4eb7a2016e2f17842", null ],

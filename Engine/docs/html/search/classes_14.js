@@ -14,5 +14,6 @@ var searchData=
   ['vulkanmeshmanager_11',['VulkanMeshManager',['../classCori_1_1Graphics_1_1VulkanMeshManager.html',1,'Cori::Graphics']]],
   ['vulkanresourcetracker_12',['VulkanResourceTracker',['../classCori_1_1Graphics_1_1VulkanResourceTracker.html',1,'Cori::Graphics']]],
   ['vulkanshadermanager_13',['VulkanShaderManager',['../classCori_1_1Graphics_1_1VulkanShaderManager.html',1,'Cori::Graphics']]],
-  ['vulkanuploadmanager_14',['VulkanUploadManager',['../classCori_1_1Graphics_1_1VulkanUploadManager.html',1,'Cori::Graphics']]]
+  ['vulkantexturemanager_14',['VulkanTextureManager',['../classCori_1_1Graphics_1_1VulkanTextureManager.html',1,'Cori::Graphics']]],
+  ['vulkanuploadmanager_15',['VulkanUploadManager',['../classCori_1_1Graphics_1_1VulkanUploadManager.html',1,'Cori::Graphics']]]
 ];

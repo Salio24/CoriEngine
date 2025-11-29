@@ -48,7 +48,6 @@ project(main)
     endif ()
 
     if (NOT (
-            (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/glad2/cmake/CMakeLists.txt") AND
             (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/glm/CMakeLists.txt") AND
             (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/nlohmann_json/CMakeLists.txt") AND
             (EXISTS "${PROJECT_SOURCE_DIR}/Engine/thirdparty/SDL3/CMakeLists.txt") AND

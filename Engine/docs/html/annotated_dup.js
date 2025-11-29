@@ -109,6 +109,7 @@ var annotated_dup =
         [ "VulkanResourceTracker", "classCori_1_1Graphics_1_1VulkanResourceTracker.html", "classCori_1_1Graphics_1_1VulkanResourceTracker" ],
         [ "ShaderObject", "classCori_1_1Graphics_1_1ShaderObject.html", "classCori_1_1Graphics_1_1ShaderObject" ],
         [ "VulkanShaderManager", "classCori_1_1Graphics_1_1VulkanShaderManager.html", "classCori_1_1Graphics_1_1VulkanShaderManager" ],
+        [ "VulkanTextureManager", "classCori_1_1Graphics_1_1VulkanTextureManager.html", "classCori_1_1Graphics_1_1VulkanTextureManager" ],
         [ "AmazingBuffer", "structCori_1_1Graphics_1_1AmazingBuffer.html", "structCori_1_1Graphics_1_1AmazingBuffer" ],
         [ "VulkanUploadManager", "classCori_1_1Graphics_1_1VulkanUploadManager.html", "classCori_1_1Graphics_1_1VulkanUploadManager" ]
       ] ],

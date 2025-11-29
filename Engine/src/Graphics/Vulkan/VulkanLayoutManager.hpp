@@ -24,6 +24,14 @@ namespace Cori {
 				return Get().m_PushConstantRange;
 			}
 
+			static uint16_t GetMaxTextures() {
+				return s_MaxTextures;
+			}
+
+			static uint16_t GetMaxSamplers() {
+				return s_MaxSamplers;
+			}
+
 			static void UpdateSamplerDescriptor(const uint32_t slot, const vk::Sampler sampler) {
 				vk::DescriptorGetInfoEXT getInfo {
 					.type = vk::DescriptorType::eSampler,
@@ -32,7 +40,7 @@ namespace Cori {
 
 				uint64_t descriptorSize = Get().m_PDDBP.samplerDescriptorSize;
 
-				std::vector<std::byte> payload(descriptorSize);
+				std::vector<Byte> payload(descriptorSize);
 
 				VulkanEngine::GetLogicalDevice().getDescriptorEXT(&getInfo, descriptorSize, payload.data());
 
@@ -60,7 +68,7 @@ namespace Cori {
 
 				uint64_t descriptorSize = Get().m_PDDBP.sampledImageDescriptorSize;
 
-				std::vector<std::byte> payload(descriptorSize);
+				std::vector<Byte> payload(descriptorSize);
 
 				VulkanEngine::GetLogicalDevice().getDescriptorEXT(&getInfo, descriptorSize, payload.data());
 
@@ -105,13 +113,13 @@ namespace Cori {
 					vk::DescriptorSetLayoutBinding{
 						.binding = 0,
 						.descriptorType = vk::DescriptorType::eSampler,
-						.descriptorCount = 32,
+						.descriptorCount = s_MaxSamplers,
 						.stageFlags = vk::ShaderStageFlagBits::eFragment
 					},
 					vk::DescriptorSetLayoutBinding{
 						.binding = 1,
 						.descriptorType = vk::DescriptorType::eSampledImage,
-						.descriptorCount = 8196,
+						.descriptorCount = s_MaxTextures,
 						.stageFlags = vk::ShaderStageFlagBits::eFragment
 					}
 				};
@@ -172,6 +180,9 @@ namespace Cori {
 			vk::PhysicalDeviceDescriptorBufferPropertiesEXT m_PDDBP;
 			vk::DeviceSize m_SamplerBindingMemOffset{ 0 };
 			vk::DeviceSize m_SampledImageBindingMemOffset{ 0 };
+
+			static constexpr uint16_t s_MaxTextures{ 16 * 1024 };
+			static constexpr uint16_t s_MaxSamplers{ 32 };
 
 			AmazingBufferHandle m_DescriptorBufferHandle{ 0 };
 
