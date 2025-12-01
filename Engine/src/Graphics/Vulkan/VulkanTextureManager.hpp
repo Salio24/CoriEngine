@@ -15,16 +15,63 @@ namespace Cori {
 
 			static VulkanTextureManager& Get();
 
-			static TextureHandle CreateTexture(void* pixels, uint64_t pixelDataSize, const vk::Format format, const vk::Extent2D extent, const char* name = "") {
+			static TextureHandle CreateTextureTest(void* pixels, uint64_t pixelDataSize, const vk::Format format, const vk::Extent2D extent, const char* name = "") {
 				std::vector<Byte> pixelData(pixelDataSize);
 
 				memcpy(pixelData.data(), pixels, pixelDataSize);
 
-				return CreateTexture(std::move(pixelData), format, extent, name);
+				return CreateTextureTest(std::move(pixelData), format, extent, name);
 			}
 
-			static TextureHandle CreateTexture(std::vector<Byte>&& pixels, const vk::Format format, const vk::Extent2D extent, const char* name = "") {
-				CORI_CORE_ASSERT(pixels.size() == vk::blockSize(format) * extent.width * extent.height, "Data size provided to VulkanTextureManager::CreateTexture doesn't match the expected size considering format an extent.");
+			static void UpdateTexture(TextureHandle handle, std::vector<Byte>&& pixels, const vk::Offset3D& offset, const vk::Extent3D& extent, vk::ImageSubresourceLayers subresourceLayers) {
+				CORI_CORE_ASSERT(extent.width > 0 && extent.height > 0 && extent.depth > 0, "Invalid texture extent passed to VulkanTextureManager::UpdateTexture." );
+				CORI_CORE_ASSERT(handle < VulkanGlobalLayoutManager::GetMaxTextures() - 1, "Invalid TextureHandle was passed to VulkanTextureManager::ChangeView.");
+
+				auto& texture = Get().m_TexturePool[handle];
+				if (!texture.valid) {
+					//TODO: warn
+					return;
+				}
+
+				CORI_CORE_ASSERT(pixels.size() == vk::blockSize(texture.image.m_Format) * extent.width * extent.height, "Data size provided to VulkanTextureManager::CreateTexture doesn't match the expected size considering format an extent.");
+
+				VulkanUploadManager::ImageUploadRange uploadRange{
+					.offset = offset,
+					.extent = extent,
+					.subresourceLayers = subresourceLayers
+				};
+
+				VulkanUploadManager::UploadRequest uploadRequest{
+					.uploadParts = VulkanUploadManager::UploadPart{ texture.image, uploadRange, std::move(pixels) },
+					.callback = VulkanTextureManager::UpdateLoadedTextures,
+					.uploadType = VulkanUploadManager::UploadType::Streaming,
+					.userData = reinterpret_cast<void*>(static_cast<uint64_t>(handle))
+				};
+
+				VulkanUploadManager::SubmitUploadRequest(std::move(uploadRequest));
+			}
+
+			static void ChangeView(TextureHandle handle, vk::ImageViewType viewType, vk::ImageSubresourceRange subresourceRange) {
+				CORI_CORE_ASSERT(handle < VulkanGlobalLayoutManager::GetMaxTextures() - 1, "Invalid TextureHandle was passed to VulkanTextureManager::ChangeView.");
+
+				auto& texture = Get().m_TexturePool[handle];
+				if (!texture.valid) {
+					//TODO: warn
+					return;
+				}
+
+				VulkanImage::ImageViewKey viewKey{
+					.type = viewType,
+					.subresourceRange = subresourceRange
+				};
+
+				texture.view = texture.image.GetView(viewKey);
+
+				VulkanGlobalLayoutManager::UpdateSampledTextureDescriptor(handle, Get().m_TexturePool[0].view);
+			}
+
+			static TextureHandle CreateTexture(const vk::ImageType type, const vk::Format format, const vk::Extent3D& extent, const uint32_t mipCount, const uint32_t layerCount, const vk::SampleCountFlagBits sampleFlags, const char* name = "") {
+				CORI_CORE_ASSERT(extent.width > 0 && extent.height > 0 && extent.depth > 0, "Invalid texture extent passed to VulkanTextureManager::CreateTexture." );
 
 				TextureHandle freeHandle;
 				if (!Get().m_Holes.empty()) {
@@ -32,7 +79,7 @@ namespace Cori {
 					Get().m_Holes.pop_back();
 				} else {
 					freeHandle = Get().m_NextMeshHandle++;
-					CORI_CORE_ASSERT(freeHandle < VulkanGlobalLayoutManager::GetMaxSamplers() - 1, "VulkanTextureManager out of texture slots.");
+					CORI_CORE_ASSERT(freeHandle < VulkanGlobalLayoutManager::GetMaxTextures() - 1, "VulkanTextureManager out of texture slots.");
 				}
 
 				auto& texture = Get().m_TexturePool[freeHandle];
@@ -40,10 +87,10 @@ namespace Cori {
 				vk::ImageCreateInfo imageCreateInfo {
 					.imageType = vk::ImageType::e2D,
 					.format = format,
-					.extent = vk::Extent3D{ extent.width, extent.height, 1 },
-					.mipLevels = 1,
-					.arrayLayers = 1,
-					.samples = vk::SampleCountFlagBits::e1,
+					.extent = extent,
+					.mipLevels = mipCount,
+					.arrayLayers = layerCount,
+					.samples = sampleFlags,
 					.tiling = vk::ImageTiling::eOptimal,
 					.usage = vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled,
 					.sharingMode = Get().m_TextureSharingMode,
@@ -68,38 +115,28 @@ namespace Cori {
 				}
 
 				texture.image = VulkanImage::Create(info);
-
-				VulkanImage::ImageViewKey viewKey{
-					.type = vk::ImageViewType::e2D,
-					.subresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 }
-				};
-
-				texture.view = texture.image.GetView(viewKey);
-
-				VulkanUploadManager::ImageUploadRange uploadRange{
-					.offset = { 0, 0, 0 },
-					.extent = { extent.width, extent.height, 1 },
-					.subresourceLayers = { vk::ImageAspectFlagBits::eColor, 0, 0, 1 }
-				};
-
-				VulkanUploadManager::UploadRequest uploadRequest{
-					.uploadParts = VulkanUploadManager::UploadPart{ texture.image, uploadRange, std::move(pixels) },
-					.callback = VulkanTextureManager::UpdateLoadedTextures,
-					.uploadType = VulkanUploadManager::UploadType::Streaming,
-					.userData = reinterpret_cast<void*>(static_cast<uint64_t>(freeHandle))
-				};
-
-				VulkanUploadManager::SubmitUploadRequest(std::move(uploadRequest));
-
-				VulkanGlobalLayoutManager::UpdateSampledTextureDescriptor(freeHandle, Get().m_TexturePool[0].view);
+				texture.valid = true;
 				return freeHandle;
+			}
+
+			static TextureHandle CreateTextureTest(std::vector<Byte>&& pixels, const vk::Format format, const vk::Extent2D extent, const char* name = "") {
+				auto handle = CreateTexture(vk::ImageType::e2D, format, { extent.width, extent.height, 1 }, 1, 1, vk::SampleCountFlagBits::e1, name);
+				UpdateTexture(handle, std::move(pixels), { 0, 0, 0 }, { extent.width, extent.height, 1 }, { vk::ImageAspectFlagBits::eColor, 0, 0, 1 });
+				ChangeView(handle, vk::ImageViewType::e2D, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+				return handle;
 			}
 
 			static void DestroyTexture(TextureHandle handle) {
 				CORI_CORE_ASSERT(handle < Get().m_TexturePool.size(), "Invalid TextureHandle was passed to VulkanTextureManager::DestroyTexture.");
+				auto& texture = Get().m_TexturePool[handle];
+				if (!texture.valid) {
+					return;
+				}
+
 				uint32_t frameIndex = VulkanEngine::GetCurrentFrameInFlight();
 				uint32_t prevFrame = (frameIndex + FRAMES_IN_FLIGHT - 1) % FRAMES_IN_FLIGHT;
 				Get().m_DestructionQueue[prevFrame].emplace_back(handle);
+				texture.valid = false;
 			}
 
 			static void ProcessDestructionQueue() {
@@ -268,6 +305,7 @@ namespace Cori {
 			struct Texture {
 				VulkanImage image;
 				vk::ImageView view;
+				bool valid{ false };
 			};
 
 			std::vector<Texture> m_TexturePool;

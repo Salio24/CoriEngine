@@ -14,8 +14,8 @@ namespace Cori {
 				const char* sessionType = std::getenv("XDG_SESSION_TYPE");
 				if (sessionType) {
 					if (std::string(sessionType) == "wayland") {
-						if (std::getenv("ENABLE_VULKAN_RENDERDOC_CAPTURE")) {
-							std::cout << "RenderDoc environment variable detected. Current session is wayland, switching to XWayland for renderdoc to work." << std::endl;
+						if (std::getenv("ENABLE_VULKAN_RENDERDOC_CAPTURE" ) || std::getenv("ENABLE_NVIDIA_NSIGHT_CAPTURE")) {
+							CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self }, "RenderDoc or nsight environment variable detected. Current session is wayland, switching to XWayland for them to be happy.");
 							SDL_SetHint("SDL_VIDEO_DRIVER", "x11");
 						}
 					}

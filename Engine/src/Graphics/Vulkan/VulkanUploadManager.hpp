@@ -1079,7 +1079,6 @@ namespace Cori {
 			}
 
 			struct Allocation {
-				//void* ptr;
 				vk::DeviceSize offset{};
 				vma::VirtualAllocation virtualAllocation;
 			};

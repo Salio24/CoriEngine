@@ -182,7 +182,7 @@ namespace Cori {
 			vk::DeviceSize m_SampledImageBindingMemOffset{ 0 };
 
 			static constexpr uint16_t s_MaxTextures{ 16 * 1024 };
-			static constexpr uint16_t s_MaxSamplers{ 32 };
+			static constexpr uint16_t s_MaxSamplers{ 1 * 1024 };
 
 			AmazingBufferHandle m_DescriptorBufferHandle{ 0 };
 

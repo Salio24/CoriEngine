@@ -2,13 +2,14 @@
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 #define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
 #define VULKAN_HPP_NO_EXCEPTIONS
+#define VULKAN_HPP_HANDLE_ERROR_OUT_OF_DATE_AS_SUCCESS
 #include <vulkan/vulkan_raii.hpp>
 #include <vulkan/vk_platform.h>
 #include <vulkan/vulkan_to_string.hpp>
 #include <vulkan/vulkan_format_traits.hpp>
 #include "vk_mem_alloc.hpp"
 
-#define CORI_CHECK_VK_RESULT(result) (result == vk::Result::eSuccess)
+#define CORI_CHECK_VK_RESULT(result) (result == vk::Result::eSuccess || result == vk::Result::eSuboptimalKHR)
 
 static constexpr uint32_t FRAMES_IN_FLIGHT = 2;
 

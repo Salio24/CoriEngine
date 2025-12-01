@@ -61,7 +61,7 @@ namespace Cori {
 
 				auto image = Image::Create(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "placeholders/uv_sample.png");
 
-				texture = VulkanTextureManager::CreateTexture(image->GetPixelData(), image->GetHeight() * image->GetWidth() * 4, vk::Format::eR8G8B8A8Srgb, { image->GetHeight(), image->GetWidth() }, "Test Texture");
+				texture = VulkanTextureManager::CreateTextureTest(image->GetPixelData(), image->GetHeight() * image->GetWidth() * 4, vk::Format::eR8G8B8A8Srgb, { image->GetHeight(), image->GetWidth() }, "Test Texture");
 			}
 
 			~Renderer() {
@@ -78,43 +78,44 @@ namespace Cori {
 				Get();
 				CORI_PROFILE_FUNCTION();
 				auto& frameData = VulkanEngine::Get().BeginFrame();
+				if (!frameData.m_SkippedFrame) {
+					vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 1.0f, 1.0f);
+					vk::RenderingAttachmentInfo attachmentInfo = {
+						.imageView = VulkanEngine::GetSwapChainImageView(),
+						.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
+						.loadOp = vk::AttachmentLoadOp::eClear,
+						.storeOp = vk::AttachmentStoreOp::eStore,
+						.clearValue = clearColor
+					};
 
-				vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 1.0f, 1.0f);
-				vk::RenderingAttachmentInfo attachmentInfo = {
-					.imageView = VulkanEngine::GetSwapChainImageView(),
-					.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
-					.loadOp = vk::AttachmentLoadOp::eClear,
-					.storeOp = vk::AttachmentStoreOp::eStore,
-					.clearValue = clearColor
-				};
+					vk::RenderingInfo renderingInfo = {
+						.renderArea = {.offset = {0, 0}, .extent = VulkanEngine::GetSwapChainExtent()},
+						.layerCount = 1,
+						.colorAttachmentCount = 1,
+						.pColorAttachments = &attachmentInfo
+					};
 
-				vk::RenderingInfo renderingInfo = {
-					.renderArea = {.offset = {0, 0}, .extent = VulkanEngine::GetSwapChainExtent()},
-					.layerCount = 1,
-					.colorAttachmentCount = 1,
-					.pColorAttachments = &attachmentInfo
-				};
+					frameData.m_CommandBuffer.beginRendering(renderingInfo);
 
-				frameData.m_CommandBuffer.beginRendering(renderingInfo);
+					VulkanGlobalLayoutManager::BindDescriptorBuffer(frameData.m_CommandBuffer);
+					VulkanShaderManager::GetShaderObject(Get().shader).Bind(frameData.m_CommandBuffer);
 
-				VulkanGlobalLayoutManager::BindDescriptorBuffer(frameData.m_CommandBuffer);
-				VulkanShaderManager::GetShaderObject(Get().shader).Bind(frameData.m_CommandBuffer);
+					frameData.m_CommandBuffer.bindIndexBuffer(VulkanMeshManager::GetIndexBuffer().m_Buffer, 0, vk::IndexType::eUint32);
 
-				frameData.m_CommandBuffer.bindIndexBuffer(VulkanMeshManager::GetIndexBuffer().m_Buffer, 0, vk::IndexType::eUint32);
+					struct PushConstants {
+						uint64_t vertexBufferAddress{ 0 };
+						uint64_t meshAssetDataAddress{ 0 };
+					} pc;
 
-				struct PushConstants {
-					uint64_t vertexBufferAddress{ 0 };
-					uint64_t meshAssetDataAddress{ 0 };
-				} pc;
+					pc.vertexBufferAddress = VulkanMeshManager::GetVertexSSBO().GetBDA();
+					pc.meshAssetDataAddress = VulkanMeshManager::GetFrameLocal().GetBDA();
 
-				pc.vertexBufferAddress = VulkanMeshManager::GetVertexSSBO().GetBDA();
-				pc.meshAssetDataAddress = VulkanMeshManager::GetFrameLocal().GetBDA();
+					frameData.m_CommandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(pc), &pc);
 
-				frameData.m_CommandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(pc), &pc);
+					frameData.m_CommandBuffer.drawIndexed(6, 1, 0, 0, 0);
 
-				frameData.m_CommandBuffer.drawIndexed(6, 1, 0, 0, 0);
-
-				frameData.m_CommandBuffer.endRendering();
+					frameData.m_CommandBuffer.endRendering();
+				}
 
 				VulkanEngine::Get().EndFrame();
 

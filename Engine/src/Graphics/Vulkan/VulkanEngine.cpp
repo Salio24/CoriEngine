@@ -94,7 +94,7 @@ namespace Cori {
 			m_DeviceExtensions.push_back(vk::EXTMemoryBudgetExtensionName);
 			m_DeviceExtensions.push_back(vk::EXTShaderObjectExtensionName);
 			//m_DeviceExtensions.push_back(vk::KHRPushDescriptorExtensionName);
-			m_DeviceExtensions.push_back(vk::KHRUnifiedImageLayoutsExtensionName);
+			//m_DeviceExtensions.push_back(vk::KHRUnifiedImageLayoutsExtensionName);
 			m_DeviceExtensions.push_back(vk::EXTExtendedDynamicState3ExtensionName);
 			m_DeviceExtensions.push_back(vk::EXTDescriptorBufferExtensionName);
 
@@ -165,8 +165,6 @@ namespace Cori {
 			frameData.m_SkippedFrame = false;
 
 			while (vk::Result::eTimeout == m_Device.waitForFences(frameData.m_DrawFence, vk::True, UINT64_MAX)) {}
-			auto result = m_Device.resetFences(frameData.m_DrawFence);
-			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to reset fence. Error: {}", vk::to_string(result));
 
 			auto [result_, imageIndex] = m_Device.acquireNextImageKHR(m_SwapChain, UINT64_MAX, frameData.m_PresentCompleteSemaphore, nullptr);
 
@@ -176,11 +174,14 @@ namespace Cori {
 				return frameData;
 			}
 
+			auto result = m_Device.resetFences(frameData.m_DrawFence);
+			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to reset fence. Error: {}", vk::to_string(result));
+
 			AddWaitSemaphore(frameData.m_PresentCompleteSemaphore, vk::PipelineStageFlagBits::eColorAttachmentOutput);
 
 			frameData.m_SwapChainImageIndex = imageIndex;
 
-			CORI_CORE_ASSERT(result_ == vk::Result::eSuccess, "Failed acquire swapchain image. Error: {}", vk::to_string(result));
+			CORI_CORE_ASSERT(result_ == vk::Result::eSuccess || result_ == vk::Result::eSuboptimalKHR, "Failed acquire swapchain image. Error: {}", vk::to_string(result));
 
 			m_CurrentSwapChainImageIndex = imageIndex;
 
@@ -194,7 +195,7 @@ namespace Cori {
 				.dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
 				.dstAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
 				.oldLayout = vk::ImageLayout::eUndefined,
-				.newLayout = vk::ImageLayout::eGeneral,
+				.newLayout = vk::ImageLayout::eColorAttachmentOptimal,
 				.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
 				.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
 				.image = m_SwapChainImages[imageIndex],
@@ -269,7 +270,7 @@ namespace Cori {
 					.srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
 					.dstStageMask = vk::PipelineStageFlagBits2::eBottomOfPipe,
 					.dstAccessMask = {},
-					.oldLayout = vk::ImageLayout::eGeneral,
+					.oldLayout = vk::ImageLayout::eColorAttachmentOptimal,
 					.newLayout = vk::ImageLayout::ePresentSrcKHR,
 					.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
 					.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
@@ -293,8 +294,6 @@ namespace Cori {
 				auto result = frameData.m_CommandBuffer.end();
 
 				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to end command buffer recording. Error: {}", vk::to_string(result));
-
-				vk::PipelineStageFlags waitDestinationStageMask( vk::PipelineStageFlagBits::eColorAttachmentOutput );
 
 				vk::SubmitInfo submitInfo{
 					.waitSemaphoreCount = static_cast<uint32_t>(m_WaitSemaphores.size()),
@@ -440,7 +439,12 @@ namespace Cori {
 
 				bool supportsAllRequiredExtensions = std::ranges::all_of(m_DeviceExtensions, [&availableDeviceExtensions](auto const& requiredDeviceExtension) {
 					return std::ranges::any_of(availableDeviceExtensions, [requiredDeviceExtension](auto const& availableDeviceExtension) {
-						return strcmp(availableDeviceExtension.extensionName, requiredDeviceExtension) == 0;
+						bool supported = strcmp(availableDeviceExtension.extensionName, requiredDeviceExtension) == 0;
+						if (!supported) {
+							CORI_CORE_DEBUG("{}", requiredDeviceExtension);
+						}
+
+						return supported;
 					});
 				});
 
@@ -797,8 +801,13 @@ namespace Cori {
 			auto result = m_Device.waitIdle();
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Calling wait idle on device has failed. Error: {}", vk::to_string(result));
 
+
+			for (auto& imageView : m_SwapChainImageViews) {
+				m_Device.destroyImageView(imageView);
+			}
+
 			m_SwapChainImageViews.clear();
-			m_SwapChain = nullptr;
+			m_Device.destroySwapchainKHR(m_SwapChain);
 			CreateSwapChain();
 		}
 
