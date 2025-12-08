@@ -5,7 +5,8 @@
 
 namespace Cori {
 	namespace Graphics {
-		using TextureHandle = uint16_t;
+		using TextureHandle = uint32_t;
+		using SamplerHandle = uint32_t;
 
 		class VulkanTextureManager {
 		public:
@@ -23,7 +24,7 @@ namespace Cori {
 				return CreateTextureTest(std::move(pixelData), format, extent, name);
 			}
 
-			static void UpdateTexture(TextureHandle handle, std::vector<Byte>&& pixels, const vk::Offset3D& offset, const vk::Extent3D& extent, vk::ImageSubresourceLayers subresourceLayers) {
+			static void UpdateTexture(const TextureHandle handle, std::vector<Byte>&& pixels, const vk::Offset3D& offset, const vk::Extent3D& extent, vk::ImageSubresourceLayers subresourceLayers) {
 				CORI_CORE_ASSERT(extent.width > 0 && extent.height > 0 && extent.depth > 0, "Invalid texture extent passed to VulkanTextureManager::UpdateTexture." );
 				CORI_CORE_ASSERT(handle < VulkanGlobalLayoutManager::GetMaxTextures() - 1, "Invalid TextureHandle was passed to VulkanTextureManager::ChangeView.");
 
@@ -51,7 +52,7 @@ namespace Cori {
 				VulkanUploadManager::SubmitUploadRequest(std::move(uploadRequest));
 			}
 
-			static void ChangeView(TextureHandle handle, vk::ImageViewType viewType, vk::ImageSubresourceRange subresourceRange) {
+			static void ChangeView(const TextureHandle handle, vk::ImageViewType viewType, vk::ImageSubresourceRange subresourceRange) {
 				CORI_CORE_ASSERT(handle < VulkanGlobalLayoutManager::GetMaxTextures() - 1, "Invalid TextureHandle was passed to VulkanTextureManager::ChangeView.");
 
 				auto& texture = Get().m_TexturePool[handle];
@@ -66,8 +67,12 @@ namespace Cori {
 				};
 
 				texture.view = texture.image.GetView(viewKey);
+			}
 
-				VulkanGlobalLayoutManager::UpdateSampledTextureDescriptor(handle, Get().m_TexturePool[0].view);
+			static void UpdateView(const TextureHandle handle) {
+				CORI_CORE_ASSERT(handle < VulkanGlobalLayoutManager::GetMaxTextures() - 1, "Invalid TextureHandle was passed to VulkanTextureManager::ChangeView.");
+
+				VulkanGlobalLayoutManager::UpdateSampledTextureDescriptor(handle, Get().m_TexturePool[handle].view);
 			}
 
 			static TextureHandle CreateTexture(const vk::ImageType type, const vk::Format format, const vk::Extent3D& extent, const uint32_t mipCount, const uint32_t layerCount, const vk::SampleCountFlagBits sampleFlags, const char* name = "") {
@@ -85,7 +90,7 @@ namespace Cori {
 				auto& texture = Get().m_TexturePool[freeHandle];
 
 				vk::ImageCreateInfo imageCreateInfo {
-					.imageType = vk::ImageType::e2D,
+					.imageType = type,
 					.format = format,
 					.extent = extent,
 					.mipLevels = mipCount,
@@ -116,6 +121,7 @@ namespace Cori {
 
 				texture.image = VulkanImage::Create(info);
 				texture.valid = true;
+				VulkanGlobalLayoutManager::UpdateSampledTextureDescriptor(freeHandle, Get().m_TexturePool[0].view);
 				return freeHandle;
 			}
 
@@ -151,7 +157,7 @@ namespace Cori {
 			static void UpdateLoadedTextures(void* data) {
 				TextureHandle handle = static_cast<TextureHandle>(reinterpret_cast<uint64_t>(data));
 
-				VulkanGlobalLayoutManager::UpdateSampledTextureDescriptor(handle, Get().m_TexturePool[handle].view);
+				UpdateView(handle);
 			}
 
 			~VulkanTextureManager() {

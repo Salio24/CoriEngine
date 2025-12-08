@@ -38,6 +38,7 @@ namespace Cori {
 			friend class VulkanShaderManager;
 			std::variant<vk::ShaderEXT, std::array<vk::ShaderEXT, 2>> m_ShaderVariant;
 			const char* m_ShaderName{ "Unnamed Shader Object" };
+			bool m_Valid{ false };
 		};
 
 		class VulkanShaderManager {
@@ -48,25 +49,33 @@ namespace Cori {
 
 			static VulkanShaderManager& Get();
 
+			static bool IsValid(const ShaderObjectHandle handle) {
+				return handle < Get().m_Shaders.size() && Get().m_Shaders[handle].m_Valid;
+			}
+
 			static ShaderObject& GetShaderObject(const ShaderObjectHandle handle) {
 				CORI_CORE_ASSERT(handle < Get().m_Shaders.size(), "Invalid ShaderObjectHandle was passed to VulkanShaderManager::GetShaderObject.");
+				CORI_CORE_ASSERT(Get().m_Shaders[handle].m_Valid, "Requested ShaderObject at handle '{}' is invalid.", handle);
 				return Get().m_Shaders[handle];
 			}
 
-			static void DestroyShader(ShaderObjectHandle& handle) {
+			static void DestroyShader(const ShaderObjectHandle handle) {
 				CORI_CORE_ASSERT(handle < Get().m_Shaders.size(), "Invalid ShaderObjectHandle was passed to VulkanShaderManager::GetShaderObject.");
 
-				if (std::holds_alternative<vk::ShaderEXT>(Get().m_Shaders[handle].m_ShaderVariant)) {
-					VulkanEngine::GetLogicalDevice().destroyShaderEXT(std::get<vk::ShaderEXT>(Get().m_Shaders[handle].m_ShaderVariant));
+				auto& shaderObject = Get().m_Shaders[handle];
+
+				if (std::holds_alternative<vk::ShaderEXT>(shaderObject.m_ShaderVariant)) {
+					VulkanEngine::GetLogicalDevice().destroyShaderEXT(std::get<vk::ShaderEXT>(shaderObject.m_ShaderVariant));
 				} else {
-					for (auto& shader : std::get<std::array<vk::ShaderEXT, 2>>(Get().m_Shaders[handle].m_ShaderVariant)) {
+					for (auto& shader : std::get<std::array<vk::ShaderEXT, 2>>(shaderObject.m_ShaderVariant)) {
 						VulkanEngine::GetLogicalDevice().destroyShaderEXT(shader);
 					}
 				}
 
-				handle = UINT32_MAX;
+				shaderObject.m_Valid = false;
 			}
 
+			//TODO: force the use of one source, instead of separate vertex and fragment source
 			static ShaderObjectHandle CreateVertexShaderPair(const void* vertexSource, const uint64_t vertexSourceSize, const char* vertexEntryPoint, const void* fragmentSource, const uint64_t fragmentSourceSize, const char* fragmentEntryPoint, const char* shaderName = "") {
 				std::array<vk::ShaderCreateInfoEXT, 2> infos;
 				infos[0] = {
@@ -116,6 +125,8 @@ namespace Cori {
 					return freeHandle;
 				}
 
+				object.m_Valid = true;
+
 				ShaderObjectHandle newHandle = Get().m_Shaders.size();
 				Get().m_Shaders.emplace_back(object);
 				return newHandle;
@@ -157,6 +168,8 @@ namespace Cori {
 					Get().m_Shaders[freeHandle] = object;
 					return freeHandle;
 				}
+
+				object.m_Valid = true;
 
 				ShaderObjectHandle newHandle = Get().m_Shaders.size();
 				Get().m_Shaders.emplace_back(object);

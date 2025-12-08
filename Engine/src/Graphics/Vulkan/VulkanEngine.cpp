@@ -12,6 +12,7 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include "VulkanImageViewManager.hpp"
 #include "VulkanShaderManager.hpp"
 #include "VulkanTextureManager.hpp"
+#include "VulkanMaterialSystem.hpp"
 
 const std::vector g_ValidationLayers = {
 	"VK_LAYER_KHRONOS_validation"
@@ -117,12 +118,14 @@ namespace Cori {
 			VulkanImageViewManager::Init();
 			VulkanShaderManager::Init();
 			VulkanTextureManager::Init();
+			VulkanMaterialSystem::Init();
 		}
 
 		VulkanEngine::~VulkanEngine() {
 			auto result = m_Device.waitIdle();
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Calling wait idle on device has failed. Error: {}", vk::to_string(result));
 
+			VulkanMaterialSystem::Shutdown();
 			VulkanTextureManager::Shutdown();
 			VulkanShaderManager::Shutdown();
 			VulkanImageViewManager::Shutdown();
@@ -438,14 +441,15 @@ namespace Cori {
 				CORI_CORE_ASSERT(result_ == vk::Result::eSuccess, "Failed to enumerate available physical device extensions. Error: {}", vk::to_string(result_));
 
 				bool supportsAllRequiredExtensions = std::ranges::all_of(m_DeviceExtensions, [&availableDeviceExtensions](auto const& requiredDeviceExtension) {
-					return std::ranges::any_of(availableDeviceExtensions, [requiredDeviceExtension](auto const& availableDeviceExtension) {
-						bool supported = strcmp(availableDeviceExtension.extensionName, requiredDeviceExtension) == 0;
-						if (!supported) {
-							CORI_CORE_DEBUG("{}", requiredDeviceExtension);
-						}
-
-						return supported;
+					bool supported = std::ranges::any_of(availableDeviceExtensions, [requiredDeviceExtension](auto const& availableDeviceExtension) {
+						return strcmp(availableDeviceExtension.extensionName, requiredDeviceExtension) == 0;
 					});
+
+					//if (!supported) {
+					//	CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self }, "{}", requiredDeviceExtension);
+					//}
+
+					return supported;
 				});
 
 				auto features = device.getFeatures2<vk::PhysicalDeviceFeatures2, vk::PhysicalDeviceVulkan13Features, vk::PhysicalDeviceVulkan12Features, vk::PhysicalDeviceVulkan11Features, vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT, vk::PhysicalDeviceMemoryPriorityFeaturesEXT, vk::PhysicalDeviceShaderObjectFeaturesEXT, vk::PhysicalDeviceDescriptorBufferFeaturesEXT>();
@@ -465,6 +469,7 @@ namespace Cori {
 					features.get<vk::PhysicalDeviceVulkan12Features>().samplerFilterMinmax &&
 					features.get<vk::PhysicalDeviceVulkan12Features>().timelineSemaphore &&
 					features.get<vk::PhysicalDeviceVulkan12Features>().bufferDeviceAddress &&
+					features.get<vk::PhysicalDeviceVulkan12Features>().scalarBlockLayout &&
 					features.get<vk::PhysicalDeviceVulkan11Features>().shaderDrawParameters &&
 					features.get<vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT>().extendedDynamicState &&
 					features.get<vk::PhysicalDeviceMemoryPriorityFeaturesEXT>().memoryPriority &&
@@ -578,6 +583,7 @@ namespace Cori {
 						.descriptorBindingPartiallyBound = true,
 						.runtimeDescriptorArray = true,
 						.samplerFilterMinmax = true,
+						.scalarBlockLayout = true,
 						.timelineSemaphore = true,
 						.bufferDeviceAddress = true
 					},
@@ -699,6 +705,10 @@ namespace Cori {
 					if (availableFormat.format == vk::Format::eB8G8R8A8Srgb && availableFormat.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear) {
 						return availableFormat;
 					}
+
+					//if (availableFormat.format == vk::Format::eB8G8R8A8Unorm) {
+					//	return availableFormat;
+					//}
 				}
 
 				return availableFormats[0];

@@ -26,7 +26,7 @@ namespace Cori {
 			vk::Buffer m_Buffer = nullptr;
 			vma::Allocation m_Allocation = nullptr;
 			size_t m_Size{ 0 };
-			const char* m_Name{ "Unnamed Buffer" };
+			std::string m_Name{"Unnamed Buffer"};
 		};
 	}
 }

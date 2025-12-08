@@ -4,8 +4,10 @@
 #include "Vulkan/VulkanImage.hpp"
 #include "Vulkan/VulkanBuffer.hpp"
 #include "Vulkan/VulkanResourceTracker.hpp"
+#include "Vulkan/VulkanLayoutManager.hpp"
 #include "Utility/StringHash.hpp"
 #include "ResourceType.hpp"
+
 
 #ifndef CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE
 	#define CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE 16
@@ -87,12 +89,12 @@ namespace Cori {
 
 		struct PooledImage {
 			VulkanImage image;
-			uint32_t framesAgoUsed;
+			uint32_t framesAgoUsed{ 0 };
 		};
 
 		struct PooledBuffer {
 			VulkanBuffer buffer;
-			uint32_t framesAgoUsed;
+			uint32_t framesAgoUsed{ 0 };
 		};
 
 		enum class ResourceOrigin {
@@ -110,8 +112,8 @@ namespace Cori {
 		};
 
 		struct BufferRange {
-			uint32_t offset{ 0 };
-			uint32_t size{ 0 };
+			uint64_t offset{ 0 };
+			uint64_t size{ 0 };
 		};
 
 		struct ResourceUsage {
@@ -131,7 +133,7 @@ namespace Cori {
 		};
 
 		struct ResourceNode {
-			const char* name;
+			const char* name{ "" };
 			ResourceOrigin origin;
 			ResourceType type;
 			PassHandle lastProducer{ UINT32_MAX };
@@ -168,7 +170,7 @@ namespace Cori {
 			void Reset() {
 				m_SwapChainImageData = {};
 				m_SwapChainImageRetrieved = false;
-				m_NodesSize = 0;
+				m_Nodes.clear();
 			}
 
 			void UpdateResourceStates() {
@@ -211,28 +213,22 @@ namespace Cori {
 				return m_Nodes[handle];
 			}
 
-			ResourceHandle AddNode(ResourceNode&& node) {
-				if (m_NodesSize >= m_Nodes.size()) {
-					m_Nodes.resize(m_Nodes.size() * 1.5f);
-				}
+			VulkanImage& GetImage(const ResourceHandle handle) {
+				auto& node = GetNode(handle);
+				CORI_CORE_ASSERT(node.type == ResourceType::Image, "Invalid resource type.");
+				return std::get<VulkanImage>(node.resource);
+			}
 
-				m_Nodes[m_NodesSize] = std::move(node);
-
-				return m_NodesSize++;
+			VulkanBuffer& GetBuffer(const ResourceHandle handle) {
+				auto& node = GetNode(handle);
+				CORI_CORE_ASSERT(node.type == ResourceType::Buffer, "Invalid resource type.");
+				return std::get<VulkanBuffer>(node.resource);
 			}
 
 			ResourceHandle AddNode(const ResourceNode& node) {
-				if (m_NodesSize >= m_Nodes.size()) {
-					m_Nodes.resize(m_Nodes.size() * 1.5f);
-				}
-
-				m_Nodes[m_NodesSize] = node;
-
-				return m_NodesSize++;
-			}
-
-			void RegisterSwapChainImage(SwapChainImageData&& data) {
-				m_SwapChainImageData = std::move(data);
+				ResourceHandle handle = m_Nodes.size();
+				m_Nodes.emplace_back(node);
+				return handle;
 			}
 
 			void RegisterSwapChainImage(const SwapChainImageData& data) {
@@ -253,10 +249,8 @@ namespace Cori {
 			std::vector<std::map<PooledImageDescription, PooledImage>::iterator> m_ImagesToFree;
 			std::vector<std::map<PooledBufferDescription, PooledBuffer>::iterator> m_BuffersToFree;
 
-
 			SwapChainImageData m_SwapChainImageData;
 			bool m_SwapChainImageRetrieved{ false };
-			uint32_t m_NodesSize{ 0 };
 
 			static constexpr vk::AccessFlags2 s_WriteFlagMask = vk::AccessFlagBits2::eShaderWrite | vk::AccessFlagBits2::eColorAttachmentWrite | vk::AccessFlagBits2::eDepthStencilAttachmentWrite |
 																vk::AccessFlagBits2::eTransferWrite | vk::AccessFlagBits2::eHostWrite | vk::AccessFlagBits2::eMemoryWrite | vk::AccessFlagBits2::eShaderStorageWrite |
@@ -269,47 +263,36 @@ namespace Cori {
 		class Pass {
 		public:
 			Pass() {
-				m_Writes.resize(CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE);
-				m_Reads.resize(CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE);
+				m_Writes.reserve(CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE);
+				m_Reads.reserve(CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE);
 				//m_Producers.resize(CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE);
-				m_Consumers.resize(CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE);
-				m_ImageBarriers.resize(CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE);
-				m_BufferBarriers.resize(CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE);
-			}
-
-
-			explicit Pass(const char* name) {
-				m_Name = name;
-			}
-
-			void Reset(const char* name) {
-				m_Name = name;
-				m_Work = nullptr;
-				m_Degree = 0;
-				m_WritesSize = 0;
-				m_ReadsSize = 0;
-				m_ProducersCount = 0;
-				m_ConsumersSize = 0;
-				m_ImageBarriersSize = 0;
-				m_BufferBarriersSize = 0;
+				m_Consumers.reserve(CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE);
+				m_ImageBarriers.reserve(CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE);
+				m_BufferBarriers.reserve(CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE);
 			}
 
 			void Writes(const ResourceHandle resource, const ResourceUsage& usage) {
-				if (m_WritesSize >= m_Writes.size()) {
-					m_Writes.resize(m_Writes.size() * 1.5f);
-				}
-
-				m_Writes[m_WritesSize++] = { resource, usage };
+				m_Writes.emplace_back(PassResourceDependency{ resource, usage });
 			}
 
 			void Reads(const ResourceHandle resource, const ResourceUsage& usage) {
-				if (m_ReadsSize >= m_Reads.size()) {
-					m_Reads.resize(m_Reads.size() * 1.5f);
-				}
-
-				m_Reads[m_ReadsSize++] = { resource, usage };
+				m_Reads.emplace_back(PassResourceDependency{ resource, usage });
 			}
 
+			void AssignWork(std::function<void(vk::CommandBuffer cmb, RenderGraphResourceRegistry& registry)> work) {
+				m_Work = std::move(work);
+			}
+
+			void AddPushConstants(const vk::ShaderStageFlags stageFlags, const void* data, const uint8_t dataSize) {
+				CORI_CORE_ASSERT(dataSize <= 128, "Exceeding push constant limit of 128 bytes, tried to add push constants with size '{}' to pass '{}'", dataSize, m_Name);
+				memcpy(m_PushConstantsBuffer.data(), data, dataSize);
+				m_PushConstantsBufferSize = dataSize;
+				m_PushConstantsStageFlags = stageFlags;
+			}
+
+		protected:
+			friend class RenderGraph;
+			friend class RenderGraphPassRegistry;
 
 			//void AddProducer(const PassHandle producer, const ResourceHandle resource) {
 			//	if (m_ProducersCount >= m_Producers.size()) {
@@ -324,47 +307,49 @@ namespace Cori {
 			}
 
 			void AddConsumer(const PassHandle consumer) {
-				if (m_ConsumersSize >= m_Consumers.size()) {
-					m_Consumers.resize(m_Consumers.size() * 1.5f);
-				}
-
-				m_Consumers[m_ConsumersSize++] = { consumer };
+				m_Consumers.emplace_back(consumer);
 			}
 
-			void AddImageBarrier(vk::ImageMemoryBarrier2&& barrier) {
-				if (m_ImageBarriersSize >= m_ImageBarriers.size()) {
-					m_ImageBarriers.resize(m_ImageBarriers.size() * 1.5f);
-				}
-
-				m_ImageBarriers[m_ImageBarriersSize++] = barrier;
+			void AddImageBarrier(const vk::ImageMemoryBarrier2& barrier) {
+				m_ImageBarriers.emplace_back(barrier);
 			}
 
-			void AddBufferBarrier(vk::BufferMemoryBarrier2&& barrier) {
-				if (m_BufferBarriersSize >= m_BufferBarriers.size()) {
-					m_BufferBarriers.resize(m_BufferBarriers.size() * 1.5f);
-				}
-
-				m_BufferBarriers[m_BufferBarriersSize++] = barrier;
+			void AddImageBarriers(std::vector<vk::ImageMemoryBarrier2>& barriers) {
+				std::ranges::move(barriers, std::back_inserter(m_ImageBarriers));
 			}
 
-			//TODO: add an ability to add multiple barriers at once.
-
-			void AddBufferBarriers(void* data, size_t bufferAmount) {
-				// check if we have enough space
-				// memcpy from data to m_BufferBarriers + m_BufferBarriersSize at size 'bufferAmount'
-
-				// or do some range/view/iterator smart thing idk, fuck around and find out i guess, oki bye)
+			void AddBufferBarriers(std::vector<vk::BufferMemoryBarrier2>& barriers) {
+				std::ranges::move(barriers, std::back_inserter(m_BufferBarriers));
 			}
 
-			void AssignWork(std::function<void(vk::CommandBuffer cmb, const RenderGraphResourceRegistry& registry)> work) {
-				m_Work = std::move(work);
+			void AddBufferBarrier(const vk::BufferMemoryBarrier2& barrier) {
+				m_BufferBarriers.emplace_back(barrier);
 			}
 
-		public:
+			explicit Pass(const char* name) {
+				m_Name = name;
+			}
+
+			void Reset(const char* name) {
+				m_Name = name;
+				m_Work = nullptr;
+				m_Degree = 0;
+				m_ProducersCount = 0;
+
+				m_Writes.clear();
+				m_Reads.clear();
+				m_Consumers.clear();
+				m_ImageBarriers.clear();
+				m_BufferBarriers.clear();
+				m_PushConstantsBufferSize = 0;
+			}
+
 			const char* m_Name{ "" };
 
 			friend class RenderGraph;
-			std::function<void(vk::CommandBuffer cmb, const RenderGraphResourceRegistry& registry)> m_Work;
+			std::function<void(vk::CommandBuffer cmb, RenderGraphResourceRegistry& registry)> m_Work;
+
+
 
 			std::vector<PassResourceDependency> m_Writes;
 			std::vector<PassResourceDependency> m_Reads;
@@ -373,14 +358,12 @@ namespace Cori {
 			std::vector<vk::ImageMemoryBarrier2> m_ImageBarriers;
 			std::vector<vk::BufferMemoryBarrier2> m_BufferBarriers;
 
-			uint64_t m_Degree{ 0 };
-
-			uint8_t m_WritesSize{ 0 };
-			uint8_t m_ReadsSize{ 0 };
+			std::array<Byte, 128> m_PushConstantsBuffer{};
+			uint8_t m_PushConstantsBufferSize{ 0 };
 			uint8_t m_ProducersCount{ 0 };
-			uint8_t m_ConsumersSize{ 0 };
-			uint8_t m_ImageBarriersSize{ 0 };
-			uint8_t m_BufferBarriersSize{ 0 };
+			vk::ShaderStageFlags m_PushConstantsStageFlags;
+
+			uint64_t m_Degree{ 0 };
 			PassHandle m_SelfHandle{ UINT32_MAX };
 		};
 
@@ -388,14 +371,14 @@ namespace Cori {
 		public:
 			RenderGraphPassRegistry() {
 				m_Passes.resize(CORI_RENDER_GRAPH_PASS_REGISTRY_INLINE_SIZE);
-				m_SortedPassOrder.resize(CORI_RENDER_GRAPH_PASS_REGISTRY_INLINE_SIZE);
-				m_ResourceInPassSet.resize(CORI_RENDER_GRAPH_PER_PASS_UNIQUE_RESOURCES_SET_INLINE_SIZE);
-				m_ProducersSet.resize(CORI_RENDER_GRAPH_PASS_REGISTRY_INLINE_SIZE);
+				m_SortedPassOrder.reserve(CORI_RENDER_GRAPH_PASS_REGISTRY_INLINE_SIZE);
+				m_ResourceInPassSet.reserve(CORI_RENDER_GRAPH_PER_PASS_UNIQUE_RESOURCES_SET_INLINE_SIZE);
+				m_ProducersSet.reserve(CORI_RENDER_GRAPH_PASS_REGISTRY_INLINE_SIZE);
 			}
 
 			void Reset() {
 				m_PassesSize = 0;
-				m_SortedPassOrderSize = 0;
+				m_SortedPassOrder.clear();
 			}
 
 			Pass& GetPass(const PassHandle handle) {
@@ -415,39 +398,27 @@ namespace Cori {
 			}
 
 			void AddSortedPass(PassHandle handle) {
-				if (m_SortedPassOrderSize >= m_SortedPassOrder.size()) {
-					m_SortedPassOrder.resize(m_SortedPassOrder.size() * 1.5f);
-				}
-
-				m_SortedPassOrder[m_SortedPassOrderSize++] = handle;
+				m_SortedPassOrder.emplace_back(handle);
 			}
 
 			void AddResourceToSet(ResourceHandle handle) {
-				for (size_t i = 0; i < m_ResourceInPassSetSize; ++i) {
-					if (m_ResourceInPassSet[i] == handle) {
+				for (auto& resource : m_ResourceInPassSet) {
+					if (resource == handle) {
 						return;
 					}
 				}
 
-				if (m_ResourceInPassSetSize >= m_ResourceInPassSet.size()) {
-					m_ResourceInPassSet.resize(m_ResourceInPassSet.size() * 2.0f);
-				}
-
-				m_ResourceInPassSet[m_ResourceInPassSetSize++] = handle;
+				m_ResourceInPassSet.emplace_back(handle);
 			}
 
 			void AddPassToSet(PassHandle handle) {
-				for (size_t i = 0; i < m_ProducersSetSize; ++i) {
-					if (m_ProducersSet[i] == handle) {
+				for (auto& pass : m_ProducersSet) {
+					if (pass == handle) {
 						return;
 					}
 				}
 
-				if (m_ProducersSetSize >= m_ProducersSet.size()) {
-					m_ProducersSet.resize(m_ProducersSet.size() * 2.0f);
-				}
-
-				m_ProducersSet[m_ProducersSetSize++] = handle;
+				m_ProducersSet.emplace_back(handle);
 			}
 
 			std::vector<Pass> m_Passes;
@@ -456,9 +427,6 @@ namespace Cori {
 			std::vector<ResourceHandle> m_ResourceInPassSet;
 			std::vector<PassHandle> m_ProducersSet;
 
-			uint32_t m_ResourceInPassSetSize{ 0 };
-			uint32_t m_ProducersSetSize{ 0 };
-			uint32_t m_SortedPassOrderSize{ 0 };
 			uint32_t m_PassesSize{ 0 };
 		};
 
@@ -477,7 +445,7 @@ namespace Cori {
 				node.resourceAllocated = true;
 				node.resource.emplace<VulkanBuffer>(buffer);
 
-				return m_ResourceRegistry->AddNode(std::move(node));
+				return m_ResourceRegistry->AddNode(node);
 			}
 
 			ResourceHandle ImportImage(const VulkanImage& image, const char* name) {
@@ -488,7 +456,7 @@ namespace Cori {
 				node.resourceAllocated = true;
 				node.resource.emplace<VulkanImage>(image);
 
-				return m_ResourceRegistry->AddNode(std::move(node));
+				return m_ResourceRegistry->AddNode(node);
 			}
 
 			ResourceHandle CreateBuffer(const VulkanBuffer::CreateInfo& createInfo, const char* name) {
@@ -502,7 +470,7 @@ namespace Cori {
 					createInfo.name
 				);
 
-				return m_ResourceRegistry->AddNode(std::move(node));
+				return m_ResourceRegistry->AddNode(node);
 			}
 
 			ResourceHandle CreateImage(const VulkanImage::CreateInfo& createInfo, const char* name) {
@@ -516,7 +484,7 @@ namespace Cori {
 					createInfo.name
 				);
 
-				return m_ResourceRegistry->AddNode(std::move(node));
+				return m_ResourceRegistry->AddNode(node);
 			}
 
 			Pass& CreatePass(const char* name) {
@@ -556,7 +524,7 @@ namespace Cori {
 					}
 					#else
 					for (auto& pass : std::ranges::subrange(m_PassRegistry->m_Passes.begin(), m_PassRegistry->m_Passes.begin() + m_PassRegistry->m_PassesSize)) {
-						for (const auto& readDep : std::ranges::subrange(pass.m_Reads.begin(), pass.m_Reads.begin() + pass.m_ReadsSize)) {
+						for (const auto& readDep : pass.m_Reads) {
 							ResourceHandle handle = readDep.resource;
 							auto& node = m_ResourceRegistry->GetNode(handle);
 
@@ -565,7 +533,7 @@ namespace Cori {
 							}
 						}
 
-						for (const auto& writeDep : std::ranges::subrange(pass.m_Writes.begin(), pass.m_Writes.begin() + pass.m_WritesSize)) {
+						for (const auto& writeDep : pass.m_Reads) {
 							ResourceHandle handle = writeDep.resource;
 							auto& node = m_ResourceRegistry->GetNode(handle);
 
@@ -574,18 +542,18 @@ namespace Cori {
 							}
 						}
 
-						for (PassHandle handle : std::ranges::subrange(m_PassRegistry->m_ProducersSet.begin(), m_PassRegistry->m_ProducersSet.begin() + m_PassRegistry->m_ProducersSetSize)) {
+						for (PassHandle handle : m_PassRegistry->m_ProducersSet) {
 							if (handle != pass.m_SelfHandle) {
 								pass.AddProducer();
 								m_PassRegistry->GetPass(handle).AddConsumer(pass.m_SelfHandle);
 							}
 						}
 
-						for (const auto& writeDep : std::ranges::subrange(pass.m_Writes.begin(), pass.m_Writes.begin() + pass.m_WritesSize)) {
+						for (const auto& writeDep : pass.m_Writes) {
 							m_ResourceRegistry->GetNode(writeDep.resource).lastProducer = pass.m_SelfHandle;
 						}
 
-						m_PassRegistry->m_ProducersSetSize = 0;
+						m_PassRegistry->m_ProducersSet.clear();
 					}
 
 					#endif
@@ -608,7 +576,7 @@ namespace Cori {
 						m_PassRegistry->m_ZeroInDegreeQueue.erase(m_PassRegistry->m_ZeroInDegreeQueue.begin());
 						m_PassRegistry->AddSortedPass( pass.m_SelfHandle);
 
-						for (const auto& consumerDep : std::ranges::subrange(pass.m_Consumers.begin(), pass.m_Consumers.begin() + pass.m_ConsumersSize)) {
+						for (const auto& consumerDep : pass.m_Consumers) {
 							Pass& consumerPass = m_PassRegistry->GetPass(consumerDep);
 							consumerPass.m_Degree--;
 							if (consumerPass.m_Degree == 0) {
@@ -617,12 +585,12 @@ namespace Cori {
 						}
 					}
 
-					CORI_CORE_ASSERT(m_PassRegistry->m_SortedPassOrderSize == m_PassRegistry->m_PassesSize, "Error when compiling the render graph, graph has a cycle.")
+					CORI_CORE_ASSERT(m_PassRegistry->m_SortedPassOrder.size() == m_PassRegistry->m_PassesSize, "Error when compiling the render graph, graph has a cycle.")
 				}
 
 				{
 					CORI_PROFILE_SCOPE("Resoruce creation and aqusition.");
-					for (auto& node : std::ranges::subrange(m_ResourceRegistry->m_Nodes.begin(), m_ResourceRegistry->m_Nodes.begin() + m_ResourceRegistry->m_NodesSize)) {
+					for (auto& node : m_ResourceRegistry->m_Nodes) {
 						if (node.origin == ResourceOrigin::Created && !node.resourceAllocated) {
 							switch (node.type) {
 							case ResourceType::Image:
@@ -676,7 +644,7 @@ namespace Cori {
 
 				{
 					CORI_PROFILE_SCOPE("Barrier geneartion");
-					for (auto& passHandle : std::ranges::subrange(m_PassRegistry->m_SortedPassOrder.begin(), m_PassRegistry->m_SortedPassOrder.begin() + m_PassRegistry->m_SortedPassOrderSize)) {
+					for (auto& passHandle : m_PassRegistry->m_SortedPassOrder) {
 						Pass& pass = m_PassRegistry->GetPass(passHandle);
 
 						auto ProcessResource = [&](const PassResourceDependency& dep) {
@@ -687,7 +655,7 @@ namespace Cori {
 									auto opt = VulkanResourceTracker::TransitionImage(std::get<VulkanImage>(node.resource), std::get<vk::ImageSubresourceRange>(dep.usage.subrange), dep.usage.desiredState);
 									if (opt) {
 										for (auto& barrier : *opt.value()) {
-											pass.AddImageBarrier(std::move(barrier));
+											pass.AddImageBarrier(barrier);
 										}
 									}
 								}
@@ -695,45 +663,49 @@ namespace Cori {
 									auto opt = VulkanResourceTracker::TransitionBuffer(std::get<VulkanBuffer>(node.resource), std::get<BufferRange>(dep.usage.subrange).offset, std::get<BufferRange>(dep.usage.subrange).size, dep.usage.desiredState);
 									if (opt) {
 										for (auto& barrier : *opt.value()) {
-											pass.AddBufferBarrier(std::move(barrier));
+											pass.AddBufferBarrier(barrier);
 										}
 									}
 								}
 							}
 						};
 
-						for (const auto& write : std::ranges::subrange(pass.m_Writes.begin(), pass.m_Writes.begin() + pass.m_WritesSize)) {
+						for (const auto& write : pass.m_Writes) {
 							ProcessResource(write);
 						}
 
-						for (const auto& read : std::ranges::subrange(pass.m_Reads.begin(), pass.m_Reads.begin() + pass.m_ReadsSize)) {
+						for (const auto& read : pass.m_Reads) {
 							ProcessResource(read);
 						}
 
-						m_PassRegistry->m_ResourceInPassSetSize = 0;
+						m_PassRegistry->m_ResourceInPassSet.clear();
 					}
 				}
 			}
 
 			void Execute(vk::CommandBuffer cmb) {
-				for (const auto& passHandle : std::ranges::subrange(m_PassRegistry->m_SortedPassOrder.begin(), m_PassRegistry->m_SortedPassOrder.begin() + m_PassRegistry->m_SortedPassOrderSize)) {
+				for (const auto& passHandle : m_PassRegistry->m_SortedPassOrder) {
 					const Pass& pass = m_PassRegistry->GetPass(passHandle);
 
 					if (m_ResourceRegistry->m_SwapChainImageRetrieved) {
 						break;
 					}
 
-					//CORI_PROFILE_SCOPE(pass.m_Name);
+					CORI_PROFILE_SCOPE_DYNAMIC_NAME(pass.m_Name);
 
-					if (pass.m_ImageBarriersSize > 0 || pass.m_BufferBarriersSize > 0) {
+					if (pass.m_ImageBarriers.size() > 0 || pass.m_BufferBarriers.size() > 0) {
 						vk::DependencyInfo depInfo {
-							.bufferMemoryBarrierCount = pass.m_BufferBarriersSize,
+							.bufferMemoryBarrierCount = static_cast<uint32_t>(pass.m_BufferBarriers.size()),
 							.pBufferMemoryBarriers = pass.m_BufferBarriers.data(),
-							.imageMemoryBarrierCount = pass.m_ImageBarriersSize,
+							.imageMemoryBarrierCount = static_cast<uint32_t>(pass.m_ImageBarriers.size()),
 							.pImageMemoryBarriers = pass.m_ImageBarriers.data()
 						};
 
 						cmb.pipelineBarrier2(depInfo);
+					}
+
+					if (pass.m_PushConstantsBufferSize > 0) {
+						cmb.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), pass.m_PushConstantsStageFlags, 0, pass.m_PushConstantsBufferSize, pass.m_PushConstantsBuffer.data());
 					}
 
 					if (pass.m_Work) {

@@ -59,7 +59,7 @@ namespace Cori {
 			vk::Format m_Format;
 			uint32_t m_MipLevels{ 0 };
 			uint32_t m_ArrayLayers{ 0 };
-			const char* m_Name{ "Unnamed Image" };
+			std::string m_Name{ "Unnamed Image" };
 		};
 	}
 }

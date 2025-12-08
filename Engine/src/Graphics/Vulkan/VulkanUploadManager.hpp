@@ -110,6 +110,7 @@ namespace Cori {
 						size += m_SectorSize;
 					}
 
+					VulkanResourceTracker::OverrideBufferState(m_FrameLocalBuffers[frameIndex], offset, size, {vk::PipelineStageFlagBits2::eTopOfPipe, vk::AccessFlagBits2::eNone});
 					auto barriers = VulkanResourceTracker::TransitionBuffer(m_FrameLocalBuffers[frameIndex], offset, size, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
 
 					if (barriers) {
@@ -535,7 +536,9 @@ namespace Cori {
 								.layerCount = range.subresourceLayers.layerCount
 							};
 
-							auto dstBarrier = VulkanResourceTracker::TransitionImage(image, vkRange, {vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite, vk::ImageLayout::eGeneral });
+							//TODO: override image state
+
+							auto dstBarrier = VulkanResourceTracker::TransitionImage(image, vkRange, {vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite, vk::ImageLayout::eTransferDstOptimal });
 
 							if (dstBarrier) {
 								std::ranges::move(*dstBarrier.value(), std::back_inserter(m_ImageBarriersCache));
@@ -547,7 +550,7 @@ namespace Cori {
 								std::ranges::move(*stageBarrier.value(), std::back_inserter(m_BufferBarriersCache));
 							}
 
-							m_HighPrioritySecondaryCommandBuffers[frameIndex].copyBufferToImage(m_HighPriorityRingStagingBuffer.m_Buffer, image.m_Image, vk::ImageLayout::eGeneral, region);
+							m_HighPrioritySecondaryCommandBuffers[frameIndex].copyBufferToImage(m_HighPriorityRingStagingBuffer.m_Buffer, image.m_Image, vk::ImageLayout::eTransferDstOptimal, region);
 						}
 						else if (std::holds_alternative<VulkanBuffer>(part.resource)) {
 							CORI_CORE_ASSERT(std::holds_alternative<BufferUploadRange>(part.range), "UploadPart was passed to VulkanUploadManager with VulkanBuffer as a resource and ImageUploadRange as a range.");
@@ -567,6 +570,7 @@ namespace Cori {
 								.accessMask = vk::AccessFlagBits2::eTransferWrite
 							};
 
+							VulkanResourceTracker::OverrideBufferState(buffer, range.offset, part.data.size(), {vk::PipelineStageFlagBits2::eTopOfPipe, vk::AccessFlagBits2::eNone});
 							auto dstBarrier = VulkanResourceTracker::TransitionBuffer(buffer, range.offset, part.data.size(), dstState);
 
 							if (dstBarrier) {
@@ -687,7 +691,7 @@ namespace Cori {
 								.layerCount = range.subresourceLayers.layerCount
 							};
 
-							auto dstBarrier = VulkanResourceTracker::TransitionImage(image, vkRange, {vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite, vk::ImageLayout::eGeneral });
+							auto dstBarrier = VulkanResourceTracker::TransitionImage(image, vkRange, {vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite, vk::ImageLayout::eTransferDstOptimal });
 
 							if (dstBarrier) {
 								std::ranges::move(*dstBarrier.value(), std::back_inserter(m_ImageBarriersCache));
@@ -699,7 +703,7 @@ namespace Cori {
 								std::ranges::move(*stageBarrier.value(), std::back_inserter(m_BufferBarriersCache));
 							}
 
-							m_LowPrioritySecondaryCommandBuffers[frameIndex].copyBufferToImage(m_LowPriorityRingStagingBuffer.m_Buffer, image.m_Image, vk::ImageLayout::eGeneral, region);
+							m_LowPrioritySecondaryCommandBuffers[frameIndex].copyBufferToImage(m_LowPriorityRingStagingBuffer.m_Buffer, image.m_Image, vk::ImageLayout::eTransferDstOptimal, region);
 						}
 						else if (std::holds_alternative<VulkanBuffer>(part.resource)) {
 							CORI_CORE_ASSERT(std::holds_alternative<BufferUploadRange>(part.range), "UploadPart was passed to VulkanUploadManager with VulkanBuffer as a resource and ImageUploadRange as a range.");
@@ -717,6 +721,7 @@ namespace Cori {
 								.accessMask = vk::AccessFlagBits2::eTransferWrite
 							};
 
+							VulkanResourceTracker::OverrideBufferState(buffer, range.offset, part.data.size(), {vk::PipelineStageFlagBits2::eTopOfPipe, vk::AccessFlagBits2::eNone});
 							auto dstBarrier = VulkanResourceTracker::TransitionBuffer(buffer, range.offset, part.data.size(), dstState);
 
 							if (dstBarrier) {

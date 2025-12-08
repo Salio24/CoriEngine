@@ -106,7 +106,7 @@ namespace Cori {
 				};
 
 				VulkanUploadManager::UploadRequest request {
-					.uploadParts = std::vector<VulkanUploadManager::UploadPart>{ vertexPart, indexPart },
+					.uploadParts = std::vector<VulkanUploadManager::UploadPart>{ std::move(vertexPart), std::move(indexPart) },
 					.callback = VulkanMeshManager::UpdateLoadedMesh,
 					.uploadType = VulkanUploadManager::UploadType::Streaming,
 					.userData = reinterpret_cast<void*>(static_cast<uint64_t>(freeHandle))
@@ -178,8 +178,12 @@ namespace Cori {
 				return Get().m_VertexSSBO;
 			}
 
-			static VulkanBuffer& GetFrameLocal() {
+			static VulkanBuffer& GetFrameLocalMeshAssetBuffer() {
 				return VulkanUploadManager::GetAmazingBuffer(Get().m_MeshAssetBufferHandle).GetCurrentFrameLocalBuffer();
+			}
+
+			static uint32_t GetLoadedMeshCount() {
+				return Get().m_MeshAssets.size();
 			}
 
 			static void UpdateLoadedMesh(void* data) {
@@ -219,7 +223,7 @@ namespace Cori {
 				AmazingBuffer::CreateInfo amazingBufferInfo {
 					.size = MESH_ASSET_COUNT_LIMIT * sizeof(MeshAssetInfo),
 					.createZeroed = true,
-					.usage = vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eStorageBuffer | vk::BufferUsageFlagBits::eShaderDeviceAddress,
+					.usage = vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eStorageBuffer,
 					.queueFamilyIndices = { graphicsQueueFamilyIndex },
 					.name = "MeshManager mesh asset buffer"
 				};
@@ -250,7 +254,7 @@ namespace Cori {
 
 				vk::BufferCreateInfo vertexSSBOInfo {
 					.size = BUFFER_VERTEX_COUNT * sizeof(Vertex),
-					.usage = vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eStorageBuffer | vk::BufferUsageFlagBits::eShaderDeviceAddress,
+					.usage = vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eStorageBuffer,
 					.sharingMode = m_MeshSharingMode,
 					.queueFamilyIndexCount = static_cast<uint32_t>(m_QueueFamilyIndices.size()),
 					.pQueueFamilyIndices = m_QueueFamilyIndices.data()

@@ -238,7 +238,10 @@ namespace Cori {
 					}
 				}
 
-				stateMap.erase(stateMap.upper_bound(newRangeStart), stateMap.lower_bound(newRangeEnd));
+				auto fIt = stateMap.lower_bound(newRangeStart);
+				auto lIt = stateMap.upper_bound(newRangeEnd);
+
+				stateMap.erase(fIt, lIt);
 
 				auto [newIt, _] = stateMap.emplace(newRangeStart, desiredState);
 
@@ -300,7 +303,7 @@ namespace Cori {
 					}
 				}
 
-				stateMap.erase(stateMap.upper_bound(newRangeStart), stateMap.lower_bound(newRangeEnd));
+				stateMap.erase(stateMap.lower_bound(newRangeStart), stateMap.upper_bound(newRangeEnd));
 
 				auto [newIt, _] = stateMap.emplace(newRangeStart, desiredState);
 
