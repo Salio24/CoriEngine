@@ -143,7 +143,7 @@ namespace Cori {
 							}
 						}
 
-						stateMap.erase(stateMap.upper_bound(rangeStartMipKey), stateMap.lower_bound(rangeEndMipKey));
+						stateMap.erase(stateMap.lower_bound(rangeStartMipKey), stateMap.upper_bound(rangeEndMipKey));
 
 						auto [newIt, _] = stateMap.emplace(rangeStartMipKey, desiredState);
 

@@ -123,6 +123,10 @@ namespace Cori {
 				return Get().m_SwapChainExtent;
 			}
 
+			static vk::SurfaceFormatKHR GetSwapChaimImageFormat() {
+				return Get().m_SwapChainImageFormat;
+			}
+
 			FrameData& BeginFrame();
 
 			void EndFrame();

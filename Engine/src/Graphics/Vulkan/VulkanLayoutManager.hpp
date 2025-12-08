@@ -56,9 +56,22 @@ namespace Cori {
 			}
 
 			static void UpdateSampledTextureDescriptor(const uint32_t slot, const vk::ImageView view) {
+				//vk::SamplerCreateInfo samplerInfo{
+				//	.magFilter = vk::Filter::eLinear,
+				//	.minFilter = vk::Filter::eLinear,
+				//	.mipmapMode = vk::SamplerMipmapMode::eLinear,
+				//	.addressModeU = vk::SamplerAddressMode::eClampToEdge,
+				//	.addressModeV = vk::SamplerAddressMode::eClampToEdge,
+				//	.addressModeW = vk::SamplerAddressMode::eClampToEdge,
+				//	.anisotropyEnable = vk::False
+				//};
+				//auto [result, sampler] = VulkanEngine::GetLogicalDevice().createSampler(samplerInfo);
+				//CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to create sampler. Error: {}", vk::to_string(result));
+
 				vk::DescriptorImageInfo imageInfo{
+				//	.sampler = sampler,
 					.imageView = view,
-					.imageLayout = vk::ImageLayout::eGeneral
+					.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
 				};
 
 				vk::DescriptorGetInfoEXT getInfo {
@@ -98,7 +111,6 @@ namespace Cori {
 
 				cmb.setDescriptorBufferOffsetsEXT(vk::PipelineBindPoint::eGraphics, Get().m_PipelineLayout, 0, 1, &bufferIndex, &setOffset);
 			}
-
 
 			~VulkanGlobalLayoutManager() {
 				VulkanUploadManager::DestroyAmazingBuffer(m_DescriptorBufferHandle);
@@ -181,7 +193,7 @@ namespace Cori {
 			vk::DeviceSize m_SamplerBindingMemOffset{ 0 };
 			vk::DeviceSize m_SampledImageBindingMemOffset{ 0 };
 
-			static constexpr uint16_t s_MaxTextures{ 16 * 1024 };
+			static constexpr uint16_t s_MaxTextures{ 1 * 1024 };
 			static constexpr uint16_t s_MaxSamplers{ 1 * 1024 };
 
 			AmazingBufferHandle m_DescriptorBufferHandle{ 0 };

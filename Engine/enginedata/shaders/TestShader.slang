@@ -76,7 +76,7 @@ VSOutput vertMain(uint32_t instanceID : SV_VulkanInstanceID, uint32_t baseInstan
 
     uint32_t objectID = pc.compactedObjectIDBuffer[baseInstance + instanceID].id;
     ObjectData obj = pc.objectDataBuffer[objectID];
-    MaterialData material = pc.materialDataBuffer[1].customData;
+    MaterialData material = pc.materialDataBuffer[obj.materialID].customData;
 
     Vertex v = pc.vertexBuffer[vertexID];
 
@@ -91,6 +91,5 @@ VSOutput vertMain(uint32_t instanceID : SV_VulkanInstanceID, uint32_t baseInstan
 [shader("fragment")]
 float4 fragMain(VSOutput vertIn) : SV_TARGET {
 	float4 color = vertIn.fragColor * globalTextures[vertIn.albedoTexture].Sample(globalSamplers[vertIn.albedoSampler], vertIn.uv);
-	color.rgb = pow(color.rgb, float3(2.2)); //reverse gamma correction
 	return color;
 }

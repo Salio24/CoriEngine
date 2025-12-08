@@ -965,8 +965,6 @@ namespace Cori {
 					VulkanEngine::SetDebugName(m_LowPrioritySecondaryCommandBuffers[i], std::format("VulkanUploadManager LowPriority Secondary Command Buffer {}", i));
 				}
 
-
-
 				auto [result4, semaphore] = VulkanEngine::GetLogicalDevice().createSemaphore(vk::SemaphoreCreateInfo());
 				auto [result5, fence] = VulkanEngine::GetLogicalDevice().createFence({ .flags = vk::FenceCreateFlagBits::eSignaled });
 

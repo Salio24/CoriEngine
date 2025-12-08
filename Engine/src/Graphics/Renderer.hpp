@@ -460,6 +460,14 @@ namespace Cori {
 					.albedoSampler = 0
 				};
 
+				MaterialData materialData_ {
+					.colorFactor = { 1.0f, 1.0f, 1.0f, 1.0f },
+					.albedoTexture = 1,
+					.albedoSampler = 0
+				};
+
+				material2 = VulkanMaterialSystem::CreateMaterial(shaderEffect, materialData_, "Test Material 2");
+
 				material = VulkanMaterialSystem::CreateMaterial(shaderEffect, materialData, "Test Material");
 
 				AmazingBuffer::CreateInfo objectBufferInfo {
@@ -628,10 +636,17 @@ namespace Cori {
 				if (!oneshot) {
 					oneshot = true;
 
-					glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5, 1.0f));
+					glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(-0.5f, 0.0f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5, 1.0f));
 
-					RegisterObject(Get().quad, Get().material, transform, { 0.125f, 0.125f, 0.25f, 0.25f });
+					RegisterObject(Get().quad, Get().material, transform);
+					transform = glm::translate(transform, glm::vec3(+1.0f, 0.0f, 0.0f));
+
+					RegisterObject(Get().quad, Get().material2, transform);
 				}
+
+				static uint32_t frameIndex_ = 0;
+				frameIndex_++;
+
 
 				Get().UpdateBuffers();
 				Get().m_GraphPassRegistry.Reset();
@@ -743,6 +758,25 @@ namespace Cori {
 				indirectPass.Reads(DrawCommandCountBufferHandle, { { vk::PipelineStageFlagBits2::eDrawIndirect, vk::AccessFlagBits2::eIndirectCommandRead }, BufferRange{ 0, VK_WHOLE_SIZE } });
 				indirectPass.AddPushConstants(vk::ShaderStageFlagBits::eAll, &dps, sizeof(dps));
 				indirectPass.AssignWork([&](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
+					if (frameIndex_ == 3) {
+						auto& text = VulkanTextureManager::GetTexture(2);
+						vk::ImageSubresourceRange vkRange{
+							.aspectMask = vk::ImageAspectFlagBits::eColor,
+							.baseMipLevel = 0,
+							.levelCount = 1,
+							.baseArrayLayer = 0,
+							.layerCount = 1
+						};
+						auto dstBarrier = VulkanResourceTracker::TransitionImage(text, vkRange, {vk::PipelineStageFlagBits2::eFragmentShader, vk::AccessFlagBits2::eShaderSampledRead, vk::ImageLayout::eShaderReadOnlyOptimal });
+
+						vk::DependencyInfo depInfo {
+							.imageMemoryBarrierCount = static_cast<uint32_t>(dstBarrier.value()->size()),
+							.pImageMemoryBarriers = dstBarrier.value()->data()
+						};
+
+
+						commandBuffer.pipelineBarrier2(depInfo);
+					}
 					VulkanGlobalLayoutManager::BindDescriptorBuffer(commandBuffer);
 					commandBuffer.bindIndexBuffer(VulkanMeshManager::GetIndexBuffer().m_Buffer, 0, vk::IndexType::eUint32);
 
@@ -757,7 +791,7 @@ namespace Cori {
 
 					//FIXME: use the swapchain data feature of the rendergraph, and dont render to the swapchain framebuffer directly, but to an HDR texure, but this is fine for testing.
 					//temp
-					vk::ClearValue clearColor = vk::ClearColorValue(1.0f, 1.0f, 1.0f, 1.0f);
+					vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 0.0f);
 					vk::RenderingAttachmentInfo attachmentInfo = {
 						.imageView = VulkanEngine::GetSwapChainImageView(),
 						.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
@@ -774,7 +808,6 @@ namespace Cori {
 					};
 					commandBuffer.beginRendering(renderingInfo);
 					//temp
-
 
 					for (uint32_t i = 0; i < Get().m_Groups.size(); i++) {
 						auto& group = Get().m_Groups[i];
@@ -798,7 +831,7 @@ namespace Cori {
 				}
 
 				if (!frameData.m_SkippedFrame && false) {
-					vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 1.0f, 1.0f);
+					vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 0.0f);
 					vk::RenderingAttachmentInfo attachmentInfo = {
 						.imageView = VulkanEngine::GetSwapChainImageView(),
 						.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
@@ -952,6 +985,7 @@ namespace Cori {
 
 			MeshHandle quad;
 			MaterialHandle material;
+			MaterialHandle material2;
 
 			VulkanBuffer buffer;
 			VulkanImage image;

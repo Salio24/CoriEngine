@@ -256,7 +256,7 @@ namespace Cori {
 
 			frameData.m_CommandBuffer.setColorBlendEnableEXT(0, 0u);
 
-			vk::ColorComponentFlags ccFlags = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eA;
+			vk::ColorComponentFlags ccFlags = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
 			frameData.m_CommandBuffer.setColorWriteMaskEXT(0, 1, &ccFlags);
 
 			return frameData;

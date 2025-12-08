@@ -2,6 +2,7 @@
 #include "VulkanEngine.hpp"
 #include "VulkanImage.hpp"
 #include "VulkanLayoutManager.hpp"
+#include <entt/container/dense_set.hpp>
 
 namespace Cori {
 	namespace Graphics {
@@ -22,6 +23,14 @@ namespace Cori {
 				memcpy(pixelData.data(), pixels, pixelDataSize);
 
 				return CreateTextureTest(std::move(pixelData), format, extent, name);
+			}
+
+			static void TransitionLoadedImages() {
+
+			}
+
+			static VulkanImage& GetTexture(uint32_t handle) {
+				return Get().m_TexturePool[handle].image;
 			}
 
 			static void UpdateTexture(const TextureHandle handle, std::vector<Byte>&& pixels, const vk::Offset3D& offset, const vk::Extent3D& extent, vk::ImageSubresourceLayers subresourceLayers) {
@@ -83,7 +92,7 @@ namespace Cori {
 					freeHandle = Get().m_Holes.back();
 					Get().m_Holes.pop_back();
 				} else {
-					freeHandle = Get().m_NextMeshHandle++;
+					freeHandle = Get().m_NextTextureHandle++;
 					CORI_CORE_ASSERT(freeHandle < VulkanGlobalLayoutManager::GetMaxTextures() - 1, "VulkanTextureManager out of texture slots.");
 				}
 
@@ -262,9 +271,9 @@ namespace Cori {
 
 					bool isBlack = (top && left) || (!top && !left);
 
-					missingData[i * 4] = isBlack ? 0x00 : 0xFF;
+					missingData[i * 4] = isBlack ? 0x00 : 0x0F;
 					missingData[i * 4 + 1] = 0x00;
-					missingData[i * 4 + 2] = isBlack ? 0x00 : 0xFF;
+					missingData[i * 4 + 2] = isBlack ? 0x00 : 0x0F;
 					missingData[i * 4 + 3] = 0xFF;
 				}
 
@@ -298,13 +307,13 @@ namespace Cori {
 					.addressModeU = vk::SamplerAddressMode::eClampToEdge,
 					.addressModeV = vk::SamplerAddressMode::eClampToEdge,
 					.addressModeW = vk::SamplerAddressMode::eClampToEdge,
-					.anisotropyEnable = vk::False,
+					.anisotropyEnable = vk::False
 				};
 
 				auto [result, sampler] = VulkanEngine::GetLogicalDevice().createSampler(samplerInfo);
 				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to create sampler. Error: {}", vk::to_string(result));
 
-				VulkanGlobalLayoutManager::UpdateSamplerDescriptor(m_SamplerPool.size(), sampler);
+				VulkanGlobalLayoutManager::UpdateSamplerDescriptor(0, sampler);
 				m_SamplerPool[0] = sampler;
 			}
 
@@ -314,6 +323,10 @@ namespace Cori {
 				bool valid{ false };
 			};
 
+
+			//std::vector<std::pair<TextureHandle, VulkanUploadManager::ImageUploadRange>> m_PendingUploads;
+			//std::vector<uint32_t> m_UploadVectorHoles;
+
 			std::vector<Texture> m_TexturePool;
 			std::vector<TextureHandle> m_Holes;
 			std::vector<vk::Sampler> m_SamplerPool;
@@ -321,7 +334,8 @@ namespace Cori {
 			vk::SharingMode m_TextureSharingMode;
 			std::vector<uint32_t> m_QueueFamilyIndices;
 
-			TextureHandle m_NextMeshHandle{ 2 };
+			TextureHandle m_NextTextureHandle{ 2 };
+			SamplerHandle m_NextSamplerHandle{ 1 };
 
 			std::array<std::vector<TextureHandle>, FRAMES_IN_FLIGHT> m_DestructionQueue;
 
