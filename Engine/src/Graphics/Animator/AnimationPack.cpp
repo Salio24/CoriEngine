@@ -231,7 +231,7 @@ namespace Cori {
 
 			CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::AnimationPack }, "Animation Pack '{}', was created as a placeholder. Requested animation at '{}' doesn't exist, returning a placeholder.", m_Name, index);
 			std::vector<Internal::AnimationFrame> frames;
-			constexpr Internal::AnimationFrame frame { UVs{}, 2 };
+			Internal::AnimationFrame frame { UVs{}, 2 };
 			frames.push_back(frame);
 			const Internal::AnimationData data({ 8, 8 }, frames);
 			return Animation{ shared_from_this(), 0 };
@@ -249,7 +249,7 @@ namespace Cori {
 		AnimationPack::AnimationPack() {
 			m_Valid = false;
 			std::vector<Internal::AnimationFrame> frames;
-			constexpr Internal::AnimationFrame frame{ UVs{}, 2 };
+			Internal::AnimationFrame frame{ UVs{}, 2 };
 			frames.push_back(frame);
 			const Internal::AnimationData data({ 8, 8 }, frames);
 			m_Animations.clear();

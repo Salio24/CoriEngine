@@ -11,7 +11,6 @@
 #include "Vulkan/VulkanMaterialSystem.hpp"
 #include "FileSystem/PathManager.hpp"
 #include "Image.hpp"
-
 //FIXME: need explicit Renderer lifetime control, its deleted after VulkanEngine has been shutdown
 
 namespace Cori {
@@ -107,10 +106,7 @@ namespace Cori {
 				alignas(16) glm::vec4 uvOffsets{ 0.0f, 0.0f, 1.0f, 1.0f };
 				MaterialHandle material{ 0 };
 				SubBatchHandle subBatch{ 0 };
-				bool valid{ false };
-				bool pad1{ false };
-				bool pad2{ false };
-				bool pad3{ false };
+				alignas(4) bool valid{ false };
 				uint32_t pad4{ 0 };
 			};
 
@@ -129,12 +125,12 @@ namespace Cori {
 			std::vector<DrawGroup> m_Groups;
 			std::vector<DrawGroupHandle> m_GroupHoles;
 			DrawGroupHandle m_NextGroupHandle{ 0 };
-			static constexpr DrawGroupHandle MAX_GROUPS = 128;
+			static constexpr DrawGroupHandle MAX_GROUPS = 128; //1024
 
 			std::vector<SubBatch> m_SubBatches;
 			std::vector<SubBatchHandle> m_SubBatchHoles;
 			SubBatchHandle m_NextSubBatchHandle{ 0 };
-			static constexpr SubBatchHandle MAX_SUBBATCHES = 512;
+			static constexpr SubBatchHandle MAX_SUBBATCHES = 512; // 30000
 
 			std::vector<ObjectData> m_ObjectData;
 			std::vector<ObjectMetadata> m_ObjectMetadata;
@@ -160,6 +156,7 @@ namespace Cori {
 			uint32_t m_TotalObjectCount{ 0 };
 
 			std::unordered_map<ShaderEffectHandle, std::pair<DrawGroupHandle, std::unordered_map<MeshHandle, SubBatchHandle>>> m_SubBatchLookup;
+			//FIXME: need to tell the renderer when a mesh or a shader effect was deleted, to free the batch or draw group
 
 			static ObjectHandle RegisterObject(const MeshHandle mesh, const MaterialHandle material, const glm::mat4& transform, const glm::vec4& UVs = { 0.0f, 0.0f, 1.0f, 1.0f } ) {
 				ObjectHandle freeHandle;
@@ -780,8 +777,8 @@ namespace Cori {
 					VulkanGlobalLayoutManager::BindDescriptorBuffer(commandBuffer);
 					commandBuffer.bindIndexBuffer(VulkanMeshManager::GetIndexBuffer().m_Buffer, 0, vk::IndexType::eUint32);
 
-					PipelineState curentPipelineState;
-					curentPipelineState.Change(commandBuffer);
+					PipelineState currentPipelineState;
+					currentPipelineState.Change(commandBuffer);
 
 					uint32_t currentCommandOffset = 0;
 					ShaderEffectHandle curentShaderEffect = UINT32_MAX;
@@ -813,7 +810,8 @@ namespace Cori {
 						auto& group = Get().m_Groups[i];
 						if (group.GetBatchCount() != 0) {
 							if (group.effect != curentShaderEffect) {
-								VulkanMaterialSystem::BindShaderEffect(group.effect, curentPipelineState, commandBuffer);
+								VulkanMaterialSystem::BindShaderEffect(group.effect, currentPipelineState, commandBuffer);
+								curentShaderEffect = group.effect;
 							}
 
 							commandBuffer.drawIndexedIndirectCount(indirectCommandBuffer.m_Buffer, currentCommandOffset * INDIRECT_COMMAND_SIZE, indirectCommandCountBuffer.m_Buffer, i * sizeof(uint32_t), group.GetBatchCount(), INDIRECT_COMMAND_SIZE);
@@ -973,8 +971,7 @@ namespace Cori {
 				#endif
 			}
 		private:
-
-			static constexpr uint32_t INDIRECT_COMMAND_SIZE = 32;
+			static constexpr uint32_t INDIRECT_COMMAND_SIZE = 20;
 
 			ShaderObjectHandle cullShader;
 			ShaderObjectHandle cmgShader;

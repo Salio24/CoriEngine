@@ -171,7 +171,6 @@ project(CoriEngine)
     #dynamic_bitset
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/dynamic_bitset EXCLUDE_FROM_ALL)
 
-
 #find_package (Vulkan REQUIRED)
 
 # project's binary setup vvv
@@ -198,6 +197,14 @@ project(CoriEngine)
         $<$<CONFIG:RelWithDebInfo>:DEBUG_BUILD>
         $<$<CONFIG:Release>:RELEASE_BUILD>
     )
+
+    if (CORI_USE_AVX2 OR CORI_USE_NATIVE OR CORI_FORCE_AVX2)
+        target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
+                $<$<CONFIG:Debug>:CORI_USE_SMID>
+                $<$<CONFIG:RelWithDebInfo>:CORI_USE_SMID>
+                $<$<CONFIG:Release>:CORI_USE_SMID>
+        )
+    endif()
 
     if (CORI_ENABLE_TRACY_PROFILER)
         target_compile_definitions(${ENGINE_LIBRARY_NAME} PUBLIC

@@ -65,7 +65,7 @@ namespace Cori {
 				return false;
 			});
 			dispatcher.Dispatch<WindowResizeEvent>([](const WindowResizeEvent& e) -> bool {
-				Graphics::Internal::API::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
+				//Graphics::Internal::API::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
 				return false;
 			});
 

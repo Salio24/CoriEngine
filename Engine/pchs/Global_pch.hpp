@@ -46,6 +46,11 @@
 #include <future>
 #include <condition_variable>
 #include <source_location>
+
+#ifdef CORI_USE_SMID
+	#define GLM_FORCE_INTRINSICS
+#endif
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtx/io.hpp>

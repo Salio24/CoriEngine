@@ -1,7 +1,6 @@
 #pragma once
 #include "GraphicsAPIs.hpp"
 
-
 namespace Cori {
 	namespace Graphics {
 		class RenderingContext {

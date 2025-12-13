@@ -74,8 +74,6 @@ project(main)
         add_compile_options(-mavx2)
     endif()
 
-    add_compile_options()
-
     #set(CMAKE_COLOR_DIAGNOSTICS ON CACHE BOOL "")
 
     add_subdirectory(${PROJECT_SOURCE_DIR}/Engine)

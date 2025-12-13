@@ -5,6 +5,7 @@
 #include "VulkanEngine.hpp"
 #include "Graphics/ResourceType.hpp"
 #include "VulkanResourceTracker.hpp"
+#include "Core/DataStructures/FlatSlotMap.hpp"
 #include <sul/dynamic_bitset.hpp>
 
 namespace Cori {

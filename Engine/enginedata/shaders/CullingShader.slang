@@ -13,7 +13,7 @@ typealias GlobalAtomic = Atomic<uint32_t>;
 
 typealias CompactedObjectID = uint32_t;
 
-struct VkDrawIndexedIndirectCommand {
+struct VkDrawIndexedIndirectCommand2 {
 	uint32_t indexCount;
 	uint32_t instanceCount;
 	uint32_t firstIndex;
@@ -22,6 +22,14 @@ struct VkDrawIndexedIndirectCommand {
 	uint32_t pad1;
 	uint32_t pad2;
 	uint32_t pad3;
+};
+
+struct VkDrawIndexedIndirectCommand {
+	uint32_t indexCount;
+	uint32_t instanceCount;
+	uint32_t firstIndex;
+	int32_t vertexOffset;
+	uint32_t firstInstance;
 };
 
 typealias DrawCommandCount = Atomic<uint32_t>;

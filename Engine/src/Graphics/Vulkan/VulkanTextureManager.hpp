@@ -2,7 +2,7 @@
 #include "VulkanEngine.hpp"
 #include "VulkanImage.hpp"
 #include "VulkanLayoutManager.hpp"
-#include <entt/container/dense_set.hpp>
+
 
 namespace Cori {
 	namespace Graphics {
@@ -322,7 +322,6 @@ namespace Cori {
 				vk::ImageView view;
 				bool valid{ false };
 			};
-
 
 			//std::vector<std::pair<TextureHandle, VulkanUploadManager::ImageUploadRange>> m_PendingUploads;
 			//std::vector<uint32_t> m_UploadVectorHoles;
