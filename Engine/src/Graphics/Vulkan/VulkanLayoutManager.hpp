@@ -171,7 +171,7 @@ namespace Cori {
 
 				VulkanEngine::GetPhysicalDevice().getProperties2(&props);
 
-				uint64_t alignedSize = AlignUp(setSize, m_PDDBP.descriptorBufferOffsetAlignment);
+				uint64_t alignedSize = Math::AlignUp(setSize, m_PDDBP.descriptorBufferOffsetAlignment);
 
 				m_SamplerBindingMemOffset = VulkanEngine::GetLogicalDevice().getDescriptorSetLayoutBindingOffsetEXT(m_DescriptorSetLayout, 0);
 				m_SampledImageBindingMemOffset = VulkanEngine::GetLogicalDevice().getDescriptorSetLayoutBindingOffsetEXT(m_DescriptorSetLayout, 1);

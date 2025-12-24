@@ -6,9 +6,13 @@ Cori is my game engine that I’m actively working on. When building, I took som
 
 ***
 
+# IMPORTANT NOTE:
+
+This is dev branch, and currently I'm migrating from OpenGL to Vulkan, and the Vulkan backend is under construction and not exactly working at the moment. So I would not be surprised if this doesn't even compile after some commit, for a stable version check out a CoriStable branch, it has OpenGL 2D rendering backend. 
+
 ## Getting Started
 
-Cori Engine uses CMake as a build system. Currently, it supports only Windows.
+Cori Engine uses CMake as a build system.
 
 <ins>**1. Necessary tools**</ins>
 - CMake 3.28.x - 3.31.x

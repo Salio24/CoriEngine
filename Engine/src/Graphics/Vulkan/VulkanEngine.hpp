@@ -94,6 +94,10 @@ namespace Cori {
 				return Get().m_CurrentFrameInFlight;
 			}
 
+			static uint32_t GetPreviousFrameInFlight() {
+				return (Get().m_CurrentFrameInFlight + FRAMES_IN_FLIGHT - 1) % FRAMES_IN_FLIGHT;
+			}
+
 			static vk::Queue& GetTransferQueue() {
 				return Get().m_TransferQueue;
 			}

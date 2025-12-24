@@ -26,6 +26,12 @@
 
 #define CORI_BIND_EVENT_FN(x, ...) std::bind(&x, this __VA_OPT__(,) __VA_ARGS__)
 
+#ifdef DEBUG_BUILD
+	#define CORI_DEBUG_BOOL true
+#else
+	#define CORI_DEBUG_BOOL false
+#endif
+
 #if defined(_WIN64)
 	#define PLATFORM_WINDOWS
 	#if defined(__MINGW64__)

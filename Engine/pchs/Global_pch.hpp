@@ -63,5 +63,6 @@
 #include "../src/Core/Error.hpp"
 #include "../src/GlobalDefines.hpp"
 #include "../src/Core/ByteType.hpp"
+#include "../src/Math/Alignment.hpp"
 
 #endif

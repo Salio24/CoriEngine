@@ -1,6 +1,5 @@
 #pragma once
 #include "VulkanEngine.hpp"
-#include "DeletionQueue.hpp"
 
 namespace Cori {
 	namespace Graphics {

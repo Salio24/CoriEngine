@@ -8,15 +8,13 @@
 #include "Core/DataStructures/FlatSlotMap.hpp"
 #include <sul/dynamic_bitset.hpp>
 
+//PS: oops, this has a critical design flaw payload alloc spam, well guess i need to rewrite upload system. Frame arena will also be a good addition, dynamic buffer sizes, hooray!
+
 namespace Cori {
 	namespace Graphics {
 
 		#define HIGH_PRIORITY_STAGING_SIZE 96;
 		#define LOW_PRIORITY_STAGING_SIZE 256;
-
-		static uint64_t AlignUp(const uint64_t value, const uint64_t alignment) { //FIXME: move to helper
-			return (value + alignment - 1) & ~(alignment - 1);
-		}
 
 		using AmazingBufferHandle = uint32_t;
 
@@ -42,7 +40,7 @@ namespace Cori {
 					CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::UploadManager }, "Submission was made for AmazingBuffer '{}', but the payload is empty, so no upload will be made.", m_Name);
 				}
 
-				update.offset = AlignUp(update.offset, update.alignment);
+				update.offset = Math::AlignUp(update.offset, update.alignment);
 
 				CORI_CORE_ASSERT(update.data.size() + update.offset <= m_Size, "Amazing buffer master buffer update out of range.");
 
@@ -146,7 +144,7 @@ namespace Cori {
 
 				CORI_CORE_ASSERT(createInfo.size != 0, "Trying to create AmazingBuffer '{}' with size of 0, this is illegal.", m_Name);
 
-				//m_Size = AlignUp(createInfo.size, m_SectorSize);
+				//m_Size = Math::AlignUp(createInfo.size, m_SectorSize);
 				m_Size = createInfo.size;
 
 
@@ -509,15 +507,15 @@ namespace Cori {
 
 							std::array<uint8_t, 3> blockExtent = vk::blockExtent(image.m_Format);
 
-							region.imageOffset = vk::Offset3D{ static_cast<int32_t>(std::clamp(static_cast<uint32_t>(AlignUp(range.offset.x, blockExtent[0])), 0u, image.m_Extent3D.width)),
-									static_cast<int32_t>(std::clamp(static_cast<uint32_t>(AlignUp(range.offset.y, blockExtent[1])), 0u, image.m_Extent3D.height)),
-									static_cast<int32_t>(std::clamp(static_cast<uint32_t>(AlignUp(range.offset.z, blockExtent[2])), 0u, image.m_Extent3D.depth)) };
+							region.imageOffset = vk::Offset3D{ static_cast<int32_t>(std::clamp(static_cast<uint32_t>(Math::AlignUp(range.offset.x, blockExtent[0])), 0u, image.m_Extent3D.width)),
+									static_cast<int32_t>(std::clamp(static_cast<uint32_t>(Math::AlignUp(range.offset.y, blockExtent[1])), 0u, image.m_Extent3D.height)),
+									static_cast<int32_t>(std::clamp(static_cast<uint32_t>(Math::AlignUp(range.offset.z, blockExtent[2])), 0u, image.m_Extent3D.depth)) };
 
 							CORI_CORE_ASSERT(!(region.imageOffset.x == static_cast<int32_t>(image.m_Extent3D.width) || region.imageOffset.y == static_cast<int32_t>(image.m_Extent3D.height) || region.imageOffset.z == static_cast<int32_t>(image.m_Extent3D.depth)), "Invalid ImageUploadRange no upload will be made, frame critical queue -> aborting. Image offset ended up at the image edge after block extent alignment. Requested offset: '{} {} {}', aligned offset '{} {} {}', Image '{}'", range.offset.x, range.offset.y, range.offset.z, region.imageOffset.x, region.imageOffset.y, region.imageOffset.z, image.m_Name);
 
-							region.imageExtent = vk::Extent3D{ std::clamp(static_cast<uint32_t>(AlignUp(range.extent.width, blockExtent[0])), 0u, image.m_Extent3D.width - region.imageOffset.x),
-																std::clamp(static_cast<uint32_t>(AlignUp(range.extent.height, blockExtent[1])), 0u, image.m_Extent3D.height - region.imageOffset.y),
-																std::clamp(static_cast<uint32_t>(AlignUp(range.extent.depth, blockExtent[2])), 0u, image.m_Extent3D.depth - region.imageOffset.z) };
+							region.imageExtent = vk::Extent3D{ std::clamp(static_cast<uint32_t>(Math::AlignUp(range.extent.width, blockExtent[0])), 0u, image.m_Extent3D.width - region.imageOffset.x),
+																std::clamp(static_cast<uint32_t>(Math::AlignUp(range.extent.height, blockExtent[1])), 0u, image.m_Extent3D.height - region.imageOffset.y),
+																std::clamp(static_cast<uint32_t>(Math::AlignUp(range.extent.depth, blockExtent[2])), 0u, image.m_Extent3D.depth - region.imageOffset.z) };
 
 							std::optional<Allocation> alloc = AllocateHighPriority(part.data.size(), std::max<uint64_t>(4, vk::blockSize(image.m_Format)));
 							CORI_CORE_ASSERT(alloc, "High priority ring staging buffer out of space, failed to allocate memory for uploading frame critical data.");
@@ -664,18 +662,18 @@ namespace Cori {
 
 							std::array<uint8_t, 3> blockExtent = vk::blockExtent(image.m_Format);
 
-							region.imageOffset = vk::Offset3D{ static_cast<int32_t>(std::clamp(static_cast<uint32_t>(AlignUp(range.offset.x, blockExtent[0])), 0u, image.m_Extent3D.width)),
-									static_cast<int32_t>(std::clamp(static_cast<uint32_t>(AlignUp(range.offset.y, blockExtent[1])), 0u, image.m_Extent3D.height)),
-									static_cast<int32_t>(std::clamp(static_cast<uint32_t>(AlignUp(range.offset.z, blockExtent[2])), 0u, image.m_Extent3D.depth)) };
+							region.imageOffset = vk::Offset3D{ static_cast<int32_t>(std::clamp(static_cast<uint32_t>(Math::AlignUp(range.offset.x, blockExtent[0])), 0u, image.m_Extent3D.width)),
+									static_cast<int32_t>(std::clamp(static_cast<uint32_t>(Math::AlignUp(range.offset.y, blockExtent[1])), 0u, image.m_Extent3D.height)),
+									static_cast<int32_t>(std::clamp(static_cast<uint32_t>(Math::AlignUp(range.offset.z, blockExtent[2])), 0u, image.m_Extent3D.depth)) };
 
 							if (region.imageOffset.x == static_cast<int32_t>(image.m_Extent3D.width) || region.imageOffset.y == static_cast<int32_t>(image.m_Extent3D.height) || region.imageOffset.z == static_cast<int32_t>(image.m_Extent3D.depth)) {
 								CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::UploadManager }, "Invalid ImageUploadRange no upload will be made. Image offset ended up at the image edge after block extent alignment. Requested offset: '{} {} {}', aligned offset '{} {} {}', Image '{}'", range.offset.x, range.offset.y, range.offset.z, region.imageOffset.x, region.imageOffset.y, region.imageOffset.z, image.m_Name);
 								return;
 							}
 
-							region.imageExtent = vk::Extent3D{ std::clamp(static_cast<uint32_t>(AlignUp(range.extent.width, blockExtent[0])), 0u, image.m_Extent3D.width - region.imageOffset.x),
-																std::clamp(static_cast<uint32_t>(AlignUp(range.extent.height, blockExtent[1])), 0u, image.m_Extent3D.height - region.imageOffset.y),
-																std::clamp(static_cast<uint32_t>(AlignUp(range.extent.depth, blockExtent[2])), 0u, image.m_Extent3D.depth - region.imageOffset.z) };
+							region.imageExtent = vk::Extent3D{ std::clamp(static_cast<uint32_t>(Math::AlignUp(range.extent.width, blockExtent[0])), 0u, image.m_Extent3D.width - region.imageOffset.x),
+																std::clamp(static_cast<uint32_t>(Math::AlignUp(range.extent.height, blockExtent[1])), 0u, image.m_Extent3D.height - region.imageOffset.y),
+																std::clamp(static_cast<uint32_t>(Math::AlignUp(range.extent.depth, blockExtent[2])), 0u, image.m_Extent3D.depth - region.imageOffset.z) };
 
 							region.bufferOffset = alloc.offset;
 

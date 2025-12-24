@@ -71,9 +71,7 @@ namespace Cori {
 					{
 						std::unique_lock lock(m_QueueMutex);
 
-						if (m_Stop) {
-							throw std::runtime_error("Submit on stopped ThreadPool");
-						}
+						CORI_CORE_ASSERT(!m_Stop, "Submit on stopped ThreadPool");
 
 						m_Tasks.emplace([task]() { (*task)(); });
 					}
