@@ -48,29 +48,29 @@ namespace Cori {
 
 		void DeletionQueue::FlushAll() {
 			for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
-				for (auto& deleter : Get().m_Deleters[i] | std::views::reverse) {
+				for (auto& deleter : m_Deleters[i] | std::views::reverse) {
 					deleter();
 				}
 
-				Get().m_Deleters[i].clear();
+				m_Deleters[i].clear();
 
-				for (auto& buffer : Get().m_BufferQueue[i] | std::views::reverse) {
+				for (auto& buffer : m_BufferQueue[i] | std::views::reverse) {
 					buffer.Destroy();
 				}
 
-				Get().m_BufferQueue[i].clear();
+				m_BufferQueue[i].clear();
 
-				for (auto& image : Get().m_ImageQueue[i] | std::views::reverse) {
+				for (auto& image : m_ImageQueue[i] | std::views::reverse) {
 					image.Destroy();
 				}
 
-				Get().m_ImageQueue[i].clear();
+				m_ImageQueue[i].clear();
 
-				for (auto [alloc, block] : Get().m_VirtAllocQueue[i] | std::views::reverse) {
+				for (auto [alloc, block] : m_VirtAllocQueue[i] | std::views::reverse) {
 					block.free(alloc);
 				}
 
-				Get().m_VirtAllocQueue[i].clear();
+				m_VirtAllocQueue[i].clear();
 			}
 		}
 	}

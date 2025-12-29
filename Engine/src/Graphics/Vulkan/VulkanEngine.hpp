@@ -19,6 +19,26 @@ namespace Cori {
 	namespace Graphics {
 		class Renderer;
 
+		using vk::operator&;
+		using vk::operator|;
+		using vk::operator^;
+		using vk::operator~;
+		using vk::operator<;
+		using vk::operator<=;
+		using vk::operator>;
+		using vk::operator>=;
+		using vk::operator==;
+		using vk::operator!=;
+
+		//NOTE: this is applicable only to buffers, as using CONCURENT sharing mode on images is a really bad idea
+		enum class QueueUsageFlagBits : VkFlags {
+			GRAPHICS = 0x00000001,
+			TRANSFER = 0x00000002,
+			COMPUTE = 0x00000004
+		};
+
+		using QueueUsageFlags = vk::Flags<QueueUsageFlagBits>;
+
 		class VulkanEngine {
 		public:
 			struct FrameData {
@@ -73,6 +93,7 @@ namespace Cori {
 				return Get().m_Device.setDebugUtilsObjectNameEXT(info);
 			}
 
+			static std::pair<vk::SharingMode, std::vector<uint32_t>>& GetBufferSharingSettings(const QueueUsageFlags usage);
 
 			static vk::Device GetLogicalDevice() {
 				return Get().m_Device;
@@ -96,6 +117,10 @@ namespace Cori {
 
 			static uint32_t GetPreviousFrameInFlight() {
 				return (Get().m_CurrentFrameInFlight + FRAMES_IN_FLIGHT - 1) % FRAMES_IN_FLIGHT;
+			}
+
+			static uint32_t GetNextFrameInFlight() {
+				return (Get().m_CurrentFrameInFlight + FRAMES_IN_FLIGHT + 1) % FRAMES_IN_FLIGHT;
 			}
 
 			static vk::Queue& GetTransferQueue() {
@@ -177,6 +202,7 @@ namespace Cori {
 
 			bool m_DedicatedTransferQueue = false;
 			bool m_DedicatedPresentQueue = false;
+			bool m_DedicatedComputeQueue = false;
 
 			vk::Queue m_TransferQueue = nullptr;
 			vk::Queue m_GraphicsQueue = nullptr;
@@ -199,6 +225,8 @@ namespace Cori {
 			std::vector<vk::Semaphore> m_WaitSemaphores;
 			std::vector<vk::PipelineStageFlags> m_WaitDstStageMasks;
 
+			std::unordered_map<QueueUsageFlags::MaskType, std::pair<vk::SharingMode, std::vector<uint32_t>>> m_SharingSettings;
+
 			std::vector<vk::Image> m_SwapChainImages;
 			std::vector<vk::ImageView> m_SwapChainImageViews;
 			vk::SurfaceFormatKHR m_SwapChainImageFormat;
@@ -208,6 +236,7 @@ namespace Cori {
 			uint32_t m_TransferQueueFamilyIndex;
 			uint32_t m_GraphicsQueueFamilyIndex;
 			uint32_t m_PresentQueueFamilyIndex;
+			uint32_t m_ComputeQueueFamilyIndex;
 
 
 			static std::vector<const char*> m_DeviceExtensions;
@@ -219,4 +248,13 @@ namespace Cori {
 			static VulkanEngine* s_Instance;
 		};
 	}
+}
+
+namespace vk {
+	template<> struct FlagTraits<Cori::Graphics::QueueUsageFlagBits> {
+		using WrappedType = VkFlags;
+		static VULKAN_HPP_CONST_OR_CONSTEXPR bool isBitmask = true;
+		static VULKAN_HPP_CONST_OR_CONSTEXPR Flags<Cori::Graphics::QueueUsageFlagBits> allFlags =
+			Cori::Graphics::QueueUsageFlagBits::GRAPHICS | Cori::Graphics::QueueUsageFlagBits::TRANSFER | Cori::Graphics::QueueUsageFlagBits::COMPUTE;
+	};
 }

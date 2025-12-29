@@ -1,7 +1,9 @@
 #pragma once
+#include <cmath>
 #include <sul/dynamic_bitset.hpp>
 #include "VulkanEngine.hpp"
 #include "VulkanBuffer.hpp"
+#include "DeletionQueue.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -20,12 +22,12 @@ namespace Cori {
 					return;
 				}
 
-				if (m_Alignment % offset != 0) {
+				if (m_Alignment % offset != 0 && CORI_DEBUG_BOOL) {
 					offset = Math::AlignUp(offset, m_Alignment);
 					//FIXME: warn, offset misalignment can cause errors
 				}
 
-				if ((offset + data.size_bytes() > m_Size) && CORI_DEBUG_BOOL) {
+				if (offset + data.size_bytes() > m_Size) {
 					//FIXME: error message here
 					return;
 				}
@@ -75,7 +77,7 @@ namespace Cori {
 			uint64_t m_StartOffset{ 0 };
 			uint64_t m_Alignment{ 0 };
 			const char* m_Name;
-			static std::function<void(const VulkanVirtualBuffer&)> s_UploadListener;
+			static inline std::function<void(const VulkanVirtualBuffer&)> s_UploadListener;
 		};
 
 		class VulkanVirtualBufferAllocator {
@@ -369,6 +371,11 @@ namespace Cori {
 		};
 
 		class VulkanDynamicContainerUploadManager {
+			struct PendingCopy {
+				vk::Buffer srcBuffer;
+				vk::Buffer dstBuffer;
+				uint64_t size;
+			};
 		public:
 			~VulkanDynamicContainerUploadManager() {
 
@@ -380,18 +387,209 @@ namespace Cori {
 
 			static VulkanDynamicContainerUploadManager& Get();
 
-			static void ProcessUpdates() {
+			static void ProcessUpdates(vk::CommandBuffer cmb) {
+				if (!Get().m_Initialized) {
+					return;
+				}
 
+				for (auto& pendingCopy : Get().m_PendingCopies) {
+					Get().m_BufferMemoryBarrierCache.emplace_back(vk::BufferMemoryBarrier2{
+						.srcStageMask = s_GenericReadStages,
+						.srcAccessMask = s_GenericReadAccess,
+						.dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
+						.dstAccessMask = vk::AccessFlagBits2::eTransferRead,
+						.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+						.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+						.buffer = pendingCopy.srcBuffer,
+						.offset = 0,
+						.size = VK_WHOLE_SIZE
+					});
+				}
+
+				vk::DependencyInfo depInfo {
+					.bufferMemoryBarrierCount = static_cast<uint32_t>(Get().m_BufferMemoryBarrierCache.size()),
+					.pBufferMemoryBarriers = Get().m_BufferMemoryBarrierCache.data()
+				};
+
+				cmb.pipelineBarrier2(depInfo);
+
+				Get().m_BufferMemoryBarrierCache.clear();
+
+				for (auto& pendingCopy : Get().m_PendingCopies) {
+					vk::BufferCopy2 region {
+						.srcOffset = 0,
+						.dstOffset = 0,
+						.size = pendingCopy.size
+					};
+
+					vk::CopyBufferInfo2	info {
+						.srcBuffer = pendingCopy.srcBuffer,
+						.dstBuffer = pendingCopy.dstBuffer,
+						.regionCount = 1,
+						.pRegions = &region
+					};
+
+					cmb.copyBuffer2(&info);
+
+					Get().m_BufferMemoryBarrierCache.emplace_back(vk::BufferMemoryBarrier2{
+						.srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
+						.srcAccessMask = vk::AccessFlagBits2::eTransferWrite,
+						.dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
+						.dstAccessMask = vk::AccessFlagBits2::eTransferWrite,
+						.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+						.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+						.buffer = pendingCopy.srcBuffer,
+						.offset = 0,
+						.size = VK_WHOLE_SIZE
+					});
+				}
+
+				depInfo = {
+					.bufferMemoryBarrierCount = static_cast<uint32_t>(Get().m_BufferMemoryBarrierCache.size()),
+					.pBufferMemoryBarriers = Get().m_BufferMemoryBarrierCache.data()
+				};
+
+				cmb.pipelineBarrier2(depInfo);
+
+				Get().m_BufferMemoryBarrierCache.clear();
+
+				Get().m_PendingCopies.clear();
+
+				for (auto& bufferCopyInfo : Get().m_BufferCopyInfos) {
+					cmb.copyBuffer2(bufferCopyInfo);
+
+					Get().m_BufferMemoryBarrierCache.emplace_back(vk::BufferMemoryBarrier2{
+						.srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
+						.srcAccessMask = vk::AccessFlagBits2::eTransferWrite,
+						.dstStageMask = s_GenericReadStages,
+						.dstAccessMask = s_GenericReadAccess,
+						.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+						.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+						.buffer = bufferCopyInfo.dstBuffer,
+						.offset = 0,
+						.size = VK_WHOLE_SIZE
+					});
+				}
+
+				depInfo = {
+					.bufferMemoryBarrierCount = static_cast<uint32_t>(Get().m_BufferMemoryBarrierCache.size()),
+					.pBufferMemoryBarriers = Get().m_BufferMemoryBarrierCache.data()
+				};
+
+				cmb.pipelineBarrier2(depInfo);
+
+				Get().m_BufferMemoryBarrierCache.clear();
+				Get().m_BufferCopyInfos.clear();
+				Get().m_CopyRegions.clear();
 			}
 
 		protected:
 			template <typename T> friend class VulkanDynamicVector;
-			static void Upload(void* data, const uint64_t size, const uint64_t offset, vk::Buffer dstBuffer) {
+
+			static void BeginUpdate(vk::Buffer dstBuffer) {
+				//lock
+
+				auto& info = Get().m_BufferCopyInfos.emplace_back();
+
+				info.dstBuffer = dstBuffer;
+				info.srcBuffer = Get().m_RingStagingBuffer.m_Buffer;
+				info.regionCount = 0;
+				info.pRegions = Get().m_CopyRegions.data() + Get().m_CopyRegions.size() * sizeof(vk::BufferCopy2);
 
 			}
 
-			static void FallbackListener() {
+			static void Upload(const void* data, const uint64_t size, const uint64_t offset) {
+				CORI_CORE_ASSERT(Get().m_Initialized, "Upload is called on non initialized VulkanDynamicContainerUploadManager.");
 
+				vma::VirtualAllocationCreateInfo allocInfo {
+					.size = size,
+					.alignment = 4,
+					.flags = vma::VirtualAllocationCreateFlagBits::eStrategyMinTime
+				};
+
+				vk::DeviceSize stageOffset;
+				auto [result, virtAlloc] = Get().m_RingStagingBlock.virtualAllocate(allocInfo, stageOffset);
+
+				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to allocate from staging buffer of VulkanDynamicContainerUploadManager. Error: {}", vk::to_string(result));
+
+				result = VulkanEngine::GetAllocator().copyMemoryToAllocation(data, Get().m_RingStagingBuffer.m_Allocation, stageOffset, size);
+
+				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to copy to staging buffer of VulkanDynamicContainerUploadManager. Error: {}", vk::to_string(result));
+
+
+				auto& region = Get().m_CopyRegions.emplace_back();
+				region.srcOffset = stageOffset;
+				region.dstOffset = offset;
+				region.size = size;
+
+				auto& info = Get().m_BufferCopyInfos.back();
+				info.regionCount++;
+
+				DeletionQueue::PushVirtualAlloc(virtAlloc, Get().m_RingStagingBlock, VulkanEngine::GetCurrentFrameInFlight());
+			}
+
+			static void EndUpdate() {
+
+				//unlock
+			}
+
+
+
+			static void RecordCopy(VulkanBuffer& srcBuffer, vk::Buffer dstBuffer, const uint64_t size) {
+				CORI_CORE_ASSERT(Get().m_Initialized, "RecordCopy is called on non initialized VulkanDynamicContainerUploadManager.");
+				//lock
+
+				Get().m_PendingCopies.emplace_back(srcBuffer.m_Buffer, dstBuffer, size);
+
+				DeletionQueue::PushBuffer(srcBuffer, VulkanEngine::GetCurrentFrameInFlight());
+
+				//unlock
+			}
+
+			static void FallbackListener() {
+				//lock
+				if (!Get().m_Initialized) {
+					vma::AllocationCreateInfo allocationCreateInfo {
+						.flags = vma::AllocationCreateFlagBits::eHostAccessSequentialWrite | vma::AllocationCreateFlagBits::eMapped,
+						.usage = vma::MemoryUsage::eAuto
+					};
+
+					vk::BufferCreateInfo bufferCreateInfo {
+						.size = STAGING_SIZE,
+						.usage = vk::BufferUsageFlagBits::eTransferSrc,
+						.sharingMode = vk::SharingMode::eExclusive
+					};
+
+					VulkanBuffer::CreateInfo info {
+						.bufferCreateInfo = &bufferCreateInfo,
+						.allocationCreateInfo = &allocationCreateInfo,
+						.name = "VulkanDynamicContainerUploadManager staging buffer"
+					};
+
+					Get().m_RingStagingBuffer = VulkanBuffer::Create(info);
+
+					vma::VirtualBlockCreateInfo blockInfo {
+						.size = STAGING_SIZE,
+						.flags = vma::VirtualBlockCreateFlagBits::eLinearAlgorithm
+					};
+
+					auto [result, virtBlock] = vma::createVirtualBlock(blockInfo);
+
+					CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to create vma low virtual block for VulkanDynamicContainerUploadManager. Error: {}", vk::to_string(result));
+
+					Get().m_RingStagingBlock = virtBlock;
+
+					for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
+						Get().m_DestructionQueue[i].reserve(64);
+					}
+
+					Get().m_BufferCopyInfos.reserve(8);
+					Get().m_CopyRegions.reserve(64);
+					Get().m_BufferMemoryBarrierCache.reserve(256);
+
+					Get().m_Initialized = true;
+				}
+				//unlock
 			}
 
 		private:
@@ -403,8 +601,23 @@ namespace Cori {
 			vma::VirtualBlock m_RingStagingBlock;
 
 			std::array<std::vector<vma::VirtualAllocation>, FRAMES_IN_FLIGHT> m_DestructionQueue;
+			std::vector<PendingCopy> m_PendingCopies;
+			std::vector<vk::BufferCopy2> m_CopyRegions;
+			std::vector<vk::CopyBufferInfo2> m_BufferCopyInfos;
 
-			bool m_StagingBufferCreated{ false };
+			std::vector<vk::BufferMemoryBarrier2> m_BufferMemoryBarrierCache;
+
+			static constexpr vk::PipelineStageFlags2 s_GenericReadStages =
+				vk::PipelineStageFlagBits2::eVertexShader |
+				vk::PipelineStageFlagBits2::eFragmentShader |
+				vk::PipelineStageFlagBits2::eComputeShader;
+
+			static constexpr vk::AccessFlags2 s_GenericReadAccess =
+				vk::AccessFlagBits2::eShaderRead |
+				vk::AccessFlagBits2::eUniformRead |
+				vk::AccessFlagBits2::eShaderStorageRead;
+
+			bool m_Initialized{ false };
 
 			static std::unique_ptr<VulkanDynamicContainerUploadManager> s_Instance;
 		};
@@ -413,7 +626,7 @@ namespace Cori {
 		class VulkanDynamicVector {
 			struct PendingReallocation {
 				VulkanBuffer srcBuffer;
-				uint64_t dataSize;
+				uint64_t size;
 				bool active{ false };
 			};
 		public:
@@ -421,8 +634,13 @@ namespace Cori {
 			using iterator = std::vector<T>::iterator;
 			using const_iterator = std::vector<T>::const_iterator;
 
-			VulkanDynamicVector() {
+			VulkanDynamicVector(const QueueUsageFlags queueUsage, const vk::BufferUsageFlags bufferUsage) : m_BufferUsageFlags(bufferUsage), m_QueueUsageFlags(queueUsage) {}
 
+			VulkanDynamicVector(const uint64_t capacity, const QueueUsageFlags queueUsage, const vk::BufferUsageFlags bufferUsage, const char* name = "") : m_BufferUsageFlags(bufferUsage), m_QueueUsageFlags(queueUsage) {
+				Reserve(capacity);
+				if (!CORI_IS_EMPTY_CSTR(name)) {
+					m_Name = std::string(name);
+				}
 			}
 
 			~VulkanDynamicVector() {
@@ -433,6 +651,7 @@ namespace Cori {
 			VulkanDynamicVector& operator=(const VulkanDynamicVector&) = delete;
 
 			VulkanDynamicVector(VulkanDynamicVector&& other) {
+
 
 			}
 
@@ -469,7 +688,7 @@ namespace Cori {
 
 			void PushBack(const T& value) {
 				if (m_CPUShadow.size() == m_CPUShadow.capacity()) {
-					size_t newCap = m_CPUShadow.capacity() == 0 ? 4 : m_CPUShadow.capacity() * 2;
+					size_t newCap = m_CPUShadow.capacity() == 0 ? 4 : m_CPUShadow.capacity() * GROWTH_FACTOR;
 					Reserve(newCap);
 				}
 
@@ -482,7 +701,7 @@ namespace Cori {
 			template <typename... Args>
 			void EmplaceBack(Args&&... args) {
 				if (m_CPUShadow.size() == m_CPUShadow.capacity()) {
-					uint64_t newCap = m_CPUShadow.capacity() == 0 ? 4 : m_CPUShadow.capacity() * 2;
+					uint64_t newCap = m_CPUShadow.capacity() == 0 ? 4 : m_CPUShadow.capacity() * GROWTH_FACTOR;
 					Reserve(newCap);
 				}
 
@@ -562,27 +781,57 @@ namespace Cori {
 			}
 
 			void Sync() {
-				uint32_t frameIndex = VulkanEngine::GetCurrentFrameInFlight();
-				uint64_t currentRangeBeginning = m_SectorStates[frameIndex].find_first();
-				while (currentRangeBeginning != sul::dynamic_bitset<>::npos) {
-					uint64_t currentRangeEnd = m_SectorStates[frameIndex].find_sequence_end(currentRangeBeginning);
-
-					uint64_t offset = currentRangeBeginning * SECTOR_SIZE;
-					uint64_t size = (currentRangeEnd - currentRangeBeginning) * SECTOR_SIZE;
-
-					size += m_LastSectorSize;
-
-					if (m_IsBAR) {
-						auto result = VulkanEngine::GetAllocator().copyMemoryToAllocation(reinterpret_cast<void*>(reinterpret_cast<uint64_t>(m_CPUShadow.data()) + offset), m_GPUBuffers[frameIndex].m_Allocation, offset, size);
-						CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to copy upload data to allocation of VulkanDynamicVector. Error: {}", vk::to_string(result));
-					} else {
-						VulkanDynamicContainerUploadManager::Upload(reinterpret_cast<void*>(reinterpret_cast<uint64_t>(m_CPUShadow.data()) + offset), size, offset, m_GPUBuffers[frameIndex].m_Buffer);
-					}
-
-					currentRangeBeginning = m_SectorStates[frameIndex].find_next(currentRangeEnd);
+				if (m_ResizeRequired) {
+					ResizeBuffers(m_CPUShadow.capacity());
+					m_ResizeRequired = false;
 				}
 
-				m_SectorStates[frameIndex].reset();
+				for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
+					auto& reaclloc = m_PendingReallocations[i];
+					if (reaclloc.active) {
+						reaclloc.active = false;
+
+						if (m_IsBAR) {
+							ReportChange(0, reaclloc.size);
+							reaclloc.srcBuffer.Destroy();
+						} else {
+							VulkanDynamicContainerUploadManager::RecordCopy(reaclloc.srcBuffer, m_GPUBuffers[i].m_Buffer, reaclloc.size);
+						}
+					}
+				}
+
+				if (m_IsDirty) {
+					uint32_t frameIndex = VulkanEngine::GetCurrentFrameInFlight();
+
+					if (!m_IsBAR) {
+						VulkanDynamicContainerUploadManager::BeginUpdate(m_GPUBuffers[frameIndex].m_Buffer);
+					}
+
+					uint64_t currentRangeBeginning = m_SectorStates[frameIndex].find_first();
+					while (currentRangeBeginning != sul::dynamic_bitset<>::npos) {
+						uint64_t currentRangeEnd = m_SectorStates[frameIndex].find_sequence_end(currentRangeBeginning);
+
+						uint64_t offset = currentRangeBeginning * SECTOR_SIZE;
+						uint64_t size = (currentRangeEnd - currentRangeBeginning) * SECTOR_SIZE;
+
+						size += m_LastSectorSize;
+
+						if (m_IsBAR) {
+							auto result = VulkanEngine::GetAllocator().copyMemoryToAllocation(reinterpret_cast<void*>(reinterpret_cast<uint64_t>(m_CPUShadow.data()) + offset), m_GPUBuffers[frameIndex].m_Allocation, offset, size);
+							CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to copy upload data to allocation of VulkanDynamicVector. Error: {}", vk::to_string(result));
+						} else {
+							VulkanDynamicContainerUploadManager::Upload(reinterpret_cast<void*>(reinterpret_cast<uint64_t>(m_CPUShadow.data()) + offset), size, offset);
+						}
+
+						currentRangeBeginning = m_SectorStates[frameIndex].find_next(currentRangeEnd);
+					}
+
+					if (!m_IsBAR) {
+						VulkanDynamicContainerUploadManager::EndUpdate();
+					}
+
+					m_SectorStates[frameIndex].reset();
+				}
 			}
 
 			void Reserve(const uint64_t newCapacity) {
@@ -590,9 +839,29 @@ namespace Cori {
 					return;
 				}
 
-				ResizeBuffers(newCapacity);
+				//ResizeBuffers(newCapacity);
+
+
+				m_ResizeRequired = true;
+				m_OldSize = m_CPUShadow.size();
+				for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
+					m_SectorStates[i].resize(std::ceil(static_cast<float>(newCapacity * sizeof(T)) / static_cast<float>(SECTOR_SIZE)), false);
+				}
 
 				m_CPUShadow.reserve(newCapacity);
+			}
+
+			void Resize(const uint64_t newSize, const T& value) {
+				if (newSize <= m_CPUShadow.size()) {
+					return;
+				}
+
+				if (newSize > m_CPUShadow.capacity()) {
+					Reserve(newSize);
+				}
+
+				ReportChange(m_CPUShadow.size() * sizeof(T), (newSize - m_CPUShadow.size()) * sizeof(T));
+				m_CPUShadow.resize(newSize, value);
 			}
 
 			void Resize(const uint64_t newSize) {
@@ -632,6 +901,8 @@ namespace Cori {
 				for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
 					m_SectorStates[i].set(affectedSectorStart, affectedSectorEnd - affectedSectorStart + 1, true);
 				}
+
+				m_IsDirty = true;
 			}
 
 			void ResizeNonReporting(const uint64_t newSize) {
@@ -647,16 +918,13 @@ namespace Cori {
 			}
 
 			void ResizeBuffers(const uint64_t newSize) {
-				for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
-					m_SectorStates[i].resize(newSize);
-				}
-
+				auto& sharingSettings = VulkanEngine::GetBufferSharingSettings(m_QueueUsageFlags);
 				vk::BufferCreateInfo bufferCreateInfo{
-					.size = newSize,
-					.usage = m_UsageFlags,
-					.sharingMode = m_SharingMode,
-					.queueFamilyIndexCount = static_cast<uint32_t>(m_QueueFamilyIndices.size()),
-					.pQueueFamilyIndices = m_QueueFamilyIndices.data()
+					.size = newSize * sizeof(T),
+					.usage = m_BufferUsageFlags | vk::BufferUsageFlagBits::eTransferSrc | vk::BufferUsageFlagBits::eTransferDst,
+					.sharingMode = sharingSettings.first,
+					.queueFamilyIndexCount = static_cast<uint32_t>(sharingSettings.second.size()),
+					.pQueueFamilyIndices = sharingSettings.second.data()
 				};
 
 				vma::AllocationCreateInfo BARAlloc {
@@ -672,48 +940,62 @@ namespace Cori {
 
 
 				for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; ++i) {
-
-					std::string name = std::format("{} GPU buffer {}", m_Name, i);
-
 					VulkanBuffer::CreateInfo info {
 						.bufferCreateInfo = &bufferCreateInfo,
 						.allocationCreateInfo = &BARAlloc,
-						.name = name.c_str()
 					};
 
-					m_PendingReallocations[i].srcBuffer = m_GPUBuffers[i];
-					m_PendingReallocations[i].dataSize = sizeof(T) * m_CPUShadow.size();
-					m_PendingReallocations[i].active = true;
+					if (m_GPUBuffers[i].m_Buffer) {
+						m_PendingReallocations[i].srcBuffer = m_GPUBuffers[i];
+						m_PendingReallocations[i].size = sizeof(T) * m_OldSize;
+						m_PendingReallocations[i].active = true;
+					}
 
-					m_GPUBuffers[i] = VulkanBuffer::Create(info);
+					if constexpr (CORI_DEBUG_BOOL) {
+						std::string name = std::format("{} GPU buffer {}", m_Name, i);
+						info.name = name.c_str();
+						m_GPUBuffers[i] = VulkanBuffer::Create(info);
+					} else {
+						m_GPUBuffers[i] = VulkanBuffer::Create(info);
+					}
+
+					//m_SectorStates[i].resize(std::ceil(static_cast<float>(newSize) / static_cast<float>(SECTOR_SIZE)));
 				}
 
 				std::array<bool, FRAMES_IN_FLIGHT> isBufferBAR{ true };
-				bool BAR = true;
+				m_IsBAR = true;
+
+				uint32_t lastSectorSize = newSize % SECTOR_SIZE;
+				m_LastSectorSize = lastSectorSize != 0 ? lastSectorSize : SECTOR_SIZE;
 
 				for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
 					auto propertyFlags = VulkanEngine::GetAllocator().getAllocationMemoryProperties(m_GPUBuffers[i].m_Allocation);
-					if (!(propertyFlags & vk::MemoryPropertyFlagBits::eHostVisible)) {
+					if (!(propertyFlags & vk::MemoryPropertyFlagBits::eHostVisible) || true) {
 						isBufferBAR[i] = false;
-						BAR = false;
+						m_IsBAR = false;
 					}
 				}
 
-				if (!BAR) {
+				if (!m_IsBAR) {
 					VulkanDynamicContainerUploadManager::FallbackListener();
 					for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
-						std::string name = std::format("{} GPU buffer {}", m_Name, i);
-
-						VulkanBuffer::CreateInfo info {
-							.bufferCreateInfo = &bufferCreateInfo,
-							.allocationCreateInfo = &localAlloc,
-							.name = name.c_str()
-						};
-
 						if (isBufferBAR[i]) {
+
+							VulkanBuffer::CreateInfo info {
+								.bufferCreateInfo = &bufferCreateInfo,
+								.allocationCreateInfo = &localAlloc,
+							};
+
 							m_GPUBuffers[i].Destroy();
 
-							m_GPUBuffers[i] = VulkanBuffer::Create(info);
+							if constexpr (CORI_DEBUG_BOOL) {
+								std::string name = std::format("{} GPU buffer {}", m_Name, i);
+								info.name = name.c_str();
+								m_GPUBuffers[i] = VulkanBuffer::Create(info);
+							} else {
+								m_GPUBuffers[i] = VulkanBuffer::Create(info);
+							}
+
 						}
 					}
 				}
@@ -723,15 +1005,18 @@ namespace Cori {
 			std::array<VulkanBuffer, FRAMES_IN_FLIGHT> m_GPUBuffers;
 			std::array<sul::dynamic_bitset<>, FRAMES_IN_FLIGHT> m_SectorStates;
 			std::array<PendingReallocation, FRAMES_IN_FLIGHT> m_PendingReallocations;
-			std::vector<uint32_t> m_QueueFamilyIndices;
-			vk::BufferUsageFlags m_UsageFlags;
-			vk::SharingMode m_SharingMode;
-			const char* m_Name{ "" };
-			float m_LastSectorSize{ SECTOR_SIZE };
+			vk::BufferUsageFlags m_BufferUsageFlags;
+			QueueUsageFlags m_QueueUsageFlags;
+			std::string m_Name{ "Unnamed VulkanDynamicVector" };
+			uint32_t m_LastSectorSize{ SECTOR_SIZE };
 			bool m_EvenSectors{ false };
 			bool m_IsBAR{ false };
+			bool m_IsDirty{ false };
+			bool m_ResizeRequired{ false };
+			uint64_t m_OldSize{ 0 };
 
-			static constexpr float SECTOR_SIZE{ 4 * 1024 }; //4kb
+			static constexpr uint32_t SECTOR_SIZE{ 4 * 1024 }; //4kb
+			static constexpr float GROWTH_FACTOR{ 2.0f };
 
 		};
 

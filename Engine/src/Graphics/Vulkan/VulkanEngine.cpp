@@ -13,6 +13,8 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include "VulkanShaderManager.hpp"
 #include "VulkanTextureManager.hpp"
 #include "VulkanMaterialSystem.hpp"
+#include "VulkanUploadSubsystem.hpp"
+#include "DeletionQueue.hpp"
 
 const std::vector g_ValidationLayers = {
 	"VK_LAYER_KHRONOS_validation"
@@ -112,6 +114,7 @@ namespace Cori {
 			CreateCommandBuffer();
 			CreateSyncObjects();
 
+			DeletionQueue::Init();
 			VulkanUploadManager::Init();
 			VulkanMeshManager::Init();
 			VulkanGlobalLayoutManager::Init();
@@ -119,12 +122,14 @@ namespace Cori {
 			VulkanShaderManager::Init();
 			VulkanTextureManager::Init();
 			VulkanMaterialSystem::Init();
+			VulkanDynamicContainerUploadManager::Init();
 		}
 
 		VulkanEngine::~VulkanEngine() {
 			auto result = m_Device.waitIdle();
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Calling wait idle on device has failed. Error: {}", vk::to_string(result));
 
+			VulkanDynamicContainerUploadManager::Shutdown();
 			VulkanMaterialSystem::Shutdown();
 			VulkanTextureManager::Shutdown();
 			VulkanShaderManager::Shutdown();
@@ -132,6 +137,7 @@ namespace Cori {
 			VulkanGlobalLayoutManager::Shutdown();
 			VulkanMeshManager::Shutdown();
 			VulkanUploadManager::Shutdown();
+			DeletionQueue::Shutdown();
 
 			for (auto& semaphore : m_RenderFinishedSemaphores) {
 				m_Device.destroySemaphore(semaphore);
@@ -158,6 +164,11 @@ namespace Cori {
 			m_Instance.destroyDebugUtilsMessengerEXT(m_DebugMessenger);
 			m_Instance.destroy();
 			s_Instance = nullptr;
+		}
+
+		std::pair<vk::SharingMode, std::vector<uint32_t>>& VulkanEngine::GetBufferSharingSettings(const QueueUsageFlags usage) {
+			CORI_CORE_ASSERT(Get().m_SharingSettings.contains(static_cast<QueueUsageFlags::MaskType>(usage)), "Incorrect QueueUsageFlags were passed to VulkanEngine::GetBufferSharingSettings.");
+			return Get().m_SharingSettings[static_cast<QueueUsageFlags::MaskType>(usage)];
 		}
 
 		VulkanEngine::FrameData& VulkanEngine::BeginFrame() {
@@ -258,6 +269,8 @@ namespace Cori {
 
 			vk::ColorComponentFlags ccFlags = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
 			frameData.m_CommandBuffer.setColorWriteMaskEXT(0, 1, &ccFlags);
+
+			DeletionQueue::Flush();
 
 			return frameData;
 		}
@@ -672,6 +685,48 @@ namespace Cori {
 					}
 				}
 			}
+
+			m_ComputeQueueFamilyIndex = m_GraphicsQueueFamilyIndex;
+
+			constexpr QueueUsageFlags g = QueueUsageFlagBits::GRAPHICS;
+			constexpr QueueUsageFlags t = QueueUsageFlagBits::TRANSFER;
+			constexpr QueueUsageFlags c = QueueUsageFlagBits::COMPUTE;
+
+			constexpr QueueUsageFlags gt = QueueUsageFlagBits::GRAPHICS | QueueUsageFlagBits::TRANSFER;
+			constexpr QueueUsageFlags tc = QueueUsageFlagBits::TRANSFER | QueueUsageFlagBits::COMPUTE;
+			constexpr QueueUsageFlags cg = QueueUsageFlagBits::COMPUTE | QueueUsageFlagBits::GRAPHICS;
+
+			constexpr QueueUsageFlags gtc = QueueUsageFlagBits::GRAPHICS | QueueUsageFlagBits::TRANSFER | QueueUsageFlagBits::COMPUTE;
+
+			m_SharingSettings[static_cast<QueueUsageFlags::MaskType>(g)] = std::make_pair(vk::SharingMode::eExclusive, std::vector<uint32_t>{} );
+			m_SharingSettings[static_cast<QueueUsageFlags::MaskType>(t)] = std::make_pair(vk::SharingMode::eExclusive, std::vector<uint32_t>{} );
+			m_SharingSettings[static_cast<QueueUsageFlags::MaskType>(c)] = std::make_pair(vk::SharingMode::eExclusive, std::vector<uint32_t>{} );
+
+			if (m_GraphicsQueueFamilyIndex == m_TransferQueueFamilyIndex) {
+				m_SharingSettings[static_cast<QueueUsageFlags::MaskType>(gt)] = std::make_pair(vk::SharingMode::eExclusive, std::vector<uint32_t>{} );
+			} else {
+				m_SharingSettings[static_cast<QueueUsageFlags::MaskType>(gt)] = std::make_pair(vk::SharingMode::eConcurrent, std::vector<uint32_t>{ m_GraphicsQueueFamilyIndex, m_TransferQueueFamilyIndex } );
+			}
+
+			if (m_TransferQueueFamilyIndex == m_ComputeQueueFamilyIndex) {
+				m_SharingSettings[static_cast<QueueUsageFlags::MaskType>(tc)] = std::make_pair(vk::SharingMode::eExclusive, std::vector<uint32_t>{} );
+			} else {
+				m_SharingSettings[static_cast<QueueUsageFlags::MaskType>(tc)] = std::make_pair(vk::SharingMode::eConcurrent, std::vector<uint32_t>{ m_TransferQueueFamilyIndex, m_ComputeQueueFamilyIndex } );
+			}
+
+			if (m_ComputeQueueFamilyIndex == m_GraphicsQueueFamilyIndex) {
+				m_SharingSettings[static_cast<QueueUsageFlags::MaskType>(cg)] = std::make_pair(vk::SharingMode::eExclusive, std::vector<uint32_t>{} );
+			} else {
+				m_SharingSettings[static_cast<QueueUsageFlags::MaskType>(cg)] = std::make_pair(vk::SharingMode::eConcurrent, std::vector<uint32_t>{ m_ComputeQueueFamilyIndex, m_GraphicsQueueFamilyIndex } );
+			}
+
+			if (m_GraphicsQueueFamilyIndex == m_TransferQueueFamilyIndex && m_TransferQueueFamilyIndex == m_ComputeQueueFamilyIndex) {
+				m_SharingSettings[static_cast<QueueUsageFlags::MaskType>(gtc)] = std::make_pair(vk::SharingMode::eExclusive, std::vector<uint32_t>{} );
+			} else if ((m_GraphicsQueueFamilyIndex == m_ComputeQueueFamilyIndex && m_TransferQueueFamilyIndex != m_ComputeQueueFamilyIndex) || (m_GraphicsQueueFamilyIndex != m_ComputeQueueFamilyIndex && m_TransferQueueFamilyIndex == m_ComputeQueueFamilyIndex)) {
+				m_SharingSettings[static_cast<QueueUsageFlags::MaskType>(gtc)] = std::make_pair(vk::SharingMode::eConcurrent, std::vector<uint32_t>{ m_GraphicsQueueFamilyIndex, m_TransferQueueFamilyIndex } );
+			} else {
+				m_SharingSettings[static_cast<QueueUsageFlags::MaskType>(gtc)] = std::make_pair(vk::SharingMode::eConcurrent, std::vector<uint32_t>{ m_GraphicsQueueFamilyIndex, m_TransferQueueFamilyIndex, m_ComputeQueueFamilyIndex } );
+			}
 		}
 
 		void VulkanEngine::InitializeVMA() {
@@ -705,11 +760,7 @@ namespace Cori {
 					if (availableFormat.format == vk::Format::eB8G8R8A8Srgb && availableFormat.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear) {
 						return availableFormat;
 					}
-
-					//if (availableFormat.format == vk::Format::eB8G8R8A8Unorm) {
-					//	return availableFormat;
-					//}
-				}
+					}
 
 				return availableFormats[0];
 			};

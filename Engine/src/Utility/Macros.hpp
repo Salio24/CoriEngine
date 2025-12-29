@@ -26,6 +26,8 @@
 
 #define CORI_BIND_EVENT_FN(x, ...) std::bind(&x, this __VA_OPT__(,) __VA_ARGS__)
 
+#define CORI_IS_EMPTY_CSTR(str) std::strcmp(str, "") == 0
+
 #ifdef DEBUG_BUILD
 	#define CORI_DEBUG_BOOL true
 #else

@@ -4,6 +4,7 @@
 #include "RenderGraph.hpp"
 #include "Core/Time.hpp"
 #include "Vulkan/VulkanUploadManager.hpp"
+#include "Vulkan/VulkanUploadSubsystem.hpp"
 #include "Vulkan/VulkanMeshManager.hpp"
 #include "Vulkan/VulkanShaderManager.hpp"
 #include "Vulkan/VulkanLayoutManager.hpp"
@@ -106,8 +107,7 @@ namespace Cori {
 				alignas(16) glm::vec4 uvOffsets{ 0.0f, 0.0f, 1.0f, 1.0f };
 				MaterialHandle material{ 0 };
 				SubBatchHandle subBatch{ 0 };
-				alignas(4) bool valid{ false };
-				uint32_t pad4{ 0 };
+				uint32_t valid{ false };
 			};
 
 			struct ObjectMetadata {
@@ -822,11 +822,20 @@ namespace Cori {
 					commandBuffer.endRendering();
 				});
 
+				if (Get().testVec.Size() < 8253) {
+					static int ada = 0;
+					Get().testVec.PushBack(ada++);
+				}
+
 				graph.Compile();
 				auto& frameData = VulkanEngine::Get().BeginFrame();
 				if (!frameData.m_SkippedFrame) {
 					graph.Execute(frameData.m_CommandBuffer);
 				}
+
+				Get().testVec.Sync();
+
+				VulkanDynamicContainerUploadManager::ProcessUpdates(frameData.m_CommandBuffer);
 
 				if (!frameData.m_SkippedFrame && false) {
 					vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 0.0f);
@@ -866,6 +875,7 @@ namespace Cori {
 
 					frameData.m_CommandBuffer.endRendering();
 				}
+
 
 				VulkanEngine::Get().EndFrame();
 
@@ -976,6 +986,8 @@ namespace Cori {
 			ShaderObjectHandle cullShader;
 			ShaderObjectHandle cmgShader;
 			ShaderObjectHandle compactShader;
+
+			VulkanDynamicVector<uint64_t> testVec = { 256, QueueUsageFlagBits::GRAPHICS, vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eStorageBuffer };
 
 			ShaderObjectHandle testShader;
 			ShaderObjectHandle defaultShader;
