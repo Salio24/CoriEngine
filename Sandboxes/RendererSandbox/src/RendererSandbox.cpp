@@ -1,5 +1,5 @@
-#define CORI_ASYNC_LOGGING
-#define CORI_NO_FILE_LOGGING
+//#define CORI_ASYNC_LOGGING
+//#define CORI_NO_FILE_LOGGING
 #include <Cori.hpp>
 #include <CoriEntry.hpp>
 

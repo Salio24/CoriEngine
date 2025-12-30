@@ -53,6 +53,11 @@ namespace Cori {
 					static constexpr char ResourceTracker[] = "Resource Tracker";
 					static constexpr char RenderGraph[] = "Render Graph";
 					static constexpr char UploadManager[] = "Upload Manager";
+					static constexpr char UploadSubsystem[] = "Upload Subsystem";
+					static constexpr char VirtualBuffer[] = "Virtual Buffer";
+					static constexpr char VirtualBufferAllocator[] = "Virtual Buffer Allocator";
+					static constexpr char DeletionQueue[] = "Deletion Queue";
+
 
 				};
 

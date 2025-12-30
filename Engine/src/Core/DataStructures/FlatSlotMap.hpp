@@ -3,26 +3,26 @@
 namespace Cori {
 	namespace Core {
 		template<typename T>
-		concept IsFlatSlotMapHandle = requires(const T& a, const T& b) {
+		concept IsVersionedHandle = requires(const T& a, const T& b) {
 			{ a.GetIndex() } -> std::same_as<uint32_t>;
 			{ a.GetVersion() } -> std::same_as<int32_t>;
 			{ a == b } -> std::convertible_to<bool>;
 			typename T::Hasher;
 		};
 
-		struct FlatSlotMapHandle {
+		struct VersionedHandleBase {
 			[[nodiscard]] uint32_t GetIndex() const {
 				return index;
 			}
 
 			[[nodiscard]] int32_t GetVersion() const {
-				return index;
+				return version;
 			}
 
-			bool operator==(const FlatSlotMapHandle& other) const = default;
+			[[nodiscard]] bool operator==(const VersionedHandleBase& other) const = default;
 
 			struct Hasher {
-				size_t operator()(const FlatSlotMapHandle& handle) const {
+				size_t operator()(const VersionedHandleBase& handle) const {
 					return std::hash<uint64_t>{}(static_cast<uint64_t>(handle.index) << 32 | handle.version);
 				}
 			};
@@ -32,13 +32,16 @@ namespace Cori {
 			int32_t version{ INT32_MIN };
 		};
 
-		template<typename T, IsFlatSlotMapHandle HandleT = FlatSlotMapHandle>
+		template<typename T, IsVersionedHandle HandleT = VersionedHandleBase>
 		class FlatSlotMap {
 		public:
+			using Handle = HandleT;
+
+			//TODO: i need normal iterators, not this pile of garbage
 			struct Iterator {
 				~Iterator() = default;
 				Iterator& operator++() {
-					while (IsIndexValid(index + 1)) {
+					while (map->IsIndexValid(index + 1)) {
 						index++;
 					}
 
@@ -47,7 +50,7 @@ namespace Cori {
 
 				Iterator& operator--() {
 					if (index > 0) {
-						while (IsIndexValid(index - 1)) {
+						while (map->IsIndexValid(index - 1)) {
 							index--;
 						}
 					}
@@ -55,9 +58,13 @@ namespace Cori {
 					return *this;
 				}
 
-				bool operator!=(const Iterator& other) const = default;
+				[[nodiscard]] bool operator!=(const Iterator& other) const = default;
 
-				T& operator*() {
+				[[nodiscard]] T& operator*() {
+					return map->m_Data[index];
+				}
+
+				[[nodiscard]] const T& operator*() const {
 					return map->m_Data[index];
 				}
 
@@ -117,6 +124,11 @@ namespace Cori {
 			}
 
 			[[nodiscard]] T& operator[](const HandleT handle) {
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Accessed FlatSlotMap with an invalid handle.");
+				return m_Data[handle.GetIndex()];
+			}
+
+			[[nodiscard]] const T& operator[](const HandleT handle) const {
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Accessed FlatSlotMap with an invalid handle.");
 				return m_Data[handle.GetIndex()];
 			}

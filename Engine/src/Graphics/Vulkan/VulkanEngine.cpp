@@ -122,6 +122,7 @@ namespace Cori {
 			VulkanShaderManager::Init();
 			VulkanTextureManager::Init();
 			VulkanMaterialSystem::Init();
+			VulkanVirtualBufferAllocator::Init();
 			VulkanDynamicContainerUploadManager::Init();
 		}
 
@@ -130,6 +131,7 @@ namespace Cori {
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Calling wait idle on device has failed. Error: {}", vk::to_string(result));
 
 			VulkanDynamicContainerUploadManager::Shutdown();
+			VulkanVirtualBufferAllocator::Shutdown();
 			VulkanMaterialSystem::Shutdown();
 			VulkanTextureManager::Shutdown();
 			VulkanShaderManager::Shutdown();
@@ -183,6 +185,7 @@ namespace Cori {
 			auto [result_, imageIndex] = m_Device.acquireNextImageKHR(m_SwapChain, UINT64_MAX, frameData.m_PresentCompleteSemaphore, nullptr);
 
 			if (result_ == vk::Result::eErrorOutOfDateKHR) {
+				CORI_WARN("Skipp");
 				ResizeSwapChain();
 				frameData.m_SkippedFrame = true;
 				return frameData;
@@ -278,7 +281,7 @@ namespace Cori {
 		void VulkanEngine::EndFrame() {
 			FrameData& frameData = m_FrameData[m_CurrentFrameInFlight];
 			VulkanUploadManager::Get().SubmitStaging();
-			VulkanUploadManager::Get().SubmitAmazing();
+			//VulkanUploadManager::Get().SubmitAmazing();
 
 			if (!frameData.m_SkippedFrame) {
 				vk::ImageMemoryBarrier2 barrier {
@@ -336,6 +339,7 @@ namespace Cori {
 
 				if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) {
 					ResizeSwapChain();
+					CORI_DEBUG("Resize");
 				} else if (result != vk::Result::eSuccess) {
 					CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Presentation failed. Error: {}", vk::to_string(result));
 				}

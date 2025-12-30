@@ -16,8 +16,8 @@ namespace Cori {
 			static DeletionQueue& Get();
 
 			static void PushDeleter(std::function<void()>&& deleter) {
-				uint32_t prevFrame = VulkanEngine::GetPreviousFrameInFlight();
-				Get().m_Deleters[prevFrame].push_back(std::move(deleter));
+				uint32_t frame = GetDstFrame();
+				Get().m_Deleters[frame].push_back(std::move(deleter));
 			}
 
 			static void PushDeleter(std::function<void()>&& deleter, const uint32_t dstFrame) {
@@ -25,8 +25,8 @@ namespace Cori {
 			}
 
 			static void PushBuffer(VulkanBuffer& buffer) {
-				uint32_t prevFrame = VulkanEngine::GetPreviousFrameInFlight();
-				Get().m_BufferQueue[prevFrame].push_back(buffer);
+				uint32_t frame = GetDstFrame();
+				Get().m_BufferQueue[frame].push_back(buffer);
 			}
 
 			static void PushBuffer(VulkanBuffer& buffer, uint32_t dstFrame) {
@@ -34,8 +34,8 @@ namespace Cori {
 			}
 
 			static void PushImage(VulkanImage& image) {
-				uint32_t prevFrame = VulkanEngine::GetPreviousFrameInFlight();
-				Get().m_ImageQueue[prevFrame].push_back(image);
+				uint32_t frame = GetDstFrame();
+				Get().m_ImageQueue[frame].push_back(image);
 			}
 
 			static void PushImage(VulkanImage& image, const uint32_t dstFrame) {
@@ -43,12 +43,21 @@ namespace Cori {
 			}
 
 			static void PushVirtualAlloc(vma::VirtualAllocation allocation, vma::VirtualBlock block) {
-				uint32_t prevFrame = VulkanEngine::GetPreviousFrameInFlight();
-				Get().m_VirtAllocQueue[prevFrame].emplace_back(allocation, block);
+				uint32_t frame = GetDstFrame();
+				Get().m_VirtAllocQueue[frame].emplace_back(allocation, block);
 			}
 
 			static void PushVirtualAlloc(vma::VirtualAllocation allocation, vma::VirtualBlock block, const uint32_t dstFrame) {
 				Get().m_VirtAllocQueue[dstFrame].emplace_back(allocation, block);
+			}
+
+			static void PushVirtualBlock(vma::VirtualBlock block) {
+				uint32_t frame = GetDstFrame();
+				Get().m_VirtBlockQueue[frame].emplace_back(block);
+			}
+
+			static void PushVirtualBlock(vma::VirtualBlock block, const uint32_t dstFrame) {
+				Get().m_VirtBlockQueue[dstFrame].emplace_back(block);
 			}
 
 			static void Flush();
@@ -65,13 +74,19 @@ namespace Cori {
 					m_BufferQueue[i].reserve(64);
 					m_ImageQueue[i].reserve(64);
 					m_VirtAllocQueue[i].reserve(64);
+					m_VirtBlockQueue[i].reserve(64);
 				}
+			}
+			
+			[[nodiscard]] static uint32_t GetDstFrame() {
+				return VulkanEngine::GetPreviousFrameInFlight();
 			}
 
 			std::array<std::vector<std::function<void()>>, FRAMES_IN_FLIGHT> m_Deleters;
 			std::array<std::vector<VulkanBuffer>, FRAMES_IN_FLIGHT> m_BufferQueue;
 			std::array<std::vector<VulkanImage>, FRAMES_IN_FLIGHT> m_ImageQueue;
 			std::array<std::vector<std::pair<vma::VirtualAllocation, vma::VirtualBlock>>, FRAMES_IN_FLIGHT> m_VirtAllocQueue;
+			std::array<std::vector<vma::VirtualBlock>, FRAMES_IN_FLIGHT> m_VirtBlockQueue;
 
 			static std::unique_ptr<DeletionQueue> s_Instance;
 		};

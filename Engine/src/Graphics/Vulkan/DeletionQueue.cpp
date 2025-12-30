@@ -44,6 +44,17 @@ namespace Cori {
 			}
 
 			Get().m_VirtAllocQueue[frameIndex].clear();
+
+			for (auto& block : Get().m_VirtBlockQueue[frameIndex] | std::views::reverse) {
+				if (!block.isVirtualBlockEmpty()) {
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Deleting vma virtual block, but some allocations made from this block are still not freed, they will be forcibly freed now. You should generally free all allocation before deleting a block, not doing that can lead to a crash under certain circumstances (e.g., freeing a virtual allocation after the block was deleted via deletion queue in the next frame).");
+					block.clearVirtualBlock();
+				}
+
+				block.destroy();
+			}
+
+			Get().m_VirtBlockQueue[frameIndex].clear();
 		}
 
 		void DeletionQueue::FlushAll() {
@@ -71,6 +82,15 @@ namespace Cori {
 				}
 
 				m_VirtAllocQueue[i].clear();
+			}
+
+			for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
+				for (auto& block : m_VirtBlockQueue[i] | std::views::reverse) {
+					block.clearVirtualBlock();
+					block.destroy();
+				}
+
+				m_VirtBlockQueue[i].clear();
 			}
 		}
 	}

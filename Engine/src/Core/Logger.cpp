@@ -78,10 +78,12 @@ namespace Cori {
 		spdlog::register_logger(s_CoreLogger);
 		s_CoreLogger->set_level(spdlog::level::trace);
 		s_CoreLogger->flush_on(spdlog::level::warn);
+		//s_CoreLogger->flush_on(spdlog::level::trace);
 
 		spdlog::register_logger(s_ClientLogger);
 		s_ClientLogger->set_level(spdlog::level::trace);
 		s_ClientLogger->flush_on(spdlog::level::warn);
+		//s_ClientLogger->flush_on(spdlog::level::trace);
 
 		s_Initialized = true;
 
