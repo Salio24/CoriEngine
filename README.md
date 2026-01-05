@@ -6,10 +6,6 @@ Cori is my game engine that I’m actively working on. When building, I took som
 
 ***
 
-# IMPORTANT NOTE:
-
-This is dev branch, and currently I'm migrating from OpenGL to Vulkan, and the Vulkan backend is under active development and not is exactly stable at the moment. For a stable version check out a CoriStable branch, it has OpenGL 2D rendering backend. 
-
 ## Getting Started
 
 Cori Engine uses CMake as a build system.
@@ -152,13 +148,19 @@ Now you have several options: CLion, directly through CMake, and a bunch of othe
 - **Asset Manager:** Descriptor based asset manager utilizing smart pointers for safe memory management. 
 
 ### Rendering
-- **Abstracted Graphics API:** Designed to support multiple graphics backends, with a complete implementation for **OpenGL 4.6**.
-- **High-Performance 2D Batch Renderer:** Utilizes instanced rendering to draw thousands of quads and in minimal amount of draw calls. Utilizes a concept of depth so user doesn't need to worry about rendering order, correctly renders opaque and semi transparent object using depth testing and k-way merge algorythm.
-- **World & Screen Space Rendering:** Easily switch between rendering in camera-relative world coordinates and screen-fixed UI coordinates.
-- **High-Quality Text Rendering:** Uses Multi-channel Signed Distance Fields (MSDF) via `msdf-atlas-gen` to render crisp, scalable text. Font atlases are automatically cached to disk for fast startups. Supports several types of text alignment: Left, Center, Right.
-- **2D Sprite Animation System:** A `QuadAnimator` component plays animation sequences loaded from `AnimationPack` assets. Supports JSON configurations exported from **Aseprite** as well as engine custom formats.
-- **Automatic Texture Padding:** `SpriteAtlas` loading includes automatic padding/extrusion to prevent common "texture bleeding" artifacts.
-
+1. Legacy OpenGL:
+    - **High-Performance 2D Batch Renderer:** Utilizes instanced rendering to draw thousands of quads and in minimal amount of draw calls. Utilizes a concept of depth so user doesn't need to worry about rendering order, correctly renders opaque and semi transparent object using depth testing and k-way merge algorythm.
+    - **World & Screen Space Rendering:** Easily switch between rendering in camera-relative world coordinates and screen-fixed UI coordinates.
+    - **High-Quality Text Rendering:** Uses Multi-channel Signed Distance Fields (MSDF) via `msdf-atlas-gen` to render crisp, scalable text. Font atlases are automatically cached to disk for fast startups. Supports several types of text alignment: Left, Center, Right.
+    - **2D Sprite Animation System:** A `QuadAnimator` component plays animation sequences loaded from `AnimationPack` assets. Supports JSON configurations exported from `Aseprite` as well as engine custom formats.
+    - **Automatic Texture Padding:** `SpriteAtlas` loading includes automatic padding/extrusion to prevent common "texture bleeding" artifacts.
+2. Vulkan 1.3 (WIP!):
+    - **GPU-Driven architecture:** Indirect rendering with compute culling and draw command generation in compute shader.
+    - **Hybrid Memory Subsystem:** Custom containers templated like `VulkanFlatSlotMap` and `VulkanDynamicVectors` that sync data to the gpu, use sector-based dirty tracking to minimize PCIe bus usage. `VulkanVirtualBufferAllocator` allows to create buffers of neccesary size each frame without physically creating separate `VkBuffer` objects, creating such buffer (`VulkanVirtualBuffer`) is practically free. And last but not least, asset streaming line, uses timeline semaphores and a separate transfer queue for non blocking asset loading.
+    - **Bindless Architecture:** Fully bindless resources using `VK_EXT_descriptor_buffer` for samplers and images and `Buffer Device Address` (`BDA`) for buffers.
+    - **Shader Objects:** Utilizing `VK_EXT_shader_object` to decouple shaders from pipeline state, preventing pipeline state object (`PSO`) explosion.
+    - **Render Graph:** A DAG-based system that automatically resolves execution dependencies and injects memory barriers where needed.
+    
 ### Entity Component System (ECS)
 - **Powered by EnTT:** Built on the fast and feature-rich `EnTT` library.
 - **Scene & Entity Management:** Provides a clean `Scene` and `Entity` API for creating, finding, and managing game objects.

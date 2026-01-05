@@ -552,8 +552,6 @@ namespace Cori {
 				Get().m_UploaderMutex.unlock();
 			}
 
-
-
 			static void RecordCopy(VulkanBuffer& srcBuffer, vk::Buffer dstBuffer, const uint64_t size) {
 				CORI_CORE_ASSERT(Get().m_Initialized, "RecordCopy is called on non initialized VulkanDynamicContainerUploadManager.");
 				Get().m_UploaderMutex.lock();
@@ -1273,7 +1271,7 @@ namespace Cori {
 		template<typename T>
 		struct VulkanFlatSlotMapHandle : Core::VersionedHandleBase {};
 		
-		template<typename T, Core::IsVersionedHandle HandleT = VulkanFlatSlotMapHandle<T>>
+		template<std::copy_constructible T, Core::IsVersionedHandle HandleT = VulkanFlatSlotMapHandle<T>>
 		class VulkanFlatSlotMap {
 		public:
 			using Handle = HandleT;
@@ -1286,18 +1284,6 @@ namespace Cori {
 				using pointer = typename std::conditional<IsConst, const T*, typename VulkanDynamicVector<T>::Reference>::type;
 				using reference = typename std::conditional<IsConst, typename VulkanDynamicVector<T>::ConstReference, typename VulkanDynamicVector<T>::Reference>::type;
 				using MapType = typename std::conditional<IsConst, const VulkanFlatSlotMap, VulkanFlatSlotMap>::type;
-
-				void SkipForward() {
-					while (m_Index != m_Map->Size() && m_Map->IsIndexValid(m_Index + 1)) {
-						m_Index++;
-					}
-				}
-
-				void SkipBackwards() {
-					while (m_Index > 0 && m_Map->IsIndexValid(m_Index - 1)) {
-						m_Index--;
-					}
-				}
 
 				IteratorImpl& operator++() {
 					SkipForward();
@@ -1349,6 +1335,18 @@ namespace Cori {
 				uint32_t m_Index;
 				IteratorImpl(MapType* m, const uint32_t index) : m_Map(m), m_Index(index) {}
 
+			private:
+				void SkipForward() {
+					while (m_Index != m_Map->Size() && m_Map->IsIndexValid(m_Index + 1)) {
+						m_Index++;
+					}
+				}
+
+				void SkipBackwards() {
+					while (m_Index > 0 && m_Map->IsIndexValid(m_Index - 1)) {
+						m_Index--;
+					}
+				}
 			};
 
 			using Iterator = IteratorImpl<false>;
@@ -1437,7 +1435,7 @@ namespace Cori {
 			[[nodiscard]] Iterator begin() {
 				Iterator it(this, 0);
 				if (!IsIndexValid(0)) {
-					it.SkipForward();
+					it++;
 				}
 
 				return it;
@@ -1463,7 +1461,7 @@ namespace Cori {
 			[[nodiscard]] ConstIterator begin() const {
 				ConstIterator it(this, 0);
 				if (!IsIndexValid(0)) {
-					it.SkipForward();
+					it++;
 				}
 
 				return it;
@@ -1548,5 +1546,7 @@ namespace Cori {
 			std::vector<uint32_t> m_Holes{};
 			static constexpr uint32_t INITIAL_HOLE_VECTOR_SIZE{ 32 };
 		};
+
+
 	}
 }
