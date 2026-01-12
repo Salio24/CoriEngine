@@ -58,6 +58,5 @@ namespace Cori {
 			const auto view = std::string_view(signature.data(), signature.size() - 1);
 			return fnv1a64(view.data(), view.size());
 		}
-
 	}
 }

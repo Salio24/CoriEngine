@@ -157,7 +157,7 @@ Now you have several options: CLion, directly through CMake, and a bunch of othe
 2. Vulkan 1.3 (WIP!, not stable at the moment):
     - **GPU-Driven architecture:** Indirect rendering with compute culling and draw command generation in compute shader.
     - **Hybrid Memory Subsystem:** Custom templated containers like `VulkanFlatSlotMap` and `VulkanDynamicVectors` that sync data to the GPU, use sector-based dirty tracking to minimize PCIe bus usage. `VulkanVirtualBufferAllocator` allows to create buffers of necessary size each frame without physically creating separate `VkBuffer` objects, creating such buffer (`VulkanVirtualBuffer`) is practically free. And last but not least, asset streaming line, uses timeline semaphores and a separate transfer queue for non blocking asset loading.
-    - **Bindless Architecture:** Fully bindless resources using `VK_EXT_descriptor_buffer` for samplers and images and `Buffer Device Address` (`BDA`) for buffers.
+    - **Bindless Architecture:** Fully bindless resources using `VK_EXT_descriptor_buffer` for samplers and images and `Buffer Device Address (BDA)` for buffers.
     - **Shader Objects:** Utilizing `VK_EXT_shader_object` to decouple shaders from pipeline state, preventing pipeline state object (`PSO`) explosion.
     - **Render Graph:** A DAG-based system that automatically resolves execution dependencies and injects memory barriers where needed.
     

@@ -34,5 +34,21 @@ namespace Cori {
 			CORI_CORE_ASSERT(s_Instance, "Calling VulkanDynamicContainerUploadManager::Get but it was already destroyed or not yet created.");
 			return *s_Instance;
 		}
+
+		std::unique_ptr<VulkanStreamingLine> VulkanStreamingLine::s_Instance{ nullptr };
+
+		void VulkanStreamingLine::Init() {
+			CORI_CORE_ASSERT(!s_Instance, "VulkanStreamingLine is already initialized.");
+			s_Instance = std::unique_ptr<VulkanStreamingLine>(new VulkanStreamingLine());
+		}
+
+		void VulkanStreamingLine::Shutdown() {
+			s_Instance.reset();
+		}
+
+		VulkanStreamingLine& VulkanStreamingLine::Get() {
+			CORI_CORE_ASSERT(s_Instance, "Calling VulkanStreamingLine::Get but it was already destroyed or not yet created.");
+			return *s_Instance;
+		}
 	}
 }

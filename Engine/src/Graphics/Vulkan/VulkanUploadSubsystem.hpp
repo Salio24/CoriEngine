@@ -4,6 +4,7 @@
 #include "VulkanBuffer.hpp"
 #include "DeletionQueue.hpp"
 #include "Core/DataStructures/FlatSlotMap.hpp"
+#include "Utility/TemplateUtils.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -504,7 +505,7 @@ namespace Cori {
 			}
 
 		protected:
-			template <typename T> friend class VulkanDynamicVector;
+			template <Utility::NotBool T> friend class VulkanDynamicVector;
 
 			static void BeginUpdate(vk::Buffer dstBuffer) {
 				Get().m_UploaderMutex.lock();
@@ -649,7 +650,7 @@ namespace Cori {
 			static std::unique_ptr<VulkanDynamicContainerUploadManager> s_Instance;
 		};
 
-		template <typename T>
+		template <Utility::NotBool T>
 		class VulkanDynamicVector {
 			struct PendingReallocation {
 				VulkanBuffer srcBuffer;
@@ -657,7 +658,6 @@ namespace Cori {
 				bool active{ false };
 			};
 		public:
-
 
 			VulkanDynamicVector(const QueueUsageFlags queueUsage, const vk::BufferUsageFlags bufferUsage, const char* name = "") : m_BufferUsageFlags(bufferUsage), m_QueueUsageFlags(queueUsage) {
 				#ifdef DEBUG_BUILD
@@ -1542,11 +1542,162 @@ namespace Cori {
 
 			VulkanDynamicVector<T> m_Data{};
 		private:
-			std::vector<int32_t> m_Versions{};
+		std::vector<int32_t> m_Versions{};
 			std::vector<uint32_t> m_Holes{};
 			static constexpr uint32_t INITIAL_HOLE_VECTOR_SIZE{ 32 };
 		};
 
+		class VulkanStreamingLine {
+		public:
+			struct ImageUploadRange {
+				vk::Offset3D offset;
+				vk::Extent3D extent;
+				vk::ImageSubresourceLayers subresourceLayers;
+			};
 
+			struct BufferUploadRange {
+				uint64_t offset{ 0 };
+				uint64_t alignment{ 4 };
+			};
+
+			struct BufferUpload {
+				VulkanBuffer resource;
+				BufferUploadRange range;
+			};
+
+			struct ImageUpload {
+				VulkanImage resource;
+				ImageUploadRange range;
+			};
+		private:
+			struct Allocation {
+				vk::DeviceSize offset{};
+				vma::VirtualAllocation virtualAllocation;
+			};
+
+			struct PendingUpload {
+				std::variant<std::pair<VulkanImage, ImageUploadRange>, std::pair<VulkanBuffer, BufferUploadRange>> resourceWithRange;
+				uint64_t stagingSize;
+				Allocation stagingAllocation;
+			};
+		public:
+
+			using GenericUpload = std::pair<std::variant<BufferUpload, ImageUpload>, std::span<Byte>>;
+
+			static void Init();
+
+			static void Shutdown();
+
+			static VulkanStreamingLine& Get();
+
+			[[nodiscard]] static std::optional<uint64_t> SubmitUploads(const std::span<GenericUpload>& uploads) {
+				uint32_t frameIndex = VulkanEngine::GetCurrentFrameInFlight();
+				auto& queue = Get().m_PendingUploads[frameIndex];
+				uint32_t startOffset = queue.size();
+				if (queue.capacity() < startOffset + uploads.size()) {
+					queue.reserve(queue.capacity() >= 4 ? queue.capacity() * 1.5f : 4);
+				}
+
+				bool success = true;
+
+				for (auto [upload, data] : uploads) {
+					if (std::holds_alternative<BufferUpload>(upload)) {
+						auto& bufferUpload = std::get<BufferUpload>(upload);
+						auto alloc = Get().TryAllocate(data.size_bytes(), std::max<uint64_t>(4, bufferUpload.range.alignment));
+						if (alloc) {
+							queue.emplace_back(std::make_pair(bufferUpload.resource, bufferUpload.range), data.size_bytes(), alloc.value());
+						} else {
+							success = false;
+							break;
+						}
+					} else {
+						auto& imageUpload = std::get<ImageUpload>(upload);
+						auto alloc = Get().TryAllocate(data.size_bytes(), std::max<uint64_t>(4, std::max<uint64_t>(4, vk::blockSize(imageUpload.resource.m_Format))));
+						if (alloc) {
+							queue.emplace_back(std::make_pair(imageUpload.resource, imageUpload.range), data.size_bytes(), alloc.value());
+						} else {
+							success = false;
+							break;
+						}
+					}
+				}
+
+				if (!success) {
+					for (auto& invalid : std::ranges::subrange(queue.begin() + startOffset, queue.end())) {
+						Get().m_StagingBlock.free(invalid.stagingAllocation.virtualAllocation);
+					}
+
+					queue.erase(queue.begin() + startOffset, queue.end());
+					return std::nullopt;
+				}
+
+				for (auto [in, pending] : std::views::zip(uploads, std::ranges::subrange(queue.begin() + startOffset, queue.end()))) {
+					auto result = VulkanEngine::GetAllocator().copyMemoryToAllocation(in.second.data(), Get().m_RingStagingBuffer.m_Allocation, pending.stagingAllocation.offset, pending.stagingSize);
+					CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to copy streaming data to the staging buffer. Error: {}", vk::to_string(result));
+				}
+
+				return Get().m_NextTicket;
+			}
+
+			[[nodiscard]] static bool CheckTicket(const uint64_t ticket) {
+				auto [result, currentValue] = VulkanEngine::GetLogicalDevice().getSemaphoreCounterValue(Get().m_TimelineSemaphore);
+				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to get value of the timeline semaphore in the streaming line. Error: {}", vk::to_string(result));
+
+				return currentValue >= ticket;
+			}
+
+			[[nodiscard]] static std::optional<uint64_t> SubmitUploads(const GenericUpload& upload) {
+				return SubmitUploads({ upload });
+			}
+
+			static void ProcessUploads() {
+
+			}
+
+
+			~VulkanStreamingLine() {
+
+			}
+
+
+		private:
+			VulkanStreamingLine() {
+
+			}
+
+			[[nodiscard]] std::optional<Allocation> TryAllocate(const uint64_t size, const uint64_t alignment) {
+				if (size > HEAP_SIZE) {
+					return std::nullopt;
+				}
+
+				vma::VirtualAllocationCreateInfo allocInfo {
+					.size = size,
+					.alignment = alignment,
+					.flags = vma::VirtualAllocationCreateFlagBits::eStrategyMinTime
+				};
+
+				vk::DeviceSize offset;
+				auto [result, virtAlloc] = m_StagingBlock.virtualAllocate(allocInfo, offset);
+				if (result != vk::Result::eSuccess) {
+					return std::nullopt;
+				}
+
+				Allocation allocation;
+				allocation.offset = offset;
+				allocation.virtualAllocation = virtAlloc;
+				return allocation;
+			}
+
+			vma::VirtualBlock m_StagingBlock;
+			VulkanBuffer m_RingStagingBuffer;
+			std::array<vk::Fence, FRAMES_IN_FLIGHT> m_Fences;
+			std::array<std::vector<PendingUpload>, FRAMES_IN_FLIGHT> m_PendingUploads;
+			vk::Semaphore m_TimelineSemaphore;
+			uint64_t m_NextTicket{ 0 };
+			static constexpr uint64_t HEAP_SIZE{ 128 * 1024 * 1024 };
+
+			static std::unique_ptr<VulkanStreamingLine> s_Instance;
+
+		};
 	}
 }

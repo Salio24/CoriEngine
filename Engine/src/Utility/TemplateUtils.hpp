@@ -29,5 +29,11 @@ namespace Cori {
 		concept IsStreamable = requires(std::ostream& os, const T& val) {
 			{ os << val } -> std::same_as<std::ostream&>;
 		};
+
+		/**
+		 * @brief Checks if T is not bool.
+		 */
+		template <typename T>
+		concept NotBool = !std::is_same_v<std::remove_cvref_t<T>, bool>;
 	}
 }
