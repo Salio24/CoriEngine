@@ -115,6 +115,7 @@ namespace Cori {
 			CreateSyncObjects();
 
 			DeletionQueue::Init();
+			VulkanStreamingLine::Init();
 			VulkanUploadManager::Init();
 			VulkanMeshManager::Init();
 			VulkanGlobalLayoutManager::Init();
@@ -139,6 +140,7 @@ namespace Cori {
 			VulkanGlobalLayoutManager::Shutdown();
 			VulkanMeshManager::Shutdown();
 			VulkanUploadManager::Shutdown();
+			VulkanStreamingLine::Shutdown();
 			DeletionQueue::Shutdown();
 
 			for (auto& semaphore : m_RenderFinishedSemaphores) {

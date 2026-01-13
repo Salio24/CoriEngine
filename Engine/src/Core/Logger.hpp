@@ -57,6 +57,7 @@ namespace Cori {
 					static constexpr char VirtualBuffer[] = "Virtual Buffer";
 					static constexpr char VirtualBufferAllocator[] = "Virtual Buffer Allocator";
 					static constexpr char DeletionQueue[] = "Deletion Queue";
+					static constexpr char StreamingLine[] = "Streaming Line";
 
 
 				};

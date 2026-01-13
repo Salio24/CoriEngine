@@ -1,5 +1,6 @@
 #pragma once
 #include <sul/dynamic_bitset.hpp>
+#include <utility>
 #include "VulkanEngine.hpp"
 #include "VulkanBuffer.hpp"
 #include "DeletionQueue.hpp"
@@ -21,22 +22,27 @@ namespace Cori {
 
 				#ifdef DEBUG_BUILD
 				if (alignof(T) > m_Alignment || m_Alignment % alignof(T) != 0) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::VirtualBuffer }, "Critical missalignment was encountered when trying to upload to VirtualBuffer, type '{}' has aligment '{}', but VirtualBuffer '{}' was created with alignment of '{}'. No upload was made.", CORI_CLEAN_TYPE_NAME(T), alignof(T), m_Name, m_Alignment);
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::VirtualBuffer }, "Critical misalignment was encountered when trying to upload to VirtualBuffer, type '{}' has alignment '{}', but VirtualBuffer '{}' was created with alignment of '{}'. No upload was made.", CORI_CLEAN_TYPE_NAME(T), alignof(T), m_Name, m_Alignment);
 					return;
 				}
 				#endif
 
-				if (m_Alignment % offset != 0) {
+				if (offset % m_Alignment != 0) {
 					offset = Math::AlignUp(offset, m_Alignment);
 					#ifdef DEBUG_BUILD
-					CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::VirtualBuffer }, "Offset '{}' provided when calling UploadToAllocation of VirtualBuffer '{}' is missalignet to its alignment of '{}', it will be aligned up, this can cause errors.", offset, m_Name, m_Alignment);
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::VirtualBuffer }, "Offset '{}' provided when calling UploadToAllocation of VirtualBuffer '{}' is misaligned to its alignment of '{}', no upload will be made.", offset, m_Name, m_Alignment);
 					#else
-					CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::VirtualBuffer }, "Offset '{}' provided when calling UploadToAllocation of VirtualBuffer '{}' is missalignet to its alignment of '{}', it will be aligned up, this can cause errors.", offset, "Name is unavailable in release build", m_Alignment);
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::VirtualBuffer }, "Offset '{}' provided when calling UploadToAllocation of VirtualBuffer '{}' is misaligned to its alignment of '{}', no upload will be made.", offset, "Name is unavailable in release build", m_Alignment);
 					#endif
+					return;
 				}
 
 				if (offset + data.size_bytes() > m_Size) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::VirtualBuffer }, "Trying to upload to VirtualBuffer '{}', but upload is out of bounds, offest '{}', data size '{}', buffer size '{}'", offset, data.size_bytes(), m_Size);
+					#ifdef DEBUG_BUILD
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::VirtualBuffer }, "Trying to upload to VirtualBuffer '{}', but upload is out of bounds, offest '{}', data size '{}', buffer size '{}', no upload will be made.", m_Name, offset, data.size_bytes(), m_Size);
+					#else
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::VirtualBuffer }, "Trying to upload to VirtualBuffer '{}', but upload is out of bounds, offest '{}', data size '{}', buffer size '{}', no upload will be made.", "Name is unavailable in release build", offset, data.size_bytes(), m_Size);
+					#endif
 					return;
 				}
 
@@ -1547,6 +1553,8 @@ namespace Cori {
 			static constexpr uint32_t INITIAL_HOLE_VECTOR_SIZE{ 32 };
 		};
 
+		static constexpr uint32_t TRANSFERS_IN_FLIGHT{ 3 };
+
 		class VulkanStreamingLine {
 		public:
 			struct ImageUploadRange {
@@ -1563,11 +1571,15 @@ namespace Cori {
 			struct BufferUpload {
 				VulkanBuffer resource;
 				BufferUploadRange range;
+				vk::PipelineStageFlagBits2 srcPipelineStages;
+				vk::AccessFlagBits2 srcAccessFlags;
 			};
 
 			struct ImageUpload {
 				VulkanImage resource;
 				ImageUploadRange range;
+				vk::ImageLayout dstLayout;
+				uint32_t dstQueueFamilyIndex{};
 			};
 		private:
 			struct Allocation {
@@ -1576,13 +1588,29 @@ namespace Cori {
 			};
 
 			struct PendingUpload {
-				std::variant<std::pair<VulkanImage, ImageUploadRange>, std::pair<VulkanBuffer, BufferUploadRange>> resourceWithRange;
+				std::variant<ImageUpload, BufferUpload> resourceUpload;
 				uint64_t stagingSize;
 				Allocation stagingAllocation;
 			};
+
+			struct SlotData {
+				std::vector<PendingUpload> pendingUploads;
+				uint64_t completionTicket{ 0 };
+				bool isBusy{ false };
+				vk::CommandBuffer primaryCmb;
+				vk::CommandBuffer secondaryCmb;
+			};
+
 		public:
 
-			using GenericUpload = std::pair<std::variant<BufferUpload, ImageUpload>, std::span<Byte>>;
+			struct GenericUpload {
+				std::variant<ImageUpload, BufferUpload> resourceUpload;
+				std::span<Byte> data;
+
+				GenericUpload() = delete;
+
+				GenericUpload(const std::variant<ImageUpload, BufferUpload>& resource, const std::span<Byte>& data) : resourceUpload(resource), data(data) {}
+			};
 
 			static void Init();
 
@@ -1590,12 +1618,15 @@ namespace Cori {
 
 			static VulkanStreamingLine& Get();
 
-			[[nodiscard]] static std::optional<uint64_t> SubmitUploads(const std::span<GenericUpload>& uploads) {
-				uint32_t frameIndex = VulkanEngine::GetCurrentFrameInFlight();
-				auto& queue = Get().m_PendingUploads[frameIndex];
-				uint32_t startOffset = queue.size();
-				if (queue.capacity() < startOffset + uploads.size()) {
-					queue.reserve(queue.capacity() >= 4 ? queue.capacity() * 1.5f : 4);
+			[[nodiscard]] static std::optional<uint64_t> SubmitUploads(const std::span<const GenericUpload>& uploads) {
+				auto freeSlot = Get().GetFreeTransferSlot();
+				if (!freeSlot) {
+					return std::nullopt;
+				}
+				auto& slot = Get().m_Slots[freeSlot.value()];
+				uint32_t startOffset = slot.pendingUploads.size();
+				if (slot.pendingUploads.capacity() < startOffset + uploads.size()) {
+					slot.pendingUploads.reserve(slot.pendingUploads.capacity() >= 4 ? slot.pendingUploads.capacity() * 1.5f : 4);
 				}
 
 				bool success = true;
@@ -1603,18 +1634,126 @@ namespace Cori {
 				for (auto [upload, data] : uploads) {
 					if (std::holds_alternative<BufferUpload>(upload)) {
 						auto& bufferUpload = std::get<BufferUpload>(upload);
+
+						if (bufferUpload.range.offset % bufferUpload.range.alignment != 0) {
+							#ifdef DEBUG_BUILD
+							CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Offset '{}' provided when calling SubmitUpdate for resource VulkanBuffer '{}' is misaligned to the provided alignment of '{}', no upload will be made.", bufferUpload.range.offset, bufferUpload.resource.m_Name, bufferUpload.range.alignment);
+							#else
+							CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::VirtualBuffer }, "Offset '{}' provided when calling SubmitUpdate for resource VulkanBuffer '{}' is misaligned to the provided alignment of '{}', no upload will be made.", bufferUpload.range.offset, "Name is unavailable in release build", bufferUpload.range.alignment);
+							#endif
+							success = false;
+							break;
+						}
+
+						if (bufferUpload.range.offset + data.size_bytes() > bufferUpload.resource.m_Size) {
+							#ifdef DEBUG_BUILD
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Trying to upload to VulkanBuffer '{}' via VulkanStreamingLine, but upload is out of bounds, offest '{}', data size '{}', buffer size '{}', no upload will be made.", bufferUpload.resource.m_Name, bufferUpload.range.offset, data.size_bytes(), bufferUpload.resource.m_Size);
+							#else
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Trying to upload to VulkanBuffer '{}' via VulkanStreamingLine, but upload is out of bounds, offest '{}', data size '{}', buffer size '{}', no upload will be made.", "Name is unavailable in release build", bufferUpload.range.offset, data.size_bytes(), bufferUpload.resource.m_Size);
+							#endif
+							success = false;
+							break;
+						}
+
 						auto alloc = Get().TryAllocate(data.size_bytes(), std::max<uint64_t>(4, bufferUpload.range.alignment));
 						if (alloc) {
-							queue.emplace_back(std::make_pair(bufferUpload.resource, bufferUpload.range), data.size_bytes(), alloc.value());
+							slot.pendingUploads.emplace_back(bufferUpload, data.size_bytes(), alloc.value());
 						} else {
 							success = false;
 							break;
 						}
 					} else {
 						auto& imageUpload = std::get<ImageUpload>(upload);
+
+						if (imageUpload.range.subresourceLayers.baseArrayLayer + imageUpload.range.subresourceLayers.layerCount > imageUpload.resource.m_ArrayLayers) {
+							#ifdef DEBUG_BUILD
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Invalid BaseArrayLayer '{}' and/or LayerCount '{}' was provided when trying to upload to VulkanImage '{}' via streaming line, the sum of them can't be more than the total image layer count '{}', no upload will be made.", imageUpload.range.subresourceLayers.baseArrayLayer, imageUpload.range.subresourceLayers.layerCount, imageUpload.resource.m_Name, imageUpload.resource.m_ArrayLayers);
+							#else
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Invalid BaseArrayLayer '{}' and/or LayerCount '{}' was provided when trying to upload to VulkanImage '{}' via streaming line, the sum of them can't be more than the total image layer count '{}', no upload will be made.", imageUpload.range.subresourceLayers.baseArrayLayer, imageUpload.range.subresourceLayers.layerCount, "Name is unavailable in release build", imageUpload.resource.m_ArrayLayers);
+							#endif
+
+							success = false;
+							break;
+						}
+
+						if (imageUpload.range.subresourceLayers.mipLevel + 1 <= imageUpload.resource.m_MipLevels) {
+							#ifdef DEBUG_BUILD
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Invalid MipLevel '{}' was provided when trying to upload to VulkanImage '{}' via streaming line, MipLevel + 1 can't be more than the total image mip level count '{}', no upload will be made.", imageUpload.range.subresourceLayers.mipLevel, imageUpload.resource.m_Name, imageUpload.resource.m_MipLevels);
+							#else
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Invalid MipLevel '{}' was provided when trying to upload to VulkanImage '{}' via streaming line, MipLevel + 1 can't be more than the total image mip level count '{}', no upload will be made.", imageUpload.range.subresourceLayers.mipLevel, "Name is unavailable in release build", imageUpload.resource.m_MipLevels);
+							#endif
+
+							success = false;
+							break;
+						}
+
+						if (imageUpload.range.extent.width == 0 || imageUpload.range.extent.height == 0 || imageUpload.range.extent.depth == 0) {
+							#ifdef DEBUG_BUILD
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Invalid Extent3D '{} {} {}' provided when trying to upload to VulkanImage '{}' via streaming line, no extent part can be 0, no upload will be made.", imageUpload.range.extent.width, imageUpload.range.extent.height, imageUpload.range.extent.depth, imageUpload.resource.m_Name);
+							#else
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Invalid Extent3D '{} {} {}' provided when trying to upload to VulkanImage '{}' via streaming line, no extent part can be 0, no upload will be made.", imageUpload.range.extent.width, imageUpload.range.extent.height, imageUpload.range.extent.depth, "Name is unavailable in release build");
+							#endif
+
+							success = false;
+							break;
+						}
+
+						std::array<uint8_t, 3> blockExtent = vk::blockExtent(imageUpload.resource.m_Format);
+
+						vk::Extent3D mipExtent{ std::max(1u, mipExtent.width >> imageUpload.range.subresourceLayers.mipLevel), std::max(1u, mipExtent.height >> imageUpload.range.subresourceLayers.mipLevel), std::max(1u, mipExtent.depth >> imageUpload.range.subresourceLayers.mipLevel) };
+
+						if (imageUpload.range.offset.x % blockExtent[0] != 0 || imageUpload.range.offset.y % blockExtent[1] != 0 || imageUpload.range.offset.z % blockExtent[2] != 0) {
+							#ifdef DEBUG_BUILD
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Offset3D '{} {} {}' provided when calling SubmitUpdate for resource VulkanImage '{}' is misaligned to the block extent '{} {} {}' of image format '{}', no upload will be made.", imageUpload.range.offset.x, imageUpload.range.offset.y, imageUpload.range.offset.z, imageUpload.resource.m_Name, blockExtent[0], blockExtent[1], blockExtent[2], vk::to_string(imageUpload.resource.m_Format));
+							#else
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Offset3D '{} {} {}' provided when calling SubmitUpdate for resource VulkanImage '{}' is misaligned to the block extend '{} {} {}' of image format '{}', no upload will be made.", imageUpload.range.offset.x, imageUpload.range.offset.y, imageUpload.range.offset.z, "Name is unavailable in release build", blockExtent[0], blockExtent[1], blockExtent[2], vk::to_string(imageUpload.resource.m_Format));
+							#endif
+
+							success = false;
+							break;
+						}
+
+						if (imageUpload.range.offset.x + imageUpload.range.extent.width > mipExtent.width || imageUpload.range.offset.y + imageUpload.range.extent.height > mipExtent.height || imageUpload.range.offset.z + imageUpload.range.extent.depth > mipExtent.depth) {
+							#ifdef DEBUG_BUILD
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Offset3D '{} {} {}' + Extent3D '{} {} {}' provided when calling SubmitUpdate for resource VulkanImage '{}' is located beyond the image mip level '{}' Extent3D '{} {} {}', no upload will be made.", imageUpload.range.offset.x, imageUpload.range.offset.y, imageUpload.range.offset.z, imageUpload.range.extent.width, imageUpload.range.extent.height, imageUpload.range.extent.depth, imageUpload.resource.m_Name, imageUpload.range.subresourceLayers.mipLevel, mipExtent.width, mipExtent.height, mipExtent.depth);
+							#else
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Offset3D '{} {} {}' + Extent3D '{} {} {}' provided when calling SubmitUpdate for resource VulkanImage '{}' is located beyond the image mip level '{}' Extent3D '{} {} {}', no upload will be made.", imageUpload.range.offset.x, imageUpload.range.offset.y, imageUpload.range.offset.z, imageUpload.range.extent.width, imageUpload.range.extent.height, imageUpload.range.extent.depth, "Name is unavailable in release build", imageUpload.range.subresourceLayers.mipLevel, mipExtent.width, mipExtent.height, mipExtent.depth);
+							#endif
+
+							success = false;
+							break;
+						}
+
+						if (imageUpload.range.extent.width % blockExtent[0] != 0 && imageUpload.range.offset.x + imageUpload.range.extent.width != mipExtent.width ||
+							imageUpload.range.extent.height % blockExtent[1] != 0 && imageUpload.range.offset.y + imageUpload.range.extent.height != mipExtent.height ||
+							imageUpload.range.extent.depth % blockExtent[2] != 0 && imageUpload.range.offset.z + imageUpload.range.extent.depth != mipExtent.depth) {
+							#ifdef DEBUG_BUILD
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Invalid Extent3D '{} {} {}' provided when trying to upload to VulkanImage '{}' via StreamingLine, extent + offset is not at the image border and extent is not aligned to block extent '{} {} {}' of image format '{}', no upload will be made.", imageUpload.range.extent.width, imageUpload.range.extent.height, imageUpload.range.extent.depth, imageUpload.resource.m_Name, blockExtent[0], blockExtent[1], blockExtent[2], vk::to_string(imageUpload.resource.m_Format));
+							#else
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Invalid Extent3D '{} {} {}' provided when trying to upload to VulkanImage '{}' via StreamingLine, extent + offset is not at the image border and extent is not aligned to block extent '{} {} {}' of image format '{}', no upload will be made.", imageUpload.range.extent.width, imageUpload.range.extent.height, imageUpload.range.extent.depth, "Name is unavailable in release build", blockExtent[0], blockExtent[1], blockExtent[2], vk::to_string(imageUpload.resource.m_Format));
+							#endif
+
+							success = false;
+							break;
+						}
+
+						uint8_t blockSize = vk::blockSize(imageUpload.resource.m_Format);
+						uint64_t expectedDataSize = blockSize * std::ceil(static_cast<float>(imageUpload.range.extent.width) / static_cast<float>(blockExtent[0])) * std::ceil(static_cast<float>(imageUpload.range.extent.height) / static_cast<float>(blockExtent[1])) * std::ceil(static_cast<float>(imageUpload.range.extent.depth) / static_cast<float>(blockExtent[2])) * imageUpload.range.subresourceLayers.layerCount;
+
+						if (data.size_bytes() != expectedDataSize) {
+							#ifdef DEBUG_BUILD
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Data with invalid size was provided when trying to upload to VulkanImage '{}' via StreamingLine, upload Extent3D '{} {} {}', mip layer '{}', array layer count '{}', image format '{}', block size '{}', total expected data size '{}', provided data size '{}', no upload will be made.", imageUpload.resource.m_Name, imageUpload.range.extent.width, imageUpload.range.extent.height, imageUpload.range.extent.depth, imageUpload.range.subresourceLayers.mipLevel, imageUpload.range.subresourceLayers.layerCount, vk::to_string(imageUpload.resource.m_Format), blockSize, expectedDataSize, data.size_bytes());
+							#else
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Data with invalid size was provided when trying to upload to VulkanImage '{}' via StreamingLine, upload Extent3D '{} {} {}', mip layer '{}', array layer count '{}', image format '{}', block size '{}', total expected data size '{}', provided data size '{}', no upload will be made.", "Name is unavailable in release build", imageUpload.range.extent.width, imageUpload.range.extent.height, imageUpload.range.extent.depth, imageUpload.range.subresourceLayers.mipLevel, imageUpload.range.subresourceLayers.layerCount, vk::to_string(imageUpload.resource.m_Format), blockSize, expectedDataSize, data.size_bytes());
+							#endif
+
+							success = false;
+							break;
+						}
+
 						auto alloc = Get().TryAllocate(data.size_bytes(), std::max<uint64_t>(4, std::max<uint64_t>(4, vk::blockSize(imageUpload.resource.m_Format))));
 						if (alloc) {
-							queue.emplace_back(std::make_pair(imageUpload.resource, imageUpload.range), data.size_bytes(), alloc.value());
+							slot.pendingUploads.emplace_back(imageUpload, data.size_bytes(), alloc.value());
 						} else {
 							success = false;
 							break;
@@ -1623,16 +1762,17 @@ namespace Cori {
 				}
 
 				if (!success) {
-					for (auto& invalid : std::ranges::subrange(queue.begin() + startOffset, queue.end())) {
+					for (auto& invalid : std::ranges::subrange(slot.pendingUploads.begin() + startOffset, slot.pendingUploads.end())) {
 						Get().m_StagingBlock.free(invalid.stagingAllocation.virtualAllocation);
 					}
 
-					queue.erase(queue.begin() + startOffset, queue.end());
+					slot.pendingUploads.erase(slot.pendingUploads.begin() + startOffset, slot.pendingUploads.end());
+					ProcessUploads();
 					return std::nullopt;
 				}
 
-				for (auto [in, pending] : std::views::zip(uploads, std::ranges::subrange(queue.begin() + startOffset, queue.end()))) {
-					auto result = VulkanEngine::GetAllocator().copyMemoryToAllocation(in.second.data(), Get().m_RingStagingBuffer.m_Allocation, pending.stagingAllocation.offset, pending.stagingSize);
+				for (auto [in, pending] : std::views::zip(uploads, std::ranges::subrange(slot.pendingUploads.begin() + startOffset, slot.pendingUploads.end()))) {
+					auto result = VulkanEngine::GetAllocator().copyMemoryToAllocation(in.data.data(), Get().m_RingStagingBuffer.m_Allocation, pending.stagingAllocation.offset, pending.stagingSize);
 					CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to copy streaming data to the staging buffer. Error: {}", vk::to_string(result));
 				}
 
@@ -1647,22 +1787,303 @@ namespace Cori {
 			}
 
 			[[nodiscard]] static std::optional<uint64_t> SubmitUploads(const GenericUpload& upload) {
-				return SubmitUploads({ upload });
+				return SubmitUploads(std::span{ &upload, 1 });
 			}
 
 			static void ProcessUploads() {
+				for (auto& slot : Get().m_Slots) {
+					if (!slot.pendingUploads.empty() && slot.isBusy == false) {
 
+						vk::CommandBufferInheritanceInfo inherit{
+							.pNext = nullptr,
+							.occlusionQueryEnable = vk::False
+						};
+
+
+						vk::CommandBufferBeginInfo secondaryBeginInfo {
+							.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit,
+							.pInheritanceInfo = &inherit,
+						};
+
+						auto result = slot.secondaryCmb.begin(secondaryBeginInfo);
+						CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to begin secondary command buffer recording in VulkanStreamingLine. Error: {}", vk::to_string(result));
+
+						for (auto& pending : slot.pendingUploads) {
+							if (std::holds_alternative<ImageUpload>(pending.resourceUpload)) {
+								auto& resourceUpload = std::get<ImageUpload>(pending.resourceUpload);
+
+								vk::BufferImageCopy region{
+									.bufferOffset = pending.stagingAllocation.offset,
+									.bufferRowLength = 0,
+									.bufferImageHeight = 0,
+									.imageSubresource = resourceUpload.range.subresourceLayers,
+									.imageOffset = resourceUpload.range.offset,
+									.imageExtent = resourceUpload.range.extent
+								};
+
+								vk::ImageSubresourceRange vkRange{
+									.aspectMask = resourceUpload.range.subresourceLayers.aspectMask,
+									.baseMipLevel = resourceUpload.range.subresourceLayers.mipLevel,
+									.levelCount = 1,
+									.baseArrayLayer = resourceUpload.range.subresourceLayers.baseArrayLayer,
+									.layerCount = resourceUpload.range.subresourceLayers.layerCount
+								};
+
+								Get().m_AcquireImageBarriersCache.emplace_back(vk::ImageMemoryBarrier2{
+									.srcStageMask = vk::PipelineStageFlagBits2::eNone,
+									.srcAccessMask = vk::AccessFlagBits2::eNone,
+									.dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
+									.dstAccessMask = vk::AccessFlagBits2::eTransferWrite,
+									.oldLayout = vk::ImageLayout::eUndefined,
+									.newLayout = vk::ImageLayout::eTransferDstOptimal,
+									.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+									.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+									.image = resourceUpload.resource.m_Image,
+									.subresourceRange = vkRange
+								});
+
+								slot.secondaryCmb.copyBufferToImage(Get().m_RingStagingBuffer.m_Buffer, resourceUpload.resource.m_Image, vk::ImageLayout::eTransferDstOptimal, region);
+
+								Get().m_ReleaseImageBarriersCache.emplace_back(vk::ImageMemoryBarrier2{
+									.srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
+									.srcAccessMask = vk::AccessFlagBits2::eTransferWrite,
+									.dstStageMask = vk::PipelineStageFlagBits2::eNone,
+									.dstAccessMask = vk::AccessFlagBits2::eNone,
+									.oldLayout = vk::ImageLayout::eTransferDstOptimal,
+									.newLayout = resourceUpload.dstLayout,
+									.srcQueueFamilyIndex = VulkanEngine::GetTransferQueueFamilyIndex(),
+									.dstQueueFamilyIndex = resourceUpload.dstQueueFamilyIndex,
+									.image = resourceUpload.resource.m_Image,
+									.subresourceRange = vkRange
+								});
+
+							} else {
+								auto& resourceUpload = std::get<BufferUpload>(pending.resourceUpload);
+
+								Get().m_BufferBarriersCache.emplace_back(vk::BufferMemoryBarrier2{
+									.srcStageMask = resourceUpload.srcPipelineStages,
+									.srcAccessMask = resourceUpload.srcAccessFlags,
+									.dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
+									.dstAccessMask = vk::AccessFlagBits2::eTransferWrite,
+									.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+									.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+									.buffer = resourceUpload.resource.m_Buffer,
+									.offset = resourceUpload.range.offset,
+									.size = pending.stagingSize,
+								});
+
+								vk::BufferCopy region{
+									.srcOffset = pending.stagingAllocation.offset,
+									.dstOffset = resourceUpload.range.offset,
+									.size = pending.stagingSize
+								};
+
+								slot.secondaryCmb.copyBuffer(Get().m_RingStagingBuffer.m_Buffer, resourceUpload.resource.m_Buffer, region);
+							}
+						}
+
+						result = slot.secondaryCmb.end();
+						CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to end secondary command buffer recording in VulkanStreamingLine. Error: {}", vk::to_string(result));
+
+						vk::CommandBufferBeginInfo primaryBeginInfo {
+							.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit
+						};
+
+						result = slot.primaryCmb.begin(primaryBeginInfo);
+						CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to begin primary command buffer recording in VulkanStreamingLine. Error: {}", vk::to_string(result));
+
+						vk::DependencyInfo depInfoIn{};
+						bool inEmpty = true;
+						vk::DependencyInfo depInfoOut{};
+						bool outEmpty = true;
+
+
+						if (!Get().m_AcquireImageBarriersCache.empty()) {
+							depInfoIn.imageMemoryBarrierCount = static_cast<uint32_t>(Get().m_AcquireImageBarriersCache.size());
+							depInfoIn.pImageMemoryBarriers = Get().m_AcquireImageBarriersCache.data();
+
+							depInfoOut.imageMemoryBarrierCount = static_cast<uint32_t>(Get().m_ReleaseImageBarriersCache.size());
+							depInfoOut.pImageMemoryBarriers = Get().m_ReleaseImageBarriersCache.data();
+
+							inEmpty = false;
+							outEmpty = false;
+						}
+
+						if (!Get().m_BufferBarriersCache.empty()) {
+							depInfoIn.bufferMemoryBarrierCount = static_cast<uint32_t>(Get().m_BufferBarriersCache.size());
+							depInfoIn.pBufferMemoryBarriers = Get().m_BufferBarriersCache.data();
+
+							inEmpty = false;
+						}
+
+						if (!inEmpty) {
+							slot.primaryCmb.pipelineBarrier2(depInfoIn);
+						}
+
+						slot.primaryCmb.executeCommands(slot.secondaryCmb);
+
+						if (!outEmpty) {
+							slot.primaryCmb.pipelineBarrier2(depInfoOut);
+						}
+
+						result = slot.primaryCmb.end();
+						CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to end primary command buffer recording in VulkanStreamingLine. Error: {}", vk::to_string(result));
+
+						vk::TimelineSemaphoreSubmitInfo timelineInfo {
+							.signalSemaphoreValueCount = 1,
+							.pSignalSemaphoreValues = &Get().m_NextTicket
+						};
+
+						vk::SubmitInfo submitInfo{
+							.pNext = &timelineInfo,
+							.commandBufferCount = 1,
+							.pCommandBuffers = &slot.primaryCmb,
+							.signalSemaphoreCount = 1,
+							.pSignalSemaphores = &Get().m_TimelineSemaphore
+						};
+
+						result = VulkanEngine::GetTransferQueue().submit(1, &submitInfo, VK_NULL_HANDLE);
+						CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Transfer queue submission failed in VulkanStreamingLine. Error: {}", vk::to_string(result));
+
+						Get().m_BufferBarriersCache.clear();
+						Get().m_AcquireImageBarriersCache.clear();
+						Get().m_ReleaseImageBarriersCache.clear();
+
+						slot.isBusy = true;
+						slot.completionTicket = Get().m_NextTicket++;
+						break;
+					}
+				}
 			}
-
 
 			~VulkanStreamingLine() {
+				m_StagingBlock.clearVirtualBlock();
+				m_StagingBlock.destroy();
 
+				m_RingStagingBuffer.Destroy();
+
+				for (auto& slot : m_Slots) {
+					VulkanEngine::GetLogicalDevice().freeCommandBuffers(VulkanEngine::GetTransferCmp(), slot.primaryCmb);
+					VulkanEngine::GetLogicalDevice().freeCommandBuffers(VulkanEngine::GetTransferCmp(), slot.secondaryCmb);
+				}
+
+				VulkanEngine::GetLogicalDevice().destroySemaphore(m_TimelineSemaphore);
 			}
-
 
 		private:
 			VulkanStreamingLine() {
+				vk::CommandBufferAllocateInfo pCmbCreateInfo {
+					.commandPool = VulkanEngine::GetTransferCmp(),
+					.level = vk::CommandBufferLevel::ePrimary,
+					.commandBufferCount = TRANSFERS_IN_FLIGHT
+				};
 
+				vk::CommandBufferAllocateInfo sCmbCreateInfo {
+					.commandPool = VulkanEngine::GetTransferCmp(),
+					.level = vk::CommandBufferLevel::eSecondary,
+					.commandBufferCount = TRANSFERS_IN_FLIGHT
+				};
+
+				auto [result, pCmb] = VulkanEngine::GetLogicalDevice().allocateCommandBuffers(pCmbCreateInfo);
+				auto [result1, sCmb] = VulkanEngine::GetLogicalDevice().allocateCommandBuffers(sCmbCreateInfo);
+
+				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to create primary command buffers for VulkanStreamingLine. Error: {}", vk::to_string(result));
+				CORI_CORE_ASSERT(result1 == vk::Result::eSuccess, "Failed to create secondary command buffers for VulkanStreamingLine. Error: {}", vk::to_string(result1));
+
+				for (uint32_t i = 0; i < TRANSFERS_IN_FLIGHT; i++) {
+					auto& slot = m_Slots[i];
+
+					slot.primaryCmb = pCmb[i];
+					slot.secondaryCmb = sCmb[i];
+
+					slot.pendingUploads.reserve(128);
+				}
+
+				vk::SemaphoreTypeCreateInfo semType {
+					.semaphoreType = vk::SemaphoreType::eTimeline,
+					.initialValue = 0
+				};
+
+				vk::SemaphoreCreateInfo semInfo {
+					.pNext = &semType,
+				};
+
+				auto [result2, semaphore] = VulkanEngine::GetLogicalDevice().createSemaphore(semInfo);
+
+				CORI_CORE_ASSERT(result2 == vk::Result::eSuccess, "Failed to create timeline semaphore for VulkanStreamingLine. Error: {}", vk::to_string(result2));
+
+				m_TimelineSemaphore = semaphore;
+				VulkanEngine::SetDebugName(m_TimelineSemaphore, "VulkanStreamingLine Timeline Semaphore");
+
+				vk::BufferCreateInfo stagingCreateInfo {
+					.size = HEAP_SIZE,
+					.usage = vk::BufferUsageFlagBits::eTransferSrc,
+					.sharingMode = vk::SharingMode::eExclusive
+				};
+
+				vma::AllocationCreateInfo allocCreateInfo {
+					.flags = vma::AllocationCreateFlagBits::eHostAccessSequentialWrite | vma::AllocationCreateFlagBits::eMapped,
+					.usage = vma::MemoryUsage::eAuto
+				};
+
+				VulkanBuffer::CreateInfo stagingInfo {
+					.bufferCreateInfo = &stagingCreateInfo,
+					.allocationCreateInfo = &allocCreateInfo,
+				};
+
+				m_RingStagingBuffer = VulkanBuffer::Create(stagingInfo);
+
+				vma::VirtualBlockCreateInfo blockInfo {
+					.size = HEAP_SIZE,
+					.flags = vma::VirtualBlockCreateFlagBits::eLinearAlgorithm
+				};
+
+				auto [result3, block] = vma::createVirtualBlock(blockInfo);
+				CORI_CORE_ASSERT(result3 == vk::Result::eSuccess, "Failed to create vma virtual block for VulkanStreamingLine. Error: {}", vk::to_string(result3));
+
+				m_StagingBlock = block;
+
+				m_BufferBarriersCache.reserve(128);
+				m_AcquireImageBarriersCache.reserve(128);
+				m_ReleaseImageBarriersCache.reserve(128);
+			}
+
+			[[nodiscard]] std::optional<uint32_t> GetFreeTransferSlot() {
+				uint32_t freeSlot = UINT32_MAX;
+				uint32_t slotCounter = 0;
+				auto [result, currentValue] = VulkanEngine::GetLogicalDevice().getSemaphoreCounterValue(Get().m_TimelineSemaphore);
+				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to get value of the timeline semaphore in the streaming line. Error: {}", vk::to_string(result));
+
+				for (const auto& slot : m_Slots) {
+					if (currentValue >= slot.completionTicket) {
+						if (freeSlot == UINT32_MAX) {
+							freeSlot = currentValue;
+						}
+
+						if (slot.isBusy == true) {
+							ScrubSlot(slotCounter);
+						}
+					}
+
+					slotCounter++;
+				}
+
+				if (freeSlot != UINT32_MAX) {
+					return freeSlot;
+				}
+
+				return std::nullopt;
+			}
+
+			void ScrubSlot(const uint32_t slotIndex) {
+				auto& slot = m_Slots[slotIndex];
+				slot.isBusy = false;
+
+				for (auto& pending : slot.pendingUploads) {
+					Get().m_StagingBlock.free(pending.stagingAllocation.virtualAllocation);
+				}
+
+				slot.pendingUploads.clear();
 			}
 
 			[[nodiscard]] std::optional<Allocation> TryAllocate(const uint64_t size, const uint64_t alignment) {
@@ -1690,10 +2111,17 @@ namespace Cori {
 
 			vma::VirtualBlock m_StagingBlock;
 			VulkanBuffer m_RingStagingBuffer;
-			std::array<vk::Fence, FRAMES_IN_FLIGHT> m_Fences;
-			std::array<std::vector<PendingUpload>, FRAMES_IN_FLIGHT> m_PendingUploads;
+
+			std::array<SlotData, TRANSFERS_IN_FLIGHT> m_Slots;
+
+			std::vector<vk::BufferMemoryBarrier2> m_BufferBarriersCache;
+
+			std::vector<vk::ImageMemoryBarrier2> m_AcquireImageBarriersCache;
+			std::vector<vk::ImageMemoryBarrier2> m_ReleaseImageBarriersCache;
 			vk::Semaphore m_TimelineSemaphore;
-			uint64_t m_NextTicket{ 0 };
+
+			uint64_t m_NextTicket{ 1 };
+
 			static constexpr uint64_t HEAP_SIZE{ 128 * 1024 * 1024 };
 
 			static std::unique_ptr<VulkanStreamingLine> s_Instance;
