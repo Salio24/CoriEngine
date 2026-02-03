@@ -6,8 +6,8 @@ namespace Cori {
 		class VulkanImage {
 		public:
 			struct CreateInfo {
-				vk::ImageCreateInfo* imageCreateInfo{ nullptr };
-				vma::AllocationCreateInfo* allocationCreateInfo{ nullptr };
+				const vk::ImageCreateInfo* imageCreateInfo{ nullptr };
+				const vma::AllocationCreateInfo* allocationCreateInfo{ nullptr };
 				const char* name = "";
 			};
 
@@ -23,7 +23,7 @@ namespace Cori {
 			};
 
 
-			[[nodiscard]] static VulkanImage Create(CreateInfo& info);
+			[[nodiscard]] static VulkanImage Create(const CreateInfo& info);
 
 			void Destroy();
 

@@ -116,7 +116,6 @@ namespace Cori {
 
 			DeletionQueue::Init();
 			VulkanStreamingLine::Init();
-			VulkanUploadManager::Init();
 			VulkanMeshManager::Init();
 			VulkanGlobalLayoutManager::Init();
 			VulkanImageViewManager::Init();
@@ -139,7 +138,6 @@ namespace Cori {
 			VulkanImageViewManager::Shutdown();
 			VulkanGlobalLayoutManager::Shutdown();
 			VulkanMeshManager::Shutdown();
-			VulkanUploadManager::Shutdown();
 			VulkanStreamingLine::Shutdown();
 			DeletionQueue::Shutdown();
 
@@ -163,11 +161,12 @@ namespace Cori {
 
 			m_Device.destroySwapchainKHR(m_SwapChain);
 			m_Instance.destroySurfaceKHR(m_Surface);
-			vmaDestroyAllocator(&*m_Allocator);
+			m_Allocator.destroy();
 			m_Device.destroy();
 			m_Instance.destroyDebugUtilsMessengerEXT(m_DebugMessenger);
 			m_Instance.destroy();
 			s_Instance = nullptr;
+
 		}
 
 		std::pair<vk::SharingMode, std::vector<uint32_t>>& VulkanEngine::GetBufferSharingSettings(const QueueUsageFlags usage) {
@@ -175,9 +174,13 @@ namespace Cori {
 			return Get().m_SharingSettings[static_cast<QueueUsageFlags::MaskType>(usage)];
 		}
 
-		VulkanEngine::FrameData& VulkanEngine::BeginFrame() {
-			FrameData& frameData = m_FrameData[m_CurrentFrameInFlight];
+		void VulkanEngine::CPUFrameStart() {
 			m_CurrentFrameIndex++;
+			VulkanVirtualBufferAllocator::ClearGPUScratchBlock();
+		}
+
+		VulkanEngine::FrameData& VulkanEngine::GPUFrameBegin() {
+			FrameData& frameData = m_FrameData[m_CurrentFrameInFlight];
 			frameData.m_FrameIndex = m_CurrentFrameIndex;
 			frameData.m_SwapChainImageIndex = UINT32_MAX;
 			frameData.m_SkippedFrame = false;
@@ -209,7 +212,7 @@ namespace Cori {
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to begin command buffer recording. Error: {}", vk::to_string(result));
 
 			vk::ImageMemoryBarrier2 barrier {
-				.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+				.srcStageMask = vk::PipelineStageFlagBits2::eTopOfPipe,
 				.srcAccessMask = {},
 				.dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
 				.dstAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
@@ -217,7 +220,7 @@ namespace Cori {
 				.newLayout = vk::ImageLayout::eColorAttachmentOptimal,
 				.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
 				.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-				.image = m_SwapChainImages[imageIndex],
+				.image = m_SwapChainImages[m_CurrentSwapChainImageIndex],
 				.subresourceRange = {
 					.aspectMask = vk::ImageAspectFlagBits::eColor,
 					.baseMipLevel = 0,
@@ -280,10 +283,16 @@ namespace Cori {
 			return frameData;
 		}
 
-		void VulkanEngine::EndFrame() {
+		void VulkanEngine::GPUFrameMiddlePointSync() {
 			FrameData& frameData = m_FrameData[m_CurrentFrameInFlight];
-			VulkanUploadManager::Get().SubmitStaging();
-			//VulkanUploadManager::Get().SubmitAmazing();
+			VulkanStreamingLine::ProcessUploads();
+			VulkanVirtualBufferAllocator::SubmitCopies(frameData.m_CommandBuffer);
+			VulkanDynamicContainerUploadManager::ProcessUpdates(frameData.m_CommandBuffer);
+		}
+
+
+		void VulkanEngine::GPUFrameEnd() {
+			FrameData& frameData = m_FrameData[m_CurrentFrameInFlight];
 
 			if (!frameData.m_SkippedFrame) {
 				vk::ImageMemoryBarrier2 barrier {
@@ -316,6 +325,11 @@ namespace Cori {
 
 				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to end command buffer recording. Error: {}", vk::to_string(result));
 
+				vk::TimelineSemaphoreSubmitInfo timelineInfo{
+					.waitSemaphoreValueCount = static_cast<uint32_t>(m_TimelineWaitValues.size()),
+					.pWaitSemaphoreValues = m_TimelineWaitValues.data()
+				};
+
 				vk::SubmitInfo submitInfo{
 					.waitSemaphoreCount = static_cast<uint32_t>(m_WaitSemaphores.size()),
 					.pWaitSemaphores = m_WaitSemaphores.data(),
@@ -325,6 +339,10 @@ namespace Cori {
 					.signalSemaphoreCount = 1,
 					.pSignalSemaphores = &m_RenderFinishedSemaphores[m_CurrentSwapChainImageIndex]
 				};
+
+				if (m_TimelineSemaphoresPresent) {
+					submitInfo.pNext = &timelineInfo;
+				}
 
 				result = m_GraphicsQueue.submit(submitInfo, frameData.m_DrawFence);
 				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Graphics queue submission failed. Error: {}", vk::to_string(result));
@@ -349,6 +367,8 @@ namespace Cori {
 
 			m_WaitSemaphores.clear();
 			m_WaitDstStageMasks.clear();
+			m_TimelineWaitValues.clear();
+			m_TimelineSemaphoresPresent = false;
 			m_CurrentFrameInFlight = (m_CurrentFrameInFlight + 1) % FRAMES_IN_FLIGHT;
 		}
 

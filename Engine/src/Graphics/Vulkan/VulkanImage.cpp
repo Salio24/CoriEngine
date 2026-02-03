@@ -4,7 +4,7 @@
 
 namespace Cori {
 	namespace Graphics {
-		VulkanImage VulkanImage::Create(CreateInfo& info) {
+		VulkanImage VulkanImage::Create(const CreateInfo& info) {
 			VulkanImage image;
 			auto [result, value] = VulkanEngine::GetAllocator().createImage(*info.imageCreateInfo, *info.allocationCreateInfo);
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to create image '{}'. Error: {}", info.name, vk::to_string(result));

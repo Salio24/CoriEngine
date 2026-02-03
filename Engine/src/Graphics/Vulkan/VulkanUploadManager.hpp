@@ -3,12 +3,20 @@
 #include "VulkanImage.hpp"
 #include "VulkanBuffer.hpp"
 #include "VulkanEngine.hpp"
-#include "Graphics/ResourceType.hpp"
 #include "VulkanResourceTracker.hpp"
 #include "Core/DataStructures/FlatSlotMap.hpp"
 #include <sul/dynamic_bitset.hpp>
 
 //PS: oops, this has a critical design flaw payload alloc spam, well guess i need to rewrite upload system. Frame arena will also be a good addition, dynamic buffer sizes, hooray!
+
+//DEPRICATED!!!
+//DEPRICATED!!!
+//DEPRICATED!!!
+//DEPRICATED!!!
+//DEPRICATED!!!
+//DEPRICATED!!!
+
+#if 0
 
 namespace Cori {
 	namespace Graphics {
@@ -1187,3 +1195,5 @@ namespace Cori {
 		};
 	}
 }
+
+#endif

@@ -17,13 +17,13 @@ namespace Cori {
 			};
 
 			template<typename T = Byte>
-			void UploadToAllocation(const std::span<T> data, uint64_t offset) {
+			bool UploadToAllocation(const std::span<T> data, uint64_t offset) {
 				CORI_CORE_ASSERT(m_Type == Type::CPUUpload, "Calling UploadToAllocation on VulkanVirtualBuffer that was created as a GPU scratch, this type of virtual buffer can not be uploaded from CPU.")
 
 				#ifdef DEBUG_BUILD
 				if (alignof(T) > m_Alignment || m_Alignment % alignof(T) != 0) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::VirtualBuffer }, "Critical misalignment was encountered when trying to upload to VirtualBuffer, type '{}' has alignment '{}', but VirtualBuffer '{}' was created with alignment of '{}'. No upload was made.", CORI_CLEAN_TYPE_NAME(T), alignof(T), m_Name, m_Alignment);
-					return;
+					return false;
 				}
 				#endif
 
@@ -34,7 +34,7 @@ namespace Cori {
 					#else
 					CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::VirtualBuffer }, "Offset '{}' provided when calling UploadToAllocation of VirtualBuffer '{}' is misaligned to its alignment of '{}', no upload will be made.", offset, "Name is unavailable in release build", m_Alignment);
 					#endif
-					return;
+					return false;
 				}
 
 				if (offset + data.size_bytes() > m_Size) {
@@ -43,7 +43,7 @@ namespace Cori {
 					#else
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::VirtualBuffer }, "Trying to upload to VirtualBuffer '{}', but upload is out of bounds, offest '{}', data size '{}', buffer size '{}', no upload will be made.", "Name is unavailable in release build", offset, data.size_bytes(), m_Size);
 					#endif
-					return;
+					return false;
 				}
 
 				auto result = VulkanEngine::GetAllocator().copyMemoryToAllocation(data.data(), m_Alloc, offset + m_StartOffset, data.size_bytes());
@@ -53,6 +53,8 @@ namespace Cori {
 				if (s_UploadListener) {
 					s_UploadListener(*this);
 				}
+
+				return true;
 			}
 
 			[[nodiscard]] vk::Buffer GetHeapHandle() {
@@ -157,7 +159,7 @@ namespace Cori {
 				};
 
 				vk::DeviceSize offset;
-				auto [result, alloc] = Get().m_GPUScratchBlock.virtualAllocate(allocInfo, &offset);
+				auto [result, _] = Get().m_GPUScratchBlock.virtualAllocate(allocInfo, &offset);
 				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to create VulkanVirtualBuffer from GPU scratch heap, likely out of memory. Error: {}", vk::to_string(result));
 
 				VulkanVirtualBuffer virtBuff;
@@ -170,8 +172,11 @@ namespace Cori {
 				virtBuff.m_Name = name;
 				#endif
 				virtBuff.m_Alignment = alignment;
-				DeletionQueue::PushVirtualAlloc(alloc, Get().m_GPUScratchBlock, VulkanEngine::GetCurrentFrameInFlight());
 				return virtBuff;
+			}
+
+			static void ClearGPUScratchBlock() {
+				Get().m_GPUScratchBlock.clearVirtualBlock();
 			}
 
 			static void SubmitCopies(vk::CommandBuffer cmb) {
@@ -854,7 +859,7 @@ namespace Cori {
 			};
 
 			using Iterator = IteratorImpl;
-			using ConstIterator = std::vector<T>::const_iterator;
+			using ConstIterator = typename std::vector<T>::const_iterator;
 
 			using Reference = ReferenceProxy;
 			using ConstReference = const T&;
@@ -1357,8 +1362,8 @@ namespace Cori {
 
 			using Iterator = IteratorImpl<false>;
 			using ConstIterator = IteratorImpl<true>;
-			using Reference = VulkanDynamicVector<T>::Reference;
-			using ConstReference = VulkanDynamicVector<T>::ConstReference;
+			using Reference = typename VulkanDynamicVector<T>::Reference;
+			using ConstReference = typename VulkanDynamicVector<T>::ConstReference;
 			using ReverseIterator = std::reverse_iterator<Iterator>;
 			using ConstReverseIterator = std::reverse_iterator<ConstIterator>;
 
@@ -1897,7 +1902,6 @@ namespace Cori {
 						vk::DependencyInfo depInfoOut{};
 						bool outEmpty = true;
 
-
 						if (!Get().m_AcquireImageBarriersCache.empty()) {
 							depInfoIn.imageMemoryBarrierCount = static_cast<uint32_t>(Get().m_AcquireImageBarriersCache.size());
 							depInfoIn.pImageMemoryBarriers = Get().m_AcquireImageBarriersCache.data();
@@ -2057,7 +2061,7 @@ namespace Cori {
 				for (const auto& slot : m_Slots) {
 					if (currentValue >= slot.completionTicket) {
 						if (freeSlot == UINT32_MAX) {
-							freeSlot = currentValue;
+							freeSlot = slotCounter;
 						}
 
 						if (slot.isBusy == true) {

@@ -124,6 +124,10 @@ namespace Cori {
 				return (Get().m_CurrentFrameInFlight + FRAMES_IN_FLIGHT + 1) % FRAMES_IN_FLIGHT;
 			}
 
+			static uint64_t GetFrameIndex() {
+				return Get().m_CurrentFrameIndex;
+			}
+
 			static vk::Queue& GetTransferQueue() {
 				return Get().m_TransferQueue;
 			}
@@ -140,9 +144,31 @@ namespace Cori {
 				return Get().m_TransferCommandPool;
 			}
 
-			static void AddWaitSemaphore(vk::Semaphore& semaphore, vk::PipelineStageFlags waitDstStageMask) {
+			static void AddWaitSemaphore(const vk::Semaphore semaphore, const vk::PipelineStageFlags waitDstStageMask) {
+				for (uint32_t i = 0; i < Get().m_WaitSemaphores.size(); i++) {
+					if (Get().m_WaitSemaphores[i] == semaphore && Get().m_WaitDstStageMasks[i] == waitDstStageMask) {
+						return;
+					}
+				}
+
 				Get().m_WaitSemaphores.emplace_back(semaphore);
+				Get().m_TimelineWaitValues.emplace_back(0);
 				Get().m_WaitDstStageMasks.emplace_back(waitDstStageMask);
+			}
+
+			static void AddWaitTimelineSemaphore(const vk::Semaphore semaphore, const uint64_t value, const vk::PipelineStageFlags waitDstStageMask) {
+				for (uint32_t i = 0; i < Get().m_WaitSemaphores.size(); i++) {
+					if (Get().m_WaitSemaphores[i] == semaphore && Get().m_WaitDstStageMasks[i] == waitDstStageMask && Get().m_TimelineWaitValues[i] < value) {
+						Get().m_TimelineWaitValues[i] = value;
+						return;
+					}
+				}
+
+				Get().m_WaitSemaphores.emplace_back(semaphore);
+				Get().m_TimelineWaitValues.emplace_back(value);
+				Get().m_WaitDstStageMasks.emplace_back(waitDstStageMask);
+
+				Get().m_TimelineSemaphoresPresent = true;
 			}
 
 			static vk::ImageView GetSwapChainImageView() {
@@ -157,9 +183,13 @@ namespace Cori {
 				return Get().m_SwapChainImageFormat;
 			}
 
-			FrameData& BeginFrame();
+			void CPUFrameStart();
 
-			void EndFrame();
+			FrameData& GPUFrameBegin();
+
+			void GPUFrameMiddlePointSync();
+
+			void GPUFrameEnd();
 
 			~VulkanEngine();
 
@@ -188,8 +218,6 @@ namespace Cori {
 			void CreateCommandBuffer();
 
 			void CreateSyncObjects();
-
-			void SubmitToPresentQueue(std::function<void(vk::Queue&)>&& operation);
 
 			friend Renderer;
 
@@ -225,6 +253,9 @@ namespace Cori {
 
 			std::vector<vk::Semaphore> m_WaitSemaphores;
 			std::vector<vk::PipelineStageFlags> m_WaitDstStageMasks;
+			std::vector<uint64_t> m_TimelineWaitValues;
+
+			bool m_TimelineSemaphoresPresent{ false };
 
 			std::unordered_map<QueueUsageFlags::MaskType, std::pair<vk::SharingMode, std::vector<uint32_t>>> m_SharingSettings;
 

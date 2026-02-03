@@ -629,6 +629,8 @@ namespace Cori {
 				Get();
 				CORI_PROFILE_FUNCTION();
 
+				auto frameIndex = VulkanEngine::Get().IncrementFrameIndex();
+
 				static bool oneshot = false;
 				if (!oneshot) {
 					oneshot = true;
@@ -647,21 +649,21 @@ namespace Cori {
 
 				Get().UpdateBuffers();
 				Get().m_GraphPassRegistry.Reset();
-				Get().m_GraphResourceRegistry.Reset();
-				uint32_t frameIndex = VulkanEngine::GetCurrentFrameInFlight();
+				Get().m_GraphResourceRegistry.Reset(frameIndex);
+				uint32_t frameInFlightIndex = VulkanEngine::GetCurrentFrameInFlight();
 				RenderGraph graph(Get().m_GraphPassRegistry, Get().m_GraphResourceRegistry);
 
 				auto ObjectBufferHandle = graph.ImportBuffer(VulkanUploadManager::GetAmazingBuffer(Get().m_ObjectBufferHandle).GetCurrentFrameLocalBuffer(), "Object Data Buffer");
 				auto BatchInfoBufferHandle = graph.ImportBuffer(VulkanUploadManager::GetAmazingBuffer(Get().m_BatchInfoBufferHandle).GetCurrentFrameLocalBuffer(), "Batch Info Buffer");
 
-				auto GroupCommandOffsetsBufferHandle = graph.ImportBuffer(Get().m_GroupCommandOffsets[frameIndex], "Group Command Offsets Buffer");
+				auto GroupCommandOffsetsBufferHandle = graph.ImportBuffer(Get().m_GroupCommandOffsets[frameInFlightIndex], "Group Command Offsets Buffer");
 
-				auto DrawCommandBufferHandle = graph.ImportBuffer(Get().m_DrawCommandBuffers[frameIndex], "Draw Command Buffer");
-				auto DrawCommandCountBufferHandle = graph.ImportBuffer(Get().m_DrawCommandCountBuffers[frameIndex], "Draw Command Count Buffer");
+				auto DrawCommandBufferHandle = graph.ImportBuffer(Get().m_DrawCommandBuffers[frameInFlightIndex], "Draw Command Buffer");
+				auto DrawCommandCountBufferHandle = graph.ImportBuffer(Get().m_DrawCommandCountBuffers[frameInFlightIndex], "Draw Command Count Buffer");
 
-				auto BatchIntermediateInfoBufferHandle = graph.ImportBuffer(Get().m_BatchIntermediateInfoBuffers[frameIndex], "Batch Intermediate Info Buffer");
-				auto InstanceAtomicCounterHandle = graph.ImportBuffer(Get().m_AtomicInstance[frameIndex], "Instance Atomic Counter Buffer");
-				auto CompactedInstanceListBufferHandle = graph.ImportBuffer(Get().m_CompactedInstanceListBuffers[frameIndex], "Compacted Instance List Buffer Buffer");
+				auto BatchIntermediateInfoBufferHandle = graph.ImportBuffer(Get().m_BatchIntermediateInfoBuffers[frameInFlightIndex], "Batch Intermediate Info Buffer");
+				auto InstanceAtomicCounterHandle = graph.ImportBuffer(Get().m_AtomicInstance[frameInFlightIndex], "Instance Atomic Counter Buffer");
+				auto CompactedInstanceListBufferHandle = graph.ImportBuffer(Get().m_CompactedInstanceListBuffers[frameInFlightIndex], "Compacted Instance List Buffer Buffer");
 
 				auto MeshAssetBufferHandle = graph.ImportBuffer(VulkanMeshManager::GetFrameLocalMeshAssetBuffer(), "Mesh Asset Buffer");
 
@@ -827,8 +829,8 @@ namespace Cori {
 					Get().testVec.PushBack(ada++);
 				}
 
-				graph.Compile();
-				auto& frameData = VulkanEngine::Get().BeginFrame();
+				graph.Compile(frameIndex);
+				auto& frameData = VulkanEngine::Get().GPUFrameBegin();
 				if (!frameData.m_SkippedFrame) {
 					graph.Execute(frameData.m_CommandBuffer);
 				}
@@ -877,7 +879,7 @@ namespace Cori {
 				}
 
 
-				VulkanEngine::Get().EndFrame();
+				VulkanEngine::Get().GPUFrameEnd();
 
 				//VulkanResourceTracker* tracker = &VulkanResourceTracker::Get();
 

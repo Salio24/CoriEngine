@@ -3,6 +3,8 @@
 #include "VulkanImage.hpp"
 #include "VulkanBuffer.hpp"
 
+#if 0
+
 namespace Cori {
 	namespace Graphics {
 		struct ResourceState {
@@ -402,3 +404,5 @@ namespace Cori {
 		};
 	}
 }
+
+#endif

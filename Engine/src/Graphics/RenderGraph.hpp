@@ -5,9 +5,9 @@
 #include "Vulkan/VulkanBuffer.hpp"
 #include "Vulkan/VulkanResourceTracker.hpp"
 #include "Vulkan/VulkanLayoutManager.hpp"
+#include "Vulkan/VulkanUploadSubsystem.hpp"
 #include "Utility/StringHash.hpp"
-#include "ResourceType.hpp"
-
+#include "Utility/HashCombine.hpp"
 
 #ifndef CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE
 	#define CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE 16
@@ -37,120 +37,170 @@ namespace Cori {
 			const char* name = "";
 		};
 
-		struct BufferCreateInfo {
-			vk::BufferCreateInfo bufferCreateInfo;
-			vma::AllocationCreateInfo allocationCreateInfo;
-			const char* name = "";
-		};
-
-		struct PooledImageDescription {
-			explicit PooledImageDescription(const ImageCreateInfo& fullInfo) {
-				flags = fullInfo.imageCreateInfo.flags;
-				imageType = fullInfo.imageCreateInfo.imageType;
-				format = fullInfo.imageCreateInfo.format;
-				extent = fullInfo.imageCreateInfo.extent;
-				mipLevels = fullInfo.imageCreateInfo.mipLevels;
-				arrayLayers = fullInfo.imageCreateInfo.arrayLayers;
-				samples = fullInfo.imageCreateInfo.samples;
-				tiling = fullInfo.imageCreateInfo.tiling;
-				usage = fullInfo.imageCreateInfo.usage;
-			}
-
-			vk::ImageCreateFlags flags;
-			vk::ImageType imageType;
-			vk::Format format;
-			vk::Extent3D extent;
-			uint32_t mipLevels;
-			uint32_t arrayLayers;
-			vk::SampleCountFlagBits samples;
-			vk::ImageTiling tiling;
-			vk::ImageUsageFlags usage;
-
-			bool operator==(const PooledImageDescription& other) const = default;
-
-			auto operator<=>(const PooledImageDescription& other) const = default;
-		};
-
-		struct PooledBufferDescription {
-			explicit PooledBufferDescription(const BufferCreateInfo& fullInfo) {
-				flags = fullInfo.bufferCreateInfo.flags;
-				size = fullInfo.bufferCreateInfo.size;
-				usage = fullInfo.bufferCreateInfo.usage;
-			}
-
-			vk::BufferCreateFlags flags;
-			vk::DeviceSize size;
-			vk::BufferUsageFlags usage;
-
-			bool operator==(const PooledBufferDescription& other) const = default;
-
-			auto operator<=>(const PooledBufferDescription& other) const = default;
-		};
-
-		struct PooledImage {
-			VulkanImage image;
-			uint32_t framesAgoUsed{ 0 };
-		};
-
-		struct PooledBuffer {
-			VulkanBuffer buffer;
-			uint32_t framesAgoUsed{ 0 };
-		};
-
-		enum class ResourceOrigin {
-			Undefined,
-			Imported,
-			Created
-		};
-
-		using ResourceHandle = uint32_t;
-		using PassHandle = uint32_t;
-
-		struct PassPassDependency {
-			PassHandle otherPass;
-			ResourceHandle resource;
-		};
-
-		struct BufferRange {
-			uint64_t offset{ 0 };
+		struct ScratchBufferCreateInfo {
 			uint64_t size{ 0 };
-		};
-
-		struct ResourceUsage {
-			ResourceState desiredState;
-
-			std::variant<std::monostate, vk::ImageSubresourceRange, BufferRange> subrange;
-
-			//union {
-			//	BufferRange bufferRange;
-			//	vk::ImageSubresourceRange imageRange;
-			//};
-		};
-
-		struct PassResourceDependency {
-			ResourceHandle resource;
-			ResourceUsage usage;
-		};
-
-		struct ResourceNode {
+			uint64_t alignment{ 4 };
 			const char* name{ "" };
-			ResourceOrigin origin;
-			ResourceType type;
-			PassHandle lastProducer{ UINT32_MAX };
-			bool resourceAllocated{ false };
+		};
 
-			//union {
-			//	ImageCreateInfo imageInfo;
-			//	BufferCreateInfo bufferInfo;
-			//};
+		class RenderGraphResourceRegistry;
+		class RenderGraph;
 
-			std::variant<std::monostate, ImageCreateInfo, BufferCreateInfo> createInfo;
-			std::variant<std::monostate, VulkanImage, VulkanBuffer> resource;
+		namespace Internal {
+			using PassHandle = uint32_t;
 
-			//union {
-			//	VulkanBuffer buffer;
-			//	VulkanImage image;
-			//};
+			enum class ResourceOrigin {
+				Imported,
+				Created
+			};
+
+			struct ResourceState {
+				vk::PipelineStageFlags2 stageMask{ vk::PipelineStageFlagBits2::eNone };
+				vk::AccessFlags2 accessMask{ vk::AccessFlagBits2::eNone };
+				vk::ImageLayout imageLayout{ vk::ImageLayout::eUndefined };
+
+				bool operator==(const ResourceState& other) const = default;
+			};
+
+			struct ResourceUsage {
+				ResourceState desiredState;
+
+				vk::ImageSubresourceRange subrange{};
+			};
+
+			struct PooledImageDescription {
+				explicit PooledImageDescription(const ImageCreateInfo& fullInfo) {
+					flags = fullInfo.imageCreateInfo.flags;
+					imageType = fullInfo.imageCreateInfo.imageType;
+					format = fullInfo.imageCreateInfo.format;
+					extent = fullInfo.imageCreateInfo.extent;
+					mipLevels = fullInfo.imageCreateInfo.mipLevels;
+					arrayLayers = fullInfo.imageCreateInfo.arrayLayers;
+					samples = fullInfo.imageCreateInfo.samples;
+					tiling = fullInfo.imageCreateInfo.tiling;
+					usage = fullInfo.imageCreateInfo.usage;
+				}
+
+				vk::ImageCreateFlags flags;
+				vk::ImageType imageType;
+				vk::Format format;
+				vk::Extent3D extent;
+				uint32_t mipLevels;
+				uint32_t arrayLayers;
+				vk::SampleCountFlagBits samples;
+				vk::ImageTiling tiling;
+				vk::ImageUsageFlags usage;
+
+				bool operator==(const PooledImageDescription& other) const = default;
+
+				auto operator<=>(const PooledImageDescription& other) const = default;
+
+				struct Hasher {
+					std::size_t operator()(const PooledImageDescription& desc) const noexcept {
+						uint64_t hash;
+
+						Utility::HashCombine(hash, static_cast<uint32_t>(desc.flags));
+						Utility::HashCombine(hash, static_cast<uint32_t>(desc.imageType));
+						Utility::HashCombine(hash, static_cast<uint32_t>(desc.format));
+						Utility::HashCombine(hash, desc.extent.width);
+						Utility::HashCombine(hash, desc.extent.height);
+						Utility::HashCombine(hash, desc.extent.depth);
+						Utility::HashCombine(hash, desc.mipLevels);
+						Utility::HashCombine(hash, desc.arrayLayers);
+						Utility::HashCombine(hash, static_cast<uint32_t>(desc.samples));
+						Utility::HashCombine(hash, static_cast<uint32_t>(desc.tiling));
+						Utility::HashCombine(hash, static_cast<uint32_t>(desc.usage));
+
+						return hash;
+					}
+				};
+			};
+
+			struct PooledImage {
+				VulkanImage image;
+				uint32_t lastFrameUsed{ 0 };
+			};
+
+			struct ImageState {
+				bool isUniform{ true };
+
+				ResourceState globalState;
+
+				std::vector<ResourceState> subresourceStates;
+
+				void Reset(const ResourceState& initial) {
+					isUniform = true;
+					globalState = initial;
+					subresourceStates.clear();
+				}
+			};
+
+			using BufferState = ResourceState;
+
+			using ImageStateHandle = uint32_t;
+
+			class GraphResourceHandleBase {
+			protected:
+				GraphResourceHandleBase() = default;
+				GraphResourceHandleBase(const uint32_t value) : resourceID(value) {}
+
+				operator uint32_t() const { return resourceID; }
+
+				uint32_t resourceID{ UINT32_MAX };
+
+				friend RenderGraphResourceRegistry;
+				friend RenderGraph;
+			};
+
+			struct PassResourceDependency {
+				GraphResourceHandleBase resource;
+				ResourceUsage usage;
+			};
+
+			struct ImageResourceData {
+				ImageCreateInfo createInfo;
+				VulkanImage image;
+				ImageStateHandle stateHandle;
+			};
+
+			struct VirtualBufferResourceData {
+				ScratchBufferCreateInfo createInfo;
+				VulkanVirtualBuffer virtualBuffer;
+				BufferState state;
+			};
+
+			using DynamicContainerResourceData = void*;
+
+			struct ResourceNode {
+				const char* name{ "" };
+				ResourceOrigin origin;
+				PassHandle lastProducer{ UINT32_MAX };
+
+				std::variant<ImageResourceData, VirtualBufferResourceData, DynamicContainerResourceData> resourceData;
+			};
+		}
+
+		template<typename T>
+		class GraphResourceHandle : public Internal::GraphResourceHandleBase {};
+
+		struct BufferUsage {
+			vk::PipelineStageFlags2 stageMask{ vk::PipelineStageFlagBits2::eNone };
+			vk::AccessFlags2 accessMask{ vk::AccessFlagBits2::eNone };
+
+			explicit operator Internal::ResourceUsage() const {
+				return { { stageMask, accessMask } };
+			}
+		};
+
+		struct ImageUsage {
+			vk::PipelineStageFlags2 stageMask{ vk::PipelineStageFlagBits2::eNone };
+			vk::AccessFlags2 accessMask{ vk::AccessFlagBits2::eNone };
+			vk::ImageLayout imageLayout{ vk::ImageLayout::eUndefined };
+			vk::ImageSubresourceRange subrange{};
+
+			explicit operator Internal::ResourceUsage() const {
+				return { { stageMask, accessMask, imageLayout }, subrange };
+			}
 		};
 
 		struct SwapChainImageData {
@@ -159,76 +209,55 @@ namespace Cori {
 			vk::Extent2D imageExtent;
 		};
 
+		struct ScratchBufferTag {};
+		struct UploadBufferTag {};
+
 		class RenderGraphResourceRegistry {
 		public:
 			RenderGraphResourceRegistry() {
 				m_Nodes.resize(CORI_RENDER_GRAPH_RESOURCE_REGISTRY_INLINE_SIZE);
-				m_ImagesToFree.reserve(CORI_RENDER_GRAPH_RESOURCE_REGISTRY_INLINE_SIZE);
-				m_BuffersToFree.reserve(CORI_RENDER_GRAPH_RESOURCE_REGISTRY_INLINE_SIZE);
+				m_ImageStateCache.reserve(64); //TODO: move to define
 			}
 
-			void Reset() {
+			void Reset(const uint64_t currentFrameIndex) {
 				m_SwapChainImageData = {};
 				m_SwapChainImageRetrieved = false;
 				m_Nodes.clear();
+				m_ImageStateCacheSize = 0;
+
+				ClearStalePooledImages(currentFrameIndex);
 			}
 
-			void UpdateResourceStates() {
-				for (auto& pooledImage : m_ImagePool | std::views::values) {
-					pooledImage.framesAgoUsed++;
-				}
-
-				for (auto& pooledBuffer : m_BufferPool | std::views::values) {
-					pooledBuffer.framesAgoUsed++;
-				}
-			}
-
-			void ClearStalePooledResources() {
-				m_ImagesToFree.clear();
-				m_BuffersToFree.clear();
-				for (auto it = m_ImagePool.begin(); it != m_ImagePool.end(); ++it) {
-					if (it->second.framesAgoUsed > CORI_STALE_RESOURCE_LIFETIME) {
-						m_ImagesToFree.push_back(it);
-						it->second.image.Destroy();
-					}
-				}
-
-				for (auto it = m_BufferPool.begin(); it != m_BufferPool.end(); ++it) {
-					if (it->second.framesAgoUsed > CORI_STALE_RESOURCE_LIFETIME) {
-						m_BuffersToFree.push_back(it);
-						it->second.buffer.Destroy();
-					}
-				}
-
-				for (auto it : m_ImagesToFree) {
-					m_ImagePool.erase(it);
-				}
-
-				for (auto it : m_BuffersToFree) {
-					m_BufferPool.erase(it);
-				}
-			}
-
-			ResourceNode& GetNode(const ResourceHandle handle) {
-				return m_Nodes[handle];
-			}
-
-			VulkanImage& GetImage(const ResourceHandle handle) {
+			VulkanVirtualBuffer& GetResource(const GraphResourceHandle<ScratchBufferTag> handle) {
 				auto& node = GetNode(handle);
-				CORI_CORE_ASSERT(node.type == ResourceType::Image, "Invalid resource type.");
-				return std::get<VulkanImage>(node.resource);
+				auto& resourceData = std::get<Internal::VirtualBufferResourceData>(node.resourceData);
+				return resourceData.virtualBuffer;
 			}
 
-			VulkanBuffer& GetBuffer(const ResourceHandle handle) {
+			VulkanVirtualBuffer& GetResource(const GraphResourceHandle<UploadBufferTag> handle) {
 				auto& node = GetNode(handle);
-				CORI_CORE_ASSERT(node.type == ResourceType::Buffer, "Invalid resource type.");
-				return std::get<VulkanBuffer>(node.resource);
+				auto& resourceData = std::get<Internal::VirtualBufferResourceData>(node.resourceData);
+				return resourceData.virtualBuffer;
 			}
 
-			ResourceHandle AddNode(const ResourceNode& node) {
-				ResourceHandle handle = m_Nodes.size();
-				m_Nodes.emplace_back(node);
-				return handle;
+			VulkanImage& GetResource(const GraphResourceHandle<VulkanImage> handle) {
+				auto& node = GetNode(handle);
+				auto& resourceData = std::get<Internal::ImageResourceData>(node.resourceData);
+				return resourceData.image;
+			}
+
+			template<typename T>
+			VulkanDynamicVector<T>& GetResource(const GraphResourceHandle<VulkanDynamicVector<T>> handle) {
+				auto& node = GetNode(handle);
+				auto resourceData = std::get<Internal::DynamicContainerResourceData>(node.resourceData);
+				return *static_cast<VulkanDynamicVector<T>*>(resourceData);
+			}
+
+			template<typename T>
+			VulkanFlatSlotMap<T>& GetResource(const GraphResourceHandle<VulkanFlatSlotMap<T>> handle) {
+				auto& node = GetNode(handle);
+				auto resourceData = std::get<Internal::DynamicContainerResourceData>(node.resourceData);
+				return *static_cast<VulkanFlatSlotMap<T>*>(resourceData);
 			}
 
 			void RegisterSwapChainImage(const SwapChainImageData& data) {
@@ -240,17 +269,94 @@ namespace Cori {
 				return m_SwapChainImageData;
 			}
 
-			//TODO: add GetImage and GetBuffer
+		protected:
+			friend RenderGraph;
 
-			std::vector<ResourceNode> m_Nodes;
+			Internal::ResourceNode& GetNode(const Internal::GraphResourceHandleBase handle) {
+				return m_Nodes[handle];
+			}
 
-			std::map<PooledImageDescription, PooledImage> m_ImagePool;
-			std::map<PooledBufferDescription, PooledBuffer> m_BufferPool;
-			std::vector<std::map<PooledImageDescription, PooledImage>::iterator> m_ImagesToFree;
-			std::vector<std::map<PooledBufferDescription, PooledBuffer>::iterator> m_BuffersToFree;
+			Internal::GraphResourceHandleBase AddNode(const Internal::ResourceNode& node) {
+				Internal::GraphResourceHandleBase handle = m_Nodes.size();
+				m_Nodes.emplace_back(node);
+				return handle;
+			}
+
+			Internal::ImageState& GetImageState(const Internal::ImageStateHandle handle) {
+				return m_ImageStateCache[handle];
+			}
+
+			Internal::ImageStateHandle GetFreeImageState() {
+				if (m_ImageStateCacheSize >= m_ImageStateCache.size()) {
+					m_ImageStateCache.resize(m_ImageStateCache.size() * 1.5f);
+				}
+
+				Internal::ImageState& state = m_ImageStateCache[m_ImageStateCacheSize];
+				state.Reset({});
+
+				return m_ImageStateCacheSize++;
+			}
+
+			VulkanImage& GetPooledImage(const ImageCreateInfo& info, const uint64_t currentFrameIndex) {
+				Internal::PooledImageDescription desc(info);
+
+				auto& bucket = m_ImagePool[desc];
+
+				for (auto& entry : bucket) {
+					if (entry.lastFrameUsed != currentFrameIndex) {
+						entry.lastFrameUsed = currentFrameIndex;
+						return entry.image;
+					}
+				}
+
+				VulkanImage::CreateInfo createInfo {
+					.imageCreateInfo = &info.imageCreateInfo,
+					.allocationCreateInfo = &info.allocationCreateInfo,
+					.name = info.name,
+				};
+
+				auto newImage = VulkanImage::Create(createInfo);
+
+				bucket.emplace_back(newImage, currentFrameIndex);
+
+				return bucket.back().image;
+			}
+
+			void ClearStalePooledImages(const uint64_t currentFrameIndex) {
+				for (auto it = m_ImagePool.begin(); it != m_ImagePool.end(); ) {
+					auto& bucket = it->second;
+
+					for (int32_t i = bucket.size() - 1; i >= 0; i--) {
+						if (currentFrameIndex - bucket[i].lastFrameUsed > CORI_STALE_RESOURCE_LIFETIME) {
+							bucket[i].image.Destroy();
+
+							if (i != bucket.size() - 1) {
+								bucket[i] = bucket.back();
+							}
+
+							bucket.pop_back();
+						}
+					}
+
+					if (bucket.empty()) {
+						it = m_ImagePool.erase(it);
+					} else {
+						++it;
+					}
+				}
+			}
+
+		private:
+
+			std::vector<Internal::ResourceNode> m_Nodes;
+			std::vector<Internal::ImageState> m_ImageStateCache;
+
+			std::unordered_map<Internal::PooledImageDescription, std::vector<Internal::PooledImage>, Internal::PooledImageDescription::Hasher> m_ImagePool;
 
 			SwapChainImageData m_SwapChainImageData;
 			bool m_SwapChainImageRetrieved{ false };
+
+			uint32_t m_ImageStateCacheSize{ 0 };
 
 			static constexpr vk::AccessFlags2 s_WriteFlagMask = vk::AccessFlagBits2::eShaderWrite | vk::AccessFlagBits2::eColorAttachmentWrite | vk::AccessFlagBits2::eDepthStencilAttachmentWrite |
 																vk::AccessFlagBits2::eTransferWrite | vk::AccessFlagBits2::eHostWrite | vk::AccessFlagBits2::eMemoryWrite | vk::AccessFlagBits2::eShaderStorageWrite |
@@ -265,48 +371,48 @@ namespace Cori {
 			Pass() {
 				m_Writes.reserve(CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE);
 				m_Reads.reserve(CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE);
-				//m_Producers.resize(CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE);
 				m_Consumers.reserve(CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE);
 				m_ImageBarriers.reserve(CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE);
 				m_BufferBarriers.reserve(CORI_RENDER_GRAPH_PASS_BUFFERS_INLINE_BUFFER_SIZE);
 			}
 
-			void Writes(const ResourceHandle resource, const ResourceUsage& usage) {
-				m_Writes.emplace_back(PassResourceDependency{ resource, usage });
+			void Writes(const GraphResourceHandle<ScratchBufferTag> resource, const BufferUsage& usage) {
+				m_Writes.emplace_back(Internal::PassResourceDependency{ resource, Internal::ResourceUsage(usage) });
 			}
 
-			void Reads(const ResourceHandle resource, const ResourceUsage& usage) {
-				m_Reads.emplace_back(PassResourceDependency{ resource, usage });
+			void Writes(const GraphResourceHandle<VulkanImage> resource, const ImageUsage& usage) {
+				m_Writes.emplace_back(Internal::PassResourceDependency{ resource, Internal::ResourceUsage(usage) });
 			}
+
+			void Reads(const GraphResourceHandle<ScratchBufferTag> resource, const BufferUsage& usage) {
+				m_Reads.emplace_back(Internal::PassResourceDependency{ resource, Internal::ResourceUsage(usage) });
+			}
+
+			void Reads(const GraphResourceHandle<VulkanImage> resource, const ImageUsage& usage) {
+				m_Reads.emplace_back(Internal::PassResourceDependency{ resource, Internal::ResourceUsage(usage) });
+			}
+
+			void Reads([[maybe_unused]] const GraphResourceHandle<UploadBufferTag> resource) {}
+
+			template<typename T>
+			void Reads([[maybe_unused]] const GraphResourceHandle<VulkanDynamicVector<T>> resource) {}
+
+			template<typename T>
+			void Reads([[maybe_unused]] const GraphResourceHandle<VulkanFlatSlotMap<T>> resource) {}
 
 			void AssignWork(std::function<void(vk::CommandBuffer cmb, RenderGraphResourceRegistry& registry)> work) {
 				m_Work = std::move(work);
 			}
 
-			void AddPushConstants(const vk::ShaderStageFlags stageFlags, const void* data, const uint8_t dataSize) {
-				CORI_CORE_ASSERT(dataSize <= 128, "Exceeding push constant limit of 128 bytes, tried to add push constants with size '{}' to pass '{}'", dataSize, m_Name);
-				memcpy(m_PushConstantsBuffer.data(), data, dataSize);
-				m_PushConstantsBufferSize = dataSize;
-				m_PushConstantsStageFlags = stageFlags;
-			}
-
 		protected:
-			friend class RenderGraph;
+			friend RenderGraph;
 			friend class RenderGraphPassRegistry;
-
-			//void AddProducer(const PassHandle producer, const ResourceHandle resource) {
-			//	if (m_ProducersCount >= m_Producers.size()) {
-			//		m_Producers.resize(m_Producers.size() * 1.5f);
-			//	}
-//
-			//	m_Producers[m_ProducersCount++] = { producer, resource };
-			//}
 
 			void AddProducer() {
 				m_ProducersCount++;
 			}
 
-			void AddConsumer(const PassHandle consumer) {
+			void AddConsumer(const Internal::PassHandle consumer) {
 				m_Consumers.emplace_back(consumer);
 			}
 
@@ -341,30 +447,22 @@ namespace Cori {
 				m_Consumers.clear();
 				m_ImageBarriers.clear();
 				m_BufferBarriers.clear();
-				m_PushConstantsBufferSize = 0;
 			}
 
 			const char* m_Name{ "" };
 
-			friend class RenderGraph;
 			std::function<void(vk::CommandBuffer cmb, RenderGraphResourceRegistry& registry)> m_Work;
 
-
-
-			std::vector<PassResourceDependency> m_Writes;
-			std::vector<PassResourceDependency> m_Reads;
-			//std::vector<PassPassDependency> m_Producers;
-			std::vector<PassHandle> m_Consumers;
+			std::vector<Internal::PassResourceDependency> m_Writes;
+			std::vector<Internal::PassResourceDependency> m_Reads;
+			std::vector<Internal::PassHandle> m_Consumers;
 			std::vector<vk::ImageMemoryBarrier2> m_ImageBarriers;
 			std::vector<vk::BufferMemoryBarrier2> m_BufferBarriers;
 
-			std::array<Byte, 128> m_PushConstantsBuffer{};
-			uint8_t m_PushConstantsBufferSize{ 0 };
 			uint8_t m_ProducersCount{ 0 };
-			vk::ShaderStageFlags m_PushConstantsStageFlags;
 
 			uint64_t m_Degree{ 0 };
-			PassHandle m_SelfHandle{ UINT32_MAX };
+			Internal::PassHandle m_SelfHandle{ UINT32_MAX };
 		};
 
 		class RenderGraphPassRegistry {
@@ -381,7 +479,10 @@ namespace Cori {
 				m_SortedPassOrder.clear();
 			}
 
-			Pass& GetPass(const PassHandle handle) {
+		protected:
+			friend RenderGraph;
+
+			Pass& GetPass(const Internal::PassHandle handle) {
 				return m_Passes[handle];
 			}
 
@@ -397,11 +498,11 @@ namespace Cori {
 				return pass;
 			}
 
-			void AddSortedPass(PassHandle handle) {
+			void AddSortedPass(Internal::PassHandle handle) {
 				m_SortedPassOrder.emplace_back(handle);
 			}
 
-			void AddResourceToSet(ResourceHandle handle) {
+			void AddResourceToSet(Internal::GraphResourceHandleBase handle) {
 				for (auto& resource : m_ResourceInPassSet) {
 					if (resource == handle) {
 						return;
@@ -411,7 +512,7 @@ namespace Cori {
 				m_ResourceInPassSet.emplace_back(handle);
 			}
 
-			void AddPassToSet(PassHandle handle) {
+			void AddPassToSet(Internal::PassHandle handle) {
 				for (auto& pass : m_ProducersSet) {
 					if (pass == handle) {
 						return;
@@ -421,11 +522,13 @@ namespace Cori {
 				m_ProducersSet.emplace_back(handle);
 			}
 
+		private:
+
 			std::vector<Pass> m_Passes;
-			std::vector<PassHandle> m_SortedPassOrder;
-			std::vector<PassHandle> m_ZeroInDegreeQueue;
-			std::vector<ResourceHandle> m_ResourceInPassSet;
-			std::vector<PassHandle> m_ProducersSet;
+			std::vector<Internal::PassHandle> m_SortedPassOrder;
+			std::vector<Internal::PassHandle> m_ZeroInDegreeQueue;
+			std::vector<Internal::GraphResourceHandleBase> m_ResourceInPassSet;
+			std::vector<Internal::PassHandle> m_ProducersSet;
 
 			uint32_t m_PassesSize{ 0 };
 		};
@@ -437,54 +540,52 @@ namespace Cori {
 				m_PassRegistry = &passRegistry;
 			}
 
-			ResourceHandle ImportBuffer(const VulkanBuffer& buffer, const char* name) {
-				ResourceNode node;
+			GraphResourceHandle<UploadBufferTag> ImportBuffer(const VulkanVirtualBuffer& buffer, const char* name) {
+				Internal::ResourceNode node;
 				node.name = name;
-				node.type = ResourceType::Buffer;
-				node.origin = ResourceOrigin::Imported;
-				node.resourceAllocated = true;
-				node.resource.emplace<VulkanBuffer>(buffer);
+				node.origin = Internal::ResourceOrigin::Imported;
+				node.resourceData.emplace<Internal::VirtualBufferResourceData>(Internal::VirtualBufferResourceData{ {}, buffer, { vk::PipelineStageFlagBits2::eTopOfPipe, vk::AccessFlagBits2::eNone } });
 
-				return m_ResourceRegistry->AddNode(node);
+				return static_cast<GraphResourceHandle<UploadBufferTag>>(m_ResourceRegistry->AddNode(node));
 			}
 
-			ResourceHandle ImportImage(const VulkanImage& image, const char* name) {
-				ResourceNode node;
+			template<typename T>
+			GraphResourceHandle<VulkanDynamicVector<T>> ImportDynamicVector(const VulkanDynamicVector<T>& vector, const char* name) {
+				Internal::ResourceNode node;
 				node.name = name;
-				node.type = ResourceType::Image;
-				node.origin = ResourceOrigin::Imported;
-				node.resourceAllocated = true;
-				node.resource.emplace<VulkanImage>(image);
+				node.origin = Internal::ResourceOrigin::Imported;
+				node.resourceData.emplace<Internal::DynamicContainerResourceData>(static_cast<void*>(&vector));
 
-				return m_ResourceRegistry->AddNode(node);
+				return static_cast<GraphResourceHandle<VulkanDynamicVector<T>>>(m_ResourceRegistry->AddNode(node));
 			}
 
-			ResourceHandle CreateBuffer(const VulkanBuffer::CreateInfo& createInfo, const char* name) {
-				ResourceNode node;
+			template<typename T>
+			GraphResourceHandle<VulkanFlatSlotMap<T>> ImportFlatSlotMap(const VulkanFlatSlotMap<T>& vector, const char* name) {
+				Internal::ResourceNode node;
 				node.name = name;
-				node.type = ResourceType::Buffer;
-				node.origin = ResourceOrigin::Created;
-				node.createInfo.emplace<BufferCreateInfo>(
-					*createInfo.bufferCreateInfo,
-					*createInfo.allocationCreateInfo,
-					createInfo.name
-				);
+				node.origin = Internal::ResourceOrigin::Imported;
+				node.resourceData.emplace<Internal::DynamicContainerResourceData>(static_cast<void*>(&vector));
 
-				return m_ResourceRegistry->AddNode(node);
+				return static_cast<GraphResourceHandle<VulkanFlatSlotMap<T>>>(m_ResourceRegistry->AddNode(node));
 			}
 
-			ResourceHandle CreateImage(const VulkanImage::CreateInfo& createInfo, const char* name) {
-				ResourceNode node;
+			GraphResourceHandle<ScratchBufferTag> CreateBuffer(const ScratchBufferCreateInfo& createInfo, const char* name) {
+				Internal::ResourceNode node;
 				node.name = name;
-				node.type = ResourceType::Image;
-				node.origin = ResourceOrigin::Created;
-				node.createInfo.emplace<ImageCreateInfo>(
-					*createInfo.imageCreateInfo,
-					*createInfo.allocationCreateInfo,
-					createInfo.name
-				);
+				node.origin = Internal::ResourceOrigin::Created;
+				node.resourceData.emplace<Internal::VirtualBufferResourceData>(Internal::VirtualBufferResourceData{ createInfo, {}, {} });
 
-				return m_ResourceRegistry->AddNode(node);
+				return static_cast<GraphResourceHandle<ScratchBufferTag>>(m_ResourceRegistry->AddNode(node));
+			}
+
+			GraphResourceHandle<VulkanImage> CreateImage(const VulkanImage::CreateInfo& createInfo, const char* name) {
+				Internal::ResourceNode node;
+				node.name = name;
+				node.origin = Internal::ResourceOrigin::Created;
+
+				node.resourceData.emplace<Internal::ImageResourceData>(Internal::ImageResourceData{ { *createInfo.imageCreateInfo, *createInfo.allocationCreateInfo, createInfo.name }, {}, m_ResourceRegistry->GetFreeImageState() });
+
+				return static_cast<GraphResourceHandle<VulkanImage>>(m_ResourceRegistry->AddNode(node));
 			}
 
 			Pass& CreatePass(const char* name) {
@@ -494,7 +595,7 @@ namespace Cori {
 				return pass;
 			}
 
-			void Compile() {
+			void Compile(const uint64_t currentFrameIndex) {
 				CORI_PROFILE_FUNCTION();
 				{
 					CORI_PROFILE_SCOPE("DAG Build");
@@ -525,7 +626,7 @@ namespace Cori {
 					#else
 					for (auto& pass : std::ranges::subrange(m_PassRegistry->m_Passes.begin(), m_PassRegistry->m_Passes.begin() + m_PassRegistry->m_PassesSize)) {
 						for (const auto& readDep : pass.m_Reads) {
-							ResourceHandle handle = readDep.resource;
+							Internal::GraphResourceHandleBase handle = readDep.resource;
 							auto& node = m_ResourceRegistry->GetNode(handle);
 
 							if (node.lastProducer != UINT32_MAX) {
@@ -534,7 +635,7 @@ namespace Cori {
 						}
 
 						for (const auto& writeDep : pass.m_Reads) {
-							ResourceHandle handle = writeDep.resource;
+							Internal::GraphResourceHandleBase handle = writeDep.resource;
 							auto& node = m_ResourceRegistry->GetNode(handle);
 
 							if (node.lastProducer != UINT32_MAX) {
@@ -542,7 +643,7 @@ namespace Cori {
 							}
 						}
 
-						for (PassHandle handle : m_PassRegistry->m_ProducersSet) {
+						for (auto handle : m_PassRegistry->m_ProducersSet) {
 							if (handle != pass.m_SelfHandle) {
 								pass.AddProducer();
 								m_PassRegistry->GetPass(handle).AddConsumer(pass.m_SelfHandle);
@@ -591,52 +692,17 @@ namespace Cori {
 				{
 					CORI_PROFILE_SCOPE("Resoruce creation and aqusition.");
 					for (auto& node : m_ResourceRegistry->m_Nodes) {
-						if (node.origin == ResourceOrigin::Created && !node.resourceAllocated) {
-							switch (node.type) {
-							case ResourceType::Image:
-								{
-									auto [it, isNew] = m_ResourceRegistry->m_ImagePool.try_emplace(PooledImageDescription(std::get<ImageCreateInfo>(node.createInfo)));
-									if (isNew) {
-										VulkanImage::CreateInfo createInfo {
-											.imageCreateInfo = &std::get<ImageCreateInfo>(node.createInfo).imageCreateInfo,
-											.allocationCreateInfo = &std::get<ImageCreateInfo>(node.createInfo).allocationCreateInfo,
-											.name = std::get<ImageCreateInfo>(node.createInfo).name,
-										};
+						if (node.origin == Internal::ResourceOrigin::Created) {
+							if (std::holds_alternative<Internal::ImageResourceData>(node.resourceData)) {
+								auto& data = std::get<Internal::ImageResourceData>(node.resourceData);
 
-										auto image = VulkanImage::Create(createInfo);
-										it->second.image = image;
-										node.resource.emplace<VulkanImage>(image);
+								data.image = m_ResourceRegistry->GetPooledImage(data.createInfo, currentFrameIndex);
+								data.stateHandle = m_ResourceRegistry->GetFreeImageState();
+							}
+							else if (std::holds_alternative<Internal::VirtualBufferResourceData>(node.resourceData)) {
+								auto& data = std::get<Internal::VirtualBufferResourceData>(node.resourceData);
 
-										node.resourceAllocated = true;
-									} else {
-										node.resource.emplace<VulkanImage>(it->second.image);
-										it->second.framesAgoUsed = 0;
-									}
-
-									break;
-								}
-							case ResourceType::Buffer:
-								{
-									auto [it, isNew] = m_ResourceRegistry->m_BufferPool.try_emplace(PooledBufferDescription(std::get<BufferCreateInfo>(node.createInfo)));
-									if (isNew) {
-										VulkanBuffer::CreateInfo createInfo {
-											.bufferCreateInfo = &std::get<BufferCreateInfo>(node.createInfo).bufferCreateInfo,
-											.allocationCreateInfo = &std::get<BufferCreateInfo>(node.createInfo).allocationCreateInfo,
-											.name = std::get<BufferCreateInfo>(node.createInfo).name,
-										};
-
-										auto buffer = VulkanBuffer::Create(createInfo);
-										it->second.buffer = buffer;
-										node.resource.emplace<VulkanBuffer>(buffer);
-
-										node.resourceAllocated = true;
-									} else {
-										node.resource.emplace<VulkanBuffer>(it->second.buffer);
-										it->second.framesAgoUsed = 0;
-									}
-
-									break;
-								}
+								data.virtualBuffer = VulkanVirtualBufferAllocator::CreateVirtualScratchBuffer(data.createInfo.size, data.createInfo.alignment, data.createInfo.name);
 							}
 						}
 					}
@@ -647,26 +713,193 @@ namespace Cori {
 					for (auto& passHandle : m_PassRegistry->m_SortedPassOrder) {
 						Pass& pass = m_PassRegistry->GetPass(passHandle);
 
-						auto ProcessResource = [&](const PassResourceDependency& dep) {
-							ResourceNode& node = m_ResourceRegistry->GetNode(dep.resource);
+						auto ProcessResource = [&](const Internal::PassResourceDependency& dep) {
+							Internal::ResourceNode& node = m_ResourceRegistry->GetNode(dep.resource);
 
-							if (node.resourceAllocated) {
-								if (node.type == ResourceType::Image) {
-									auto opt = VulkanResourceTracker::TransitionImage(std::get<VulkanImage>(node.resource), std::get<vk::ImageSubresourceRange>(dep.usage.subrange), dep.usage.desiredState);
-									if (opt) {
-										for (auto& barrier : *opt.value()) {
+							if (std::holds_alternative<Internal::ImageResourceData>(node.resourceData)) {
+								auto& data = std::get<Internal::ImageResourceData>(node.resourceData);
+								auto& state = m_ResourceRegistry->GetImageState(data.stateHandle);
+								auto& image = data.image;
+								auto& range = dep.usage.subrange;
+								auto imageAspect = image.GetAspectMask();
+
+								bool isFullImage = range.baseMipLevel == 0 && range.levelCount == image.m_MipLevels && range.baseArrayLayer == 0 && range.layerCount == image.m_ArrayLayers && !(~imageAspect & range.aspectMask);
+
+								if (isFullImage) {
+									if (state.isUniform) {
+										if (state.globalState != dep.usage.desiredState) {
+
+											vk::ImageMemoryBarrier2 barrier{
+												.srcStageMask = state.globalState.stageMask,
+												.srcAccessMask = state.globalState.accessMask,
+												.dstStageMask = dep.usage.desiredState.stageMask,
+												.dstAccessMask = dep.usage.desiredState.accessMask,
+												.oldLayout = state.globalState.imageLayout,
+												.newLayout = dep.usage.desiredState.imageLayout,
+												.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+												.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+												.image = image.m_Image,
+												.subresourceRange = range
+											};
+
+											pass.AddImageBarrier(barrier);
+
+											state.globalState = dep.usage.desiredState;
+										}
+
+										return;
+									}
+								}
+
+								uint8_t planeCount = 0;
+								planeCount += static_cast<bool>(imageAspect & vk::ImageAspectFlagBits::eColor);
+								planeCount += static_cast<bool>(imageAspect & vk::ImageAspectFlagBits::eDepth);
+								planeCount += static_cast<bool>(imageAspect & vk::ImageAspectFlagBits::eStencil);
+
+								if (state.isUniform) {
+									state.subresourceStates.assign(planeCount * image.m_ArrayLayers * image.m_MipLevels, state.globalState);
+									state.isUniform = false;
+								}
+
+								constexpr std::array<vk::ImageAspectFlagBits, 3> possiblePlanes = { vk::ImageAspectFlagBits::eColor, vk::ImageAspectFlagBits::eDepth, vk::ImageAspectFlagBits::eStencil };
+
+								uint8_t planeCounter = 0;
+								for (auto planeAspect : possiblePlanes) {
+									if (!(imageAspect & planeAspect)) {
+										continue;
+									}
+
+									uint32_t planeOffset = planeCounter++ * image.m_ArrayLayers * image.m_MipLevels;
+
+									for (uint32_t layer = range.baseArrayLayer; layer < range.baseArrayLayer + range.layerCount; ++layer) {
+										uint32_t layerOffset = layer * image.m_ArrayLayers;
+										Internal::ResourceState batchSrcState = state.subresourceStates[planeOffset + layerOffset + range.baseMipLevel];
+										uint32_t currentStartMip = range.baseMipLevel;
+										uint32_t mipCount = 0;
+										bool batchActive = false;
+
+										for (uint32_t mip = range.baseMipLevel; mip < range.baseMipLevel + range.levelCount; ++mip) {
+											uint32_t index = planeOffset + layerOffset + mip;
+											Internal::ResourceState& currentState = state.subresourceStates[index];
+
+											if (currentState != dep.usage.desiredState) {
+												if (!batchActive) {
+													batchSrcState = currentState;
+													currentStartMip = mip;
+													mipCount = 1;
+													batchActive = true;
+												}
+												else if (currentState == batchSrcState) {
+													mipCount++;
+												}
+												else {
+													vk::ImageSubresourceRange batchRange{
+														.aspectMask = planeAspect,
+														.baseMipLevel = currentStartMip,
+														.levelCount = mipCount,
+														.baseArrayLayer = layer,
+														.layerCount = 1
+													};
+
+													vk::ImageMemoryBarrier2 barrier{
+														.srcStageMask = batchSrcState.stageMask,
+														.srcAccessMask = batchSrcState.accessMask,
+														.dstStageMask = dep.usage.desiredState.stageMask,
+														.dstAccessMask = dep.usage.desiredState.accessMask,
+														.oldLayout = batchSrcState.imageLayout,
+														.newLayout = dep.usage.desiredState.imageLayout,
+														.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+														.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+														.image = image.m_Image,
+														.subresourceRange = batchRange
+													};
+
+													pass.AddImageBarrier(barrier);
+
+													batchSrcState = currentState;
+													currentStartMip = mip;
+													mipCount = 1;
+												}
+
+												currentState = dep.usage.desiredState;
+											}
+											else {
+												if (batchActive) {
+													vk::ImageSubresourceRange batchRange{
+														.aspectMask = planeAspect,
+														.baseMipLevel = currentStartMip,
+														.levelCount = mipCount,
+														.baseArrayLayer = layer,
+														.layerCount = 1
+													};
+
+													vk::ImageMemoryBarrier2 barrier{
+														.srcStageMask = batchSrcState.stageMask,
+														.srcAccessMask = batchSrcState.accessMask,
+														.dstStageMask = dep.usage.desiredState.stageMask,
+														.dstAccessMask = dep.usage.desiredState.accessMask,
+														.oldLayout = batchSrcState.imageLayout,
+														.newLayout = dep.usage.desiredState.imageLayout,
+														.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+														.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+														.image = image.m_Image,
+														.subresourceRange = batchRange
+													};
+
+													pass.AddImageBarrier(barrier);
+
+													batchActive = false;
+												}
+											}
+										}
+
+										if (batchActive) {
+											vk::ImageSubresourceRange batchRange{
+												.aspectMask = planeAspect,
+												.baseMipLevel = currentStartMip,
+												.levelCount = mipCount,
+												.baseArrayLayer = layer,
+												.layerCount = 1
+											};
+
+											vk::ImageMemoryBarrier2 barrier{
+												.srcStageMask = batchSrcState.stageMask,
+												.srcAccessMask = batchSrcState.accessMask,
+												.dstStageMask = dep.usage.desiredState.stageMask,
+												.dstAccessMask = dep.usage.desiredState.accessMask,
+												.oldLayout = batchSrcState.imageLayout,
+												.newLayout = dep.usage.desiredState.imageLayout,
+												.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+												.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+												.image = image.m_Image,
+												.subresourceRange = batchRange
+											};
+
 											pass.AddImageBarrier(barrier);
 										}
 									}
 								}
-								else {
-									auto opt = VulkanResourceTracker::TransitionBuffer(std::get<VulkanBuffer>(node.resource), std::get<BufferRange>(dep.usage.subrange).offset, std::get<BufferRange>(dep.usage.subrange).size, dep.usage.desiredState);
-									if (opt) {
-										for (auto& barrier : *opt.value()) {
-											pass.AddBufferBarrier(barrier);
-										}
-									}
-								}
+
+
+							}
+							else if (std::holds_alternative<Internal::VirtualBufferResourceData>(node.resourceData)) {
+								auto& data = std::get<Internal::VirtualBufferResourceData>(node.resourceData);
+
+								vk::BufferMemoryBarrier2 barrier{
+									.srcStageMask = data.state.stageMask,
+									.srcAccessMask = data.state.accessMask,
+									.dstStageMask = dep.usage.desiredState.stageMask,
+									.dstAccessMask = dep.usage.desiredState.accessMask,
+									.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+									.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+									.buffer = data.virtualBuffer.GetHeapHandle(),
+									.offset = data.virtualBuffer.GetStartOffset(),
+									.size = data.virtualBuffer.GetSize()
+								};
+
+								data.state = dep.usage.desiredState;
+
+								pass.AddBufferBarrier(barrier);
 							}
 						};
 
@@ -702,10 +935,6 @@ namespace Cori {
 						};
 
 						cmb.pipelineBarrier2(depInfo);
-					}
-
-					if (pass.m_PushConstantsBufferSize > 0) {
-						cmb.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), pass.m_PushConstantsStageFlags, 0, pass.m_PushConstantsBufferSize, pass.m_PushConstantsBuffer.data());
 					}
 
 					if (pass.m_Work) {

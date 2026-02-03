@@ -1,4 +1,5 @@
 #include "VulkanUploadManager.hpp"
+#if 0
 
 namespace Cori {
 	namespace Graphics {
@@ -19,3 +20,5 @@ namespace Cori {
 		}
 	}
 }
+
+#endif
