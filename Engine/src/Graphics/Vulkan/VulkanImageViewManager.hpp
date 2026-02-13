@@ -78,7 +78,7 @@ namespace Cori {
 			}
 
 		private:
-			std::unordered_map<uint64_t, std::map<VulkanImage::ImageViewKey, vk::ImageView>> m_ImageViews;
+			std::unordered_map<uint64_t, std::unordered_map<VulkanImage::ImageViewKey, vk::ImageView, VulkanImage::ImageViewKey::Hasher>> m_ImageViews;
 
 			static std::unique_ptr<VulkanImageViewManager> s_Instance;
 		};

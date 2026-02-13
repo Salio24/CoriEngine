@@ -42,6 +42,15 @@ namespace Cori {
 				Get().m_ImageQueue[dstFrame].push_back(image);
 			}
 
+			static void PushShaderObject(vk::ShaderEXT image) {
+				uint32_t frame = GetDstFrame();
+				Get().m_ShaderObjectQueue[frame].push_back(image);
+			}
+
+			static void PushShaderObject(vk::ShaderEXT image, const uint32_t dstFrame) {
+				Get().m_ShaderObjectQueue[dstFrame].push_back(image);
+			}
+
 			static void PushVirtualAlloc(vma::VirtualAllocation allocation, vma::VirtualBlock block) {
 				uint32_t frame = GetDstFrame();
 				Get().m_VirtAllocQueue[frame].emplace_back(allocation, block);
@@ -85,8 +94,10 @@ namespace Cori {
 			std::array<std::vector<std::function<void()>>, FRAMES_IN_FLIGHT> m_Deleters;
 			std::array<std::vector<VulkanBuffer>, FRAMES_IN_FLIGHT> m_BufferQueue;
 			std::array<std::vector<VulkanImage>, FRAMES_IN_FLIGHT> m_ImageQueue;
+			std::array<std::vector<vk::ShaderEXT>, FRAMES_IN_FLIGHT> m_ShaderObjectQueue;
 			std::array<std::vector<std::pair<vma::VirtualAllocation, vma::VirtualBlock>>, FRAMES_IN_FLIGHT> m_VirtAllocQueue;
 			std::array<std::vector<vma::VirtualBlock>, FRAMES_IN_FLIGHT> m_VirtBlockQueue;
+
 
 			static std::unique_ptr<DeletionQueue> s_Instance;
 		};

@@ -989,7 +989,7 @@ namespace Cori {
 			ShaderObjectHandle cmgShader;
 			ShaderObjectHandle compactShader;
 
-			VulkanDynamicVector<uint64_t> testVec = { 256, QueueUsageFlagBits::GRAPHICS, vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eStorageBuffer };
+			VulkanDynamicVector<uint64_t> testVec = { 256, QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eStorageBuffer };
 
 			ShaderObjectHandle testShader;
 			ShaderObjectHandle defaultShader;

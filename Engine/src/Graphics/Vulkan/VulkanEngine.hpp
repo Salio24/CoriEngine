@@ -33,9 +33,9 @@ namespace Cori {
 
 		//NOTE: this is applicable only to buffers, as using CONCURENT sharing mode on images is a terrible idea
 		enum class QueueUsageFlagBits : VkFlags {
-			GRAPHICS = 0x00000001,
-			TRANSFER = 0x00000002,
-			COMPUTE = 0x00000004
+			eGraphics = 0x00000001,
+			eTransfer = 0x00000002,
+			eCompute = 0x00000004
 		};
 
 		using QueueUsageFlags = vk::Flags<QueueUsageFlagBits>;
@@ -287,6 +287,6 @@ namespace vk {
 		using WrappedType = VkFlags;
 		static VULKAN_HPP_CONST_OR_CONSTEXPR bool isBitmask = true;
 		static VULKAN_HPP_CONST_OR_CONSTEXPR Flags<Cori::Graphics::QueueUsageFlagBits> allFlags =
-			Cori::Graphics::QueueUsageFlagBits::GRAPHICS | Cori::Graphics::QueueUsageFlagBits::TRANSFER | Cori::Graphics::QueueUsageFlagBits::COMPUTE;
+			Cori::Graphics::QueueUsageFlagBits::eGraphics | Cori::Graphics::QueueUsageFlagBits::eTransfer | Cori::Graphics::QueueUsageFlagBits::eCompute;
 	};
 }

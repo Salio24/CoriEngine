@@ -1,6 +1,6 @@
 #pragma once
 #include "VulkanEngine.hpp"
-#include "VulkanUploadManager.hpp"
+#include "VulkanUploadSubsystem.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -43,33 +43,11 @@ namespace Cori {
 				std::vector<Byte> payload(descriptorSize);
 
 				VulkanEngine::GetLogicalDevice().getDescriptorEXT(&getInfo, descriptorSize, payload.data());
-
-				AmazingBuffer::UpdateData updateData {
-					.offset = Get().m_SamplerBindingMemOffset + slot * descriptorSize,
-					.alignment = descriptorSize,
-					.data = std::move(payload)
-				};
-
-				auto& db = VulkanUploadManager::GetAmazingBuffer(Get().m_DescriptorBufferHandle);
-
-				db.SubmitUpdate(std::move(updateData));
+				Get().m_DescriptorBuffer.InsertRange(payload, Get().m_SamplerBindingMemOffset + slot * descriptorSize);
 			}
 
 			static void UpdateSampledTextureDescriptor(const uint32_t slot, const vk::ImageView view) {
-				//vk::SamplerCreateInfo samplerInfo{
-				//	.magFilter = vk::Filter::eLinear,
-				//	.minFilter = vk::Filter::eLinear,
-				//	.mipmapMode = vk::SamplerMipmapMode::eLinear,
-				//	.addressModeU = vk::SamplerAddressMode::eClampToEdge,
-				//	.addressModeV = vk::SamplerAddressMode::eClampToEdge,
-				//	.addressModeW = vk::SamplerAddressMode::eClampToEdge,
-				//	.anisotropyEnable = vk::False
-				//};
-				//auto [result, sampler] = VulkanEngine::GetLogicalDevice().createSampler(samplerInfo);
-				//CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to create sampler. Error: {}", vk::to_string(result));
-
 				vk::DescriptorImageInfo imageInfo{
-				//	.sampler = sampler,
 					.imageView = view,
 					.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
 				};
@@ -85,22 +63,12 @@ namespace Cori {
 
 				VulkanEngine::GetLogicalDevice().getDescriptorEXT(&getInfo, descriptorSize, payload.data());
 
-				AmazingBuffer::UpdateData updateData {
-					.offset = Get().m_SampledImageBindingMemOffset + slot * descriptorSize,
-					.alignment = descriptorSize,
-					.data = std::move(payload)
-				};
-
-				auto& db = VulkanUploadManager::GetAmazingBuffer(Get().m_DescriptorBufferHandle);
-
-				db.SubmitUpdate(std::move(updateData));
+				Get().m_DescriptorBuffer.InsertRange(payload, Get().m_SampledImageBindingMemOffset + slot * descriptorSize);
 			}
 
 			static void BindDescriptorBuffer(vk::CommandBuffer& cmb) {
-				auto& descriptorBuffer = VulkanUploadManager::GetAmazingBuffer(Get().m_DescriptorBufferHandle);
-
 				vk::DescriptorBufferBindingInfoEXT bindInfo {
-					.address = descriptorBuffer.GetCurrentFrameLocalBuffer().GetBDA(),
+					.address = Get().m_DescriptorBuffer.GetVulkanBuffer().GetBDA(),
 					.usage = vk::BufferUsageFlagBits::eSamplerDescriptorBufferEXT | vk::BufferUsageFlagBits::eResourceDescriptorBufferEXT
 				};
 
@@ -113,8 +81,6 @@ namespace Cori {
 			}
 
 			~VulkanGlobalLayoutManager() {
-				VulkanUploadManager::DestroyAmazingBuffer(m_DescriptorBufferHandle);
-
 				VulkanEngine::GetLogicalDevice().destroyPipelineLayout(m_PipelineLayout);
 				VulkanEngine::GetLogicalDevice().destroyDescriptorSetLayout(m_DescriptorSetLayout);
 			}
@@ -176,14 +142,7 @@ namespace Cori {
 				m_SamplerBindingMemOffset = VulkanEngine::GetLogicalDevice().getDescriptorSetLayoutBindingOffsetEXT(m_DescriptorSetLayout, 0);
 				m_SampledImageBindingMemOffset = VulkanEngine::GetLogicalDevice().getDescriptorSetLayoutBindingOffsetEXT(m_DescriptorSetLayout, 1);
 
-				AmazingBuffer::CreateInfo dbInfo {
-					.size = alignedSize,
-					.usage = vk::BufferUsageFlagBits::eSamplerDescriptorBufferEXT | vk::BufferUsageFlagBits::eResourceDescriptorBufferEXT | vk::BufferUsageFlagBits::eShaderDeviceAddress,
-					.queueFamilyIndices = { VulkanEngine::GetGraphicsQueueFamilyIndex() },
-					.name = "Global descriptor buffer"
-				};
-
-				m_DescriptorBufferHandle = VulkanUploadManager::CreateAmazingBuffer(dbInfo);
+				m_DescriptorBuffer.Reserve(alignedSize);
 			}
 
 			vk::DescriptorSetLayout m_DescriptorSetLayout;
@@ -196,7 +155,7 @@ namespace Cori {
 			static constexpr uint16_t s_MaxTextures{ 1 * 1024 };
 			static constexpr uint16_t s_MaxSamplers{ 1 * 1024 };
 
-			AmazingBufferHandle m_DescriptorBufferHandle{ 0 };
+			VulkanDynamicVector<Byte> m_DescriptorBuffer{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eSamplerDescriptorBufferEXT | vk::BufferUsageFlagBits::eResourceDescriptorBufferEXT | vk::BufferUsageFlagBits::eShaderDeviceAddress, "Global Descriptor Buffer" };
 
 			static std::unique_ptr<VulkanGlobalLayoutManager> s_Instance;
 		};

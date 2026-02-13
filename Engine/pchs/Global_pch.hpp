@@ -61,6 +61,7 @@
 #include "../src/Profiling/Profiler.hpp"
 #include "../src/Core/Uuid.hpp"
 #include "../src/Core/Error.hpp"
+#include "../src/Core/ErrorCodes.hpp"
 #include "../src/GlobalDefines.hpp"
 #include "../src/Core/ByteType.hpp"
 #include "../src/Math/Alignment.hpp"

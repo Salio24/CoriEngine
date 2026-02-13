@@ -43,6 +43,10 @@ namespace Cori {
 				block.free(alloc);
 			}
 
+			for (auto shaderObject : Get().m_ShaderObjectQueue[frameIndex] | std::views::reverse) {
+				VulkanEngine::GetLogicalDevice().destroyShaderEXT(shaderObject);
+			}
+
 			Get().m_VirtAllocQueue[frameIndex].clear();
 
 			for (auto& block : Get().m_VirtBlockQueue[frameIndex] | std::views::reverse) {
@@ -76,6 +80,10 @@ namespace Cori {
 				}
 
 				m_ImageQueue[i].clear();
+
+				for (auto shaderObject : m_ShaderObjectQueue[i] | std::views::reverse) {
+					VulkanEngine::GetLogicalDevice().destroyShaderEXT(shaderObject);
+				}
 
 				for (auto [alloc, block] : m_VirtAllocQueue[i] | std::views::reverse) {
 					block.free(alloc);

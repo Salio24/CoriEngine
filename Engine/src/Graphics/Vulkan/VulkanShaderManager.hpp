@@ -4,41 +4,46 @@
 
 namespace Cori {
 	namespace Graphics {
-		using ShaderObjectHandle = uint32_t;
-
-		class ShaderObject {
-		public:
-			enum class Type {
-				VertexFragmentPair,
-				Compute
-			};
-
-			void Bind(vk::CommandBuffer& cmb) const {
-				if (std::holds_alternative<vk::ShaderEXT>(m_ShaderVariant)) {
-					cmb.bindShadersEXT(vk::ShaderStageFlagBits::eCompute, std::get<vk::ShaderEXT>(m_ShaderVariant));
-					return;
-				}
-
-				cmb.bindShadersEXT({ vk::ShaderStageFlagBits::eVertex, vk::ShaderStageFlagBits::eFragment }, std::get<std::array<vk::ShaderEXT, 2>>(m_ShaderVariant));
-			}
-
-			[[nodiscard]] Type GetType() const {
-				if (std::holds_alternative<vk::ShaderEXT>(m_ShaderVariant)) {
-					return Type::Compute;
-				}
-
-				return Type::VertexFragmentPair;
+		struct ComputeShader {
+			void Bind(vk::CommandBuffer cmb) const {
+				cmb.bindShadersEXT(vk::ShaderStageFlagBits::eCompute, m_ComputeShaderObject);
 			}
 
 			[[nodiscard]] const char* GetName() const {
-				return m_ShaderName;
+				#ifdef DEBUG_BUILD
+				return m_ShaderName.c_str();
+				#else
+				return "Shader Name unavailable in release build";
+				#endif
 			}
 
 		protected:
 			friend class VulkanShaderManager;
-			std::variant<vk::ShaderEXT, std::array<vk::ShaderEXT, 2>> m_ShaderVariant;
-			const char* m_ShaderName{ "Unnamed Shader Object" };
-			bool m_Valid{ false };
+			#ifdef DEBUG_BUILD
+			std::string m_ShaderName{ "Unnamed Compute Shader Object" };
+			#endif
+			vk::ShaderEXT m_ComputeShaderObject;
+		};
+
+		struct VertFragShaderPair {
+			void Bind(vk::CommandBuffer cmb) const {
+				cmb.bindShadersEXT({ vk::ShaderStageFlagBits::eVertex, vk::ShaderStageFlagBits::eFragment }, m_VertFragPair);
+			}
+
+			[[nodiscard]] const char* GetName() const {
+				#ifdef DEBUG_BUILD
+				return m_ShaderName.c_str();
+				#else
+				return "Shader name unavailable in release build";
+				#endif
+			}
+
+		protected:
+			friend class VulkanShaderManager;
+			#ifdef DEBUG_BUILD
+			std::string m_ShaderName{ "Unnamed VertFrag Shader Object" };
+			#endif
+			std::array<vk::ShaderEXT, 2> m_VertFragPair;
 		};
 
 		class VulkanShaderManager {
@@ -49,34 +54,56 @@ namespace Cori {
 
 			static VulkanShaderManager& Get();
 
-			static bool IsValid(const ShaderObjectHandle handle) {
-				return handle < Get().m_Shaders.size() && Get().m_Shaders[handle].m_Valid;
+			[[nodiscard]] static bool IsHandleValid(const Core::Handle<ComputeShader> handle) {
+				return Get().m_ComputeShaders.IsHandleValid(handle);
 			}
 
-			static ShaderObject& GetShaderObject(const ShaderObjectHandle handle) {
-				CORI_CORE_ASSERT(handle < Get().m_Shaders.size(), "Invalid ShaderObjectHandle was passed to VulkanShaderManager::GetShaderObject.");
-				CORI_CORE_ASSERT(Get().m_Shaders[handle].m_Valid, "Requested ShaderObject at handle '{}' is invalid.", handle);
-				return Get().m_Shaders[handle];
+			[[nodiscard]] static bool IsHandleValid(const Core::Handle<VertFragShaderPair> handle) {
+				return Get().m_PairShaders.IsHandleValid(handle);
 			}
 
-			static void DestroyShader(const ShaderObjectHandle handle) {
-				CORI_CORE_ASSERT(handle < Get().m_Shaders.size(), "Invalid ShaderObjectHandle was passed to VulkanShaderManager::GetShaderObject.");
-
-				auto& shaderObject = Get().m_Shaders[handle];
-
-				if (std::holds_alternative<vk::ShaderEXT>(shaderObject.m_ShaderVariant)) {
-					VulkanEngine::GetLogicalDevice().destroyShaderEXT(std::get<vk::ShaderEXT>(shaderObject.m_ShaderVariant));
-				} else {
-					for (auto& shader : std::get<std::array<vk::ShaderEXT, 2>>(shaderObject.m_ShaderVariant)) {
-						VulkanEngine::GetLogicalDevice().destroyShaderEXT(shader);
-					}
+			[[nodiscard]] static std::expected<std::reference_wrapper<ComputeShader>, ErrorCode> GetShader(const Core::Handle<ComputeShader> handle) {
+				if (!Get().m_ComputeShaders.IsHandleValid(handle)) {
+					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
 
-				shaderObject.m_Valid = false;
+				return std::ref(Get().m_ComputeShaders[handle]);
 			}
 
-			//TODO: force the use of one source, instead of separate vertex and fragment source
-			static ShaderObjectHandle CreateVertexShaderPair(const void* vertexSource, const uint64_t vertexSourceSize, const char* vertexEntryPoint, const void* fragmentSource, const uint64_t fragmentSourceSize, const char* fragmentEntryPoint, const char* shaderName = "") {
+			[[nodiscard]] static std::expected<std::reference_wrapper<VertFragShaderPair>, ErrorCode> GetShader(const Core::Handle<VertFragShaderPair> handle) {
+				if (!Get().m_PairShaders.IsHandleValid(handle)) {
+					return std::unexpected(ErrorCode::eInvalidHandle);
+				}
+
+				return std::ref(Get().m_PairShaders[handle]);
+			}
+
+			static void DestroyShader(const Core::Handle<ComputeShader> handle) {
+				if (Get().m_ComputeShaders.IsHandleValid(handle)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderManager }, "Invalid compute shader handle was passed to DestroyShader.");
+					return;
+				}
+
+				DeletionQueue::PushShaderObject(Get().m_ComputeShaders[handle].m_ComputeShaderObject, VulkanEngine::GetCurrentFrameInFlight());
+
+				Get().m_ComputeShaders.Remove(handle);
+			}
+
+			static void DestroyShader(const Core::Handle<VertFragShaderPair> handle) {
+				if (Get().m_PairShaders.IsHandleValid(handle)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderManager }, "Invalid vert+frag pair shader handle was passed to DestroyShader.");
+					return;
+				}
+
+				auto& pair = Get().m_PairShaders[handle];
+
+				DeletionQueue::PushShaderObject(pair.m_VertFragPair[0], VulkanEngine::GetCurrentFrameInFlight());
+				DeletionQueue::PushShaderObject(pair.m_VertFragPair[1], VulkanEngine::GetCurrentFrameInFlight());
+
+				Get().m_PairShaders.Remove(handle);
+			}
+
+			[[nodiscard]] static Core::Handle<VertFragShaderPair> CreateVertexShaderPair(const void* vertexSource, const uint64_t vertexSourceSize, const char* vertexEntryPoint, const void* fragmentSource, const uint64_t fragmentSourceSize, const char* fragmentEntryPoint, const char* shaderName = "") {
 				std::array<vk::ShaderCreateInfoEXT, 2> infos;
 				infos[0] = {
 					.stage = vk::ShaderStageFlagBits::eVertex,
@@ -103,40 +130,29 @@ namespace Cori {
 					.pPushConstantRanges = &VulkanGlobalLayoutManager::GetGlobalPushConstantRange()
 				};
 
-				ShaderObject object;
-				object.m_ShaderVariant = std::array<vk::ShaderEXT, 2>{};
-				auto& array = std::get<std::array<vk::ShaderEXT, 2>>(object.m_ShaderVariant);
+				VertFragShaderPair object;
+				object.m_VertFragPair = std::array<vk::ShaderEXT, 2>{};
 
-				auto result = VulkanEngine::GetLogicalDevice().createShadersEXT(2, infos.data(), nullptr, array.data());
+				auto result = VulkanEngine::GetLogicalDevice().createShadersEXT(2, infos.data(), nullptr, object.m_VertFragPair.data());
 				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Vertex Fragment pair '{}' shader creation failed. Error: {}", shaderName, vk::to_string(result));
 
+				#ifdef DEBUG_BUILD
 				if (strcmp(shaderName, "") != 0) {
 					object.m_ShaderName = shaderName;
 				}
+				#endif
 
-				VulkanEngine::SetDebugName(array[0], std::format("Vertex shader from Vertex Shader pair '{}'", object.m_ShaderName));
-				VulkanEngine::SetDebugName(array[1], std::format("Fragment shader from Vertex Shader pair '{}'", object.m_ShaderName));
+				VulkanEngine::SetDebugName(object.m_VertFragPair[0], std::format("Vertex shader from Vertex Shader pair '{}'", object.m_ShaderName));
+				VulkanEngine::SetDebugName(object.m_VertFragPair[1], std::format("Fragment shader from Vertex Shader pair '{}'", object.m_ShaderName));
 
-				if (!Get().m_Holes.empty()) {
-					ShaderObjectHandle freeHandle = Get().m_Holes.back();
-					Get().m_Holes.pop_back();
-
-					Get().m_Shaders[freeHandle] = object;
-					return freeHandle;
-				}
-
-				object.m_Valid = true;
-
-				ShaderObjectHandle newHandle = Get().m_Shaders.size();
-				Get().m_Shaders.emplace_back(object);
-				return newHandle;
+				return Get().m_PairShaders.Emplace(object);
 			}
 
-			static ShaderObjectHandle CreateVertexShaderPair(const void* source, const uint64_t sourceSize, const char* vertexEntryPoint, const char* fragmentEntryPoint, const char* shaderName = "") {
+			[[nodiscard]] static Core::Handle<VertFragShaderPair> CreateVertexShaderPair(const void* source, const uint64_t sourceSize, const char* vertexEntryPoint, const char* fragmentEntryPoint, const char* shaderName = "") {
 				return CreateVertexShaderPair(source, sourceSize, vertexEntryPoint, source, sourceSize, fragmentEntryPoint, shaderName);
 			}
 
-			static ShaderObjectHandle CreateComputeShader(const void* source, const uint64_t sourceSize, const char* entryPoint, const char* shaderName) {
+			[[nodiscard]] static Core::Handle<ComputeShader> CreateComputeShader(const void* source, const uint64_t sourceSize, const char* entryPoint, const char* shaderName) {
 				vk::ShaderCreateInfoEXT createInfo {
 					.stage = vk::ShaderStageFlagBits::eCompute,
 					.codeType = vk::ShaderCodeTypeEXT::eSpirv,
@@ -147,54 +163,47 @@ namespace Cori {
 					.pPushConstantRanges = &VulkanGlobalLayoutManager::GetGlobalPushConstantRange()
 				};
 
-				ShaderObject object;
-				object.m_ShaderVariant = vk::ShaderEXT{};
-				object.m_ShaderName = shaderName;
-				auto& shader = std::get<vk::ShaderEXT>(object.m_ShaderVariant);
+				ComputeShader object;
+				object.m_ComputeShaderObject = vk::ShaderEXT{};
 
-				auto result = VulkanEngine::GetLogicalDevice().createShadersEXT(1, &createInfo, nullptr, &shader);
+				auto result = VulkanEngine::GetLogicalDevice().createShadersEXT(1, &createInfo, nullptr, &object.m_ComputeShaderObject);
 				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Vertex Fragment pair '{}' shader creation failed. Error: {}", shaderName, vk::to_string(result));
 
+				#ifdef DEBUG_BUILD
 				if (strcmp(shaderName, "") != 0) {
 					object.m_ShaderName = shaderName;
 				}
+				#endif
 
-				VulkanEngine::SetDebugName(shader, std::format("Compute shader '{}'", object.m_ShaderName));
+				VulkanEngine::SetDebugName(object.m_ComputeShaderObject, std::format("Compute shader '{}'", object.m_ShaderName));
 
-				if (!Get().m_Holes.empty()) {
-					ShaderObjectHandle freeHandle = Get().m_Holes.back();
-					Get().m_Holes.pop_back();
-
-					Get().m_Shaders[freeHandle] = object;
-					return freeHandle;
-				}
-
-				object.m_Valid = true;
-
-				ShaderObjectHandle newHandle = Get().m_Shaders.size();
-				Get().m_Shaders.emplace_back(object);
-				return newHandle;
+				return Get().m_ComputeShaders.Emplace(object);
 			}
 
 			~VulkanShaderManager() {
-				for (auto& shaderObject : m_Shaders) {
-					if (std::holds_alternative<vk::ShaderEXT>(shaderObject.m_ShaderVariant)) {
-						VulkanEngine::GetLogicalDevice().destroyShaderEXT(std::get<vk::ShaderEXT>(shaderObject.m_ShaderVariant));
-					} else {
-						for (auto& shader : std::get<std::array<vk::ShaderEXT, 2>>(shaderObject.m_ShaderVariant)) {
-							VulkanEngine::GetLogicalDevice().destroyShaderEXT(shader);
-						}
-					}
+				for (auto& cs : m_ComputeShaders) {
+					DeletionQueue::PushShaderObject(cs.m_ComputeShaderObject, VulkanEngine::GetCurrentFrameInFlight());
 				}
+
+				m_ComputeShaders.Clear();
+
+				for (auto& vfp : m_PairShaders) {
+					DeletionQueue::PushShaderObject(vfp.m_VertFragPair[0], VulkanEngine::GetCurrentFrameInFlight());
+					DeletionQueue::PushShaderObject(vfp.m_VertFragPair[1], VulkanEngine::GetCurrentFrameInFlight());
+				}
+
+				m_PairShaders.Clear();
 			}
 
 		private:
 			VulkanShaderManager() {
-				m_Shaders.reserve(32);
+				m_ComputeShaders.Reserve(64);
+				m_PairShaders.Reserve(64);
 			}
 
-			std::vector<ShaderObject> m_Shaders;
-			std::vector<ShaderObjectHandle> m_Holes;
+			Core::FlatSlotMap<ComputeShader> m_ComputeShaders;
+			Core::FlatSlotMap<VertFragShaderPair> m_PairShaders;
+
 			static std::unique_ptr<VulkanShaderManager> s_Instance;
 		};
 	}

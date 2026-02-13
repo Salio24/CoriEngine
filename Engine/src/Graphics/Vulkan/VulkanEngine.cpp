@@ -286,6 +286,9 @@ namespace Cori {
 		void VulkanEngine::GPUFrameMiddlePointSync() {
 			FrameData& frameData = m_FrameData[m_CurrentFrameInFlight];
 			VulkanStreamingLine::ProcessUploads();
+
+
+
 			VulkanVirtualBufferAllocator::SubmitCopies(frameData.m_CommandBuffer);
 			VulkanDynamicContainerUploadManager::ProcessUpdates(frameData.m_CommandBuffer);
 		}
@@ -714,15 +717,15 @@ namespace Cori {
 
 			m_ComputeQueueFamilyIndex = m_GraphicsQueueFamilyIndex;
 
-			constexpr QueueUsageFlags g = QueueUsageFlagBits::GRAPHICS;
-			constexpr QueueUsageFlags t = QueueUsageFlagBits::TRANSFER;
-			constexpr QueueUsageFlags c = QueueUsageFlagBits::COMPUTE;
+			constexpr QueueUsageFlags g = QueueUsageFlagBits::eGraphics;
+			constexpr QueueUsageFlags t = QueueUsageFlagBits::eTransfer;
+			constexpr QueueUsageFlags c = QueueUsageFlagBits::eCompute;
 
-			constexpr QueueUsageFlags gt = QueueUsageFlagBits::GRAPHICS | QueueUsageFlagBits::TRANSFER;
-			constexpr QueueUsageFlags tc = QueueUsageFlagBits::TRANSFER | QueueUsageFlagBits::COMPUTE;
-			constexpr QueueUsageFlags cg = QueueUsageFlagBits::COMPUTE | QueueUsageFlagBits::GRAPHICS;
+			constexpr QueueUsageFlags gt = QueueUsageFlagBits::eGraphics | QueueUsageFlagBits::eTransfer;
+			constexpr QueueUsageFlags tc = QueueUsageFlagBits::eTransfer | QueueUsageFlagBits::eCompute;
+			constexpr QueueUsageFlags cg = QueueUsageFlagBits::eCompute | QueueUsageFlagBits::eGraphics;
 
-			constexpr QueueUsageFlags gtc = QueueUsageFlagBits::GRAPHICS | QueueUsageFlagBits::TRANSFER | QueueUsageFlagBits::COMPUTE;
+			constexpr QueueUsageFlags gtc = QueueUsageFlagBits::eGraphics | QueueUsageFlagBits::eTransfer | QueueUsageFlagBits::eCompute;
 
 			m_SharingSettings[static_cast<QueueUsageFlags::MaskType>(g)] = std::make_pair(vk::SharingMode::eExclusive, std::vector<uint32_t>{} );
 			m_SharingSettings[static_cast<QueueUsageFlags::MaskType>(t)] = std::make_pair(vk::SharingMode::eExclusive, std::vector<uint32_t>{} );

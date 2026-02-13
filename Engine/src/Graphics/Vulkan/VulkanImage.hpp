@@ -1,5 +1,6 @@
 #pragma once
 #include "VulkanEngine.hpp"
+#include "Utility/HashCombine.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -20,6 +21,26 @@ namespace Cori {
 				bool operator==(const ImageViewKey& other) const = default;
 
 				auto operator<=>(const ImageViewKey& other) const = default;
+
+				struct Hasher {
+					std::size_t operator()(const ImageViewKey& key) const noexcept {
+						uint64_t hash;
+
+						Utility::HashCombine(hash, static_cast<uint32_t>(key.flags));
+						Utility::HashCombine(hash, static_cast<uint32_t>(key.type));
+						Utility::HashCombine(hash, static_cast<uint32_t>(key.components.r));
+						Utility::HashCombine(hash, static_cast<uint32_t>(key.components.g));
+						Utility::HashCombine(hash, static_cast<uint32_t>(key.components.b));
+						Utility::HashCombine(hash, static_cast<uint32_t>(key.components.a));
+						Utility::HashCombine(hash, static_cast<uint32_t>(key.subresourceRange.aspectMask));
+						Utility::HashCombine(hash, key.subresourceRange.baseMipLevel);
+						Utility::HashCombine(hash, key.subresourceRange.levelCount);
+						Utility::HashCombine(hash, key.subresourceRange.baseArrayLayer);
+						Utility::HashCombine(hash, key.subresourceRange.layerCount);
+
+						return hash;
+					}
+				};
 			};
 
 
