@@ -3,7 +3,6 @@
 #include "Vulkan/VulkanEngine.hpp"
 #include "Vulkan/VulkanImage.hpp"
 #include "Vulkan/VulkanBuffer.hpp"
-#include "Vulkan/VulkanResourceTracker.hpp"
 #include "Vulkan/VulkanLayoutManager.hpp"
 #include "Vulkan/VulkanUploadSubsystem.hpp"
 #include "Utility/StringHash.hpp"
@@ -44,6 +43,7 @@ namespace Cori {
 		};
 
 		class RenderGraphResourceRegistry;
+		class RenderGraphPassRegistry;
 		class RenderGraph;
 
 		namespace Internal {
@@ -149,6 +149,7 @@ namespace Cori {
 				uint32_t resourceID{ UINT32_MAX };
 
 				friend RenderGraphResourceRegistry;
+				friend RenderGraphPassRegistry;
 				friend RenderGraph;
 			};
 
@@ -169,7 +170,7 @@ namespace Cori {
 				BufferState state;
 			};
 
-			using DynamicContainerResourceData = void*;
+			using DynamicContainerResourceData = const void*;
 
 			struct ResourceNode {
 				const char* name{ "" };
@@ -247,17 +248,17 @@ namespace Cori {
 			}
 
 			template<typename T>
-			VulkanDynamicVector<T>& GetResource(const GraphResourceHandle<VulkanDynamicVector<T>> handle) {
+			const VulkanDynamicVector<T>& GetResource(const GraphResourceHandle<VulkanDynamicVector<T>> handle) {
 				auto& node = GetNode(handle);
 				auto resourceData = std::get<Internal::DynamicContainerResourceData>(node.resourceData);
-				return *static_cast<VulkanDynamicVector<T>*>(resourceData);
+				return *static_cast<const VulkanDynamicVector<T>*>(resourceData);
 			}
 
 			template<typename T>
-			VulkanFlatSlotMap<T>& GetResource(const GraphResourceHandle<VulkanFlatSlotMap<T>> handle) {
+			const VulkanFlatSlotMap<T>& GetResource(const GraphResourceHandle<VulkanFlatSlotMap<T>> handle) {
 				auto& node = GetNode(handle);
 				auto resourceData = std::get<Internal::DynamicContainerResourceData>(node.resourceData);
-				return *static_cast<VulkanFlatSlotMap<T>*>(resourceData);
+				return *static_cast<const VulkanFlatSlotMap<T>*>(resourceData);
 			}
 
 			void RegisterSwapChainImage(const SwapChainImageData& data) {
@@ -554,7 +555,7 @@ namespace Cori {
 				Internal::ResourceNode node;
 				node.name = name;
 				node.origin = Internal::ResourceOrigin::Imported;
-				node.resourceData.emplace<Internal::DynamicContainerResourceData>(static_cast<void*>(&vector));
+				node.resourceData.emplace<Internal::DynamicContainerResourceData>(static_cast<const void*>(&vector));
 
 				return static_cast<GraphResourceHandle<VulkanDynamicVector<T>>>(m_ResourceRegistry->AddNode(node));
 			}
@@ -564,7 +565,7 @@ namespace Cori {
 				Internal::ResourceNode node;
 				node.name = name;
 				node.origin = Internal::ResourceOrigin::Imported;
-				node.resourceData.emplace<Internal::DynamicContainerResourceData>(static_cast<void*>(&vector));
+				node.resourceData.emplace<Internal::DynamicContainerResourceData>(static_cast<const void*>(&vector));
 
 				return static_cast<GraphResourceHandle<VulkanFlatSlotMap<T>>>(m_ResourceRegistry->AddNode(node));
 			}
@@ -595,7 +596,7 @@ namespace Cori {
 				return pass;
 			}
 
-			void Compile(const uint64_t currentFrameIndex) {
+			void Compile(const uint64_t currentFrameIndex, const uint32_t dstFrameInFlight) {
 				CORI_PROFILE_FUNCTION();
 				{
 					CORI_PROFILE_SCOPE("DAG Build");
@@ -702,7 +703,7 @@ namespace Cori {
 							else if (std::holds_alternative<Internal::VirtualBufferResourceData>(node.resourceData)) {
 								auto& data = std::get<Internal::VirtualBufferResourceData>(node.resourceData);
 
-								data.virtualBuffer = VulkanVirtualBufferAllocator::CreateVirtualScratchBuffer(data.createInfo.size, data.createInfo.alignment, data.createInfo.name);
+								data.virtualBuffer = VulkanVirtualBufferAllocator::CreateVirtualScratchBuffer(data.createInfo.size, data.createInfo.alignment, dstFrameInFlight, data.createInfo.name);
 							}
 						}
 					}

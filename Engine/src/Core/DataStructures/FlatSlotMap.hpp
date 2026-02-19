@@ -11,6 +11,9 @@ namespace Cori {
 		};
 
 		struct VersionedHandleBase {
+			VersionedHandleBase() = default;
+			VersionedHandleBase(const uint32_t index, const uint32_t version) : index(index), version(version) {}
+
 			[[nodiscard]] uint32_t GetIndex() const {
 				return index;
 			}
@@ -22,7 +25,7 @@ namespace Cori {
 			[[nodiscard]] bool operator==(const VersionedHandleBase& other) const = default;
 
 			struct Hasher {
-				size_t operator()(const VersionedHandleBase& handle) const {
+				std::size_t operator()(const VersionedHandleBase& handle) const {
 					return std::hash<uint64_t>{}(static_cast<uint64_t>(handle.index) << 32 | handle.version);
 				}
 			};
@@ -35,9 +38,13 @@ namespace Cori {
 		template<typename T>
 		struct Handle : VersionedHandleBase {
 			using Type = T;
+
+			using VersionedHandleBase::VersionedHandleBase;
+
+			[[nodiscard]] bool operator==(const Handle<T>& other) const = default;
 		};
 
-		template<std::copy_constructible T, IsVersionedHandle HandleT = Handle<T>, uint16_t REUSE_THRESHOLD = 64>
+		template<std::copy_constructible T, uint16_t REUSE_THRESHOLD = 64, bool ENABLE_VERSIONING = true, IsVersionedHandle HandleT = Handle<T>>
 		class FlatSlotMap {
 		public:
 			using Handle = HandleT;
@@ -108,7 +115,7 @@ namespace Cori {
 					sul::dynamic_bitset<>::size_type nextIndex = m_Map->m_SlotStates.find_next(m_Index);
 
 					if (nextIndex == sul::dynamic_bitset<>::npos) {
-						m_Index = static_cast<uint32_t>(m_Data.Capacity());
+						m_Index = static_cast<uint32_t>(m_Map->m_Data.capacity());
 						return;
 					}
 
@@ -145,7 +152,10 @@ namespace Cori {
 
 			void Reserve(SizeT capacity) {
 				m_Data.reserve(capacity);
-				m_Versions.reserve(capacity);
+				if constexpr (ENABLE_VERSIONING) {
+					m_Versions.reserve(capacity);
+				}
+
 				m_SlotStates.reserve(capacity);
 			}
 
@@ -169,16 +179,26 @@ namespace Cori {
 
 					m_Data[index] = T(std::forward<Args>(args)...);
 
-					m_Versions[index]++;
+					if constexpr (ENABLE_VERSIONING) {
+						m_Versions[index]++;
+					}
+
 					m_SlotStates[index] = true;
 				} else {
 					index = m_Data.size();
 					m_Data.emplace_back(std::forward<Args>(args)...);
 					m_SlotStates.push_back(true);
-					m_Versions.emplace_back(1);
+
+					if constexpr (ENABLE_VERSIONING) {
+						m_Versions.emplace_back(1);
+					}
 				}
 
-				return { index, m_Versions[index] };
+				if constexpr (ENABLE_VERSIONING) {
+					return Handle{ index, m_Versions[index] };
+				}
+
+				return Handle{ index, 1 };
 			}
 
 			void Remove(const Handle handle) {
@@ -218,6 +238,16 @@ namespace Cori {
 			[[nodiscard]] ConstReference operator[](const Handle handle) const {
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Accessed FlatSlotMap with an invalid handle.");
 				return m_Data[handle.GetIndex()];
+			}
+
+			[[nodiscard]] Reference operator[](const SizeT index) {
+				CORI_CORE_ASSERT(index < m_Data.size() && m_SlotStates[index], "Accessed FlatSlotMap with an invalid index.");
+				return m_Data[index];
+			}
+
+			[[nodiscard]] ConstReference operator[](const SizeT index) const {
+				CORI_CORE_ASSERT(index < m_Data.size() && m_SlotStates[index], "Accessed FlatSlotMap with an invalid index.");
+				return m_Data[index];
 			}
 
 			[[nodiscard]] Iterator begin() {
@@ -297,7 +327,11 @@ namespace Cori {
 			}
 
 			[[nodiscard]] bool IsHandleValid(const Handle handle) const {
-				return handle.GetIndex() < RawSize() && m_Versions[handle.GetIndex()] == handle.GetVersion();
+				if constexpr(ENABLE_VERSIONING) {
+					return m_Versions[handle.GetIndex()] == handle.GetVersion() && IsIndexValid(handle.GetIndex());
+				}
+
+				return IsIndexValid(handle.GetIndex()) && handle.GetVersion() == 1;
 			}
 
 			[[nodiscard]] bool IsIndexValid(const SizeT index) const {
@@ -306,12 +340,18 @@ namespace Cori {
 
 			[[nodiscard]] Handle GetIndexHandle(const SizeT index) const {
 				CORI_CORE_ASSERT(IsIndexValid(index), "Invalid index passed to FlatSlotMap::GetIndexHandle.");
-				return { index, m_Versions[index] };
+				if constexpr(ENABLE_VERSIONING) {
+					return { index, m_Versions[index] };
+				}
+
+				return Handle{ index, 1 };
 			}
 
 			void Clear() {
 				m_Data.clear();
-				m_Versions.clear();
+				if constexpr(ENABLE_VERSIONING) {
+					m_Versions.clear();
+				}
 				m_Holes.clear();
 				m_SlotStates.clear();
 			}
@@ -320,25 +360,31 @@ namespace Cori {
 			friend Iterator;
 			friend ConstIterator;
 
-			[[nodiscard]] Reference operator[](const SizeT index) {
-				CORI_CORE_ASSERT(index < m_Data.Size(), "Accessed FlatSlotMap with an invalid handle.");
-				return m_Data[index];
-			}
-
-			[[nodiscard]] ConstReference operator[](const SizeT index) const {
-				CORI_CORE_ASSERT(index < m_Data.Size(), "Accessed FlatSlotMap with an invalid handle.");
-				return m_Data[index];
-			}
-
 			std::vector<T> m_Data{};
 			sul::dynamic_bitset<> m_SlotStates{};
 		private:
-			std::vector<uint32_t> m_Versions{};
 			std::deque<SizeT> m_Holes{};
+			std::conditional_t<ENABLE_VERSIONING, std::vector<uint32_t>, uint8_t> m_Versions{};
 			uint32_t m_ReusedIndexCounter{ 0 };
 		};
 
 	}
+}
+
+namespace std {
+	template <>
+	struct hash<Cori::Core::VersionedHandleBase> {
+		std::size_t operator()(const Cori::Core::VersionedHandleBase& handle) const {
+			return Cori::Core::VersionedHandleBase::Hasher()(handle);
+		}
+	};
+
+	template<typename T>
+	struct hash<Cori::Core::Handle<T>> {
+		std::size_t operator()(const Cori::Core::Handle<T>& handle) const {
+			return Cori::Core::VersionedHandleBase::Hasher()(handle);
+		}
+	};
 }
 
 

@@ -33,6 +33,7 @@ namespace Cori {
 			AssetManager::Init();
 			World::SceneManager::Init();
 			Audio::Mixer::Init();
+			Graphics::Renderer::Init();
 
 			m_GameTimer.SetTickrate(120);
 			m_GameTimer.SetTickrateUpdateFunc(CORI_BIND_EVENT_FN(Application::TickrateUpdate, CORI_PLACEHOLDERS(1)));
@@ -40,10 +41,11 @@ namespace Cori {
 		}
 
 		Application::~Application() {
-			m_LayerStack.ClearStack();
-			AssetManager::Shutdown();
-			World::SceneManager::Shutdown();
+			Graphics::Renderer::Shutdown();
 			Audio::Mixer::Shutdown();
+			World::SceneManager::Shutdown();
+			AssetManager::Shutdown();
+			m_LayerStack.ClearStack();
 		}
 
 		void Application::EmitEvent(Event& event) {
@@ -113,7 +115,7 @@ namespace Cori {
 						layer->ActiveScene.EndRender();
 					}
 
-					Graphics::Renderer::Render();
+					Graphics::Renderer::Get().Render();
 
 					{
 						CORI_PROFILE_SCOPE("ImGui Render");

@@ -12,13 +12,13 @@ namespace Cori {
 
 		struct MaterialData {
 			alignas(16) glm::vec4 colorFactor{ 1.0f };
-			Core::Handle<Texture> albedoTexture;
+			Core::Handle<Texture2> albedoTexture;
 			SamplerHandle albedoSampler{ 0 };
 		};
 
 		struct Material {
 			MaterialData customData;
-			ShaderEffectIndex shaderEffectHandle{ 0 };
+			ShaderEffectIndex shaderEffectIndex{ 0 };
 			uint32_t version{ 0 };
 		};
 
@@ -60,9 +60,10 @@ namespace Cori {
 		};
 
 		class VulkanMaterialSystem {
+		public:
 			using OnShaderEffectDeletedFn = std::function<void(const Core::Handle<ShaderEffect>)>;
 			using OnShaderEffectSwappedFn = std::function<void(const Core::Handle<Material>, const Core::Handle<ShaderEffect> oldFx, const Core::Handle<ShaderEffect> newFx)>;
-		public:
+
 			static void Init();
 
 			static void Shutdown();
@@ -71,7 +72,7 @@ namespace Cori {
 
 			[[nodiscard]] static Core::Handle<ShaderEffect> CreateShaderEffect(const Core::Handle<VertFragShaderPair> shaderPair, const PipelineState& state, const ShaderEffectData& data = {}, const char* name = "") {
 				if (!VulkanShaderManager::IsHandleValid(shaderPair)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid VertFragShaderPair handle passed to CreateShaderEffect, returning placeholder shader effect.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid Vert+Frag Shader pair handle passed to CreateShaderEffect, returning placeholder shader effect.");
 					return Get().m_PlaceholderEffect;
 				}
 
@@ -129,7 +130,7 @@ namespace Cori {
 				}
 
 				const auto& data = std::as_const(Get().m_Materials)[material];
-				auto handle = Get().m_Materials.Emplace(data.customData, data.shaderEffectHandle);
+				auto handle = Get().m_Materials.Emplace(data.customData, data.shaderEffectIndex);
 
 				#ifdef DEBUG_BUILD
 				Get().m_MaterialNames.resize(Get().m_Materials.Capacity());
@@ -201,7 +202,7 @@ namespace Cori {
 
 				const auto& data = std::as_const(Get().m_Materials)[material];
 
-				return Get().m_ShaderEffects.GetIndexHandle(data.shaderEffectHandle);
+				return Get().m_ShaderEffects.GetIndexHandle(data.shaderEffectIndex);
 			}
 
 			static std::expected<void, ErrorCode> ChangeMaterialShaderEffect(const Core::Handle<Material> material, const Core::Handle<ShaderEffect> newShaderEffect) {
@@ -213,14 +214,14 @@ namespace Cori {
 
 				if (!Get().m_OnShaderEffectSwappedListeners.empty()) {
 					const Material& constRef = dataRef;
-					Core::Handle<ShaderEffect> oldShaderEffect = Get().m_ShaderEffects.GetIndexHandle(constRef.shaderEffectHandle);
+					Core::Handle<ShaderEffect> oldShaderEffect = Get().m_ShaderEffects.GetIndexHandle(constRef.shaderEffectIndex);
 
 					for (auto& func : Get().m_OnShaderEffectSwappedListeners) {
 						func(material, newShaderEffect, oldShaderEffect);
 					}
 				}
 
-				dataRef->shaderEffectHandle = newShaderEffect.GetIndex();
+				dataRef->shaderEffectIndex = newShaderEffect.GetIndex();
 
 				return {};
 			}
@@ -269,13 +270,19 @@ namespace Cori {
 			}
 
 			static void DestroyShaderEffect(const Core::Handle<ShaderEffect> shaderEffect) {
-				if (IsHandleValid(shaderEffect) || shaderEffect == Get().m_PlaceholderEffect) {
+				if (!IsHandleValid(shaderEffect)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid ShaderEffect handle was passed to DestroyMaterial.");
+					return;
+				}
+
+				if (Get().m_PlaceholderEffect == shaderEffect) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Placeholder ShaderEffect handle was passed to DestroyShaderEffect. Can't destroy the placeholder.");
 					return;
 				}
 
 				for (auto it = Get().m_Materials.cbegin(); it != Get().m_Materials.cend(); ++it) {
 					auto& material = *it;
-					if (material.shaderEffectHandle == shaderEffect.GetIndex()) {
+					if (material.shaderEffectIndex == shaderEffect.GetIndex()) {
 						ChangeMaterialShaderEffect(it.GetHandle(), Get().m_PlaceholderEffect);
 					}
 				}
@@ -288,7 +295,13 @@ namespace Cori {
 			}
 
 			static void DestroyMaterial(const Core::Handle<Material> material) {
-				if (!IsHandleValid(material) || material == Get().m_PlaceholderMaterial) {
+				if (!IsHandleValid(material)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid Material handle was passed to DestroyMaterial.");
+					return;
+				}
+
+				if (Get().m_PlaceholderMaterial == material) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Placeholder Material handle was passed to DestroyMaterial. Can't destroy the placeholder.");
 					return;
 				}
 
@@ -312,13 +325,6 @@ namespace Cori {
 				return Get().m_ShaderEffectData.GetVulkanBuffer().GetBDA();
 			}
 
-			//TODO:
-			//1: move placeholder shader creation to the ShaderManager
-			//2: add a way to add an OnVertFragShaderPairDelete listener to the ShaderManager
-			//3: listen on that here and change the VertFragShaderPair in the ShaderEffects that use it to the placeholder shader pair,
-			//OR just check if the shader pair handle is valid when we actually use the effect, and if it is not, change the effect's shader pair to the placeholder, but why, not like the previous is expensive as it does not happen often
-			//4: in CreateVertexShaderPair don't assert when we fail to create a shader, but instead return a placeholder shader pair and log an error, but keep the assert in compute shader creation
-
 		private:
 			VulkanMaterialSystem() {
 				m_Materials.Reserve(512);
@@ -329,25 +335,24 @@ namespace Cori {
 				m_ShaderEffects.Reserve(32);
 				m_ShaderEffectData.Reserve(32);
 
-				std::ifstream file(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "shaders/DefaultShader.spv", std::ios::ate | std::ios::binary);
-
-				CORI_CORE_ASSERT(file.good(), "Failed to open DefaultShader.spv, can't create placeholder shader, aborting.");
-
-				std::vector<Byte> buffer(file.tellg());
-				file.seekg(0, std::ios::beg);
-				file.read(reinterpret_cast<char*>(buffer.data()), static_cast<std::streamsize>(buffer.size()));
-				file.close();
-
-				auto shader = VulkanShaderManager::CreateVertexShaderPair(buffer.data(), buffer.size(), "vertMain", "fragMain", "Placeholder Vert+Frag Shader Pair");
-
 				#ifdef DEBUG_BUILD
-				m_PlaceholderEffect = m_ShaderEffects.Emplace(shader, PipelineState{}, "Placeholder Shader Effect");
+				m_PlaceholderEffect = m_ShaderEffects.Emplace(VulkanShaderManager::GetPlaceholderShaderPair(), PipelineState{}, "Placeholder Shader Effect");
 				m_PlaceholderMaterial = m_Materials.Emplace(MaterialData{}, m_PlaceholderEffect.GetIndex());
-				m_MaterialNames.push_back("Placeholder Material");
+				m_MaterialNames.emplace_back("Placeholder Material");
 				#else
 				m_PlaceholderEffect = m_ShaderEffects.Emplace(shader, PipelineState{});
 				m_PlaceholderMaterial = m_Materials.Emplace(MaterialData{}, m_PlaceholderEffect.GetIndex());
 				#endif
+
+				VulkanShaderManager::AddOnVertFragShaderPairDeletedListener(ShaderPairDeleteListener);
+			}
+
+			static void ShaderPairDeleteListener(const Core::Handle<VertFragShaderPair> handle) {
+				for (auto& effect : Get().m_ShaderEffects) {
+					if (effect.shaders == handle) {
+						effect.shaders = VulkanShaderManager::GetPlaceholderShaderPair();
+					}
+				}
 			}
 
 			VulkanFlatSlotMap<Material> m_Materials{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Material Slot Map" };

@@ -90,7 +90,7 @@ namespace Cori {
 			}
 
 		protected:
-			AssetStatus m_Status{ AssetStatus::UNSPECIFIED };
+			AssetStatus m_Status{ AssetStatus::eUnspecified };
 		};
 
 		/**

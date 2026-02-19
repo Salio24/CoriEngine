@@ -66,7 +66,7 @@ namespace Cori {
 			}
 
 			[[nodiscard]] uint64_t GetBDA() {
-				return m_StartOffset;
+				return m_StartBDA;
 			}
 
 			[[nodiscard]] uint64_t GetStartOffset() const {
@@ -82,6 +82,7 @@ namespace Cori {
 			}
 
 		protected:
+			friend class RenderGraph;
 			friend class VulkanVirtualBufferAllocator;
 			VulkanVirtualBuffer() = default;
 
@@ -115,7 +116,7 @@ namespace Cori {
 				DeletionQueue::PushVirtualBlock(m_UploadArenaBlock, VulkanEngine::GetCurrentFrameInFlight());
 			}
 
-			static VulkanVirtualBuffer CreateVirtualUploadBuffer(uint64_t size, const uint64_t alignment, const char* name = "") {
+			static VulkanVirtualBuffer CreateVirtualUploadBuffer(uint64_t size, const uint64_t alignment, const uint32_t dstFrameInFlight, const char* name = "") {
 				size = Math::AlignUp(size, alignment);
 
 				vma::VirtualAllocationCreateInfo allocInfo {
@@ -126,6 +127,8 @@ namespace Cori {
 				vk::DeviceSize offset;
 				auto [result, alloc] = Get().m_UploadArenaBlock.virtualAllocate(allocInfo, &offset);
 				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to create VulkanVirtualBuffer from CPU upload arena heap, likely out of memory. Error: {}", vk::to_string(result));
+
+				Get().m_UploadVirtualAllocations[dstFrameInFlight].emplace_back(alloc);
 
 				VulkanVirtualBuffer virtBuff;
 				virtBuff.m_StartOffset = offset;
@@ -146,11 +149,10 @@ namespace Cori {
 				virtBuff.m_Name = name;
 				#endif
 				virtBuff.m_Alignment = alignment;
-				DeletionQueue::PushVirtualAlloc(alloc, Get().m_UploadArenaBlock, VulkanEngine::GetCurrentFrameInFlight());
 				return virtBuff;
 			}
 
-			static VulkanVirtualBuffer CreateVirtualScratchBuffer(uint64_t size, const uint64_t alignment, const char* name = "") {
+			static VulkanVirtualBuffer CreateVirtualScratchBuffer(uint64_t size, const uint64_t alignment, const uint32_t dstFrameInFlight,  const char* name = "") {
 				size = Math::AlignUp(size, alignment);
 
 				vma::VirtualAllocationCreateInfo allocInfo {
@@ -159,8 +161,10 @@ namespace Cori {
 				};
 
 				vk::DeviceSize offset;
-				auto [result, _] = Get().m_GPUScratchBlock.virtualAllocate(allocInfo, &offset);
+				auto [result, alloc] = Get().m_GPUScratchBlock.virtualAllocate(allocInfo, &offset);
 				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to create VulkanVirtualBuffer from GPU scratch heap, likely out of memory. Error: {}", vk::to_string(result));
+
+				Get().m_GPUScratchVirtualAllocations[dstFrameInFlight].emplace_back(alloc);
 
 				VulkanVirtualBuffer virtBuff;
 				virtBuff.m_StartOffset = offset;
@@ -175,8 +179,18 @@ namespace Cori {
 				return virtBuff;
 			}
 
-			static void ClearGPUScratchBlock() {
-				Get().m_GPUScratchBlock.clearVirtualBlock();
+			static void ClearGPUScratchBlock(uint32_t frameInFlight) {
+				for (auto& alloc : Get().m_GPUScratchVirtualAllocations[frameInFlight]) {
+					Get().m_GPUScratchBlock.free(alloc);
+				}
+
+				Get().m_GPUScratchVirtualAllocations[frameInFlight].clear();
+
+				for (auto& alloc : Get().m_UploadVirtualAllocations[frameInFlight]) {
+					Get().m_UploadArenaBlock.free(alloc);
+				}
+
+				Get().m_UploadVirtualAllocations[frameInFlight].clear();
 			}
 
 			static void SubmitCopies(vk::CommandBuffer cmb) {
@@ -359,6 +373,14 @@ namespace Cori {
 				auto [result_, vBlock_] = vma::createVirtualBlock(scratchVirtualBlockCreateInfo);
 				CORI_CORE_ASSERT(result_ == vk::Result::eSuccess, "Failed to create VulkanVirtualBufferAllocator's GPU scratch vma virtual block. Error: {}", vk::to_string(result_));
 				m_GPUScratchBlock = vBlock_;
+
+				for (auto& vec : m_GPUScratchVirtualAllocations) {
+					vec.reserve(16);
+				}
+
+				for (auto& vec : m_UploadVirtualAllocations) {
+					vec.reserve(16);
+				}
 			}
 
 			enum class UploadArenaType {
@@ -380,11 +402,14 @@ namespace Cori {
 			VulkanBuffer m_GPUScratchHeap; // GPU only heap
 			vma::VirtualBlock m_GPUScratchBlock;
 			uint64_t m_GPUScratchBDA;
+			std::array<std::vector<vma::VirtualAllocation>, FRAMES_IN_FLIGHT> m_GPUScratchVirtualAllocations;
+			std::array<std::vector<vma::VirtualAllocation>, FRAMES_IN_FLIGHT> m_UploadVirtualAllocations;
+
 
 			static constexpr uint64_t UPLOAD_ARENA_SIZE{ 16 * 1024 * 1024 }; // 16mb
 			static constexpr uint64_t GPU_SCRATCH_SIZE{ 128 * 1024 * 1024 }; // 128mb
 
-			static constexpr vk::BufferUsageFlags HEAP_USAGE_FLAGS = vk::BufferUsageFlagBits::eTransferSrc | vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eVertexBuffer;
+			static constexpr vk::BufferUsageFlags HEAP_USAGE_FLAGS = vk::BufferUsageFlagBits::eTransferSrc | vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eIndirectBuffer;
 
 			static std::unique_ptr<VulkanVirtualBufferAllocator> s_Instance;
 		};
@@ -1156,6 +1181,11 @@ namespace Cori {
 				return m_GPUBuffers[frameIndex];
 			}
 
+			[[nodiscard]] const VulkanBuffer& GetVulkanBuffer() const  {
+				uint32_t frameIndex = VulkanEngine::GetCurrentFrameInFlight();
+				return m_GPUBuffers[frameIndex];
+			}
+
 		private:
 			void ReportChange(const uint64_t startOffset, const uint64_t size) {
 				uint32_t affectedSectorStart = std::floor(startOffset / SECTOR_SIZE);
@@ -1236,7 +1266,7 @@ namespace Cori {
 					}
 				}
 
-				if (!m_IsBAR) {
+				if (!m_IsBAR || true) {
 					VulkanDynamicContainerUploadManager::FallbackListener();
 					for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
 						if (isBufferBAR[i]) {
@@ -1279,7 +1309,7 @@ namespace Cori {
 
 		};
 
-		template<std::copy_constructible T, Core::IsVersionedHandle HandleT = Core::Handle<T>, uint16_t REUSE_THRESHOLD = 64>
+		template<std::copy_constructible T, uint16_t REUSE_THRESHOLD = 64, bool ENABLE_VERSIONING = true, Core::IsVersionedHandle HandleT = Core::Handle<T>>
 		class VulkanFlatSlotMap {
 		public:
 			using Handle = HandleT;
@@ -1355,7 +1385,7 @@ namespace Cori {
 					sul::dynamic_bitset<>::size_type nextIndex = m_Map->m_SlotStates.find_next(m_Index);
 
 					if (nextIndex == sul::dynamic_bitset<>::npos) {
-						m_Index = static_cast<uint32_t>(m_Data.Capacity());
+						m_Index = static_cast<uint32_t>(m_Map->m_Data.Capacity());
 						return;
 					}
 
@@ -1392,7 +1422,10 @@ namespace Cori {
 
 			void Reserve(SizeT capacity) {
 				m_Data.Reserve(capacity);
-				m_Versions.reserve(capacity);
+				if constexpr (ENABLE_VERSIONING) {
+					m_Versions.reserve(capacity);
+				}
+
 				m_SlotStates.reserve(capacity);
 			}
 
@@ -1416,16 +1449,21 @@ namespace Cori {
 
 					m_Data[index] = T(std::forward<Args>(args)...);
 
-					m_Versions[index]++;
+					if constexpr (ENABLE_VERSIONING) {
+						m_Versions[index]++;
+					}
+
 					m_SlotStates[index] = true;
 				} else {
-					index = m_Data.size();
+					index = m_Data.Size();
 					m_Data.EmplaceBack(std::forward<Args>(args)...);
 					m_SlotStates.push_back(true);
-					m_Versions.emplace_back(1);
+					if constexpr (ENABLE_VERSIONING) {
+						m_Versions.emplace_back(1);
+					}
 				}
 
-				if constexpr (requires { m_Data[index]->version = uint32_t{}; }){
+				if constexpr (requires { m_Data[index]->version = uint32_t{}; } && ENABLE_VERSIONING){
 					m_Data[index]->version = m_Versions[index];
 				}
 
@@ -1433,7 +1471,11 @@ namespace Cori {
 					m_Data[index]->valid = true;
 				}
 
-				return { index, m_Versions[index] };
+				if constexpr (ENABLE_VERSIONING) {
+					return Handle{ index, m_Versions[index] };
+				}
+
+				return Handle{ index, 1 };
 			}
 
 			void Remove(const Handle handle) {
@@ -1473,6 +1515,16 @@ namespace Cori {
 			[[nodiscard]] ConstReference operator[](const Handle handle) const {
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Accessed FlatSlotMap with an invalid handle.");
 				return m_Data[handle.GetIndex()];
+			}
+
+			[[nodiscard]] Reference operator[](const SizeT index) {
+				CORI_CORE_ASSERT(index < m_Data.Size() && m_SlotStates[index], "Accessed FlatSlotMap with an invalid index.");
+				return m_Data[index];
+			}
+
+			[[nodiscard]] ConstReference operator[](const SizeT index) const {
+				CORI_CORE_ASSERT(index < m_Data.Size() && m_SlotStates[index], "Accessed FlatSlotMap with an invalid index.");
+				return m_Data[index];
 			}
 
 			[[nodiscard]] Iterator begin() {
@@ -1559,8 +1611,16 @@ namespace Cori {
 				return m_Data.GetVulkanBuffer();
 			}
 
+			[[nodiscard]] const VulkanBuffer& GetVulkanBuffer() const {
+				return m_Data.GetVulkanBuffer();
+			}
+
 			[[nodiscard]] bool IsHandleValid(const Handle handle) const {
-				return handle.GetIndex() < RawSize() && m_Versions[handle.GetIndex()] == handle.GetVersion();
+				if constexpr (ENABLE_VERSIONING) {
+					return m_Versions[handle.GetIndex()] == handle.GetVersion() && IsIndexValid(handle.GetIndex());
+				}
+
+				return IsIndexValid(handle.GetIndex()) && handle.GetVersion() == 1;
 			}
 
 			[[nodiscard]] bool IsIndexValid(const SizeT index) const {
@@ -1569,12 +1629,19 @@ namespace Cori {
 
 			[[nodiscard]] Handle GetIndexHandle(const SizeT index) const {
 				CORI_CORE_ASSERT(IsIndexValid(index), "Invalid index passed to VulkanFlatSlotMap::GetIndexHandle.");
-				return { index, m_Versions[index] };
+
+				if constexpr (ENABLE_VERSIONING) {
+					return { index, m_Versions[index] };
+				}
+
+				return Handle{ index, 1 };
 			}
 
 			void Clear() {
 				m_Data.Clear();
-				m_Versions.clear();
+				if constexpr (ENABLE_VERSIONING) {
+					m_Versions.clear();
+				}
 				m_Holes.clear();
 				m_SlotStates.clear();
 			}
@@ -1583,21 +1650,11 @@ namespace Cori {
 			friend Iterator;
 			friend ConstIterator;
 
-			[[nodiscard]] Reference operator[](const SizeT index) {
-				CORI_CORE_ASSERT(index < m_Data.Size(), "Accessed FlatSlotMap with an invalid handle.");
-				return m_Data[index];
-			}
-
-			[[nodiscard]] ConstReference operator[](const SizeT index) const {
-				CORI_CORE_ASSERT(index < m_Data.Size(), "Accessed FlatSlotMap with an invalid handle.");
-				return m_Data[index];
-			}
-
 			VulkanDynamicVector<T> m_Data{};
 			sul::dynamic_bitset<> m_SlotStates{};
 		private:
-			std::vector<uint32_t> m_Versions{};
 			std::deque<SizeT> m_Holes{};
+			std::conditional_t<ENABLE_VERSIONING, std::vector<uint32_t>, uint8_t> m_Versions{};
 			uint32_t m_ReusedIndexCounter{ 0 };
 		};
 
@@ -1653,7 +1710,7 @@ namespace Cori {
 
 			struct GenericUpload {
 				std::variant<std::monostate, ImageUpload, BufferUpload> resourceUpload;
-				std::span<Byte> data;
+				std::span<const Byte> data;
 			};
 
 			static void Init();
@@ -1727,11 +1784,11 @@ namespace Cori {
 							break;
 						}
 
-						if (imageUpload.range.subresourceLayers.mipLevel + 1 <= imageUpload.resource.m_MipLevels) {
+						if (imageUpload.range.subresourceLayers.mipLevel > imageUpload.resource.m_MipLevels) {
 							#ifdef DEBUG_BUILD
-							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Invalid MipLevel '{}' was provided when trying to upload to VulkanImage '{}' via streaming line, MipLevel + 1 can't be more than the total image mip level count '{}', no upload will be made, this batch will be skipped.", imageUpload.range.subresourceLayers.mipLevel, imageUpload.resource.m_Name, imageUpload.resource.m_MipLevels);
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Invalid MipLevel '{}' was provided when trying to upload to VulkanImage '{}' via streaming line, MipLevel can't be more than the total image mip level count '{}', no upload will be made, this batch will be skipped.", imageUpload.range.subresourceLayers.mipLevel, imageUpload.resource.m_Name, imageUpload.resource.m_MipLevels);
 							#else
-							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Invalid MipLevel '{}' was provided when trying to upload to VulkanImage '{}' via streaming line, MipLevel + 1 can't be more than the total image mip level count '{}', no upload will be made, this batch will be skipped.", imageUpload.range.subresourceLayers.mipLevel, "Name is unavailable in release build", imageUpload.resource.m_MipLevels);
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Invalid MipLevel '{}' was provided when trying to upload to VulkanImage '{}' via streaming line, MipLevel can't be more than the total image mip level count '{}', no upload will be made, this batch will be skipped.", imageUpload.range.subresourceLayers.mipLevel, "Name is unavailable in release build", imageUpload.resource.m_MipLevels);
 							#endif
 
 							success = false;
@@ -1751,7 +1808,7 @@ namespace Cori {
 
 						std::array<uint8_t, 3> blockExtent = vk::blockExtent(imageUpload.resource.m_Format);
 
-						vk::Extent3D mipExtent{ std::max(1u, mipExtent.width >> imageUpload.range.subresourceLayers.mipLevel), std::max(1u, mipExtent.height >> imageUpload.range.subresourceLayers.mipLevel), std::max(1u, mipExtent.depth >> imageUpload.range.subresourceLayers.mipLevel) };
+						vk::Extent3D mipExtent{ std::max(1u, imageUpload.resource.m_Extent3D.width >> imageUpload.range.subresourceLayers.mipLevel), std::max(1u, imageUpload.resource.m_Extent3D.height >> imageUpload.range.subresourceLayers.mipLevel), std::max(1u, imageUpload.resource.m_Extent3D.depth >> imageUpload.range.subresourceLayers.mipLevel) };
 
 						if (imageUpload.range.offset.x % blockExtent[0] != 0 || imageUpload.range.offset.y % blockExtent[1] != 0 || imageUpload.range.offset.z % blockExtent[2] != 0) {
 							#ifdef DEBUG_BUILD
@@ -1775,9 +1832,9 @@ namespace Cori {
 							break;
 						}
 
-						if (imageUpload.range.extent.width % blockExtent[0] != 0 && imageUpload.range.offset.x + imageUpload.range.extent.width != mipExtent.width ||
-							imageUpload.range.extent.height % blockExtent[1] != 0 && imageUpload.range.offset.y + imageUpload.range.extent.height != mipExtent.height ||
-							imageUpload.range.extent.depth % blockExtent[2] != 0 && imageUpload.range.offset.z + imageUpload.range.extent.depth != mipExtent.depth) {
+						if ((imageUpload.range.extent.width % blockExtent[0] != 0 && imageUpload.range.offset.x + imageUpload.range.extent.width != mipExtent.width) ||
+							(imageUpload.range.extent.height % blockExtent[1] != 0 && imageUpload.range.offset.y + imageUpload.range.extent.height != mipExtent.height) ||
+							(imageUpload.range.extent.depth % blockExtent[2] != 0 && imageUpload.range.offset.z + imageUpload.range.extent.depth != mipExtent.depth)) {
 							#ifdef DEBUG_BUILD
 							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::StreamingLine }, "Invalid Extent3D '{} {} {}' provided when trying to upload to VulkanImage '{}' via StreamingLine, extent + offset is not at the image border and extent is not aligned to block extent '{} {} {}' of image format '{}', no upload will be made, this batch will be skipped.", imageUpload.range.extent.width, imageUpload.range.extent.height, imageUpload.range.extent.depth, imageUpload.resource.m_Name, blockExtent[0], blockExtent[1], blockExtent[2], vk::to_string(imageUpload.resource.m_Format));
 							#else
@@ -1818,8 +1875,8 @@ namespace Cori {
 					}
 
 					slot.pendingUploads.erase(slot.pendingUploads.begin() + startOffset, slot.pendingUploads.end());
-					ProcessUploads();
 					if (outOfMemory) {
+						ProcessUploads();
 						return std::unexpected(ErrorCode::eNotReady);
 					}
 

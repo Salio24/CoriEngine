@@ -276,7 +276,7 @@ project(CoriEngine)
     #target_link_libraries()
 
     # should be public
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite exprtk boost_pfr Vulkan::Headers GPUOpen::VulkanMemoryAllocator VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp Vulkan::Loader gch::small_vector sul::dynamic_bitset slot_map)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite exprtk boost_pfr Vulkan::Headers GPUOpen::VulkanMemoryAllocator VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp Vulkan::Loader gch::small_vector sul::dynamic_bitset)
 
     if (CORI_ENABLE_TRACY_PROFILER)
         target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC Tracy::TracyClient)

@@ -6,7 +6,6 @@
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #endif
 
-#include "VulkanUploadManager.hpp"
 #include "VulkanMeshManager.hpp"
 #include "VulkanLayoutManager.hpp"
 #include "VulkanImageViewManager.hpp"
@@ -176,7 +175,7 @@ namespace Cori {
 
 		void VulkanEngine::CPUFrameStart() {
 			m_CurrentFrameIndex++;
-			VulkanVirtualBufferAllocator::ClearGPUScratchBlock();
+			VulkanVirtualBufferAllocator::ClearGPUScratchBlock(GetNextFrameInFlight());
 		}
 
 		VulkanEngine::FrameData& VulkanEngine::GPUFrameBegin() {
@@ -212,7 +211,7 @@ namespace Cori {
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to begin command buffer recording. Error: {}", vk::to_string(result));
 
 			vk::ImageMemoryBarrier2 barrier {
-				.srcStageMask = vk::PipelineStageFlagBits2::eTopOfPipe,
+				.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
 				.srcAccessMask = {},
 				.dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
 				.dstAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
@@ -285,10 +284,14 @@ namespace Cori {
 
 		void VulkanEngine::GPUFrameMiddlePointSync() {
 			FrameData& frameData = m_FrameData[m_CurrentFrameInFlight];
+
+			VulkanTextureManager::ProcessUpdates(frameData.m_CommandBuffer);
+			VulkanMeshManager::ProcessUpdates(frameData.m_CommandBuffer);
+			VulkanMaterialSystem::Sync();
+			VulkanGlobalLayoutManager::Sync();
+
+
 			VulkanStreamingLine::ProcessUploads();
-
-
-
 			VulkanVirtualBufferAllocator::SubmitCopies(frameData.m_CommandBuffer);
 			VulkanDynamicContainerUploadManager::ProcessUpdates(frameData.m_CommandBuffer);
 		}

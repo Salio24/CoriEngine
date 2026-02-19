@@ -2,10 +2,12 @@
 
 namespace Cori {
 	enum class AssetStatus : uint8_t {
-		LOADING,
-		PLACEHOLDER,
-		FAILED,
-		READY,
-		UNSPECIFIED
+		eEmpty,
+		eLoading,
+		eLoadQueued,
+		eLoadFailed,
+		ePlaceholder,
+		eLoaded,
+		eUnspecified
 	};
 }

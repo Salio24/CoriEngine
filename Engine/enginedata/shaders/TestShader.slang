@@ -1,29 +1,39 @@
 struct Vertex {
 	float3 position;
-	float  uv_x;
-	float3 normal;
-	float  uv_y;
-	float4 color;
+	uint32_t normal;
+	uint32_t tangent;
+	float2 uvs;
+	uint32_t color;
+};
+
+struct Handle {
+	uint32_t index;
+	uint32_t version;
+};
+
+struct Mesh {
+	uint32_t indexCount;
+	uint32_t firstIndex;
+	Vertex* firstVertexAddress;
+	uint32_t vertexType;
+	uint32_t version;
+};
+
+struct TextureAsset {
+	uint32_t descriptorIndex;
+	uint32_t version;
 };
 
 struct MaterialData {
 	float4 colorFactor;
-	uint32_t albedoTexture;
+	Handle albedoTexture;
 	uint32_t albedoSampler;
-	uint32_t normalTexture;
-	uint32_t normalSampler;
-	uint32_t roughnessTexture;
-	uint32_t roughnessSampler;
-	uint32_t emissiveTexture;
-	uint32_t emissiveSampler;
 };
 
 struct MaterialCombinedData {
 	MaterialData customData;
 	uint32_t shaderEffectID;
-	uint32_t pad1;
-	uint32_t pad2;
-	uint32_t pad3;
+	uint32_t version;
 };
 
 struct ShaderEffectData {
@@ -44,18 +54,24 @@ struct CompactedObjectID {
 struct ObjectData {
 	float4x4 transform;
 	float4 uvOffsets;
-	uint32_t materialID;
-	uint32_t subBatchID;
-	bool valid;
-	uint32_t pad4;
+	Handle material;
+	uint32_t ownerBatch;
+	uint32_t valid;
+};
+
+struct BatchInfo {
+	Handle mesh;
+	uint32_t ownerGroup;
 };
 
 struct PushConstants {
 	ObjectData* objectDataBuffer;
 	CompactedObjectID* compactedObjectIDBuffer;
-	Vertex* vertexBuffer;
 	MaterialCombinedData* materialDataBuffer;
 	ShaderEffectData* shaderEffectDataBuffer;
+	Mesh* meshAssetDataBuffer;
+	TextureAsset* textureAssetTable;
+	BatchInfo* batchInfoBuffer;
 };
 
 [[vk::push_constant]]
@@ -76,14 +92,16 @@ VSOutput vertMain(uint32_t instanceID : SV_VulkanInstanceID, uint32_t baseInstan
 
     uint32_t objectID = pc.compactedObjectIDBuffer[baseInstance + instanceID].id;
     ObjectData obj = pc.objectDataBuffer[objectID];
-    MaterialData material = pc.materialDataBuffer[obj.materialID].customData;
 
-    Vertex v = pc.vertexBuffer[vertexID];
+    MaterialData material = pc.materialDataBuffer[obj.material.index].customData;
+    Mesh mesh = pc.meshAssetDataBuffer[pc.batchInfoBuffer[obj.ownerBatch].mesh.index];
+
+    Vertex v = mesh.firstVertexAddress[vertexID];
 
     output.pos =  mul(obj.transform, float4(v.position, 1.0));
     output.fragColor = v.color * material.colorFactor;
-    output.uv = obj.uvOffsets.xy + float2(v.uv_x, v.uv_y) * (obj.uvOffsets.zw - obj.uvOffsets.xy);
-    output.albedoTexture = material.albedoTexture;
+    output.uv = obj.uvOffsets.xy + v.uvs * (obj.uvOffsets.zw - obj.uvOffsets.xy);
+    output.albedoTexture = pc.textureAssetTable[material.albedoTexture.index].descriptorIndex;
     output.albedoSampler = material.albedoSampler;
     return output;
 }

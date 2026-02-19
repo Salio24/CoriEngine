@@ -6,7 +6,8 @@ namespace Cori {
 		eTimeout,
 		eInvalidData,
 		eInvalidHandle,
-		eInvalidObject
+		eInvalidObject,
+		eImmutableObject
 	};
 
 	inline constexpr std::string to_string(ErrorCode code) {

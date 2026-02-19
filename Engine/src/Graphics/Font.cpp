@@ -22,10 +22,10 @@ namespace Cori {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Failed to load Font from '{}', checking if placeholder is available.", path.string());
 					if (AssetManager::HasPlaceholder<Font>()) {
 						CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Placeholder is available for <{}>, asset status set to PLACEHOLDER.", CORI_CLEAN_TYPE_NAME(Font));
-						coriFont->m_Status = AssetStatus::PLACEHOLDER;
+						coriFont->m_Status = AssetStatus::ePlaceholder;
 					} else {
 						CORI_CORE_FATAL_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "No placeholder is available for <{}>, asset status set to FAILED.", CORI_CLEAN_TYPE_NAME(Font));
-						coriFont->m_Status = AssetStatus::FAILED;
+						coriFont->m_Status = AssetStatus::eLoadFailed;
 					}
 				}
 				msdfgen::deinitializeFreetype(ft);
@@ -38,7 +38,7 @@ namespace Cori {
 		}
 
 		Font::Font() {
-			m_Status = AssetStatus::LOADING;
+			m_Status = AssetStatus::eLoading;
 		}
 
 		void Font::Load(void* font, const std::vector<CharsetRange>& charsets, const std::filesystem::path& fontPath, const float minimalScale, const float miterLimit) {
@@ -175,7 +175,7 @@ namespace Cori {
 
 				Core::Application::SubmitMainTask([data, params2, subject, widthLoaded, heightLoaded] {
 					subject->m_Data->m_Atlas = Texture2D::Create(data, widthLoaded, heightLoaded, params2);
-					subject->m_Status = AssetStatus::READY;
+					subject->m_Status = AssetStatus::eLoaded;
 					free(data);
 				});
 
@@ -250,7 +250,7 @@ namespace Cori {
 
 				Core::Application::SubmitMainTask([data, params, subject, w, h]{
 					subject->m_Data->m_Atlas = Texture2D::Create(data, w, h, params);
-					subject->m_Status = AssetStatus::READY;
+					subject->m_Status = AssetStatus::eLoaded;
 					free(data);
 				});
 

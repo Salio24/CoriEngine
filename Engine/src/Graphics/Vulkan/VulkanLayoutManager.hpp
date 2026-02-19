@@ -12,24 +12,28 @@ namespace Cori {
 
 			static VulkanGlobalLayoutManager& Get();
 
-			static vk::DescriptorSetLayout& GetGlobalDescriptorSetLayout() {
+			[[nodiscard]] static vk::DescriptorSetLayout& GetGlobalDescriptorSetLayout() {
 				return Get().m_DescriptorSetLayout;
 			}
 
-			static vk::PipelineLayout& GetGlobalPipelineLayout() {
+			[[nodiscard]] static vk::PipelineLayout& GetGlobalPipelineLayout() {
 				return Get().m_PipelineLayout;
 			}
 
-			static vk::PushConstantRange& GetGlobalPushConstantRange() {
+			[[nodiscard]] static vk::PushConstantRange& GetGlobalPushConstantRange() {
 				return Get().m_PushConstantRange;
 			}
 
-			static uint16_t GetMaxTextures() {
+			[[nodiscard]] static uint16_t GetMaxTextures() {
 				return s_MaxTextures;
 			}
 
-			static uint16_t GetMaxSamplers() {
+			[[nodiscard]] static uint16_t GetMaxSamplers() {
 				return s_MaxSamplers;
+			}
+
+			static void Sync() {
+				Get().m_DescriptorBuffer.Sync();
 			}
 
 			static void UpdateSamplerDescriptor(const uint32_t slot, const vk::Sampler sampler) {

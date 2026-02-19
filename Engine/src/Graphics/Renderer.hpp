@@ -1,9 +1,9 @@
 #pragma once
+#include <cmath>
+
 #include "Vulkan/VulkanEngine.hpp"
-#include "Vulkan/VulkanResourceTracker.hpp"
 #include "RenderGraph.hpp"
 #include "Core/Time.hpp"
-#include "Vulkan/VulkanUploadManager.hpp"
 #include "Vulkan/VulkanUploadSubsystem.hpp"
 #include "Vulkan/VulkanMeshManager.hpp"
 #include "Vulkan/VulkanShaderManager.hpp"
@@ -12,376 +12,320 @@
 #include "Vulkan/VulkanMaterialSystem.hpp"
 #include "FileSystem/PathManager.hpp"
 #include "Image.hpp"
-//FIXME: need explicit Renderer lifetime control, its deleted after VulkanEngine has been shutdown
 
 namespace Cori {
 	namespace Graphics {
-		const ResourceState StateA = { vk::PipelineStageFlagBits2::eVertexShader, vk::AccessFlagBits2::eShaderRead, vk::ImageLayout::eShaderReadOnlyOptimal };
-		const ResourceState StateB = { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderWrite, vk::ImageLayout::eGeneral };
-		const ResourceState StateC = { vk::PipelineStageFlagBits2::eColorAttachmentOutput, vk::AccessFlagBits2::eColorAttachmentWrite, vk::ImageLayout::eColorAttachmentOptimal };
-		const ResourceState StateD = { vk::PipelineStageFlagBits2::eEarlyFragmentTests, vk::AccessFlagBits2::eDepthStencilAttachmentWrite, vk::ImageLayout::eDepthAttachmentOptimal };
-
-		using ObjectHandle = uint32_t;
-		using SubBatchHandle = uint32_t;
-		using DrawGroupHandle = uint32_t;
+		using BatchIndex = uint32_t;
+		using DrawGroupIndex = uint32_t;
 
 		class Renderer {
 		public:
-			struct DrawGroup {
-				DrawGroup() {
-					batches.reserve(4);
-				}
+			class DrawGroup {
+			public:
+				DrawGroup() = default;
+				explicit DrawGroup(const Core::Handle<ShaderEffect> shaderEffect) : m_ShaderEffect(shaderEffect) {}
 
 				[[nodiscard]] uint32_t GetBatchCount() const {
-					return batches.size();
+					return m_BatchCount;
 				}
 
-				void AddBatch(const SubBatchHandle handle) {
-					batches.emplace_back(handle);
+				void IncrementBatchCounter() {
+					m_BatchCount++;
 				}
 
-				void RemoveBatch(const SubBatchHandle handle) {
-					auto& batch = Get().m_SubBatches[handle];
-					if (batches.size() < batch.indexInGroup + 1) {
-						return;
-					}
-
-					if (batches.size() == batch.indexInGroup + 1) {
-						batches.pop_back();
-					} else {
-						SubBatchHandle backHandle = batches.back();
-						batches[batch.indexInGroup] = backHandle;
-						Get().m_SubBatches[backHandle].indexInGroup = batch.indexInGroup;
-						batches.pop_back();
-					}
+				void DecrementBatchCounter() {
+					m_BatchCount--;
 				}
 
-				ShaderEffectHandle effect{ 0 };
+				Core::Handle<ShaderEffect> m_ShaderEffect;
 			private:
-				std::vector<SubBatchHandle> batches;
+				uint32_t m_BatchCount{ 0 };
 			};
 
-			struct SubBatch {
-				SubBatch() {
-					objects.reserve(64);
+			class Batch {
+			public:
+				Batch() = default;
+				explicit Batch(const Core::Handle<Mesh> mesh) : m_Mesh(mesh) {}
+
+				[[nodiscard]] uint32_t GetObjectCount() const {
+					return m_ObjectCount;
 				}
 
-				[[nodiscard]] uint32_t AddObject(const ObjectHandle handle) {
-					uint32_t index = objects.size();
-					objects.emplace_back(handle);
-					return index;
+				void IncrementObjectCounter() {
+					m_ObjectCount++;
 				}
 
-				void RemoveObject(const uint32_t index) {
-					if (objects.size() < index + 1) {
-						return;
-					}
-
-					if (objects.size() == index + 1) {
-						objects.pop_back();
-					} else {
-						ObjectHandle backHandle = objects.back();
-						objects[index] = backHandle;
-						Get().m_ObjectMetadata[backHandle].indexInSubBatch = index;
-						objects.pop_back();
-					}
+				void DecrementObjectCounter() {
+					m_ObjectCount--;
 				}
 
-				MeshHandle mesh{ 0 };
-
-				uint32_t indexInGroup{ 0 };
-
+				Core::Handle<Mesh> m_Mesh;
 			private:
-				std::vector<ObjectHandle> objects;
+				uint32_t m_ObjectCount{ 0 };
 			};
 
-			struct BatchInfo {
-				//uint32_t firstSortedInstanceIndex;
-				//uint32_t totalInstanceCount;
-				MeshHandle mesh{ 0 };
-				DrawGroupHandle owner{ 0 };
+			struct BatchGPUInfo {
+				Core::Handle<Mesh> mesh;
+				DrawGroupIndex owner{ 0 };
 			};
 
-			struct ObjectData {
-				alignas(16) glm::mat4 transform{ 0.0f };
-				alignas(16) glm::vec4 uvOffsets{ 0.0f, 0.0f, 1.0f, 1.0f };
-				MaterialHandle material{ 0 };
-				SubBatchHandle subBatch{ 0 };
-				uint32_t valid{ false };
+			struct RenderObject {
+				RenderObject() = default;
+				RenderObject(const glm::mat4& transform, const glm::vec4& uvOffsets, const Core::Handle<Material> material, const BatchIndex batch) : m_Transform(transform), m_UVOffsets(uvOffsets), m_Material(material), m_OwnerBatch(batch) {}
+				alignas(16) glm::mat4 m_Transform{ 0.0f };
+				alignas(16) glm::vec4 m_UVOffsets{ 0.0f, 0.0f, 1.0f, 1.0f };
+				Core::Handle<Material> m_Material;
+				BatchIndex m_OwnerBatch{ 0 };
+				uint32_t valid{ 0 };
 			};
 
-			struct ObjectMetadata {
-				uint32_t indexInSubBatch;
-				DrawGroupHandle drawGroup;
-			};
+			VulkanFlatSlotMap<RenderObject> m_Objects{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Render Object SlotMap" };
 
-			struct ObjectUpdateRequest {
-				glm::mat4 transform{ 0.0f };
-				glm::vec4 uvOffsets{ 1000.0f };
-				MaterialHandle material{ UINT32_MAX };
-				MeshHandle mesh{ UINT32_MAX };
-			};
+			Core::FlatSlotMap<Batch, 0, false> m_Batches;
+			VulkanDynamicVector<BatchGPUInfo> m_BatchGPUInfo{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Batch GPU Data" };
 
-			std::vector<DrawGroup> m_Groups;
-			std::vector<DrawGroupHandle> m_GroupHoles;
-			DrawGroupHandle m_NextGroupHandle{ 0 };
-			static constexpr DrawGroupHandle MAX_GROUPS = 128; //1024
-
-			std::vector<SubBatch> m_SubBatches;
-			std::vector<SubBatchHandle> m_SubBatchHoles;
-			SubBatchHandle m_NextSubBatchHandle{ 0 };
-			static constexpr SubBatchHandle MAX_SUBBATCHES = 512; // 30000
-
-			std::vector<ObjectData> m_ObjectData;
-			std::vector<ObjectMetadata> m_ObjectMetadata;
-			std::vector<ObjectHandle> m_ObjectHoles;
-			ObjectHandle m_NextObjectHandle{ 0 };
-			static constexpr ObjectHandle MAX_OBJECTS = 1024 * 1024 * 1; // 1-mil TODO: there should be no limit, need resizing
-
-			AmazingBufferHandle m_ObjectBufferHandle; //per instance <ObjectData> CPU - write, GPU - compute/vertex/fragment read - retained mode
-			AmazingBufferHandle m_BatchInfoBufferHandle; //per batch <BatchInfo> CPU - write, GPU - compute read - retained mode
-
+			Core::FlatSlotMap<DrawGroup, 0, false> m_DrawGroups;
 			//std::array<VulkanBuffer, FRAMES_IN_FLIGHT> m_RedirectBuffers; //per instance <ObjectHandle> CPU - write, GPU - compute read, semi-retained mode
-			std::array<VulkanBuffer, FRAMES_IN_FLIGHT> m_GroupCommandOffsets; // per group <uint32_t>, CPU - write, GPU - compute read, semi-retained mode
-			std::array<bool, FRAMES_IN_FLIGHT> m_SemiRetainedDataDirty{ false };
-
-			std::array<VulkanBuffer, FRAMES_IN_FLIGHT> m_DrawCommandBuffers; //per batch <VkDrawIndexedIndirectCommand> CPU - none, GPU - compute write -> command submit read, immediate mode
-			std::array<VulkanBuffer, FRAMES_IN_FLIGHT> m_DrawCommandCountBuffers; //per group <uint32_t> CPU - none, GPU - compute write -> indirect command read, immediate mode
-
-			std::array<VulkanBuffer, FRAMES_IN_FLIGHT> m_BatchIntermediateInfoBuffers; //per batch <uint64_t> CPU - none, GPU - compute write/read atomic, immediate mode
-			std::array<VulkanBuffer, FRAMES_IN_FLIGHT> m_AtomicInstance; //atomic uint32_t, CPU - none, GPU - compute write/read atomic, immediate mode
-
-			std::array<VulkanBuffer, FRAMES_IN_FLIGHT> m_CompactedInstanceListBuffers; //per visible instance <uint32_t> CPU - none, GPU - compute write -> vertex/fragment read, immediate mode
 
 			uint32_t m_TotalObjectCount{ 0 };
 
-			std::unordered_map<ShaderEffectHandle, std::pair<DrawGroupHandle, std::unordered_map<MeshHandle, SubBatchHandle>>> m_SubBatchLookup;
+			std::unordered_map<Core::Handle<ShaderEffect>, std::pair<DrawGroupIndex, std::unordered_map<Core::Handle<Mesh>, BatchIndex>>> m_SubBatchLookup;
 			//FIXME: need to tell the renderer when a mesh or a shader effect was deleted, to free the batch or draw group
 
-			static ObjectHandle RegisterObject(const MeshHandle mesh, const MaterialHandle material, const glm::mat4& transform, const glm::vec4& UVs = { 0.0f, 0.0f, 1.0f, 1.0f } ) {
-				ObjectHandle freeHandle;
-				if (!Get().m_ObjectHoles.empty()) {
-					freeHandle = Get().m_GroupHoles.back();
-					Get().m_ObjectHoles.pop_back();
-				} else {
-					freeHandle = Get().m_NextObjectHandle++;
-					CORI_CORE_ASSERT(freeHandle < MAX_GROUPS - 1, "Renderer out of object slots.");
+			[[nodiscard]] std::expected<Core::Handle<RenderObject>, ErrorCode> RegisterObject(const Core::Handle<Mesh> mesh, const Core::Handle<Material> material, const glm::mat4& transform, const glm::vec4& UVs = { 0.0f, 0.0f, 1.0f, 1.0f } ) {
+				auto shaderEffect = VulkanMaterialSystem::GetMaterialShaderEffect(material);
+
+				if (!shaderEffect) {
+					return std::unexpected(shaderEffect.error());
 				}
 
-				auto& objectData = Get().m_ObjectData[freeHandle];
-				auto& objectMetadata = Get().m_ObjectMetadata[freeHandle];
-
-				objectData.transform = transform;
-				objectData.uvOffsets = UVs;
-
-				auto [groupHandle, batchHandle] = FindAppropriateGroupAndBatch(VulkanMaterialSystem::GetMaterialShaderEffect(material), mesh);
-
-				objectData.material = material;
-				objectData.subBatch = batchHandle;
-				objectData.valid = true;
-
-				auto& batch = Get().m_SubBatches[batchHandle];
-				objectMetadata.drawGroup = groupHandle;
-				objectMetadata.indexInSubBatch = batch.AddObject(freeHandle);
-
-				Get().SyncObjectGPUData(freeHandle);
-
-				for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i ++) {
-					Get().m_SemiRetainedDataDirty[i] = true;
+				if (!VulkanMeshManager::IsHandleValid(mesh)) {
+					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
 
-				Get().m_TotalObjectCount++;
-				return freeHandle;
+				auto [groupIndex, batchIndex] = FindAppropriateGroupAndBatch(shaderEffect.value(), mesh);
+
+				m_Batches[batchIndex].IncrementObjectCounter();
+				m_TotalObjectCount++;
+
+				return m_Objects.Emplace(transform, UVs, material, batchIndex);
 			}
 
-			void UpdateBuffers() {
-				uint32_t frameIndex = VulkanEngine::GetCurrentFrameInFlight();
-				if (m_SemiRetainedDataDirty[frameIndex]) {
-					m_SemiRetainedDataDirty[frameIndex] = false;
+			void UnregisterObject(const Core::Handle<RenderObject> handle) {
+				if (!IsHandleValid(handle)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Renderer }, "Invalid RenderObject handle was passed to UnregisterObject.");
+					return;
+				}
 
-					std::vector<Byte> groupCommandOffsetPayload(sizeof(uint32_t) * m_Groups.size());
+				const auto& object = std::as_const(m_Objects)[handle];
 
-					for (uint32_t i = 0; i < m_Groups.size() - 1; i++) {
-						uint32_t batchCount = m_Groups[i].GetBatchCount();
-						memcpy(groupCommandOffsetPayload.data() + (i + 1) * sizeof(uint32_t), &batchCount, sizeof(uint32_t));
+				auto& ownerBatch = m_Batches[object.m_OwnerBatch];
+				ownerBatch.DecrementObjectCounter();
+				m_TotalObjectCount--;
+
+				if (ownerBatch.GetObjectCount() == 0) {
+					DestroyBatch(object.m_OwnerBatch);
+				}
+
+				m_Objects.Remove(handle);
+			}
+
+			[[nodiscard]] bool IsHandleValid(const Core::Handle<RenderObject> handle) const {
+				return m_Objects.IsHandleValid(handle);
+			}
+
+			[[nodiscard]] std::expected<std::reference_wrapper<const glm::mat4>, ErrorCode> GetRenderObjectTransform(const Core::Handle<RenderObject> handle) {
+				if (!IsHandleValid(handle)) {
+					return std::unexpected(ErrorCode::eInvalidHandle);
+				}
+
+				return std::cref(std::as_const(m_Objects)[handle].m_Transform);
+			}
+
+			std::expected<void, ErrorCode> ChangeRenderObjectTransform(const Core::Handle<RenderObject> handle, const glm::mat4& newTransform) {
+				if (!IsHandleValid(handle)) {
+					return std::unexpected(ErrorCode::eInvalidHandle);
+				}
+
+				m_Objects[handle]->m_Transform = newTransform;
+
+				return {};
+			}
+
+			[[nodiscard]] std::expected<std::reference_wrapper<const glm::vec4>, ErrorCode> GetRenderObjectUVOffsets(const Core::Handle<RenderObject> handle) {
+				if (!IsHandleValid(handle)) {
+					return std::unexpected(ErrorCode::eInvalidHandle);
+				}
+
+				return std::cref(std::as_const(m_Objects)[handle].m_UVOffsets);
+			}
+
+			std::expected<void, ErrorCode> ChangeRenderObjectUVOffsets(const Core::Handle<RenderObject> handle, const glm::vec4& newUVOffsets) {
+				if (!IsHandleValid(handle)) {
+					return std::unexpected(ErrorCode::eInvalidHandle);
+				}
+
+				m_Objects[handle]->m_UVOffsets = newUVOffsets;
+
+				return {};
+			}
+
+			[[nodiscard]] std::expected<Core::Handle<Mesh>, ErrorCode> GetRenderObjectMesh(const Core::Handle<RenderObject> handle) {
+				if (!IsHandleValid(handle)) {
+					return std::unexpected(ErrorCode::eInvalidHandle);
+				}
+
+				return m_Batches[std::as_const(m_Objects)[handle].m_OwnerBatch].m_Mesh;
+			}
+
+			std::expected<void, ErrorCode> ChangeRenderObjectMesh(const Core::Handle<RenderObject> handle, const Core::Handle<Mesh> newMesh) {
+				if (!IsHandleValid(handle) || !VulkanMeshManager::IsHandleValid(newMesh)) {
+					return std::unexpected(ErrorCode::eInvalidHandle);
+				}
+
+				auto batchID = std::as_const(m_Objects)[handle].m_OwnerBatch;
+				auto& batch = m_Batches[batchID];
+
+				auto oldMesh = batch.m_Mesh;
+				if (oldMesh == newMesh) {
+					return {};
+				}
+
+				batch.DecrementObjectCounter();
+				if (batch.GetObjectCount() == 0) {
+					DestroyBatch(batchID);
+				}
+
+				auto drawGroupID = std::as_const(m_BatchGPUInfo)[batchID].owner;
+				auto& group = m_DrawGroups[drawGroupID];
+
+				auto [newGroup, newBatch] = FindAppropriateGroupAndBatch(group.m_ShaderEffect, newMesh);
+				m_Objects[handle]->m_OwnerBatch = newBatch;
+				m_Batches[newBatch].IncrementObjectCounter();
+
+				return {};
+			}
+
+			[[nodiscard]] std::expected<Core::Handle<Material>, ErrorCode> GetRenderObjectMaterial(const Core::Handle<RenderObject> handle) {
+				if (!IsHandleValid(handle)) {
+					return std::unexpected(ErrorCode::eInvalidHandle);
+				}
+
+				return std::as_const(m_Objects)[handle].m_Material;
+			}
+
+			std::expected<void, ErrorCode> ChangeRenderObjectMaterial(const Core::Handle<RenderObject> handle, const Core::Handle<Material> newMaterial) {
+				if (!IsHandleValid(handle) || !VulkanMaterialSystem::IsHandleValid(newMaterial)) {
+					return std::unexpected(ErrorCode::eInvalidHandle);
+				}
+
+				const auto& constObjectRef = std::as_const(m_Objects)[handle];
+
+				if (newMaterial == constObjectRef.m_Material) {
+					return {};
+				}
+
+				auto newShaderEffect = VulkanMaterialSystem::GetMaterialShaderEffect(newMaterial);
+				auto oldShaderEffect = VulkanMaterialSystem::GetMaterialShaderEffect(constObjectRef.m_Material);
+				if (oldShaderEffect) {
+					if (oldShaderEffect.value() == newShaderEffect.value()) {
+						m_Objects[handle]->m_Material = newMaterial;
+						return {};
 					}
-
-					VulkanUploadManager::UploadPart part {
-						.resource = m_GroupCommandOffsets[frameIndex],
-						.range = VulkanUploadManager::BufferUploadRange{ 0, 4 },
-						.data = std::move(groupCommandOffsetPayload)
-					};
-
-					VulkanUploadManager::UploadRequest uploadRequest {
-						.uploadParts = std::move(part),
-						.uploadType = VulkanUploadManager::UploadType::FrameCritical
-					};
-
-					VulkanUploadManager::SubmitUploadRequest(std::move(uploadRequest));
 				}
+
+				auto& oldBatch = m_Batches[constObjectRef.m_OwnerBatch];
+				auto mesh = oldBatch.m_Mesh;
+
+				oldBatch.DecrementObjectCounter();
+				if (oldBatch.GetObjectCount() == 0) {
+					DestroyBatch(constObjectRef.m_OwnerBatch);
+				}
+
+				auto [newGroup, newBatch] = FindAppropriateGroupAndBatch(newShaderEffect.value(), mesh);
+				m_Objects[handle]->m_OwnerBatch = newBatch;
+				m_Batches[newBatch].IncrementObjectCounter();
+
+				return {};
 			}
 
-			static void UnregisterObject(const ObjectHandle handle) {
-				if (handle >= MAX_OBJECTS) {
-					return;
-				}
+			static void OnMaterialShaderEffectChanged(const Core::Handle<Material> material, [[maybe_unused]] const Core::Handle<ShaderEffect> oldShaderEffect, const Core::Handle<ShaderEffect> newShaderEffect) {
+				for (auto it = Get().m_Objects.cbegin(); it != Get().m_Objects.cend(); ++it) {
+					if (it->m_Material == material) {
+						auto& oldBatch = Get().m_Batches[it->m_OwnerBatch];
+						auto mesh = oldBatch.m_Mesh;
 
-				auto& objectData = Get().m_ObjectData[handle];
-				if (!objectData.valid) {
-					return;
-				}
-
-				objectData.valid = false;
-
-				auto& objectMetadata = Get().m_ObjectMetadata[handle];
-
-				Get().m_SubBatches[objectData.subBatch].RemoveObject(objectMetadata.indexInSubBatch);
-
-				Get().m_ObjectHoles.emplace_back(handle);
-				Get().SyncObjectGPUData(handle);
-
-				Get().m_TotalObjectCount--;
-			}
-
-			static void UpdateObjectData(const ObjectHandle handle, const ObjectUpdateRequest& update) {
-				if (handle >= MAX_OBJECTS) {
-					return;
-				}
-
-				auto& objectData = Get().m_ObjectData[handle];
-				if (!objectData.valid) {
-					return;
-				}
-
-				bool updated = false;
-
-				if (update.transform != glm::mat4(0.0f)) {
-					objectData.transform = update.transform;
-					updated = true;
-				}
-
-				if (update.uvOffsets != glm::vec4(1000.0f)) {
-					objectData.uvOffsets = update.uvOffsets;
-					updated = true;
-				}
-
-				if (update.material != UINT32_MAX || update.mesh != UINT32_MAX) {
-					auto& objectMetadata = Get().m_ObjectMetadata[handle];
-					auto& currentBatch = Get().m_SubBatches[objectData.subBatch];
-
-					ShaderEffectHandle oldShaderEffectHandle = Get().m_Groups[objectMetadata.drawGroup].effect;
-					MeshHandle oldMeshHandle = currentBatch.mesh;
-
-					ShaderEffectHandle newShaderEffectHandle;
-					MeshHandle newMeshHandle = update.mesh != UINT32_MAX ? newMeshHandle = update.mesh : newMeshHandle = oldMeshHandle;
-
-					if (update.material != UINT32_MAX) {
-						if (update.material != objectData.material) {
-							newShaderEffectHandle = VulkanMaterialSystem::GetMaterialShaderEffect(update.material);
-							objectData.material = update.material;
-							updated = true;
-						} else {
-							newShaderEffectHandle = oldShaderEffectHandle;
+						oldBatch.DecrementObjectCounter();
+						if (oldBatch.GetObjectCount() == 0) {
+							Get().DestroyBatch(it->m_OwnerBatch);
 						}
-					} else {
-						newShaderEffectHandle = oldShaderEffectHandle;
+
+						auto [newGroup, newBatch] = Get().FindAppropriateGroupAndBatch(newShaderEffect, mesh);
+						Get().m_Objects[it.GetHandle()]->m_OwnerBatch = newBatch;
+						Get().m_Batches[newBatch].IncrementObjectCounter();
 					}
-
-					if (oldShaderEffectHandle != newShaderEffectHandle || oldMeshHandle != newMeshHandle) {
-						auto [groupHandle, batchHandle] = FindAppropriateGroupAndBatch(newShaderEffectHandle, newMeshHandle);
-
-						currentBatch.RemoveObject(handle);
-						auto& newBatch = Get().m_SubBatches[batchHandle];
-						objectData.subBatch = batchHandle;
-						objectMetadata.indexInSubBatch = newBatch.AddObject(handle);
-						objectMetadata.drawGroup = groupHandle;
-						updated = true;
-					}
-				}
-
-				if (updated) {
-					Get().SyncObjectGPUData(handle);
 				}
 			}
 
 		private:
-			void SyncObjectGPUData(const ObjectHandle handle) {
-				AmazingBuffer::UpdateData patch {
-					.offset = handle * sizeof(ObjectData),
-					.alignment = alignof(ObjectData),
-					.data = std::vector<Byte>(sizeof(ObjectData))
-				};
-
-				memcpy(patch.data.data(), &m_ObjectData[handle], sizeof(ObjectData));
-
-				auto& objectDataBuffer = VulkanUploadManager::GetAmazingBuffer(Get().m_ObjectBufferHandle);
-				objectDataBuffer.SubmitUpdate(std::move(patch));
-			}
-
-			[[nodiscard]] static std::pair<DrawGroupHandle, SubBatchHandle> FindAppropriateGroupAndBatch(const ShaderEffectHandle shaderEffectHandle, const MeshHandle meshHandle) {
-				auto [it, groupInserted] = Get().m_SubBatchLookup.try_emplace(shaderEffectHandle, std::pair<DrawGroupHandle, std::unordered_map<MeshHandle, SubBatchHandle>>{});
+			[[nodiscard]] std::pair<DrawGroupIndex, BatchIndex> FindAppropriateGroupAndBatch(const Core::Handle<ShaderEffect> shaderEffect, const Core::Handle<Mesh> mesh) {
+				auto [it, groupInserted] = m_SubBatchLookup.try_emplace(shaderEffect, std::pair<DrawGroupIndex, std::unordered_map<Core::Handle<Mesh>, BatchIndex>>{});
 
 				if (groupInserted) {
-					DrawGroupHandle freeHandle;
-					if (!Get().m_GroupHoles.empty()) {
-						freeHandle = Get().m_GroupHoles.back();
-						Get().m_GroupHoles.pop_back();
-					} else {
-						freeHandle = Get().m_NextGroupHandle++;
-						CORI_CORE_ASSERT(freeHandle < MAX_GROUPS - 1, "Renderer out of draw group slots.");
-					}
+					auto handle = m_DrawGroups.Emplace(shaderEffect);
 
-					Get().m_Groups[freeHandle].effect = shaderEffectHandle;
-
-					it->second.first = freeHandle;
+					it->second.first = handle.GetIndex();
+					it->second.second.reserve(64);
 				}
 
-				auto [it_, batchInserted] = it->second.second.try_emplace(meshHandle, SubBatchHandle{});
+				auto [it_, batchInserted] = it->second.second.try_emplace(mesh, BatchIndex{});
 
 				if (batchInserted) {
-					SubBatchHandle freeHandle;
-					if (!Get().m_SubBatchHoles.empty()) {
-						freeHandle = Get().m_SubBatchHoles.back();
-						Get().m_SubBatchHoles.pop_back();
-					} else {
-						freeHandle = Get().m_NextSubBatchHandle++;
-						CORI_CORE_ASSERT(freeHandle < MAX_SUBBATCHES - 1, "Renderer out of draw sub batch slots.");
-					}
+					auto handle = m_Batches.Emplace(mesh);
 
-					Get().m_SubBatches[freeHandle].mesh = meshHandle;
-					Get().m_Groups[it->second.first].AddBatch(freeHandle);
+					m_BatchGPUInfo.Resize(m_Batches.Capacity());
 
-					it_->second = freeHandle;
+					m_BatchGPUInfo[handle.GetIndex()] = BatchGPUInfo{ mesh, it->second.first };
 
-					BatchInfo info {
-						.mesh = meshHandle,
-						.owner = it->second.first
-					};
+					it_->second = handle.GetIndex();
 
-					AmazingBuffer::UpdateData patch {
-						.offset = freeHandle * sizeof(BatchInfo),
-						.alignment = alignof(BatchInfo),
-						.data = std::vector<Byte>(sizeof(BatchInfo))
-					};
-
-					memcpy(patch.data.data(), &info, sizeof(BatchInfo));
-
-					auto& batchInfoBuffer = VulkanUploadManager::GetAmazingBuffer(Get().m_BatchInfoBufferHandle);
-					batchInfoBuffer.SubmitUpdate(std::move(patch));
+					auto& group = m_DrawGroups[it->second.first];
+					group.IncrementBatchCounter();
 				}
 
 				return std::make_pair(it->second.first, it_->second);
 			}
-		public:
 
-			static void Defragment() {
+			void DestroyBatch(const BatchIndex batchID) {
+				auto groupID = std::as_const(m_BatchGPUInfo)[batchID].owner;
 
+				auto& group = m_DrawGroups[groupID];
+				group.DecrementBatchCounter();
+
+				auto mesh = m_Batches[batchID].m_Mesh;
+
+				if (group.GetBatchCount() == 0) {
+					DestroyGroup(groupID);
+				} else {
+					m_SubBatchLookup.at(group.m_ShaderEffect).second.erase(mesh);
+				}
+
+				m_Batches.Remove(m_Batches.GetIndexHandle(batchID));
 			}
 
+			void DestroyGroup(const DrawGroupIndex groupID) {
+				auto& group = m_DrawGroups[groupID];
 
+				m_SubBatchLookup.erase(group.m_ShaderEffect);
+
+				m_DrawGroups.Remove(m_DrawGroups.GetIndexHandle(groupID));
+			}
+
+		public:
 			Renderer() {
-				m_Groups.reserve(64);
-				m_SubBatches.reserve(128);
+				m_Objects.Reserve(256);
+				m_Batches.Reserve(128);
+				m_DrawGroups.Reserve(16);
 				std::ifstream file(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "shaders/CullingShader.spv", std::ios::ate | std::ios::binary);
 				if (!file.is_open()) {
 					throw std::runtime_error("failed to open file!");
@@ -395,7 +339,6 @@ namespace Cori {
 				cullShader = VulkanShaderManager::CreateComputeShader(buffer.data(), buffer.size(), "cullMain", "Cull Compute Shader");
 				cmgShader = VulkanShaderManager::CreateComputeShader(buffer.data(), buffer.size(), "cmgMain", "Indirect Command Generation Compute Shader");
 				compactShader = VulkanShaderManager::CreateComputeShader(buffer.data(), buffer.size(), "compactMain", "Instance Compacting Compute Shader");
-
 
 				std::ifstream file_(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "shaders/TestShader.spv", std::ios::ate | std::ios::binary);
 				if (!file_.is_open()) {
@@ -421,21 +364,20 @@ namespace Cori {
 
 				defaultShader = VulkanShaderManager::CreateVertexShaderPair(buffer__.data(), buffer__.size(), "vertMain", "fragMain", "Default Shader");
 
-
 				float depth = 0.0f;
 
-				std::vector<Vertex> vertices = {
+				std::vector<StaticVertex> vertices = {
 					// Bottom-left
-					{ glm::vec3(-0.5f, -0.5f, depth),   0.0f, glm::vec3(0,0,1),   0.0f, glm::vec4(1,1,1,1) },
+					{ glm::vec3(-0.5f, -0.5f, depth), 0, 0, glm::vec2(0,0), 0xFFFFFFFF },
 
 					// Bottom-right
-					{ glm::vec3( 0.5f, -0.5f, depth),   1.0f, glm::vec3(0,0,1),   0.0f, glm::vec4(1,1,1,1) },
+					{ glm::vec3( 0.5f, -0.5f, depth), 0, 0, glm::vec2(1,0), 0xFFFFFFFF },
 
 					// Top-right
-					{ glm::vec3( 0.5f,  0.5f, depth),   1.0f, glm::vec3(0,0,1),   1.0f, glm::vec4(1,1,1,1) },
+					{ glm::vec3( 0.5f,  0.5f, depth), 0, 0, glm::vec2(1,1), 0xFFFFFFFF },
 
 					// Top-left
-					{ glm::vec3(-0.5f,  0.5f, depth),   0.0f, glm::vec3(0,0,1),   1.0f, glm::vec4(1,1,1,1) }
+					{ glm::vec3(-0.5f,  0.5f, depth), 0, 0, glm::vec2(0,1), 0xFFFFFFFF }
 				};
 
 				std::vector<uint32_t> indices = {
@@ -443,12 +385,15 @@ namespace Cori {
 					2, 3, 0    // second triangle
 				};
 
-				quad = VulkanMeshManager::CreateMesh(vertices.data(), vertices.size() * sizeof(Vertex), indices.data(), indices.size() * sizeof(uint32_t));
+				quad = VulkanMeshManager::CreateMesh();
+				VulkanMeshManager::LoadToMesh(quad, vertices, std::move(indices));
 
 				auto image = Image::Create(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "placeholders/uv_sample.png");
 
-				texture = VulkanTextureManager::CreateTextureTest(image->GetPixelData(), image->GetHeight() * image->GetWidth() * 4, vk::Format::eR8G8B8A8Srgb, { image->GetHeight(), image->GetWidth() }, "Test Texture");
-				#if 1
+				texture = VulkanTextureManager::CreateTexture(vk::ImageType::e2D, vk::Format::eR8G8B8A8Srgb, { image->GetHeight(), image->GetWidth(), 1 }, 1, 1, vk::SampleCountFlagBits::e1, "UV sample texture");
+				VulkanTextureManager::UpdateTexture(texture, std::span{ static_cast<Byte*>(image->GetPixelData()), image->GetHeight() * image->GetWidth() * 4 }, { 0, 0, 0 }, { image->GetHeight(), image->GetWidth(), 1 }, { vk::ImageAspectFlagBits::eColor, 0, 0, 1 });
+				VulkanTextureManager::ChangeView(texture, vk::ImageViewType::e2D, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+
 				auto shaderEffect = VulkanMaterialSystem::CreateShaderEffect(testShader, {}, {}, "Test Shader Effect");
 
 				MaterialData materialData {
@@ -459,7 +404,7 @@ namespace Cori {
 
 				MaterialData materialData_ {
 					.colorFactor = { 1.0f, 1.0f, 1.0f, 1.0f },
-					.albedoTexture = 1,
+					.albedoTexture = VulkanTextureManager::GetPlaceholderTexture(),
 					.albedoSampler = 0
 				};
 
@@ -467,315 +412,193 @@ namespace Cori {
 
 				material = VulkanMaterialSystem::CreateMaterial(shaderEffect, materialData, "Test Material");
 
-				AmazingBuffer::CreateInfo objectBufferInfo {
-					.size = MAX_OBJECTS * sizeof(ObjectData),
-					.usage = vk::BufferUsageFlagBits::eShaderDeviceAddress,
-					.queueFamilyIndices = { VulkanEngine::GetGraphicsQueueFamilyIndex() },
-					.name = "Renderer Object Data buffer"
-				};
+				glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(-0.5f, 0.0f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5, 1.0f));
 
-				AmazingBuffer::CreateInfo batchInfoBufferInfo {
-					.size = MAX_SUBBATCHES * sizeof(BatchInfo),
-					.usage = vk::BufferUsageFlagBits::eShaderDeviceAddress,
-					.queueFamilyIndices = { VulkanEngine::GetGraphicsQueueFamilyIndex() },
-					.name = "Renderer Batch Info buffer"
-				};
+				RegisterObject(quad, material, transform);
+				transform = glm::translate(transform, glm::vec3(+1.0f, 0.0f, 0.0f));
 
-				m_ObjectBufferHandle = VulkanUploadManager::CreateAmazingBuffer(objectBufferInfo);
-				m_BatchInfoBufferHandle = VulkanUploadManager::CreateAmazingBuffer(batchInfoBufferInfo);
+				RegisterObject(quad, material2, transform);
 
-				uint32_t transferQueueFamilyIndex = VulkanEngine::GetTransferQueueFamilyIndex();
-
-				std::vector<uint32_t> queueFamilyIndices{ VulkanEngine::GetGraphicsQueueFamilyIndex() };
-
-				bool transferQueueInVector = false;
-				for (auto familyIndex : queueFamilyIndices) {
-					if (familyIndex == transferQueueFamilyIndex) {
-						transferQueueInVector = true;
-					}
-				}
-
-				vk::SharingMode sharingMode;
-				std::vector<uint32_t> queueFamilyIndices_;
-
-				if (transferQueueInVector && queueFamilyIndices.size() == 1) {
-					sharingMode = vk::SharingMode::eExclusive;
-				} else if (transferQueueInVector && queueFamilyIndices.size() != 1) {
-					sharingMode = vk::SharingMode::eConcurrent;
-					queueFamilyIndices_ = queueFamilyIndices;
-				} else {
-					queueFamilyIndices.emplace_back(transferQueueFamilyIndex);
-					sharingMode = vk::SharingMode::eConcurrent;
-					queueFamilyIndices_ = queueFamilyIndices;
-				}
-
-				vma::AllocationCreateInfo allocInfo {
-					.usage = vma::MemoryUsage::eAuto
-				};
-
-				vk::BufferCreateInfo redirectBufferInfo {
-					.size = MAX_OBJECTS * sizeof(ObjectHandle),
-					.usage = vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eTransferDst,
-					.sharingMode = sharingMode,
-					.queueFamilyIndexCount = static_cast<uint32_t>(queueFamilyIndices_.size()),
-					.pQueueFamilyIndices = queueFamilyIndices_.data(),
-				};
-
-				vk::BufferCreateInfo groupCommandOffsetBufferInfo {
-					.size = MAX_GROUPS * sizeof(uint32_t),
-					.usage = vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eTransferDst,
-					.sharingMode = sharingMode,
-					.queueFamilyIndexCount = static_cast<uint32_t>(queueFamilyIndices_.size()),
-					.pQueueFamilyIndices = queueFamilyIndices_.data(),
-				};
-
-				vk::BufferCreateInfo drawCommandBufferInfo{
-					.size = MAX_SUBBATCHES * INDIRECT_COMMAND_SIZE,
-					.usage = vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eIndirectBuffer,
-					.sharingMode = vk::SharingMode::eExclusive
-				};
-
-				vk::BufferCreateInfo drawCommandCountBufferInfo{
-					.size = MAX_GROUPS * sizeof(uint32_t),
-					.usage = vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eIndirectBuffer | vk::BufferUsageFlagBits::eTransferDst,
-					.sharingMode = vk::SharingMode::eExclusive
-				};
-
-				vk::BufferCreateInfo batchIntermediateInfoBufferInfo {
-					.size = MAX_SUBBATCHES * sizeof(uint64_t),
-					.usage = vk::BufferUsageFlagBits::eShaderDeviceAddress,
-					.sharingMode = vk::SharingMode::eExclusive
-				};
-
-				vk::BufferCreateInfo atomicBufferInfo {
-					.size = sizeof(uint32_t),
-					.usage = vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eTransferDst,
-					.sharingMode = vk::SharingMode::eExclusive
-				};
-
-				vk::BufferCreateInfo compactedInstanceListBufferInfo {
-					.size = MAX_OBJECTS * sizeof(uint32_t),
-					.usage = vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eTransferDst,
-					.sharingMode = vk::SharingMode::eExclusive
-				};
-
-				for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
-					//std::string redirectName = std::format("Instance Redirect Buffer {}", i);
-					//m_RedirectBuffers[i] = VulkanBuffer::Create({ .allocationCreateInfo = &allocInfo, .bufferCreateInfo = &redirectBufferInfo, .name = redirectName.c_str() });
-
-					std::string groupCommandOffsetName = std::format("Group Command Offset Buffer {}", i);
-					m_GroupCommandOffsets[i] = VulkanBuffer::Create({ .bufferCreateInfo = &groupCommandOffsetBufferInfo, .allocationCreateInfo = &allocInfo, .name = groupCommandOffsetName.c_str() });
-
-					std::string drawCommandName = std::format("Draw Command Buffer {}", i);
-					m_DrawCommandBuffers[i] = VulkanBuffer::Create({ .bufferCreateInfo = &drawCommandBufferInfo, .allocationCreateInfo = &allocInfo, .name = drawCommandName.c_str() });
-
-					std::string drawCommandCountName = std::format("Draw Command Count Buffer {}", i);
-					m_DrawCommandCountBuffers[i] = VulkanBuffer::Create({ .bufferCreateInfo = &drawCommandCountBufferInfo, .allocationCreateInfo = &allocInfo, .name = drawCommandCountName.c_str() });
-
-					std::string batchIntermediateInfoName = std::format("Batch Intermediate Info Buffer {}", i);
-					m_BatchIntermediateInfoBuffers[i] = VulkanBuffer::Create({ .bufferCreateInfo = &batchIntermediateInfoBufferInfo, .allocationCreateInfo = &allocInfo, .name = batchIntermediateInfoName.c_str() });
-
-					std::string atomicInstanceName = std::format("Atomic Instance Count Buffer {}", i);
-					m_AtomicInstance[i] = VulkanBuffer::Create({ .bufferCreateInfo = &atomicBufferInfo, .allocationCreateInfo = &allocInfo, .name = atomicInstanceName.c_str() });
-
-					std::string compactedInstanceListName = std::format("Compacted Instance List Buffer {}", i);
-					m_CompactedInstanceListBuffers[i] = VulkanBuffer::Create({ .bufferCreateInfo = &compactedInstanceListBufferInfo, .allocationCreateInfo = &allocInfo, .name = compactedInstanceListName.c_str() });
-				}
-
-				m_Groups.resize(MAX_GROUPS);
-				m_SubBatches.resize(MAX_SUBBATCHES);
-				m_ObjectData.resize(MAX_OBJECTS);
-				m_ObjectMetadata.resize(MAX_OBJECTS);
-				#endif
+				VulkanMaterialSystem::AddOnShaderEffectSwappedListener(OnMaterialShaderEffectChanged);
 			}
 
-			~Renderer() {
-				buffer.Destroy();
-				image.Destroy();
-			}
+			~Renderer() {}
 
-			static Renderer& Get() {
-				static Renderer instance;
-				return instance;
-			}
+			static void Init();
 
-			struct ComputePS {
-				uint64_t objectDataBuffer;
-				uint64_t compactedObjectIDBuffer;
-				//RedirectID* redirectBuffer;
+			static void Shutdown();
 
-				uint64_t bii;
+			static Renderer& Get();
 
-				uint64_t commandBuffer;
-				uint64_t commandCountBuffer;
-				uint64_t batchInfos;
-				uint64_t meshDataBuffer;
-				uint64_t globalAtomic;
-				uint64_t commandOffsets;
-
-				uint32_t totalInstanceCount;
-				uint32_t totalBatchCount;
-			};
-
-			struct DrawPS {
-				uint64_t objectDataBuffer;
-				uint64_t compactedObjectIDBuffer;
-				uint64_t vertexBuffer;
-				uint64_t materialDataBuffer;
-				uint64_t shaderEffectDataBuffer;
-			};
-
-			static void Render() {
-				Get();
+			void Render() {
 				CORI_PROFILE_FUNCTION();
 
-				auto frameIndex = VulkanEngine::Get().IncrementFrameIndex();
+				VulkanEngine::Get().CPUFrameStart();
 
-				static bool oneshot = false;
-				if (!oneshot) {
-					oneshot = true;
+				auto commandOffsetsBuffer = VulkanVirtualBufferAllocator::CreateVirtualUploadBuffer(m_DrawGroups.RawSize() * sizeof(uint32_t), 4, VulkanEngine::GetNextFrameInFlight(), "Draw Group Command Offsets");
 
-					glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(-0.5f, 0.0f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5, 1.0f));
-
-					RegisterObject(Get().quad, Get().material, transform);
-					transform = glm::translate(transform, glm::vec3(+1.0f, 0.0f, 0.0f));
-
-					RegisterObject(Get().quad, Get().material2, transform);
-				}
-
-				static uint32_t frameIndex_ = 0;
-				frameIndex_++;
-
-
-				Get().UpdateBuffers();
-				Get().m_GraphPassRegistry.Reset();
-				Get().m_GraphResourceRegistry.Reset(frameIndex);
+				m_GraphPassRegistry.Reset();
+				m_GraphResourceRegistry.Reset(VulkanEngine::GetFrameIndex());
 				uint32_t frameInFlightIndex = VulkanEngine::GetCurrentFrameInFlight();
-				RenderGraph graph(Get().m_GraphPassRegistry, Get().m_GraphResourceRegistry);
+				RenderGraph graph(m_GraphPassRegistry, m_GraphResourceRegistry);
 
-				auto ObjectBufferHandle = graph.ImportBuffer(VulkanUploadManager::GetAmazingBuffer(Get().m_ObjectBufferHandle).GetCurrentFrameLocalBuffer(), "Object Data Buffer");
-				auto BatchInfoBufferHandle = graph.ImportBuffer(VulkanUploadManager::GetAmazingBuffer(Get().m_BatchInfoBufferHandle).GetCurrentFrameLocalBuffer(), "Batch Info Buffer");
+				auto ObjectBufferHandle = graph.ImportFlatSlotMap(m_Objects, "Object Data");
+				auto BatchInfoBufferHandle = graph.ImportDynamicVector(m_BatchGPUInfo, "Batch Info");
 
-				auto GroupCommandOffsetsBufferHandle = graph.ImportBuffer(Get().m_GroupCommandOffsets[frameInFlightIndex], "Group Command Offsets Buffer");
+				auto GroupCommandOffsetsBufferHandle = graph.ImportBuffer(commandOffsetsBuffer, "Group Command Offsets Buffer"); // per group <uint32_t>, CPU - write, GPU - compute read, semi-retained mode
 
-				auto DrawCommandBufferHandle = graph.ImportBuffer(Get().m_DrawCommandBuffers[frameInFlightIndex], "Draw Command Buffer");
-				auto DrawCommandCountBufferHandle = graph.ImportBuffer(Get().m_DrawCommandCountBuffers[frameInFlightIndex], "Draw Command Count Buffer");
+				uint32_t maxObjectCount = m_Objects.RawSize();
+				uint32_t maxBatchCount = m_Batches.RawSize();
+				uint32_t maxGroupCount = m_DrawGroups.RawSize();
 
-				auto BatchIntermediateInfoBufferHandle = graph.ImportBuffer(Get().m_BatchIntermediateInfoBuffers[frameInFlightIndex], "Batch Intermediate Info Buffer");
-				auto InstanceAtomicCounterHandle = graph.ImportBuffer(Get().m_AtomicInstance[frameInFlightIndex], "Instance Atomic Counter Buffer");
-				auto CompactedInstanceListBufferHandle = graph.ImportBuffer(Get().m_CompactedInstanceListBuffers[frameInFlightIndex], "Compacted Instance List Buffer Buffer");
+				struct ComputePS{
+					uint64_t objectDataBuffer;
+					uint64_t compactedObjectIDBuffer;
 
-				auto MeshAssetBufferHandle = graph.ImportBuffer(VulkanMeshManager::GetFrameLocalMeshAssetBuffer(), "Mesh Asset Buffer");
+					uint64_t bii;
 
-				auto VertexBufferHandle = graph.ImportBuffer(VulkanMeshManager::GetVertexSSBO(), "Vertex Buffer");
+					uint64_t commandBuffer;
+					uint64_t commandCountBuffer;
+					uint64_t batchInfos;
+					uint64_t meshDataBuffer;
+					uint64_t globalAtomic;
+					uint64_t commandOffsets;
 
-				auto MaterialDataBuffer = graph.ImportBuffer(VulkanMaterialSystem::GetFrameLocalMaterialDataBuffer(), "Material Data Buffer");
-
-				auto ShaderEffectDataBufferHandle = graph.ImportBuffer(VulkanMaterialSystem::GetFrameLocalShaderEffectDataBuffer(), "Material Data Buffer");
-
-				uint32_t objectCount = Get().m_NextObjectHandle;
-				uint32_t batchCount = Get().m_NextSubBatchHandle;
-				uint32_t groupCount = Get().m_NextGroupHandle;
-
-				//uint32_t objectCount = Get().m_ObjectData.size();
-				//uint32_t batchCount = Get().m_SubBatches.size();
-				//uint32_t groupCount = Get().m_Groups.size();
-
-
-				ComputePS cps {
-					.objectDataBuffer = Get().m_GraphResourceRegistry.GetBuffer(ObjectBufferHandle).GetBDA(),
-					.compactedObjectIDBuffer = Get().m_GraphResourceRegistry.GetBuffer(CompactedInstanceListBufferHandle).GetBDA(),
-					.bii = Get().m_GraphResourceRegistry.GetBuffer(BatchIntermediateInfoBufferHandle).GetBDA(),
-					.commandBuffer = Get().m_GraphResourceRegistry.GetBuffer(DrawCommandBufferHandle).GetBDA(),
-					.commandCountBuffer = Get().m_GraphResourceRegistry.GetBuffer(DrawCommandCountBufferHandle).GetBDA(),
-					.batchInfos = Get().m_GraphResourceRegistry.GetBuffer(BatchInfoBufferHandle).GetBDA(),
-					.meshDataBuffer = Get().m_GraphResourceRegistry.GetBuffer(MeshAssetBufferHandle).GetBDA(),
-					.globalAtomic = Get().m_GraphResourceRegistry.GetBuffer(InstanceAtomicCounterHandle).GetBDA(),
-					.commandOffsets = Get().m_GraphResourceRegistry.GetBuffer(GroupCommandOffsetsBufferHandle).GetBDA(),
-					.totalInstanceCount = objectCount,
-					.totalBatchCount = batchCount
+					uint32_t totalInstanceCount;
+					uint32_t totalBatchCount;
 				};
 
-				DrawPS dps {
-					.objectDataBuffer = Get().m_GraphResourceRegistry.GetBuffer(ObjectBufferHandle).GetBDA(),
-					.compactedObjectIDBuffer = Get().m_GraphResourceRegistry.GetBuffer(CompactedInstanceListBufferHandle).GetBDA(),
-					.vertexBuffer = Get().m_GraphResourceRegistry.GetBuffer(VertexBufferHandle).GetBDA(),
-					.materialDataBuffer = Get().m_GraphResourceRegistry.GetBuffer(MaterialDataBuffer).GetBDA(),
-					.shaderEffectDataBuffer = Get().m_GraphResourceRegistry.GetBuffer(ShaderEffectDataBufferHandle).GetBDA()
+				struct DrawPS{
+					uint64_t objectDataBuffer;
+					uint64_t compactedObjectIDBuffer;
+					uint64_t materialDataBuffer;
+					uint64_t shaderEffectDataBuffer;
+					uint64_t meshDataBuffer;
+					uint64_t textureAssetTable;
+					uint64_t batchInfo;
 				};
+
+				auto DrawCommandBufferHandle = graph.CreateBuffer({ INDIRECT_COMMAND_SIZE * m_Batches.RawSize(), INDIRECT_COMMAND_SIZE }, "Draw Command Buffer"); //per batch <VkDrawIndexedIndirectCommand> CPU - none, GPU - compute write -> command submit read, immediate mode
+				auto DrawCommandCountBufferHandle = graph.CreateBuffer({ m_DrawGroups.RawSize() * sizeof(uint32_t), alignof(uint32_t) }, "Draw Command Count"); //per group <uint32_t> CPU - none, GPU - compute write -> indirect command read, immediate mode
+				auto BatchIntermediateInfoBufferHandle = graph.CreateBuffer({ m_Batches.RawSize() * sizeof(uint64_t), alignof(uint64_t) }, "Batch Intermediate Info"); //per batch <uint64_t> CPU - none, GPU - compute write/read atomic, immediate mode
+				auto InstanceAtomicCounterHandle = graph.CreateBuffer({ sizeof(uint32_t), alignof(uint32_t) }, "Instance Atomic Counter"); //atomic uint32_t, CPU - none, GPU - compute write/read atomic, immediate mode
+				auto CompactedInstanceListBufferHandle = graph.CreateBuffer({ m_Objects.RawSize() * sizeof(uint32_t), alignof(uint32_t) }, "Compacted Instance List Buffer"); //per visible instance <uint32_t> CPU - none, GPU - compute write -> vertex/fragment read, immediate mode
 
 				auto& bufferCleanupPass = graph.CreatePass("Buffer Cleanup");
-				bufferCleanupPass.Writes(DrawCommandCountBufferHandle, { {vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite}, BufferRange{ 0, VK_WHOLE_SIZE } });
-				bufferCleanupPass.Writes(InstanceAtomicCounterHandle, { {vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite}, BufferRange{ 0, VK_WHOLE_SIZE } });
-				bufferCleanupPass.Writes(CompactedInstanceListBufferHandle, { {vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite}, BufferRange{ 0, VK_WHOLE_SIZE } });
-				bufferCleanupPass.AssignWork([&](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
-					commandBuffer.fillBuffer(registry.GetBuffer(DrawCommandCountBufferHandle).m_Buffer, 0, VK_WHOLE_SIZE, 0);
-					commandBuffer.fillBuffer(registry.GetBuffer(InstanceAtomicCounterHandle).m_Buffer, 0, VK_WHOLE_SIZE, 0);
-					commandBuffer.fillBuffer(registry.GetBuffer(CompactedInstanceListBufferHandle).m_Buffer, 0, VK_WHOLE_SIZE, 0);
+				bufferCleanupPass.Writes(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
+				bufferCleanupPass.Writes(InstanceAtomicCounterHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
+				bufferCleanupPass.Writes(CompactedInstanceListBufferHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
+				bufferCleanupPass.AssignWork([=](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
+					auto& dccb = registry.GetResource(DrawCommandCountBufferHandle);
+					auto& iac = registry.GetResource(InstanceAtomicCounterHandle);
+					auto& cilb = registry.GetResource(CompactedInstanceListBufferHandle);
+					commandBuffer.fillBuffer(dccb.GetHeapHandle(), dccb.GetStartOffset(), dccb.GetSize(), 0);
+					commandBuffer.fillBuffer(iac.GetHeapHandle(), iac.GetStartOffset(), iac.GetSize(), 0);
+					commandBuffer.fillBuffer(cilb.GetHeapHandle(), cilb.GetStartOffset(), cilb.GetSize(), 0);
 				});
 
 				auto& cullPass = graph.CreatePass("Cull Pass");
-				cullPass.Writes(BatchIntermediateInfoBufferHandle, { { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite }, BufferRange{ 0, sizeof(uint64_t) * batchCount } });
-				cullPass.Reads(ObjectBufferHandle, { { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageRead }, BufferRange{ 0, sizeof(ObjectData) * objectCount } });
-				cullPass.AddPushConstants(vk::ShaderStageFlagBits::eAll, &cps, sizeof(cps));
-				cullPass.AssignWork([&](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
-					VulkanShaderManager::GetShaderObject(Get().cullShader).Bind(commandBuffer);
-					commandBuffer.dispatch(ceil(objectCount / 64.0f), 1, 1);
+				cullPass.Writes(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+				cullPass.Reads(ObjectBufferHandle);
+				cullPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
+					ComputePS ps {
+						.objectDataBuffer = registry.GetResource(ObjectBufferHandle).GetVulkanBuffer().GetBDA(),
+						.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
+						.bii = registry.GetResource(BatchIntermediateInfoBufferHandle).GetBDA(),
+						.commandBuffer = registry.GetResource(DrawCommandBufferHandle).GetBDA(),
+						.commandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle).GetBDA(),
+						.batchInfos = registry.GetResource(BatchInfoBufferHandle).GetVulkanBuffer().GetBDA(),
+						.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
+						.globalAtomic = registry.GetResource(InstanceAtomicCounterHandle).GetBDA(),
+						.commandOffsets = registry.GetResource(GroupCommandOffsetsBufferHandle).GetBDA(),
+						.totalInstanceCount = maxObjectCount,
+						.totalBatchCount = maxBatchCount
+					};
+
+					commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(ComputePS), &ps);
+
+					auto result = VulkanShaderManager::GetShader(cullShader);
+					CORI_CORE_ASSERT(result, "Failed to get cullShader. Error: {}", to_string(result.error()));
+					result.value().get().Bind(commandBuffer);
+					commandBuffer.dispatch(std::ceil(maxObjectCount / 64.0f), 1, 1);
 				});
 
 				auto& cmgPass = graph.CreatePass("Indirect Command Generation Pass");
-				cmgPass.Writes(BatchIntermediateInfoBufferHandle, { { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite }, BufferRange{ 0, sizeof(uint64_t) * batchCount } });
-				cmgPass.Writes(DrawCommandBufferHandle, { { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite }, BufferRange{ 0, groupCount * INDIRECT_COMMAND_SIZE } });
-				cmgPass.Writes(DrawCommandCountBufferHandle, { { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite }, BufferRange{ 0, sizeof(uint32_t) * groupCount } });
-				cmgPass.Writes(InstanceAtomicCounterHandle, { { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite }, BufferRange{ 0, VK_WHOLE_SIZE } });
-				cmgPass.Reads(BatchInfoBufferHandle, { { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageRead }, BufferRange{ 0, sizeof(BatchInfo) * batchCount } });
-				cmgPass.Reads(MeshAssetBufferHandle, { { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageRead }, BufferRange{ 0, sizeof(MeshAssetInfo) * VulkanMeshManager::GetLoadedMeshCount() } });
-				cmgPass.Reads(GroupCommandOffsetsBufferHandle, { { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageRead }, BufferRange{ 0, sizeof(uint32_t) * groupCount } });
-				cmgPass.AddPushConstants(vk::ShaderStageFlagBits::eAll, &cps, sizeof(cps));
-				cmgPass.AssignWork([&](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
-					VulkanShaderManager::GetShaderObject(Get().cmgShader).Bind(commandBuffer);
-					commandBuffer.dispatch(ceil(batchCount / 64.0f), 1, 1);
+				cmgPass.Writes(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+				cmgPass.Writes(DrawCommandBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+				cmgPass.Writes(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+				cmgPass.Writes(InstanceAtomicCounterHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+				cmgPass.Reads(BatchInfoBufferHandle);
+				cmgPass.Reads(GroupCommandOffsetsBufferHandle);
+				cmgPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
+					ComputePS ps {
+						.objectDataBuffer = registry.GetResource(ObjectBufferHandle).GetVulkanBuffer().GetBDA(),
+						.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
+						.bii = registry.GetResource(BatchIntermediateInfoBufferHandle).GetBDA(),
+						.commandBuffer = registry.GetResource(DrawCommandBufferHandle).GetBDA(),
+						.commandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle).GetBDA(),
+						.batchInfos = registry.GetResource(BatchInfoBufferHandle).GetVulkanBuffer().GetBDA(),
+						.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
+						.globalAtomic = registry.GetResource(InstanceAtomicCounterHandle).GetBDA(),
+						.commandOffsets = registry.GetResource(GroupCommandOffsetsBufferHandle).GetBDA(),
+						.totalInstanceCount = maxObjectCount,
+						.totalBatchCount = maxBatchCount
+					};
+
+					commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(ComputePS), &ps);
+
+					auto result = VulkanShaderManager::GetShader(cmgShader);
+					CORI_CORE_ASSERT(result, "Failed to get cmgShader. Error: {}", to_string(result.error()));
+					result.value().get().Bind(commandBuffer);
+					commandBuffer.dispatch(std::ceil(maxBatchCount / 64.0f), 1, 1);
 				});
 
 				auto& compactPass = graph.CreatePass("Compact Pass");
-				compactPass.Writes(BatchIntermediateInfoBufferHandle, { { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite }, BufferRange{ 0, sizeof(uint64_t) * batchCount } });
-				compactPass.Writes(CompactedInstanceListBufferHandle, { { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite }, BufferRange{ 0, sizeof(uint32_t) * objectCount } });
-				compactPass.Reads(ObjectBufferHandle, { { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageRead }, BufferRange{ 0, sizeof(ObjectData) * objectCount } });
-				compactPass.AddPushConstants(vk::ShaderStageFlagBits::eAll, &cps, sizeof(cps));
-				compactPass.AssignWork([&](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
-					VulkanShaderManager::GetShaderObject(Get().compactShader).Bind(commandBuffer);
-					commandBuffer.dispatch(ceil(objectCount / 64.0f), 1, 1);
+				compactPass.Writes(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+				compactPass.Writes(CompactedInstanceListBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+				compactPass.Reads(ObjectBufferHandle);
+				compactPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
+					ComputePS ps {
+						.objectDataBuffer = registry.GetResource(ObjectBufferHandle).GetVulkanBuffer().GetBDA(),
+						.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
+						.bii = registry.GetResource(BatchIntermediateInfoBufferHandle).GetBDA(),
+						.commandBuffer = registry.GetResource(DrawCommandBufferHandle).GetBDA(),
+						.commandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle).GetBDA(),
+						.batchInfos = registry.GetResource(BatchInfoBufferHandle).GetVulkanBuffer().GetBDA(),
+						.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
+						.globalAtomic = registry.GetResource(InstanceAtomicCounterHandle).GetBDA(),
+						.commandOffsets = registry.GetResource(GroupCommandOffsetsBufferHandle).GetBDA(),
+						.totalInstanceCount = maxObjectCount,
+						.totalBatchCount = maxBatchCount
+					};
+
+					commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(ComputePS), &ps);
+
+					auto result = VulkanShaderManager::GetShader(compactShader);
+					CORI_CORE_ASSERT(result, "Failed to get compactShader. Error: {}", to_string(result.error()));
+					result.value().get().Bind(commandBuffer);
+					commandBuffer.dispatch(std::ceil(maxObjectCount / 64.0f), 1, 1);
 				});
 
 				auto& indirectPass = graph.CreatePass("Indirect Pass");
-				indirectPass.Reads(ObjectBufferHandle, { { vk::PipelineStageFlagBits2::eVertexShader, vk::AccessFlagBits2::eShaderStorageRead }, BufferRange{ 0, sizeof(ObjectData) * objectCount } });
-				indirectPass.Reads(CompactedInstanceListBufferHandle, { { vk::PipelineStageFlagBits2::eVertexShader, vk::AccessFlagBits2::eShaderStorageRead }, BufferRange{ 0, sizeof(uint32_t) * objectCount } });
-				indirectPass.Reads(VertexBufferHandle, { { vk::PipelineStageFlagBits2::eVertexShader, vk::AccessFlagBits2::eShaderStorageRead }, BufferRange{ 0, sizeof(uint32_t) * objectCount } });
-				indirectPass.Reads(MaterialDataBuffer, { { vk::PipelineStageFlagBits2::eVertexShader, vk::AccessFlagBits2::eShaderStorageRead }, BufferRange{ 0, sizeof(MaterialCombinedData) * VulkanMaterialSystem::GetLoadedMaterialCount() } });
-				indirectPass.Reads(ShaderEffectDataBufferHandle, { { vk::PipelineStageFlagBits2::eVertexShader, vk::AccessFlagBits2::eShaderStorageRead }, BufferRange{ 0, sizeof(ShaderEffectData) * VulkanMaterialSystem::GetLoadedShaderEffectCount() } });
-				indirectPass.Reads(DrawCommandBufferHandle, { { vk::PipelineStageFlagBits2::eDrawIndirect, vk::AccessFlagBits2::eIndirectCommandRead }, BufferRange{ 0, VK_WHOLE_SIZE } });
-				indirectPass.Reads(DrawCommandCountBufferHandle, { { vk::PipelineStageFlagBits2::eDrawIndirect, vk::AccessFlagBits2::eIndirectCommandRead }, BufferRange{ 0, VK_WHOLE_SIZE } });
-				indirectPass.AddPushConstants(vk::ShaderStageFlagBits::eAll, &dps, sizeof(dps));
-				indirectPass.AssignWork([&](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
-					if (frameIndex_ == 3) {
-						auto& text = VulkanTextureManager::GetTexture(2);
-						vk::ImageSubresourceRange vkRange{
-							.aspectMask = vk::ImageAspectFlagBits::eColor,
-							.baseMipLevel = 0,
-							.levelCount = 1,
-							.baseArrayLayer = 0,
-							.layerCount = 1
-						};
-						auto dstBarrier = VulkanResourceTracker::TransitionImage(text, vkRange, {vk::PipelineStageFlagBits2::eFragmentShader, vk::AccessFlagBits2::eShaderSampledRead, vk::ImageLayout::eShaderReadOnlyOptimal });
+				indirectPass.Reads(ObjectBufferHandle);
+				indirectPass.Reads(CompactedInstanceListBufferHandle, { vk::PipelineStageFlagBits2::eVertexShader, vk::AccessFlagBits2::eShaderStorageRead });
+				indirectPass.Reads(DrawCommandBufferHandle, { vk::PipelineStageFlagBits2::eDrawIndirect, vk::AccessFlagBits2::eIndirectCommandRead });
+				indirectPass.Reads(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eDrawIndirect, vk::AccessFlagBits2::eIndirectCommandRead });
+				indirectPass.Reads(BatchInfoBufferHandle);
+				indirectPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
+					DrawPS ps {
+						.objectDataBuffer = registry.GetResource(ObjectBufferHandle).GetVulkanBuffer().GetBDA(),
+						.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
+						.materialDataBuffer = VulkanMaterialSystem::GetMaterialSlotMapBDA(),
+						.shaderEffectDataBuffer = VulkanMaterialSystem::GetShaderEffectDataBufferBDA(),
+						.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
+						.textureAssetTable = VulkanTextureManager::GetTextureAssetTableBDA(),
+						.batchInfo = registry.GetResource(BatchInfoBufferHandle).GetVulkanBuffer().GetBDA()
+					};
 
-						vk::DependencyInfo depInfo {
-							.imageMemoryBarrierCount = static_cast<uint32_t>(dstBarrier.value()->size()),
-							.pImageMemoryBarriers = dstBarrier.value()->data()
-						};
+					commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(DrawPS), &ps);
 
-
-						commandBuffer.pipelineBarrier2(depInfo);
-					}
 					VulkanGlobalLayoutManager::BindDescriptorBuffer(commandBuffer);
 					commandBuffer.bindIndexBuffer(VulkanMeshManager::GetIndexBuffer().m_Buffer, 0, vk::IndexType::eUint32);
 
@@ -783,12 +606,11 @@ namespace Cori {
 					currentPipelineState.Change(commandBuffer);
 
 					uint32_t currentCommandOffset = 0;
-					ShaderEffectHandle curentShaderEffect = UINT32_MAX;
+					Core::Handle<ShaderEffect> currentShaderEffect;
 
-					auto& indirectCommandBuffer = registry.GetBuffer(DrawCommandBufferHandle);
-					auto& indirectCommandCountBuffer = registry.GetBuffer(DrawCommandCountBufferHandle);
+					auto& indirectCommandBuffer = registry.GetResource(DrawCommandBufferHandle);
+					auto& indirectCommandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle);
 
-					//FIXME: use the swapchain data feature of the rendergraph, and dont render to the swapchain framebuffer directly, but to an HDR texure, but this is fine for testing.
 					//temp
 					vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 0.0f);
 					vk::RenderingAttachmentInfo attachmentInfo = {
@@ -808,201 +630,81 @@ namespace Cori {
 					commandBuffer.beginRendering(renderingInfo);
 					//temp
 
-					for (uint32_t i = 0; i < Get().m_Groups.size(); i++) {
-						auto& group = Get().m_Groups[i];
-						if (group.GetBatchCount() != 0) {
-							if (group.effect != curentShaderEffect) {
-								VulkanMaterialSystem::BindShaderEffect(group.effect, currentPipelineState, commandBuffer);
-								curentShaderEffect = group.effect;
-							}
+					for (uint32_t i = 0; i < m_DrawGroups.RawSize(); i++) {
+						if (m_DrawGroups.IsIndexValid(i)) {
+							auto& group = m_DrawGroups[i];
+							if (group.GetBatchCount() != 0) {
+								if (group.m_ShaderEffect != currentShaderEffect) {
+									auto pairHandleResult = VulkanMaterialSystem::GetShaderEffectShaderPair(group.m_ShaderEffect);
 
-							commandBuffer.drawIndexedIndirectCount(indirectCommandBuffer.m_Buffer, currentCommandOffset * INDIRECT_COMMAND_SIZE, indirectCommandCountBuffer.m_Buffer, i * sizeof(uint32_t), group.GetBatchCount(), INDIRECT_COMMAND_SIZE);
-							currentCommandOffset += group.GetBatchCount();
+									CORI_CORE_ASSERT(pairHandleResult, "Group hold an invalid  shader effect handle.");
+
+									auto shaderResult = VulkanShaderManager::GetShader(pairHandleResult.value());
+
+									CORI_CORE_ASSERT(shaderResult, "Group hold a shader effect that point to invalid Vert+Frag Shader pair.");
+
+									shaderResult.value().get().Bind(commandBuffer);
+
+									auto pipelineState = VulkanMaterialSystem::GetShaderEffectPipelineState(group.m_ShaderEffect).value();
+
+									if (pipelineState.get() != currentPipelineState) {
+										pipelineState.get().Change(commandBuffer);
+									}
+
+									currentPipelineState = pipelineState;
+									currentShaderEffect = group.m_ShaderEffect;
+								}
+
+								commandBuffer.drawIndexedIndirectCount(indirectCommandBuffer.GetHeapHandle(), currentCommandOffset * INDIRECT_COMMAND_SIZE + indirectCommandBuffer.GetStartOffset(), indirectCommandCountBuffer.GetHeapHandle(), i * sizeof(uint32_t) + indirectCommandCountBuffer.GetStartOffset(), group.GetBatchCount(), INDIRECT_COMMAND_SIZE);
+								currentCommandOffset += group.GetBatchCount();
+							}
 						}
 					}
 
 					commandBuffer.endRendering();
 				});
 
-				if (Get().testVec.Size() < 8253) {
-					static int ada = 0;
-					Get().testVec.PushBack(ada++);
+				graph.Compile(VulkanEngine::GetFrameIndex(), VulkanEngine::GetNextFrameInFlight());
+				auto& frameData = VulkanEngine::Get().GPUFrameBegin();
+
+				for (uint32_t i = 0; i < m_DrawGroups.RawSize(); ++i) {
+					uint32_t value = 0;
+					if (m_DrawGroups.IsIndexValid(i)) {
+						value = m_DrawGroups[i].GetBatchCount();
+					}
+
+					commandOffsetsBuffer.UploadToAllocation<uint32_t>(std::span{ &value, 1 }, sizeof(uint32_t) * i);
 				}
 
-				graph.Compile(frameIndex);
-				auto& frameData = VulkanEngine::Get().GPUFrameBegin();
+				m_Objects.Sync();
+				m_BatchGPUInfo.Sync();
+				VulkanEngine::Get().GPUFrameMiddlePointSync();
 				if (!frameData.m_SkippedFrame) {
 					graph.Execute(frameData.m_CommandBuffer);
 				}
 
-				Get().testVec.Sync();
-
-				VulkanDynamicContainerUploadManager::ProcessUpdates(frameData.m_CommandBuffer);
-
-				if (!frameData.m_SkippedFrame && false) {
-					vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 0.0f);
-					vk::RenderingAttachmentInfo attachmentInfo = {
-						.imageView = VulkanEngine::GetSwapChainImageView(),
-						.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
-						.loadOp = vk::AttachmentLoadOp::eClear,
-						.storeOp = vk::AttachmentStoreOp::eStore,
-						.clearValue = clearColor
-					};
-
-					vk::RenderingInfo renderingInfo = {
-						.renderArea = {.offset = {0, 0}, .extent = VulkanEngine::GetSwapChainExtent()},
-						.layerCount = 1,
-						.colorAttachmentCount = 1,
-						.pColorAttachments = &attachmentInfo
-					};
-
-					frameData.m_CommandBuffer.beginRendering(renderingInfo);
-
-					VulkanGlobalLayoutManager::BindDescriptorBuffer(frameData.m_CommandBuffer);
-					VulkanShaderManager::GetShaderObject(Get().defaultShader).Bind(frameData.m_CommandBuffer);
-
-					frameData.m_CommandBuffer.bindIndexBuffer(VulkanMeshManager::GetIndexBuffer().m_Buffer, 0, vk::IndexType::eUint32);
-
-					struct PushConstants {
-						uint64_t vertexBufferAddress{ 0 };
-						uint64_t meshAssetDataAddress{ 0 };
-					} pc;
-
-					pc.vertexBufferAddress = VulkanMeshManager::GetVertexSSBO().GetBDA();
-					pc.meshAssetDataAddress = VulkanMeshManager::GetFrameLocalMeshAssetBuffer().GetBDA();
-
-					frameData.m_CommandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(pc), &pc);
-
-					frameData.m_CommandBuffer.drawIndexed(6, 1, 0, 0, 0);
-
-					frameData.m_CommandBuffer.endRendering();
-				}
-
-
 				VulkanEngine::Get().GPUFrameEnd();
-
-				//VulkanResourceTracker* tracker = &VulkanResourceTracker::Get();
-
-				//VulkanUploadManager::Get();
-
-				#if 0
-				VulkanUploadManager* manager = &VulkanUploadManager::Get();
-
-				auto res1 = manager->Allocate(1024, 4);
-				auto res2 = manager->Allocate(1024, 4);
-				manager->SetFence(nullptr);
-				manager->test = true;
-				auto res3 = manager->Allocate(1024, 4);
-				manager->test = false;
-
-				auto res4 = manager->Allocate(512, 4);
-
-				manager->SetFence(nullptr);
-
-
-				auto res5 = manager->Allocate(1024, 4);
-
-
-				auto res6 = manager->Allocate(1024, 4);
-
-				auto res7 = manager->Allocate(1024, 4);
-
-				manager->test = true;
-
-				auto res8 = manager->Allocate(1024, 4);
-
-				manager->test = false;
-
-				auto res9 = manager->Allocate(1024, 4);
-				auto res10 = manager->Allocate(1024, 4);
-
-				manager->SetFence(nullptr);
-
-				manager->test = true;
-
-				//?????
-				auto res11 = manager->Allocate(1024, 4);
-
-				manager->test = false;
-
-				#endif
-
-				#if 0
-
-				ResourceState stateA{
-					.stageMask = vk::PipelineStageFlagBits2::eVertexInput,
-					.accessMask = vk::AccessFlagBits2::eShaderRead,
-				};
-
-				auto opt = VulkanResourceTracker::TransitionBuffer(Get().buffer, 0, VK_WHOLE_SIZE, stateA);
-
-				std::vector<vk::BufferMemoryBarrier2> wholebar = *opt.value();
-
-				ResourceState stateB{
-					.stageMask = vk::PipelineStageFlagBits2::eComputeShader,
-					.accessMask = vk::AccessFlagBits2::eShaderWrite,
-				};
-
-				auto opt1 = VulkanResourceTracker::TransitionBuffer(Get().buffer, 1024, 1024, stateB);
-
-				std::vector<vk::BufferMemoryBarrier2> quaterbar = *opt1.value();
-
-				ResourceState octa{
-					.stageMask = vk::PipelineStageFlagBits2::eFragmentShader,
-					.accessMask = vk::AccessFlagBits2::eShaderSampledRead,
-				};
-
-				auto opt2 = VulkanResourceTracker::TransitionBuffer(Get().buffer, 2048, 1024, stateB);
-
-				std::vector<vk::BufferMemoryBarrier2> octabar = *opt2.value();
-
-				ResourceState half{
-					.stageMask = vk::PipelineStageFlagBits2::eTransfer,
-					.accessMask = vk::AccessFlagBits2::eTransferWrite,
-				};
-
-				auto opt3 = VulkanResourceTracker::TransitionBuffer(Get().buffer, 0, VK_WHOLE_SIZE, half);
-
-				std::vector<vk::BufferMemoryBarrier2> halfbar = *opt3.value();
-
-				//VulkanResourceTracker::UnregisterBuffer(Get().buffer);
-				//VulkanResourceTracker::RegisterBuffer(Get().buffer);
-				#else
-
-				//RunImageTest(Get().image, { vk::ImageAspectFlagBits::eDepth, 0, 10, 0, 1 }, StateA);
-
-				//RunImageTest(Get().image, { vk::ImageAspectFlagBits::eDepth, 3, 4, 0, 1 }, StateB);
-
-				//RunImageTest(Get().image, { vk::ImageAspectFlagBits::eDepth, 2, 7, 0, 1 }, StateC);
-
-				//RunImageTest(Get().image, { vk::ImageAspectFlagBits::eDepth, 3, 2, 0, 1 }, StateB);
-
-				//VulkanResourceTracker::UnregisterImage(Get().image);
-				//VulkanResourceTracker::RegisterImage(Get().image);
-
-				#endif
 			}
 		private:
 			static constexpr uint32_t INDIRECT_COMMAND_SIZE = 20;
 
-			ShaderObjectHandle cullShader;
-			ShaderObjectHandle cmgShader;
-			ShaderObjectHandle compactShader;
+			Core::Handle<ComputeShader> cullShader;
+			Core::Handle<ComputeShader> cmgShader;
+			Core::Handle<ComputeShader> compactShader;
 
-			VulkanDynamicVector<uint64_t> testVec = { 256, QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eStorageBuffer };
+			Core::Handle<VertFragShaderPair> testShader;
+			Core::Handle<VertFragShaderPair> defaultShader;
 
-			ShaderObjectHandle testShader;
-			ShaderObjectHandle defaultShader;
+			Core::Handle<Mesh> quad;
+			Core::Handle<Material> material;
+			Core::Handle<Material> material2;
 
-			MeshHandle quad;
-			MaterialHandle material;
-			MaterialHandle material2;
-
-			VulkanBuffer buffer;
-			VulkanImage image;
-			TextureHandle texture;
+			Core::Handle<Texture2> texture;
 			RenderGraphResourceRegistry m_GraphResourceRegistry;
 			RenderGraphPassRegistry m_GraphPassRegistry;
+
+			static std::unique_ptr<Renderer> s_Instance;
+
 		};
 	}
 }

@@ -1,5 +1,4 @@
 #include "VulkanImage.hpp"
-#include "VulkanResourceTracker.hpp"
 #include "VulkanImageViewManager.hpp"
 
 namespace Cori {
@@ -15,7 +14,6 @@ namespace Cori {
 			image.m_Format = info.imageCreateInfo->format;
 			image.m_MipLevels = info.imageCreateInfo->mipLevels;
 			image.m_ArrayLayers = info.imageCreateInfo->arrayLayers;
-			VulkanResourceTracker::RegisterImage(image, info.imageCreateInfo->initialLayout);
 
 			if (strcmp(info.name, "") != 0) {
 				image.m_Name = info.name;
@@ -26,7 +24,6 @@ namespace Cori {
 		}
 
 		void VulkanImage::Destroy() {
-			VulkanResourceTracker::UnregisterImage(*this);
 			VulkanImageViewManager::UnregisterImage(*this);
 
 			VulkanEngine::GetAllocator().destroyImage(m_Image, m_Allocation);

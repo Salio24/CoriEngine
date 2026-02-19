@@ -61,6 +61,8 @@ namespace Cori {
 					static constexpr char TextureManager[] = "Texture Manager";
 					static constexpr char ShaderManager[] = "Shader Manager";
 					static constexpr char MaterialSystem[] = "Material System";
+					static constexpr char MeshManager[] = "Mesh Manager";
+					static constexpr char Renderer[] = "Renderer";
 
 
 

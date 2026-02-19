@@ -1,5 +1,4 @@
 #include "VulkanBuffer.hpp"
-#include "VulkanResourceTracker.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -15,7 +14,6 @@ namespace Cori {
 			buffer.m_Allocation = value.first;
 			buffer.m_Buffer = value.second;
 			buffer.m_Size = info.bufferCreateInfo->size;
-			VulkanResourceTracker::RegisterBuffer(buffer);
 
 			if (strcmp(info.name, "") != 0) {
 				buffer.m_Name = info.name;
@@ -26,7 +24,6 @@ namespace Cori {
 		}
 
 		void VulkanBuffer::Destroy() {
-			VulkanResourceTracker::UnregisterBuffer(*this);
 			VulkanEngine::GetAllocator().destroyBuffer(m_Buffer, m_Allocation);
 			m_Buffer = VK_NULL_HANDLE;
 			m_Size = 0;

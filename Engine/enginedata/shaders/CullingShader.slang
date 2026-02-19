@@ -34,24 +34,37 @@ struct VkDrawIndexedIndirectCommand {
 
 typealias DrawCommandCount = Atomic<uint32_t>;
 
+struct Vertex {
+	float3 position;
+	uint32_t normal;
+	uint32_t tangent;
+	float2 uvs;
+	uint32_t color;
+};
+
+struct Handle {
+	uint32_t index;
+	uint32_t version;
+};
+
 struct ObjectData {
 	float4x4 transform;
 	float4 uvOffsets;
-	uint32_t materialID;
-	uint32_t subBatchID;
-	bool valid;
-	uint32_t pad4;
+	Handle material;
+	uint32_t ownerBatch;
+	uint32_t valid;
 };
 
-struct MeshAssetData {
+struct Mesh {
 	uint32_t indexCount;
 	uint32_t firstIndex;
-	int32_t vertexOffset;
-	uint32_t padding;
+	Vertex* firstVertexAddress;
+	uint32_t vertexType;
+	uint32_t version;
 };
 
 struct BatchInfo {
-	uint32_t meshID;
+	Handle mesh;
 	uint32_t ownerGroup;
 };
 
@@ -64,7 +77,7 @@ struct PushConstants {
 	VkDrawIndexedIndirectCommand* commandBuffer; // write
 	DrawCommandCount* commandCountBuffer; // write
 	BatchInfo* batchInfos; // read
-	MeshAssetData* meshDataBuffer; // read
+	Mesh* meshDataBuffer; // read
 	GlobalAtomic* globalAtomic; // write
 	GroupCommandOffset* commandOffsets; // read
 
@@ -84,8 +97,8 @@ void cullMain(uint3 threadID : SV_DispatchThreadID) {
 	//ObjectData obj = pc.objectDataBuffer[pc.redirectBuffer[threadID.x].objectID];
 	ObjectData obj = pc.objectDataBuffer[unorderedObjectID];
 
-	if (obj.valid && IsVisible(obj)) {
-		uint32_t batchID = obj.subBatchID;
+	if (bool(obj.valid) && IsVisible(obj)) {
+		uint32_t batchID = obj.ownerBatch;
 		pc.bii[batchID].visibilityCount.add(1);
 	}
 }
@@ -107,7 +120,7 @@ void cmgMain(uint3 threadID : SV_DispatchThreadID) {
 
 		uint32_t groupID = batchInfo.ownerGroup;
 
-		MeshAssetData mesh = pc.meshDataBuffer[batchInfo.meshID];
+		Mesh mesh = pc.meshDataBuffer[batchInfo.mesh.index];
 
 		uint32_t commandIndex = pc.commandCountBuffer[groupID].add(1);
 
@@ -115,7 +128,7 @@ void cmgMain(uint3 threadID : SV_DispatchThreadID) {
 		diic.indexCount = mesh.indexCount;
 		diic.instanceCount = visibleCount;
 		diic.firstIndex = mesh.firstIndex;
-		diic.vertexOffset = mesh.vertexOffset;
+		diic.vertexOffset = 0;
 		diic.firstInstance = startOffset;
 
 		pc.commandBuffer[pc.commandOffsets[groupID] + commandIndex] = diic;
@@ -131,8 +144,8 @@ void compactMain(uint3 threadID : SV_DispatchThreadID) {
 
 	ObjectData obj = pc.objectDataBuffer[unorderedObjectID];
 
-	if (obj.valid && IsVisible(obj)) {
-		uint32_t batchID = obj.subBatchID;
+	if (bool(obj.valid) && IsVisible(obj)) {
+		uint32_t batchID = obj.ownerBatch;
 
 		uint32_t localID = pc.bii[batchID].visibilityCount.sub(1);
 
