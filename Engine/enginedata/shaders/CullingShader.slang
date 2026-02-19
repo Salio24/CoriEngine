@@ -1,7 +1,11 @@
+#include "Defines.slang"
+
 struct BatchIntermediateInfo {
 	Atomic<uint32_t> visibilityCount;
 	uint32_t outputOffset;
 };
+
+
 
 //struct RedirectID {
 //	uint32_t objectID;
@@ -33,40 +37,6 @@ struct VkDrawIndexedIndirectCommand {
 };
 
 typealias DrawCommandCount = Atomic<uint32_t>;
-
-struct Vertex {
-	float3 position;
-	uint32_t normal;
-	uint32_t tangent;
-	float2 uvs;
-	uint32_t color;
-};
-
-struct Handle {
-	uint32_t index;
-	uint32_t version;
-};
-
-struct ObjectData {
-	float4x4 transform;
-	float4 uvOffsets;
-	Handle material;
-	uint32_t ownerBatch;
-	uint32_t valid;
-};
-
-struct Mesh {
-	uint32_t indexCount;
-	uint32_t firstIndex;
-	Vertex* firstVertexAddress;
-	uint32_t vertexType;
-	uint32_t version;
-};
-
-struct BatchInfo {
-	Handle mesh;
-	uint32_t ownerGroup;
-};
 
 struct PushConstants {
 	ObjectData* objectDataBuffer;

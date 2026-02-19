@@ -353,7 +353,7 @@ namespace Cori {
 				};
 
 				VulkanStreamingLine::BufferUpload indexUpload{
-					.resource = vertexStorage->buffer,
+					.resource = m_IndexBuffer,
 					.range = {.offset = indexOffset, .alignment = alignof(VertexT) },
 					.srcPipelineStages = vk::PipelineStageFlagBits2::eTopOfPipe,
 					.srcAccessFlags = vk::AccessFlagBits2::eNone

@@ -6,6 +6,8 @@
 #include "Core/DataStructures/FlatSlotMap.hpp"
 #include "FileSystem/PathManager.hpp"
 
+//FIXME: placeholder material has invalid texture handle
+
 namespace Cori {
 	namespace Graphics {
 		using ShaderEffectIndex = uint32_t;
@@ -14,12 +16,15 @@ namespace Cori {
 			alignas(16) glm::vec4 colorFactor{ 1.0f };
 			Core::Handle<Texture2> albedoTexture;
 			SamplerHandle albedoSampler{ 0 };
+			uint32_t pad;
 		};
 
 		struct Material {
 			MaterialData customData;
 			ShaderEffectIndex shaderEffectIndex{ 0 };
 			uint32_t version{ 0 };
+			uint32_t pad1;
+			uint32_t pad2;
 		};
 
 		struct ShaderEffectData {
@@ -283,7 +288,7 @@ namespace Cori {
 				for (auto it = Get().m_Materials.cbegin(); it != Get().m_Materials.cend(); ++it) {
 					auto& material = *it;
 					if (material.shaderEffectIndex == shaderEffect.GetIndex()) {
-						ChangeMaterialShaderEffect(it.GetHandle(), Get().m_PlaceholderEffect);
+						ChangeMaterialShaderEffect(it.GetHandle(), Get().m_PlaceholderEffect); //NOLINT
 					}
 				}
 
@@ -335,13 +340,18 @@ namespace Cori {
 				m_ShaderEffects.Reserve(32);
 				m_ShaderEffectData.Reserve(32);
 
+				MaterialData placeholderData{
+					.albedoTexture = VulkanTextureManager::GetPlaceholderTexture(),
+					.albedoSampler = 0
+				};
+
 				#ifdef DEBUG_BUILD
 				m_PlaceholderEffect = m_ShaderEffects.Emplace(VulkanShaderManager::GetPlaceholderShaderPair(), PipelineState{}, "Placeholder Shader Effect");
-				m_PlaceholderMaterial = m_Materials.Emplace(MaterialData{}, m_PlaceholderEffect.GetIndex());
+				m_PlaceholderMaterial = m_Materials.Emplace(placeholderData, m_PlaceholderEffect.GetIndex());
 				m_MaterialNames.emplace_back("Placeholder Material");
 				#else
 				m_PlaceholderEffect = m_ShaderEffects.Emplace(shader, PipelineState{});
-				m_PlaceholderMaterial = m_Materials.Emplace(MaterialData{}, m_PlaceholderEffect.GetIndex());
+				m_PlaceholderMaterial = m_Materials.Emplace(placeholderData, m_PlaceholderEffect.GetIndex());
 				#endif
 
 				VulkanShaderManager::AddOnVertFragShaderPairDeletedListener(ShaderPairDeleteListener);

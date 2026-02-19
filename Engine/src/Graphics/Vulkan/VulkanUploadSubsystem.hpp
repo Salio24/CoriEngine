@@ -6,6 +6,7 @@
 #include "DeletionQueue.hpp"
 #include "Core/DataStructures/FlatSlotMap.hpp"
 #include "Utility/TemplateUtils.hpp"
+#include "Utility/BitHelpers.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -741,8 +742,8 @@ namespace Cori {
 					other.m_LastSectorSize = SECTOR_SIZE;
 					m_IsBAR = other.m_IsBAR;
 					other.m_IsBAR = false;
-					m_IsDirty = other.m_IsDirty;
-					other.m_IsDirty = false;
+					m_IsDirtyMask = other.m_IsDirtyMask;
+					other.m_IsDirtyMask = false;
 					m_ResizeRequired = other.m_ResizeRequired;
 					other.m_ResizeRequired = false;
 					m_OldSize = other.m_OldSize;
@@ -768,8 +769,8 @@ namespace Cori {
 					other.m_LastSectorSize = SECTOR_SIZE;
 					m_IsBAR = other.m_IsBAR;
 					other.m_IsBAR = false;
-					m_IsDirty = other.m_IsDirty;
-					other.m_IsDirty = false;
+					m_IsDirtyMask = other.m_IsDirtyMask;
+					other.m_IsDirtyMask = false;
 					m_ResizeRequired = other.m_ResizeRequired;
 					other.m_ResizeRequired = false;
 					m_OldSize = other.m_OldSize;
@@ -1101,7 +1102,7 @@ namespace Cori {
 					}
 				}
 
-				if (m_IsDirty) {
+				if (Utility::IsSet(m_IsDirtyMask, frameIndex)) {
 
 					if (!m_IsBAR) {
 						VulkanDynamicContainerUploadManager::BeginUpdate(m_GPUBuffers[frameIndex].m_Buffer);
@@ -1132,7 +1133,7 @@ namespace Cori {
 
 					m_SectorStates[frameIndex].reset();
 
-					m_IsDirty = false;
+					Utility::Reset(m_IsDirtyMask, frameIndex);
 				}
 			}
 
@@ -1195,7 +1196,7 @@ namespace Cori {
 					m_SectorStates[i].set(affectedSectorStart, affectedSectorEnd - affectedSectorStart + 1, true);
 				}
 
-				m_IsDirty = true;
+				m_IsDirtyMask = UINT8_MAX;
 			}
 
 			void ResizeNonReporting(const uint64_t newSize) {
@@ -1260,13 +1261,13 @@ namespace Cori {
 
 				for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
 					auto propertyFlags = VulkanEngine::GetAllocator().getAllocationMemoryProperties(m_GPUBuffers[i].m_Allocation);
-					if (!(propertyFlags & vk::MemoryPropertyFlagBits::eHostVisible) || true) {
+					if (!(propertyFlags & vk::MemoryPropertyFlagBits::eHostVisible)) {
 						isBufferBAR[i] = false;
 						m_IsBAR = false;
 					}
 				}
 
-				if (!m_IsBAR || true) {
+				if (!m_IsBAR) {
 					VulkanDynamicContainerUploadManager::FallbackListener();
 					for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
 						if (isBufferBAR[i]) {
@@ -1300,7 +1301,7 @@ namespace Cori {
 			#endif
 			uint32_t m_LastSectorSize{ SECTOR_SIZE };
 			bool m_IsBAR{ false };
-			bool m_IsDirty{ false };
+			uint8_t m_IsDirtyMask{ 0 };
 			bool m_ResizeRequired{ false };
 			uint64_t m_OldSize{ 0 };
 

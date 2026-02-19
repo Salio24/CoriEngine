@@ -622,7 +622,7 @@ namespace Cori {
 					};
 
 					vk::RenderingInfo renderingInfo = {
-						.renderArea = {.offset = {0, 0}, .extent = VulkanEngine::GetSwapChainExtent()},
+						.renderArea = {.offset = { 0, 0 }, .extent = VulkanEngine::GetSwapChainExtent()},
 						.layerCount = 1,
 						.colorAttachmentCount = 1,
 						.pColorAttachments = &attachmentInfo
@@ -667,13 +667,13 @@ namespace Cori {
 				graph.Compile(VulkanEngine::GetFrameIndex(), VulkanEngine::GetNextFrameInFlight());
 				auto& frameData = VulkanEngine::Get().GPUFrameBegin();
 
-				for (uint32_t i = 0; i < m_DrawGroups.RawSize(); ++i) {
+				for (uint32_t i = 0; i < m_DrawGroups.RawSize() - 1; ++i) {
 					uint32_t value = 0;
 					if (m_DrawGroups.IsIndexValid(i)) {
 						value = m_DrawGroups[i].GetBatchCount();
 					}
 
-					commandOffsetsBuffer.UploadToAllocation<uint32_t>(std::span{ &value, 1 }, sizeof(uint32_t) * i);
+					commandOffsetsBuffer.UploadToAllocation<uint32_t>(std::span{ &value, 1 }, sizeof(uint32_t) * (i + 1));
 				}
 
 				m_Objects.Sync();

@@ -1,45 +1,5 @@
-struct Vertex {
-	float3 position;
-	uint32_t normal;
-	uint32_t tangent;
-	float2 uvs;
-	uint32_t color;
-};
-
-struct Handle {
-	uint32_t index;
-	uint32_t version;
-};
-
-struct Mesh {
-	uint32_t indexCount;
-	uint32_t firstIndex;
-	Vertex* firstVertexAddress;
-	uint32_t vertexType;
-	uint32_t version;
-};
-
-struct TextureAsset {
-	uint32_t descriptorIndex;
-	uint32_t version;
-};
-
-struct MaterialData {
-	float4 colorFactor;
-	Handle albedoTexture;
-	uint32_t albedoSampler;
-};
-
-struct MaterialCombinedData {
-	MaterialData customData;
-	uint32_t shaderEffectID;
-	uint32_t version;
-};
-
-struct ShaderEffectData {
-	float4 custom1;
-	float4 custom2;
-};
+#include "Defines.slang"
+#include "Helpers.slang"
 
 [[vk::binding(0, 0)]]
 SamplerState globalSamplers[];
@@ -49,19 +9,6 @@ Texture2D globalTextures[];
 
 struct CompactedObjectID {
 	uint32_t id;
-};
-
-struct ObjectData {
-	float4x4 transform;
-	float4 uvOffsets;
-	Handle material;
-	uint32_t ownerBatch;
-	uint32_t valid;
-};
-
-struct BatchInfo {
-	Handle mesh;
-	uint32_t ownerGroup;
 };
 
 struct PushConstants {
@@ -99,7 +46,7 @@ VSOutput vertMain(uint32_t instanceID : SV_VulkanInstanceID, uint32_t baseInstan
     Vertex v = mesh.firstVertexAddress[vertexID];
 
     output.pos =  mul(obj.transform, float4(v.position, 1.0));
-    output.fragColor = v.color * material.colorFactor;
+    output.fragColor = ConvertColor(v.color) * material.colorFactor;
     output.uv = obj.uvOffsets.xy + v.uvs * (obj.uvOffsets.zw - obj.uvOffsets.xy);
     output.albedoTexture = pc.textureAssetTable[material.albedoTexture.index].descriptorIndex;
     output.albedoSampler = material.albedoSampler;
@@ -108,6 +55,7 @@ VSOutput vertMain(uint32_t instanceID : SV_VulkanInstanceID, uint32_t baseInstan
 
 [shader("fragment")]
 float4 fragMain(VSOutput vertIn) : SV_TARGET {
-	float4 color = vertIn.fragColor * globalTextures[vertIn.albedoTexture].Sample(globalSamplers[vertIn.albedoSampler], vertIn.uv);
+	float4 sampledColor = globalTextures[vertIn.albedoTexture].Sample(globalSamplers[vertIn.albedoSampler], vertIn.uv);
+	float4 color = vertIn.fragColor * sampledColor;
 	return color;
 }
