@@ -113,11 +113,11 @@ namespace Cori {
 			CreateCommandBuffer();
 			CreateSyncObjects();
 
+			VulkanImageViewManager::Init();
 			DeletionQueue::Init();
 			VulkanStreamingLine::Init();
 			VulkanMeshManager::Init();
 			VulkanGlobalLayoutManager::Init();
-			VulkanImageViewManager::Init();
 			VulkanShaderManager::Init();
 			VulkanTextureManager::Init();
 			VulkanMaterialSystem::Init();
@@ -134,11 +134,11 @@ namespace Cori {
 			VulkanMaterialSystem::Shutdown();
 			VulkanTextureManager::Shutdown();
 			VulkanShaderManager::Shutdown();
-			VulkanImageViewManager::Shutdown();
 			VulkanGlobalLayoutManager::Shutdown();
 			VulkanMeshManager::Shutdown();
 			VulkanStreamingLine::Shutdown();
 			DeletionQueue::Shutdown();
+			VulkanImageViewManager::Shutdown();
 
 			for (auto& semaphore : m_RenderFinishedSemaphores) {
 				m_Device.destroySemaphore(semaphore);

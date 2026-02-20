@@ -423,9 +423,13 @@ namespace Cori {
 			};
 		public:
 			~VulkanDynamicContainerUploadManager() {
-				DeletionQueue::PushBuffer(m_RingStagingBuffer, VulkanEngine::GetCurrentFrameInFlight());
+				if (m_RingStagingBuffer.m_Buffer) {
+					DeletionQueue::PushBuffer(m_RingStagingBuffer, VulkanEngine::GetCurrentFrameInFlight());
+				}
 
-				DeletionQueue::PushVirtualBlock(m_RingStagingBlock, VulkanEngine::GetCurrentFrameInFlight());
+				if (m_RingStagingBlock) {
+					DeletionQueue::PushVirtualBlock(m_RingStagingBlock, VulkanEngine::GetCurrentFrameInFlight());
+				}
 			}
 
 			static void Init();

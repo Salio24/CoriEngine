@@ -357,6 +357,12 @@ namespace Cori {
 						DeletionQueue::PushImage(texture.image, VulkanEngine::GetCurrentFrameInFlight());
 					}
 				}
+
+				for (auto& sampler : m_Samplers) {
+					if (sampler) {
+						VulkanEngine::GetLogicalDevice().destroySampler(sampler);
+					}
+				}
 			}
 
 		private:

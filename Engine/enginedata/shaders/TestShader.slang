@@ -55,7 +55,6 @@ VSOutput vertMain(uint32_t instanceID : SV_VulkanInstanceID, uint32_t baseInstan
 
 [shader("fragment")]
 float4 fragMain(VSOutput vertIn) : SV_TARGET {
-	float4 sampledColor = globalTextures[vertIn.albedoTexture].Sample(globalSamplers[vertIn.albedoSampler], vertIn.uv);
-	float4 color = vertIn.fragColor * sampledColor;
+	float4 color = vertIn.fragColor * globalTextures[NonUniformResourceIndex(vertIn.albedoTexture)].Sample(globalSamplers[NonUniformResourceIndex(vertIn.albedoSampler)], vertIn.uv);;
 	return color;
 }

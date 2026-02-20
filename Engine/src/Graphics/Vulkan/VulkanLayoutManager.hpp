@@ -146,7 +146,7 @@ namespace Cori {
 				m_SamplerBindingMemOffset = VulkanEngine::GetLogicalDevice().getDescriptorSetLayoutBindingOffsetEXT(m_DescriptorSetLayout, 0);
 				m_SampledImageBindingMemOffset = VulkanEngine::GetLogicalDevice().getDescriptorSetLayoutBindingOffsetEXT(m_DescriptorSetLayout, 1);
 
-				m_DescriptorBuffer.Reserve(alignedSize);
+				m_DescriptorBuffer.Resize(alignedSize);
 			}
 
 			vk::DescriptorSetLayout m_DescriptorSetLayout;
