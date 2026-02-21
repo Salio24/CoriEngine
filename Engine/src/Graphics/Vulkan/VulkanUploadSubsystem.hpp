@@ -19,6 +19,8 @@ namespace Cori {
 
 			template<typename T = Byte>
 			bool UploadToAllocation(const std::span<T> data, uint64_t offset) {
+				CORI_PROFILE_FUNCTION();
+
 				CORI_CORE_ASSERT(m_Type == Type::CPUUpload, "Calling UploadToAllocation on VulkanVirtualBuffer that was created as a GPU scratch, this type of virtual buffer can not be uploaded from CPU.")
 
 				#ifdef DEBUG_BUILD
@@ -118,6 +120,8 @@ namespace Cori {
 			}
 
 			static VulkanVirtualBuffer CreateVirtualUploadBuffer(uint64_t size, const uint64_t alignment, const uint32_t dstFrameInFlight, const char* name = "") {
+				CORI_PROFILE_FUNCTION();
+
 				size = Math::AlignUp(size, alignment);
 
 				vma::VirtualAllocationCreateInfo allocInfo {
@@ -154,6 +158,8 @@ namespace Cori {
 			}
 
 			static VulkanVirtualBuffer CreateVirtualScratchBuffer(uint64_t size, const uint64_t alignment, const uint32_t dstFrameInFlight,  const char* name = "") {
+				CORI_PROFILE_FUNCTION();
+
 				size = Math::AlignUp(size, alignment);
 
 				vma::VirtualAllocationCreateInfo allocInfo {

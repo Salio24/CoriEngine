@@ -291,254 +291,269 @@ namespace Cori {
 				uniformData.proj = glm::perspective(glm::radians(45.0f), static_cast<float>(800) / static_cast<float>(600), 0.1f, 10.0f);
 				uniformData.proj[1][1] *= -1;
 
-				m_GraphPassRegistry.Reset();
-				m_GraphResourceRegistry.Reset(VulkanEngine::GetFrameIndex());
-				uint32_t frameInFlightIndex = VulkanEngine::GetCurrentFrameInFlight();
+				{
+					CORI_PROFILE_SCOPE("Render Graph registry reset");
+
+					m_GraphPassRegistry.Reset();
+					m_GraphResourceRegistry.Reset(VulkanEngine::GetFrameIndex());
+				}
+
 				RenderGraph graph(m_GraphPassRegistry, m_GraphResourceRegistry);
 
-				auto ObjectBufferHandle = graph.ImportFlatSlotMap(m_Objects, "Object Data");
-				auto BatchInfoBufferHandle = graph.ImportDynamicVector(m_BatchGPUInfo, "Batch Info");
+				{
+					CORI_PROFILE_SCOPE("Render Graph configuring");
 
-				auto GroupCommandOffsetsBufferHandle = graph.ImportBuffer(commandOffsetsBuffer, "Group Command Offsets Buffer"); // per group <uint32_t>, CPU - write, GPU - compute read, semi-retained mode
-				auto UniformDataBufferHandle = graph.ImportBuffer(uniformBuffer, "Uniform Data Buffer"); // per group <uint32_t>, CPU - write, GPU - compute read, semi-retained mode
+					auto ObjectBufferHandle = graph.ImportFlatSlotMap(m_Objects, "Object Data");
+					auto BatchInfoBufferHandle = graph.ImportDynamicVector(m_BatchGPUInfo, "Batch Info");
 
+					auto GroupCommandOffsetsBufferHandle = graph.ImportBuffer(commandOffsetsBuffer, "Group Command Offsets Buffer"); // per group <uint32_t>, CPU - write, GPU - compute read, semi-retained mode
+					auto UniformDataBufferHandle = graph.ImportBuffer(uniformBuffer, "Uniform Data Buffer"); // per group <uint32_t>, CPU - write, GPU - compute read, semi-retained mode
 
-				uint32_t maxObjectCount = m_Objects.RawSize();
-				uint32_t maxBatchCount = m_Batches.RawSize();
-				uint32_t maxGroupCount = m_DrawGroups.RawSize();
+					uint32_t maxObjectCount = m_Objects.RawSize();
+					uint32_t maxBatchCount = m_Batches.RawSize();
+					uint32_t maxGroupCount = m_DrawGroups.RawSize();
 
-				struct ComputePS{
-					uint64_t objectDataBuffer;
-					uint64_t compactedObjectIDBuffer;
+					struct ComputePS{
+						uint64_t objectDataBuffer;
+						uint64_t compactedObjectIDBuffer;
 
-					uint64_t bii;
+						uint64_t bii;
 
-					uint64_t commandBuffer;
-					uint64_t commandCountBuffer;
-					uint64_t batchInfos;
-					uint64_t meshDataBuffer;
-					uint64_t globalAtomic;
-					uint64_t commandOffsets;
+						uint64_t commandBuffer;
+						uint64_t commandCountBuffer;
+						uint64_t batchInfos;
+						uint64_t meshDataBuffer;
+						uint64_t globalAtomic;
+						uint64_t commandOffsets;
 
-					uint32_t totalInstanceCount;
-					uint32_t totalBatchCount;
-				};
-
-				struct DrawPS{
-					uint64_t objectDataBuffer;
-					uint64_t compactedObjectIDBuffer;
-					uint64_t materialDataBuffer;
-					uint64_t shaderEffectDataBuffer;
-					uint64_t meshDataBuffer;
-					uint64_t textureAssetTable;
-					uint64_t batchInfo;
-					uint64_t uniformData;
-				};
-
-				auto DrawCommandBufferHandle = graph.CreateBuffer({ INDIRECT_COMMAND_SIZE * m_Batches.RawSize(), INDIRECT_COMMAND_SIZE }, "Draw Command Buffer"); //per batch <VkDrawIndexedIndirectCommand> CPU - none, GPU - compute write -> command submit read, immediate mode
-				auto DrawCommandCountBufferHandle = graph.CreateBuffer({ m_DrawGroups.RawSize() * sizeof(uint32_t), alignof(uint32_t) }, "Draw Command Count"); //per group <uint32_t> CPU - none, GPU - compute write -> indirect command read, immediate mode
-				auto BatchIntermediateInfoBufferHandle = graph.CreateBuffer({ m_Batches.RawSize() * sizeof(uint64_t), alignof(uint64_t) }, "Batch Intermediate Info"); //per batch <uint64_t> CPU - none, GPU - compute write/read atomic, immediate mode
-				auto InstanceAtomicCounterHandle = graph.CreateBuffer({ sizeof(uint32_t), alignof(uint32_t) }, "Instance Atomic Counter"); //atomic uint32_t, CPU - none, GPU - compute write/read atomic, immediate mode
-				auto CompactedInstanceListBufferHandle = graph.CreateBuffer({ m_Objects.RawSize() * sizeof(uint32_t), alignof(uint32_t) }, "Compacted Instance List Buffer"); //per visible instance <uint32_t> CPU - none, GPU - compute write -> vertex/fragment read, immediate mode
-
-				auto& bufferCleanupPass = graph.CreatePass("Buffer Cleanup");
-				bufferCleanupPass.Writes(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
-				bufferCleanupPass.Writes(InstanceAtomicCounterHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
-				bufferCleanupPass.Writes(CompactedInstanceListBufferHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
-				bufferCleanupPass.AssignWork([=](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
-					auto& dccb = registry.GetResource(DrawCommandCountBufferHandle);
-					auto& iac = registry.GetResource(InstanceAtomicCounterHandle);
-					auto& cilb = registry.GetResource(CompactedInstanceListBufferHandle);
-					commandBuffer.fillBuffer(dccb.GetHeapHandle(), dccb.GetStartOffset(), dccb.GetSize(), 0);
-					commandBuffer.fillBuffer(iac.GetHeapHandle(), iac.GetStartOffset(), iac.GetSize(), 0);
-					commandBuffer.fillBuffer(cilb.GetHeapHandle(), cilb.GetStartOffset(), cilb.GetSize(), 0);
-				});
-
-				auto& cullPass = graph.CreatePass("Cull Pass");
-				cullPass.Writes(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
-				cullPass.Reads(ObjectBufferHandle);
-				cullPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
-					ComputePS ps {
-						.objectDataBuffer = registry.GetResource(ObjectBufferHandle).GetVulkanBuffer().GetBDA(),
-						.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
-						.bii = registry.GetResource(BatchIntermediateInfoBufferHandle).GetBDA(),
-						.commandBuffer = registry.GetResource(DrawCommandBufferHandle).GetBDA(),
-						.commandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle).GetBDA(),
-						.batchInfos = registry.GetResource(BatchInfoBufferHandle).GetVulkanBuffer().GetBDA(),
-						.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
-						.globalAtomic = registry.GetResource(InstanceAtomicCounterHandle).GetBDA(),
-						.commandOffsets = registry.GetResource(GroupCommandOffsetsBufferHandle).GetBDA(),
-						.totalInstanceCount = maxObjectCount,
-						.totalBatchCount = maxBatchCount
+						uint32_t totalInstanceCount;
+						uint32_t totalBatchCount;
 					};
 
-					commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(ComputePS), &ps);
-
-					auto result = VulkanShaderManager::GetShader(cullShader);
-					CORI_CORE_ASSERT(result, "Failed to get cullShader. Error: {}", to_string(result.error()));
-					result.value().get().Bind(commandBuffer);
-					commandBuffer.dispatch(std::ceil(maxObjectCount / 64.0f), 1, 1);
-				});
-
-				auto& cmgPass = graph.CreatePass("Indirect Command Generation Pass");
-				cmgPass.Writes(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
-				cmgPass.Writes(DrawCommandBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
-				cmgPass.Writes(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
-				cmgPass.Writes(InstanceAtomicCounterHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
-				cmgPass.Reads(BatchInfoBufferHandle);
-				cmgPass.Reads(GroupCommandOffsetsBufferHandle);
-				cmgPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
-					ComputePS ps {
-						.objectDataBuffer = registry.GetResource(ObjectBufferHandle).GetVulkanBuffer().GetBDA(),
-						.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
-						.bii = registry.GetResource(BatchIntermediateInfoBufferHandle).GetBDA(),
-						.commandBuffer = registry.GetResource(DrawCommandBufferHandle).GetBDA(),
-						.commandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle).GetBDA(),
-						.batchInfos = registry.GetResource(BatchInfoBufferHandle).GetVulkanBuffer().GetBDA(),
-						.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
-						.globalAtomic = registry.GetResource(InstanceAtomicCounterHandle).GetBDA(),
-						.commandOffsets = registry.GetResource(GroupCommandOffsetsBufferHandle).GetBDA(),
-						.totalInstanceCount = maxObjectCount,
-						.totalBatchCount = maxBatchCount
+					struct DrawPS{
+						uint64_t objectDataBuffer;
+						uint64_t compactedObjectIDBuffer;
+						uint64_t materialDataBuffer;
+						uint64_t shaderEffectDataBuffer;
+						uint64_t meshDataBuffer;
+						uint64_t textureAssetTable;
+						uint64_t batchInfo;
+						uint64_t uniformData;
 					};
 
-					commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(ComputePS), &ps);
+					auto DrawCommandBufferHandle = graph.CreateBuffer({ INDIRECT_COMMAND_SIZE * m_Batches.RawSize(), INDIRECT_COMMAND_SIZE }, "Draw Command Buffer"); //per batch <VkDrawIndexedIndirectCommand> CPU - none, GPU - compute write -> command submit read, immediate mode
+					auto DrawCommandCountBufferHandle = graph.CreateBuffer({ m_DrawGroups.RawSize() * sizeof(uint32_t), alignof(uint32_t) }, "Draw Command Count"); //per group <uint32_t> CPU - none, GPU - compute write -> indirect command read, immediate mode
+					auto BatchIntermediateInfoBufferHandle = graph.CreateBuffer({ m_Batches.RawSize() * sizeof(uint64_t), alignof(uint64_t) }, "Batch Intermediate Info"); //per batch <uint64_t> CPU - none, GPU - compute write/read atomic, immediate mode
+					auto InstanceAtomicCounterHandle = graph.CreateBuffer({ sizeof(uint32_t), alignof(uint32_t) }, "Instance Atomic Counter"); //atomic uint32_t, CPU - none, GPU - compute write/read atomic, immediate mode
+					auto CompactedInstanceListBufferHandle = graph.CreateBuffer({ m_Objects.RawSize() * sizeof(uint32_t), alignof(uint32_t) }, "Compacted Instance List Buffer"); //per visible instance <uint32_t> CPU - none, GPU - compute write -> vertex/fragment read, immediate mode
 
-					auto result = VulkanShaderManager::GetShader(cmgShader);
-					CORI_CORE_ASSERT(result, "Failed to get cmgShader. Error: {}", to_string(result.error()));
-					result.value().get().Bind(commandBuffer);
-					commandBuffer.dispatch(std::ceil(maxBatchCount / 64.0f), 1, 1);
-				});
+					auto& bufferCleanupPass = graph.CreatePass("Buffer Cleanup");
+					bufferCleanupPass.Writes(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
+					bufferCleanupPass.Writes(InstanceAtomicCounterHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
+					bufferCleanupPass.Writes(CompactedInstanceListBufferHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
+					bufferCleanupPass.AssignWork([=](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
+						auto& dccb = registry.GetResource(DrawCommandCountBufferHandle);
+						auto& iac = registry.GetResource(InstanceAtomicCounterHandle);
+						auto& cilb = registry.GetResource(CompactedInstanceListBufferHandle);
+						commandBuffer.fillBuffer(dccb.GetHeapHandle(), dccb.GetStartOffset(), dccb.GetSize(), 0);
+						commandBuffer.fillBuffer(iac.GetHeapHandle(), iac.GetStartOffset(), iac.GetSize(), 0);
+						commandBuffer.fillBuffer(cilb.GetHeapHandle(), cilb.GetStartOffset(), cilb.GetSize(), 0);
+					});
 
-				auto& compactPass = graph.CreatePass("Compact Pass");
-				compactPass.Writes(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
-				compactPass.Writes(CompactedInstanceListBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
-				compactPass.Reads(ObjectBufferHandle);
-				compactPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
-					ComputePS ps {
-						.objectDataBuffer = registry.GetResource(ObjectBufferHandle).GetVulkanBuffer().GetBDA(),
-						.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
-						.bii = registry.GetResource(BatchIntermediateInfoBufferHandle).GetBDA(),
-						.commandBuffer = registry.GetResource(DrawCommandBufferHandle).GetBDA(),
-						.commandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle).GetBDA(),
-						.batchInfos = registry.GetResource(BatchInfoBufferHandle).GetVulkanBuffer().GetBDA(),
-						.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
-						.globalAtomic = registry.GetResource(InstanceAtomicCounterHandle).GetBDA(),
-						.commandOffsets = registry.GetResource(GroupCommandOffsetsBufferHandle).GetBDA(),
-						.totalInstanceCount = maxObjectCount,
-						.totalBatchCount = maxBatchCount
-					};
+					auto& cullPass = graph.CreatePass("Cull Pass");
+					cullPass.Writes(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+					cullPass.Reads(ObjectBufferHandle);
+					cullPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
+						ComputePS ps {
+							.objectDataBuffer = registry.GetResource(ObjectBufferHandle).GetVulkanBuffer().GetBDA(),
+							.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
+							.bii = registry.GetResource(BatchIntermediateInfoBufferHandle).GetBDA(),
+							.commandBuffer = registry.GetResource(DrawCommandBufferHandle).GetBDA(),
+							.commandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle).GetBDA(),
+							.batchInfos = registry.GetResource(BatchInfoBufferHandle).GetVulkanBuffer().GetBDA(),
+							.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
+							.globalAtomic = registry.GetResource(InstanceAtomicCounterHandle).GetBDA(),
+							.commandOffsets = registry.GetResource(GroupCommandOffsetsBufferHandle).GetBDA(),
+							.totalInstanceCount = maxObjectCount,
+							.totalBatchCount = maxBatchCount
+						};
 
-					commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(ComputePS), &ps);
+						commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(ComputePS), &ps);
 
-					auto result = VulkanShaderManager::GetShader(compactShader);
-					CORI_CORE_ASSERT(result, "Failed to get compactShader. Error: {}", to_string(result.error()));
-					result.value().get().Bind(commandBuffer);
-					commandBuffer.dispatch(std::ceil(maxObjectCount / 64.0f), 1, 1);
-				});
+						auto result = VulkanShaderManager::GetShader(cullShader);
+						CORI_CORE_ASSERT(result, "Failed to get cullShader. Error: {}", to_string(result.error()));
+						result.value().get().Bind(commandBuffer);
+						commandBuffer.dispatch(std::ceil(maxObjectCount / 64.0f), 1, 1);
+					});
 
-				auto& indirectPass = graph.CreatePass("Indirect Pass");
-				indirectPass.Reads(ObjectBufferHandle);
-				indirectPass.Reads(CompactedInstanceListBufferHandle, { vk::PipelineStageFlagBits2::eVertexShader, vk::AccessFlagBits2::eShaderStorageRead });
-				indirectPass.Reads(DrawCommandBufferHandle, { vk::PipelineStageFlagBits2::eDrawIndirect, vk::AccessFlagBits2::eIndirectCommandRead });
-				indirectPass.Reads(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eDrawIndirect, vk::AccessFlagBits2::eIndirectCommandRead });
-				indirectPass.Reads(UniformDataBufferHandle);
-				indirectPass.Reads(BatchInfoBufferHandle);
-				indirectPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
-					DrawPS ps {
-						.objectDataBuffer = registry.GetResource(ObjectBufferHandle).GetVulkanBuffer().GetBDA(),
-						.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
-						.materialDataBuffer = VulkanMaterialSystem::GetMaterialSlotMapBDA(),
-						.shaderEffectDataBuffer = VulkanMaterialSystem::GetShaderEffectDataBufferBDA(),
-						.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
-						.textureAssetTable = VulkanTextureManager::GetTextureAssetTableBDA(),
-						.batchInfo = registry.GetResource(BatchInfoBufferHandle).GetVulkanBuffer().GetBDA(),
-						.uniformData = registry.GetResource(UniformDataBufferHandle).GetBDA()
-					};
+					auto& cmgPass = graph.CreatePass("Indirect Command Generation Pass");
+					cmgPass.Writes(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+					cmgPass.Writes(DrawCommandBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+					cmgPass.Writes(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+					cmgPass.Writes(InstanceAtomicCounterHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+					cmgPass.Reads(BatchInfoBufferHandle);
+					cmgPass.Reads(GroupCommandOffsetsBufferHandle);
+					cmgPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
+						ComputePS ps {
+							.objectDataBuffer = registry.GetResource(ObjectBufferHandle).GetVulkanBuffer().GetBDA(),
+							.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
+							.bii = registry.GetResource(BatchIntermediateInfoBufferHandle).GetBDA(),
+							.commandBuffer = registry.GetResource(DrawCommandBufferHandle).GetBDA(),
+							.commandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle).GetBDA(),
+							.batchInfos = registry.GetResource(BatchInfoBufferHandle).GetVulkanBuffer().GetBDA(),
+							.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
+							.globalAtomic = registry.GetResource(InstanceAtomicCounterHandle).GetBDA(),
+							.commandOffsets = registry.GetResource(GroupCommandOffsetsBufferHandle).GetBDA(),
+							.totalInstanceCount = maxObjectCount,
+							.totalBatchCount = maxBatchCount
+						};
 
-					commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(DrawPS), &ps);
+						commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(ComputePS), &ps);
 
-					VulkanGlobalLayoutManager::BindDescriptorBuffer(commandBuffer);
-					commandBuffer.bindIndexBuffer(VulkanMeshManager::GetIndexBuffer().m_Buffer, 0, vk::IndexType::eUint32);
+						auto result = VulkanShaderManager::GetShader(cmgShader);
+						CORI_CORE_ASSERT(result, "Failed to get cmgShader. Error: {}", to_string(result.error()));
+						result.value().get().Bind(commandBuffer);
+						commandBuffer.dispatch(std::ceil(maxBatchCount / 64.0f), 1, 1);
+					});
 
-					PipelineState currentPipelineState;
-					currentPipelineState.Change(commandBuffer);
+					auto& compactPass = graph.CreatePass("Compact Pass");
+					compactPass.Writes(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+					compactPass.Writes(CompactedInstanceListBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+					compactPass.Reads(ObjectBufferHandle);
+					compactPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
+						ComputePS ps {
+							.objectDataBuffer = registry.GetResource(ObjectBufferHandle).GetVulkanBuffer().GetBDA(),
+							.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
+							.bii = registry.GetResource(BatchIntermediateInfoBufferHandle).GetBDA(),
+							.commandBuffer = registry.GetResource(DrawCommandBufferHandle).GetBDA(),
+							.commandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle).GetBDA(),
+							.batchInfos = registry.GetResource(BatchInfoBufferHandle).GetVulkanBuffer().GetBDA(),
+							.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
+							.globalAtomic = registry.GetResource(InstanceAtomicCounterHandle).GetBDA(),
+							.commandOffsets = registry.GetResource(GroupCommandOffsetsBufferHandle).GetBDA(),
+							.totalInstanceCount = maxObjectCount,
+							.totalBatchCount = maxBatchCount
+						};
 
-					uint32_t currentCommandOffset = 0;
-					Core::Handle<ShaderEffect> currentShaderEffect;
+						commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(ComputePS), &ps);
 
-					auto& indirectCommandBuffer = registry.GetResource(DrawCommandBufferHandle);
-					auto& indirectCommandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle);
+						auto result = VulkanShaderManager::GetShader(compactShader);
+						CORI_CORE_ASSERT(result, "Failed to get compactShader. Error: {}", to_string(result.error()));
+						result.value().get().Bind(commandBuffer);
+						commandBuffer.dispatch(std::ceil(maxObjectCount / 64.0f), 1, 1);
+					});
 
-					//temp
-					vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 0.0f);
-					vk::RenderingAttachmentInfo attachmentInfo = {
-						.imageView = VulkanEngine::GetSwapChainImageView(),
-						.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
-						.loadOp = vk::AttachmentLoadOp::eClear,
-						.storeOp = vk::AttachmentStoreOp::eStore,
-						.clearValue = clearColor
-					};
+					auto& indirectPass = graph.CreatePass("Indirect Pass");
+					indirectPass.Reads(ObjectBufferHandle);
+					indirectPass.Reads(CompactedInstanceListBufferHandle, { vk::PipelineStageFlagBits2::eVertexShader, vk::AccessFlagBits2::eShaderStorageRead });
+					indirectPass.Reads(DrawCommandBufferHandle, { vk::PipelineStageFlagBits2::eDrawIndirect, vk::AccessFlagBits2::eIndirectCommandRead });
+					indirectPass.Reads(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eDrawIndirect, vk::AccessFlagBits2::eIndirectCommandRead });
+					indirectPass.Reads(UniformDataBufferHandle);
+					indirectPass.Reads(BatchInfoBufferHandle);
+					indirectPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
+						DrawPS ps {
+							.objectDataBuffer = registry.GetResource(ObjectBufferHandle).GetVulkanBuffer().GetBDA(),
+							.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
+							.materialDataBuffer = VulkanMaterialSystem::GetMaterialSlotMapBDA(),
+							.shaderEffectDataBuffer = VulkanMaterialSystem::GetShaderEffectDataBufferBDA(),
+							.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
+							.textureAssetTable = VulkanTextureManager::GetTextureAssetTableBDA(),
+							.batchInfo = registry.GetResource(BatchInfoBufferHandle).GetVulkanBuffer().GetBDA(),
+							.uniformData = registry.GetResource(UniformDataBufferHandle).GetBDA()
+						};
 
-					vk::RenderingInfo renderingInfo = {
-						.renderArea = {.offset = { 0, 0 }, .extent = VulkanEngine::GetSwapChainExtent()},
-						.layerCount = 1,
-						.colorAttachmentCount = 1,
-						.pColorAttachments = &attachmentInfo
-					};
-					commandBuffer.beginRendering(renderingInfo);
-					//temp
+						commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(DrawPS), &ps);
 
-					for (uint32_t i = 0; i < m_DrawGroups.RawSize(); i++) {
-						if (m_DrawGroups.IsIndexValid(i)) {
-							auto& group = m_DrawGroups[i];
-							if (group.GetBatchCount() != 0) {
-								if (group.m_ShaderEffect != currentShaderEffect) {
-									auto pairHandleResult = VulkanMaterialSystem::GetShaderEffectShaderPair(group.m_ShaderEffect);
+						VulkanGlobalLayoutManager::BindDescriptorBuffer(commandBuffer);
+						commandBuffer.bindIndexBuffer(VulkanMeshManager::GetIndexBuffer().m_Buffer, 0, vk::IndexType::eUint32);
 
-									CORI_CORE_ASSERT(pairHandleResult, "Group hold an invalid  shader effect handle.");
+						PipelineState currentPipelineState;
+						currentPipelineState.Change(commandBuffer);
 
-									auto shaderResult = VulkanShaderManager::GetShader(pairHandleResult.value());
+						uint32_t currentCommandOffset = 0;
+						Core::Handle<ShaderEffect> currentShaderEffect;
 
-									CORI_CORE_ASSERT(shaderResult, "Group hold a shader effect that point to invalid Vert+Frag Shader pair.");
+						auto& indirectCommandBuffer = registry.GetResource(DrawCommandBufferHandle);
+						auto& indirectCommandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle);
 
-									shaderResult.value().get().Bind(commandBuffer);
+						//temp
+						vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 0.0f);
+						vk::RenderingAttachmentInfo attachmentInfo = {
+							.imageView = VulkanEngine::GetSwapChainImageView(),
+							.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
+							.loadOp = vk::AttachmentLoadOp::eClear,
+							.storeOp = vk::AttachmentStoreOp::eStore,
+							.clearValue = clearColor
+						};
 
-									auto pipelineState = VulkanMaterialSystem::GetShaderEffectPipelineState(group.m_ShaderEffect).value();
+						vk::RenderingInfo renderingInfo = {
+							.renderArea = {.offset = { 0, 0 }, .extent = VulkanEngine::GetSwapChainExtent()},
+							.layerCount = 1,
+							.colorAttachmentCount = 1,
+							.pColorAttachments = &attachmentInfo
+						};
+						commandBuffer.beginRendering(renderingInfo);
+						//temp
 
-									if (pipelineState.get() != currentPipelineState) {
-										pipelineState.get().Change(commandBuffer);
+						for (uint32_t i = 0; i < m_DrawGroups.RawSize(); i++) {
+							if (m_DrawGroups.IsIndexValid(i)) {
+								auto& group = m_DrawGroups[i];
+								if (group.GetBatchCount() != 0) {
+									if (group.m_ShaderEffect != currentShaderEffect) {
+										auto pairHandleResult = VulkanMaterialSystem::GetShaderEffectShaderPair(group.m_ShaderEffect);
+
+										CORI_CORE_ASSERT(pairHandleResult, "Group hold an invalid  shader effect handle.");
+
+										auto shaderResult = VulkanShaderManager::GetShader(pairHandleResult.value());
+
+										CORI_CORE_ASSERT(shaderResult, "Group hold a shader effect that point to invalid Vert+Frag Shader pair.");
+
+										shaderResult.value().get().Bind(commandBuffer);
+
+										auto pipelineState = VulkanMaterialSystem::GetShaderEffectPipelineState(group.m_ShaderEffect).value();
+
+										if (pipelineState.get() != currentPipelineState) {
+											pipelineState.get().Change(commandBuffer);
+										}
+
+										currentPipelineState = pipelineState;
+										currentShaderEffect = group.m_ShaderEffect;
 									}
 
-									currentPipelineState = pipelineState;
-									currentShaderEffect = group.m_ShaderEffect;
+									commandBuffer.drawIndexedIndirectCount(indirectCommandBuffer.GetHeapHandle(), currentCommandOffset * INDIRECT_COMMAND_SIZE + indirectCommandBuffer.GetStartOffset(), indirectCommandCountBuffer.GetHeapHandle(), i * sizeof(uint32_t) + indirectCommandCountBuffer.GetStartOffset(), group.GetBatchCount(), INDIRECT_COMMAND_SIZE);
+									currentCommandOffset += group.GetBatchCount();
 								}
-
-								commandBuffer.drawIndexedIndirectCount(indirectCommandBuffer.GetHeapHandle(), currentCommandOffset * INDIRECT_COMMAND_SIZE + indirectCommandBuffer.GetStartOffset(), indirectCommandCountBuffer.GetHeapHandle(), i * sizeof(uint32_t) + indirectCommandCountBuffer.GetStartOffset(), group.GetBatchCount(), INDIRECT_COMMAND_SIZE);
-								currentCommandOffset += group.GetBatchCount();
 							}
 						}
-					}
 
-					commandBuffer.endRendering();
-				});
+						commandBuffer.endRendering();
+					});
+				}
 
 				graph.Compile(VulkanEngine::GetFrameIndex(), VulkanEngine::GetNextFrameInFlight());
 				auto& frameData = VulkanEngine::Get().GPUFrameBegin();
 
-				for (uint32_t i = 0; i < m_DrawGroups.RawSize() - 1; ++i) {
+				if (m_DrawGroups.RawSize() > 0) {
 					uint32_t value = 0;
+					commandOffsetsBuffer.UploadToAllocation<uint32_t>(std::span{ &value, 1 }, 0);
+				}
+
+				uint32_t commandOffset = 0;
+				for (uint32_t i = 0; i < m_DrawGroups.RawSize() - 1; i++) {
 					if (m_DrawGroups.IsIndexValid(i)) {
-						value = m_DrawGroups[i].GetBatchCount();
+						commandOffset += m_DrawGroups[i].GetBatchCount();
 					}
 
-					commandOffsetsBuffer.UploadToAllocation<uint32_t>(std::span{ &value, 1 }, sizeof(uint32_t) * (i + 1));
+					commandOffsetsBuffer.UploadToAllocation<uint32_t>(std::span{ &commandOffset, 1 }, sizeof(uint32_t) * (i + 1));
 				}
 
 				uniformBuffer.UploadToAllocation(std::span<UniformData>{ &uniformData, 1 }, 0);
 
-				m_Objects.Sync();
-				m_BatchGPUInfo.Sync();
+				{
+					CORI_PROFILE_SCOPE("Renderer dynamic container sync");
+					m_Objects.Sync();
+					m_BatchGPUInfo.Sync();
+				}
 				VulkanEngine::Get().GPUFrameMiddlePointSync();
 				if (!frameData.m_SkippedFrame) {
 					graph.Execute(frameData.m_CommandBuffer);

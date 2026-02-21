@@ -5,8 +5,6 @@ struct BatchIntermediateInfo {
 	uint32_t outputOffset;
 };
 
-
-
 //struct RedirectID {
 //	uint32_t objectID;
 //};
@@ -119,7 +117,7 @@ void compactMain(uint3 threadID : SV_DispatchThreadID) {
 
 		uint32_t finalCompactedID = localID + pc.bii[batchID].outputOffset;
 		pc.compactedObjectIDBuffer[finalCompactedID] = unorderedObjectID;
-		pc.bii[batchID].outputOffset = 0;
+		//pc.bii[batchID].outputOffset = 0;
 	}
 }
 

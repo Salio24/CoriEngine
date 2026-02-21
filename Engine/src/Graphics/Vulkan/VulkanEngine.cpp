@@ -175,17 +175,24 @@ namespace Cori {
 		}
 
 		void VulkanEngine::CPUFrameStart() {
+			CORI_PROFILE_FUNCTION();
+
 			m_CurrentFrameIndex++;
 			VulkanVirtualBufferAllocator::ClearGPUScratchBlock(GetNextFrameInFlight());
 		}
 
 		VulkanEngine::FrameData& VulkanEngine::GPUFrameBegin() {
+			CORI_PROFILE_FUNCTION();
+
 			FrameData& frameData = m_FrameData[m_CurrentFrameInFlight];
 			frameData.m_FrameIndex = m_CurrentFrameIndex;
 			frameData.m_SwapChainImageIndex = UINT32_MAX;
 			frameData.m_SkippedFrame = false;
 
-			while (vk::Result::eTimeout == m_Device.waitForFences(frameData.m_DrawFence, vk::True, UINT64_MAX)) {}
+			{
+				CORI_PROFILE_SCOPE("Wait for Fences");
+				while (vk::Result::eTimeout == m_Device.waitForFences(frameData.m_DrawFence, vk::True, UINT64_MAX)) {}
+			}
 
 			auto [result_, imageIndex] = m_Device.acquireNextImageKHR(m_SwapChain, UINT64_MAX, frameData.m_PresentCompleteSemaphore, nullptr);
 
@@ -284,6 +291,8 @@ namespace Cori {
 		}
 
 		void VulkanEngine::GPUFrameMiddlePointSync() {
+			CORI_PROFILE_FUNCTION();
+
 			FrameData& frameData = m_FrameData[m_CurrentFrameInFlight];
 
 			VulkanTextureManager::ProcessUpdates(frameData.m_CommandBuffer);
@@ -299,6 +308,8 @@ namespace Cori {
 
 
 		void VulkanEngine::GPUFrameEnd() {
+			CORI_PROFILE_FUNCTION();
+
 			FrameData& frameData = m_FrameData[m_CurrentFrameInFlight];
 
 			if (!frameData.m_SkippedFrame) {
