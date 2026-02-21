@@ -6,8 +6,6 @@
 #include "Core/DataStructures/FlatSlotMap.hpp"
 #include "FileSystem/PathManager.hpp"
 
-//FIXME: placeholder material has invalid texture handle
-
 namespace Cori {
 	namespace Graphics {
 		using ShaderEffectIndex = uint32_t;

@@ -7,10 +7,6 @@ SamplerState globalSamplers[];
 [[vk::binding(1, 0)]]
 Texture2D globalTextures[];
 
-struct CompactedObjectID {
-	uint32_t id;
-};
-
 struct PushConstants {
 	ObjectData* objectDataBuffer;
 	CompactedObjectID* compactedObjectIDBuffer;
@@ -19,6 +15,7 @@ struct PushConstants {
 	Mesh* meshAssetDataBuffer;
 	TextureAsset* textureAssetTable;
 	BatchInfo* batchInfoBuffer;
+	UniformData* uniformBuffer;
 };
 
 [[vk::push_constant]]
@@ -37,7 +34,7 @@ struct VSOutput {
 VSOutput vertMain(uint32_t instanceID : SV_VulkanInstanceID, uint32_t baseInstance : SV_StartInstanceLocation, uint32_t vertexID : SV_VertexID) {
     VSOutput output;
 
-    uint32_t objectID = pc.compactedObjectIDBuffer[baseInstance + instanceID].id;
+    uint32_t objectID = pc.compactedObjectIDBuffer[baseInstance + instanceID];
     ObjectData obj = pc.objectDataBuffer[objectID];
 
     MaterialData material = pc.materialDataBuffer[obj.material.index].customData;
@@ -45,7 +42,8 @@ VSOutput vertMain(uint32_t instanceID : SV_VulkanInstanceID, uint32_t baseInstan
 
     Vertex v = mesh.firstVertexAddress[vertexID];
 
-    output.pos =  mul(obj.transform, float4(v.position, 1.0));
+    output.pos =  mul(pc.uniformBuffer.proj, mul(pc.uniformBuffer.view, mul(pc.uniformBuffer.model, mul(obj.transform, float4(v.position, 1.0)))));
+
     output.fragColor = ConvertColor(v.color) * material.colorFactor;
     output.uv = obj.uvOffsets.xy + v.uvs * (obj.uvOffsets.zw - obj.uvOffsets.xy);
     output.albedoTexture = pc.textureAssetTable[material.albedoTexture.index].descriptorIndex;
@@ -55,6 +53,6 @@ VSOutput vertMain(uint32_t instanceID : SV_VulkanInstanceID, uint32_t baseInstan
 
 [shader("fragment")]
 float4 fragMain(VSOutput vertIn) : SV_TARGET {
-	float4 color = vertIn.fragColor * globalTextures[NonUniformResourceIndex(vertIn.albedoTexture)].Sample(globalSamplers[NonUniformResourceIndex(vertIn.albedoSampler)], vertIn.uv);;
+	float4 color = vertIn.fragColor * globalTextures[NonUniformResourceIndex(vertIn.albedoTexture)].Sample(globalSamplers[NonUniformResourceIndex(vertIn.albedoSampler)], vertIn.uv);
 	return color;
 }

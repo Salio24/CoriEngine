@@ -113,6 +113,7 @@ namespace Cori {
 			CreateCommandBuffer();
 			CreateSyncObjects();
 
+			//FIXME: this shit is 1. messy, 2. and absolute abuse of singletons. Dependency injection?
 			VulkanImageViewManager::Init();
 			DeletionQueue::Init();
 			VulkanStreamingLine::Init();

@@ -1,27 +1,15 @@
-struct Vertex {
-	float3 position;
-	float  uv_x;
-	float3 normal;
-	float  uv_y;
-	float4 color;
-};
-
-struct MeshAssetData {
-	uint32_t indexCount;
-	uint32_t firstIndex;
-	int32_t vertexOffset;
-	uint32_t padding;
-};
-
-[[vk::binding(0, 0)]]
-Sampler2D globalSamplers[];
-
-[[vk::binding(1, 0)]]
-Texture2D globalTextures[];
+#include "Defines.slang"
+#include "Helpers.slang"
 
 struct PushConstants {
-	Vertex* vertexBuffer;
-	MeshAssetData* meshDataBuffer;
+	ObjectData* objectDataBuffer;
+	CompactedObjectID* compactedObjectIDBuffer;
+	MaterialCombinedData* materialDataBuffer;
+	ShaderEffectData* shaderEffectDataBuffer;
+	Mesh* meshAssetDataBuffer;
+	TextureAsset* textureAssetTable;
+	BatchInfo* batchInfoBuffer;
+	UniformData* uniformBuffer;
 };
 
 [[vk::push_constant]]
@@ -29,25 +17,25 @@ PushConstants pc;
 
 struct VSOutput {
 	float4 pos : SV_Position;
-	float4 fragColor;
-	float2 fragTexCoord;
-
-	nointerpolation uint32_t textureID : TEXCOORD1;
 };
 
 [shader("vertex")]
-VSOutput vertMain(uint32_t instanceID : SV_InstanceID, uint32_t vertexID : SV_VertexID) {
+VSOutput vertMain(uint32_t instanceID : SV_VulkanInstanceID, uint32_t baseInstance : SV_StartInstanceLocation, uint32_t vertexID : SV_VertexID) {
     VSOutput output;
 
-    Vertex v = pc.vertexBuffer[vertexID];
+    uint32_t objectID = pc.compactedObjectIDBuffer[baseInstance + instanceID];
+    ObjectData obj = pc.objectDataBuffer[objectID];
 
-    output.pos = float4(v.position, 1.0);
-    output.fragColor = v.color;
-    output.fragTexCoord = float2(v.uv_x, v.uv_y);
+    Mesh mesh = pc.meshAssetDataBuffer[pc.batchInfoBuffer[obj.ownerBatch].mesh.index];
+
+    Vertex v = mesh.firstVertexAddress[vertexID];
+
+    output.pos =  mul(pc.uniformBuffer.proj, mul(pc.uniformBuffer.view, mul(pc.uniformBuffer.model, mul(obj.transform, float4(v.position, 1.0)))));
+
     return output;
 }
 
 [shader("fragment")]
 float4 fragMain(VSOutput vertIn) : SV_TARGET {
-   return vertIn.fragColor;
+	return float4(1.0, 0.0, 1.0, 1.0);
 }

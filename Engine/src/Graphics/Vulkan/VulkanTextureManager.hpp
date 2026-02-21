@@ -66,7 +66,7 @@ namespace Cori {
 			}
 
 			[[nodiscard]] static Core::Handle<Texture2> GetWhiteTexture() {
-				return Get().m_PlaceholderTexture;
+				return Get().m_WhiteTexture;
 			}
 
 			[[nodiscard]] static uint64_t GetTextureAssetTableBDA() {
@@ -436,9 +436,9 @@ namespace Cori {
 
 					bool isBlack = (top && left) || (!top && !left);
 
-					missingData[i * 4] = isBlack ? 0x00 : 0x0F;
+					missingData[i * 4] = isBlack ? 0x00 : 0xFF;
 					missingData[i * 4 + 1] = 0x00;
-					missingData[i * 4 + 2] = isBlack ? 0x00 : 0x0F;
+					missingData[i * 4 + 2] = isBlack ? 0x00 : 0xFF;
 					missingData[i * 4 + 3] = 0xFF;
 				}
 
@@ -469,9 +469,9 @@ namespace Cori {
 				table.descriptorIndex = s_PlaceholderTextureDescriptorIndex;
 				table.version = m_PlaceholderTexture.GetVersion();
 
-				auto& table_ = m_GPUAssetTables[m_PlaceholderTexture.GetIndex()].get();
+				auto& table_ = m_GPUAssetTables[m_WhiteTexture.GetIndex()].get();
 				table_.descriptorIndex = s_WhiteTextureDescriptorIndex;
-				table_.version = m_PlaceholderTexture.GetVersion();
+				table_.version = m_WhiteTexture.GetVersion();
 
 				CORI_CORE_ASSERT(ticket, "Failed to submit uploads for white or placeholder texture to streaming line. Error: ", to_string(ticket.error()));
 

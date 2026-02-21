@@ -202,6 +202,10 @@ namespace Cori {
 				return Get().m_Meshes.IsHandleValid(handle);
 			}
 
+			[[nodiscard]] static Core::Handle<Mesh> GetPlaceholderMesh() {
+				return Get().m_PlaceholderMesh;
+			}
+
 			~VulkanMeshManager() {
 				DeletionQueue::PushVirtualBlock(m_IndexBufferBlock, VulkanEngine::GetCurrentFrameInFlight());
 
@@ -482,40 +486,40 @@ namespace Cori {
 			std::vector<StaticVertex> m_PlaceholderVertexData =
 			{
 				// +Y
-				{{ 1,  1, -1}, 0x0007FC00, 0x000003FF, {0.625f,0.500f}, 0xFFFFFFFF},
-				{{-1,  1, -1}, 0x0007FC00, 0x000003FF, {0.875f,0.500f}, 0xFFFFFFFF},
-				{{-1,  1,  1}, 0x0007FC00, 0x000003FF, {0.875f,0.750f}, 0xFFFFFFFF},
-				{{ 1,  1,  1}, 0x0007FC00, 0x000003FF, {0.625f,0.750f}, 0xFFFFFFFF},
+				{{ 1,  1, -1}, 0x0007FC00, 0x000003FF, {1.0f, 0.0f}, 0xFFFFFFFF},
+				{{-1,  1, -1}, 0x0007FC00, 0x000003FF, {1.0f, 1.0f}, 0xFFFFFFFF},
+				{{-1,  1,  1}, 0x0007FC00, 0x000003FF, {0.0f, 1.0f}, 0xFFFFFFFF},
+				{{ 1,  1,  1}, 0x0007FC00, 0x000003FF, {0.0f, 0.0f}, 0xFFFFFFFF},
 
 				// +Z
-				{{ 1, -1,  1}, 0x1FF00000, 0x000003FF, {0.375f,0.750f}, 0xFFFFFFFF},
-				{{ 1,  1,  1}, 0x1FF00000, 0x000003FF, {0.625f,1.000f}, 0xFFFFFFFF},
-				{{-1,  1,  1}, 0x1FF00000, 0x000003FF, {0.375f,1.000f}, 0xFFFFFFFF},
-				{{-1, -1,  1}, 0x1FF00000, 0x000003FF, {0.375f,0.750f}, 0xFFFFFFFF},
+				{{ 1, -1,  1}, 0x1FF00000, 0x000003FF, {1.0f, 0.0f}, 0xFFFFFFFF},
+				{{ 1,  1,  1}, 0x1FF00000, 0x000003FF, {1.0f, 1.0f}, 0xFFFFFFFF},
+				{{-1,  1,  1}, 0x1FF00000, 0x000003FF, {0.0f, 1.0f}, 0xFFFFFFFF},
+				{{-1, -1,  1}, 0x1FF00000, 0x000003FF, {0.0f, 0.0f}, 0xFFFFFFFF},
 
 				// -X
-				{{-1, -1,  1}, 0x000003FF, 0x0007FC00, {0.375f,0.000f}, 0xFFFFFFFF},
-				{{-1,  1,  1}, 0x000003FF, 0x0007FC00, {0.625f,0.000f}, 0xFFFFFFFF},
-				{{-1,  1, -1}, 0x000003FF, 0x0007FC00, {0.625f,0.250f}, 0xFFFFFFFF},
-				{{-1, -1, -1}, 0x000003FF, 0x0007FC00, {0.375f,0.250f}, 0xFFFFFFFF},
+				{{-1, -1,  1}, 0x000003FF, 0x0007FC00, {1.0f, 0.0f}, 0xFFFFFFFF},
+				{{-1,  1,  1}, 0x000003FF, 0x0007FC00, {1.0f, 1.0f}, 0xFFFFFFFF},
+				{{-1,  1, -1}, 0x000003FF, 0x0007FC00, {0.0f, 1.0f}, 0xFFFFFFFF},
+				{{-1, -1, -1}, 0x000003FF, 0x0007FC00, {0.0f, 0.0f}, 0xFFFFFFFF},
 
 				// -Y
-				{{-1, -1, -1}, 0x00000000, 0x000003FF, {0.125f,0.500f}, 0xFFFFFFFF},
-				{{ 1, -1, -1}, 0x00000000, 0x000003FF, {0.375f,0.500f}, 0xFFFFFFFF},
-				{{ 1, -1,  1}, 0x00000000, 0x000003FF, {0.125f,0.750f}, 0xFFFFFFFF},
-				{{-1, -1,  1}, 0x00000000, 0x000003FF, {0.375f,0.750f}, 0xFFFFFFFF},
+				{{-1, -1, -1}, 0x00000000, 0x000003FF, {1.0f, 0.0f}, 0xFFFFFFFF},
+				{{ 1, -1, -1}, 0x00000000, 0x000003FF, {1.0f, 1.0f}, 0xFFFFFFFF},
+				{{ 1, -1,  1}, 0x00000000, 0x000003FF, {0.0f, 1.0f}, 0xFFFFFFFF},
+				{{-1, -1,  1}, 0x00000000, 0x000003FF, {0.0f, 0.0f}, 0xFFFFFFFF},
 
 				// +X
-				{{ 1, -1, -1}, 0x000FFC00, 0x000003FF, {0.375f,0.250f}, 0xFFFFFFFF},
-				{{ 1,  1, -1}, 0x000FFC00, 0x000003FF, {0.625f,0.250f}, 0xFFFFFFFF},
-				{{ 1,  1,  1}, 0x000FFC00, 0x000003FF, {0.625f,0.500f}, 0xFFFFFFFF},
-				{{ 1, -1,  1}, 0x000FFC00, 0x000003FF, {0.375f,0.500f}, 0xFFFFFFFF},
+				{{ 1, -1, -1}, 0x000FFC00, 0x000003FF, {1.0f, 0.0f}, 0xFFFFFFFF},
+				{{ 1,  1, -1}, 0x000FFC00, 0x000003FF, {1.0f, 1.0f}, 0xFFFFFFFF},
+				{{ 1,  1,  1}, 0x000FFC00, 0x000003FF, {0.0f, 1.0f}, 0xFFFFFFFF},
+				{{ 1, -1,  1}, 0x000FFC00, 0x000003FF, {0.0f, 0.0f}, 0xFFFFFFFF},
 
 				// -Z
-				{{-1, -1, -1}, 0x3FF00000, 0x000003FF, {0.625f,0.000f}, 0xFFFFFFFF},
-				{{-1,  1, -1}, 0x3FF00000, 0x000003FF, {0.875f,0.000f}, 0xFFFFFFFF},
-				{{ 1,  1, -1}, 0x3FF00000, 0x000003FF, {0.875f,0.250f}, 0xFFFFFFFF},
-				{{ 1, -1, -1}, 0x3FF00000, 0x000003FF, {0.625f,0.250f}, 0xFFFFFFFF},
+				{{-1, -1, -1}, 0x3FF00000, 0x000003FF, {1.0f, 0.0f}, 0xFFFFFFFF},
+				{{-1,  1, -1}, 0x3FF00000, 0x000003FF, {1.0f, 1.0f}, 0xFFFFFFFF},
+				{{ 1,  1, -1}, 0x3FF00000, 0x000003FF, {0.0f, 1.0f}, 0xFFFFFFFF},
+				{{ 1, -1, -1}, 0x3FF00000, 0x000003FF, {0.0f, 0.0f}, 0xFFFFFFFF},
 			};
 
 			std::vector<uint32_t> m_PlaceholderIndexData =

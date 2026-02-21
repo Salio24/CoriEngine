@@ -58,3 +58,11 @@ struct ShaderEffectData {
 	float4 custom1;
 	float4 custom2;
 };
+
+typealias CompactedObjectID = uint32_t;
+
+struct UniformData {
+	float4x4 model;
+	float4x4 view;
+	float4x4 proj;
+};

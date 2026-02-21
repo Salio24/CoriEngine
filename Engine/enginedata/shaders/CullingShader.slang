@@ -15,8 +15,6 @@ typealias GroupCommandOffset = uint32_t;
 
 typealias GlobalAtomic = Atomic<uint32_t>;
 
-typealias CompactedObjectID = uint32_t;
-
 struct VkDrawIndexedIndirectCommand2 {
 	uint32_t indexCount;
 	uint32_t instanceCount;
