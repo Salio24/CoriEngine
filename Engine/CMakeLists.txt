@@ -60,7 +60,7 @@ project(CoriEngine)
     ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/imgui_tables.cpp
     ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/imgui_widgets.cpp
     # graphical backend v
-    ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_opengl3.cpp
+    ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_vulkan.cpp
     ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_sdl3.cpp
     )
     target_include_directories(imgui PUBLIC ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui)

@@ -25,7 +25,13 @@ public:
 	void OnImGuiRender(Cori::Core::GameTimer& gameTimer) override {
 		ImGui::Begin("Test");
 
+		if (ImGui::Button("Test Button")) {
+			CORI_DEBUG("Test Button");
+		}
+
 		ImGui::End();
+
+		Cori::ImGuiPresets::ScreenModeAndResolutionDropdowns();
 
 
 		//Cori::ImGuiPresets::ScreenModeAndResolutionDropdowns();

@@ -1,6 +1,4 @@
 #pragma once
-#include <cmath>
-
 #include "Vulkan/VulkanEngine.hpp"
 #include "RenderGraph.hpp"
 #include "Core/Time.hpp"
@@ -10,6 +8,7 @@
 #include "Vulkan/VulkanLayoutManager.hpp"
 #include "Vulkan/VulkanTextureManager.hpp"
 #include "Vulkan/VulkanMaterialSystem.hpp"
+#include "Vulkan/ImGuiRenderer.hpp"
 #include "FileSystem/PathManager.hpp"
 #include "Image.hpp"
 
@@ -288,7 +287,8 @@ namespace Cori {
 				uniformData.model = glm::translate(uniformData.model, glm::vec3(0.0f, 0.0f, 0.0f));
 
 				uniformData.view = lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-				uniformData.proj = glm::perspective(glm::radians(45.0f), static_cast<float>(800) / static_cast<float>(600), 0.1f, 10.0f);
+				auto swapChainExtent = VulkanEngine::GetSwapChainExtent();
+				uniformData.proj = glm::perspective(glm::radians(45.0f), static_cast<float>(swapChainExtent.width) / static_cast<float>(swapChainExtent.height), 0.1f, 10.0f);
 				uniformData.proj[1][1] *= -1;
 
 				{
@@ -532,32 +532,34 @@ namespace Cori {
 
 				graph.Compile(VulkanEngine::GetFrameIndex(), VulkanEngine::GetNextFrameInFlight());
 				auto& frameData = VulkanEngine::Get().GPUFrameBegin();
-
-				if (m_DrawGroups.RawSize() > 0) {
-					uint32_t value = 0;
-					commandOffsetsBuffer.UploadToAllocation<uint32_t>(std::span{ &value, 1 }, 0);
-				}
-
-				uint32_t commandOffset = 0;
-				for (uint32_t i = 0; i < m_DrawGroups.RawSize() - 1; i++) {
-					if (m_DrawGroups.IsIndexValid(i)) {
-						commandOffset += m_DrawGroups[i].GetBatchCount();
+				if (!frameData.m_SkippedFrame) {
+					if (m_DrawGroups.RawSize() > 0) {
+						uint32_t value = 0;
+						commandOffsetsBuffer.UploadToAllocation<uint32_t>(std::span{ &value, 1 }, 0);
 					}
 
-					commandOffsetsBuffer.UploadToAllocation<uint32_t>(std::span{ &commandOffset, 1 }, sizeof(uint32_t) * (i + 1));
-				}
+					uint32_t commandOffset = 0;
+					for (uint32_t i = 0; i < m_DrawGroups.RawSize() - 1; i++) {
+						if (m_DrawGroups.IsIndexValid(i)) {
+							commandOffset += m_DrawGroups[i].GetBatchCount();
+						}
 
-				uniformBuffer.UploadToAllocation(std::span<UniformData>{ &uniformData, 1 }, 0);
+						commandOffsetsBuffer.UploadToAllocation<uint32_t>(std::span{ &commandOffset, 1 }, sizeof(uint32_t) * (i + 1));
+					}
 
-				{
-					CORI_PROFILE_SCOPE("Renderer dynamic container sync");
-					m_Objects.Sync();
-					m_BatchGPUInfo.Sync();
-				}
-				VulkanEngine::Get().GPUFrameMiddlePointSync();
-				if (!frameData.m_SkippedFrame) {
+					uniformBuffer.UploadToAllocation(std::span<UniformData>{ &uniformData, 1 }, 0);
+
+					{
+						CORI_PROFILE_SCOPE("Renderer dynamic container sync");
+						m_Objects.Sync();
+						m_BatchGPUInfo.Sync();
+					}
+
+					VulkanEngine::Get().GPUFrameMiddlePointSync();
 					graph.Execute(frameData.m_CommandBuffer);
 				}
+
+				ImGuiRenderer::Render(frameData.m_CommandBuffer, VulkanEngine::GetSwapChainImageView(), VulkanEngine::GetSwapChainExtent(), frameData.m_SkippedFrame);
 
 				VulkanEngine::Get().GPUFrameEnd();
 			}

@@ -691,7 +691,7 @@ namespace Cori {
 				}
 
 				{
-					CORI_PROFILE_SCOPE("Resoruce creation and aqusition.");
+					CORI_PROFILE_SCOPE("Resource creation and acquisition.");
 					for (auto& node : m_ResourceRegistry->m_Nodes) {
 						if (node.origin == Internal::ResourceOrigin::Created) {
 							if (std::holds_alternative<Internal::ImageResourceData>(node.resourceData)) {
@@ -710,7 +710,7 @@ namespace Cori {
 				}
 
 				{
-					CORI_PROFILE_SCOPE("Barrier geneartion");
+					CORI_PROFILE_SCOPE("Barrier generation");
 					for (auto& passHandle : m_PassRegistry->m_SortedPassOrder) {
 						Pass& pass = m_PassRegistry->GetPass(passHandle);
 

@@ -166,7 +166,6 @@ namespace Cori {
 			m_Instance.destroyDebugUtilsMessengerEXT(m_DebugMessenger);
 			m_Instance.destroy();
 			s_Instance = nullptr;
-
 		}
 
 		std::pair<vk::SharingMode, std::vector<uint32_t>>& VulkanEngine::GetBufferSharingSettings(const QueueUsageFlags usage) {
@@ -194,11 +193,18 @@ namespace Cori {
 				while (vk::Result::eTimeout == m_Device.waitForFences(frameData.m_DrawFence, vk::True, UINT64_MAX)) {}
 			}
 
+			if (m_SwapChainResizeNeeded) {
+				ResizeSwapChain();
+				m_SwapChainResizeNeeded = false;
+				frameData.m_SkippedFrame = true;
+				return frameData;
+			}
+
 			auto [result_, imageIndex] = m_Device.acquireNextImageKHR(m_SwapChain, UINT64_MAX, frameData.m_PresentCompleteSemaphore, nullptr);
 
 			if (result_ == vk::Result::eErrorOutOfDateKHR) {
-				CORI_WARN("Skipp");
 				ResizeSwapChain();
+				m_SwapChainResizeNeeded = false;
 				frameData.m_SkippedFrame = true;
 				return frameData;
 			}
@@ -377,7 +383,6 @@ namespace Cori {
 
 				if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) {
 					ResizeSwapChain();
-					CORI_DEBUG("Resize");
 				} else if (result != vk::Result::eSuccess) {
 					CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Presentation failed. Error: {}", vk::to_string(result));
 				}
@@ -801,10 +806,10 @@ namespace Cori {
 
 			auto ChooseFormat = [&] {
 				for (const auto& availableFormat : availableFormats) {
-					if (availableFormat.format == vk::Format::eB8G8R8A8Srgb && availableFormat.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear) {
+					if (availableFormat.format == vk::Format::eB8G8R8A8Unorm && availableFormat.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear) {
 						return availableFormat;
 					}
-					}
+				}
 
 				return availableFormats[0];
 			};
@@ -906,6 +911,7 @@ namespace Cori {
 			auto result = m_Device.waitIdle();
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Calling wait idle on device has failed. Error: {}", vk::to_string(result));
 
+			m_SwapChainExtent = vk::Extent2D{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 
 			for (auto& imageView : m_SwapChainImageViews) {
 				m_Device.destroyImageView(imageView);

@@ -27,8 +27,8 @@ namespace Cori {
 			m_Window->SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent, CORI_PLACEHOLDERS(1)));
 			m_Window->SetVSync(false);
 
-			//m_ImGuiLayer = new Internal::ImGuiLayer();
-			//m_LayerStack.PushOverlay(m_ImGuiLayer);
+			m_ImGuiLayer = new Internal::ImGuiLayer();
+			m_LayerStack.PushOverlay(m_ImGuiLayer);
 
 			AssetManager::Init();
 			World::SceneManager::Init();
@@ -67,6 +67,7 @@ namespace Cori {
 				return false;
 			});
 			dispatcher.Dispatch<WindowResizeEvent>([](const WindowResizeEvent& e) -> bool {
+				Graphics::VulkanEngine::ReportWindowResize();
 				//Graphics::Internal::API::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
 				return false;
 			});
@@ -115,24 +116,24 @@ namespace Cori {
 						layer->ActiveScene.EndRender();
 					}
 
-					Graphics::Renderer::Get().Render();
-
 					{
 						CORI_PROFILE_SCOPE("ImGui Render");
-						//m_ImGuiLayer->StartFrame();
+						m_ImGuiLayer->StartFrame();
 
 						if (m_RenderImGui) {
 							for (Layer* layer : m_LayerStack) {
-								//layer->OnImGuiRender(m_GameTimer);
-								//layer->SceneImGuiRender(m_GameTimer);
+								layer->OnImGuiRender(m_GameTimer);
+								layer->SceneImGuiRender(m_GameTimer);
 								if (layer->IsModal()) {
 									break;
 								}
 							}
 						}
 
-						//m_ImGuiLayer->EndFrame();
+						m_ImGuiLayer->EndFrame();
 					}
+
+					Graphics::Renderer::Get().Render();
 
 					m_Window->OnUpdate();
 

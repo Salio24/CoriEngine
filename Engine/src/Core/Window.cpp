@@ -94,10 +94,10 @@ namespace Cori {
 
 			const SDL_PropertiesID props = SDL_CreateProperties();
 			SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, m_Data->m_WindowTitle.c_str());
-			//SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, m_Data->m_ScreenModes[0].m_Width);
-			//SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, m_Data->m_ScreenModes[0].m_Height);
-			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, 800);
-			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, 600);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, m_Data->m_ScreenModes[0].m_Width);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, m_Data->m_ScreenModes[0].m_Height);
+			//SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, 800);
+			//SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, 600);
 			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, displayBounds.x);
 			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, displayBounds.y);
 			SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_FULLSCREEN_BOOLEAN, false);
@@ -122,7 +122,7 @@ namespace Cori {
 
 			SDL_SetWindowPosition(m_Data->m_Window, SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID), SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID));
 
-			//SetScreenMode(m_Data->m_CurrentScreenMode);
+			SetScreenMode(m_Data->m_CurrentScreenMode);
 
 			const WindowSaveData data{ .m_Width = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Width, .m_Height = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Height, .m_RefreshRate = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_RefreshRate, .m_WindowMode = m_Data->m_CurrentWindowMode, .m_SDLModeIndex = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_SDLModeIndex, .m_ModeIndex = m_Data->m_CurrentScreenMode };
 			FileSystem::BinaryFileManager::SaveAggregateStruct(data, savePath);
@@ -141,7 +141,7 @@ namespace Cori {
 			SDL_Event e;
 
 			while (SDL_PollEvent(&e)) {
-				//ImGui_ImplSDL3_ProcessEvent(&e);
+				ImGui_ImplSDL3_ProcessEvent(&e);
 
 				// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
 				switch (e.type) {
@@ -294,7 +294,7 @@ namespace Cori {
 						CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to set window position to the center of the main screen. (This is expected on Wayland) SDL_Error: {}", SDL_GetError());
 					}
 
-					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window set to 'Windowed' mode. Screen mode: (Width: {}, Height: {})", desktopMode->w, desktopMode->h);
+					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window set to 'Windowed' mode. Screen mode: (Width: {}, Height: {})", m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Width, m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Height);
 
 					m_Data->m_CurrentWindowMode = mode;
 

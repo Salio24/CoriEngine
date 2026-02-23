@@ -96,6 +96,10 @@ namespace Cori {
 
 			static std::pair<vk::SharingMode, std::vector<uint32_t>>& GetBufferSharingSettings(const QueueUsageFlags usage);
 
+			static vk::Instance GetInstance() {
+				return Get().m_Instance;
+			}
+
 			static vk::Device GetLogicalDevice() {
 				return Get().m_Device;
 			}
@@ -140,6 +144,10 @@ namespace Cori {
 				return Get().m_GraphicsQueueFamilyIndex;
 			}
 
+			static vk::Queue GetGraphicsQueue() {
+				return Get().m_GraphicsQueue;
+			}
+
 			static vk::CommandPool& GetTransferCmp() {
 				return Get().m_TransferCommandPool;
 			}
@@ -181,6 +189,14 @@ namespace Cori {
 
 			static vk::SurfaceFormatKHR GetSwapChaimImageFormat() {
 				return Get().m_SwapChainImageFormat;
+			}
+
+			static uint32_t GetSwapChainImageCount() {
+				return Get().m_SwapChainImages.size();
+			}
+
+			static void ReportWindowResize() {
+				Get().m_SwapChainResizeNeeded = true;
 			}
 
 			void CPUFrameStart();
@@ -275,6 +291,9 @@ namespace Cori {
 			static std::vector<const char*> m_InstanceExtensions;
 
 			bool m_ValidationLayers;
+
+			bool m_SwapChainResizeNeeded{ false };
+
 			void* m_Window; // sdl window
 
 			static VulkanEngine* s_Instance;
