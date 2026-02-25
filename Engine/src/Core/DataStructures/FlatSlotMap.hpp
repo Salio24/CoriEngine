@@ -1,4 +1,5 @@
 #pragma once
+#include "sul/dynamic_bitset.hpp"
 
 namespace Cori {
 	namespace Core {
@@ -9,6 +10,8 @@ namespace Cori {
 			{ a == b } -> std::convertible_to<bool>;
 			typename T::Hasher;
 		};
+
+
 
 		struct VersionedHandleBase {
 			VersionedHandleBase() = default;

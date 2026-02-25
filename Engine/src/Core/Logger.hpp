@@ -118,6 +118,7 @@ namespace Cori {
 				static constexpr char ImGui[] = "ImGui";
 				static constexpr char UUID[] = "UUID";
 				static constexpr char SceneManager[] = "Scene Manager";
+				static constexpr char AssetManager[] = "Asset Manager";
 
 			};
 

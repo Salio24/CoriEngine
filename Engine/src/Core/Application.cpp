@@ -9,6 +9,7 @@
 #include "FileSystem/PathManager.hpp"
 #include "Graphics/Renderer2D.hpp"
 #include "Graphics/Renderer.hpp"
+#include "Core/AssetManager/AssetManager2.hpp"
 
 namespace Cori {
 	namespace Core {
@@ -31,6 +32,7 @@ namespace Cori {
 			m_LayerStack.PushOverlay(m_ImGuiLayer);
 
 			AssetManager::Init();
+			AssetManager2::Init();
 			World::SceneManager::Init();
 			Audio::Mixer::Init();
 			Graphics::Renderer::Init();
@@ -44,6 +46,7 @@ namespace Cori {
 			Graphics::Renderer::Shutdown();
 			Audio::Mixer::Shutdown();
 			World::SceneManager::Shutdown();
+			AssetManager2::Shutdown();
 			AssetManager::Shutdown();
 			m_LayerStack.ClearStack();
 		}

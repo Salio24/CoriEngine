@@ -11,7 +11,6 @@
 /.cmake-build-relwithdebinfo-mingw_llvm
 
 # build directories 
-*/bin/*
 /Engine/bin/*
 /Engine/docs/temp/*
 /Engine/tools/TracyGUI/*
@@ -31,7 +30,6 @@
 /Engine/thirdparty/entt/*
 /Engine/thirdparty/box2d/*
 /Engine/thirdparty/box2cpp/box2d/*
-/Engine/111.cpp
 
 # build directory for libs and tmp files
 /out
@@ -50,12 +48,23 @@ rmSub.sh
 *.pdb
 
 *.cori_engine_dll_copied.stamp
-/Sandboxes/Sandbox/bin/*
-/Sandboxes/RendererSandbox/bin/*
-/Sandboxes/PhysicsSandbox/bin/*
+/Sandboxes/Sandbox/bin/Debug/*
+/Sandboxes/Sandbox/bin/Release/*
+/Sandboxes/Sandbox/bin/RelWithDebInfo/*
+
+/Sandboxes/RendererSandbox/bin/Debug/*
+/Sandboxes/RendererSandbox/bin/Release/*
+/Sandboxes/RendererSandbox/bin/RelWithDebInfo/*
+
+/Sandboxes/PhysicsSandbox/bin/Debug/*
+/Sandboxes/PhysicsSandbox/bin/Release/*
+/Sandboxes/PhysicsSandbox/bin/RelWithDebInfo/*
+
 /Sandboxes/Sandbox/userdata/*
 /Sandboxes/RendererSandbox/userdata/*
 /Sandboxes/PhysicsSandbox/userdata/*
+
+
 /notes.txt
 
 *.a

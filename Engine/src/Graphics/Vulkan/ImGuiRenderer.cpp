@@ -16,7 +16,7 @@ namespace Cori {
 				.Queue = static_cast<VkQueue>(VulkanEngine::GetGraphicsQueue()),
 				.DescriptorPoolSize = 1000,
 				.MinImageCount = FRAMES_IN_FLIGHT,
-				.ImageCount = FRAMES_IN_FLIGHT,
+				.ImageCount = VulkanEngine::GetSwapChainImageCount(),
 				.UseDynamicRendering = true
 			};
 

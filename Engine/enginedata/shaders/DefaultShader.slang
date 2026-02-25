@@ -37,5 +37,5 @@ VSOutput vertMain(uint32_t instanceID : SV_VulkanInstanceID, uint32_t baseInstan
 
 [shader("fragment")]
 float4 fragMain(VSOutput vertIn) : SV_TARGET {
-	return float4(1.0, 0.0, 1.0, 1.0);
+	return pow(float4(1.0, 0.0, 1.0, 1.0), 1 / 2.2);
 }

@@ -7,6 +7,7 @@ namespace Cori {
 		eInvalidData,
 		eInvalidHandle,
 		eInvalidObject,
+		eObjectDoesNotExist,
 		eImmutableObject
 	};
 
