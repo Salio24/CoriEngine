@@ -97,7 +97,7 @@ namespace Cori {
 
 				struct Hasher {
 					std::size_t operator()(const PooledImageDescription& desc) const noexcept {
-						uint64_t hash;
+						uint64_t hash = 0;
 
 						Utility::HashCombine(hash, static_cast<uint32_t>(desc.flags));
 						Utility::HashCombine(hash, static_cast<uint32_t>(desc.imageType));

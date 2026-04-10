@@ -102,6 +102,8 @@ namespace Cori {
 			static inline std::function<void(const VulkanVirtualBuffer&)> s_UploadListener;
 		};
 
+		//TODO: inject poison value to uninitialized memory in debug build in heaps
+
 		class VulkanVirtualBufferAllocator {
 		public:
 			~VulkanVirtualBufferAllocator() {
@@ -1147,6 +1149,7 @@ namespace Cori {
 				}
 			}
 
+			//TODO: poison uninitialized memory in debug builds
 			void Reserve(const uint64_t newCapacity) {
 				if (newCapacity <= m_CPUShadow.capacity()) {
 					return;
@@ -1159,6 +1162,9 @@ namespace Cori {
 				}
 
 				m_CPUShadow.reserve(newCapacity);
+
+				// using m_OldSize determine where the initialized data ends, and poison with something like 0xFC the range between after last initialized item to the allocation end
+				// report the change of that uninitialized (now poisoned) range
 			}
 
 			void Resize(const uint64_t newSize, const T& value) {
@@ -1458,7 +1464,7 @@ namespace Cori {
 					index = m_Holes.front();
 					m_Holes.pop_front();
 
-					m_Data[index] = T(std::forward<Args>(args)...);
+					m_Data[index] = std::move(T(std::forward<Args>(args)...));
 
 					if constexpr (ENABLE_VERSIONING) {
 						m_Versions[index]++;
@@ -1628,7 +1634,7 @@ namespace Cori {
 
 			[[nodiscard]] bool IsHandleValid(const Handle handle) const {
 				if constexpr (ENABLE_VERSIONING) {
-					return m_Versions[handle.GetIndex()] == handle.GetVersion() && IsIndexValid(handle.GetIndex());
+					return IsIndexValid(handle.GetIndex()) && m_Versions[handle.GetIndex()] == handle.GetVersion();
 				}
 
 				return IsIndexValid(handle.GetIndex()) && handle.GetVersion() == 1;

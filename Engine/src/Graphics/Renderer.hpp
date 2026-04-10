@@ -11,6 +11,7 @@
 #include "Vulkan/ImGuiRenderer.hpp"
 #include "FileSystem/PathManager.hpp"
 #include "Image.hpp"
+#include "Core/AssetManager/AssetManager2.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -630,24 +631,28 @@ namespace Cori {
 					2, 3, 0    // second triangle
 				};
 
-				quad = VulkanMeshManager::CreateMesh();
-				VulkanMeshManager::LoadToMesh(quad, vertices, std::move(indices));
+				//quad = VulkanMeshManager::CreateMesh();
+				//VulkanMeshManager::LoadToMesh(quad, vertices, std::move(indices));
 
-				auto image = Image::Create(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "placeholders/uv_sample.png");
+				//auto image = Image::Create(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "placeholders/uv_sample.png");
+				texture = Core::AssetManager2::Load<Texture2>("assets/AssetNew.json");
+				swordAlbedo = Core::AssetManager2::Load<Texture2>("assets/Textures/Sword_T_albedo.json");
+				sword = Core::AssetManager2::Load<Mesh>("assets/Sword_M.json");
 
-				texture = VulkanTextureManager::CreateTexture(vk::ImageType::e2D, vk::Format::eR8G8B8A8Srgb, { image->GetHeight(), image->GetWidth(), 1 }, 1, 1, vk::SampleCountFlagBits::e1, "UV sample texture");
-				VulkanTextureManager::UpdateTexture(texture, std::span{ static_cast<Byte*>(image->GetPixelData()), image->GetHeight() * image->GetWidth() * 4 }, { 0, 0, 0 }, { image->GetHeight(), image->GetWidth(), 1 }, { vk::ImageAspectFlagBits::eColor, 0, 0, 1 });
-				VulkanTextureManager::ChangeView(texture, vk::ImageViewType::e2D, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+				//texture = VulkanTextureManager::CreateTexture(vk::ImageType::e2D, vk::Format::eR8G8B8A8Srgb, { image->GetHeight(), image->GetWidth(), 1 }, 1, 1, vk::SampleCountFlagBits::e1, "UV sample texture");
+				//VulkanTextureManager::UpdateTexture(texture, std::span{ static_cast<Byte*>(image->GetPixelData()), image->GetHeight() * image->GetWidth() * 4 }, { 0, 0, 0 }, { image->GetHeight(), image->GetWidth(), 1 }, { vk::ImageAspectFlagBits::eColor, 0, 0, 1 });
+				//VulkanTextureManager::ChangeView(texture, vk::ImageViewType::e2D, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
 
 				PipelineState state{
-					.cullMode = vk::CullModeFlagBits::eBack
+					.cullMode = vk::CullModeFlagBits::eNone,
+					.frontFace = vk::FrontFace::eCounterClockwise,
 				};
 
 				auto shaderEffect = VulkanMaterialSystem::CreateShaderEffect(testShader, state, {}, "Test Shader Effect");
 
 				MaterialData materialData {
 					.colorFactor = { 1.0f, 1.0f, 1.0f, 1.0f },
-					.albedoTexture = texture,
+					.albedoTexture = swordAlbedo.GetHandle(),
 					.albedoSampler = 0
 				};
 
@@ -661,9 +666,9 @@ namespace Cori {
 
 				material = VulkanMaterialSystem::CreateMaterial(shaderEffect, materialData, "Test Material");
 
-				glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5, 0.5f));
+				glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(0.2f), glm::vec3(0.5f, 0.5, 0.5f));
 
-				RegisterObject(VulkanMeshManager::GetPlaceholderMesh(), material, transform);
+				RegisterObject(sword.GetHandle(), material, transform);
 				transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0f));
 
 				//RegisterObject(quad, material2, transform);
@@ -745,7 +750,10 @@ namespace Cori {
 			Core::Handle<Material> material;
 			Core::Handle<Material> material2;
 
-			Core::Handle<Texture2> texture;
+			Core::AssetRef<Texture2> texture;
+			Core::AssetRef<Mesh> sword;
+			Core::AssetRef<Texture2> swordAlbedo;
+
 			RenderGraphResourceRegistry m_GraphResourceRegistry;
 			RenderGraphPassRegistry m_GraphPassRegistry;
 

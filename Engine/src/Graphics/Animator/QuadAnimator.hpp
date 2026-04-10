@@ -31,7 +31,7 @@ namespace Cori {
 
 					/**
 					 * @brief Plays a sequence of animations.
-					 * @detials Animation sequence can be either looped or no, when you pass AnimationWithParams to it,
+					 * @details Animation sequence can be either looped or no, when you pass AnimationWithParams to it,
 					 * it will loop through the whole sequence looking if any AnimationWithParams that has LoopedInSequence set to true, if it finds it that animation becomes a "Looping Point",
 					 * all animations before the looping point will be played once, like an intro, then all animations after (and including) the looping point will be looped until you call Stop.
 					 * \n It doesn't care if some animation after the looping point has LoopedInSequence set to false, it will be looped regardless, it only cares about the firs occurrence of LoopedInSequence = true.

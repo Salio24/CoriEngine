@@ -313,7 +313,7 @@ namespace Cori {
 				};
 
 				/**
-				 * @brief Entity aquifers this flag when is disabled explicitly.
+				 * @brief Entity acquires this flag when is disabled explicitly.
 				 * @warning Don't add or remove this component manually!
 				 */
 				struct InactiveLocallyFlag {
@@ -324,7 +324,7 @@ namespace Cori {
 				};
 
 				/**
-				 * @brief Entity aquifers this flag when is disabled explicitly or its parent Entity is disabled.
+				 * @brief Entity acquires this flag when is disabled explicitly or its parent Entity is disabled.
 				 * @warning Don't add or remove this component manually!
 				 */
 				struct InactiveGloballyFlag {

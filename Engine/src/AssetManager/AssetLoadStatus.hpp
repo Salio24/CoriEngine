@@ -2,12 +2,12 @@
 
 namespace Cori {
 	enum class AssetStatus : uint8_t {
-		eEmpty,
+		eEmpty, //remove
 		eUnloaded,
 		eLoading,
 		eLoadQueued,
 		eLoadFailed,
-		ePlaceholder,
+		ePlaceholder, //remove
 		eLoaded,
 		eUnspecified
 	};

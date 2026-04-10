@@ -1,0 +1,13 @@
+{
+    "Metadata": {
+        "AssetTypename": "Texture2",
+        "AssetType": 1,
+        "AssetDeletionPolicy": 0
+    },
+    "AssetData": {
+        "Image": "uv_sample.png",
+        "Format": "BC7",
+        "Width": 1024,
+        "Height": 1024
+    }
+}

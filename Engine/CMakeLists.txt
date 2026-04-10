@@ -7,10 +7,7 @@ project(CoriEngine)
     # hides all compiler warnings caused by thirdparty libs
     set(HIDE_DEPENDENCY_WARNINGS ON CACHE BOOL "")
     
-    set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "") 
-
-    #python
-    find_package(Python 3.9 REQUIRED COMPONENTS Interpreter)
+    set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
 
     # SDL3
     set(SDL_SHARED OFF)
@@ -171,6 +168,9 @@ project(CoriEngine)
     #dynamic_bitset
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/dynamic_bitset EXCLUDE_FROM_ALL)
 
+    #fast obj
+    add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/fast_obj EXCLUDE_FROM_ALL)
+
 #find_package (Vulkan REQUIRED)
 
 # project's binary setup vvv
@@ -276,7 +276,7 @@ project(CoriEngine)
     #target_link_libraries()
 
     # should be public
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite exprtk boost_pfr Vulkan::Headers GPUOpen::VulkanMemoryAllocator VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp Vulkan::Loader gch::small_vector sul::dynamic_bitset)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite exprtk boost_pfr Vulkan::Headers GPUOpen::VulkanMemoryAllocator VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp Vulkan::Loader gch::small_vector sul::dynamic_bitset fast_obj_lib)
 
     if (CORI_ENABLE_TRACY_PROFILER)
         target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC Tracy::TracyClient)

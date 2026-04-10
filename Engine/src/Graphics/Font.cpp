@@ -89,7 +89,7 @@ namespace Cori {
 
 			size_t fontFileSize = std::filesystem::file_size(fontPath);
 
-			static auto CheckCached = [&]() -> bool {
+			auto CheckCached = [&]() -> bool {
 				std::ifstream f(target, std::ios::in | std::ios::binary);
 
 				if (!f.is_open()) {

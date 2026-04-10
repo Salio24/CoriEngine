@@ -73,3 +73,6 @@
 [submodule "Engine/thirdparty/dynamic_bitset"]
 	path = Engine/thirdparty/dynamic_bitset
 	url = https://github.com/Salio24/dynamic_bitset
+[submodule "Engine/thirdparty/fast_obj"]
+	path = Engine/thirdparty/fast_obj
+	url = https://github.com/thisistherk/fast_obj

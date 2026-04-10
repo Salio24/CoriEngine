@@ -25,9 +25,8 @@ namespace Cori {
 							UpdateInactivityFlagsRecursive(m_EntityHandle.entity(), true);
 							return;
 						}
-						EraseComponents<Components::Entity::InactiveGloballyFlag>();
-						return;
 					}
+
 					EraseComponents<Components::Entity::InactiveGloballyFlag>();
 					return;
 				}
@@ -47,9 +46,8 @@ namespace Cori {
 						UpdateInactivityFlagsRecursive(m_EntityHandle.entity(), false);
 						return;
 					}
-					AddComponent<Components::Entity::InactiveGloballyFlag>();
-					return;
 				}
+
 				AddComponent<Components::Entity::InactiveGloballyFlag>();
 			}
 		}
@@ -157,7 +155,7 @@ namespace Cori {
 			if (finalEffectiveState) {
 				registry->remove<Components::Entity::InactiveGloballyFlag>(parent);
 			} else {
-				registry->emplace_or_replace<Components::Entity::InactiveLocallyFlag>(parent);
+				registry->emplace_or_replace<Components::Entity::InactiveGloballyFlag>(parent);
 			}
 
 			const auto& hierarchy = registry->get<Components::Entity::Hierarchy>(parent);

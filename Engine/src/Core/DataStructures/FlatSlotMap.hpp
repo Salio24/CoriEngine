@@ -180,7 +180,7 @@ namespace Cori {
 					index = m_Holes.front();
 					m_Holes.pop_front();
 
-					m_Data[index] = T(std::forward<Args>(args)...);
+					m_Data[index] = std::move(T(std::forward<Args>(args)...));
 
 					if constexpr (ENABLE_VERSIONING) {
 						m_Versions[index]++;
@@ -331,7 +331,7 @@ namespace Cori {
 
 			[[nodiscard]] bool IsHandleValid(const Handle handle) const {
 				if constexpr(ENABLE_VERSIONING) {
-					return m_Versions[handle.GetIndex()] == handle.GetVersion() && IsIndexValid(handle.GetIndex());
+					return IsIndexValid(handle.GetIndex()) && m_Versions[handle.GetIndex()] == handle.GetVersion();
 				}
 
 				return IsIndexValid(handle.GetIndex()) && handle.GetVersion() == 1;

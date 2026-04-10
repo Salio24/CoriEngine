@@ -348,7 +348,7 @@ namespace Cori {
 				m_PlaceholderMaterial = m_Materials.Emplace(placeholderData, m_PlaceholderEffect.GetIndex());
 				m_MaterialNames.emplace_back("Placeholder Material");
 				#else
-				m_PlaceholderEffect = m_ShaderEffects.Emplace(shader, PipelineState{});
+				m_PlaceholderEffect = m_ShaderEffects.Emplace(VulkanShaderManager::GetPlaceholderShaderPair(), PipelineState{});
 				m_PlaceholderMaterial = m_Materials.Emplace(placeholderData, m_PlaceholderEffect.GetIndex());
 				#endif
 

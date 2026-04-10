@@ -1,22 +1,28 @@
 #pragma once
 #include "VulkanEngine.hpp"
 #include "VulkanImage.hpp"
+#include "Graphics/Image.hpp"
 #include "VulkanLayoutManager.hpp"
 #include "AssetManager/AssetLoadStatus.hpp"
 #include "Core/DataStructures/FlatSlotMap.hpp"
+#include "Core/AssetManager/AssetManager2.hpp"
 
 namespace Cori {
 	namespace Graphics {
 		using SamplerHandle = uint32_t;
+		class VulkanTextureManager;
 
-		struct Texture2 {
-
+		struct Texture2 : Core::SecondaryAssetBase {
+			using Manager = VulkanTextureManager;
 		protected:
-			friend class VulkanTextureManager;
+			friend VulkanTextureManager;
 			VulkanImage image;
 			vk::ImageView view;
 			uint32_t descriptorIndex{ 0 };
-			AssetStatus assetStatus{ AssetStatus::eUnspecified };
+			Core::AssetID assetID{ 0 };
+			Core::AssetDeletionPolicy deletionPolicy{};
+			bool placeholderAssigned{ false };
+			//AssetStatus assetStatus{ AssetStatus::eUnspecified };
 		};
 
 		class VulkanTextureManager {
@@ -43,6 +49,77 @@ namespace Cori {
 
 			static VulkanTextureManager& Get();
 
+			//FIXME: returning a placeholder handle will lead to issues when trying to reload the texture under that handle, need to allocate a new handle on failure and passing a placeholder to it, and flag it as such to not delete it accidentally
+			template<typename T> requires std::same_as<Texture2, T>
+			static Core::Handle<T> Load(const Core::AssetID id) {
+				auto& record = Core::AssetManager2::GetAssetRecord(id);
+				const auto& dir = Core::AssetManager2::GetAssetDir();
+
+				auto handle = AllocateHandle();
+				Get().m_TexturePool[handle].assetID = id;
+				record.rawHandleIndex = handle.GetIndex();
+				record.rawHandleVersion = handle.GetVersion();
+
+				auto assetFilePath = dir / record.path;
+				std::ifstream file(assetFilePath);
+				nlohmann::json json = nlohmann::json::parse(file);
+				if (!json.contains("AssetData")) {
+					//error
+					AssignPlaceholderTexture(handle);
+					return handle;
+				}
+
+				auto& data = json["AssetData"];
+				if (!(data.contains("Image"))) {
+					//error
+					AssignPlaceholderTexture(handle);
+					return handle;
+				}
+
+				//this way of loading a texture is temporary, 1st it always converts to rgba8, 2nd if the load is queued i have to copy the pixel data, it would be much better to have the ability to take ownership of it. Will need to more away from SDL3_image
+
+				auto image = Image::Create(assetFilePath.replace_filename(data["Image"].get<std::string>()));
+
+				CreateTexture(handle, record.deletionPolicy, vk::ImageType::e2D, vk::Format::eR8G8B8A8Srgb, { image->GetHeight(), image->GetWidth(), 1 }, 1, 1, vk::SampleCountFlagBits::e1, "test");
+				UpdateTexture(handle, std::span{ static_cast<Byte*>(image->GetPixelData()), image->GetHeight() * image->GetWidth() * 4 }, { 0, 0, 0 }, { image->GetHeight(), image->GetWidth(), 1 }, { vk::ImageAspectFlagBits::eColor, 0, 0, 1 });
+				ChangeView(handle, vk::ImageViewType::e2D, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+				return handle;
+			}
+
+			static void Reload(const Core::Handle<Texture2> handle, const Core::AssetID id) {
+				auto& record = Core::AssetManager2::GetAssetRecord(id);
+				record.status = AssetStatus::eUnloaded;
+				const auto& dir = Core::AssetManager2::GetAssetDir();
+
+				auto assetFilePath = dir / record.path;
+				std::ifstream file(assetFilePath);
+				nlohmann::json json = nlohmann::json::parse(file);
+				if (!json.contains("AssetData")) {
+					//error
+				}
+
+				auto& data = json["AssetData"];
+				if (!(data.contains("Image"))) {
+					//error
+				}
+
+				DestroyTexture(handle);
+
+				auto image = Image::Create(assetFilePath.replace_filename(data["Image"].get<std::string>()));
+
+				Get().m_TexturePool[handle].assetID = id;
+				record.rawHandleIndex = handle.GetIndex();
+				record.rawHandleVersion = handle.GetVersion();
+				CreateTexture(handle, record.deletionPolicy, vk::ImageType::e2D, vk::Format::eR8G8B8A8Srgb, { image->GetHeight(), image->GetWidth(), 1 }, 1, 1, vk::SampleCountFlagBits::e1, "test");
+				UpdateTexture(handle, std::span{ static_cast<Byte*>(image->GetPixelData()), image->GetHeight() * image->GetWidth() * 4 }, { 0, 0, 0 }, { image->GetHeight(), image->GetWidth(), 1 }, { vk::ImageAspectFlagBits::eColor, 0, 0, 1 });
+				ChangeView(handle, vk::ImageViewType::e2D, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+			}
+
+			template<typename T> requires std::same_as<Texture2, T>
+			static Core::Handle<T> GetPlaceholder() {
+				return GetPlaceholderTexture();
+			}
+
 			[[nodiscard]] static SamplerHandle GetSampler(const vk::SamplerCreateInfo& info) {
 				auto [it, result] = Get().m_SamplerMap.try_emplace(info);
 				if (!result) {
@@ -59,6 +136,20 @@ namespace Cori {
 
 				it->second = slot;
 				return slot;
+			}
+
+			static void AssignPlaceholderTexture(const Core::Handle<Texture2> handle) {
+				if (!Get().m_TexturePool.IsHandleValid(handle)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to AssignPlaceholderTexture is invalid, aborting.");
+					return;
+				}
+
+				auto& texture = Get().m_TexturePool[handle];
+				texture.placeholderAssigned = true;
+
+				auto& tableEntry = Get().m_GPUAssetTables[handle.GetIndex()].get();
+				tableEntry.descriptorIndex = s_PlaceholderTextureDescriptorIndex;
+				tableEntry.version = handle.GetVersion();
 			}
 
 			[[nodiscard]] static Core::Handle<Texture2> GetPlaceholderTexture() {
@@ -86,7 +177,9 @@ namespace Cori {
 
 				auto& texture = Get().m_TexturePool[handle];
 
-				if (texture.assetStatus != AssetStatus::eEmpty) {
+				auto& record = Core::AssetManager2::GetAssetRecord(GetAssetID(handle));
+
+				if (record.status != AssetStatus::eUnloaded) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to UpdateTexture is pointing to an already loaded texture, aborting.");
 					return;
 				}
@@ -107,16 +200,16 @@ namespace Cori {
 
 				if (result) {
 					Get().FindInTransferSlot(result.value()).emplace_back(handle, subresourceLayers);
-					texture.assetStatus = AssetStatus::eLoading;
+					record.status = AssetStatus::eLoading;
 				} else {
 					if (result.error() == ErrorCode::eInvalidData) {
 						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "VulkanStreamingLine returned with error code eInvalidData during UpdateTexture call, aborting.");
-						texture.assetStatus = AssetStatus::eLoadFailed;
+						record.status = AssetStatus::eLoadFailed;
 						return;
 					}
 
 					Get().m_QueuedUploads.emplace(resUpload, std::move(pixels), handle);
-					texture.assetStatus = AssetStatus::eLoadQueued;
+					record.status = AssetStatus::eLoadQueued;
 				}
 			}
 
@@ -133,7 +226,9 @@ namespace Cori {
 
 				auto& texture = Get().m_TexturePool[handle];
 
-				if (texture.assetStatus != AssetStatus::eEmpty) {
+				auto& record = Core::AssetManager2::GetAssetRecord(GetAssetID(handle));
+
+				if (record.status != AssetStatus::eUnloaded) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to UpdateTexture is pointing to an already loaded texture, aborting.");
 					return;
 				}
@@ -154,11 +249,11 @@ namespace Cori {
 
 				if (result) {
 					Get().FindInTransferSlot(result.value()).emplace_back(handle, subresourceLayers);
-					texture.assetStatus = AssetStatus::eLoading;
+					record.status = AssetStatus::eLoading;
 				} else {
 					if (result.error() == ErrorCode::eInvalidData) {
 						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "VulkanStreamingLine returned with error code eInvalidData during UpdateTexture call, aborting.");
-						texture.assetStatus = AssetStatus::eLoadFailed;
+						record.status = AssetStatus::eLoadFailed;
 						return;
 					}
 
@@ -167,7 +262,7 @@ namespace Cori {
 					memcpy(dataCopy.data(), pixels.data(), pixels.size());
 
 					Get().m_QueuedUploads.emplace(resUpload, std::move(dataCopy), handle);
-					texture.assetStatus = AssetStatus::eLoadQueued;
+					record.status = AssetStatus::eLoadQueued;
 				}
 			}
 
@@ -230,7 +325,7 @@ namespace Cori {
 								.subresourceRange = vkRange
 							});
 
-							texture.assetStatus = AssetStatus::eLoaded;
+							Core::AssetManager2::GetAssetRecord(GetAssetID(handle)).status = AssetStatus::eLoaded;
 						}
 
 						inTransferAssets.clear();
@@ -258,8 +353,7 @@ namespace Cori {
 
 					if (result) {
 						Get().FindInTransferSlot(result.value()).emplace_back(upload.texture, upload.imageUpload.range.subresourceLayers);
-						auto& texture = Get().m_TexturePool[upload.texture];
-						texture.assetStatus = AssetStatus::eLoading;
+						Core::AssetManager2::GetAssetRecord(GetAssetID(upload.texture)).status = AssetStatus::eLoading;
 						Get().m_QueuedUploads.pop();
 					} else {
 						break;
@@ -269,7 +363,11 @@ namespace Cori {
 				Get().m_GPUAssetTables.Sync();
 			}
 
-			[[nodiscard]] static Core::Handle<Texture2> CreateTexture(const vk::ImageType type, const vk::Format format, const vk::Extent3D& extent, const uint32_t mipCount, const uint32_t layerCount, const vk::SampleCountFlagBits sampleFlags, const char* name = "") {
+			static Core::Handle<Texture2> AllocateHandle() {
+				return Get().m_TexturePool.Emplace();
+			}
+
+			static void CreateTexture(const Core::Handle<Texture2> handle, const Core::AssetDeletionPolicy deletionPolicy, const vk::ImageType type, const vk::Format format, const vk::Extent3D& extent, const uint32_t mipCount, const uint32_t layerCount, const vk::SampleCountFlagBits sampleFlags, const char* name = "") {
 				CORI_CORE_ASSERT(extent.width > 0 && extent.height > 0 && extent.depth > 0, "Invalid texture extent passed to VulkanTextureManager::CreateTexture." );
 
 				vk::ImageCreateInfo imageCreateInfo {
@@ -300,27 +398,30 @@ namespace Cori {
 					info.name = name;
 				}
 
-				Texture2 texture;
+				auto& texture = Get().m_TexturePool[handle];
+
 				texture.image = VulkanImage::Create(info);
 				texture.descriptorIndex = Get().m_FreeTextureDescriptorSlots.back();
 				Get().m_FreeTextureDescriptorSlots.pop_back();
-				texture.assetStatus = AssetStatus::eEmpty;
+				texture.deletionPolicy = deletionPolicy;
 
 				VulkanGlobalLayoutManager::UpdateSampledTextureDescriptor(texture.descriptorIndex, Get().m_TexturePool[Get().m_WhiteTexture].view);
 
-				auto handle = Get().m_TexturePool.Emplace(texture);
 				if (handle.GetIndex() >= Get().m_GPUAssetTables.Size()) {
 					Get().m_GPUAssetTables.Resize(Get().m_GPUAssetTables.Size() * 1.5f);
+				}
+
+				if (handle.GetIndex() >= Get().m_TextureRefCounts.size()) {
+					Get().m_TextureRefCounts.resize(Get().m_TextureRefCounts.size() * 1.5f);
 				}
 
 				auto& table = Get().m_GPUAssetTables[handle.GetIndex()].get();
 				table.descriptorIndex = texture.descriptorIndex;
 				table.version = handle.GetVersion();
-
-				return handle;
 			}
 
 			//FIXME: ACHTUNG! if i destroy the texture that is currently loading, god knows what happens, likely crash
+			// add a queue for deletion of currently loading assets
 			static void DestroyTexture(const Core::Handle<Texture2> handle) {
 				if (!Get().m_TexturePool.IsHandleValid(handle)) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to DestroyTexture is invalid, aborting.");
@@ -333,22 +434,75 @@ namespace Cori {
 				}
 
 				auto& texture = Get().m_TexturePool[handle];
+				auto& table = Get().m_GPUAssetTables[handle.GetIndex()].get();
+				table = {};
 
-				if (texture.assetStatus == AssetStatus::eLoading || texture.assetStatus == AssetStatus::eLoadQueued) {
-					CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to DestroyTexture points to the texture that is currently loading, can't destroy a not yet loaded texture.");
+				if (texture.placeholderAssigned) {
+					texture = {};
 					return;
 				}
 
-				DeletionQueue::PushImage(texture.image, VulkanEngine::GetCurrentFrameInFlight());
+				//if (texture.assetStatus == AssetStatus::eLoading || texture.assetStatus == AssetStatus::eLoadQueued) {
+				//	CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to DestroyTexture points to the texture that is currently loading, can't destroy a not yet loaded texture.");
+				//	return; // this will break ref count
+				//}
 
-				auto& table = Get().m_GPUAssetTables[handle.GetIndex()].get();
-				table = {};
+				DeletionQueue::PushImage(texture.image, VulkanEngine::GetCurrentFrameInFlight());
 
 				VulkanGlobalLayoutManager::UpdateSampledTextureDescriptor(texture.descriptorIndex, Get().m_TexturePool[Get().m_PlaceholderTexture].view);
 
 				Get().m_FreeTextureDescriptorSlots.emplace_back(texture.descriptorIndex);
+				texture = {};
+			}
+
+			static void FreeHandle(const Core::Handle<Texture2> handle) {
+				if (!Get().m_TexturePool.IsHandleValid(handle)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to FreeHandle is invalid, aborting.");
+					return;
+				}
 
 				Get().m_TexturePool.Remove(handle);
+			}
+
+			static Core::AssetID GetAssetID(const Core::Handle<Texture2> handle) {
+				if (!Get().m_TexturePool.IsHandleValid(handle)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to GetAssetID is invalid, returned AssetID = 0.");
+					return 0;
+				}
+
+				return Get().m_TexturePool[handle].assetID;
+			}
+
+			static void AddRef(const Core::Handle<Texture2> handle) {
+				if (!Get().m_TexturePool.IsHandleValid(handle)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to AddRef is invalid, aborting.");
+					return;
+				}
+
+				Get().m_TextureRefCounts[handle.GetIndex()]++;
+			}
+
+			static void RemoveRef(const Core::Handle<Texture2> handle) {
+				if (!Get().m_TexturePool.IsHandleValid(handle)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to RemoveRef is invalid, aborting.");
+					return;
+				}
+
+				auto count = --Get().m_TextureRefCounts[handle.GetIndex()];
+
+				auto& texture = Get().m_TexturePool[handle.GetIndex()];
+				if (count == 0 && texture.deletionPolicy == Core::AssetDeletionPolicy::eRefCounted && handle != Get().m_PlaceholderTexture) {
+					auto& record = Core::AssetManager2::GetAssetRecord(GetAssetID(handle));
+					record.status = AssetStatus::eUnloaded;
+					record.rawHandleIndex = UINT32_MAX;
+					record.rawHandleVersion = 0;
+					DestroyTexture(handle);
+					FreeHandle(handle);
+				}
+			}
+
+			[[nodiscard]] static bool IsHandleValid(const Core::Handle<Texture2> handle) {
+				return Get().m_TexturePool.IsHandleValid(handle);
 			}
 
 			~VulkanTextureManager() {
@@ -364,6 +518,8 @@ namespace Cori {
 					}
 				}
 			}
+
+			static constexpr bool EnableHotReload = true;
 
 		private:
 			VulkanTextureManager() {
@@ -397,6 +553,7 @@ namespace Cori {
 				};
 
 				m_TexturePool.Reserve(VulkanGlobalLayoutManager::GetMaxTextures());
+				m_TextureRefCounts.resize(VulkanGlobalLayoutManager::GetMaxTextures());
 				m_Samplers.reserve(VulkanGlobalLayoutManager::GetMaxSamplers());
 
 				m_GPUAssetTables.Resize(VulkanGlobalLayoutManager::GetMaxTextures());
@@ -523,6 +680,8 @@ namespace Cori {
 				return free->texturesInTransfer;
 			}
 
+			std::vector<uint32_t> m_TextureRefCounts;
+
 			Core::FlatSlotMap<Texture2> m_TexturePool;
 
 			std::vector<uint32_t> m_FreeTextureDescriptorSlots;
@@ -618,7 +777,10 @@ namespace Cori {
 			static constexpr vk::ImageLayout s_DstLayout{ vk::ImageLayout::eShaderReadOnlyOptimal };
 
 			static std::unique_ptr<VulkanTextureManager> s_Instance;
-
 		};
+	}
+
+	namespace Core {
+		CORI_ADD_ASSET_TRAITS(Texture2, Graphics);
 	}
 }

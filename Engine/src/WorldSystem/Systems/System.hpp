@@ -3,7 +3,7 @@
 #include "Concept.hpp"
 
 //* \n SystemPriority can be used to ensure one system is updated before another, it is safe to have more than one system with the same priority,
-//* but I highly discourage toy from doing that as in that case the order is not enforced and can vary from run to run.
+//* but I highly discourage you from doing that as in that case the order is not enforced and can vary from run to run.
 
 namespace Cori {
 	namespace World {

@@ -2,6 +2,7 @@
 #include "VulkanEngine.hpp"
 #include "VulkanLayoutManager.hpp"
 #include "Core/ErrorCodes.hpp"
+#include "Core/AssetManager/AssetManager2.hpp"
 #include "FileSystem/PathManager.hpp"
 
 //TODO: add shader caching
@@ -59,6 +60,26 @@ namespace Cori {
 			static void Shutdown();
 
 			static VulkanShaderManager& Get();
+
+			template<typename T> requires std::same_as<ComputeShader, T> || std::same_as<VertFragShaderPair, T>
+			static Core::Handle<T> Load(const Core::AssetID id) {
+
+			}
+
+			template<typename T> requires std::same_as<ComputeShader, T> || std::same_as<VertFragShaderPair, T>
+			static Core::Handle<T> Reload(const Core::AssetID id) {
+
+			}
+
+			template<typename T> requires std::same_as<ComputeShader, T> || std::same_as<VertFragShaderPair, T>
+			static Core::Handle<T> GetPlaceholder() {
+
+			}
+
+			template<typename T> requires std::same_as<ComputeShader, T> || std::same_as<VertFragShaderPair, T>
+			static void AssignPlaceholder(const Core::Handle<T> handle) {
+
+			}
 
 			[[nodiscard]] static Core::Handle<VertFragShaderPair> GetPlaceholderShaderPair() {
 				return Get().m_PlaceholderShaderPair;
@@ -145,15 +166,15 @@ namespace Cori {
 				object.m_ComputeShaderObject = vk::ShaderEXT{};
 
 				auto result = VulkanEngine::GetLogicalDevice().createShadersEXT(1, &createInfo, nullptr, &object.m_ComputeShaderObject);
-				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Vertex Fragment pair '{}' shader creation failed. Error: {}", shaderName, vk::to_string(result));
+				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Compute '{}' shader creation failed. Error: {}", shaderName, vk::to_string(result));
 
 				#ifdef DEBUG_BUILD
 				if (strcmp(shaderName, "") != 0) {
 					object.m_ShaderName = shaderName;
 				}
+				VulkanEngine::SetDebugName(object.m_ComputeShaderObject, std::format("Compute shader '{}'", object.m_ShaderName));
 				#endif
 
-				VulkanEngine::SetDebugName(object.m_ComputeShaderObject, std::format("Compute shader '{}'", object.m_ShaderName));
 
 				return Get().m_ComputeShaders.Emplace(object);
 			}
@@ -227,10 +248,10 @@ namespace Cori {
 				if (strcmp(shaderName, "") != 0) {
 					object.m_ShaderName = shaderName;
 				}
-				#endif
 
 				VulkanEngine::SetDebugName(object.m_VertFragPair[0], std::format("Vertex shader from Vertex Shader pair '{}'", object.m_ShaderName));
 				VulkanEngine::SetDebugName(object.m_VertFragPair[1], std::format("Fragment shader from Vertex Shader pair '{}'", object.m_ShaderName));
+				#endif
 
 				return m_PairShaders.Emplace(object);
 			}

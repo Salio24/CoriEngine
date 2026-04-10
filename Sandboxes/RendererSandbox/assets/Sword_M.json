@@ -1,0 +1,10 @@
+{
+    "Metadata": {
+        "AssetTypename": "Mesh",
+        "AssetType": 1,
+        "AssetDeletionPolicy": 0
+    },
+    "AssetData": {
+        "Obj": "Sword.obj"
+    }
+}
