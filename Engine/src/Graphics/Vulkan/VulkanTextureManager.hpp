@@ -36,6 +36,7 @@ namespace Cori {
 				VulkanImage image;
 				Core::Handle<Texture2> texture;
 				vk::ImageSubresourceLayers subresource;
+				uint32_t dataVersion{ 0 };
 			};
 
 			struct InTransferSlot {
@@ -187,18 +188,28 @@ namespace Cori {
 
 				for (auto& [ticket, inTransferAssets] : Get().m_TexturesInTransfer) {
 					if (currentTimelineValue >= ticket) {
-						for (auto& [handle, subresource] : inTransferAssets) {
-							UpdateView(handle);
+						for (auto& inTransferTexture : inTransferAssets) {
+							if (!Get().m_TexturePool.IsHandleValid(inTransferTexture.texture)) {
+								DeletionQueue::PushImage(inTransferTexture.image, VulkanEngine::GetCurrentFrameInFlight());
+								continue;
+							}
+
+							auto& texture = Get().m_TexturePool[inTransferTexture.texture];
+
+							if (texture.dataVersion != inTransferTexture.dataVersion) {
+								DeletionQueue::PushImage(inTransferTexture.image, VulkanEngine::GetCurrentFrameInFlight());
+								continue;
+							}
+
+							UpdateView(inTransferTexture.texture);
 
 							vk::ImageSubresourceRange vkRange{
-								.aspectMask = subresource.aspectMask,
-								.baseMipLevel = subresource.mipLevel,
+								.aspectMask = inTransferTexture.subresource.aspectMask,
+								.baseMipLevel = inTransferTexture.subresource.mipLevel,
 								.levelCount = 1,
-								.baseArrayLayer = subresource.baseArrayLayer,
-								.layerCount = subresource.layerCount
+								.baseArrayLayer = inTransferTexture.subresource.baseArrayLayer,
+								.layerCount = inTransferTexture.subresource.layerCount
 							};
-
-							auto& texture = Get().m_TexturePool[handle];
 
 							Get().m_BarrierCache.emplace_back(vk::ImageMemoryBarrier2{
 								.srcStageMask = vk::PipelineStageFlagBits2::eNone,
@@ -213,7 +224,9 @@ namespace Cori {
 								.subresourceRange = vkRange
 							});
 
-							Core::AssetManager2::GetAssetRecord(GetAssetID(handle)).status = AssetStatus::eLoaded;
+							texture.loaded = true;
+
+							Core::AssetManager2::GetAssetRecord(GetAssetID(inTransferTexture.texture)).status = AssetStatus::eLoaded;
 						}
 
 						inTransferAssets.clear();
@@ -231,6 +244,16 @@ namespace Cori {
 
 				while (!Get().m_QueuedUploads.empty()) {
 					auto& upload = Get().m_QueuedUploads.front();
+					if (!Get().m_TexturePool.IsHandleValid(upload.texture)) {
+						Get().m_QueuedUploads.pop();
+						continue;
+					}
+
+					auto& texture = Get().m_TexturePool[upload.texture];
+					if (upload.dataVersion != texture.dataVersion) {
+						Get().m_QueuedUploads.pop();
+						continue;
+					}
 
 					VulkanStreamingLine::GenericUpload request{
 						.resourceUpload = upload.imageUpload,
@@ -240,7 +263,14 @@ namespace Cori {
 					auto result = VulkanStreamingLine::SubmitUploads(request);
 
 					if (result) {
-						Get().FindInTransferSlot(result.value()).emplace_back(upload.texture, upload.imageUpload.range.subresourceLayers);
+						Get().FindInTransferSlot(result.value()).emplace_back(TextureInTransfer{
+							.image = upload.imageUpload.resource,
+							.texture = upload.texture,
+							.subresource = upload.imageUpload.range.subresourceLayers,
+							.dataVersion = upload.dataVersion
+						});
+
+
 						Core::AssetManager2::GetAssetRecord(GetAssetID(upload.texture)).status = AssetStatus::eLoading;
 						Get().m_QueuedUploads.pop();
 					} else {
@@ -467,7 +497,13 @@ namespace Cori {
 				auto result = VulkanStreamingLine::SubmitUploads(request);
 
 				if (result) {
-					Get().FindInTransferSlot(result.value()).emplace_back(handle, subresourceLayers);
+					Get().FindInTransferSlot(result.value()).emplace_back(TextureInTransfer{
+						.image = texture.image,
+						.texture = handle,
+						.subresource = subresourceLayers,
+						.dataVersion = texture.dataVersion
+					});
+
 					record.status = AssetStatus::eLoading;
 				} else {
 					if (result.error() == ErrorCode::eInvalidData) {
@@ -516,7 +552,13 @@ namespace Cori {
 				auto result = VulkanStreamingLine::SubmitUploads(request);
 
 				if (result) {
-					Get().FindInTransferSlot(result.value()).emplace_back(handle, subresourceLayers);
+					Get().FindInTransferSlot(result.value()).emplace_back(TextureInTransfer{
+						.image = texture.image,
+						.texture = handle,
+						.subresource = subresourceLayers,
+						.dataVersion = texture.dataVersion
+					});
+
 					record.status = AssetStatus::eLoading;
 				} else {
 					if (result.error() == ErrorCode::eInvalidData) {
@@ -627,35 +669,36 @@ namespace Cori {
 				}
 
 				if (handle == Get().m_PlaceholderTexture || handle == Get().m_WhiteTexture) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to DestroyTexture is a placeholder texture, you can't destroy those, aborting.");
 					return;
 				}
 
 				auto& texture = Get().m_TexturePool[handle];
-				auto& table = Get().m_GPUAssetTables[handle.GetIndex()].get();
-				table = {};
 
-				if (texture.placeholderAssigned) {
-					texture = {};
-					return;
+				if (!texture.placeholderAssigned && texture.loaded) {
+					DeletionQueue::PushImage(texture.image, VulkanEngine::GetCurrentFrameInFlight());
+					VulkanGlobalLayoutManager::UpdateSampledTextureDescriptor(texture.descriptorIndex, Get().m_TexturePool[Get().m_WhiteTexture].view);
 				}
 
-				//if (texture.assetStatus == AssetStatus::eLoading || texture.assetStatus == AssetStatus::eLoadQueued) {
-				//	CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to DestroyTexture points to the texture that is currently loading, can't destroy a not yet loaded texture.");
-				//	return; // this will break ref count
-				//}
-
-				DeletionQueue::PushImage(texture.image, VulkanEngine::GetCurrentFrameInFlight());
-
-				VulkanGlobalLayoutManager::UpdateSampledTextureDescriptor(texture.descriptorIndex, Get().m_TexturePool[Get().m_PlaceholderTexture].view);
-
 				Get().m_FreeTextureDescriptorSlots.emplace_back(texture.descriptorIndex);
-				texture = {};
+
+				auto& table = Get().m_GPUAssetTables[handle.GetIndex()].get();
+				table.descriptorIndex = 0;
+
+				texture.image = {};
+				texture.view = VK_NULL_HANDLE;
+				texture.descriptorIndex = 0;
+				texture.placeholderAssigned = false;
+				texture.loaded = false;
+				texture.dataVersion++;
 			}
 
 			static void FreeHandle(const Core::Handle<Texture2> handle) {
 				if (!Get().m_TexturePool.IsHandleValid(handle)) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to FreeHandle is invalid, aborting.");
+					return;
+				}
+
+				if (handle == Get().m_PlaceholderTexture || handle == Get().m_WhiteTexture) {
 					return;
 				}
 

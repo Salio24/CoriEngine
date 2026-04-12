@@ -292,6 +292,7 @@ namespace Cori {
 					auto& upload = Get().m_QueuedUploads.front();
 					if (!Get().m_Meshes.IsHandleValid(upload.mesh)) {
 						Get().m_QueuedUploads.pop();
+						continue;
 					}
 
 					auto& meta = Get().m_MeshMetadata[upload.mesh.GetIndex()];
@@ -330,7 +331,7 @@ namespace Cori {
 							.indexOffset = static_cast<uint32_t>(upload.indexUpload.range.offset / sizeof(uint32_t)),
 							.vertexByteSize = vertexDataSize,
 							.vertexByteOffset = static_cast<uint32_t>(upload.vertexUpload.range.offset),
-							.dataVersion = meta.dataVersion,
+							.dataVersion = upload.dataVersion,
 						});
 						Core::AssetManager2::GetAssetRecord(GetAssetID(upload.mesh)).status = AssetStatus::eLoaded;
 						Get().m_QueuedUploads.pop();
@@ -446,6 +447,10 @@ namespace Cori {
 			void FreeHandle(const Core::Handle<Mesh> handle) {
 				if (!m_Meshes.IsHandleValid(handle)) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to FreeHandle is invalid, aborting.");
+					return;
+				}
+
+				if (handle == m_PlaceholderMesh) {
 					return;
 				}
 
@@ -662,7 +667,6 @@ namespace Cori {
 				}
 
 				if (handle == m_PlaceholderMesh) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to DestroyMesh is a placeholder mesh, you can't destroy it, aborting.");
 					return;
 				}
 

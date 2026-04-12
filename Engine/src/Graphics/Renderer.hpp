@@ -658,7 +658,7 @@ namespace Cori {
 
 				MaterialData materialData_ {
 					.colorFactor = { 1.0f, 1.0f, 1.0f, 1.0f },
-					.albedoTexture = VulkanTextureManager::GetPlaceholderTexture(),
+					.albedoTexture = VulkanTextureManager::GetPlaceholder<Texture2>(),
 					.albedoSampler = 0
 				};
 

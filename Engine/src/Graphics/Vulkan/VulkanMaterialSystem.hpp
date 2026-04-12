@@ -339,7 +339,7 @@ namespace Cori {
 				m_ShaderEffectData.Reserve(32);
 
 				MaterialData placeholderData{
-					.albedoTexture = VulkanTextureManager::GetPlaceholderTexture(),
+					.albedoTexture = VulkanTextureManager::GetPlaceholder<Texture2>(),
 					.albedoSampler = 0
 				};
 
