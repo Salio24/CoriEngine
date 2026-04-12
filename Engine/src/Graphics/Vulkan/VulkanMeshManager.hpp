@@ -98,6 +98,7 @@ namespace Cori {
 				auto assetFilePath = dir / record.path;
 				std::ifstream file(assetFilePath);
 				nlohmann::json json = nlohmann::json::parse(file);
+				//FIXME: handle exceptions from json
 				if (!json.contains("AssetData")) {
 					//error
 					Get().AssignPlaceholderMesh(handle);
@@ -115,11 +116,7 @@ namespace Cori {
 				std::vector<StaticVertex> vertexData;
 				std::vector<uint32_t> indexData;
 
-				//fastObjMesh* mesh = fast_obj_read(objPath.c_str());
-
 				LoadObjToEngine(objPath.string().c_str(), vertexData, indexData);
-
-				//fast_obj_destroy(mesh);
 
 				Get().LoadToMesh(handle, std::move(vertexData), std::move(indexData));
 				return handle;
@@ -129,8 +126,40 @@ namespace Cori {
 				auto& record = Core::AssetManager2::GetAssetRecord(id);
 				const auto& dir = Core::AssetManager2::GetAssetDir();
 
+				auto assetFilePath = dir / record.path;
+				std::ifstream file(assetFilePath);
+				nlohmann::json json = nlohmann::json::parse(file);
+				if (!json.contains("AssetData")) {
+					//error
+					Get().AssignPlaceholderMesh(handle);
+				}
+
+				auto& data = json["AssetData"];
+				if (!(data.contains("Obj"))) {
+					//error
+					Get().AssignPlaceholderMesh(handle);
+				}
+
+				Get().DestroyMesh(handle);
+				auto& meta = Get().m_MeshMetadata[handle.GetIndex()];
+				if (id != meta.assetID) {
+					auto& oldRecord = Core::AssetManager2::GetAssetRecord(meta.assetID);
+					oldRecord.status = AssetStatus::eUnloaded;
+					oldRecord.rawHandleIndex = UINT32_MAX;
+					oldRecord.rawHandleVersion = 0;
+				}
+
+				record.rawHandleIndex = handle.GetIndex();
+				record.rawHandleVersion = handle.GetVersion();
+
+				std::filesystem::path objPath = assetFilePath.replace_filename(data["Obj"].get<std::string>());
+				std::vector<StaticVertex> vertexData;
+				std::vector<uint32_t> indexData;
 
 
+				LoadObjToEngine(objPath.string().c_str(), vertexData, indexData);
+
+				Get().LoadToMesh(handle, std::move(vertexData), std::move(indexData));
 			}
 
 			static void Unload(const Core::Handle<Mesh> handle) {
@@ -140,6 +169,12 @@ namespace Cori {
 				}
 
 				auto& record = Core::AssetManager2::GetAssetRecord(GetAssetID(handle));
+				record.status = AssetStatus::eUnloaded;
+				record.rawHandleIndex = UINT32_MAX;
+				record.rawHandleVersion = 0;
+
+				Get().DestroyMesh(handle);
+				Get().FreeHandle(handle);
 			}
 
 			static Core::AssetID GetAssetID(const Core::Handle<Mesh> handle) {
@@ -395,7 +430,7 @@ namespace Cori {
 			}
 
 			void AssignPlaceholderMesh(const Core::Handle<Mesh> handle) {
-				if (!Get().m_Meshes.IsHandleValid(handle)) {
+				if (!m_Meshes.IsHandleValid(handle)) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to AssignPlaceholderMesh is invalid, aborting.");
 					return;
 				}
@@ -409,7 +444,7 @@ namespace Cori {
 			}
 
 			void FreeHandle(const Core::Handle<Mesh> handle) {
-				if (!Get().m_Meshes.IsHandleValid(handle)) {
+				if (!m_Meshes.IsHandleValid(handle)) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to FreeHandle is invalid, aborting.");
 					return;
 				}
@@ -717,7 +752,7 @@ namespace Cori {
 				}
 			};
 
-			//temporary and writen by gemini. quick and dirty and does its job, will likely move to gltf once i have an editor
+			//temporary and writen by gemini. quick and dirty and does its job, will move to gltf and engine specific asset types once i have an editor
 			static bool LoadObjToEngine(const char* filepath, std::vector<StaticVertex>& outVertices, std::vector<uint32_t>& outIndices) {
 				fastObjMesh* mesh = fast_obj_read(filepath);
 				if (!mesh) {
