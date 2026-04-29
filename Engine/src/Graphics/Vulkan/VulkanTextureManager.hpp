@@ -123,22 +123,19 @@ namespace Cori {
 			}
 
 			static Core::AssetID GetAssetID(const Core::Handle<Texture2> handle) {
-				if (!Get().m_TexturePool.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to GetAssetID is invalid, returned AssetID = 0.");
-					return 0;
-				}
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Handle passed to GetAssetID in VulkanTextureManager is invalid.");
 
 				return Get().m_TexturePool[handle].assetID;
 			}
 
 			template<typename T> requires std::same_as<Texture2, T>
 			static Core::Handle<T> GetPlaceholder() {
-				return GetPlaceholderTexture();
+				return Get().m_PlaceholderTexture;
 			}
 
 			static void AddRef(const Core::Handle<Texture2> handle) {
 				if (!Get().m_TexturePool.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to AddRef is invalid, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to AddRef is invalid, skipping call.");
 					return;
 				}
 
@@ -147,7 +144,7 @@ namespace Cori {
 
 			static void RemoveRef(const Core::Handle<Texture2> handle) {
 				if (!Get().m_TexturePool.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to RemoveRef is invalid, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to RemoveRef is invalid, skipping call.");
 					return;
 				}
 
@@ -442,7 +439,7 @@ namespace Cori {
 
 			static void AssignPlaceholderTexture(const Core::Handle<Texture2> handle) {
 				if (!Get().m_TexturePool.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to AssignPlaceholderTexture is invalid, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to AssignPlaceholderTexture is invalid, skipping call.");
 					return;
 				}
 
@@ -454,22 +451,18 @@ namespace Cori {
 				tableEntry.version = handle.GetVersion();
 			}
 
-			[[nodiscard]] static Core::Handle<Texture2> GetPlaceholderTexture() {
-				return Get().m_PlaceholderTexture;
-			}
-
 			[[nodiscard]] static Core::Handle<Texture2> GetWhiteTexture() {
 				return Get().m_WhiteTexture;
 			}
 
 			static void UpdateTexture(const Core::Handle<Texture2> handle, std::vector<Byte>&& pixels, const vk::Offset3D& offset, const vk::Extent3D& extent, const vk::ImageSubresourceLayers& subresourceLayers) {
 				if (!(extent.width > 0 && extent.height > 0 && extent.depth > 0)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Invalid texture extent passed to UpdateTexture, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Invalid texture extent passed to UpdateTexture, skipping call.");
 					return;
 				}
 
 				if (!Get().m_TexturePool.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to UpdateTexture is invalid, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to UpdateTexture is invalid, skipping call.");
 					return;
 				}
 
@@ -478,7 +471,7 @@ namespace Cori {
 				auto& record = Core::AssetManager2::GetAssetRecord(GetAssetID(handle));
 
 				if (record.status != AssetStatus::eUnloaded) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to UpdateTexture is pointing to an already loaded texture, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to UpdateTexture is pointing to an already loaded texture, skipping call.");
 					return;
 				}
 
@@ -507,7 +500,7 @@ namespace Cori {
 					record.status = AssetStatus::eLoading;
 				} else {
 					if (result.error() == ErrorCode::eInvalidData) {
-						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "VulkanStreamingLine returned with error code eInvalidData during UpdateTexture call, aborting.");
+						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "VulkanStreamingLine returned with error code eInvalidData during UpdateTexture call, skipping call.");
 						record.status = AssetStatus::eLoadFailed;
 						return;
 					}
@@ -519,12 +512,12 @@ namespace Cori {
 
 			static void UpdateTexture(const Core::Handle<Texture2> handle, const std::span<Byte>& pixels, const vk::Offset3D& offset, const vk::Extent3D& extent, const vk::ImageSubresourceLayers& subresourceLayers) {
 				if (!(extent.width > 0 && extent.height > 0 && extent.depth > 0)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Invalid texture extent passed to UpdateTexture, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Invalid texture extent passed to UpdateTexture, skipping call.");
 					return;
 				}
 
 				if (!Get().m_TexturePool.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to UpdateTexture is invalid, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to UpdateTexture is invalid, skipping call.");
 					return;
 				}
 
@@ -533,7 +526,7 @@ namespace Cori {
 				auto& record = Core::AssetManager2::GetAssetRecord(GetAssetID(handle));
 
 				if (record.status != AssetStatus::eUnloaded) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to UpdateTexture is pointing to an already loaded texture, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to UpdateTexture is pointing to an already loaded texture, skipping call.");
 					return;
 				}
 
@@ -562,7 +555,7 @@ namespace Cori {
 					record.status = AssetStatus::eLoading;
 				} else {
 					if (result.error() == ErrorCode::eInvalidData) {
-						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "VulkanStreamingLine returned with error code eInvalidData during UpdateTexture call, aborting.");
+						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "VulkanStreamingLine returned with error code eInvalidData during UpdateTexture call, skipping call.");
 						record.status = AssetStatus::eLoadFailed;
 						return;
 					}
@@ -578,7 +571,7 @@ namespace Cori {
 
 			static void ChangeView(const Core::Handle<Texture2> handle, const vk::ImageViewType viewType, const vk::ImageSubresourceRange& subresourceRange) {
 				if (!Get().m_TexturePool.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to ChangeView is invalid, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to ChangeView is invalid, skipping call.");
 					return;
 				}
 
@@ -594,7 +587,7 @@ namespace Cori {
 
 			static void UpdateView(const Core::Handle<Texture2> handle) {
 				if (!Get().m_TexturePool.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to UpdateView is invalid, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to UpdateView is invalid, skipping call.");
 					return;
 				}
 
@@ -664,7 +657,7 @@ namespace Cori {
 			// add a queue for deletion of currently loading assets
 			static void DestroyTexture(const Core::Handle<Texture2> handle) {
 				if (!Get().m_TexturePool.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to DestroyTexture is invalid, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to DestroyTexture is invalid, skipping call.");
 					return;
 				}
 
@@ -694,7 +687,7 @@ namespace Cori {
 
 			static void FreeHandle(const Core::Handle<Texture2> handle) {
 				if (!Get().m_TexturePool.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to FreeHandle is invalid, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to FreeHandle is invalid, skipping call.");
 					return;
 				}
 
@@ -702,6 +695,7 @@ namespace Cori {
 					return;
 				}
 
+				Get().m_TextureRefCounts[handle.GetIndex()] = 0;
 				Get().m_TexturePool.Remove(handle);
 			}
 

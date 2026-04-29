@@ -13,6 +13,8 @@
 #include "Image.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
 
+#if 0
+
 namespace Cori {
 	namespace Graphics {
 		class Renderer {
@@ -608,7 +610,9 @@ namespace Cori {
 				file__.read(reinterpret_cast<char*>(buffer__.data()), static_cast<std::streamsize>(buffer__.size()));
 				file__.close();
 
-				defaultShader = VulkanShaderManager::CreateVertexShaderPair(buffer__.data(), buffer__.size(), "vertMain", "fragMain", "Default Shader");
+				defaultShader = VulkanShaderManager::Get().AllocateShaderPairHandle();
+
+				VulkanShaderManager::Get().CreateShaderPair(defaultShader, buffer__.data(), buffer__.size(), "vertMain", buffer__.data(), buffer__.size(), "fragMain", "Default Shader");
 
 				float depth = 0.0f;
 
@@ -763,3 +767,4 @@ namespace Cori {
 		};
 	}
 }
+#endif

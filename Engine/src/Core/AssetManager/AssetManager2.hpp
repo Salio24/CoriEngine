@@ -104,6 +104,8 @@ namespace Cori {
 					return T::Manager::GetAssetID(m_Handle);
 				}
 
+				CORI_CORE_ERROR("GetAssetID called on a AssetRef that holds an invalid handle of object of type <{}>, returning 0.", CORI_CLEAN_TYPE_NAME(T));
+
 				return 0;
 			}
 

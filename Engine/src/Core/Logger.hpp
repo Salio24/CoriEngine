@@ -52,7 +52,6 @@ namespace Cori {
 					static constexpr char ValidationLayers[] = "Validation Layers";
 					static constexpr char ResourceTracker[] = "Resource Tracker";
 					static constexpr char RenderGraph[] = "Render Graph";
-					static constexpr char UploadManager[] = "Upload Manager";
 					static constexpr char UploadSubsystem[] = "Upload Subsystem";
 					static constexpr char VirtualBuffer[] = "Virtual Buffer";
 					static constexpr char VirtualBufferAllocator[] = "Virtual Buffer Allocator";
@@ -61,6 +60,7 @@ namespace Cori {
 					static constexpr char TextureManager[] = "Texture Manager";
 					static constexpr char ShaderManager[] = "Shader Manager";
 					static constexpr char MaterialSystem[] = "Material System";
+					static constexpr char ShaderEffectManager[] = "Shader Effect Manager";
 					static constexpr char MeshManager[] = "Mesh Manager";
 					static constexpr char Renderer[] = "Renderer";
 

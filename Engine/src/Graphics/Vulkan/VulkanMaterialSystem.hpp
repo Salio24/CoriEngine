@@ -328,6 +328,8 @@ namespace Cori {
 				return Get().m_ShaderEffectData.GetVulkanBuffer().GetBDA();
 			}
 
+			~VulkanMaterialSystem() = default;
+
 		private:
 			VulkanMaterialSystem() {
 				m_Materials.Reserve(512);
@@ -344,7 +346,7 @@ namespace Cori {
 				};
 
 				#ifdef DEBUG_BUILD
-				m_PlaceholderEffect = m_ShaderEffects.Emplace(VulkanShaderManager::GetPlaceholderShaderPair(), PipelineState{}, "Placeholder Shader Effect");
+				m_PlaceholderEffect = m_ShaderEffects.Emplace(VulkanShaderManager::GetPlaceholder<VertFragShaderPair>(), PipelineState{}, "Placeholder Shader Effect");
 				m_PlaceholderMaterial = m_Materials.Emplace(placeholderData, m_PlaceholderEffect.GetIndex());
 				m_MaterialNames.emplace_back("Placeholder Material");
 				#else
@@ -358,7 +360,7 @@ namespace Cori {
 			static void ShaderPairDeleteListener(const Core::Handle<VertFragShaderPair> handle) {
 				for (auto& effect : Get().m_ShaderEffects) {
 					if (effect.shaders == handle) {
-						effect.shaders = VulkanShaderManager::GetPlaceholderShaderPair();
+						effect.shaders = VulkanShaderManager::GetPlaceholder<VertFragShaderPair>();
 					}
 				}
 			}

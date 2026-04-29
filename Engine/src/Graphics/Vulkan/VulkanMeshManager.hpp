@@ -154,8 +154,7 @@ namespace Cori {
 
 				std::filesystem::path objPath = assetFilePath.replace_filename(data["Obj"].get<std::string>());
 				std::vector<StaticVertex> vertexData;
-				std::vector<uint32_t> indexData;
-
+				std::vector<uint32_t>indexData;
 
 				LoadObjToEngine(objPath.string().c_str(), vertexData, indexData);
 
@@ -164,7 +163,7 @@ namespace Cori {
 
 			static void Unload(const Core::Handle<Mesh> handle) {
 				if (!Get().m_Meshes.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to Unload is invalid, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to Unload is invalid, skipping call.");
 					return;
 				}
 
@@ -178,45 +177,35 @@ namespace Cori {
 			}
 
 			static Core::AssetID GetAssetID(const Core::Handle<Mesh> handle) {
-				if (!Get().m_Meshes.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to GetAssetID is invalid, returned AssetID = 0.");
-					return 0;
-				}
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Handle passed to GetAssetID in VulkanMeshManager is invalid.");
 
 				return Get().m_MeshMetadata[handle.GetIndex()].assetID;
 			}
 
 			template<typename T> requires std::same_as<Mesh, T>
 			static Core::Handle<T> GetPlaceholder() {
-				return Get().GetPlaceholderMesh();
+				return Get().m_PlaceholderMesh;
 			}
 
 			static void AddRef(Core::Handle<Mesh> handle) {
 				if (!Get().m_Meshes.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to AddRef is invalid, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to AddRef is invalid, skipping call.");
 					return;
 				}
 
-				Get().m_MeshRefCounts[handle.GetIndex()]++;
+				Get().m_RefCounts[handle.GetIndex()]++;
 
 			}
 
 			static void RemoveRef(Core::Handle<Mesh> handle) {
 				if (!Get().m_Meshes.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to RemoveRef is invalid, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to RemoveRef is invalid, skipping call.");
 					return;
 				}
 
-				auto count = --Get().m_MeshRefCounts[handle.GetIndex()];
-				auto& meta = Get().m_MeshMetadata[handle.GetIndex()];
-				if (count == 0 && meta.deletionPolicy == Core::AssetDeletionPolicy::eRefCounted && handle != Get().m_PlaceholderMesh) {
-					auto& record = Core::AssetManager2::GetAssetRecord(GetAssetID(handle));
-					record.status = AssetStatus::eUnloaded;
-					record.rawHandleIndex = UINT32_MAX;
-					record.rawHandleVersion = 0;
-
-					Get().DestroyMesh(handle);
-					Get().FreeHandle(handle);
+				auto count = --Get().m_RefCounts[handle.GetIndex()];
+				if (count == 0 && Get().m_MeshMetadata[handle.GetIndex()].deletionPolicy == Core::AssetDeletionPolicy::eRefCounted && handle != Get().m_PlaceholderMesh) {
+					Unload(handle);
 				}
 			}
 
@@ -405,16 +394,58 @@ namespace Cori {
 
 				m_Meshes.Reserve(512);
 				m_MeshMetadata.resize(512);
-				m_MeshRefCounts.resize(512);
+				m_RefCounts.resize(512);
 
 				m_PlaceholderMesh = AllocateHandle();
-				std::vector<uint32_t> indices = m_PlaceholderIndexData;
-				std::vector<StaticVertex> vertices = m_PlaceholderVertexData;
-				LoadToMesh<StaticVertex, false>(m_PlaceholderMesh, std::move(vertices), std::move(indices));
-			}
 
-			[[nodiscard]] Core::Handle<Mesh> GetPlaceholderMesh() const {
-				return m_PlaceholderMesh;
+				std::vector<StaticVertex> placeholderVertexData{
+					// +Y
+					{{1, 1, -1}, 0x0007FC00, 0x000003FF, {1.0f, 0.0f}, 0xFFFFFFFF},
+					{{-1, 1, -1}, 0x0007FC00, 0x000003FF, {1.0f, 1.0f}, 0xFFFFFFFF},
+					{{-1, 1, 1}, 0x0007FC00, 0x000003FF, {0.0f, 1.0f}, 0xFFFFFFFF},
+					{{1, 1, 1}, 0x0007FC00, 0x000003FF, {0.0f, 0.0f}, 0xFFFFFFFF},
+
+					// +Z
+					{{1, -1, 1}, 0x1FF00000, 0x000003FF, {1.0f, 0.0f}, 0xFFFFFFFF},
+					{{1, 1, 1}, 0x1FF00000, 0x000003FF, {1.0f, 1.0f}, 0xFFFFFFFF},
+					{{-1, 1, 1}, 0x1FF00000, 0x000003FF, {0.0f, 1.0f}, 0xFFFFFFFF},
+					{{-1, -1, 1}, 0x1FF00000, 0x000003FF, {0.0f, 0.0f}, 0xFFFFFFFF},
+
+					// -X
+					{{-1, -1, 1}, 0x000003FF, 0x0007FC00, {1.0f, 0.0f}, 0xFFFFFFFF},
+					{{-1, 1, 1}, 0x000003FF, 0x0007FC00, {1.0f, 1.0f}, 0xFFFFFFFF},
+					{{-1, 1, -1}, 0x000003FF, 0x0007FC00, {0.0f, 1.0f}, 0xFFFFFFFF},
+					{{-1, -1, -1}, 0x000003FF, 0x0007FC00, {0.0f, 0.0f}, 0xFFFFFFFF},
+
+					// -Y
+					{{-1, -1, -1}, 0x00000000, 0x000003FF, {1.0f, 0.0f}, 0xFFFFFFFF},
+					{{1, -1, -1}, 0x00000000, 0x000003FF, {1.0f, 1.0f}, 0xFFFFFFFF},
+					{{1, -1, 1}, 0x00000000, 0x000003FF, {0.0f, 1.0f}, 0xFFFFFFFF},
+					{{-1, -1, 1}, 0x00000000, 0x000003FF, {0.0f, 0.0f}, 0xFFFFFFFF},
+
+					// +X
+					{{1, -1, -1}, 0x000FFC00, 0x000003FF, {1.0f, 0.0f}, 0xFFFFFFFF},
+					{{1, 1, -1}, 0x000FFC00, 0x000003FF, {1.0f, 1.0f}, 0xFFFFFFFF},
+					{{1, 1, 1}, 0x000FFC00, 0x000003FF, {0.0f, 1.0f}, 0xFFFFFFFF},
+					{{1, -1, 1}, 0x000FFC00, 0x000003FF, {0.0f, 0.0f}, 0xFFFFFFFF},
+
+					// -Z
+					{{-1, -1, -1}, 0x3FF00000, 0x000003FF, {1.0f, 0.0f}, 0xFFFFFFFF},
+					{{-1, 1, -1}, 0x3FF00000, 0x000003FF, {1.0f, 1.0f}, 0xFFFFFFFF},
+					{{1, 1, -1}, 0x3FF00000, 0x000003FF, {0.0f, 1.0f}, 0xFFFFFFFF},
+					{{1, -1, -1}, 0x3FF00000, 0x000003FF, {0.0f, 0.0f}, 0xFFFFFFFF},
+				};
+
+				std::vector<uint32_t> placeholderIndexData{
+					0, 1, 2, 0, 2, 3, // +Y
+					4, 5, 6, 4, 6, 7, // +Z
+					8, 9, 10, 8, 10, 11, // -X
+					12, 13, 14, 12, 14, 15, // -Y
+					16, 17, 18, 16, 18, 19, // +X
+					20, 21, 22, 20, 22, 23 // -Z
+				};
+
+				LoadToMesh<StaticVertex, false>(m_PlaceholderMesh, std::move(placeholderVertexData), std::move(placeholderIndexData));
 			}
 
 			[[nodiscard]] Core::Handle<Mesh> AllocateHandle() {
@@ -423,8 +454,8 @@ namespace Cori {
 					m_MeshMetadata.resize(m_MeshMetadata.size() * 1.5f);
 				}
 
-				if (handle.GetIndex() >= m_MeshRefCounts.size()) {
-					m_MeshRefCounts.resize(m_MeshRefCounts.size() * 1.5f);
+				if (handle.GetIndex() >= m_RefCounts.size()) {
+					m_RefCounts.resize(m_RefCounts.size() * 1.5f);
 				}
 
 				return handle;
@@ -432,7 +463,7 @@ namespace Cori {
 
 			void AssignPlaceholderMesh(const Core::Handle<Mesh> handle) {
 				if (!m_Meshes.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to AssignPlaceholderMesh is invalid, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to AssignPlaceholderMesh is invalid, skipping call.");
 					return;
 				}
 
@@ -446,7 +477,7 @@ namespace Cori {
 
 			void FreeHandle(const Core::Handle<Mesh> handle) {
 				if (!m_Meshes.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to FreeHandle is invalid, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to FreeHandle is invalid, skipping call.");
 					return;
 				}
 
@@ -456,6 +487,7 @@ namespace Cori {
 
 				m_MeshMetadata[handle.GetIndex()] = {};
 				m_Meshes[handle] = Mesh{};
+				m_RefCounts[handle.GetIndex()] = 0;
 				m_Meshes.Remove(handle);
 			}
 
@@ -467,6 +499,11 @@ namespace Cori {
 					}
 				}();
 
+				if (!m_Meshes.IsHandleValid(handle)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to LoadToMesh is invalid, skipping call.");
+					return;
+				}
+
 				Core::AssetRecord* record = nullptr;
 
 				if constexpr (UpdateAssetRecord) {
@@ -475,7 +512,7 @@ namespace Cori {
 
 				if constexpr (UpdateAssetRecord) {
 					if (record->status != AssetStatus::eUnloaded) {
-						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to LoadToMesh is pointing to an already loaded mesh, aborting.");
+						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to LoadToMesh is pointing to an already loaded mesh, skipping call.");
 						return;
 					}
 				}
@@ -530,7 +567,7 @@ namespace Cori {
 					};
 
 					#ifdef DEBUG_BUILD
-					std::string name = std::format("Mesh Manager vertex storage buffer {}", vertexStorageBufferCounter++);
+					std::string name = std::format("Mesh Manager vertex storage buffer {}", m_VertexStorageBufferCounter++);
 					createInfo.name = name.c_str();
 					#endif
 
@@ -662,7 +699,7 @@ namespace Cori {
 
 			void DestroyMesh(Core::Handle<Mesh> handle) {
 				if (!m_Meshes.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to DestroyMesh is invalid, aborting.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to DestroyMesh is invalid, skipping call.");
 					return;
 				}
 
@@ -912,8 +949,7 @@ namespace Cori {
 				return true;
 			}
 
-			std::vector<uint32_t> m_MeshRefCounts;
-			std::queue<Core::Handle<Mesh>> m_QueuedDeletes;
+			std::vector<uint32_t> m_RefCounts;
 
 			VulkanFlatSlotMap<Mesh> m_Meshes{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Mesh assets data buffer" };
 
@@ -931,58 +967,9 @@ namespace Cori {
 
 			std::vector<vk::BufferMemoryBarrier2> m_BarrierCache;
 
-			uint32_t vertexStorageBufferCounter{ 0 }; //used for giving debug names
+			uint32_t m_VertexStorageBufferCounter{ 0 }; //used for giving debug names
 
 			static std::unique_ptr<VulkanMeshManager> s_Instance;
-
-			std::vector<StaticVertex> m_PlaceholderVertexData =
-			{
-				// +Y
-				{{ 1,  1, -1}, 0x0007FC00, 0x000003FF, {1.0f, 0.0f}, 0xFFFFFFFF},
-				{{-1,  1, -1}, 0x0007FC00, 0x000003FF, {1.0f, 1.0f}, 0xFFFFFFFF},
-				{{-1,  1,  1}, 0x0007FC00, 0x000003FF, {0.0f, 1.0f}, 0xFFFFFFFF},
-				{{ 1,  1,  1}, 0x0007FC00, 0x000003FF, {0.0f, 0.0f}, 0xFFFFFFFF},
-
-				// +Z
-				{{ 1, -1,  1}, 0x1FF00000, 0x000003FF, {1.0f, 0.0f}, 0xFFFFFFFF},
-				{{ 1,  1,  1}, 0x1FF00000, 0x000003FF, {1.0f, 1.0f}, 0xFFFFFFFF},
-				{{-1,  1,  1}, 0x1FF00000, 0x000003FF, {0.0f, 1.0f}, 0xFFFFFFFF},
-				{{-1, -1,  1}, 0x1FF00000, 0x000003FF, {0.0f, 0.0f}, 0xFFFFFFFF},
-
-				// -X
-				{{-1, -1,  1}, 0x000003FF, 0x0007FC00, {1.0f, 0.0f}, 0xFFFFFFFF},
-				{{-1,  1,  1}, 0x000003FF, 0x0007FC00, {1.0f, 1.0f}, 0xFFFFFFFF},
-				{{-1,  1, -1}, 0x000003FF, 0x0007FC00, {0.0f, 1.0f}, 0xFFFFFFFF},
-				{{-1, -1, -1}, 0x000003FF, 0x0007FC00, {0.0f, 0.0f}, 0xFFFFFFFF},
-
-				// -Y
-				{{-1, -1, -1}, 0x00000000, 0x000003FF, {1.0f, 0.0f}, 0xFFFFFFFF},
-				{{ 1, -1, -1}, 0x00000000, 0x000003FF, {1.0f, 1.0f}, 0xFFFFFFFF},
-				{{ 1, -1,  1}, 0x00000000, 0x000003FF, {0.0f, 1.0f}, 0xFFFFFFFF},
-				{{-1, -1,  1}, 0x00000000, 0x000003FF, {0.0f, 0.0f}, 0xFFFFFFFF},
-
-				// +X
-				{{ 1, -1, -1}, 0x000FFC00, 0x000003FF, {1.0f, 0.0f}, 0xFFFFFFFF},
-				{{ 1,  1, -1}, 0x000FFC00, 0x000003FF, {1.0f, 1.0f}, 0xFFFFFFFF},
-				{{ 1,  1,  1}, 0x000FFC00, 0x000003FF, {0.0f, 1.0f}, 0xFFFFFFFF},
-				{{ 1, -1,  1}, 0x000FFC00, 0x000003FF, {0.0f, 0.0f}, 0xFFFFFFFF},
-
-				// -Z
-				{{-1, -1, -1}, 0x3FF00000, 0x000003FF, {1.0f, 0.0f}, 0xFFFFFFFF},
-				{{-1,  1, -1}, 0x3FF00000, 0x000003FF, {1.0f, 1.0f}, 0xFFFFFFFF},
-				{{ 1,  1, -1}, 0x3FF00000, 0x000003FF, {0.0f, 1.0f}, 0xFFFFFFFF},
-				{{ 1, -1, -1}, 0x3FF00000, 0x000003FF, {0.0f, 0.0f}, 0xFFFFFFFF},
-			};
-
-			std::vector<uint32_t> m_PlaceholderIndexData =
-			{
-				0,1,2, 0,2,3,        // +Y
-				4,5,6, 4,6,7,        // +Z
-				8,9,10, 8,10,11,     // -X
-				12,13,14, 12,14,15,  // -Y
-				16,17,18, 16,18,19,  // +X
-				20,21,22, 20,22,23   // -Z
-			};
 
 			static constexpr QueueUsageFlags BUFFER_USAGE{ QueueUsageFlagBits::eGraphics | QueueUsageFlagBits::eTransfer };
 
