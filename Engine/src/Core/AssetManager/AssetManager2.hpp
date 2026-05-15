@@ -5,6 +5,8 @@
 #include "Utility/StringHash.hpp"
 #include "nlohmann/json.hpp"
 #include "FileSystem/PathManager.hpp"
+#include "Utility/CleanTypeName.hpp"
+#include "glaze/glaze.hpp"
 
 #define CORI_ADD_ASSET_TRAITS(T, ...) \
 template <> struct AssetTraits<__VA_ARGS__ __VA_OPT__(::) T> { \
@@ -39,7 +41,7 @@ namespace Cori {
 			{ T::Manager::IsHandleValid(a) } -> std::same_as<bool>;
 			{ T::Manager::GetAssetID(a) } -> std::same_as<AssetID>;
 			{ T::Manager::template GetPlaceholder<T>() } -> std::same_as<Handle<T>>;
-			{ T::Manager::template Load<T>(b) } -> std::same_as<Handle<T>>; // add Unload method requrement
+			{ T::Manager::template Load<T>(b) } -> std::same_as<Handle<T>>; // add Unload method requirement, add 'Serialize' method requirement for assets that can be saved to disk (e.g. ShaderEffect, Material etc, all the assets that are just configs)
 			requires std::same_as<Utility::StringHash64, std::remove_cvref_t<decltype(AssetTraits<T>::TypeHash)>>;
 			requires std::same_as<bool, std::remove_cvref_t<decltype(T::Manager::EnableHotReload)>>;
 			T::Manager::AddRef(a);
@@ -53,10 +55,7 @@ namespace Cori {
 			AssetRef() = default;
 
 			explicit AssetRef(Handle<T> handle) {
-				if (T::Manager::IsHandleValid(handle)) {
-					T::Manager::AddRef(handle);
-					m_Handle = handle;
-				}
+				CORI_CORE_ASSERT(T::Manager::IsHandleValid(handle), "Trying to construct AssetRef<{}> with an invalid handle, asserting.", CORI_CLEAN_TYPE_NAME(T));
 			}
 
 			~AssetRef() {
@@ -99,12 +98,16 @@ namespace Cori {
 				return m_Handle;
 			}
 
+			ConstHandle<T> GetHandle() const {
+				return m_Handle;
+			}
+
 			AssetID GetAssetID() {
 				if (T::Manager::IsHandleValid(m_Handle)) {
 					return T::Manager::GetAssetID(m_Handle);
 				}
 
-				CORI_CORE_ERROR("GetAssetID called on a AssetRef that holds an invalid handle of object of type <{}>, returning 0.", CORI_CLEAN_TYPE_NAME(T));
+				CORI_CORE_ERROR("GetAssetID called on a AssetRef<{}>, that holds an invalid handle, returning 0.", CORI_CLEAN_TYPE_NAME(T));
 
 				return 0;
 			}
@@ -113,6 +116,7 @@ namespace Cori {
 			Handle<T> m_Handle;
 		};
 
+		#if 0
 		class TestManager;
 
 		struct TestAsset : public PrimaryAssetBase {
@@ -185,6 +189,7 @@ namespace Cori {
 			std::vector<uint32_t> refCounts;
 			FlatSlotMap<TestAsset> flat;
 		};
+		#endif
 
 		enum class AssetType : uint8_t {
 			ePrimary = 0,
@@ -202,6 +207,7 @@ namespace Cori {
 			AssetStatus status{ AssetStatus::eUnloaded };
 			AssetType type{ AssetType::eUndefined };
 			AssetDeletionPolicy deletionPolicy{ AssetDeletionPolicy::eRefCounted };
+			std::string name{};
 
 			uint64_t assetTypenameHash{ 0 };
 			uint32_t rawHandleIndex{ UINT32_MAX };
@@ -250,6 +256,15 @@ namespace Cori {
 				return Get().m_AssetDatabase[id];
 			}
 
+			static std::expected<void, ErrorCode> AddAssetRecord(const AssetID id, const AssetRecord& record) {
+				auto [_, result] = Get().m_AssetDatabase.try_emplace(id, record);
+				if (!result) {
+					return std::unexpected(ErrorCode::eObjectAlreadyExists);
+				}
+
+				return {};
+			}
+
 			static void UnloadAsset(AssetID id) {
 
 			}
@@ -287,7 +302,6 @@ namespace Cori {
 		private:
 			AssetManager2() {
 				s_Instance = std::unique_ptr<AssetManager2>(this);
-				TestManager::Get();
 
 				m_AppRootPath = FileSystem::PathManager::GetAliasedPath("APP_ROOT");
 				ScanDirectory(FileSystem::PathManager::GetAliasedPath("ASSET_DIR"));
@@ -341,7 +355,7 @@ namespace Cori {
 			static std::unique_ptr<AssetManager2> s_Instance;
 		};
 
-		//FIXME: check for AssetID != 0
+		//FIXME: check for AssetID != 0r
 		template<typename T>
 		void to_json(nlohmann::json& j, const AssetRef<T>& ref) {
 			AssetID id = ref.GetAssetID();
@@ -355,4 +369,22 @@ namespace Cori {
 			ref = AssetManager2::Load<T>(path.c_str());
 		}
 	}
+}
+
+namespace glz {
+	template <class T>
+	struct from<JSON, Cori::Core::AssetRef<T>> {
+		template <auto Opts>
+		static void op(Cori::Core::AssetRef<T>& to, is_context auto&& ctx, auto&& it, auto&& end) {
+
+		}
+	};
+
+	template <class T>
+	struct to<JSON, Cori::Core::AssetRef<T>> {
+		template <auto Opts>
+		static void op(const Cori::Core::AssetRef<T>& from, is_context auto&& ctx, auto&& b, auto&& ix) noexcept {
+
+		}
+	};
 }

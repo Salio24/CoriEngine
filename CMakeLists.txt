@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.28...3.31)
+cmake_minimum_required(VERSION 3.28)
 
 if(MSVC)
     message(FATAL_ERROR "MSVC is not supported, use GCC or Clang (not clang-cl)")
@@ -66,7 +66,7 @@ project(main)
             ))
         message(FATAL_ERROR "CoriEngine thirdparty dependencies not found. Are you sure you cloned the repo recursively? Try running 'git submodule update --init --recursive' to download dependencies.")
     endif()
-    set(CMAKE_CXX_STANDARD 23)
+    set(CMAKE_CXX_STANDARD 26)
 
     if (NOT CORI_FORCE_AVX2 AND CORI_USE_NATIVE)
         add_compile_options(-march=native)

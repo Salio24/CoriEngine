@@ -39,12 +39,24 @@ namespace Cori {
 		};
 
 		template<typename T>
-		struct Handle : VersionedHandleBase {
+		struct ConstHandle : VersionedHandleBase {
 			using Type = T;
 
 			using VersionedHandleBase::VersionedHandleBase;
 
+			[[nodiscard]] bool operator==(const ConstHandle<T>& other) const = default;
+		};
+
+		template<typename T>
+		struct Handle : ConstHandle<T> {
+			using Type = T;
+
+			using ConstHandle<T>::ConstHandle;
+
 			[[nodiscard]] bool operator==(const Handle<T>& other) const = default;
+			[[nodiscard]] bool operator==(const ConstHandle<T>& other) const {
+				return ConstHandle<T>::operator==(other);
+			}
 		};
 
 		template<std::copy_constructible T, uint16_t REUSE_THRESHOLD = 64, bool ENABLE_VERSIONING = true, IsVersionedHandle HandleT = Handle<T>>

@@ -1,0 +1,12 @@
+{
+    "Metadata": {
+        "AssetTypename": "VertFragShaderPair",
+        "AssetType": 1,
+        "AssetDeletionPolicy": 0
+    },
+    "AssetData": {
+        "Spv": "TestShader.spv",
+        "VertexEntry": "vertMain",
+        "FragmentEntry": "fragMain"
+    }
+}

@@ -171,6 +171,10 @@ project(CoriEngine)
     #fast obj
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/fast_obj EXCLUDE_FROM_ALL)
 
+    #glaze
+    set(glaze_ENABLE_REFLECTION26 ON CACHE BOOL "")
+    add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/glaze EXCLUDE_FROM_ALL)
+
 #find_package (Vulkan REQUIRED)
 
 # project's binary setup vvv
@@ -275,8 +279,10 @@ project(CoriEngine)
     endif ()
     #target_link_libraries()
 
+    target_compile_options(${ENGINE_LIBRARY_NAME} PUBLIC -freflection)
+
     # should be public
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite exprtk boost_pfr Vulkan::Headers GPUOpen::VulkanMemoryAllocator VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp Vulkan::Loader gch::small_vector sul::dynamic_bitset fast_obj_lib)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite exprtk boost_pfr Vulkan::Headers GPUOpen::VulkanMemoryAllocator VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp Vulkan::Loader gch::small_vector sul::dynamic_bitset fast_obj_lib glaze_glaze)
 
     if (CORI_ENABLE_TRACY_PROFILER)
         target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC Tracy::TracyClient)

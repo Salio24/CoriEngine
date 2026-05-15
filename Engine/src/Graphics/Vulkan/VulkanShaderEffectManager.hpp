@@ -36,13 +36,13 @@ namespace Cori {
 			bool operator==(const PipelineState& other) const = default;
 		};
 
-		struct ShaderEffect {
+		struct ShaderEffect : public Core::SecondaryAssetBase {
 			using Manager = VulkanShaderEffectManager;
 
 			Core::AssetRef<VertFragShaderPair> shaders;
-			PipelineState pipelineState;
-			Core::AssetDeletionPolicy deletionPolicy;
-			Core::AssetID assetID;
+			PipelineState pipelineState{};
+			Core::AssetDeletionPolicy deletionPolicy{};
+			Core::AssetID assetID{};
 		};
 
 		class VulkanShaderEffectManager {
@@ -131,6 +131,76 @@ namespace Cori {
 
 			static constexpr bool EnableHotReload = false;
 
+		protected:
+			static std::expected<Core::Handle<ShaderEffect>, ErrorCode> DuplicateShaderEffect(const Core::Handle<ShaderEffect> original, std::filesystem::path path, const Core::AssetDeletionPolicy deletionPolicy, std::string name) {
+				//to properly implement this (and material duplication) I first have to add a new data path to the asset manager design, so far it has:
+				// 1. Drive -> A.S. Registry -> Engine memory (initial load)
+				// 2. Drive -> A.S. Registry -> Engine Memory (hot reload)
+				// but i need a third part for serialization of some asset types e.g.
+				// Request -> Engine memory + A.S. Registry -> Save to drive on request (saving the scene or smthg)
+				// this will involve stuff like deciding on the new name (PBR_ShaderEffect Cope (1)) and
+				// very likely some other complications that i don't see right now, but will see once i start designing the editor and the PrimaryAsset related systems.
+				// So for that reason the 3rd asset data path will be put aside for now.
+
+				CORI_CORE_ASSERT(false, "Not implemented");
+				return {};
+			}
+
+			[[nodiscard]] static std::expected<std::reference_wrapper<const ShaderEffectData>, ErrorCode> GetShaderEffectData(const Core::Handle<ShaderEffect> shaderEffect) {
+				if (!IsHandleValid(shaderEffect)) {
+					return std::unexpected(ErrorCode::eInvalidHandle);
+				}
+
+				return std::cref(std::as_const(Get().m_ShaderEffectData)[shaderEffect.GetIndex()]);
+			}
+
+			static std::expected<void, ErrorCode> ChangeShaderEffectData(const Core::Handle<ShaderEffect> shaderEffect, const ShaderEffectData& data) {
+				if (!IsHandleValid(shaderEffect)) {
+					return std::unexpected(ErrorCode::eInvalidHandle);
+				}
+
+				auto dataRef = Get().m_ShaderEffectData[shaderEffect.GetIndex()];
+				dataRef = data;
+				return {};
+			}
+
+			[[nodiscard]] static std::expected<std::reference_wrapper<const Core::AssetRef<VertFragShaderPair>>, ErrorCode> GetShaderEffectShaderPair(const Core::Handle<ShaderEffect> shaderEffect) {
+				if (!IsHandleValid(shaderEffect)) {
+					return std::unexpected(ErrorCode::eInvalidHandle);
+				}
+
+				auto& effect = Get().m_ShaderEffects[shaderEffect];
+				return std::cref(effect.shaders);
+			}
+
+			static std::expected<void, ErrorCode> ChangeShaderEffectShaderPair(const Core::Handle<ShaderEffect> shaderEffect, const Core::AssetRef<VertFragShaderPair>& shaderPair) {
+				if (!IsHandleValid(shaderEffect)) {
+					return std::unexpected(ErrorCode::eInvalidHandle);
+				}
+
+				Get().m_ShaderEffects[shaderEffect].shaders = shaderPair;
+				return {};
+			}
+
+			[[nodiscard]] static std::expected<std::reference_wrapper<const PipelineState>, ErrorCode> GetShaderEffectPipelineState(const Core::Handle<ShaderEffect> shaderEffect) {
+				if (!IsHandleValid(shaderEffect)) {
+					return std::unexpected(ErrorCode::eInvalidHandle);
+				}
+
+				auto& effect = Get().m_ShaderEffects[shaderEffect];
+				return std::cref(effect.pipelineState);
+			}
+
+			static std::expected<void, ErrorCode> ChangeShaderEffectPipelineState(const Core::Handle<ShaderEffect> shaderEffect, const PipelineState& newPipelineState) {
+				if (!IsHandleValid(shaderEffect)) {
+					return std::unexpected(ErrorCode::eInvalidHandle);
+				}
+
+				auto& effect = Get().m_ShaderEffects[shaderEffect];
+				effect.pipelineState = newPipelineState;
+				return {};
+			}
+
 		private:
 			void AssignPlaceholder(const Core::Handle<ShaderEffect> handle) {
 				if (!IsHandleValid(handle)) {
@@ -147,28 +217,21 @@ namespace Cori {
 					m_RefCounts.resize(m_RefCounts.size() * 1.5f);
 				}
 				if (handle.GetIndex() >= m_ShaderEffectData.Size()) {
-					m_ShaderEffectData.Reserve(m_ShaderEffectData.Size() * 1.5f);
+					m_ShaderEffectData.Resize(m_ShaderEffectData.Size() * 1.5f);
 				}
 
 				return handle;
 			}
 
-			void CreateShaderEffect(const Core::Handle<ShaderEffect> handle, const Core::Handle<VertFragShaderPair> shaderPair, const PipelineState& state, const ShaderEffectData& data = {}) {
+			void CreateShaderEffect(const Core::Handle<ShaderEffect> handle, Core::AssetRef<VertFragShaderPair> shaderPair, const PipelineState& state, const ShaderEffectData& data = {}) {
 				if (!IsHandleValid(handle)) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Invalid ShaderEffect handle passed to CreateShaderEffect, skipping call.");
 					return;
 				}
 
-				if (!VulkanShaderManager::IsHandleValid(shaderPair)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Invalid Vert+Frag Shader pair handle passed to CreateShaderEffect, returning placeholder shader effect.");
-					return;
-				}
-
 				auto& effect = m_ShaderEffects[handle];
-				effect.shaders = Core::AssetRef(shaderPair);
+				effect.shaders = std::move(shaderPair);
 				effect.pipelineState = state;
-
-				m_ShaderEffectData.Resize(m_ShaderEffects.Capacity());
 
 				auto dataRef = m_ShaderEffectData[handle.GetIndex()];
 				dataRef = data;
@@ -217,6 +280,8 @@ namespace Cori {
 				m_ShaderEffects.Reserve(32);
 				m_ShaderEffectData.Reserve(32);
 
+				m_PlaceholderEffect = m_ShaderEffects.Emplace(ShaderEffect{ .shaders = Core::AssetRef(VulkanShaderManager::GetPlaceholder<VertFragShaderPair>()) });
+
 				VulkanShaderManager::AddOnVertFragShaderPairDeletedListener(ShaderPairDeleteListener);
 			}
 
@@ -239,5 +304,9 @@ namespace Cori {
 
 			static std::unique_ptr<VulkanShaderEffectManager> s_Instance;
 		};
+	}
+
+	namespace Core {
+		CORI_ADD_ASSET_TRAITS(ShaderEffect, Graphics);
 	}
 }

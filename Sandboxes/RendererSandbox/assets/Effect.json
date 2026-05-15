@@ -1,0 +1,30 @@
+{
+    "Metadata": {
+        "AssetTypename": "ShaderEffect",
+        "AssetType": 1,
+        "AssetDeletionPolicy": 0
+    },
+    "AssetData": {
+        "ShaderPair": "Shaders/ShaderPair.json",
+        "PipelineState": {
+            "CullMode": "eNone",
+            "FrontFace": "eCounterClockwise",
+            "CompareOp": "eGreater",
+            "depthTestEnable": false,
+            "depthBoundsTestEnable": false,
+            "depthBiasEnable": false,
+            "stencilTestEnable": false,
+            "logicOpEnable": false
+        },
+        "CustomData": {
+            "f1": 0.0,
+            "f2": 0.0,
+            "f3": 0.0,
+            "f4": 0.0,
+            "f5": 0.0,
+            "f6": 0.0,
+            "f7": 0.0,
+            "f8": 0.0
+        }
+    }
+}

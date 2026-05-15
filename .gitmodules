@@ -76,3 +76,6 @@
 [submodule "Engine/thirdparty/fast_obj"]
 	path = Engine/thirdparty/fast_obj
 	url = https://github.com/thisistherk/fast_obj
+[submodule "Engine/thirdparty/glaze"]
+	path = Engine/thirdparty/glaze
+	url = https://github.com/stephenberry/glaze
