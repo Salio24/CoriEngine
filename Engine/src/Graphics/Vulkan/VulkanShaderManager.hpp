@@ -4,6 +4,7 @@
 #include "Core/ErrorCodes.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
 #include "FileSystem/PathManager.hpp"
+#include "Utility/GlazeUtils.hpp"
 
 //TODO: add shader caching
 

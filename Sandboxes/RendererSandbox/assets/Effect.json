@@ -1,8 +1,8 @@
 {
     "Metadata": {
         "AssetTypename": "ShaderEffect",
-        "AssetType": 1,
-        "AssetDeletionPolicy": 0
+        "AssetTypeV": 1,
+        "AssetDeletionPolicyV": 0
     },
     "AssetData": {
         "ShaderPair": "Shaders/ShaderPair.json",
@@ -17,14 +17,14 @@
             "logicOpEnable": false
         },
         "CustomData": {
-            "f1": 0.0,
-            "f2": 0.0,
-            "f3": 0.0,
-            "f4": 0.0,
-            "f5": 0.0,
-            "f6": 0.0,
-            "f7": 0.0,
-            "f8": 0.0
+            "Custom1": 0.0,
+            "Custom2": 0.0,
+            "Custom3": 0.0,
+            "Custom4": 0.0,
+            "Custom5": 0.0,
+            "Custom6": 0.0,
+            "Custom7": 0.0,
+            "Custom8": 0.0
         }
     }
 }

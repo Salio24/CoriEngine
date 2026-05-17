@@ -57,7 +57,71 @@ namespace Cori {
 
 			template<typename T> requires std::same_as<ShaderEffect, T>
 			[[nodiscard]] static Core::Handle<T> Load(const Core::AssetID id) {
+				struct AssetData {
+					Core::AssetRef<VertFragShaderPair> ShaderPair;
+					struct PipelineStateGlaze {
+						Utility::GlazeWithFallback<vk::CullModeFlags, Utility::VulkanFlagsGlazeHelper<vk::CullModeFlags>(vk::CullModeFlagBits::eNone | vk::CullModeFlagBits::eFront), "cullMode from VulkanShaderEffectManager::Load"> cullMode;
+						Utility::GlazeWithFallback<vk::FrontFace, vk::FrontFace::eCounterClockwise, "frontFace from VulkanShaderEffectManager::Load"> frontFace;
+						Utility::GlazeWithFallback<vk::CompareOp, vk::CompareOp::eGreater, "depthCompareOp from VulkanShaderEffectManager::Load"> depthCompareOp;
+						Utility::GlazeWithFallback<bool, false, "depthTestEnable from VulkanShaderEffectManager::Load"> depthTestEnable;
+						Utility::GlazeWithFallback<bool, false, "depthBoundsTestEnable from VulkanShaderEffectManager::Load"> depthBoundsTestEnable;
+						Utility::GlazeWithFallback<bool, false, "depthBiasEnable from VulkanShaderEffectManager::Load"> depthBiasEnable;
+						Utility::GlazeWithFallback<bool, false, "stencilTestEnable from VulkanShaderEffectManager::Load"> stencilTestEnable;
+						Utility::GlazeWithFallback<bool, false, "logicOpEnable from VulkanShaderEffectManager::Load"> logicOpEnable;
+					} PipelineState;
 
+					struct CustomDataGlaze {
+						std::optional<float> Custom1;
+						std::optional<float> Custom2;
+						std::optional<float> Custom3;
+						std::optional<float> Custom4;
+						std::optional<float> Custom5;
+						std::optional<float> Custom6;
+						std::optional<float> Custom7;
+						std::optional<float> Custom8;
+					} CustomData;
+				};
+
+				auto& record = Core::AssetManager2::GetAssetRecord(id);
+				const auto& dir = Core::AssetManager2::GetAssetDir();
+				auto assetFilePath = dir / record.path;
+
+				auto handle = Get().AllocateHandle();
+
+				AssetData data;
+				std::string buffer;
+				auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
+				if (readError != glz::error_code::none) {
+					//error
+					Get().AssignPlaceholder(handle);
+					return handle;
+				}
+
+				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
+				if (parseError) {
+					//error
+					Get().AssignPlaceholder(handle);
+					return handle;
+				}
+
+				ShaderEffectData customData{
+					.custom1 = { data.CustomData.Custom1.value_or(0.0f), data.CustomData.Custom2.value_or(0.0f), data.CustomData.Custom3.value_or(0.0f), data.CustomData.Custom4.value_or(0.0f) },
+					.custom2 = { data.CustomData.Custom5.value_or(0.0f), data.CustomData.Custom6.value_or(0.0f), data.CustomData.Custom7.value_or(0.0f), data.CustomData.Custom8.value_or(0.0f) }
+				};
+
+				PipelineState state{
+					.cullMode = data.PipelineState.cullMode,
+					.frontFace = data.PipelineState.frontFace,
+					.depthCompareOp = data.PipelineState.depthCompareOp,
+					.depthTestEnable = data.PipelineState.depthTestEnable,
+					.depthBoundsTestEnable = data.PipelineState.depthBoundsTestEnable,
+					.depthBiasEnable = data.PipelineState.depthBiasEnable,
+					.stencilTestEnable = data.PipelineState.stencilTestEnable,
+					.logicOpEnable = data.PipelineState.logicOpEnable
+				};
+
+				Get().CreateShaderEffect(handle, std::move(data.ShaderPair), state, customData);
+				return handle;
 			}
 
 			static void Unload(const Core::Handle<ShaderEffect> handle) {

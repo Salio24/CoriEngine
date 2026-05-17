@@ -6,7 +6,7 @@
 #include "nlohmann/json.hpp"
 #include "FileSystem/PathManager.hpp"
 #include "Utility/CleanTypeName.hpp"
-#include "glaze/glaze.hpp"
+#include "Utility/GlazeUtils.hpp"
 
 #define CORI_ADD_ASSET_TRAITS(T, ...) \
 template <> struct AssetTraits<__VA_ARGS__ __VA_OPT__(::) T> { \
@@ -192,14 +192,14 @@ namespace Cori {
 		#endif
 
 		enum class AssetType : uint8_t {
-			ePrimary = 0,
-			eSecondary = 1,
+			ePrimary,
+			eSecondary,
 			eUndefined
 		};
 
 		enum class AssetDeletionPolicy : uint8_t {
-			eRefCounted = 0,
-			eKeepAlive = 1
+			eRefCounted,
+			eKeepAlive
 		};
 
 		struct AssetRecord {
@@ -308,44 +308,36 @@ namespace Cori {
 			}
 
 			static void ProcessFile(const std::filesystem::path& assetFilePath) {
-				std::ifstream file(assetFilePath);
+				struct Layout {
+					struct Metadata {
+						std::string AssetTypename;
+						Core::AssetType AssetType;
+						std::optional<Utility::GlazeWithFallback<Core::AssetDeletionPolicy, Core::AssetDeletionPolicy::eRefCounted, "from Metadata declared in AssetManager::ProcessFile">> AssetDeletionPolicy;
+					} Metadata;
+					glz::raw_json_view AssetData;
+				};
 
-				if (!file.good()) {
+				Layout l;
+				std::string buffer;
+				auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
+				if (readError != glz::error_code::none) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::AssetManager }, "Failed to open asset file '{}', skipping it.", assetFilePath.string());
 				}
 
-				nlohmann::json json = nlohmann::json::parse(file);
-
-				if (json.contains("Metadata") && json.contains("AssetData")) {
-					nlohmann::json& meta = json["Metadata"];
-					if (meta.contains("AssetTypename") && meta.contains("AssetType")) {
-
-						uint32_t typeFlag = meta["AssetType"].get<uint32_t>();
-						if (typeFlag != 0 && typeFlag != 1) {
-							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::AssetManager }, "Asset file '{}' specifies invalid value '{}' for AssetType, must be either 0 (for primary asset) or 1 (for secondary asset). Asset will be skipped.", assetFilePath.string(), typeFlag);
-							return;
-						}
-
-						Utility::StringHash64 typeHash = Utility::HashString64(meta["AssetTypename"].get<std::string>());
-						auto relativeAssetPath = std::filesystem::relative(assetFilePath, Get().m_AppRootPath);
-						AssetID pathHash = Utility::HashString64(relativeAssetPath.string());
-						//TODO: in debug build, check for hash collisions
-
-						auto& entry = Get().m_AssetDatabase[pathHash];
-						entry.path = relativeAssetPath;
-						entry.type = static_cast<AssetType>(typeFlag);
-						entry.assetTypenameHash = typeHash;
-
-						if (meta.contains("AssetDeletionPolicy") ) {
-							uint32_t assetDeletionPolicyFlag = meta["AssetDeletionPolicy"].get<uint32_t>();
-							if (assetDeletionPolicyFlag != 0 && assetDeletionPolicyFlag != 1) {
-								CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::AssetManager }, "Asset file '{}' specifies 'AssetDeletionPolicy', but holds an invalid value '{}' for AssetDeletionPolicy, must be either 0 (ref counted) or 1 (keep alive). Ref counted will be used.", assetFilePath.string(), typeFlag);
-							} else {
-								entry.deletionPolicy = static_cast<AssetDeletionPolicy>(assetDeletionPolicyFlag);
-							}
-						}
-					}
+				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(l, buffer);
+				if (parseError) {
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::AssetManager }, "Asset file '{}' metadata load failed, error: {}", assetFilePath.string(), glz::format_error(parseError, buffer));
+					return;
 				}
+
+				auto relativeAssetPath = std::filesystem::relative(assetFilePath, Get().m_AppRootPath);
+				AssetID pathHash = Utility::HashString64(relativeAssetPath.string());
+				auto& entry = Get().m_AssetDatabase[pathHash];
+
+				entry.path = relativeAssetPath;
+				entry.type = l.Metadata.AssetType;
+				entry.assetTypenameHash = Utility::HashString64(l.Metadata.AssetTypename);
+				entry.deletionPolicy = l.Metadata.AssetDeletionPolicy.value_or(AssetDeletionPolicy::eRefCounted);
 			}
 
 			std::unordered_map<AssetID, AssetRecord> m_AssetDatabase;
@@ -354,29 +346,20 @@ namespace Cori {
 
 			static std::unique_ptr<AssetManager2> s_Instance;
 		};
-
-		//FIXME: check for AssetID != 0r
-		template<typename T>
-		void to_json(nlohmann::json& j, const AssetRef<T>& ref) {
-			AssetID id = ref.GetAssetID();
-			std::string path = AssetManager2::GetPath(id).value().get().filename().string();
-			j = path;
-		}
-
-		template<typename T>
-		void from_json(const nlohmann::json& j, AssetRef<T>& ref) {
-			std::string path = j.get<std::string>();
-			ref = AssetManager2::Load<T>(path.c_str());
-		}
 	}
 }
 
+//FIXME: check for AssetID != 0r
 namespace glz {
 	template <class T>
 	struct from<JSON, Cori::Core::AssetRef<T>> {
 		template <auto Opts>
 		static void op(Cori::Core::AssetRef<T>& to, is_context auto&& ctx, auto&& it, auto&& end) {
-
+			std::string result;
+			parse<JSON>::op<Opts>(result, ctx, it, end);
+			if (!static_cast<bool>(ctx.error)) {
+				to = Cori::Core::AssetManager2::Load<T>(result.c_str());
+			}
 		}
 	};
 
@@ -384,7 +367,9 @@ namespace glz {
 	struct to<JSON, Cori::Core::AssetRef<T>> {
 		template <auto Opts>
 		static void op(const Cori::Core::AssetRef<T>& from, is_context auto&& ctx, auto&& b, auto&& ix) noexcept {
-
+			Cori::Core::AssetID id = from.GetAssetID();
+			std::string path = Cori::Core::AssetManager2::GetPath(id).value().get().filename().string();
+			serialize<JSON>::op<Opts>(path, ctx, b, ix);
 		}
 	};
 }
