@@ -1,10 +1,11 @@
 {
     "Metadata": {
-        "AssetTypename": "Texture2",
+        "AssetTypename": "ComputeShader",
         "AssetType": "eSecondary",
         "AssetDeletionPolicy": "eRefCounted"
     },
     "AssetData": {
-        "Image": "Sword_albedo.jpg"
+        "spv": "CullingShader.spv",
+        "computeEntry": "compactMain"
     }
 }

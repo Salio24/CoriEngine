@@ -59,10 +59,11 @@ namespace Cori {
 			}
 		};
 
-		template<std::copy_constructible T, uint16_t REUSE_THRESHOLD = 64, bool ENABLE_VERSIONING = true, IsVersionedHandle HandleT = Handle<T>>
+		template<std::copy_constructible T, uint16_t REUSE_THRESHOLD = 64, bool ENABLE_VERSIONING = true, IsVersionedHandle HandleT = Handle<T>, typename ConstHandleT = ConstHandle<T>> requires std::derived_from<HandleT, ConstHandleT>
 		class FlatSlotMap {
 		public:
 			using Handle = HandleT;
+			using ConstHandle = ConstHandleT;
 
 			using SizeT = uint32_t;
 
@@ -250,7 +251,7 @@ namespace Cori {
 				return m_Data[handle.GetIndex()];
 			}
 
-			[[nodiscard]] ConstReference operator[](const Handle handle) const {
+			[[nodiscard]] ConstReference operator[](const ConstHandle handle) const {
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Accessed FlatSlotMap with an invalid handle.");
 				return m_Data[handle.GetIndex()];
 			}
@@ -341,7 +342,7 @@ namespace Cori {
 				return Size() == 0;
 			}
 
-			[[nodiscard]] bool IsHandleValid(const Handle handle) const {
+			[[nodiscard]] bool IsHandleValid(const ConstHandle handle) const {
 				if constexpr(ENABLE_VERSIONING) {
 					return IsIndexValid(handle.GetIndex()) && m_Versions[handle.GetIndex()] == handle.GetVersion();
 				}
@@ -397,6 +398,13 @@ namespace std {
 	template<typename T>
 	struct hash<Cori::Core::Handle<T>> {
 		std::size_t operator()(const Cori::Core::Handle<T>& handle) const {
+			return Cori::Core::VersionedHandleBase::Hasher()(handle);
+		}
+	};
+
+	template<typename T>
+	struct hash<Cori::Core::ConstHandle<T>> {
+		std::size_t operator()(const Cori::Core::ConstHandle<T>& handle) const {
 			return Cori::Core::VersionedHandleBase::Hasher()(handle);
 		}
 	};

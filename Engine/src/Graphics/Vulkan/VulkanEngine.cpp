@@ -121,6 +121,7 @@ namespace Cori {
 			VulkanGlobalLayoutManager::Init();
 			VulkanShaderManager::Init();
 			VulkanTextureManager::Init();
+			VulkanShaderEffectManager::Init();
 			VulkanMaterialSystem::Init();
 			VulkanVirtualBufferAllocator::Init();
 			VulkanDynamicContainerUploadManager::Init();
@@ -133,6 +134,7 @@ namespace Cori {
 			VulkanDynamicContainerUploadManager::Shutdown();
 			VulkanVirtualBufferAllocator::Shutdown();
 			VulkanMaterialSystem::Shutdown();
+			VulkanShaderEffectManager::Shutdown();
 			VulkanTextureManager::Shutdown();
 			VulkanShaderManager::Shutdown();
 			VulkanGlobalLayoutManager::Shutdown();
@@ -303,6 +305,7 @@ namespace Cori {
 
 			VulkanTextureManager::ProcessUpdates(frameData.m_CommandBuffer);
 			VulkanMeshManager::ProcessUpdates(frameData.m_CommandBuffer);
+			VulkanShaderEffectManager::Sync();
 			VulkanMaterialSystem::Sync();
 			VulkanGlobalLayoutManager::Sync();
 

@@ -1,0 +1,30 @@
+{
+    "Metadata": {
+        "AssetTypename": "ShaderEffect",
+        "AssetType": "eSecondary",
+        "AssetDeletionPolicy": "eRefCounted"
+    },
+    "AssetData": {
+        "shaderPair": "assets/Shaders/TestShader.json",
+        "pipelineState": {
+            "cullMode": [ "eNone" ],
+            "frontFace": "eCounterClockwise",
+            "depthCompareOp": "eGreater",
+            "depthTestEnable": false,
+            "depthBoundsTestEnable": false,
+            "depthBiasEnable": false,
+            "stencilTestEnable": false,
+            "logicOpEnable": false
+        },
+        "customData": {
+            "custom1": 0.0,
+            "custom2": 0.0,
+            "custom3": 0.0,
+            "custom4": 0.0,
+            "custom5": 0.0,
+            "custom6": 0.0,
+            "custom7": 0.0,
+            "custom8": 0.0
+        }
+    }
+}

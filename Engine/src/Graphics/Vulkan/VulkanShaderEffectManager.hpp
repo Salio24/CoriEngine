@@ -2,6 +2,7 @@
 #include "VulkanEngine.hpp"
 #include "VulkanShaderManager.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
+#include "VulkanFlagsGlaze.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -46,6 +47,35 @@ namespace Cori {
 		};
 
 		class VulkanShaderEffectManager {
+			struct JsonAssetData {
+				Core::AssetRef<VertFragShaderPair> shaderPair;
+				struct PipelineStateGlaze {
+					Utility::GlazeWithFallback<vk::CullModeFlags, vk::CullModeFlagBits::eNone | vk::CullModeFlagBits::eFront, "cullMode from VulkanShaderEffectManager::Load"> cullMode;
+					Utility::GlazeWithFallback<vk::FrontFace, vk::FrontFace::eCounterClockwise, "frontFace from VulkanShaderEffectManager::Load"> frontFace;
+					Utility::GlazeWithFallback<vk::CompareOp, vk::CompareOp::eGreater, "depthCompareOp from VulkanShaderEffectManager::Load"> depthCompareOp;
+					Utility::GlazeWithFallback<bool, false, "depthTestEnable from VulkanShaderEffectManager::Load"> depthTestEnable;
+					Utility::GlazeWithFallback<bool, false, "depthBoundsTestEnable from VulkanShaderEffectManager::Load"> depthBoundsTestEnable;
+					Utility::GlazeWithFallback<bool, false, "depthBiasEnable from VulkanShaderEffectManager::Load"> depthBiasEnable;
+					Utility::GlazeWithFallback<bool, false, "stencilTestEnable from VulkanShaderEffectManager::Load"> stencilTestEnable;
+					Utility::GlazeWithFallback<bool, false, "logicOpEnable from VulkanShaderEffectManager::Load"> logicOpEnable;
+				} pipelineState;
+
+				struct CustomDataGlaze {
+					std::optional<float> custom1;
+					std::optional<float> custom2;
+					std::optional<float> custom3;
+					std::optional<float> custom4;
+					std::optional<float> custom5;
+					std::optional<float> custom6;
+					std::optional<float> custom7;
+					std::optional<float> custom8;
+				} customData;
+			};
+
+			struct JsonAssetDataCombined {
+				glz::skip Metadata;
+				JsonAssetData AssetData;
+			};
 		public:
 			using OnShaderEffectDeletedFn = std::function<void(const Core::Handle<ShaderEffect>)>;
 
@@ -57,38 +87,16 @@ namespace Cori {
 
 			template<typename T> requires std::same_as<ShaderEffect, T>
 			[[nodiscard]] static Core::Handle<T> Load(const Core::AssetID id) {
-				struct AssetData {
-					Core::AssetRef<VertFragShaderPair> ShaderPair;
-					struct PipelineStateGlaze {
-						Utility::GlazeWithFallback<vk::CullModeFlags, Utility::VulkanFlagsGlazeHelper<vk::CullModeFlags>(vk::CullModeFlagBits::eNone | vk::CullModeFlagBits::eFront), "cullMode from VulkanShaderEffectManager::Load"> cullMode;
-						Utility::GlazeWithFallback<vk::FrontFace, vk::FrontFace::eCounterClockwise, "frontFace from VulkanShaderEffectManager::Load"> frontFace;
-						Utility::GlazeWithFallback<vk::CompareOp, vk::CompareOp::eGreater, "depthCompareOp from VulkanShaderEffectManager::Load"> depthCompareOp;
-						Utility::GlazeWithFallback<bool, false, "depthTestEnable from VulkanShaderEffectManager::Load"> depthTestEnable;
-						Utility::GlazeWithFallback<bool, false, "depthBoundsTestEnable from VulkanShaderEffectManager::Load"> depthBoundsTestEnable;
-						Utility::GlazeWithFallback<bool, false, "depthBiasEnable from VulkanShaderEffectManager::Load"> depthBiasEnable;
-						Utility::GlazeWithFallback<bool, false, "stencilTestEnable from VulkanShaderEffectManager::Load"> stencilTestEnable;
-						Utility::GlazeWithFallback<bool, false, "logicOpEnable from VulkanShaderEffectManager::Load"> logicOpEnable;
-					} PipelineState;
-
-					struct CustomDataGlaze {
-						std::optional<float> Custom1;
-						std::optional<float> Custom2;
-						std::optional<float> Custom3;
-						std::optional<float> Custom4;
-						std::optional<float> Custom5;
-						std::optional<float> Custom6;
-						std::optional<float> Custom7;
-						std::optional<float> Custom8;
-					} CustomData;
-				};
-
 				auto& record = Core::AssetManager2::GetAssetRecord(id);
 				const auto& dir = Core::AssetManager2::GetAssetDir();
 				auto assetFilePath = dir / record.path;
 
 				auto handle = Get().AllocateHandle();
+				Get().m_ShaderEffects[handle].assetID = id;
+				Get().m_ShaderEffects[handle].deletionPolicy = record.deletionPolicy;
+				record.rawHandleIndex = handle.GetIndex();
+				record.rawHandleVersion = handle.GetVersion();
 
-				AssetData data;
 				std::string buffer;
 				auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
 				if (readError != glz::error_code::none) {
@@ -97,30 +105,32 @@ namespace Cori {
 					return handle;
 				}
 
+				JsonAssetDataCombined data;
 				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
 				if (parseError) {
-					//error
+					std::string error_msg = glz::format_error(parseError, buffer);
+					std::cerr << error_msg << '\n';
 					Get().AssignPlaceholder(handle);
 					return handle;
 				}
 
 				ShaderEffectData customData{
-					.custom1 = { data.CustomData.Custom1.value_or(0.0f), data.CustomData.Custom2.value_or(0.0f), data.CustomData.Custom3.value_or(0.0f), data.CustomData.Custom4.value_or(0.0f) },
-					.custom2 = { data.CustomData.Custom5.value_or(0.0f), data.CustomData.Custom6.value_or(0.0f), data.CustomData.Custom7.value_or(0.0f), data.CustomData.Custom8.value_or(0.0f) }
+					.custom1 = { data.AssetData.customData.custom1.value_or(0.0f), data.AssetData.customData.custom2.value_or(0.0f), data.AssetData.customData.custom3.value_or(0.0f), data.AssetData.customData.custom4.value_or(0.0f) },
+					.custom2 = { data.AssetData.customData.custom5.value_or(0.0f), data.AssetData.customData.custom6.value_or(0.0f), data.AssetData.customData.custom7.value_or(0.0f), data.AssetData.customData.custom8.value_or(0.0f) }
 				};
 
 				PipelineState state{
-					.cullMode = data.PipelineState.cullMode,
-					.frontFace = data.PipelineState.frontFace,
-					.depthCompareOp = data.PipelineState.depthCompareOp,
-					.depthTestEnable = data.PipelineState.depthTestEnable,
-					.depthBoundsTestEnable = data.PipelineState.depthBoundsTestEnable,
-					.depthBiasEnable = data.PipelineState.depthBiasEnable,
-					.stencilTestEnable = data.PipelineState.stencilTestEnable,
-					.logicOpEnable = data.PipelineState.logicOpEnable
+					.cullMode = data.AssetData.pipelineState.cullMode,
+					.frontFace = data.AssetData.pipelineState.frontFace,
+					.depthCompareOp = data.AssetData.pipelineState.depthCompareOp,
+					.depthTestEnable = data.AssetData.pipelineState.depthTestEnable,
+					.depthBoundsTestEnable = data.AssetData.pipelineState.depthBoundsTestEnable,
+					.depthBiasEnable = data.AssetData.pipelineState.depthBiasEnable,
+					.stencilTestEnable = data.AssetData.pipelineState.stencilTestEnable,
+					.logicOpEnable = data.AssetData.pipelineState.logicOpEnable
 				};
 
-				Get().CreateShaderEffect(handle, std::move(data.ShaderPair), state, customData);
+				Get().CreateShaderEffect(handle, std::move(data.AssetData.shaderPair), state, customData);
 				return handle;
 			}
 
@@ -137,6 +147,29 @@ namespace Cori {
 
 				Get().DestroyShaderEffect(handle);
 				Get().FreeHandle(handle);
+			}
+
+			static bool ChangeDeletionPolicy(const Core::Handle<ShaderEffect> handle, const Core::AssetDeletionPolicy newPolicy) {
+				if (!Get().m_ShaderEffects.IsHandleValid(handle)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Handle passed to ChangeDeletionPolicy is invalid, skipping call.");
+					return false;
+				}
+
+				auto& effect = Get().m_ShaderEffects[handle];
+				if (effect.deletionPolicy == newPolicy) {
+					return false;
+				}
+
+				if (effect.deletionPolicy == Core::AssetDeletionPolicy::eKeepAlive) {
+					auto refCount = Get().m_RefCounts[handle.GetIndex()];
+					if (refCount == 0) {
+						Unload(handle);
+						return true;
+					}
+				}
+
+				effect.deletionPolicy = newPolicy;
+				return false;
 			}
 
 			[[nodiscard]] static Core::AssetID GetAssetID(const Core::Handle<ShaderEffect> handle) {
@@ -171,7 +204,7 @@ namespace Cori {
 				}
 			}
 
-			[[nodiscard]] static bool IsHandleValid(const Core::Handle<ShaderEffect> handle) {
+			[[nodiscard]] static bool IsHandleValid(const Core::ConstHandle<ShaderEffect> handle) {
 				return Get().m_ShaderEffects.IsHandleValid(handle);
 			}
 
@@ -196,6 +229,7 @@ namespace Cori {
 			static constexpr bool EnableHotReload = false;
 
 		protected:
+			friend class Renderer;
 			static std::expected<Core::Handle<ShaderEffect>, ErrorCode> DuplicateShaderEffect(const Core::Handle<ShaderEffect> original, std::filesystem::path path, const Core::AssetDeletionPolicy deletionPolicy, std::string name) {
 				//to properly implement this (and material duplication) I first have to add a new data path to the asset manager design, so far it has:
 				// 1. Drive -> A.S. Registry -> Engine memory (initial load)
@@ -228,7 +262,7 @@ namespace Cori {
 				return {};
 			}
 
-			[[nodiscard]] static std::expected<std::reference_wrapper<const Core::AssetRef<VertFragShaderPair>>, ErrorCode> GetShaderEffectShaderPair(const Core::Handle<ShaderEffect> shaderEffect) {
+			[[nodiscard]] static std::expected<std::reference_wrapper<const Core::AssetRef<VertFragShaderPair>>, ErrorCode> GetShaderEffectShaderPair(const Core::ConstHandle<ShaderEffect> shaderEffect) {
 				if (!IsHandleValid(shaderEffect)) {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
@@ -237,16 +271,20 @@ namespace Cori {
 				return std::cref(effect.shaders);
 			}
 
-			static std::expected<void, ErrorCode> ChangeShaderEffectShaderPair(const Core::Handle<ShaderEffect> shaderEffect, const Core::AssetRef<VertFragShaderPair>& shaderPair) {
+			static std::expected<void, ErrorCode> ChangeShaderEffectShaderPair(const Core::Handle<ShaderEffect> shaderEffect, Core::AssetRef<VertFragShaderPair> shaderPair) {
 				if (!IsHandleValid(shaderEffect)) {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
 
-				Get().m_ShaderEffects[shaderEffect].shaders = shaderPair;
+				if (!shaderPair.IsInitialized()) {
+					return std::unexpected(ErrorCode::eUninitializedAssetRef);
+				}
+
+				Get().m_ShaderEffects[shaderEffect].shaders = std::move(shaderPair);
 				return {};
 			}
 
-			[[nodiscard]] static std::expected<std::reference_wrapper<const PipelineState>, ErrorCode> GetShaderEffectPipelineState(const Core::Handle<ShaderEffect> shaderEffect) {
+			[[nodiscard]] static std::expected<std::reference_wrapper<const PipelineState>, ErrorCode> GetShaderEffectPipelineState(const Core::ConstHandle<ShaderEffect> shaderEffect) {
 				if (!IsHandleValid(shaderEffect)) {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
@@ -290,6 +328,11 @@ namespace Cori {
 			void CreateShaderEffect(const Core::Handle<ShaderEffect> handle, Core::AssetRef<VertFragShaderPair> shaderPair, const PipelineState& state, const ShaderEffectData& data = {}) {
 				if (!IsHandleValid(handle)) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Invalid ShaderEffect handle passed to CreateShaderEffect, skipping call.");
+					return;
+				}
+
+				if (!shaderPair.IsInitialized()) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Uninitialized VertFragShaderPair AssetRef was passed to CreateShaderEffect, skipping call.");
 					return;
 				}
 
@@ -342,7 +385,7 @@ namespace Cori {
 			VulkanShaderEffectManager() {
 				m_RefCounts.resize(32);
 				m_ShaderEffects.Reserve(32);
-				m_ShaderEffectData.Reserve(32);
+				m_ShaderEffectData.Resize(32);
 
 				m_PlaceholderEffect = m_ShaderEffects.Emplace(ShaderEffect{ .shaders = Core::AssetRef(VulkanShaderManager::GetPlaceholder<VertFragShaderPair>()) });
 

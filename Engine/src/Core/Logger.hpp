@@ -110,6 +110,11 @@ namespace Cori {
 					static constexpr char Unique[] = "Unique";
 				};
 
+				struct Glaze {
+					static constexpr char Self[] = "Glaze";
+					static constexpr char GlazeWithFallback[] = "GlazeWithFallback";
+				};
+
 				static constexpr char Logger[] = "Logger";
 				static constexpr char Layer[] = "Layer";
 				static constexpr char LayerStack[] = "LayerStack";

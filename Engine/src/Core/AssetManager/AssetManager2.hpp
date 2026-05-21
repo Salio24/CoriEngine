@@ -56,6 +56,7 @@ namespace Cori {
 
 			explicit AssetRef(Handle<T> handle) {
 				CORI_CORE_ASSERT(T::Manager::IsHandleValid(handle), "Trying to construct AssetRef<{}> with an invalid handle, asserting.", CORI_CLEAN_TYPE_NAME(T));
+				m_Handle = handle;
 			}
 
 			~AssetRef() {
@@ -94,15 +95,19 @@ namespace Cori {
 				return *this;
 			}
 
-			Handle<T> GetHandle() {
+			[[nodiscard]] Handle<T> GetHandle() {
 				return m_Handle;
 			}
 
-			ConstHandle<T> GetHandle() const {
+			[[nodiscard]] ConstHandle<T> GetHandle() const {
 				return m_Handle;
 			}
 
-			AssetID GetAssetID() {
+			[[nodiscard]] bool IsInitialized() const {
+				return m_Handle.GetIndex() != UINT32_MAX && m_Handle.GetVersion() != 0;
+			}
+
+			[[nodiscard]] AssetID GetAssetID() {
 				if (T::Manager::IsHandleValid(m_Handle)) {
 					return T::Manager::GetAssetID(m_Handle);
 				}
@@ -308,6 +313,10 @@ namespace Cori {
 			}
 
 			static void ProcessFile(const std::filesystem::path& assetFilePath) {
+				if (assetFilePath.filename() == "Samplers.json") {
+					return;
+				}
+
 				struct Layout {
 					struct Metadata {
 						std::string AssetTypename;

@@ -4,14 +4,24 @@
 namespace Cori {
 	namespace Utility {
 
-		template<typename T>
-		consteval auto VulkanFlagsGlazeHelper(T v) {
-			return static_cast<std::underlying_type_t<typename T::BitsType>>(v);
-		}
+		//template<typename T>
+		//consteval auto VulkanFlagsGlazeHelper(T v) {
+		//	return static_cast<std::underlying_type_t<typename T::BitsType>>(v);
+		//}
+
+		template <typename F, typename T>
+		concept IsFallbackFactory = requires { { F{}() } -> std::convertible_to<T>; };
 
 		template <typename T, auto Fallback, glz::string_literal Message = "">
 		struct GlazeWithFallback {
-			T value{ static_cast<T>(Fallback) };
+			static constexpr T MakeFallback() {
+				if constexpr (IsFallbackFactory<decltype(Fallback), T>)
+					return static_cast<T>(Fallback());
+				else
+					return static_cast<T>(Fallback);
+			}
+
+			T value{ MakeFallback() };
 
 			#ifdef DEBUG_BUILD
 			static constexpr bool Debug = true;
@@ -140,7 +150,7 @@ namespace Cori {
 				return is >> w.value;
 			}
 
-			static constexpr T GetFallback() { return Fallback; }
+			static constexpr T GetFallback() { return MakeFallback(); }
 		};
 
 		struct ReflectEnumsOpts : glz::opts {
@@ -160,7 +170,7 @@ namespace Cori {
 }
 
 namespace std {
-	template <typename T, T Fallback, glz::string_literal Message>
+	template <typename T, auto Fallback, glz::string_literal Message>
 	struct hash<Cori::Utility::GlazeWithFallback<T, Fallback, Message>> {
 		size_t operator()(const Cori::Utility::GlazeWithFallback<T, Fallback, Message>& w) const noexcept(noexcept(hash<T>{}(w.value))) {
 			return hash<T>{}(w.value);
@@ -169,40 +179,57 @@ namespace std {
 }
 
 namespace glz {
-	template <typename T, T Fallback, string_literal Message>
+	template <typename T, auto Fallback, string_literal Message>
 	struct from<JSON, Cori::Utility::GlazeWithFallback<T, Fallback, Message>> {
 		template <auto Opts>
 		static void op(Cori::Utility::GlazeWithFallback<T, Fallback, Message>& value, is_context auto&& ctx, auto&& it, auto&& end) {
-			T result{ Fallback };
-			std::string_view bad_token;
+			T result;
+			std::string_view badToken;
 			if constexpr (value.Debug) {
-				const auto* token_start = it;
-				while (token_start != end && (*token_start == ' ' || *token_start == '\t' || *token_start == '\n' || *token_start == '\r')) {
-					++token_start;
+				const auto* tokenStart = it;
+				while (tokenStart != end && (*tokenStart == ' ' || *tokenStart == '\t' || *tokenStart == '\n' || *tokenStart == '\r')) {
+					++tokenStart;
 				}
 
-				const auto* token_end = token_start;
-				while (token_end != end && *token_end != ',' && *token_end != '}' && *token_end != ']') {
-					++token_end;
+				bool arrayOrObject = *tokenStart == '[' || *tokenStart == '{';
+
+				const auto* tokenEnd = tokenStart;
+
+				if (arrayOrObject) {
+					while (tokenEnd != end && *(tokenEnd - 1) != '}' && *(tokenEnd - 1) != ']') {
+						++tokenEnd;
+					}
+				} else {
+					while (tokenEnd != end && *tokenEnd != ',') {
+						++tokenEnd;
+					}
 				}
 
-				while (token_end != token_start && (*(token_end-1) == ' ' || *(token_end-1) == '\t' || *(token_end-1) == '\n' || *(token_end-1) == '\r')) {
-					--token_end;
+				auto c = *(tokenEnd - 1);
+
+				if (!arrayOrObject) {
+					while (tokenEnd != tokenStart && (*(tokenEnd - 1) == ' ' || *(tokenEnd - 1) == '\t' || *(tokenEnd - 1) == '\n' || *(tokenEnd - 1) == '\r')) {
+						--tokenEnd;
+					}
 				}
 
-				bad_token = {token_start, static_cast<std::size_t>(token_end - token_start)};
+
+				badToken = {tokenStart, static_cast<uint64_t>(tokenEnd - tokenStart)};
 			}
+
+			auto oldIt = it;
 
 			parse<JSON>::op<Opts>(result, ctx, it, end);
 			if (static_cast<bool>(ctx.error)) {
 				if constexpr (Message.size() != 0 && value.Debug) {
-					CORI_CORE_WARN("[GlazeWithFallback] {} | Error: {} | Got: '{}' | Fallback: '{}'", Message.sv(), glz::enum_to_string(ctx.error), bad_token, glz::write<Opts>(Fallback).value_or("?"));
+					CORI_CORE_WARN_TAGGED({ Cori::Logger::Tags::Core::Self, Cori::Logger::Tags::Core::Glaze::Self, Cori::Logger::Tags::Core::Glaze::GlazeWithFallback }, "Message: {} | Error: {} | Got: '{}' | Fallback: '{}'", Message.sv(), glz::enum_to_string(ctx.error), badToken, glz::write<Opts>(value.MakeFallback()).value_or("?"));
 				}
 
 				ctx.error = error_code::none;
+				it = oldIt;
 				skip_value<JSON>::op<Opts>(ctx, it, end);
 				ctx.error = error_code::none;
-				value.value = Fallback;
+				value.value = value.MakeFallback();
 			}
 			else {
 				value.value = result;
@@ -210,7 +237,7 @@ namespace glz {
 		}
 	};
 
-	template <typename T, T Fallback, string_literal Message>
+	template <typename T, auto Fallback, string_literal Message>
 	struct to<JSON, Cori::Utility::GlazeWithFallback<T, Fallback, Message>> {
 		template <auto Opts>
 		static void op(const Cori::Utility::GlazeWithFallback<T, Fallback, Message>& value, is_context auto&& ctx, auto&& b, auto&& ix) noexcept {

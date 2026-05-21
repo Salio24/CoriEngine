@@ -6,6 +6,7 @@
 #include "AssetManager/AssetLoadStatus.hpp"
 #include "Core/DataStructures/FlatSlotMap.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
+#include "VulkanFlagsGlaze.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -44,6 +45,15 @@ namespace Cori {
 				std::vector<TextureInTransfer> texturesInTransfer;
 			};
 
+			struct JsonAssetData {
+				std::string image;
+			};
+
+			struct JsonAssetDataCombined {
+				glz::skip Metadata;
+				JsonAssetData AssetData;
+			};
+
 		public:
 			static void Init();
 
@@ -59,31 +69,33 @@ namespace Cori {
 
 				auto handle = AllocateHandle();
 				Get().m_TexturePool[handle].assetID = id;
+				Get().m_TexturePool[handle].deletionPolicy = record.deletionPolicy;
 				record.rawHandleIndex = handle.GetIndex();
 				record.rawHandleVersion = handle.GetVersion();
 
 				auto assetFilePath = dir / record.path;
-				std::ifstream file(assetFilePath);
-				nlohmann::json json = nlohmann::json::parse(file);
-				//FIXME: handle exceptions from json
-				if (!json.contains("AssetData")) {
+
+				std::string buffer;
+				auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
+				if (readError != glz::error_code::none) {
 					//error
-					AssignPlaceholderTexture(handle);
+					Get().AssignPlaceholder(handle);
 					return handle;
 				}
 
-				auto& data = json["AssetData"];
-				if (!(data.contains("Image"))) {
+				JsonAssetDataCombined data;
+				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
+				if (parseError) {
 					//error
-					AssignPlaceholderTexture(handle);
+					Get().AssignPlaceholder(handle);
 					return handle;
 				}
 
 				//this way of loading a texture is temporary, 1st it always converts to rgba8, 2nd if the load is queued i have to copy the pixel data, it would be much better to have the ability to take ownership of it. Will need to more away from SDL3_image
 
-				auto image = Image::Create(assetFilePath.replace_filename(data["Image"].get<std::string>()));
+				auto image = Image::Create(assetFilePath.replace_filename(data.AssetData.image));
 
-				CreateTexture(handle, record.deletionPolicy, vk::ImageType::e2D, vk::Format::eR8G8B8A8Srgb, { image->GetHeight(), image->GetWidth(), 1 }, 1, 1, vk::SampleCountFlagBits::e1, "test");
+				CreateTexture(handle, vk::ImageType::e2D, vk::Format::eR8G8B8A8Srgb, { image->GetHeight(), image->GetWidth(), 1 }, 1, 1, vk::SampleCountFlagBits::e1, "test");
 				UpdateTexture(handle, std::span{ static_cast<Byte*>(image->GetPixelData()), image->GetHeight() * image->GetWidth() * 4 }, { 0, 0, 0 }, { image->GetHeight(), image->GetWidth(), 1 }, { vk::ImageAspectFlagBits::eColor, 0, 0, 1 });
 				ChangeView(handle, vk::ImageViewType::e2D, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
 				return handle;
@@ -93,33 +105,81 @@ namespace Cori {
 				auto& record = Core::AssetManager2::GetAssetRecord(id);
 				record.status = AssetStatus::eUnloaded;
 				const auto& dir = Core::AssetManager2::GetAssetDir();
+				bool deleted = ChangeDeletionPolicy(handle, record.deletionPolicy);
+				if (deleted) {
+					return;
+				}
 
 				auto assetFilePath = dir / record.path;
-				std::ifstream file(assetFilePath);
-				nlohmann::json json = nlohmann::json::parse(file);
-				if (!json.contains("AssetData")) {
+				std::string buffer;
+				auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
+				if (readError != glz::error_code::none) {
 					//error
+					return;
 				}
 
-				auto& data = json["AssetData"];
-				if (!(data.contains("Image"))) {
+				JsonAssetDataCombined data;
+				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
+				if (parseError) {
 					//error
+					return;
 				}
+
+				auto& texture = Get().m_TexturePool[handle];
+				if (texture.assetID != id) {
+					record.rawHandleIndex = handle.GetIndex();
+					record.rawHandleVersion = handle.GetVersion();
+					auto& oldRecord = Core::AssetManager2::GetAssetRecord(texture.assetID);
+					texture.assetID = id;
+					oldRecord.rawHandleIndex = UINT32_MAX;
+					oldRecord.rawHandleVersion = 0;
+					oldRecord.status = AssetStatus::eUnloaded;
+				}
+
+				auto image = Image::Create(assetFilePath.replace_filename(data.AssetData.image));
 
 				DestroyTexture(handle);
-
-				auto image = Image::Create(assetFilePath.replace_filename(data["Image"].get<std::string>()));
-
-				Get().m_TexturePool[handle].assetID = id;
-				record.rawHandleIndex = handle.GetIndex();
-				record.rawHandleVersion = handle.GetVersion();
-				CreateTexture(handle, record.deletionPolicy, vk::ImageType::e2D, vk::Format::eR8G8B8A8Srgb, { image->GetHeight(), image->GetWidth(), 1 }, 1, 1, vk::SampleCountFlagBits::e1, "test");
+				CreateTexture(handle, vk::ImageType::e2D, vk::Format::eR8G8B8A8Srgb, { image->GetHeight(), image->GetWidth(), 1 }, 1, 1, vk::SampleCountFlagBits::e1, "test");
 				UpdateTexture(handle, std::span{ static_cast<Byte*>(image->GetPixelData()), image->GetHeight() * image->GetWidth() * 4 }, { 0, 0, 0 }, { image->GetHeight(), image->GetWidth(), 1 }, { vk::ImageAspectFlagBits::eColor, 0, 0, 1 });
 				ChangeView(handle, vk::ImageViewType::e2D, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
 			}
 
 			static void Unload(const Core::Handle<Texture2> handle) {
+				if (!Get().m_TexturePool.IsHandleValid(handle)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to Unload is invalid, skipping call.");
+					return;
+				}
 
+				auto& record = Core::AssetManager2::GetAssetRecord(GetAssetID(handle));
+				record.status = AssetStatus::eUnloaded;
+				record.rawHandleIndex = UINT32_MAX;
+				record.rawHandleVersion = 0;
+
+				DestroyTexture(handle);
+				FreeHandle(handle);
+			}
+
+			static bool ChangeDeletionPolicy(const Core::Handle<Texture2> handle, const Core::AssetDeletionPolicy newPolicy) {
+				if (!Get().m_TexturePool.IsHandleValid(handle)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to ChangeDeletionPolicy is invalid, skipping call.");
+					return false;
+				}
+
+				auto& texture = Get().m_TexturePool[handle];
+				if (texture.deletionPolicy == newPolicy) {
+					return false;
+				}
+
+				if (texture.deletionPolicy == Core::AssetDeletionPolicy::eKeepAlive) {
+					auto refCount = Get().m_TextureRefCounts[handle.GetIndex()];
+					if (refCount == 0) {
+						Unload(handle);
+						return true;
+					}
+				}
+
+				texture.deletionPolicy = newPolicy;
+				return false;
 			}
 
 			static Core::AssetID GetAssetID(const Core::Handle<Texture2> handle) {
@@ -152,22 +212,45 @@ namespace Cori {
 
 				auto& texture = Get().m_TexturePool[handle.GetIndex()];
 				if (count == 0 && texture.deletionPolicy == Core::AssetDeletionPolicy::eRefCounted && handle != Get().m_PlaceholderTexture) {
-					auto& record = Core::AssetManager2::GetAssetRecord(GetAssetID(handle));
-					record.status = AssetStatus::eUnloaded;
-					record.rawHandleIndex = UINT32_MAX;
-					record.rawHandleVersion = 0;
-					DestroyTexture(handle);
-					FreeHandle(handle);
+					Unload(handle);
 				}
 			}
 
-			[[nodiscard]] static SamplerHandle GetSampler(const vk::SamplerCreateInfo& info) {
+			[[nodiscard]] static bool DoesSamplerExist(const char* alias) {
+				return Get().m_SamplerAliases.contains(alias);
+			}
+
+			[[nodiscard]] static SamplerHandle GetSampler(const char* alias) {
+				if (!Get().m_SamplerAliases.contains(alias)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "No sampler with alias '{}' found, returning placeholder.", alias);
+					return 0;
+				}
+
+				return Get().m_SamplerAliases[alias];
+			}
+
+			[[nodiscard]] static SamplerHandle GetOrCreateSampler(const vk::SamplerCreateInfo& info, const char* alias = "") {
 				auto [it, result] = Get().m_SamplerMap.try_emplace(info);
+				bool aliasPresent = !CORI_IS_EMPTY_CSTR(alias);
 				if (!result) {
+					if (aliasPresent) {
+
+						auto [it_, result_] = Get().m_SamplerAliases.try_emplace(alias);
+						if (result_) {
+							it_->second = it->second;
+						} else if (it_->second != it->second) {
+							CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "A different sampler with alias '{}' already exists, ignoring alias.", alias);
+						}
+					}
+
 					return it->second;
 				}
 
 				uint32_t slot = Get().m_Samplers.size();
+
+				if (slot >= Get().m_Samplers.size()) {
+					Get().m_Samplers.resize(Get().m_Samplers.size() * 2.0f);
+				}
 
 				auto [result_, sampler] = VulkanEngine::GetLogicalDevice().createSampler(info);
 				CORI_CORE_ASSERT(result_ == vk::Result::eSuccess, "Failed to create sampler. Error: {}", vk::to_string(result_));
@@ -176,7 +259,48 @@ namespace Cori {
 				Get().m_Samplers[slot] = sampler;
 
 				it->second = slot;
+
+				if (aliasPresent) {
+					auto [it_, result__] = Get().m_SamplerAliases.try_emplace(alias);
+					if (result__) {
+						it_->second = it->second;
+					} else if (it_->second != it->second) {
+						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "A different sampler with alias '{}' already exists, ignoring alias.", alias);
+					}
+				}
+
 				return slot;
+			}
+
+			[[nodiscard]] static bool AssignAliasToSampler(const SamplerHandle handle, const char* alias) {
+				bool samplerFound = false;
+				for (const auto samplerHandle : Get().m_SamplerMap | std::views::values) {
+					if (samplerHandle == handle) {
+						samplerFound = true;
+						break;
+					}
+				}
+
+				if (!samplerFound) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "No sampler with handle '{}' found, can't assign alias '{}' to a sampler that doesn't exist.", handle, alias);
+					return false;
+				}
+
+				auto [it, result] = Get().m_SamplerAliases.try_emplace(alias);
+
+				if (!result) {
+					if (it->second == handle) {
+						CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Sampler '{}' already have alias '{}' assigned to it.", handle, alias);
+						return true;
+					}
+
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Alias '{}' is already assigned to different sampler than '{}', failed to assign alias.", alias, handle);
+					return false;
+				}
+
+				it->second = handle;
+				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Assigned alias '{}' to sampler '{}'.", alias, handle);
+				return true;
 			}
 
 			static void ProcessUpdates(vk::CommandBuffer cmb) {
@@ -435,9 +559,10 @@ namespace Cori {
 				VulkanGlobalLayoutManager::UpdateSamplerDescriptor(0, sampler);
 				m_Samplers.push_back(sampler);
 				m_SamplerMap.insert({ samplerInfo, 0 });
+				m_SamplerAliases.insert({ "Default", 0});
 			}
 
-			static void AssignPlaceholderTexture(const Core::Handle<Texture2> handle) {
+			static void AssignPlaceholder(const Core::Handle<Texture2> handle) {
 				if (!Get().m_TexturePool.IsHandleValid(handle)) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to AssignPlaceholderTexture is invalid, skipping call.");
 					return;
@@ -600,7 +725,7 @@ namespace Cori {
 				return Get().m_TexturePool.Emplace();
 			}
 
-			static void CreateTexture(const Core::Handle<Texture2> handle, const Core::AssetDeletionPolicy deletionPolicy, const vk::ImageType type, const vk::Format format, const vk::Extent3D& extent, const uint32_t mipCount, const uint32_t layerCount, const vk::SampleCountFlagBits sampleFlags, const char* name = "") {
+			static void CreateTexture(const Core::Handle<Texture2> handle, const vk::ImageType type, const vk::Format format, const vk::Extent3D& extent, const uint32_t mipCount, const uint32_t layerCount, const vk::SampleCountFlagBits sampleFlags, const char* name = "") {
 				CORI_CORE_ASSERT(extent.width > 0 && extent.height > 0 && extent.depth > 0, "Invalid texture extent passed to VulkanTextureManager::CreateTexture." );
 
 				vk::ImageCreateInfo imageCreateInfo {
@@ -636,7 +761,6 @@ namespace Cori {
 				texture.image = VulkanImage::Create(info);
 				texture.descriptorIndex = Get().m_FreeTextureDescriptorSlots.back();
 				Get().m_FreeTextureDescriptorSlots.pop_back();
-				texture.deletionPolicy = deletionPolicy;
 
 				VulkanGlobalLayoutManager::UpdateSampledTextureDescriptor(texture.descriptorIndex, Get().m_TexturePool[Get().m_WhiteTexture].view);
 
@@ -653,8 +777,6 @@ namespace Cori {
 				table.version = handle.GetVersion();
 			}
 
-			//FIXME: ACHTUNG! if i destroy the texture that is currently loading, god knows what happens, likely crash
-			// add a queue for deletion of currently loading assets
 			static void DestroyTexture(const Core::Handle<Texture2> handle) {
 				if (!Get().m_TexturePool.IsHandleValid(handle)) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Handle passed to DestroyTexture is invalid, skipping call.");
@@ -721,6 +843,70 @@ namespace Cori {
 
 				free->ticket = value;
 				return free->texturesInTransfer;
+			}
+
+			struct SamplerJsonDef {
+				std::string Alias;
+
+				vk::SamplerCreateFlags Flags;
+				vk::Filter MagFilter;
+				vk::Filter MinFilter;
+				vk::SamplerAddressMode AddressModeU;
+				vk::SamplerAddressMode AddressModeV;
+				vk::SamplerAddressMode AddressModeW;
+				float MipLoadBias;
+				bool AnisotropyEnable;
+				float MaxAnisotropy;
+				bool CompareEnable;
+				vk::CompareOp CompareOp;
+				float MinLod;
+				float MaxLod;
+				vk::BorderColor BorderColor;
+				bool UnnormalizedCoordinates;
+
+				std::optional<uint32_t> internalValue;
+			};
+
+			static void LoadSamplers() {
+				std::filesystem::path config = FileSystem::PathManager::GetAliasedPath("ASSET_DIR") / "Samplers.json";
+
+				std::string buffer;
+				auto readError = glz::file_to_buffer(buffer, config.c_str());
+				if (readError != glz::error_code::none) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Failed to open sampler config file '{}', skipping it.", config.string());
+				}
+
+				std::vector<Utility::GlazeWithFallback<SamplerJsonDef, []{ return SamplerJsonDef{ .internalValue = UINT32_MAX }; }, "Sampler config in VulkanTextureManager">> samplers;
+
+				auto parseError = glz::read<Utility::ReflectEnumsOpts{ .error_on_missing_keys = true }>(samplers, buffer);
+				if (parseError) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::AssetManager }, "Failed to parse sampler configs from 'Samplers.json', error: {}", glz::format_error(parseError, buffer));
+					return;
+				}
+
+				for (auto& def : samplers) {
+					if (def->internalValue != UINT32_MAX) {
+						vk::SamplerCreateInfo info{
+							.flags = def->Flags,
+							.magFilter = def->MagFilter,
+							.minFilter = def->MinFilter,
+							.addressModeU = def->AddressModeU,
+							.addressModeV = def->AddressModeV,
+							.addressModeW = def->AddressModeW,
+							.mipLodBias = def->MipLoadBias,
+							.anisotropyEnable = def->AnisotropyEnable,
+							.maxAnisotropy = def->MaxAnisotropy,
+							.compareEnable = def->CompareEnable,
+							.compareOp = def->CompareOp,
+							.minLod = def->MinLod,
+							.maxLod = def->MaxLod,
+							.borderColor = def->BorderColor,
+							.unnormalizedCoordinates = def->UnnormalizedCoordinates
+						};
+
+						static_cast<void>(GetOrCreateSampler(info, def->Alias.c_str()));
+					}
+				}
 			}
 
 			std::vector<uint32_t> m_TextureRefCounts;
@@ -816,6 +1002,24 @@ namespace Cori {
 
 			std::vector<vk::Sampler> m_Samplers;
 			std::unordered_map<vk::SamplerCreateInfo, SamplerHandle, SCIHasher> m_SamplerMap;
+
+			struct TransparentHash {
+				using is_transparent = void;
+
+				size_t operator()(std::string_view sv) const noexcept {
+					return std::hash<std::string_view>{}(sv);
+				}
+			};
+
+			struct TransparentEqual {
+				using is_transparent = void;
+
+				bool operator()(std::string_view lhs, std::string_view rhs) const noexcept {
+					return lhs == rhs;
+				}
+			};
+
+			std::unordered_map<std::string, SamplerHandle, TransparentHash, TransparentEqual> m_SamplerAliases;
 
 			static constexpr vk::ImageLayout s_DstLayout{ vk::ImageLayout::eShaderReadOnlyOptimal };
 

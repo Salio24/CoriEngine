@@ -13,7 +13,7 @@
 #include "Image.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
 
-#if 0
+#if 1
 
 namespace Cori {
 	namespace Graphics {
@@ -24,7 +24,7 @@ namespace Cori {
 			class DrawGroup {
 			public:
 				DrawGroup() = default;
-				explicit DrawGroup(const Core::Handle<ShaderEffect> shaderEffect) : m_ShaderEffect(shaderEffect) {}
+				explicit DrawGroup(const Core::ConstHandle<ShaderEffect> shaderEffect) : m_ShaderEffect(shaderEffect) {}
 
 				[[nodiscard]] uint32_t GetBatchCount() const {
 					return m_BatchCount;
@@ -38,7 +38,7 @@ namespace Cori {
 					m_BatchCount--;
 				}
 
-				Core::Handle<ShaderEffect> m_ShaderEffect;
+				Core::ConstHandle<ShaderEffect> m_ShaderEffect;
 			private:
 				uint32_t m_BatchCount{ 0 };
 			};
@@ -101,7 +101,7 @@ namespace Cori {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
 
-				auto [groupIndex, batchIndex] = FindAppropriateGroupAndBatch(shaderEffect.value(), mesh);
+				auto [groupIndex, batchIndex] = FindAppropriateGroupAndBatch(shaderEffect.value().get().GetHandle(), mesh);
 
 				m_Batches[batchIndex].IncrementObjectCounter();
 				m_TotalObjectCount++;
@@ -226,7 +226,7 @@ namespace Cori {
 				auto newShaderEffect = VulkanMaterialSystem::GetMaterialShaderEffect(newMaterial);
 				auto oldShaderEffect = VulkanMaterialSystem::GetMaterialShaderEffect(constObjectRef.m_Material);
 				if (oldShaderEffect) {
-					if (oldShaderEffect.value() == newShaderEffect.value()) {
+					if (oldShaderEffect.value().get().GetHandle() == newShaderEffect.value().get().GetHandle()) {
 						m_Objects[handle]->m_Material = newMaterial;
 						return {};
 					}
@@ -240,14 +240,14 @@ namespace Cori {
 					DestroyBatch(constObjectRef.m_OwnerBatch);
 				}
 
-				auto [newGroup, newBatch] = FindAppropriateGroupAndBatch(newShaderEffect.value(), mesh);
+				auto [newGroup, newBatch] = FindAppropriateGroupAndBatch(newShaderEffect.value().get().GetHandle(), mesh);
 				m_Objects[handle]->m_OwnerBatch = newBatch;
 				m_Batches[newBatch].IncrementObjectCounter();
 
 				return {};
 			}
 
-			static void OnMaterialShaderEffectChanged(const Core::Handle<Material> material, [[maybe_unused]] const Core::Handle<ShaderEffect> oldShaderEffect, const Core::Handle<ShaderEffect> newShaderEffect) {
+			static void OnMaterialShaderEffectChanged(const Core::Handle<Material> material, [[maybe_unused]] const Core::ConstHandle<ShaderEffect> oldShaderEffect, const Core::ConstHandle<ShaderEffect> newShaderEffect) {
 				for (auto it = Get().m_Objects.cbegin(); it != Get().m_Objects.cend(); ++it) {
 					if (it->m_Material == material) {
 						auto& oldBatch = Get().m_Batches[it->m_OwnerBatch];
@@ -383,9 +383,11 @@ namespace Cori {
 
 						commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(ComputePS), &ps);
 
-						auto result = VulkanShaderManager::GetShader(cullShader);
-						CORI_CORE_ASSERT(result, "Failed to get cullShader. Error: {}", to_string(result.error()));
-						result.value().get().Bind(commandBuffer);
+						//auto result = VulkanShaderManager::GetShader(cullShader);
+						//CORI_CORE_ASSERT(result, "Failed to get cullShader. Error: {}", to_string(result.error()));
+						//result.value().get().Bind(commandBuffer);
+
+						VulkanShaderManager::Bind(cullShader.GetHandle(), commandBuffer);
 						commandBuffer.dispatch(std::ceil(maxObjectCount / 64.0f), 1, 1);
 					});
 
@@ -413,9 +415,11 @@ namespace Cori {
 
 						commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(ComputePS), &ps);
 
-						auto result = VulkanShaderManager::GetShader(cmgShader);
-						CORI_CORE_ASSERT(result, "Failed to get cmgShader. Error: {}", to_string(result.error()));
-						result.value().get().Bind(commandBuffer);
+						//auto result = VulkanShaderManager::GetShader(cmgShader);
+						//CORI_CORE_ASSERT(result, "Failed to get cmgShader. Error: {}", to_string(result.error()));
+						//result.value().get().Bind(commandBuffer);
+
+						VulkanShaderManager::Bind(cmgShader.GetHandle(), commandBuffer);
 						commandBuffer.dispatch(std::ceil(maxBatchCount / 64.0f), 1, 1);
 					});
 
@@ -440,9 +444,11 @@ namespace Cori {
 
 						commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(ComputePS), &ps);
 
-						auto result = VulkanShaderManager::GetShader(compactShader);
-						CORI_CORE_ASSERT(result, "Failed to get compactShader. Error: {}", to_string(result.error()));
-						result.value().get().Bind(commandBuffer);
+						//auto result = VulkanShaderManager::GetShader(compactShader);
+						//CORI_CORE_ASSERT(result, "Failed to get compactShader. Error: {}", to_string(result.error()));
+						//result.value().get().Bind(commandBuffer);
+
+						VulkanShaderManager::Bind(compactShader.GetHandle(), commandBuffer);
 						commandBuffer.dispatch(std::ceil(maxObjectCount / 64.0f), 1, 1);
 					});
 
@@ -458,7 +464,7 @@ namespace Cori {
 							.objectDataBuffer = registry.GetResource(ObjectBufferHandle).GetVulkanBuffer().GetBDA(),
 							.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
 							.materialDataBuffer = VulkanMaterialSystem::GetMaterialSlotMapBDA(),
-							.shaderEffectDataBuffer = VulkanMaterialSystem::GetShaderEffectDataBufferBDA(),
+							.shaderEffectDataBuffer = VulkanShaderEffectManager::GetShaderEffectDataBufferBDA(),
 							.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
 							.textureAssetTable = VulkanTextureManager::GetTextureAssetTableBDA(),
 							.batchInfo = registry.GetResource(BatchInfoBufferHandle).GetVulkanBuffer().GetBDA(),
@@ -474,7 +480,7 @@ namespace Cori {
 						currentPipelineState.Change(commandBuffer);
 
 						uint32_t currentCommandOffset = 0;
-						Core::Handle<ShaderEffect> currentShaderEffect;
+						Core::ConstHandle<ShaderEffect> currentShaderEffect;
 
 						auto& indirectCommandBuffer = registry.GetResource(DrawCommandBufferHandle);
 						auto& indirectCommandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle);
@@ -503,17 +509,13 @@ namespace Cori {
 								auto& group = m_DrawGroups[i];
 								if (group.GetBatchCount() != 0) {
 									if (group.m_ShaderEffect != currentShaderEffect) {
-										auto pairHandleResult = VulkanMaterialSystem::GetShaderEffectShaderPair(group.m_ShaderEffect);
+										auto pairHandleResult = VulkanShaderEffectManager::GetShaderEffectShaderPair(group.m_ShaderEffect);
 
 										CORI_CORE_ASSERT(pairHandleResult, "Group hold an invalid  shader effect handle.");
 
-										auto shaderResult = VulkanShaderManager::GetShader(pairHandleResult.value());
+										VulkanShaderManager::Bind(pairHandleResult.value().get().GetHandle(), commandBuffer);
 
-										CORI_CORE_ASSERT(shaderResult, "Group hold a shader effect that point to invalid Vert+Frag Shader pair.");
-
-										shaderResult.value().get().Bind(commandBuffer);
-
-										auto pipelineState = VulkanMaterialSystem::GetShaderEffectPipelineState(group.m_ShaderEffect).value();
+										auto pipelineState = VulkanShaderEffectManager::GetShaderEffectPipelineState(group.m_ShaderEffect).value();
 
 										if (pipelineState.get() != currentPipelineState) {
 											pipelineState.get().Change(commandBuffer);
@@ -584,10 +586,11 @@ namespace Cori {
 				file.read(reinterpret_cast<char*>(buffer.data()), static_cast<std::streamsize>(buffer.size()));
 				file.close();
 
-				cullShader = VulkanShaderManager::CreateComputeShader(buffer.data(), buffer.size(), "cullMain", "Cull Compute Shader");
-				cmgShader = VulkanShaderManager::CreateComputeShader(buffer.data(), buffer.size(), "cmgMain", "Indirect Command Generation Compute Shader");
-				compactShader = VulkanShaderManager::CreateComputeShader(buffer.data(), buffer.size(), "compactMain", "Instance Compacting Compute Shader");
+				cullShader = Core::AssetManager2::Load<ComputeShader>("assets/Shaders/Cull_Pass1.json");
+				cmgShader = Core::AssetManager2::Load<ComputeShader>("assets/Shaders/Cull_Pass2.json");
+				compactShader = Core::AssetManager2::Load<ComputeShader>("assets/Shaders/Cull_Pass3.json");
 
+				#if 0
 				std::ifstream file_(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "shaders/TestShader.spv", std::ios::ate | std::ios::binary);
 				if (!file_.is_open()) {
 					throw std::runtime_error("failed to open file!");
@@ -635,17 +638,21 @@ namespace Cori {
 					2, 3, 0    // second triangle
 				};
 
+				#endif
+
 				//quad = VulkanMeshManager::CreateMesh();
 				//VulkanMeshManager::LoadToMesh(quad, vertices, std::move(indices));
 
 				//auto image = Image::Create(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "placeholders/uv_sample.png");
-				texture = Core::AssetManager2::Load<Texture2>("assets/AssetNew.json");
-				swordAlbedo = Core::AssetManager2::Load<Texture2>("assets/Textures/Sword_T_albedo.json");
+				//texture = Core::AssetManager2::Load<Texture2>("assets/AssetNew.json");
+				//swordAlbedo = Core::AssetManager2::Load<Texture2>("assets/Textures/Sword_T_albedo.json");
 				sword = Core::AssetManager2::Load<Mesh>("assets/Sword_M.json");
 
 				//texture = VulkanTextureManager::CreateTexture(vk::ImageType::e2D, vk::Format::eR8G8B8A8Srgb, { image->GetHeight(), image->GetWidth(), 1 }, 1, 1, vk::SampleCountFlagBits::e1, "UV sample texture");
 				//VulkanTextureManager::UpdateTexture(texture, std::span{ static_cast<Byte*>(image->GetPixelData()), image->GetHeight() * image->GetWidth() * 4 }, { 0, 0, 0 }, { image->GetHeight(), image->GetWidth(), 1 }, { vk::ImageAspectFlagBits::eColor, 0, 0, 1 });
 				//VulkanTextureManager::ChangeView(texture, vk::ImageViewType::e2D, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
+
+				#if 0
 
 				PipelineState state{
 					.cullMode = vk::CullModeFlagBits::eNone,
@@ -670,17 +677,25 @@ namespace Cori {
 
 				material = VulkanMaterialSystem::CreateMaterial(shaderEffect, materialData, "Test Material");
 
-				glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(0.2f), glm::vec3(0.5f, 0.5, 0.5f));
 
-				RegisterObject(sword.GetHandle(), material, transform);
+				#endif
+
+				glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(0.2f), glm::vec3(0.5f, 0.5, 0.5f));
+				swordMaterial = Core::AssetManager2::Load<Material>("assets/Sword_Material.json");
+				auto result = RegisterObject(sword.GetHandle(), swordMaterial.GetHandle(), transform);
 				transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0f));
+
+				if (!result) {
+					CORI_DEBUG("{}", to_string(result.error()));
+				}
 
 				//RegisterObject(quad, material2, transform);
 
 				VulkanMaterialSystem::AddOnShaderEffectSwappedListener(OnMaterialShaderEffectChanged);
+				//FIXME: renderer crashes if we try to run it with no objects added, because we try to allocate virtual upload buffer with size 0 and vma becomes all whiny
 			}
 
-			[[nodiscard]] std::pair<DrawGroupIndex, BatchIndex> FindAppropriateGroupAndBatch(const Core::Handle<ShaderEffect> shaderEffect, const Core::Handle<Mesh> mesh) {
+			[[nodiscard]] std::pair<DrawGroupIndex, BatchIndex> FindAppropriateGroupAndBatch(const Core::ConstHandle<ShaderEffect> shaderEffect, const Core::Handle<Mesh> mesh) {
 				auto [it, groupInserted] = m_SubBatchLookup.try_emplace(shaderEffect, std::pair<DrawGroupIndex, std::unordered_map<Core::Handle<Mesh>, BatchIndex>>{});
 
 				if (groupInserted) {
@@ -741,22 +756,23 @@ namespace Cori {
 			Core::FlatSlotMap<DrawGroup, 0, false> m_DrawGroups;
 			uint32_t m_TotalObjectCount{ 0 };
 
-			std::unordered_map<Core::Handle<ShaderEffect>, std::pair<DrawGroupIndex, std::unordered_map<Core::Handle<Mesh>, BatchIndex>>> m_SubBatchLookup;
+			std::unordered_map<Core::ConstHandle<ShaderEffect>, std::pair<DrawGroupIndex, std::unordered_map<Core::Handle<Mesh>, BatchIndex>>> m_SubBatchLookup;
 
-			Core::Handle<ComputeShader> cullShader;
-			Core::Handle<ComputeShader> cmgShader;
-			Core::Handle<ComputeShader> compactShader;
+			Core::AssetRef<ComputeShader> cullShader;
+			Core::AssetRef<ComputeShader> cmgShader;
+			Core::AssetRef<ComputeShader> compactShader;
 
-			Core::Handle<VertFragShaderPair> testShader;
-			Core::Handle<VertFragShaderPair> defaultShader;
+			//Core::Handle<VertFragShaderPair> testShader;
+			//Core::Handle<VertFragShaderPair> defaultShader;
 
-			Core::Handle<Mesh> quad;
-			Core::Handle<Material> material;
-			Core::Handle<Material> material2;
-
-			Core::AssetRef<Texture2> texture;
+			Core::AssetRef<Mesh> quad;
+			//Core::AssetRef<Material> material;
+			//Core::AssetRef<Material> material2;
+			Core::AssetRef<Material> swordMaterial;
 			Core::AssetRef<Mesh> sword;
-			Core::AssetRef<Texture2> swordAlbedo;
+
+			//Core::AssetRef<Texture2> texture;
+			//Core::AssetRef<Texture2> swordAlbedo;
 
 			RenderGraphResourceRegistry m_GraphResourceRegistry;
 			RenderGraphPassRegistry m_GraphPassRegistry;

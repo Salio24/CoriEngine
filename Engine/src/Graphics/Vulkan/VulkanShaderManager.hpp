@@ -15,7 +15,7 @@ namespace Cori {
 		struct ComputeShader : public Core::SecondaryAssetBase {
 			using Manager = VulkanShaderManager;
 
-			vk::ShaderEXT m_ComputeShaderObject{};
+			vk::ShaderEXT m_ComputeShaderObject{ VK_NULL_HANDLE };
 			Core::AssetID assetID{ 0 };
 			Core::AssetDeletionPolicy deletionPolicy{};
 			bool placeholderAssigned{ false };
@@ -24,14 +24,34 @@ namespace Cori {
 		struct VertFragShaderPair : public Core::SecondaryAssetBase {
 			using Manager = VulkanShaderManager;
 
-			//TODO: make sure vk::ShaderEXT is initialized to VK_NULL_HANDLE
-			std::array<vk::ShaderEXT, 2> m_VertFragPair{};
+			std::array<vk::ShaderEXT, 2> m_VertFragPair{ VK_NULL_HANDLE, VK_NULL_HANDLE };
 			Core::AssetID assetID{ 0 };
 			Core::AssetDeletionPolicy deletionPolicy{};
 			bool placeholderAssigned{ false };
 		};
 
 		class VulkanShaderManager {
+			struct ShaderPairJsonAssetData {
+				std::string spv;
+				std::string vertexEntry;
+				std::string fragmentEntry;
+			};
+
+			struct ShaderPairJsonAssetDataCombined {
+				glz::skip Metadata;
+				ShaderPairJsonAssetData AssetData;
+			};
+
+			struct ComputeShaderJsonAssetData {
+				std::string spv;
+				std::string computeEntry;
+			};
+
+			struct ComputeShaderJsonAssetDataCombined {
+				glz::skip Metadata;
+				ComputeShaderJsonAssetData AssetData;
+			};
+
 		public:
 			using OnVertFragShaderPairDeletedFn = std::function<void(const Core::Handle<VertFragShaderPair>)>;
 
@@ -50,77 +70,81 @@ namespace Cori {
 
 				if constexpr (std::same_as<ComputeShader, T>) {
 					auto handle = Get().AllocateComputeShaderHandle();
-					std::ifstream file(assetFilePath);
-					if (!file.good()) {
+
+					Get().m_ComputeShaders[handle].assetID = id;
+					Get().m_ComputeShaders[handle].deletionPolicy = record.deletionPolicy;
+					record.rawHandleIndex = handle.GetIndex();
+					record.rawHandleVersion = handle.GetVersion();
+
+					std::string buffer;
+					auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
+					if (readError != glz::error_code::none) {
+						//error
 						Get().AssignPlaceholder(handle);
 						return handle;
 					}
 
-					nlohmann::json json = nlohmann::json::parse(file);
-					if (!json.contains("AssetData")) {
+					ComputeShaderJsonAssetDataCombined data;
+					auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
+					if (parseError) {
+						//error
 						Get().AssignPlaceholder(handle);
 						return handle;
 					}
 
-					auto& data = json["AssetData"];
-					if (!(data.contains("ComputeEntry") && data.contains("Spv"))) {
-						Get().AssignPlaceholder(handle);
-						return handle;
-					}
-
-					std::string entryName = data["ComputeEntry"].get<std::string>();
-
-					std::ifstream spvData(assetFilePath.replace_filename(data["Spv"].get<std::string>()), std::ios::ate | std::ios::binary);
+					std::ifstream spvData(assetFilePath.replace_filename(data.AssetData.spv), std::ios::ate | std::ios::binary);
 
 					if (!spvData.good()) {
 						Get().AssignPlaceholder(handle);
+						//error
 						return handle;
 					}
 
-					std::vector<Byte> buffer(file.tellg());
+					std::vector<Byte> spvBuffer(spvData.tellg());
 					spvData.seekg(0, std::ios::beg);
-					spvData.read(reinterpret_cast<char*>(buffer.data()), static_cast<std::streamsize>(buffer.size()));
+					spvData.read(reinterpret_cast<char*>(spvBuffer.data()), static_cast<std::streamsize>(spvBuffer.size()));
 					spvData.close();
 
-					Get().CreateComputeShader(handle, buffer.data(), buffer.size(), entryName.c_str(), "ADD A NAME LATER");
+					Get().CreateComputeShader(handle, spvBuffer.data(), spvBuffer.size(), data.AssetData.computeEntry.c_str(), "ADD A NAME LATER");
 					return handle;
 				}
 				else {
 					auto handle = Get().AllocateShaderPairHandle();
-					std::ifstream file(assetFilePath);
-					if (!file.good()) {
+					Get().m_PairShaders[handle].assetID = id;
+					Get().m_PairShaders[handle].deletionPolicy = record.deletionPolicy;
+					record.rawHandleIndex = handle.GetIndex();
+					record.rawHandleVersion = handle.GetVersion();
+
+					std::string buffer;
+					auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
+					if (readError != glz::error_code::none) {
+						//error
 						Get().AssignPlaceholder(handle);
 						return handle;
 					}
 
-					nlohmann::json json = nlohmann::json::parse(file);
-					if (!json.contains("AssetData")) {
+					ShaderPairJsonAssetDataCombined data;
+					auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
+					if (parseError) {
+						//error
 						Get().AssignPlaceholder(handle);
 						return handle;
 					}
 
-					auto& data = json["AssetData"];
-					if (!(data.contains("VertexEntry") && data.contains("FragmentEntry") && data.contains("Spv"))) {
-						Get().AssignPlaceholder(handle);
-						return handle;
-					}
-
-					std::string vertEntryName = data["VertexEntry"].get<std::string>();
-					std::string fragEntryName = data["FragmentEntry"].get<std::string>();
-
-					std::ifstream spvData(assetFilePath.replace_filename(data["Spv"].get<std::string>()), std::ios::ate | std::ios::binary);
+					std::ifstream spvData(assetFilePath.replace_filename(data.AssetData.spv), std::ios::ate | std::ios::binary);
 
 					if (!spvData.good()) {
 						Get().AssignPlaceholder(handle);
+						//error
 						return handle;
 					}
 
-					std::vector<Byte> buffer(file.tellg());
+					std::vector<Byte> spvBuffer(spvData.tellg());
 					spvData.seekg(0, std::ios::beg);
-					spvData.read(reinterpret_cast<char*>(buffer.data()), static_cast<std::streamsize>(buffer.size()));
+					spvData.read(reinterpret_cast<char*>(spvBuffer.data()), static_cast<std::streamsize>(spvBuffer.size()));
 					spvData.close();
 
-					Get().CreateShaderPair(handle, buffer.data(), buffer.size(), vertEntryName.c_str(), buffer.data(), buffer.size(), fragEntryName.c_str(), "ADD A NAME LATER");
+					Get().CreateShaderPair(handle, spvBuffer.data(), spvBuffer.size(), data.AssetData.vertexEntry.c_str(), spvBuffer.data(), spvBuffer.size(), data.AssetData.fragmentEntry.c_str(), "ADD A NAME LATER");
 					return handle;
 				}
 			}
@@ -161,6 +185,52 @@ namespace Cori {
 
 				Get().DestroyShader(handle);
 				Get().FreeHandle(handle);
+			}
+
+			static bool ChangeDeletionPolicy(const Core::Handle<ComputeShader> handle, const Core::AssetDeletionPolicy newPolicy) {
+				if (!Get().m_ComputeShaders.IsHandleValid(handle)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderManager }, "Handle passed to ChangeDeletionPolicy is invalid, skipping call.");
+					return false;
+				}
+
+				auto& shader = Get().m_ComputeShaders[handle];
+				if (shader.deletionPolicy == newPolicy) {
+					return false;
+				}
+
+				if (shader.deletionPolicy == Core::AssetDeletionPolicy::eKeepAlive) {
+					auto refCount = Get().m_ComputeShadersRefCounts[handle.GetIndex()];
+					if (refCount == 0) {
+						Unload(handle);
+						return true;
+					}
+				}
+
+				shader.deletionPolicy = newPolicy;
+				return false;
+			}
+
+			static bool ChangeDeletionPolicy(const Core::Handle<VertFragShaderPair> handle, const Core::AssetDeletionPolicy newPolicy) {
+				if (!Get().m_PairShaders.IsHandleValid(handle)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderManager }, "Handle passed to ChangeDeletionPolicy is invalid, skipping call.");
+					return false;
+				}
+
+				auto& shader = Get().m_PairShaders[handle];
+				if (shader.deletionPolicy == newPolicy) {
+					return false;
+				}
+
+				if (shader.deletionPolicy == Core::AssetDeletionPolicy::eKeepAlive) {
+					auto refCount = Get().m_PairShadersRefCounts[handle.GetIndex()];
+					if (refCount == 0) {
+						Unload(handle);
+						return true;
+					}
+				}
+
+				shader.deletionPolicy = newPolicy;
+				return false;
 			}
 
 			static Core::AssetID GetAssetID(const Core::Handle<VertFragShaderPair> handle) {
@@ -243,7 +313,7 @@ namespace Cori {
 				Get().m_Listeners.clear();
 			}
 
-			static void Bind(const Core::Handle<VertFragShaderPair> handle, vk::CommandBuffer cmb) {
+			static void Bind(const Core::ConstHandle<VertFragShaderPair> handle, vk::CommandBuffer cmb) {
 				if (!Get().m_PairShaders.IsHandleValid(handle)) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderManager }, "Handle passed to Bind is invalid, binding placeholder shader pair.");
 					cmb.bindShadersEXT({ vk::ShaderStageFlagBits::eVertex, vk::ShaderStageFlagBits::eFragment }, Get().m_PairShaders[Get().m_PlaceholderShaderPair].m_VertFragPair);
@@ -253,7 +323,7 @@ namespace Cori {
 				cmb.bindShadersEXT({ vk::ShaderStageFlagBits::eVertex, vk::ShaderStageFlagBits::eFragment }, Get().m_PairShaders[handle].m_VertFragPair);
 			}
 
-			static void Bind(const Core::Handle<ComputeShader> handle, vk::CommandBuffer cmb) {
+			static void Bind(const Core::ConstHandle<ComputeShader> handle, vk::CommandBuffer cmb) {
 				if (!Get().m_ComputeShaders.IsHandleValid(handle)) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderManager }, "Handle passed to Bind is invalid, binding placeholder (empty) compute shader.");
 					cmb.bindShadersEXT({ vk::ShaderStageFlagBits::eCompute }, Get().m_ComputeShaders[Get().m_PlaceholderComputeShader].m_ComputeShaderObject);
@@ -340,7 +410,7 @@ namespace Cori {
 				auto& object = m_ComputeShaders[handle];
 				vk::ShaderEXT shaderObject{};
 
-				auto result = VulkanEngine::GetLogicalDevice().createShadersEXT(1, &createInfo, nullptr, &object.m_ComputeShaderObject);
+				auto result = VulkanEngine::GetLogicalDevice().createShadersEXT(1, &createInfo, nullptr, &shaderObject);
 				if (result != vk::Result::eSuccess) {
 					CORI_CORE_FATAL_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderManager }, "Compute shader '{}' creation failed, this can have catastrophic consequences, likely crash. Error: {}", shaderName, vk::to_string(result));
 					VulkanEngine::GetLogicalDevice().destroyShaderEXT(object.m_ComputeShaderObject);
@@ -497,7 +567,7 @@ namespace Cori {
 				m_ComputeShaders.Reserve(64);
 				m_PairShaders.Reserve(64);
 				m_ComputeShadersRefCounts.resize(64);
-				m_PairShadersRefCounts.reserve(64);
+				m_PairShadersRefCounts.resize(64);
 
 				std::ifstream file(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "shaders/DefaultShader.spv", std::ios::ate | std::ios::binary);
 

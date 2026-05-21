@@ -14,7 +14,7 @@ namespace Cori {
 
 		struct MaterialData {
 			alignas(16) glm::vec4 colorFactor{ 1.0f };
-			Core::Handle<Texture2> albedoTexture;
+			Core::AssetRef<Texture2> albedoTexture;
 			SamplerHandle albedoSampler{ 0 };
 			uint32_t pad{ 0 };
 		};
@@ -33,6 +33,21 @@ namespace Cori {
 				Core::AssetID assetID;
 				Core::AssetDeletionPolicy deletionPolicy;
 			};
+
+			struct JsonAssetData {
+				struct JsonMaterialData {
+					std::array<float, 4> colorFactor;
+					Core::AssetRef<Texture2> albedoTexture;
+					std::string albedoSampler;
+				} materialData;
+
+				Core::AssetRef<ShaderEffect> shaderEffect;
+			};
+
+			struct JsonAssetDataCombined {
+				glz::skip Metadata;
+				JsonAssetData AssetData;
+			};
 		public:
 			using OnShaderEffectSwappedFn = std::function<void(const Core::Handle<Material>, const Core::ConstHandle<ShaderEffect> oldFx, const Core::ConstHandle<ShaderEffect> newFx)>;
 
@@ -44,7 +59,40 @@ namespace Cori {
 
 			template<typename T> requires std::same_as<Material, T>
 			[[nodiscard]] static Core::Handle<T> Load(const Core::AssetID id) {
+				auto& record = Core::AssetManager2::GetAssetRecord(id);
+				const auto& dir = Core::AssetManager2::GetAssetDir();
+				auto assetFilePath = dir / record.path;
 
+				auto handle = Get().AllocateHandle();
+				Get().m_MaterialCPUData[handle.GetIndex()].assetID = id;
+				Get().m_MaterialCPUData[handle.GetIndex()].deletionPolicy = record.deletionPolicy;
+				record.rawHandleIndex = handle.GetIndex();
+				record.rawHandleVersion = handle.GetVersion();
+
+				std::string buffer;
+				auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
+				if (readError != glz::error_code::none) {
+					//error
+					Get().AssignPlaceholder(handle);
+					return handle;
+				}
+
+				JsonAssetDataCombined data;
+				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
+				if (parseError) {
+					//error
+					Get().AssignPlaceholder(handle);
+					return handle;
+				}
+
+				MaterialData materialData {
+					.colorFactor = { data.AssetData.materialData.colorFactor[0], data.AssetData.materialData.colorFactor[1], data.AssetData.materialData.colorFactor[2], data.AssetData.materialData.colorFactor[3] },
+					.albedoTexture = std::move(data.AssetData.materialData.albedoTexture),
+					.albedoSampler = VulkanTextureManager::GetSampler(data.AssetData.materialData.albedoSampler.c_str())
+				};
+
+				Get().CreateMaterial(handle, std::move(data.AssetData.shaderEffect), std::move(materialData));
+				return handle;
 			}
 
 			static void Unload(const Core::Handle<Material> handle) {
@@ -60,6 +108,29 @@ namespace Cori {
 
 				Get().DestroyMaterial(handle);
 				Get().FreeHandle(handle);
+			}
+
+			static bool ChangeDeletionPolicy(const Core::Handle<Material> handle, const Core::AssetDeletionPolicy newPolicy) {
+				if (!Get().m_Materials.IsHandleValid(handle)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Handle passed to ChangeDeletionPolicy is invalid, skipping call.");
+					return false;
+				}
+
+				auto& material = Get().m_MaterialCPUData[handle.GetIndex()];
+				if (material.deletionPolicy == newPolicy) {
+					return false;
+				}
+
+				if (material.deletionPolicy == Core::AssetDeletionPolicy::eKeepAlive) {
+					auto refCount = Get().m_RefCounts[handle.GetIndex()];
+					if (refCount == 0) {
+						Unload(handle);
+						return true;
+					}
+				}
+
+				material.deletionPolicy = newPolicy;
+				return false;
 			}
 
 			[[nodiscard]] static Core::AssetID GetAssetID(const Core::Handle<Material> handle) {
@@ -116,7 +187,10 @@ namespace Cori {
 
 			~VulkanMaterialSystem() = default;
 
+			static constexpr bool EnableHotReload = false;
+
 		protected:
+			friend class Renderer;
 			[[nodiscard]] static Core::Handle<Material> DuplicateMaterial(const Core::Handle<Material> material, const char* name = "") {
 				//if (!IsHandleValid(material)) {
 				//	CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid Material handle passed to DuplicateMaterial, returning placeholder material.");
@@ -140,13 +214,13 @@ namespace Cori {
 				return std::cref(data.customData);
 			}
 
-			static std::expected<void, ErrorCode> ChangeMaterialData(const Core::Handle<Material> material, const MaterialData& data) {
+			static std::expected<void, ErrorCode> ChangeMaterialData(const Core::Handle<Material> material, MaterialData&& data) {
 				if (!IsHandleValid(material)) {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
 
 				auto dataRef = Get().m_Materials[material];
-				dataRef->customData = data;
+				dataRef->customData = std::move(data);
 				return {};
 			}
 
@@ -163,6 +237,10 @@ namespace Cori {
 			static std::expected<void, ErrorCode> ChangeMaterialShaderEffect(const Core::Handle<Material> material, Core::AssetRef<ShaderEffect> newShaderEffect) {
 				if (!IsHandleValid(material)) {
 					return std::unexpected(ErrorCode::eInvalidHandle);
+				}
+
+				if (!newShaderEffect.IsInitialized()) {
+					return std::unexpected(ErrorCode::eUninitializedAssetRef);
 				}
 
 				auto dataRef = Get().m_Materials[material];
@@ -207,20 +285,25 @@ namespace Cori {
 				return handle;
 			}
 
-			void CreateMaterial(const Core::Handle<Material> material, Core::AssetRef<ShaderEffect> shaderEffect, const MaterialData& data) {
+			void CreateMaterial(const Core::Handle<Material> material, Core::AssetRef<ShaderEffect> shaderEffect, MaterialData&& data) {
 				if (!IsHandleValid(material)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid Material handle was passed to CreateMaterial.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid Material handle was passed to CreateMaterial, skipping call.");
+					return;
+				}
+
+				if (!shaderEffect.IsInitialized()) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Uninitialized ShaderEffect AssetRef was passed to CreateMaterial, skipping call.");
 					return;
 				}
 
 				auto dataRef = m_Materials[material];
 				dataRef->shaderEffect = std::move(shaderEffect);
-				dataRef->customData = data;
+				dataRef->customData = std::move(data);
 			}
 
 			void DestroyMaterial(const Core::Handle<Material> material) {
 				if (!IsHandleValid(material)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid Material handle was passed to DestroyMaterial.");
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid Material handle was passed to DestroyMaterial, skipping call.");
 					return;
 				}
 
@@ -252,13 +335,15 @@ namespace Cori {
 
 			VulkanMaterialSystem() {
 				m_Materials.Reserve(512);
+				m_MaterialCPUData.resize(512);
+				m_RefCounts.resize(512);
 
 				MaterialData placeholderData{
-					.albedoTexture = VulkanTextureManager::GetPlaceholder<Texture2>(),
+					.albedoTexture = Core::AssetRef(VulkanTextureManager::GetPlaceholder<Texture2>()),
 					.albedoSampler = 0
 				};
 
-				m_PlaceholderMaterial = m_Materials.Emplace(Material{ .customData = placeholderData, .shaderEffect = Core::AssetRef(VulkanShaderEffectManager::GetPlaceholder<ShaderEffect>()) });
+				m_PlaceholderMaterial = m_Materials.Emplace(Material{ .customData = std::move(placeholderData), .shaderEffect = Core::AssetRef(VulkanShaderEffectManager::GetPlaceholder<ShaderEffect>()) });
 			}
 
 			static void ShaderEffectDeletedListener(const Core::Handle<ShaderEffect> handle) {
@@ -281,5 +366,9 @@ namespace Cori {
 
 			static std::unique_ptr<VulkanMaterialSystem> s_Instance;
 		};
+	}
+
+	namespace Core {
+		CORI_ADD_ASSET_TRAITS(Material, Graphics);
 	}
 }

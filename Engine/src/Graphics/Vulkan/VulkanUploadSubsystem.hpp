@@ -1326,10 +1326,11 @@ namespace Cori {
 
 		};
 
-		template<std::copy_constructible T, uint16_t REUSE_THRESHOLD = 64, bool ENABLE_VERSIONING = true, Core::IsVersionedHandle HandleT = Core::Handle<T>>
+		template<std::copy_constructible T, uint16_t REUSE_THRESHOLD = 64, bool ENABLE_VERSIONING = true, Core::IsVersionedHandle HandleT = Core::Handle<T>, typename ConstHandleT = Core::ConstHandle<T>> requires std::derived_from<HandleT, ConstHandleT>
 		class VulkanFlatSlotMap {
 		public:
 			using Handle = HandleT;
+			using ConstHandle = ConstHandleT;
 
 			using SizeT = uint32_t;
 
@@ -1516,7 +1517,7 @@ namespace Cori {
 				return std::nullopt;
 			}
 
-			[[nodiscard]] std::optional<std::reference_wrapper<const T>> TryGet(const Handle handle) const {
+			[[nodiscard]] std::optional<std::reference_wrapper<const T>> TryGet(const ConstHandle handle) const {
 				if (IsHandleValid(handle)) {
 					return std::cref(m_Data[handle.GetIndex()]);
 				}
@@ -1529,7 +1530,7 @@ namespace Cori {
 				return m_Data[handle.GetIndex()];
 			}
 
-			[[nodiscard]] ConstReference operator[](const Handle handle) const {
+			[[nodiscard]] ConstReference operator[](const ConstHandle handle) const {
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Accessed FlatSlotMap with an invalid handle.");
 				return m_Data[handle.GetIndex()];
 			}
@@ -1632,7 +1633,7 @@ namespace Cori {
 				return m_Data.GetVulkanBuffer();
 			}
 
-			[[nodiscard]] bool IsHandleValid(const Handle handle) const {
+			[[nodiscard]] bool IsHandleValid(const ConstHandle handle) const {
 				if constexpr (ENABLE_VERSIONING) {
 					return IsIndexValid(handle.GetIndex()) && m_Versions[handle.GetIndex()] == handle.GetVersion();
 				}

@@ -78,6 +78,15 @@ namespace Cori {
 				bool loaded{ false };
 			};
 
+			struct JsonAssetData {
+				std::string obj;
+			};
+
+			struct JsonAssetDataCombined {
+				glz::skip Metadata;
+				JsonAssetData AssetData;
+			};
+
 		public:
 			static void Init();
 
@@ -92,27 +101,29 @@ namespace Cori {
 
 				auto handle = Get().AllocateHandle();
 				Get().m_MeshMetadata[handle.GetIndex()].assetID = id;
+				Get().m_MeshMetadata[handle.GetIndex()].deletionPolicy = record.deletionPolicy;
 				record.rawHandleIndex = handle.GetIndex();
 				record.rawHandleVersion = handle.GetVersion();
 
 				auto assetFilePath = dir / record.path;
-				std::ifstream file(assetFilePath);
-				nlohmann::json json = nlohmann::json::parse(file);
-				//FIXME: handle exceptions from json
-				if (!json.contains("AssetData")) {
+
+				std::string buffer;
+				auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
+				if (readError != glz::error_code::none) {
 					//error
-					Get().AssignPlaceholderMesh(handle);
+					Get().AssignPlaceholder(handle);
 					return handle;
 				}
 
-				auto& data = json["AssetData"];
-				if (!(data.contains("Obj"))) {
+				JsonAssetDataCombined data;
+				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
+				if (parseError) {
 					//error
-					Get().AssignPlaceholderMesh(handle);
+					Get().AssignPlaceholder(handle);
 					return handle;
 				}
 
-				std::filesystem::path objPath = assetFilePath.replace_filename(data["Obj"].get<std::string>());
+				std::filesystem::path objPath = assetFilePath.replace_filename(data.AssetData.obj);
 				std::vector<StaticVertex> vertexData;
 				std::vector<uint32_t> indexData;
 
@@ -125,34 +136,38 @@ namespace Cori {
 			static void Reload(const Core::Handle<Mesh> handle, const Core::AssetID id) {
 				auto& record = Core::AssetManager2::GetAssetRecord(id);
 				const auto& dir = Core::AssetManager2::GetAssetDir();
+				bool deleted = ChangeDeletionPolicy(handle, record.deletionPolicy);
+				if (deleted) {
+					return;
+				}
 
 				auto assetFilePath = dir / record.path;
-				std::ifstream file(assetFilePath);
-				nlohmann::json json = nlohmann::json::parse(file);
-				if (!json.contains("AssetData")) {
+
+				std::string buffer;
+				auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
+				if (readError != glz::error_code::none) {
 					//error
-					Get().AssignPlaceholderMesh(handle);
+					return;
 				}
 
-				auto& data = json["AssetData"];
-				if (!(data.contains("Obj"))) {
+				JsonAssetDataCombined data;
+				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
+				if (parseError) {
 					//error
-					Get().AssignPlaceholderMesh(handle);
+					return;
 				}
-
 				Get().DestroyMesh(handle);
 				auto& meta = Get().m_MeshMetadata[handle.GetIndex()];
 				if (id != meta.assetID) {
+					record.rawHandleIndex = handle.GetIndex();
+					record.rawHandleVersion = handle.GetVersion();
 					auto& oldRecord = Core::AssetManager2::GetAssetRecord(meta.assetID);
-					oldRecord.status = AssetStatus::eUnloaded;
 					oldRecord.rawHandleIndex = UINT32_MAX;
 					oldRecord.rawHandleVersion = 0;
+					oldRecord.status = AssetStatus::eUnloaded;
 				}
 
-				record.rawHandleIndex = handle.GetIndex();
-				record.rawHandleVersion = handle.GetVersion();
-
-				std::filesystem::path objPath = assetFilePath.replace_filename(data["Obj"].get<std::string>());
+				std::filesystem::path objPath = assetFilePath.replace_filename(data.AssetData.obj);
 				std::vector<StaticVertex> vertexData;
 				std::vector<uint32_t>indexData;
 
@@ -174,6 +189,29 @@ namespace Cori {
 
 				Get().DestroyMesh(handle);
 				Get().FreeHandle(handle);
+			}
+
+			static bool ChangeDeletionPolicy(const Core::Handle<Mesh> handle, const Core::AssetDeletionPolicy newPolicy) {
+				if (!Get().m_Meshes.IsHandleValid(handle)) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to ChangeDeletionPolicy is invalid, skipping call.");
+					return false;
+				}
+
+				auto& meta = Get().m_MeshMetadata[handle.GetIndex()];
+				if (meta.deletionPolicy == newPolicy) {
+					return false;
+				}
+
+				if (meta.deletionPolicy == Core::AssetDeletionPolicy::eKeepAlive) {
+					auto refCount = Get().m_RefCounts[handle.GetIndex()];
+					if (refCount == 0) {
+						Unload(handle);
+						return true;
+					}
+				}
+
+				meta.deletionPolicy = newPolicy;
+				return false;
 			}
 
 			static Core::AssetID GetAssetID(const Core::Handle<Mesh> handle) {
@@ -461,7 +499,7 @@ namespace Cori {
 				return handle;
 			}
 
-			void AssignPlaceholderMesh(const Core::Handle<Mesh> handle) {
+			void AssignPlaceholder(const Core::Handle<Mesh> handle) {
 				if (!m_Meshes.IsHandleValid(handle)) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to AssignPlaceholderMesh is invalid, skipping call.");
 					return;
