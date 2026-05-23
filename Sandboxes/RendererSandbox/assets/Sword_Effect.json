@@ -1,8 +1,8 @@
 {
     "Metadata": {
-        "AssetTypename": "ShaderEffect",
-        "AssetType": "eSecondary",
-        "AssetDeletionPolicy": "eRefCounted"
+        "assetTypename": "ShaderEffect",
+        "assetType": "eSecondary",
+        "assetDeletionPolicy": "eRefCounted"
     },
     "AssetData": {
         "shaderPair": "assets/Shaders/TestShader.json",

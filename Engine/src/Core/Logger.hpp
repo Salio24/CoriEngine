@@ -1,12 +1,5 @@
 ﻿#ifndef LOGGER
 #define LOGGER
-#include <spdlog/spdlog.h>
-#include <spdlog/async.h>
-#include <spdlog/sinks/rotating_file_sink.h>
-#include <spdlog/fmt/ostr.h>
-#include <spdlog/fmt/bundled/color.h>
-#include <spdlog/fmt/bundled/base.h>
-#include <spdlog/fmt/bundled/format.h>
 #include "Utility/CleanTypeName.hpp"
 
 #if defined(__clang__)

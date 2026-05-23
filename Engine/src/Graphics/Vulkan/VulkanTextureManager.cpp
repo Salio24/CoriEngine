@@ -7,7 +7,6 @@ namespace Cori {
 		void VulkanTextureManager::Init() {
 			CORI_CORE_ASSERT(!s_Instance, "VulkanTextureManager is already initialized.");
 			s_Instance = std::unique_ptr<VulkanTextureManager>(new VulkanTextureManager());
-			LoadSamplers();
 		}
 
 		void VulkanTextureManager::Shutdown() {

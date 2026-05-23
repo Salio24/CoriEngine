@@ -1,10 +1,10 @@
 {
     "Metadata": {
-        "AssetTypename": "Texture2",
-        "AssetType": "eSecondary",
-        "AssetDeletionPolicy": "eRefCounted"
+        "assetTypename": "Texture2",
+        "assetType": "eSecondary",
+        "assetDeletionPolicy": "eRefCounted"
     },
     "AssetData": {
-        "Image": "Sword_albedo.jpg"
+        "image": "Sword_albedo.jpg"
     }
 }

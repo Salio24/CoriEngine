@@ -1,10 +1,9 @@
 #pragma once
-#include <gch/small_vector.hpp>
-#include "Vulkan/VulkanEngine.hpp"
-#include "Vulkan/VulkanImage.hpp"
-#include "Vulkan/VulkanBuffer.hpp"
-#include "Vulkan/VulkanLayoutManager.hpp"
-#include "Vulkan/VulkanUploadSubsystem.hpp"
+#include "VulkanEngine.hpp"
+#include "VulkanImage.hpp"
+#include "VulkanBuffer.hpp"
+#include "VulkanLayoutManager.hpp"
+#include "VulkanUploadSubsystem.hpp"
 #include "Utility/StringHash.hpp"
 #include "Utility/HashCombine.hpp"
 

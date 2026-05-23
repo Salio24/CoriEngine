@@ -100,7 +100,7 @@ namespace Cori {
 				std::string buffer;
 				auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
 				if (readError != glz::error_code::none) {
-					//error
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Load({}), handle [{},{}], failed to open asset file '{}', error '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead.", id, handle.GetIndex(), handle.GetVersion(), assetFilePath.string(), glz::enum_to_string(readError));
 					Get().AssignPlaceholder(handle);
 					return handle;
 				}
@@ -108,8 +108,7 @@ namespace Cori {
 				JsonAssetDataCombined data;
 				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
 				if (parseError) {
-					std::string error_msg = glz::format_error(parseError, buffer);
-					std::cerr << error_msg << '\n';
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Load({}), handle [{},{}], failed to parse asset file '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead. Error: {}", id, handle.GetIndex(), handle.GetVersion(), assetFilePath.string(), glz::format_error(parseError, buffer));
 					Get().AssignPlaceholder(handle);
 					return handle;
 				}
@@ -257,8 +256,7 @@ namespace Cori {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
 
-				auto dataRef = Get().m_ShaderEffectData[shaderEffect.GetIndex()];
-				dataRef = data;
+				Get().m_ShaderEffectData[shaderEffect.GetIndex()] = data;
 				return {};
 			}
 
@@ -340,8 +338,7 @@ namespace Cori {
 				effect.shaders = std::move(shaderPair);
 				effect.pipelineState = state;
 
-				auto dataRef = m_ShaderEffectData[handle.GetIndex()];
-				dataRef = data;
+				m_ShaderEffectData[handle.GetIndex()] = data;
 			}
 
 			void DestroyShaderEffect(const Core::Handle<ShaderEffect> handle) {

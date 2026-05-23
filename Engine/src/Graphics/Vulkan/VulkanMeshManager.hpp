@@ -110,7 +110,7 @@ namespace Cori {
 				std::string buffer;
 				auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
 				if (readError != glz::error_code::none) {
-					//error
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Load({}), compute shader handle [{},{}], failed to open asset file '{}', error '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead.", id, handle.GetIndex(), handle.GetVersion(), assetFilePath.string(), glz::enum_to_string(readError));
 					Get().AssignPlaceholder(handle);
 					return handle;
 				}
@@ -118,7 +118,7 @@ namespace Cori {
 				JsonAssetDataCombined data;
 				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
 				if (parseError) {
-					//error
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Load({}), compute shader handle [{},{}], failed to parse asset file '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead. Error: {}", id, handle.GetIndex(), handle.GetVersion(), assetFilePath.string(), glz::format_error(parseError, buffer));
 					Get().AssignPlaceholder(handle);
 					return handle;
 				}
@@ -146,16 +146,17 @@ namespace Cori {
 				std::string buffer;
 				auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
 				if (readError != glz::error_code::none) {
-					//error
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Reload([{},{}], {}) failed to open asset file '{}', error '{}', asset will not be reloaded.", handle.GetIndex(), handle.GetVersion(), id, assetFilePath.string(), glz::enum_to_string(readError));
 					return;
 				}
 
 				JsonAssetDataCombined data;
 				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
 				if (parseError) {
-					//error
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Reload([{},{}], {}) failed to parse asset file '{}', asset will not be reloaded. Error: {}", handle.GetIndex(), handle.GetVersion(), id, assetFilePath.string(), glz::format_error(parseError, buffer));
 					return;
 				}
+
 				Get().DestroyMesh(handle);
 				auto& meta = Get().m_MeshMetadata[handle.GetIndex()];
 				if (id != meta.assetID) {
@@ -267,12 +268,9 @@ namespace Cori {
 								continue;
 							}
 
-							auto meshData = std::as_const(Get().m_Meshes)[inTransferMesh.mesh];
+							auto& meshData = Get().m_Meshes[inTransferMesh.mesh];
 							meshData.indexCount = inTransferMesh.indexCount;
 							meshData.firstIndex = inTransferMesh.indexOffset;
-
-							auto meshRef = Get().m_Meshes[inTransferMesh.mesh];
-							meshRef = meshData;
 
 							Get().m_BarrierCache.emplace_back(vk::BufferMemoryBarrier2{
 								.srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
@@ -507,8 +505,7 @@ namespace Cori {
 
 				auto placeholderData = std::as_const(m_Meshes)[m_PlaceholderMesh];
 				placeholderData.version = handle.GetVersion();
-				auto dataRef = m_Meshes[handle];
-				dataRef = placeholderData;
+				m_Meshes[handle] = placeholderData;
 
 				m_MeshMetadata[handle.GetIndex()].placeholderAssigned = true;
 			}
@@ -661,8 +658,7 @@ namespace Cori {
 						.version = handle.GetVersion()
 					};
 
-					auto dataRef = m_Meshes[handle];
-					dataRef = mesh;
+					m_Meshes[handle] = mesh;
 
 					auto& meta = m_MeshMetadata[handle.GetIndex()];
 
@@ -696,8 +692,8 @@ namespace Cori {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "VulkanStreamingLine returned with error code eInvalidData during CreateMesh call, using placeholder.");
 
 					auto placeholderData = std::as_const(m_Meshes)[m_PlaceholderMesh];
-					auto dataRef = m_Meshes[handle];
-					dataRef = placeholderData;
+					placeholderData.version = handle.GetVersion();
+					m_Meshes[handle] = placeholderData;
 
 					auto& meta = m_MeshMetadata[handle.GetIndex()];
 					meta.placeholderAssigned = true;
@@ -712,15 +708,11 @@ namespace Cori {
 				std::vector<Byte> verticesBytes(vertices.size() * sizeof(VertexT));
 				memcpy(verticesBytes.data(), vertices.data(), vertices.size() * sizeof(VertexT));
 
-				Mesh mesh{
-					.indexCount = 0,
-					.firstIndex = 0,
-					.firstVertexAddress = vertexStorage->buffer.GetBDA() + vertexOffset,
-					.vertexType = std::to_underlying(vertexType)
-				};
-
-				auto dataRef = m_Meshes[handle];
-				dataRef = mesh;
+				auto& meshData = m_Meshes[handle];
+				meshData.indexCount = 0;
+				meshData.firstIndex = 0;
+				meshData.firstVertexAddress = vertexStorage->buffer.GetBDA() + vertexOffset;
+				meshData.vertexType = std::to_underlying(vertexType);
 
 				auto& meta = m_MeshMetadata[handle.GetIndex()];
 
@@ -756,14 +748,11 @@ namespace Cori {
 				meta.placeholderAssigned = false;
 				meta.dataVersion++;
 
-				auto meshData = std::as_const(m_Meshes)[handle];
+				auto& meshData = m_Meshes[handle];
 				meshData.indexCount = 0;
 				meshData.firstIndex = 0;
 				meshData.firstVertexAddress = 0;
 				meshData.vertexType = 0;
-
-				auto dataRef = m_Meshes[handle];
-				dataRef = meshData;
 			}
 
 			std::vector<MeshInTransfer>& FindInTransferSlot(const uint64_t value) {

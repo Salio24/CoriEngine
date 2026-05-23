@@ -33,6 +33,7 @@ option(CORI_USE_AVX2 "Allows the use of AVX2 in thirdparty libs. You need to do 
 option(CORI_USE_NATIVE "Adds -march=native compiler flag if CORI_FORCE_AVX2 is OFF, ON by default" ON)
 option(CORI_FORCE_AVX2 "Force AVX2, default OFF, -march=native is used by default. You need to do clean configuration+build after changing this." OFF)
 option(CORI_ENABLE_TRACY_PROFILER "Enables Tracy profiler in debug builds. You need to do clean configuration+build after changing this." OFF)
+option(CORI_USE_MOLD "Adds -fuse-ld=mold link flag globally to enable the use of mold linker, off by default." OFF)
 
 if (NOT CORI_USE_AVX2)
     set(CORI_FORCE_AVX2 OFF)
@@ -72,6 +73,10 @@ project(main)
         add_compile_options(-march=native)
     else()
         add_compile_options(-mavx2)
+    endif()
+
+    if (CORI_USE_MOLD)
+        add_link_options("-fuse-ld=mold")
     endif()
 
     #set(CMAKE_COLOR_DIAGNOSTICS ON CACHE BOOL "")

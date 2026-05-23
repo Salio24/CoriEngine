@@ -792,58 +792,21 @@ namespace Cori {
 				return *this;
 			}
 
-			struct ReferenceProxy {
-				VulkanDynamicVector* parent;
-				uint64_t index;
-
-				ReferenceProxy& operator=(const T& value) {
-					parent->m_CPUShadow[index] = value;
-					parent->ReportChange(index * sizeof(T), sizeof(T));
-					return *this;
-				}
-
-				ReferenceProxy& operator=(const ReferenceProxy& other) {
-					if (parent == other.parent && index == other.index) {
-						return *this;
-					}
-
-					parent->m_CPUShadow[index] = other.parent->m_CPUShadow[other.index];
-					parent->ReportChange(index * sizeof(T), sizeof(T));
-					return *this;
-				}
-
-				[[nodiscard]] T* operator->() {
-					parent->ReportChange(index * sizeof(T), sizeof(T));
-					return &parent->m_CPUShadow[index];
-				}
-
-				[[nodiscard]] const T* operator->() const {
-					return &parent->m_CPUShadow[index];
-				}
-
-				[[nodiscard]] T& get() {
-					parent->ReportChange(index * sizeof(T), sizeof(T));
-					return parent->m_CPUShadow[index];
-				}
-
-				[[nodiscard]] operator const T&() const {
-					return parent->m_CPUShadow[index];
-				}
-			};
-
-			//FIXME: this is garbage, need to fix the iterators
+			//FIXME: make it a proper std::contiguous_iterator
 			struct IteratorImpl {
-				using iterator_category = std::random_access_iterator_tag;
-				using difference_type = std::ptrdiff_t;
-				using value_type = T;
-				using pointer = ReferenceProxy;
-				using reference = ReferenceProxy;
+				using iterator_category = std::vector<T>::iterator::iterator_category;
+				using difference_type = std::vector<T>::iterator::difference_type;
+				using value_type = std::vector<T>::iterator::value_type;
+				using pointer = std::vector<T>::iterator::pointer;
+				using reference = std::vector<T>::iterator::reference;
 
-				[[nodiscard]] ReferenceProxy operator*() const {
-					return { m_Parent, static_cast<uint64_t>(m_Underlying - m_Parent->m_CPUShadow.begin()) };
+				[[nodiscard]] reference operator*() const {
+					auto index = static_cast<uint64_t>(m_Underlying - m_Parent->m_CPUShadow.begin());
+					m_Parent->ReportChange(index * sizeof(T), sizeof(T));
+					return *m_Underlying;
 				}
 
-				[[nodiscard]] ReferenceProxy operator->() const {
+				[[nodiscard]] pointer operator->() const {
 					return operator*();
 				}
 
@@ -874,6 +837,11 @@ namespace Cori {
 					return *this;
 				}
 
+				IteratorImpl& operator-=(difference_type n) {
+					m_Underlying -= n;
+					return *this;
+				}
+
 				[[nodiscard]] IteratorImpl operator+(difference_type n) const {
 					return { m_Parent, m_Underlying + n };
 				}
@@ -899,7 +867,7 @@ namespace Cori {
 			using Iterator = IteratorImpl;
 			using ConstIterator = typename std::vector<T>::const_iterator;
 
-			using Reference = ReferenceProxy;
+			using Reference = T&;
 			using ConstReference = const T&;
 
 			//TODO: range based variant
@@ -982,7 +950,8 @@ namespace Cori {
 				#else
 				CORI_CORE_ASSERT(index < m_CPUShadow.size(), "VulkanDynamicVector '{}' index '{}' out of bounds.", "name unavailable in release build", index);
 				#endif
-				return ReferenceProxy{ this, index };
+				ReportChange(index * sizeof(T), sizeof(T));
+				return m_CPUShadow[index];
 			}
 
 			[[nodiscard]] ConstReference At(const uint64_t index) const {
@@ -1339,7 +1308,7 @@ namespace Cori {
 				using iterator_category = std::bidirectional_iterator_tag;
 				using difference_type = std::ptrdiff_t;
 				using value_type = T;
-				using pointer = typename std::conditional<IsConst, const T*, typename VulkanDynamicVector<T>::Reference>::type;
+				using pointer = typename std::conditional<IsConst, const T*, T*>::type;
 				using reference = typename std::conditional<IsConst, typename VulkanDynamicVector<T>::ConstReference, typename VulkanDynamicVector<T>::Reference>::type;
 				using MapType = typename std::conditional<IsConst, const VulkanFlatSlotMap, VulkanFlatSlotMap>::type;
 
@@ -1379,12 +1348,7 @@ namespace Cori {
 				}
 
 				[[nodiscard]] pointer operator->() const {
-					if constexpr (IsConst) {
-						return &(*m_Map)[m_Index];
-					}
-					else {
-						return (*m_Map)[m_Index];
-					}
+					return &(*m_Map)[m_Index];
 				}
 
 				[[nodiscard]] Handle GetHandle() const {
@@ -1481,12 +1445,12 @@ namespace Cori {
 					}
 				}
 
-				if constexpr (requires { m_Data[index]->version = uint32_t{}; } && ENABLE_VERSIONING){
-					m_Data[index]->version = m_Versions[index];
+				if constexpr (requires { m_Data[index].version = uint32_t{}; } && ENABLE_VERSIONING){
+					m_Data[index].version = m_Versions[index];
 				}
 
-				if constexpr (requires { m_Data[index]->valid = bool{}; }) {
-					m_Data[index]->valid = true;
+				if constexpr (requires { m_Data[index].valid = bool{}; }) {
+					m_Data[index].valid = true;
 				}
 
 				if constexpr (ENABLE_VERSIONING) {
@@ -1519,7 +1483,7 @@ namespace Cori {
 
 			[[nodiscard]] std::optional<std::reference_wrapper<const T>> TryGet(const ConstHandle handle) const {
 				if (IsHandleValid(handle)) {
-					return std::cref(m_Data[handle.GetIndex()]);
+					return std::cref(std::as_const(m_Data)[handle.GetIndex()]);
 				}
 
 				return std::nullopt;
@@ -1532,7 +1496,7 @@ namespace Cori {
 
 			[[nodiscard]] ConstReference operator[](const ConstHandle handle) const {
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Accessed FlatSlotMap with an invalid handle.");
-				return m_Data[handle.GetIndex()];
+				return std::as_const(m_Data)[handle.GetIndex()];
 			}
 
 			[[nodiscard]] Reference operator[](const SizeT index) {
@@ -1542,7 +1506,7 @@ namespace Cori {
 
 			[[nodiscard]] ConstReference operator[](const SizeT index) const {
 				CORI_CORE_ASSERT(index < m_Data.Size() && m_SlotStates[index], "Accessed FlatSlotMap with an invalid index.");
-				return m_Data[index];
+				return std::as_const(m_Data)[index];
 			}
 
 			[[nodiscard]] Iterator begin() {

@@ -26,6 +26,9 @@ namespace Cori {
 			uint32_t version{ 0 };
 			uint32_t pad1{ 0 };
 			uint32_t pad2{ 0 };
+			uint32_t pad3{ 0 };
+			uint32_t pad4{ 0 };
+			uint32_t pad5{ 0 };
 		};
 
 		class VulkanMaterialSystem {
@@ -72,7 +75,7 @@ namespace Cori {
 				std::string buffer;
 				auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
 				if (readError != glz::error_code::none) {
-					//error
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Load({}), handle [{},{}], failed to open asset file '{}', error '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead.", id, handle.GetIndex(), handle.GetVersion(), assetFilePath.string(), glz::enum_to_string(readError));
 					Get().AssignPlaceholder(handle);
 					return handle;
 				}
@@ -80,7 +83,7 @@ namespace Cori {
 				JsonAssetDataCombined data;
 				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
 				if (parseError) {
-					//error
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Load({}), handle [{},{}], failed to parse asset file '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead. Error: {}", id, handle.GetIndex(), handle.GetVersion(), assetFilePath.string(), glz::format_error(parseError, buffer));
 					Get().AssignPlaceholder(handle);
 					return handle;
 				}
@@ -165,8 +168,8 @@ namespace Cori {
 				return Get().m_PlaceholderMaterial;
 			}
 
-			[[nodiscard]] static bool IsHandleValid(const Core::Handle<Material> material) {
-				return Get().m_Materials.IsHandleValid(material);
+			[[nodiscard]] static bool IsHandleValid(const Core::Handle<Material> handle) {
+				return Get().m_Materials.IsHandleValid(handle);
 			}
 
 			static void AddOnShaderEffectSwappedListener(OnShaderEffectSwappedFn func) {
@@ -191,7 +194,7 @@ namespace Cori {
 
 		protected:
 			friend class Renderer;
-			[[nodiscard]] static Core::Handle<Material> DuplicateMaterial(const Core::Handle<Material> material, const char* name = "") {
+			[[nodiscard]] static Core::Handle<Material> DuplicateMaterial(const Core::Handle<Material> handle, const char* name = "") {
 				//if (!IsHandleValid(material)) {
 				//	CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid Material handle passed to DuplicateMaterial, returning placeholder material.");
 				//	return Get().m_PlaceholderMaterial;
@@ -205,37 +208,36 @@ namespace Cori {
 				return {};
 			}
 
-			[[nodiscard]] static std::expected<std::reference_wrapper<const MaterialData>, ErrorCode> GetMaterialData(const Core::Handle<Material> material) {
-				if (!IsHandleValid(material)) {
+			[[nodiscard]] static std::expected<std::reference_wrapper<const MaterialData>, ErrorCode> GetMaterialData(const Core::Handle<Material> handle) {
+				if (!IsHandleValid(handle)) {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
 
-				const auto& data = std::as_const(Get().m_Materials)[material];
-				return std::cref(data.customData);
+				const auto& material = std::as_const(Get().m_Materials)[handle];
+				return std::cref(material.customData);
 			}
 
-			static std::expected<void, ErrorCode> ChangeMaterialData(const Core::Handle<Material> material, MaterialData&& data) {
-				if (!IsHandleValid(material)) {
+			static std::expected<void, ErrorCode> ChangeMaterialData(const Core::Handle<Material> handle, MaterialData&& data) {
+				if (!IsHandleValid(handle)) {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
 
-				auto dataRef = Get().m_Materials[material];
-				dataRef->customData = std::move(data);
+				Get().m_Materials[handle].customData = std::move(data);
 				return {};
 			}
 
-			[[nodiscard]] static std::expected<std::reference_wrapper<const Core::AssetRef<ShaderEffect>>, ErrorCode> GetMaterialShaderEffect(const Core::Handle<Material> material) {
-				if (!IsHandleValid(material)) {
+			[[nodiscard]] static std::expected<std::reference_wrapper<const Core::AssetRef<ShaderEffect>>, ErrorCode> GetMaterialShaderEffect(const Core::Handle<Material> handle) {
+				if (!IsHandleValid(handle)) {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
 
-				const auto& data = std::as_const(Get().m_Materials)[material];
+				const auto& material = std::as_const(Get().m_Materials)[handle];
 
-				return std::cref(data.shaderEffect);
+				return std::cref(material.shaderEffect);
 			}
 
-			static std::expected<void, ErrorCode> ChangeMaterialShaderEffect(const Core::Handle<Material> material, Core::AssetRef<ShaderEffect> newShaderEffect) {
-				if (!IsHandleValid(material)) {
+			static std::expected<void, ErrorCode> ChangeMaterialShaderEffect(const Core::Handle<Material> handle, Core::AssetRef<ShaderEffect> newShaderEffect) {
+				if (!IsHandleValid(handle)) {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
 
@@ -243,17 +245,15 @@ namespace Cori {
 					return std::unexpected(ErrorCode::eUninitializedAssetRef);
 				}
 
-				auto dataRef = Get().m_Materials[material];
+				auto& material = Get().m_Materials[handle];
 
 				if (!Get().m_OnShaderEffectSwappedListeners.empty()) {
-					const Material& constRef = dataRef;
-
 					for (auto& func : Get().m_OnShaderEffectSwappedListeners) {
-						func(material, newShaderEffect.GetHandle(), constRef.shaderEffect.GetHandle());
+						func(handle, newShaderEffect.GetHandle(), material.shaderEffect.GetHandle());
 					}
 				}
 
-				dataRef->shaderEffect = std::move(newShaderEffect);
+				material.shaderEffect = std::move(newShaderEffect);
 
 				return {};
 			}
@@ -265,11 +265,10 @@ namespace Cori {
 					return;
 				}
 
-				auto dataRef = Get().m_Materials[handle];
+				auto& data = Get().m_Materials[handle];
 				auto& placeholderData = std::as_const(m_Materials)[m_PlaceholderMaterial];
-
-				dataRef->shaderEffect = placeholderData.shaderEffect;
-				dataRef->customData = placeholderData.customData;
+				data.shaderEffect = placeholderData.shaderEffect;
+				data.customData = placeholderData.customData;
 			}
 
 			[[nodiscard]] Core::Handle<Material> AllocateHandle() {
@@ -285,8 +284,8 @@ namespace Cori {
 				return handle;
 			}
 
-			void CreateMaterial(const Core::Handle<Material> material, Core::AssetRef<ShaderEffect> shaderEffect, MaterialData&& data) {
-				if (!IsHandleValid(material)) {
+			void CreateMaterial(const Core::Handle<Material> handle, Core::AssetRef<ShaderEffect> shaderEffect, MaterialData data) {
+				if (!IsHandleValid(handle)) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid Material handle was passed to CreateMaterial, skipping call.");
 					return;
 				}
@@ -296,18 +295,18 @@ namespace Cori {
 					return;
 				}
 
-				auto dataRef = m_Materials[material];
-				dataRef->shaderEffect = std::move(shaderEffect);
-				dataRef->customData = std::move(data);
+				auto& material = m_Materials[handle];
+				material.shaderEffect = std::move(shaderEffect);
+				material.customData = std::move(data);
 			}
 
-			void DestroyMaterial(const Core::Handle<Material> material) {
-				if (!IsHandleValid(material)) {
+			void DestroyMaterial(const Core::Handle<Material> handle) {
+				if (!IsHandleValid(handle)) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid Material handle was passed to DestroyMaterial, skipping call.");
 					return;
 				}
 
-				if (m_PlaceholderMaterial == material) {
+				if (m_PlaceholderMaterial == handle) {
 					return;
 				}
 
@@ -328,9 +327,9 @@ namespace Cori {
 				m_RefCounts[handle.GetIndex()] = 0;
 				m_MaterialCPUData[handle.GetIndex()] = {};
 
-				auto dataRef = m_Materials[handle];
-				dataRef->shaderEffect = {};
-				dataRef->customData = {};
+				auto& material = m_Materials[handle];
+				material.shaderEffect = {};
+				material.customData = {};
 			}
 
 			VulkanMaterialSystem() {

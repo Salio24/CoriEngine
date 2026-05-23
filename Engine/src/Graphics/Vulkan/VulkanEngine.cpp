@@ -1,5 +1,4 @@
 #include "VulkanEngine.hpp"
-#include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan_hpp_macros.hpp>
 #if VULKAN_HPP_DISPATCH_LOADER_DYNAMIC == 1

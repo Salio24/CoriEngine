@@ -1,16 +1,16 @@
 #pragma once
-#include "Vulkan/VulkanEngine.hpp"
+#include "VulkanEngine.hpp"
 #include "RenderGraph.hpp"
 #include "Core/Time.hpp"
-#include "Vulkan/VulkanUploadSubsystem.hpp"
-#include "Vulkan/VulkanMeshManager.hpp"
-#include "Vulkan/VulkanShaderManager.hpp"
-#include "Vulkan/VulkanLayoutManager.hpp"
-#include "Vulkan/VulkanTextureManager.hpp"
-#include "Vulkan/VulkanMaterialSystem.hpp"
-#include "Vulkan/ImGuiRenderer.hpp"
+#include "VulkanUploadSubsystem.hpp"
+#include "VulkanMeshManager.hpp"
+#include "VulkanShaderManager.hpp"
+#include "VulkanLayoutManager.hpp"
+#include "VulkanTextureManager.hpp"
+#include "VulkanMaterialSystem.hpp"
+#include "ImGuiRenderer.hpp"
 #include "FileSystem/PathManager.hpp"
-#include "Image.hpp"
+#include "../Image.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
 
 #if 1
@@ -145,7 +145,7 @@ namespace Cori {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
 
-				m_Objects[handle]->m_Transform = newTransform;
+				m_Objects[handle].m_Transform = newTransform;
 
 				return {};
 			}
@@ -163,7 +163,7 @@ namespace Cori {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
 
-				m_Objects[handle]->m_UVOffsets = newUVOffsets;
+				m_Objects[handle].m_UVOffsets = newUVOffsets;
 
 				return {};
 			}
@@ -198,7 +198,7 @@ namespace Cori {
 				auto& group = m_DrawGroups[drawGroupID];
 
 				auto [newGroup, newBatch] = FindAppropriateGroupAndBatch(group.m_ShaderEffect, newMesh);
-				m_Objects[handle]->m_OwnerBatch = newBatch;
+				m_Objects[handle].m_OwnerBatch = newBatch;
 				m_Batches[newBatch].IncrementObjectCounter();
 
 				return {};
@@ -212,7 +212,7 @@ namespace Cori {
 				return std::as_const(m_Objects)[handle].m_Material;
 			}
 
-			std::expected<void, ErrorCode> ChangeRenderObjectMaterial(const Core::Handle<RenderObject> handle, const Core::Handle<Material> newMaterial) {
+			std::expected<void, ErrorCode> ChangeRenderObjectMaterial(const Core::Handle<RenderObject> handle, Core::Handle<Material> newMaterial) {
 				if (!IsHandleValid(handle) || !VulkanMaterialSystem::IsHandleValid(newMaterial)) {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
@@ -227,7 +227,7 @@ namespace Cori {
 				auto oldShaderEffect = VulkanMaterialSystem::GetMaterialShaderEffect(constObjectRef.m_Material);
 				if (oldShaderEffect) {
 					if (oldShaderEffect.value().get().GetHandle() == newShaderEffect.value().get().GetHandle()) {
-						m_Objects[handle]->m_Material = newMaterial;
+						m_Objects[handle].m_Material = newMaterial;
 						return {};
 					}
 				}
@@ -241,7 +241,7 @@ namespace Cori {
 				}
 
 				auto [newGroup, newBatch] = FindAppropriateGroupAndBatch(newShaderEffect.value().get().GetHandle(), mesh);
-				m_Objects[handle]->m_OwnerBatch = newBatch;
+				m_Objects[handle].m_OwnerBatch = newBatch;
 				m_Batches[newBatch].IncrementObjectCounter();
 
 				return {};
@@ -259,7 +259,7 @@ namespace Cori {
 						}
 
 						auto [newGroup, newBatch] = Get().FindAppropriateGroupAndBatch(newShaderEffect, mesh);
-						Get().m_Objects[it.GetHandle()]->m_OwnerBatch = newBatch;
+						Get().m_Objects[it.GetHandle()].m_OwnerBatch = newBatch;
 						Get().m_Batches[newBatch].IncrementObjectCounter();
 					}
 				}

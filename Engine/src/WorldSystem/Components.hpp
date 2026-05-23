@@ -3,8 +3,6 @@
 #include <box2cpp/box2cpp.h>
 #include "Entity.hpp"
 #include "Graphics/Texture.hpp"
-#include <glm/gtx/matrix_transform_2d.hpp>
-#include <utility>
 #include "Audio/Track.hpp"
 
 namespace Cori {

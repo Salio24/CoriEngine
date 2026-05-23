@@ -1,8 +1,8 @@
 {
     "Metadata": {
-        "AssetTypename": "Material",
-        "AssetType": "eSecondary",
-        "AssetDeletionPolicy": "eRefCounted"
+        "assetTypename": "Material",
+        "assetType": "eSecondary",
+        "assetDeletionPolicy": "eRefCounted"
     },
     "AssetData": {
         "materialData": {

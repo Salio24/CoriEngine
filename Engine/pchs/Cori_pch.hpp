@@ -3,7 +3,6 @@
 
 #include "Global_pch.hpp"
 
-#include <SDL3/SDL.h>
 
 
 #endif CORI_PCH

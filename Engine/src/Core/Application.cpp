@@ -8,7 +8,7 @@
 #include "EventSystem/KeyEvent.hpp"
 #include "FileSystem/PathManager.hpp"
 #include "Graphics/Renderer2D.hpp"
-#include "Graphics/Renderer.hpp"
+#include "../Graphics/Vulkan/Renderer.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
 
 namespace Cori {

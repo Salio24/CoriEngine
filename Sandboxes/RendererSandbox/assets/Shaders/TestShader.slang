@@ -1,5 +1,5 @@
-#include "../../../../Engine/enginedata/shaders/Defines.slang"
-#include "../../../../Engine/enginedata/shaders/Helpers.slang"
+#include "Defines.slang"
+#include "Helpers.slang"
 
 [[vk::binding(0, 0)]]
 SamplerState globalSamplers[];

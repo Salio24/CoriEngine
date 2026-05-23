@@ -250,6 +250,7 @@ namespace Cori {
 				//record.status = AssetStatus::eLoading;
 
 				if constexpr (std::derived_from<T, PrimaryAssetBase>) {
+
 				}
 				else if constexpr (std::derived_from<T, SecondaryAssetBase>) {
 					return AssetRef<T>(T::Manager::template Load<T>(id));
@@ -286,7 +287,6 @@ namespace Cori {
 						}
 					}
 				}
-
 			}
 
 			static std::expected<std::reference_wrapper<std::filesystem::path>, ErrorCode> GetPath(const AssetID assetID) {
@@ -319,9 +319,9 @@ namespace Cori {
 
 				struct Layout {
 					struct Metadata {
-						std::string AssetTypename;
-						Core::AssetType AssetType;
-						std::optional<Utility::GlazeWithFallback<Core::AssetDeletionPolicy, Core::AssetDeletionPolicy::eRefCounted, "from Metadata declared in AssetManager::ProcessFile">> AssetDeletionPolicy;
+						std::string assetTypename;
+						AssetType assetType;
+						std::optional<Utility::GlazeWithFallback<AssetDeletionPolicy, AssetDeletionPolicy::eRefCounted, "from Metadata declared in AssetManager::ProcessFile">> assetDeletionPolicy;
 					} Metadata;
 					glz::raw_json_view AssetData;
 				};
@@ -344,9 +344,9 @@ namespace Cori {
 				auto& entry = Get().m_AssetDatabase[pathHash];
 
 				entry.path = relativeAssetPath;
-				entry.type = l.Metadata.AssetType;
-				entry.assetTypenameHash = Utility::HashString64(l.Metadata.AssetTypename);
-				entry.deletionPolicy = l.Metadata.AssetDeletionPolicy.value_or(AssetDeletionPolicy::eRefCounted);
+				entry.type = l.Metadata.assetType;
+				entry.assetTypenameHash = Utility::HashString64(l.Metadata.assetTypename);
+				entry.deletionPolicy = l.Metadata.assetDeletionPolicy.value_or(AssetDeletionPolicy::eRefCounted);
 			}
 
 			std::unordered_map<AssetID, AssetRecord> m_AssetDatabase;

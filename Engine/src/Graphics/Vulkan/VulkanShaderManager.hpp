@@ -79,7 +79,7 @@ namespace Cori {
 					std::string buffer;
 					auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
 					if (readError != glz::error_code::none) {
-						//error
+						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderManager }, "Load({}), compute shader handle [{},{}], failed to open asset file '{}', error '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead.", id, handle.GetIndex(), handle.GetVersion(), assetFilePath.string(), glz::enum_to_string(readError));
 						Get().AssignPlaceholder(handle);
 						return handle;
 					}
@@ -87,16 +87,18 @@ namespace Cori {
 					ComputeShaderJsonAssetDataCombined data;
 					auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
 					if (parseError) {
-						//error
+						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderManager }, "Load({}), compute shader handle [{},{}], failed to parse asset file '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead. Error: {}", id, handle.GetIndex(), handle.GetVersion(), assetFilePath.string(), glz::format_error(parseError, buffer));
 						Get().AssignPlaceholder(handle);
 						return handle;
 					}
 
-					std::ifstream spvData(assetFilePath.replace_filename(data.AssetData.spv), std::ios::ate | std::ios::binary);
+					auto spvFile = assetFilePath.replace_filename(data.AssetData.spv);
+
+					std::ifstream spvData(spvFile, std::ios::ate | std::ios::binary);
 
 					if (!spvData.good()) {
+						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderManager }, "Load({}), compute shader handle [{},{}], failed to open spv file '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead.", id, handle.GetIndex(), handle.GetVersion(), spvFile.string());
 						Get().AssignPlaceholder(handle);
-						//error
 						return handle;
 					}
 
@@ -118,7 +120,7 @@ namespace Cori {
 					std::string buffer;
 					auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
 					if (readError != glz::error_code::none) {
-						//error
+						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderManager }, "Load({}), shader pair handle [{},{}], failed to open asset file '{}', error '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead.", id, handle.GetIndex(), handle.GetVersion(), assetFilePath.string(), glz::enum_to_string(readError));
 						Get().AssignPlaceholder(handle);
 						return handle;
 					}
@@ -126,16 +128,18 @@ namespace Cori {
 					ShaderPairJsonAssetDataCombined data;
 					auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
 					if (parseError) {
-						//error
+						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderManager }, "Load({}), shader pair handle [{},{}], failed to parse asset file '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead. Error: {}", id, handle.GetIndex(), handle.GetVersion(), assetFilePath.string(), glz::format_error(parseError, buffer));
 						Get().AssignPlaceholder(handle);
 						return handle;
 					}
 
-					std::ifstream spvData(assetFilePath.replace_filename(data.AssetData.spv), std::ios::ate | std::ios::binary);
+					auto spvFile = assetFilePath.replace_filename(data.AssetData.spv);
+
+					std::ifstream spvData(spvFile, std::ios::ate | std::ios::binary);
 
 					if (!spvData.good()) {
+						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderManager }, "Load({}), shader pair handle [{},{}], failed to open spv file '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead.", id, handle.GetIndex(), handle.GetVersion(), spvFile.string());
 						Get().AssignPlaceholder(handle);
-						//error
 						return handle;
 					}
 
