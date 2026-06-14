@@ -15,7 +15,7 @@ namespace Cori {
 				.QueueFamily = VulkanEngine::GetGraphicsQueueFamilyIndex(),
 				.Queue = static_cast<VkQueue>(VulkanEngine::GetGraphicsQueue()),
 				.DescriptorPoolSize = 1000,
-				.MinImageCount = FRAMES_IN_FLIGHT,
+				.MinImageCount = 2,
 				.ImageCount = VulkanEngine::GetSwapChainImageCount(),
 				.UseDynamicRendering = true
 			};
@@ -70,15 +70,16 @@ namespace Cori {
 				ImGui_ImplVulkan_RenderDrawData(drawData, cmb);
 
 				cmb.endRendering();
+
 			}
 
-			const ImGuiIO& io = ImGui::GetIO();
+			//const ImGuiIO& io = ImGui::GetIO();
 
-			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-			{
-				ImGui::UpdatePlatformWindows();
-				ImGui::RenderPlatformWindowsDefault();
-			}
+			//if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			//{
+			//	ImGui::UpdatePlatformWindows();
+			//	ImGui::RenderPlatformWindowsDefault();
+			//}
 		}
 	}
 }

@@ -168,7 +168,7 @@ namespace Cori {
 				return Get().m_PlaceholderMaterial;
 			}
 
-			[[nodiscard]] static bool IsHandleValid(const Core::Handle<Material> handle) {
+			[[nodiscard]] static bool IsHandleValid(const Core::ConstHandle<Material> handle) {
 				return Get().m_Materials.IsHandleValid(handle);
 			}
 
@@ -208,7 +208,7 @@ namespace Cori {
 				return {};
 			}
 
-			[[nodiscard]] static std::expected<std::reference_wrapper<const MaterialData>, ErrorCode> GetMaterialData(const Core::Handle<Material> handle) {
+			[[nodiscard]] static std::expected<std::reference_wrapper<const MaterialData>, ErrorCode> GetMaterialData(const Core::ConstHandle<Material> handle) {
 				if (!IsHandleValid(handle)) {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
@@ -226,7 +226,7 @@ namespace Cori {
 				return {};
 			}
 
-			[[nodiscard]] static std::expected<std::reference_wrapper<const Core::AssetRef<ShaderEffect>>, ErrorCode> GetMaterialShaderEffect(const Core::Handle<Material> handle) {
+			[[nodiscard]] static std::expected<std::reference_wrapper<const Core::AssetRef<ShaderEffect>>, ErrorCode> GetMaterialShaderEffect(const Core::ConstHandle<Material> handle) {
 				if (!IsHandleValid(handle)) {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}

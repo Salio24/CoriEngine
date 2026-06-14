@@ -1460,6 +1460,29 @@ namespace Cori {
 				return Handle{ index, 1 };
 			}
 
+			template<typename... Args>
+			bool EmplaceAt(const SizeT index, Args&&... args) {
+				static_assert(ENABLE_VERSIONING == false, "Index version of EmplaceAt should only be used with versioning off.");
+
+				if (index >= RawSize()) {
+					return false;
+				}
+
+				if (IsIndexOccupied(index)) {
+					return false;
+				}
+
+				if constexpr (requires { m_Data[index].valid = bool{}; }) {
+					m_Data[index].valid = true;
+				}
+
+				m_Data[index] = std::move(T(std::forward<Args>(args)...));
+
+				m_SlotStates[index] = true;
+
+				return true;
+			}
+
 			void Remove(const Handle handle) {
 				if (!IsHandleValid(handle)) {
 					return;
@@ -1471,6 +1494,18 @@ namespace Cori {
 
 				m_SlotStates[index] = false;
 				m_Holes.emplace_back(index);
+			}
+
+			void RemoveAt(const SizeT index) {
+				static_assert(ENABLE_VERSIONING == false, "Index version of RemoveAt should only be used with versioning off.");
+
+				if (!IsIndexValid(index)) {
+					return;
+				}
+
+				m_Data[index] = T{};
+
+				m_SlotStates[index] = false;
 			}
 
 			[[nodiscard]] std::optional<Reference> TryGet(const Handle handle) {
@@ -1609,6 +1644,12 @@ namespace Cori {
 				return index < RawSize() && m_SlotStates[index];
 			}
 
+			[[nodiscard]] bool IsIndexOccupied(const SizeT index) const {
+				CORI_CORE_ASSERT(index < RawSize(), "VulkanFlatSlotMap: IsIndexOccupied index out of bounds.");
+
+				return m_SlotStates[index];
+			}
+
 			[[nodiscard]] Handle GetIndexHandle(const SizeT index) const {
 				CORI_CORE_ASSERT(IsIndexValid(index), "Invalid index passed to VulkanFlatSlotMap::GetIndexHandle.");
 
@@ -1636,7 +1677,7 @@ namespace Cori {
 			sul::dynamic_bitset<> m_SlotStates{};
 		private:
 			std::deque<SizeT> m_Holes{};
-			std::conditional_t<ENABLE_VERSIONING, std::vector<uint32_t>, uint8_t> m_Versions{};
+			std::conditional_t<ENABLE_VERSIONING, std::vector<uint32_t>, void> m_Versions{};
 			uint32_t m_ReusedIndexCounter{ 0 };
 		};
 

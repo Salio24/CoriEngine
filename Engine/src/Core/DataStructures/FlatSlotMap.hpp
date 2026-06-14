@@ -59,7 +59,7 @@ namespace Cori {
 			}
 		};
 
-		template<std::copy_constructible T, uint16_t REUSE_THRESHOLD = 64, bool ENABLE_VERSIONING = true, IsVersionedHandle HandleT = Handle<T>, typename ConstHandleT = ConstHandle<T>> requires std::derived_from<HandleT, ConstHandleT>
+		template<typename T, uint16_t REUSE_THRESHOLD = 64, bool ENABLE_VERSIONING = true, IsVersionedHandle HandleT = Handle<T>, typename ConstHandleT = ConstHandle<T>> requires std::derived_from<HandleT, ConstHandleT>
 		class FlatSlotMap {
 		public:
 			using Handle = HandleT;

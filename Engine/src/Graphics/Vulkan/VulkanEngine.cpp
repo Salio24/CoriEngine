@@ -826,6 +826,7 @@ namespace Cori {
 				return vk::PresentModeKHR::eFifo;
 			};
 
+			auto caps = m_PhysicalDevice.getSurfaceCapabilitiesKHR(m_Surface);
 
 			auto ChooseExtent = [&] -> vk::Extent2D {
 				if (surfaceCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
@@ -835,6 +836,7 @@ namespace Cori {
 				int width;
 				int height;
 				SDL_GetWindowSizeInPixels(static_cast<SDL_Window*>(m_Window), &width, &height);
+				//FIXME: this will cause issues as SDL_GetWindowSizeInPixels is not threads safe and should only be called from the main thread
 
 				return {
 					std::clamp<uint32_t>(width, surfaceCapabilities.minImageExtent.width, surfaceCapabilities.maxImageExtent.width),
@@ -879,6 +881,8 @@ namespace Cori {
 			CORI_CORE_ASSERT(result____ == vk::Result::eSuccess, "Failed to get swapchain images. Error: {}", vk::to_string(result____));
 			m_SwapChainImages = std::move(images);
 
+			SetDebugName(m_SwapChain, "Main SwapChain");
+
 			vk::ImageViewCreateInfo imageViewCreateInfo{
 				.viewType = vk::ImageViewType::e2D,
 				.format = m_SwapChainImageFormat.format,
@@ -895,6 +899,10 @@ namespace Cori {
 				m_SwapChainImageViews.emplace_back(view);
 
 				std::string name = std::format("SwapChain image view {}", count);
+
+				std::string name_ = std::format("SwapChain image {}", count);
+
+				SetDebugName(image, name_);
 
 				SetDebugName(view, name);
 

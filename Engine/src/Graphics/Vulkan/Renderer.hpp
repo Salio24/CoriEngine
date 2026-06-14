@@ -10,10 +10,7 @@
 #include "VulkanMaterialSystem.hpp"
 #include "ImGuiRenderer.hpp"
 #include "FileSystem/PathManager.hpp"
-#include "../Image.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
-
-#if 1
 
 namespace Cori {
 	namespace Graphics {
@@ -46,7 +43,7 @@ namespace Cori {
 			class Batch {
 			public:
 				Batch() = default;
-				explicit Batch(const Core::Handle<Mesh> mesh) : m_Mesh(mesh) {}
+				explicit Batch(Core::AssetRef<Mesh> mesh) : m_Mesh(std::move(mesh)) {}
 
 				[[nodiscard]] uint32_t GetObjectCount() const {
 					return m_ObjectCount;
@@ -60,7 +57,7 @@ namespace Cori {
 					m_ObjectCount--;
 				}
 
-				Core::Handle<Mesh> m_Mesh;
+				Core::AssetRef<Mesh> m_Mesh;
 			private:
 				uint32_t m_ObjectCount{ 0 };
 			};
@@ -72,12 +69,12 @@ namespace Cori {
 
 			struct RenderObject {
 				RenderObject() = default;
-				RenderObject(const glm::mat4& transform, const glm::vec4& uvOffsets, const Core::Handle<Material> material, const BatchIndex batch) : m_Transform(transform), m_UVOffsets(uvOffsets), m_Material(material), m_OwnerBatch(batch) {}
+				RenderObject(const glm::mat4& transform, const glm::vec4& uvOffsets, Core::AssetRef<Material> material, const BatchIndex batch) : m_Transform(transform), m_UVOffsets(uvOffsets), m_Material(std::move(material)), m_OwnerBatch(batch) {}
 			private:
 				friend Renderer;
 				alignas(16) glm::mat4 m_Transform{ 0.0f };
 				alignas(16) glm::vec4 m_UVOffsets{ 0.0f, 0.0f, 1.0f, 1.0f };
-				Core::Handle<Material> m_Material;
+				Core::AssetRef<Material> m_Material;
 				BatchIndex m_OwnerBatch{ 0 };
 			public:
 				uint32_t valid{ 0 };
@@ -90,23 +87,23 @@ namespace Cori {
 
 			static Renderer& Get();
 
-			[[nodiscard]] std::expected<Core::Handle<RenderObject>, ErrorCode> RegisterObject(const Core::Handle<Mesh> mesh, const Core::Handle<Material> material, const glm::mat4& transform, const glm::vec4& UVs = { 0.0f, 0.0f, 1.0f, 1.0f } ) {
-				auto shaderEffect = VulkanMaterialSystem::GetMaterialShaderEffect(material);
+			[[nodiscard]] std::expected<Core::Handle<RenderObject>, ErrorCode> RegisterObject(Core::AssetRef<Mesh> mesh, Core::AssetRef<Material> material, const glm::mat4& transform, const glm::vec4& UVs = { 0.0f, 0.0f, 1.0f, 1.0f } ) {
+				if (!mesh.IsInitialized() || !material.IsInitialized()) {
+					return std::unexpected(ErrorCode::eUninitializedAssetRef);
+				}
+
+				auto shaderEffect = VulkanMaterialSystem::GetMaterialShaderEffect(material.GetHandle());
 
 				if (!shaderEffect) {
 					return std::unexpected(shaderEffect.error());
 				}
 
-				if (!VulkanMeshManager::IsHandleValid(mesh)) {
-					return std::unexpected(ErrorCode::eInvalidHandle);
-				}
-
-				auto [groupIndex, batchIndex] = FindAppropriateGroupAndBatch(shaderEffect.value().get().GetHandle(), mesh);
+				auto [groupIndex, batchIndex] = FindAppropriateGroupAndBatch(shaderEffect.value().get().GetHandle(), std::move(mesh));
 
 				m_Batches[batchIndex].IncrementObjectCounter();
 				m_TotalObjectCount++;
 
-				return m_Objects.Emplace(transform, UVs, material, batchIndex);
+				return m_Objects.Emplace(transform, UVs, std::move(material), batchIndex);
 			}
 
 			void UnregisterObject(const Core::Handle<RenderObject> handle) {
@@ -173,11 +170,15 @@ namespace Cori {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
 
-				return m_Batches[std::as_const(m_Objects)[handle].m_OwnerBatch].m_Mesh;
+				return m_Batches[std::as_const(m_Objects)[handle].m_OwnerBatch].m_Mesh.GetHandle();
 			}
 
-			std::expected<void, ErrorCode> ChangeRenderObjectMesh(const Core::Handle<RenderObject> handle, const Core::Handle<Mesh> newMesh) {
-				if (!IsHandleValid(handle) || !VulkanMeshManager::IsHandleValid(newMesh)) {
+			std::expected<void, ErrorCode> ChangeRenderObjectMesh(const Core::Handle<RenderObject> handle, Core::AssetRef<Mesh> newMesh) {
+				if (newMesh.IsInitialized()) {
+					return std::unexpected(ErrorCode::eUninitializedAssetRef);
+				}
+
+				if (!IsHandleValid(handle)) {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
 
@@ -185,7 +186,7 @@ namespace Cori {
 				auto& batch = m_Batches[batchID];
 
 				auto oldMesh = batch.m_Mesh;
-				if (oldMesh == newMesh) {
+				if (oldMesh.GetAssetID() == newMesh.GetAssetID()) {
 					return {};
 				}
 
@@ -197,7 +198,7 @@ namespace Cori {
 				auto drawGroupID = std::as_const(m_BatchGPUInfo)[batchID].owner;
 				auto& group = m_DrawGroups[drawGroupID];
 
-				auto [newGroup, newBatch] = FindAppropriateGroupAndBatch(group.m_ShaderEffect, newMesh);
+				auto [newGroup, newBatch] = FindAppropriateGroupAndBatch(group.m_ShaderEffect, std::move(newMesh));
 				m_Objects[handle].m_OwnerBatch = newBatch;
 				m_Batches[newBatch].IncrementObjectCounter();
 
@@ -209,22 +210,29 @@ namespace Cori {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
 
-				return std::as_const(m_Objects)[handle].m_Material;
+				//yes const casts are bad and all, but this is a workaround to avoid marking sector as dirty, while at the same time retrieving non const material handle.
+				auto& materialRef = const_cast<Core::AssetRef<Material>&>(std::as_const(m_Objects)[handle].m_Material);
+
+				return materialRef.GetHandle();
 			}
 
-			std::expected<void, ErrorCode> ChangeRenderObjectMaterial(const Core::Handle<RenderObject> handle, Core::Handle<Material> newMaterial) {
-				if (!IsHandleValid(handle) || !VulkanMaterialSystem::IsHandleValid(newMaterial)) {
+			std::expected<void, ErrorCode> ChangeRenderObjectMaterial(const Core::Handle<RenderObject> handle, Core::AssetRef<Material> newMaterial) {
+				if (newMaterial.IsInitialized()) {
+					return std::unexpected(ErrorCode::eUninitializedAssetRef);
+				}
+
+				if (!IsHandleValid(handle)) {
 					return std::unexpected(ErrorCode::eInvalidHandle);
 				}
 
 				const auto& constObjectRef = std::as_const(m_Objects)[handle];
 
-				if (newMaterial == constObjectRef.m_Material) {
+				if (newMaterial.GetHandle() == constObjectRef.m_Material.GetHandle()) {
 					return {};
 				}
 
-				auto newShaderEffect = VulkanMaterialSystem::GetMaterialShaderEffect(newMaterial);
-				auto oldShaderEffect = VulkanMaterialSystem::GetMaterialShaderEffect(constObjectRef.m_Material);
+				auto newShaderEffect = VulkanMaterialSystem::GetMaterialShaderEffect(newMaterial.GetHandle());
+				auto oldShaderEffect = VulkanMaterialSystem::GetMaterialShaderEffect(constObjectRef.m_Material.GetHandle());
 				if (oldShaderEffect) {
 					if (oldShaderEffect.value().get().GetHandle() == newShaderEffect.value().get().GetHandle()) {
 						m_Objects[handle].m_Material = newMaterial;
@@ -240,7 +248,7 @@ namespace Cori {
 					DestroyBatch(constObjectRef.m_OwnerBatch);
 				}
 
-				auto [newGroup, newBatch] = FindAppropriateGroupAndBatch(newShaderEffect.value().get().GetHandle(), mesh);
+				auto [newGroup, newBatch] = FindAppropriateGroupAndBatch(newShaderEffect.value().get().GetHandle(), std::move(mesh));
 				m_Objects[handle].m_OwnerBatch = newBatch;
 				m_Batches[newBatch].IncrementObjectCounter();
 
@@ -249,7 +257,7 @@ namespace Cori {
 
 			static void OnMaterialShaderEffectChanged(const Core::Handle<Material> material, [[maybe_unused]] const Core::ConstHandle<ShaderEffect> oldShaderEffect, const Core::ConstHandle<ShaderEffect> newShaderEffect) {
 				for (auto it = Get().m_Objects.cbegin(); it != Get().m_Objects.cend(); ++it) {
-					if (it->m_Material == material) {
+					if (it->m_Material.GetHandle() == material) {
 						auto& oldBatch = Get().m_Batches[it->m_OwnerBatch];
 						auto mesh = oldBatch.m_Mesh;
 
@@ -258,7 +266,7 @@ namespace Cori {
 							Get().DestroyBatch(it->m_OwnerBatch);
 						}
 
-						auto [newGroup, newBatch] = Get().FindAppropriateGroupAndBatch(newShaderEffect, mesh);
+						auto [newGroup, newBatch] = Get().FindAppropriateGroupAndBatch(newShaderEffect, std::move(mesh));
 						Get().m_Objects[it.GetHandle()].m_OwnerBatch = newBatch;
 						Get().m_Batches[newBatch].IncrementObjectCounter();
 					}
@@ -682,7 +690,7 @@ namespace Cori {
 
 				glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(0.2f), glm::vec3(0.5f, 0.5, 0.5f));
 				swordMaterial = Core::AssetManager2::Load<Material>("assets/Sword_Material.json");
-				auto result = RegisterObject(sword.GetHandle(), swordMaterial.GetHandle(), transform);
+				auto result = RegisterObject(sword, swordMaterial, transform);
 				transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0f));
 
 				if (!result) {
@@ -695,7 +703,8 @@ namespace Cori {
 				//FIXME: renderer crashes if we try to run it with no objects added, because we try to allocate virtual upload buffer with size 0 and vma becomes all whiny
 			}
 
-			[[nodiscard]] std::pair<DrawGroupIndex, BatchIndex> FindAppropriateGroupAndBatch(const Core::ConstHandle<ShaderEffect> shaderEffect, const Core::Handle<Mesh> mesh) {
+			[[nodiscard]] std::pair<DrawGroupIndex, BatchIndex> FindAppropriateGroupAndBatch(const Core::ConstHandle<ShaderEffect> shaderEffect, Core::AssetRef<Mesh> mesh) {
+				CORI_CORE_ASSERT(mesh.IsInitialized(), "Uninitialized mesh asset ref passed to FindAppropriateGroupAndBatch in SceneRenderer.");
 				auto [it, groupInserted] = m_SubBatchLookup.try_emplace(shaderEffect, std::pair<DrawGroupIndex, std::unordered_map<Core::Handle<Mesh>, BatchIndex>>{});
 
 				if (groupInserted) {
@@ -705,14 +714,14 @@ namespace Cori {
 					it->second.second.reserve(64);
 				}
 
-				auto [it_, batchInserted] = it->second.second.try_emplace(mesh, BatchIndex{});
+				auto [it_, batchInserted] = it->second.second.try_emplace(mesh.GetHandle(), BatchIndex{});
 
 				if (batchInserted) {
 					auto handle = m_Batches.Emplace(mesh);
 
 					m_BatchGPUInfo.Resize(m_Batches.Capacity());
 
-					m_BatchGPUInfo[handle.GetIndex()] = BatchGPUInfo{ mesh, it->second.first };
+					m_BatchGPUInfo[handle.GetIndex()] = BatchGPUInfo{ mesh.GetHandle(), it->second.first };
 
 					it_->second = handle.GetIndex();
 
@@ -734,7 +743,7 @@ namespace Cori {
 				if (group.GetBatchCount() == 0) {
 					DestroyGroup(groupID);
 				} else {
-					m_SubBatchLookup.at(group.m_ShaderEffect).second.erase(mesh);
+					m_SubBatchLookup.at(group.m_ShaderEffect).second.erase(mesh.GetHandle());
 				}
 
 				m_Batches.Remove(m_Batches.GetIndexHandle(batchID));
@@ -783,4 +792,3 @@ namespace Cori {
 		};
 	}
 }
-#endif

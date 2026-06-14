@@ -48,7 +48,7 @@ struct MaterialData {
 
 struct MaterialCombinedData {
 	MaterialData customData;
-	Handle shaderEffectID;
+	Handle shaderEffect;
 	uint32_t version;
 	uint32_t pad1;
 	uint32_t pad2;

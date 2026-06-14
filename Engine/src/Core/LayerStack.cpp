@@ -111,6 +111,7 @@ namespace Cori {
 		}
 
 		void LayerStack::PushLayer(Layer* layer) {
+			CORI_CORE_ASSERT(layer, "Layer pushed to the LayerStack is null.");
 			m_Layers.emplace(m_Layers.begin() + m_LayerInsertIndex, layer);
 			layer->OnAttach();
 			++m_LayerInsertIndex;
@@ -118,6 +119,7 @@ namespace Cori {
 		}
 
 		void LayerStack::PushOverlay(Layer* overlay) {
+			CORI_CORE_ASSERT(overlay, "Overlay layer pushed to the LayerStack is null.");
 			m_Layers.emplace_back(overlay);
 			overlay->OnAttach();
 			++m_OverlayLayerCount;

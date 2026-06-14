@@ -11,6 +11,10 @@
 #include "../Graphics/Vulkan/Renderer.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
 
+//FIXME: remove include later
+#include "Threading/SPSCRing.hpp"
+#include "AssetManager/AssetHandleAllocator.hpp"
+
 namespace Cori {
 	namespace Core {
 		Application* Application::s_Instance{ nullptr };
@@ -135,6 +139,8 @@ namespace Cori {
 
 						m_ImGuiLayer->EndFrame();
 					}
+
+					//AssetManager2::OnUpdate(m_GameTimer);
 
 					Graphics::Renderer::Get().Render();
 

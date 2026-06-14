@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/DataStructures/FlatSlotMap.hpp"
+#include "AssetManagerEnums.hpp"
 #include "AssetManager/AssetLoadStatus.hpp"
 #include "Core/ErrorCodes.hpp"
 #include "Utility/StringHash.hpp"
@@ -7,11 +8,34 @@
 #include "FileSystem/PathManager.hpp"
 #include "Utility/CleanTypeName.hpp"
 #include "Utility/GlazeUtils.hpp"
+#include "Core/Time.hpp"
 
 #define CORI_ADD_ASSET_TRAITS(T, ...) \
 template <> struct AssetTraits<__VA_ARGS__ __VA_OPT__(::) T> { \
 	static constexpr Utility::StringHash64 TypeHash = Utility::HashString64(#T); \
 }
+
+class ScopedTimer {
+public:
+	using clock = std::chrono::steady_clock;
+
+	explicit ScopedTimer(std::string_view name = "ScopedTimer")
+		: name_(name), start_(clock::now()) {}
+
+	~ScopedTimer() {
+		const auto end = clock::now();
+		const auto duration = std::chrono::duration<double, std::milli>(end - start_);
+		std::cout << name_ << " took " << std::fixed << std::setprecision(5)
+				  << duration.count() << " ms\n";
+	}
+
+	ScopedTimer(const ScopedTimer&) = delete;
+	ScopedTimer& operator=(const ScopedTimer&) = delete;
+
+private:
+	std::string_view name_;
+	clock::time_point start_;
+};
 
 namespace Cori {
 	namespace Core {
@@ -57,6 +81,7 @@ namespace Cori {
 			explicit AssetRef(Handle<T> handle) {
 				CORI_CORE_ASSERT(T::Manager::IsHandleValid(handle), "Trying to construct AssetRef<{}> with an invalid handle, asserting.", CORI_CLEAN_TYPE_NAME(T));
 				m_Handle = handle;
+				T::Manager::AddRef(m_Handle);
 			}
 
 			~AssetRef() {
@@ -85,6 +110,10 @@ namespace Cori {
 			}
 
 			AssetRef& operator=(AssetRef&& other) noexcept {
+				if (&other == this) {
+					return *this;
+				}
+
 				if (T::Manager::IsHandleValid(m_Handle)) {
 					T::Manager::RemoveRef(m_Handle);
 				}
@@ -196,19 +225,9 @@ namespace Cori {
 		};
 		#endif
 
-		enum class AssetType : uint8_t {
-			ePrimary,
-			eSecondary,
-			eUndefined
-		};
-
-		enum class AssetDeletionPolicy : uint8_t {
-			eRefCounted,
-			eKeepAlive
-		};
-
 		struct AssetRecord {
 			std::filesystem::path path;
+			std::filesystem::file_time_type pathTimestamp;
 			AssetStatus status{ AssetStatus::eUnloaded };
 			AssetType type{ AssetType::eUndefined };
 			AssetDeletionPolicy deletionPolicy{ AssetDeletionPolicy::eRefCounted };
@@ -301,6 +320,37 @@ namespace Cori {
 				return Get().m_AppRootPath;
 			}
 
+			static void OnUpdate(GameTimer& timer) {
+				static float timer_ = 0.0;
+				timer_ += timer.GetDeltaTime();
+
+				if (timer_ > 1.0f) {
+					timer_ = 0.0f;
+					TestCase();
+				}
+			}
+
+			static void TestCase() {
+				ScopedTimer test("awea");
+				uint64_t counter = 0;
+				uint64_t counter2 = 0;
+
+				auto copy = Get().m_AssetDatabase;
+
+				for (auto& entry : copy | std::views::values) {
+					auto newStamp = std::filesystem::last_write_time(Get().m_AppRootPath / entry.path);
+					if (entry.pathTimestamp < newStamp) {
+						CORI_DEBUG("{}", entry.path.string());
+						entry.pathTimestamp = newStamp;
+						counter2++;
+					}
+
+					counter++;
+				}
+
+				CORI_DEBUG("checked '{}', changed '{}'", counter, counter2);
+			}
+
 
 			~AssetManager2() = default;
 
@@ -344,6 +394,7 @@ namespace Cori {
 				auto& entry = Get().m_AssetDatabase[pathHash];
 
 				entry.path = relativeAssetPath;
+				entry.pathTimestamp = std::filesystem::last_write_time(Get().m_AppRootPath / entry.path);
 				entry.type = l.Metadata.assetType;
 				entry.assetTypenameHash = Utility::HashString64(l.Metadata.assetTypename);
 				entry.deletionPolicy = l.Metadata.assetDeletionPolicy.value_or(AssetDeletionPolicy::eRefCounted);

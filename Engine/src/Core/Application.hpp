@@ -138,7 +138,7 @@ namespace Cori {
 
 			std::unique_ptr<Graphics::VulkanEngine> m_VulkanEngine;
 
-			Internal::ImGuiLayer* m_ImGuiLayer;
+			Internal::ImGuiLayer* m_ImGuiLayer{ nullptr };
 
 			LayerStack m_LayerStack;
 

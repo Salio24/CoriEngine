@@ -3,6 +3,8 @@
 ################################################################################
 
 /.vs
+/Obsidian-Vault
+/Obsidian
 
 # i have sold my soul to the devil xD
 /.idea
@@ -55,6 +57,7 @@ rmSub.sh
 /Sandboxes/RendererSandbox/bin/Debug/*
 /Sandboxes/RendererSandbox/bin/Release/*
 /Sandboxes/RendererSandbox/bin/RelWithDebInfo/*
+/Sandboxes/RendererSandbox/assets/Junk/*
 
 /Sandboxes/PhysicsSandbox/bin/Debug/*
 /Sandboxes/PhysicsSandbox/bin/Release/*

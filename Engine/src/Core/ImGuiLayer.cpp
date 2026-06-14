@@ -14,8 +14,9 @@ namespace Cori {
 
 				io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
 				io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // Enable docking
-				io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable multi-viewport
+				//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable multi-viewport
 				// big L wayland
+				// no multi-viewport support with threading, at least for now
 
 				ImGui::StyleColorsDark();
 
@@ -25,6 +26,8 @@ namespace Cori {
 					style.WindowRounding = 0.0f;
 					style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 				}
+
+				std::list<int> t;
 
 				Graphics::ImGuiRenderer::Init(Application::GetWindow().GetNativeWindow());
 

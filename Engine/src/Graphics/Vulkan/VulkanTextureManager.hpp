@@ -877,7 +877,9 @@ namespace Cori {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Failed to open sampler config file '{}', skipping it.", config.string());
 				}
 
-				std::vector<Utility::GlazeWithFallback<SamplerJsonDef, []{ return SamplerJsonDef{ .internalValue = UINT32_MAX }; }, "Sampler config in VulkanTextureManager">> samplers;
+				//the fallback here is only for glaze to not bitch about a single sampler object in the json that failed to parse, so it doesnt abort parsing.
+				//Even tho it will say that it got a fallback sampler in the console when parsing fails, the sampler wont't be actually added, i rely on GetSampler to return a default sampler when it cant find a sampler with the given alias.
+				std::vector<Utility::GlazeWithFallback<SamplerJsonDef, []{ return SamplerJsonDef{ .internalValue = UINT32_MAX }; }, "Sampler config in VulkanTextureManager. Fallback is just to skip this one, the actual vulkan sampler will not be created from this fallback entry.">> samplers;
 
 				auto parseError = glz::read<Utility::ReflectEnumsOpts{ .error_on_missing_keys = true }>(samplers, buffer);
 				if (parseError) {

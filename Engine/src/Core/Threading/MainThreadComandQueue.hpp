@@ -3,6 +3,7 @@
 #if 1
 namespace Cori {
 	namespace Core {
+		//FIXME: remove Threading namespace
 		namespace Threading {
 			class MainThreadQueue {
 			public:
