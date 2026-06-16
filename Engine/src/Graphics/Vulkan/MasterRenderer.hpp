@@ -1,5 +1,7 @@
 #pragma once
 #include "Renderer.hpp"
+#include "../RenderThreadCommandQueue.hpp"
+#include "../RenderThreadWakeup.hpp"
 
 namespace Cori {
 	namespace Graphics {

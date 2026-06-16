@@ -1462,11 +1462,8 @@ namespace Cori {
 
 			template<typename... Args>
 			bool EmplaceAt(const SizeT index, Args&&... args) {
-				static_assert(ENABLE_VERSIONING == false, "Index version of EmplaceAt should only be used with versioning off.");
-
-				if (index >= RawSize()) {
-					return false;
-				}
+				static_assert(ENABLE_VERSIONING == false, "Index version of EmplaceAt should only be used with versioning turned off.");
+				CORI_CORE_ASSERT(index < RawSize(), "VulkanFlatSlotMap::EmplaceAt index '{}' out of bounds.", index);
 
 				if (IsIndexOccupied(index)) {
 					return false;
@@ -1497,7 +1494,7 @@ namespace Cori {
 			}
 
 			void RemoveAt(const SizeT index) {
-				static_assert(ENABLE_VERSIONING == false, "Index version of RemoveAt should only be used with versioning off.");
+				static_assert(ENABLE_VERSIONING == false, "Index version of RemoveAt should only be used with versioning turned off.");
 
 				if (!IsIndexValid(index)) {
 					return;

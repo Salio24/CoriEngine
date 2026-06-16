@@ -13,7 +13,7 @@
 
 //FIXME: remove include later
 #include "Threading/SPSCRing.hpp"
-#include "AssetManager/AssetHandleAllocator.hpp"
+#include "../Graphics/AssetHandleAllocator.hpp"
 
 namespace Cori {
 	namespace Core {

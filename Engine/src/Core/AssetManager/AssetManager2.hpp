@@ -351,6 +351,9 @@ namespace Cori {
 				CORI_DEBUG("checked '{}', changed '{}'", counter, counter2);
 			}
 
+			static std::mutex& GetMutex() {
+				return Get().m_Mutex;
+			}
 
 			~AssetManager2() = default;
 
@@ -403,6 +406,8 @@ namespace Cori {
 			std::unordered_map<AssetID, AssetRecord> m_AssetDatabase;
 
 			std::filesystem::path m_AppRootPath;
+
+			std::mutex m_Mutex;
 
 			static std::unique_ptr<AssetManager2> s_Instance;
 		};
