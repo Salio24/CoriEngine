@@ -79,3 +79,6 @@
 [submodule "Engine/thirdparty/glaze"]
 	path = Engine/thirdparty/glaze
 	url = https://github.com/stephenberry/glaze
+[submodule "Engine/thirdparty/oneTBB"]
+	path = Engine/thirdparty/oneTBB
+	url = https://github.com/uxlfoundation/oneTBB

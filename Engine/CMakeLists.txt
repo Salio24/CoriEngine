@@ -7,7 +7,7 @@ project(CoriEngine)
     # hides all compiler warnings caused by thirdparty libs
     set(HIDE_DEPENDENCY_WARNINGS ON CACHE BOOL "")
     
-    set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+    set(BUILD_SHARED_LIBS OFF)
 
     # SDL3
     set(SDL_SHARED OFF)
@@ -175,6 +175,12 @@ project(CoriEngine)
     set(glaze_ENABLE_REFLECTION26 ON CACHE BOOL "")
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/glaze EXCLUDE_FROM_ALL)
 
+    set(TBB_TEST OFF CACHE BOOL "")
+    set(TBB_STRICT OFF CACHE BOOL "") 
+    set(BUILD_SHARED_LIBS ON)
+    add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/oneTBB EXCLUDE_FROM_ALL)
+    set(BUILD_SHARED_LIBS OFF)
+
 #find_package (Vulkan REQUIRED)
 
 # project's binary setup vvv
@@ -282,7 +288,7 @@ project(CoriEngine)
     target_compile_options(${ENGINE_LIBRARY_NAME} PUBLIC -freflection)
 
     # should be public
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite exprtk boost_pfr Vulkan::Headers GPUOpen::VulkanMemoryAllocator VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp Vulkan::Loader gch::small_vector sul::dynamic_bitset fast_obj_lib glaze_glaze)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite exprtk boost_pfr Vulkan::Headers GPUOpen::VulkanMemoryAllocator VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp Vulkan::Loader gch::small_vector sul::dynamic_bitset fast_obj_lib glaze_glaze tbb)
 
     if (CORI_ENABLE_TRACY_PROFILER)
         target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC Tracy::TracyClient)
