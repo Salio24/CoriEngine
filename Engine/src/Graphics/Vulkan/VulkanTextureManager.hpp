@@ -311,14 +311,14 @@ namespace Cori {
 					if (currentTimelineValue >= ticket) {
 						for (auto& inTransferTexture : inTransferAssets) {
 							if (!Get().m_TexturePool.IsHandleValid(inTransferTexture.texture)) {
-								DeletionQueue::PushImage(inTransferTexture.image, VulkanEngine::GetCurrentFrameInFlight());
+								DeletionQueue::PushImage(inTransferTexture.image);
 								continue;
 							}
 
 							auto& texture = Get().m_TexturePool[inTransferTexture.texture];
 
 							if (texture.dataVersion != inTransferTexture.dataVersion) {
-								DeletionQueue::PushImage(inTransferTexture.image, VulkanEngine::GetCurrentFrameInFlight());
+								DeletionQueue::PushImage(inTransferTexture.image);
 								continue;
 							}
 
@@ -412,7 +412,7 @@ namespace Cori {
 			~VulkanTextureManager() {
 				for (auto& texture : m_TexturePool) {
 					if (texture.image.m_Image) {
-						DeletionQueue::PushImage(texture.image, VulkanEngine::GetCurrentFrameInFlight());
+						DeletionQueue::PushImage(texture.image);
 					}
 				}
 
@@ -791,7 +791,7 @@ namespace Cori {
 				auto& texture = m_TexturePool[handle];
 
 				if (!texture.placeholderAssigned && texture.loaded) {
-					DeletionQueue::PushImage(texture.image, VulkanEngine::GetCurrentFrameInFlight());
+					DeletionQueue::PushImage(texture.image);
 					VulkanGlobalLayoutManager::UpdateSampledTextureDescriptor(texture.descriptorIndex, m_TexturePool[m_WhiteTexture].view);
 				}
 

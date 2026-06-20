@@ -256,15 +256,15 @@ namespace Cori {
 					if (currentTimelineValue >= ticket) {
 						for (auto& inTransferMesh : inTransferAssets) {
 							if (!Get().m_Meshes.IsHandleValid(inTransferMesh.mesh)) {
-								DeletionQueue::PushVirtualAlloc(inTransferMesh.vertexAllocation, inTransferMesh.vertexBlock, VulkanEngine::GetCurrentFrameInFlight());
-								DeletionQueue::PushVirtualAlloc(inTransferMesh.indexAllocation, Get().m_IndexBufferBlock, VulkanEngine::GetCurrentFrameInFlight());
+								DeletionQueue::PushVirtualAlloc(inTransferMesh.vertexAllocation, inTransferMesh.vertexBlock);
+								DeletionQueue::PushVirtualAlloc(inTransferMesh.indexAllocation, Get().m_IndexBufferBlock);
 								continue;
 							}
 
 							auto& meta = Get().m_MeshMetadata[inTransferMesh.mesh.GetIndex()];
 							if (meta.dataVersion != inTransferMesh.dataVersion) {
-								DeletionQueue::PushVirtualAlloc(inTransferMesh.vertexAllocation, inTransferMesh.vertexBlock, VulkanEngine::GetCurrentFrameInFlight());
-								DeletionQueue::PushVirtualAlloc(inTransferMesh.indexAllocation, Get().m_IndexBufferBlock, VulkanEngine::GetCurrentFrameInFlight());
+								DeletionQueue::PushVirtualAlloc(inTransferMesh.vertexAllocation, inTransferMesh.vertexBlock);
+								DeletionQueue::PushVirtualAlloc(inTransferMesh.indexAllocation, Get().m_IndexBufferBlock);
 								continue;
 							}
 
@@ -381,14 +381,14 @@ namespace Cori {
 			}
 
 			~VulkanMeshManager() {
-				DeletionQueue::PushVirtualBlock(m_IndexBufferBlock, VulkanEngine::GetCurrentFrameInFlight());
+				DeletionQueue::PushVirtualBlock(m_IndexBufferBlock);
 
 				for (auto& vertexStorage : m_VertexStorages) {
-					DeletionQueue::PushBuffer(vertexStorage.buffer, VulkanEngine::GetCurrentFrameInFlight());
-					DeletionQueue::PushVirtualBlock(vertexStorage.block, VulkanEngine::GetCurrentFrameInFlight());
+					DeletionQueue::PushBuffer(vertexStorage.buffer);
+					DeletionQueue::PushVirtualBlock(vertexStorage.block);
 				}
 
-				DeletionQueue::PushBuffer(m_IndexBuffer, VulkanEngine::GetCurrentFrameInFlight());
+				DeletionQueue::PushBuffer(m_IndexBuffer);
 			}
 
 			static constexpr bool EnableHotReload = true;
@@ -740,8 +740,8 @@ namespace Cori {
 				auto& meta = m_MeshMetadata[handle.GetIndex()];
 
 				if (!meta.placeholderAssigned && meta.loaded) {
-					DeletionQueue::PushVirtualAlloc(meta.vertexAllocation, meta.vertexBlock, VulkanEngine::GetCurrentFrameInFlight());
-					DeletionQueue::PushVirtualAlloc(meta.indexAllocation, Get().m_IndexBufferBlock, VulkanEngine::GetCurrentFrameInFlight());
+					DeletionQueue::PushVirtualAlloc(meta.vertexAllocation, meta.vertexBlock);
+					DeletionQueue::PushVirtualAlloc(meta.indexAllocation, Get().m_IndexBufferBlock);
 				}
 
 				meta.loaded = false;

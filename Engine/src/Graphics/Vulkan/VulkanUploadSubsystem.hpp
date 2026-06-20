@@ -107,18 +107,18 @@ namespace Cori {
 		class VulkanVirtualBufferAllocator {
 		public:
 			~VulkanVirtualBufferAllocator() {
-				DeletionQueue::PushBuffer(m_GPUScratchHeap, VulkanEngine::GetCurrentFrameInFlight());
+				DeletionQueue::PushBuffer(m_GPUScratchHeap);
 
 				if (std::holds_alternative<VulkanBuffer>(m_UploadArenaHeap)) {
-					DeletionQueue::PushBuffer(std::get<VulkanBuffer>(m_UploadArenaHeap), VulkanEngine::GetCurrentFrameInFlight());
+					DeletionQueue::PushBuffer(std::get<VulkanBuffer>(m_UploadArenaHeap));
 				} else {
 					auto [gpuArena, cpuArena] = std::get<std::pair<VulkanBuffer, VulkanBuffer>>(m_UploadArenaHeap);
-					DeletionQueue::PushBuffer(gpuArena, VulkanEngine::GetCurrentFrameInFlight());
-					DeletionQueue::PushBuffer(cpuArena, VulkanEngine::GetCurrentFrameInFlight());
+					DeletionQueue::PushBuffer(gpuArena);
+					DeletionQueue::PushBuffer(cpuArena);
 				}
 
-				DeletionQueue::PushVirtualBlock(m_GPUScratchBlock, VulkanEngine::GetCurrentFrameInFlight());
-				DeletionQueue::PushVirtualBlock(m_UploadArenaBlock, VulkanEngine::GetCurrentFrameInFlight());
+				DeletionQueue::PushVirtualBlock(m_GPUScratchBlock);
+				DeletionQueue::PushVirtualBlock(m_UploadArenaBlock);
 			}
 
 			static VulkanVirtualBuffer CreateVirtualUploadBuffer(uint64_t size, const uint64_t alignment, const uint32_t dstFrameInFlight, const char* name = "") {
@@ -432,11 +432,11 @@ namespace Cori {
 		public:
 			~VulkanDynamicContainerUploadManager() {
 				if (m_RingStagingBuffer.m_Buffer) {
-					DeletionQueue::PushBuffer(m_RingStagingBuffer, VulkanEngine::GetCurrentFrameInFlight());
+					DeletionQueue::PushBuffer(m_RingStagingBuffer);
 				}
 
 				if (m_RingStagingBlock) {
-					DeletionQueue::PushVirtualBlock(m_RingStagingBlock, VulkanEngine::GetCurrentFrameInFlight());
+					DeletionQueue::PushVirtualBlock(m_RingStagingBlock);
 				}
 			}
 
@@ -595,7 +595,7 @@ namespace Cori {
 				auto& info = Get().m_BufferCopyInfos.back();
 				info.regionCount++;
 
-				DeletionQueue::PushVirtualAlloc(virtAlloc, Get().m_RingStagingBlock, VulkanEngine::GetCurrentFrameInFlight());
+				DeletionQueue::PushVirtualAlloc(virtAlloc, Get().m_RingStagingBlock);
 			}
 
 			static void EndUpdate() {
@@ -608,7 +608,7 @@ namespace Cori {
 
 				Get().m_PendingCopies.emplace_back(srcBuffer.m_Buffer, dstBuffer, size);
 
-				DeletionQueue::PushBuffer(srcBuffer, VulkanEngine::GetCurrentFrameInFlight());
+				DeletionQueue::PushBuffer(srcBuffer);
 
 				Get().m_UploaderMutex.unlock();
 			}

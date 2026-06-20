@@ -339,14 +339,14 @@ namespace Cori {
 
 			~VulkanShaderManager() {
 				for (auto& cs : m_ComputeShaders) {
-					DeletionQueue::PushShaderObject(cs.m_ComputeShaderObject, VulkanEngine::GetCurrentFrameInFlight());
+					DeletionQueue::PushShaderObject(cs.m_ComputeShaderObject);
 				}
 
 				m_ComputeShaders.Clear();
 
 				for (auto& vfp : m_PairShaders) {
-					DeletionQueue::PushShaderObject(vfp.m_VertFragPair[0], VulkanEngine::GetCurrentFrameInFlight());
-					DeletionQueue::PushShaderObject(vfp.m_VertFragPair[1], VulkanEngine::GetCurrentFrameInFlight());
+					DeletionQueue::PushShaderObject(vfp.m_VertFragPair[0]);
+					DeletionQueue::PushShaderObject(vfp.m_VertFragPair[1]);
 				}
 
 				m_PairShaders.Clear();
@@ -509,7 +509,7 @@ namespace Cori {
 				auto& object = m_ComputeShaders[handle];
 
 				if (!object.placeholderAssigned) {
-					DeletionQueue::PushShaderObject(m_ComputeShaders[handle].m_ComputeShaderObject, VulkanEngine::GetCurrentFrameInFlight());
+					DeletionQueue::PushShaderObject(m_ComputeShaders[handle].m_ComputeShaderObject);
 				}
 
 				object.placeholderAssigned = false;
@@ -528,8 +528,8 @@ namespace Cori {
 				auto& pair = m_PairShaders[handle];
 
 				if (!pair.placeholderAssigned) {
-					DeletionQueue::PushShaderObject(pair.m_VertFragPair[0], VulkanEngine::GetCurrentFrameInFlight());
-					DeletionQueue::PushShaderObject(pair.m_VertFragPair[1], VulkanEngine::GetCurrentFrameInFlight());
+					DeletionQueue::PushShaderObject(pair.m_VertFragPair[0]);
+					DeletionQueue::PushShaderObject(pair.m_VertFragPair[1]);
 				}
 
 				pair.placeholderAssigned = false;

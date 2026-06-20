@@ -81,9 +81,19 @@ namespace Cori {
 
 		private:
 			void ResizeExtras(const uint64_t newSize) {
-				m_RefCounts.grow_to_at_least(newSize);
-				m_DeletionPolicies.grow_to_at_least(newSize);
-				m_AssetIDs.grow_to_at_least(newSize);
+				const uint64_t newSizePowerOfTwo = Utility::GetNextPowerOfTwo(newSize);
+
+				if (newSizePowerOfTwo >= m_RefCounts.size()) {
+					m_RefCounts.grow_to_at_least(newSizePowerOfTwo);
+				}
+
+				if (newSizePowerOfTwo >= m_DeletionPolicies.size()) {
+					m_DeletionPolicies.grow_to_at_least(newSizePowerOfTwo);
+				}
+
+				if (newSizePowerOfTwo >= m_AssetIDs.size()) {
+					m_AssetIDs.grow_to_at_least(newSizePowerOfTwo);
+				}
 			}
 
 			tbb::concurrent_vector<std::atomic<uint32_t>> m_RefCounts;

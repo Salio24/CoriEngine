@@ -2,6 +2,7 @@
 #include <oneapi/tbb/concurrent_queue.h>
 #include <oneapi/tbb/concurrent_vector.h>
 #include "Core/DataStructures/FlatSlotMap.hpp"
+#include "Utility/BitHelpers.hpp"
 
 namespace Cori {
 	namespace Threading {
@@ -14,7 +15,7 @@ namespace Cori {
 				bool popped = false;
 
 				uint32_t currentCounter = m_ReusedIndexCounter.load(std::memory_order_acquire);
-				while (currentCounter < 0) {
+				while (currentCounter > 0) {
 					if (m_ReusedIndexCounter.compare_exchange_weak(currentCounter, currentCounter - 1, std::memory_order_acq_rel, std::memory_order_acquire)) {
 						if (m_Holes.try_pop(index)) {
 							popped = true;
@@ -27,7 +28,7 @@ namespace Cori {
 
 				if (!popped && m_Holes.unsafe_size() > REUSE_THRESHOLD) {
 					uint32_t expected = 0;
-					uint32_t desired = std::max<std::ptrdiff_t>(0, m_Holes.unsafe_size());
+					const uint32_t desired = std::max<std::ptrdiff_t>(0, m_Holes.unsafe_size());
 
 					if (desired > REUSE_THRESHOLD && m_ReusedIndexCounter.compare_exchange_strong(expected, desired - 1, std::memory_order_acq_rel, std::memory_order_acquire)) {
 						if (m_Holes.try_pop(index)) {
@@ -54,17 +55,21 @@ namespace Cori {
 			void Free(const Core::Handle<T> handle) {
 				CORI_CORE_ASSERT(IsHandleValid(handle), "ConcurrentHandleAllocatorBase::Free called with an invalid handle")
 
-				uint32_t index = handle.Index();
+				uint32_t index = handle.GetIndex();
 				m_Versions[index].fetch_add(1, std::memory_order_release);
 				m_Holes.push(index);
 			}
 
-			[[nodiscard]] bool IsHandleValid(const Core::ConstHandle<T> handle) {
+			[[nodiscard]] bool IsHandleValid(const Core::ConstHandle<T> handle) const {
 				return handle.GetIndex() < m_Versions.size() && m_Versions[handle.GetIndex()].load(std::memory_order_acquire) == handle.GetVersion();
 			}
 
 			void Resize(const uint64_t newSize) {
-				m_Versions.grow_to_at_least(newSize);
+				const uint64_t newSizePowerOfTwo = Utility::GetNextPowerOfTwo(newSize);
+
+				if (newSizePowerOfTwo >= m_Versions.size()) {
+					m_Versions.grow_to_at_least(newSizePowerOfTwo);
+				}
 
 				static_cast<Derived*>(this)->ResizeExtras(newSize);
 			}

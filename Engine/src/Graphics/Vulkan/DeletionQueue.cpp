@@ -19,37 +19,35 @@ namespace Cori {
 		}
 
 		void DeletionQueue::Flush() {
-			uint32_t frameIndex = VulkanEngine::GetCurrentFrameInFlight();
-
-			for (auto& deleter : Get().m_Deleters[frameIndex] | std::views::reverse) {
+			for (auto& deleter : Get().m_Deleters[Get().m_Counter] | std::views::reverse) {
 				deleter();
 			}
 
-			Get().m_Deleters[frameIndex].clear();
+			Get().m_Deleters[Get().m_Counter].clear();
 
-			for (auto& buffer : Get().m_BufferQueue[frameIndex] | std::views::reverse) {
+			for (auto& buffer : Get().m_BufferQueue[Get().m_Counter] | std::views::reverse) {
 				buffer.Destroy();
 			}
 
-			Get().m_BufferQueue[frameIndex].clear();
+			Get().m_BufferQueue[Get().m_Counter].clear();
 
-			for (auto& image : Get().m_ImageQueue[frameIndex] | std::views::reverse) {
+			for (auto& image : Get().m_ImageQueue[Get().m_Counter] | std::views::reverse) {
 				image.Destroy();
 			}
 
-			Get().m_ImageQueue[frameIndex].clear();
+			Get().m_ImageQueue[Get().m_Counter].clear();
 
-			for (auto [alloc, block] : Get().m_VirtAllocQueue[frameIndex] | std::views::reverse) {
+			for (auto [alloc, block] : Get().m_VirtAllocQueue[Get().m_Counter] | std::views::reverse) {
 				block.free(alloc);
 			}
 
-			for (auto shaderObject : Get().m_ShaderObjectQueue[frameIndex] | std::views::reverse) {
+			for (auto shaderObject : Get().m_ShaderObjectQueue[Get().m_Counter] | std::views::reverse) {
 				VulkanEngine::GetLogicalDevice().destroyShaderEXT(shaderObject);
 			}
 
-			Get().m_VirtAllocQueue[frameIndex].clear();
+			Get().m_VirtAllocQueue[Get().m_Counter].clear();
 
-			for (auto& block : Get().m_VirtBlockQueue[frameIndex] | std::views::reverse) {
+			for (auto& block : Get().m_VirtBlockQueue[Get().m_Counter] | std::views::reverse) {
 				if (!block.isVirtualBlockEmpty()) {
 					CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Deleting vma virtual block, but some allocations made from this block are still not freed, they will be forcibly freed now. You should generally free all allocation before deleting a block, not doing that can lead to a crash under certain circumstances (e.g., freeing a virtual allocation after the block was deleted via deletion queue in the next frame).");
 					block.clearVirtualBlock();
@@ -58,11 +56,13 @@ namespace Cori {
 				block.destroy();
 			}
 
-			Get().m_VirtBlockQueue[frameIndex].clear();
+			Get().m_VirtBlockQueue[Get().m_Counter].clear();
+
+			Get().m_Counter = (Get().m_Counter + 1) % s_BucketCount;
 		}
 
 		void DeletionQueue::FlushAll() {
-			for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
+			for (uint32_t i = 0; i < s_BucketCount; i++) {
 				for (auto& deleter : m_Deleters[i] | std::views::reverse) {
 					deleter();
 				}
@@ -92,7 +92,7 @@ namespace Cori {
 				m_VirtAllocQueue[i].clear();
 			}
 
-			for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
+			for (uint32_t i = 0; i < s_BucketCount; i++) {
 				for (auto& block : m_VirtBlockQueue[i] | std::views::reverse) {
 					block.clearVirtualBlock();
 					block.destroy();

@@ -12,6 +12,8 @@
 #include "FileSystem/PathManager.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
 
+#include "Renderer/PersistentRenderTarget.hpp"
+
 namespace Cori {
 	namespace Graphics {
 		class Renderer {
