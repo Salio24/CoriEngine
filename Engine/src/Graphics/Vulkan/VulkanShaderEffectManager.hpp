@@ -228,7 +228,7 @@ namespace Cori {
 			static constexpr bool EnableHotReload = false;
 
 		protected:
-			friend class Renderer;
+			friend class SceneRenderer;
 			static std::expected<Core::Handle<ShaderEffect>, ErrorCode> DuplicateShaderEffect(const Core::Handle<ShaderEffect> original, std::filesystem::path path, const Core::AssetDeletionPolicy deletionPolicy, std::string name) {
 				//to properly implement this (and material duplication) I first have to add a new data path to the asset manager design, so far it has:
 				// 1. Drive -> A.S. Registry -> Engine memory (initial load)

@@ -1,7 +1,7 @@
 #include "ImGuiLayer.hpp"
 #include <imgui.h>
 #include "Core/Application.hpp"
-#include "Graphics/Vulkan/ImGuiRenderer.hpp"
+#include "../Graphics/Vulkan/Renderer/ImGuiRenderer.hpp"
 
 namespace Cori {
 	namespace Core {

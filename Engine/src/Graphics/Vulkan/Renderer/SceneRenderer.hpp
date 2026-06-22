@@ -1,22 +1,27 @@
 #pragma once
-#include "VulkanEngine.hpp"
+#include "Graphics/Vulkan/VulkanEngine.hpp"
 #include "RenderGraph.hpp"
 #include "Core/Time.hpp"
-#include "VulkanUploadSubsystem.hpp"
-#include "VulkanMeshManager.hpp"
-#include "VulkanShaderManager.hpp"
-#include "VulkanLayoutManager.hpp"
-#include "VulkanTextureManager.hpp"
-#include "VulkanMaterialSystem.hpp"
+#include "Graphics/Vulkan/VulkanUploadSubsystem.hpp"
+#include "Graphics/Vulkan/VulkanMeshManager.hpp"
+#include "Graphics/Vulkan/VulkanShaderManager.hpp"
+#include "Graphics/Vulkan/VulkanLayoutManager.hpp"
+#include "Graphics/Vulkan/VulkanTextureManager.hpp"
+#include "Graphics/Vulkan/VulkanMaterialSystem.hpp"
 #include "ImGuiRenderer.hpp"
 #include "FileSystem/PathManager.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
+#include "Core/Threading/ConcurrentHandleAllocator.hpp"
+#include "Core/Threading/SPSCRing.hpp"
 
-#include "Renderer/PersistentRenderTarget.hpp"
+#include "PersistentRenderTarget.hpp"
+#include "CameraSnapshot.hpp"
 
 namespace Cori {
 	namespace Graphics {
-		class Renderer {
+		struct FrameData;
+
+		class SceneRenderer {
 			using BatchIndex = uint32_t;
 			using DrawGroupIndex = uint32_t;
 
@@ -69,11 +74,21 @@ namespace Cori {
 				DrawGroupIndex owner{ 0 };
 			};
 
+		public:
+			struct CreateInfo {
+				vk::Extent2D initialPRTExtent;
+				vk::Format PRTFormat;
+				#ifdef DEBUG_BUILD
+				std::string name;
+				#endif
+				bool registerPRTWithImGui;
+			};
+
 			struct RenderObject {
 				RenderObject() = default;
 				RenderObject(const glm::mat4& transform, const glm::vec4& uvOffsets, Core::AssetRef<Material> material, const BatchIndex batch) : m_Transform(transform), m_UVOffsets(uvOffsets), m_Material(std::move(material)), m_OwnerBatch(batch) {}
 			private:
-				friend Renderer;
+				friend SceneRenderer;
 				alignas(16) glm::mat4 m_Transform{ 0.0f };
 				alignas(16) glm::vec4 m_UVOffsets{ 0.0f, 0.0f, 1.0f, 1.0f };
 				Core::AssetRef<Material> m_Material;
@@ -82,37 +97,31 @@ namespace Cori {
 				uint32_t valid{ 0 };
 			};
 
-		public:
 			static void Init();
 
 			static void Shutdown();
 
-			static Renderer& Get();
+			static SceneRenderer& Get();
 
-			[[nodiscard]] std::expected<Core::Handle<RenderObject>, ErrorCode> RegisterObject(Core::AssetRef<Mesh> mesh, Core::AssetRef<Material> material, const glm::mat4& transform, const glm::vec4& UVs = { 0.0f, 0.0f, 1.0f, 1.0f } ) {
-				if (!mesh.IsInitialized() || !material.IsInitialized()) {
-					return std::unexpected(ErrorCode::eUninitializedAssetRef);
-				}
+			void RegisterObject(const Core::Handle<RenderObject> handle, Core::AssetRef<Mesh> mesh, Core::AssetRef<Material> material, const glm::mat4& transform, const glm::vec4& UVs = { 0.0f, 0.0f, 1.0f, 1.0f } ) {
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle passed to SceneRenderer::RegisterObject");
 
 				auto shaderEffect = VulkanMaterialSystem::GetMaterialShaderEffect(material.GetHandle());
 
-				if (!shaderEffect) {
-					return std::unexpected(shaderEffect.error());
-				}
+				//if (!shaderEffect) {
+				//	return std::unexpected(shaderEffect.error());
+				//}
 
 				auto [groupIndex, batchIndex] = FindAppropriateGroupAndBatch(shaderEffect.value().get().GetHandle(), std::move(mesh));
 
 				m_Batches[batchIndex].IncrementObjectCounter();
 				m_TotalObjectCount++;
 
-				return m_Objects.Emplace(transform, UVs, std::move(material), batchIndex);
+				m_Objects.EmplaceAt(handle.GetIndex(), transform, UVs, std::move(material), batchIndex);
 			}
 
 			void UnregisterObject(const Core::Handle<RenderObject> handle) {
-				if (!IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Renderer }, "Invalid RenderObject handle was passed to UnregisterObject.");
-					return;
-				}
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle passed to SceneRenderer::UnregisterObject");
 
 				const auto& object = std::as_const(m_Objects)[handle];
 
@@ -128,7 +137,7 @@ namespace Cori {
 			}
 
 			[[nodiscard]] bool IsHandleValid(const Core::Handle<RenderObject> handle) const {
-				return m_Objects.IsHandleValid(handle);
+				return m_RenderObjectAllocator.IsHandleValid(handle);
 			}
 
 			[[nodiscard]] std::expected<std::reference_wrapper<const glm::mat4>, ErrorCode> GetRenderObjectTransform(const Core::Handle<RenderObject> handle) {
@@ -139,14 +148,12 @@ namespace Cori {
 				return std::cref(std::as_const(m_Objects)[handle].m_Transform);
 			}
 
-			std::expected<void, ErrorCode> ChangeRenderObjectTransform(const Core::Handle<RenderObject> handle, const glm::mat4& newTransform) {
-				if (!IsHandleValid(handle)) {
-					return std::unexpected(ErrorCode::eInvalidHandle);
-				}
+			void ChangeRenderObjectTransform(const Core::Handle<RenderObject> handle, const glm::mat4& newTransform) {
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle passed to SceneRenderer::ChangeRenderObjectTransform");
 
 				m_Objects[handle].m_Transform = newTransform;
 
-				return {};
+				return;
 			}
 
 			[[nodiscard]] std::expected<std::reference_wrapper<const glm::vec4>, ErrorCode> GetRenderObjectUVOffsets(const Core::Handle<RenderObject> handle) {
@@ -157,14 +164,10 @@ namespace Cori {
 				return std::cref(std::as_const(m_Objects)[handle].m_UVOffsets);
 			}
 
-			std::expected<void, ErrorCode> ChangeRenderObjectUVOffsets(const Core::Handle<RenderObject> handle, const glm::vec4& newUVOffsets) {
-				if (!IsHandleValid(handle)) {
-					return std::unexpected(ErrorCode::eInvalidHandle);
-				}
+			void ChangeRenderObjectUVOffsets(const Core::Handle<RenderObject> handle, const glm::vec4& newUVOffsets) {
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle passed to SceneRenderer::ChangeRenderObjectUVOffsets");
 
 				m_Objects[handle].m_UVOffsets = newUVOffsets;
-
-				return {};
 			}
 
 			[[nodiscard]] std::expected<Core::Handle<Mesh>, ErrorCode> GetRenderObjectMesh(const Core::Handle<RenderObject> handle) {
@@ -175,21 +178,15 @@ namespace Cori {
 				return m_Batches[std::as_const(m_Objects)[handle].m_OwnerBatch].m_Mesh.GetHandle();
 			}
 
-			std::expected<void, ErrorCode> ChangeRenderObjectMesh(const Core::Handle<RenderObject> handle, Core::AssetRef<Mesh> newMesh) {
-				if (newMesh.IsInitialized()) {
-					return std::unexpected(ErrorCode::eUninitializedAssetRef);
-				}
-
-				if (!IsHandleValid(handle)) {
-					return std::unexpected(ErrorCode::eInvalidHandle);
-				}
+			void ChangeRenderObjectMesh(const Core::Handle<RenderObject> handle, Core::AssetRef<Mesh> newMesh) {
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle passed to SceneRenderer::ChangeRenderObjectMesh");
 
 				auto batchID = std::as_const(m_Objects)[handle].m_OwnerBatch;
 				auto& batch = m_Batches[batchID];
 
 				auto oldMesh = batch.m_Mesh;
 				if (oldMesh.GetAssetID() == newMesh.GetAssetID()) {
-					return {};
+					return;
 				}
 
 				batch.DecrementObjectCounter();
@@ -203,8 +200,6 @@ namespace Cori {
 				auto [newGroup, newBatch] = FindAppropriateGroupAndBatch(group.m_ShaderEffect, std::move(newMesh));
 				m_Objects[handle].m_OwnerBatch = newBatch;
 				m_Batches[newBatch].IncrementObjectCounter();
-
-				return {};
 			}
 
 			[[nodiscard]] std::expected<Core::Handle<Material>, ErrorCode> GetRenderObjectMaterial(const Core::Handle<RenderObject> handle) {
@@ -218,19 +213,13 @@ namespace Cori {
 				return materialRef.GetHandle();
 			}
 
-			std::expected<void, ErrorCode> ChangeRenderObjectMaterial(const Core::Handle<RenderObject> handle, Core::AssetRef<Material> newMaterial) {
-				if (newMaterial.IsInitialized()) {
-					return std::unexpected(ErrorCode::eUninitializedAssetRef);
-				}
-
-				if (!IsHandleValid(handle)) {
-					return std::unexpected(ErrorCode::eInvalidHandle);
-				}
+			void ChangeRenderObjectMaterial(const Core::Handle<RenderObject> handle, Core::AssetRef<Material> newMaterial) {
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle passed to SceneRenderer::ChangeRenderObjectMaterial");
 
 				const auto& constObjectRef = std::as_const(m_Objects)[handle];
 
 				if (newMaterial.GetHandle() == constObjectRef.m_Material.GetHandle()) {
-					return {};
+					return;
 				}
 
 				auto newShaderEffect = VulkanMaterialSystem::GetMaterialShaderEffect(newMaterial.GetHandle());
@@ -238,7 +227,7 @@ namespace Cori {
 				if (oldShaderEffect) {
 					if (oldShaderEffect.value().get().GetHandle() == newShaderEffect.value().get().GetHandle()) {
 						m_Objects[handle].m_Material = newMaterial;
-						return {};
+						return;
 					}
 				}
 
@@ -253,8 +242,6 @@ namespace Cori {
 				auto [newGroup, newBatch] = FindAppropriateGroupAndBatch(newShaderEffect.value().get().GetHandle(), std::move(mesh));
 				m_Objects[handle].m_OwnerBatch = newBatch;
 				m_Batches[newBatch].IncrementObjectCounter();
-
-				return {};
 			}
 
 			static void OnMaterialShaderEffectChanged(const Core::Handle<Material> material, [[maybe_unused]] const Core::ConstHandle<ShaderEffect> oldShaderEffect, const Core::ConstHandle<ShaderEffect> newShaderEffect) {
@@ -275,16 +262,52 @@ namespace Cori {
 				}
 			}
 
-			void Render() {
+			[[nodiscard]] bool IsDormant() const {
+				return m_IsDormant;
+			}
+
+			void MarkNonDormant() {
+				m_IsDormant = false;
+			}
+
+			[[nodiscard]] FrameData* PopRecycledFrameData() {
+				FrameData* ptr = *m_RecycleRing.FrontWait();
+				m_RecycleRing.Pop();
+				return ptr;
+			}
+
+			void PushFrameData(FrameData* frameData) {
+				m_ReadyRing.Emplace(frameData);
+			}
+
+			[[nodiscard]] bool IsReady() {
+				return m_ReadyRing.Front() != nullptr;
+			}
+
+			[[nodiscard]] FrameData** PeekFrameData() {
+				return m_ReadyRing.Front();
+			}
+
+			void ProcessFrameData();
+
+			struct UniformData {
+				alignas(16) glm::mat4 model{};
+				alignas(16) glm::mat4 view{};
+				alignas(16) glm::mat4 proj{};
+			};
+
+			struct FrameContext {
+				VulkanVirtualBuffer commandOffsetsBuffer;
+				VulkanVirtualBuffer uniformBuffer;
+				RenderGraph graph;
+				UniformData uniformData;
+			};
+
+			FrameContext Stage1() {
 				CORI_PROFILE_FUNCTION();
 
-				VulkanEngine::Get().CPUFrameStart();
+				//VulkanEngine::Get().CPUFrameStart();
 
-				struct UniformData {
-					alignas(16) glm::mat4 model{};
-					alignas(16) glm::mat4 view{};
-					alignas(16) glm::mat4 proj{};
-				};
 
 				auto commandOffsetsBuffer = VulkanVirtualBufferAllocator::CreateVirtualUploadBuffer(m_DrawGroups.RawSize() * sizeof(uint32_t), 4, VulkanEngine::GetNextFrameInFlight(), "Draw Group Command Offsets");
 
@@ -546,6 +569,7 @@ namespace Cori {
 				}
 
 				graph.Compile(VulkanEngine::GetFrameIndex(), VulkanEngine::GetNextFrameInFlight());
+				/*
 				auto& frameData = VulkanEngine::Get().GPUFrameBegin();
 				if (!frameData.m_SkippedFrame) {
 					if (m_DrawGroups.RawSize() > 0) {
@@ -577,134 +601,49 @@ namespace Cori {
 				ImGuiRenderer::Render(frameData.m_CommandBuffer, VulkanEngine::GetSwapChainImageView(), VulkanEngine::GetSwapChainExtent(), frameData.m_SkippedFrame);
 
 				VulkanEngine::Get().GPUFrameEnd();
+				*/
+
+				return FrameContext{
+					.commandOffsetsBuffer = commandOffsetsBuffer,
+					.uniformBuffer = uniformBuffer,
+					.graph = graph,
+					.uniformData = uniformData
+				};
 			}
 
-			~Renderer() = default;
+			void Stage2(VulkanEngine::FrameInfo& frameData, FrameContext& frameContext) {
+				if (m_DrawGroups.RawSize() > 0) {
+					uint32_t value = 0;
+					frameContext.commandOffsetsBuffer.UploadToAllocation<uint32_t>(std::span{&value, 1}, 0);
+				}
+
+				uint32_t commandOffset = 0;
+				for (uint32_t i = 0; i < m_DrawGroups.RawSize() - 1; i++) {
+					if (m_DrawGroups.IsIndexValid(i)) {
+						commandOffset += m_DrawGroups[i].GetBatchCount();
+					}
+
+					frameContext.commandOffsetsBuffer.UploadToAllocation<uint32_t>(std::span{&commandOffset, 1}, sizeof(uint32_t) * (i + 1));
+				}
+
+				frameContext.uniformBuffer.UploadToAllocation(std::span<UniformData>{&frameContext.uniformData, 1}, 0);
+
+				{
+					CORI_PROFILE_SCOPE("Renderer dynamic container sync");
+					m_Objects.Sync();
+					m_BatchGPUInfo.Sync();
+				}
+			}
+
+			void Stage3(VulkanEngine::FrameInfo& frameData, FrameContext& frameContext) {
+				frameContext.graph.Execute(frameData.m_CommandBuffer);
+			}
+
+			~SceneRenderer() = default;
+
+			SceneRenderer(CreateInfo&& createInfo);
 
 		private:
-			Renderer() {
-				m_Objects.Reserve(256);
-				m_Batches.Reserve(128);
-				m_DrawGroups.Reserve(16);
-				std::ifstream file(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "shaders/CullingShader.spv", std::ios::ate | std::ios::binary);
-				if (!file.is_open()) {
-					throw std::runtime_error("failed to open file!");
-				}
-
-				std::vector<Byte> buffer(file.tellg());
-				file.seekg(0, std::ios::beg);
-				file.read(reinterpret_cast<char*>(buffer.data()), static_cast<std::streamsize>(buffer.size()));
-				file.close();
-
-				cullShader = Core::AssetManager2::Load<ComputeShader>("assets/Shaders/Cull_Pass1.json");
-				cmgShader = Core::AssetManager2::Load<ComputeShader>("assets/Shaders/Cull_Pass2.json");
-				compactShader = Core::AssetManager2::Load<ComputeShader>("assets/Shaders/Cull_Pass3.json");
-
-				#if 0
-				std::ifstream file_(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "shaders/TestShader.spv", std::ios::ate | std::ios::binary);
-				if (!file_.is_open()) {
-					throw std::runtime_error("failed to open file!");
-				}
-
-				std::vector<Byte> buffer_(file_.tellg());
-				file_.seekg(0, std::ios::beg);
-				file_.read(reinterpret_cast<char*>(buffer_.data()), static_cast<std::streamsize>(buffer_.size()));
-				file_.close();
-
-				testShader = VulkanShaderManager::CreateVertexShaderPair(buffer_.data(), buffer_.size(), "vertMain", "fragMain", "Test Shader");
-
-				std::ifstream file__(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "shaders/DefaultShader.spv", std::ios::ate | std::ios::binary);
-				if (!file__.is_open()) {
-					throw std::runtime_error("failed to open file!");
-				}
-
-				std::vector<Byte> buffer__(file__.tellg());
-				file__.seekg(0, std::ios::beg);
-				file__.read(reinterpret_cast<char*>(buffer__.data()), static_cast<std::streamsize>(buffer__.size()));
-				file__.close();
-
-				defaultShader = VulkanShaderManager::Get().AllocateShaderPairHandle();
-
-				VulkanShaderManager::Get().CreateShaderPair(defaultShader, buffer__.data(), buffer__.size(), "vertMain", buffer__.data(), buffer__.size(), "fragMain", "Default Shader");
-
-				float depth = 0.0f;
-
-				std::vector<StaticVertex> vertices = {
-					// Bottom-left
-					{ glm::vec3(-0.5f, -0.5f, depth), 0, 0, glm::vec2(0,0), 0xFFFFFFFF },
-
-					// Bottom-right
-					{ glm::vec3( 0.5f, -0.5f, depth), 0, 0, glm::vec2(1,0), 0xFFFFFFFF },
-
-					// Top-right
-					{ glm::vec3( 0.5f,  0.5f, depth), 0, 0, glm::vec2(1,1), 0xFFFFFFFF },
-
-					// Top-left
-					{ glm::vec3(-0.5f,  0.5f, depth), 0, 0, glm::vec2(0,1), 0xFFFFFFFF }
-				};
-
-				std::vector<uint32_t> indices = {
-					0, 1, 2,   // first triangle
-					2, 3, 0    // second triangle
-				};
-
-				#endif
-
-				//quad = VulkanMeshManager::CreateMesh();
-				//VulkanMeshManager::LoadToMesh(quad, vertices, std::move(indices));
-
-				//auto image = Image::Create(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "placeholders/uv_sample.png");
-				//texture = Core::AssetManager2::Load<Texture2>("assets/AssetNew.json");
-				//swordAlbedo = Core::AssetManager2::Load<Texture2>("assets/Textures/Sword_T_albedo.json");
-				sword = Core::AssetManager2::Load<Mesh>("assets/Sword_M.json");
-
-				//texture = VulkanTextureManager::CreateTexture(vk::ImageType::e2D, vk::Format::eR8G8B8A8Srgb, { image->GetHeight(), image->GetWidth(), 1 }, 1, 1, vk::SampleCountFlagBits::e1, "UV sample texture");
-				//VulkanTextureManager::UpdateTexture(texture, std::span{ static_cast<Byte*>(image->GetPixelData()), image->GetHeight() * image->GetWidth() * 4 }, { 0, 0, 0 }, { image->GetHeight(), image->GetWidth(), 1 }, { vk::ImageAspectFlagBits::eColor, 0, 0, 1 });
-				//VulkanTextureManager::ChangeView(texture, vk::ImageViewType::e2D, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
-
-				#if 0
-
-				PipelineState state{
-					.cullMode = vk::CullModeFlagBits::eNone,
-					.frontFace = vk::FrontFace::eCounterClockwise,
-				};
-
-				auto shaderEffect = VulkanMaterialSystem::CreateShaderEffect(testShader, state, {}, "Test Shader Effect");
-
-				MaterialData materialData {
-					.colorFactor = { 1.0f, 1.0f, 1.0f, 1.0f },
-					.albedoTexture = swordAlbedo.GetHandle(),
-					.albedoSampler = 0
-				};
-
-				MaterialData materialData_ {
-					.colorFactor = { 1.0f, 1.0f, 1.0f, 1.0f },
-					.albedoTexture = VulkanTextureManager::GetPlaceholder<Texture2>(),
-					.albedoSampler = 0
-				};
-
-				material2 = VulkanMaterialSystem::CreateMaterial(shaderEffect, materialData_, "Test Material 2");
-
-				material = VulkanMaterialSystem::CreateMaterial(shaderEffect, materialData, "Test Material");
-
-
-				#endif
-
-				glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(0.2f), glm::vec3(0.5f, 0.5, 0.5f));
-				swordMaterial = Core::AssetManager2::Load<Material>("assets/Sword_Material.json");
-				auto result = RegisterObject(sword, swordMaterial, transform);
-				transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0f));
-
-				if (!result) {
-					CORI_DEBUG("{}", to_string(result.error()));
-				}
-
-				//RegisterObject(quad, material2, transform);
-
-				VulkanMaterialSystem::AddOnShaderEffectSwappedListener(OnMaterialShaderEffectChanged);
-				//FIXME: renderer crashes if we try to run it with no objects added, because we try to allocate virtual upload buffer with size 0 and vma becomes all whiny
-			}
-
 			[[nodiscard]] std::pair<DrawGroupIndex, BatchIndex> FindAppropriateGroupAndBatch(const Core::ConstHandle<ShaderEffect> shaderEffect, Core::AssetRef<Mesh> mesh) {
 				CORI_CORE_ASSERT(mesh.IsInitialized(), "Uninitialized mesh asset ref passed to FindAppropriateGroupAndBatch in SceneRenderer.");
 				auto [it, groupInserted] = m_SubBatchLookup.try_emplace(shaderEffect, std::pair<DrawGroupIndex, std::unordered_map<Core::Handle<Mesh>, BatchIndex>>{});
@@ -759,7 +698,8 @@ namespace Cori {
 				m_DrawGroups.Remove(m_DrawGroups.GetIndexHandle(groupID));
 			}
 
-			VulkanFlatSlotMap<RenderObject> m_Objects{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Render Object SlotMap" };
+			Threading::ConcurrentHandleAllocator<RenderObject, 64> m_RenderObjectAllocator;
+			VulkanFlatSlotMap<RenderObject, 0, false> m_Objects{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Render Object SlotMap" };
 
 			Core::FlatSlotMap<Batch, 0, false> m_Batches;
 			VulkanDynamicVector<BatchGPUInfo> m_BatchGPUInfo{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Batch GPU Data" };
@@ -788,9 +728,22 @@ namespace Cori {
 			RenderGraphResourceRegistry m_GraphResourceRegistry;
 			RenderGraphPassRegistry m_GraphPassRegistry;
 
+			CameraSnapshot m_CameraSnapshot;
+			PersistentRenderTarget m_PRT;
+
+			#ifdef DEBUG_BUILD
+			std::string m_Name;
+			#endif
+
+			bool m_IsDormant{ true };
+
+			Threading::SPSCRing<FrameData*> m_ReadyRing{ FRAMES_IN_FLIGHT };
+			Threading::SPSCRing<FrameData*> m_RecycleRing{ FRAMES_IN_FLIGHT };
+			std::array<FrameData*, FRAMES_IN_FLIGHT> m_FrameDataAllocated;
+
 			static constexpr uint32_t INDIRECT_COMMAND_SIZE = 20;
 
-			static std::unique_ptr<Renderer> s_Instance;
+			static std::unique_ptr<SceneRenderer> s_Instance;
 		};
 	}
 }

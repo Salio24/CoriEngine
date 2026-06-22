@@ -19,7 +19,7 @@ static constexpr uint32_t FRAMES_IN_FLIGHT = 2;
 
 namespace Cori {
 	namespace Graphics {
-		class Renderer;
+		class SceneRenderer;
 
 		using vk::operator&;
 		using vk::operator|;
@@ -43,7 +43,7 @@ namespace Cori {
 
 		class VulkanEngine {
 		public:
-			struct FrameData {
+			struct FrameInfo {
 				vk::CommandBuffer m_CommandBuffer;
 				vk::Semaphore m_PresentCompleteSemaphore;
 				vk::Fence m_DrawFence;
@@ -202,7 +202,7 @@ namespace Cori {
 
 			void CPUFrameStart();
 
-			FrameData& GPUFrameBegin();
+			FrameInfo& GPUFrameBegin();
 
 			void GPUFrameMiddlePointSync();
 
@@ -236,7 +236,7 @@ namespace Cori {
 
 			void CreateSyncObjects();
 
-			friend Renderer;
+			friend SceneRenderer;
 
 			vk::raii::Context m_Context;
 			vk::DebugUtilsMessengerEXT m_DebugMessenger = nullptr;
@@ -266,7 +266,7 @@ namespace Cori {
 			uint32_t m_CurrentSwapChainImageIndex = 0;
 
 			std::vector<vk::Semaphore> m_RenderFinishedSemaphores;
-			std::array<FrameData, FRAMES_IN_FLIGHT> m_FrameData;
+			std::array<FrameInfo, FRAMES_IN_FLIGHT> m_FrameData;
 
 			std::vector<vk::Semaphore> m_WaitSemaphores;
 			std::vector<vk::PipelineStageFlags> m_WaitDstStageMasks;

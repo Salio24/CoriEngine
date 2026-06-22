@@ -263,6 +263,15 @@ project(CoriEngine)
         target_compile_options(msdf-atlas-gen PRIVATE -w)
         target_compile_options(msdfgen-core PRIVATE -w)
         target_compile_options(tmxlite PRIVATE -w)
+
+        get_target_property(GLAZE_INCLUDES glaze_glaze INTERFACE_INCLUDE_DIRECTORIES)
+        target_include_directories(${ENGINE_LIBRARY_NAME} SYSTEM PRIVATE ${GLAZE_INCLUDES})
+
+        get_target_property(VMA_INCLUDES GPUOpen::VulkanMemoryAllocator INTERFACE_INCLUDE_DIRECTORIES)
+        target_include_directories(${ENGINE_LIBRARY_NAME} SYSTEM PRIVATE ${VMA_INCLUDES})
+
+        get_target_property(VMAHPP_INCLUDES VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp INTERFACE_INCLUDE_DIRECTORIES)
+        target_include_directories(${ENGINE_LIBRARY_NAME} SYSTEM PRIVATE ${VMAHPP_INCLUDES})
         #target_compile_options(vulkan PRIVATE -w)
 
         #if(TARGET TIFF::tiff)

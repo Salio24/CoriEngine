@@ -7,8 +7,8 @@ namespace Cori {
 		class PersistentRenderTarget {
 		public:
 			PersistentRenderTarget(const PersistentRenderTarget&) = delete;
-			PersistentRenderTarget(PersistentRenderTarget&&) = delete;
 			PersistentRenderTarget& operator=(const PersistentRenderTarget&) = delete;
+			PersistentRenderTarget(PersistentRenderTarget&&) = delete;
 			PersistentRenderTarget& operator=(PersistentRenderTarget&&) = delete;
 
 			PersistentRenderTarget(const vk::Extent2D extent, const vk::Format format, const bool registerWithImGui, const char* name = "") : m_Format(format), m_RegisterWithImGui(registerWithImGui) {

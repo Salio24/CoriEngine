@@ -1,5 +1,4 @@
 #pragma once
-#include <meta>
 #include "VulkanEngine.hpp"
 #include "Utility/GlazeUtils.hpp"
 

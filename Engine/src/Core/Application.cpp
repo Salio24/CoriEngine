@@ -8,7 +8,7 @@
 #include "EventSystem/KeyEvent.hpp"
 #include "FileSystem/PathManager.hpp"
 #include "Graphics/Renderer2D.hpp"
-#include "../Graphics/Vulkan/Renderer.hpp"
+#include "../Graphics/Vulkan/Renderer/SceneRenderer.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
 
 //FIXME: remove include later
@@ -39,7 +39,7 @@ namespace Cori {
 			AssetManager2::Init();
 			World::SceneManager::Init();
 			Audio::Mixer::Init();
-			Graphics::Renderer::Init();
+			Graphics::SceneRenderer::Init();
 
 			m_GameTimer.SetTickrate(120);
 			m_GameTimer.SetTickrateUpdateFunc(CORI_BIND_EVENT_FN(Application::TickrateUpdate, CORI_PLACEHOLDERS(1)));
@@ -47,7 +47,7 @@ namespace Cori {
 		}
 
 		Application::~Application() {
-			Graphics::Renderer::Shutdown();
+			Graphics::SceneRenderer::Shutdown();
 			Audio::Mixer::Shutdown();
 			World::SceneManager::Shutdown();
 			AssetManager2::Shutdown();
@@ -142,7 +142,7 @@ namespace Cori {
 
 					//AssetManager2::OnUpdate(m_GameTimer);
 
-					Graphics::Renderer::Get().Render();
+					Graphics::SceneRenderer::Get().Render();
 
 					m_Window->OnUpdate();
 

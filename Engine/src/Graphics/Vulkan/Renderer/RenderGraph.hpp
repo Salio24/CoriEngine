@@ -1,9 +1,9 @@
 #pragma once
-#include "VulkanEngine.hpp"
-#include "VulkanImage.hpp"
-#include "VulkanBuffer.hpp"
-#include "VulkanLayoutManager.hpp"
-#include "VulkanUploadSubsystem.hpp"
+#include "Graphics/Vulkan/VulkanEngine.hpp"
+#include "Graphics/Vulkan/VulkanImage.hpp"
+#include "Graphics/Vulkan/VulkanBuffer.hpp"
+#include "Graphics/Vulkan/VulkanLayoutManager.hpp"
+#include "Graphics/Vulkan/VulkanUploadSubsystem.hpp"
 #include "Utility/StringHash.hpp"
 #include "Utility/HashCombine.hpp"
 
@@ -559,8 +559,8 @@ namespace Cori {
 				return static_cast<GraphResourceHandle<VulkanDynamicVector<T>>>(m_ResourceRegistry->AddNode(node));
 			}
 
-			template<typename T>
-			GraphResourceHandle<VulkanFlatSlotMap<T>> ImportFlatSlotMap(const VulkanFlatSlotMap<T>& vector, const char* name) {
+			template<typename T, uint16_t REUSE_THRESHOLD = 64, bool ENABLE_VERSIONING = true, Core::IsVersionedHandle HandleT = Core::Handle<T>, typename ConstHandleT = Core::ConstHandle<T>>
+			GraphResourceHandle<VulkanFlatSlotMap<T>> ImportFlatSlotMap(const VulkanFlatSlotMap<T, REUSE_THRESHOLD, ENABLE_VERSIONING, HandleT, ConstHandleT>& vector, const char* name) {
 				Internal::ResourceNode node;
 				node.name = name;
 				node.origin = Internal::ResourceOrigin::Imported;

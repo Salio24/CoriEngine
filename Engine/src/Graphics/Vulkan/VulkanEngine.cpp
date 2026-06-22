@@ -112,7 +112,6 @@ namespace Cori {
 			CreateCommandBuffer();
 			CreateSyncObjects();
 
-			//FIXME: this shit is 1. messy, 2. and absolute abuse of singletons. Dependency injection?
 			VulkanImageViewManager::Init();
 			DeletionQueue::Init();
 			VulkanStreamingLine::Init();
@@ -147,7 +146,7 @@ namespace Cori {
 			}
 
 			for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++ ) {
-				FrameData& frameData = m_FrameData[i];
+				FrameInfo& frameData = m_FrameData[i];
 				m_Device.destroySemaphore(frameData.m_PresentCompleteSemaphore);
 				m_Device.destroyFence(frameData.m_DrawFence);
 				m_Device.freeCommandBuffers(m_GraphicsCommandPool, 1, &frameData.m_CommandBuffer);
@@ -181,10 +180,10 @@ namespace Cori {
 			VulkanVirtualBufferAllocator::ClearGPUScratchBlock(GetNextFrameInFlight());
 		}
 
-		VulkanEngine::FrameData& VulkanEngine::GPUFrameBegin() {
+		VulkanEngine::FrameInfo& VulkanEngine::GPUFrameBegin() {
 			CORI_PROFILE_FUNCTION();
 
-			FrameData& frameData = m_FrameData[m_CurrentFrameInFlight];
+			FrameInfo& frameData = m_FrameData[m_CurrentFrameInFlight];
 			frameData.m_FrameIndex = m_CurrentFrameIndex;
 			frameData.m_SwapChainImageIndex = UINT32_MAX;
 			frameData.m_SkippedFrame = false;
@@ -300,7 +299,7 @@ namespace Cori {
 		void VulkanEngine::GPUFrameMiddlePointSync() {
 			CORI_PROFILE_FUNCTION();
 
-			FrameData& frameData = m_FrameData[m_CurrentFrameInFlight];
+			FrameInfo& frameData = m_FrameData[m_CurrentFrameInFlight];
 
 			VulkanTextureManager::ProcessUpdates(frameData.m_CommandBuffer);
 			VulkanMeshManager::ProcessUpdates(frameData.m_CommandBuffer);
@@ -318,7 +317,7 @@ namespace Cori {
 		void VulkanEngine::GPUFrameEnd() {
 			CORI_PROFILE_FUNCTION();
 
-			FrameData& frameData = m_FrameData[m_CurrentFrameInFlight];
+			FrameInfo& frameData = m_FrameData[m_CurrentFrameInFlight];
 
 			if (!frameData.m_SkippedFrame) {
 				vk::ImageMemoryBarrier2 barrier {

@@ -193,7 +193,7 @@ namespace Cori {
 			static constexpr bool EnableHotReload = false;
 
 		protected:
-			friend class Renderer;
+			friend class SceneRenderer;
 			[[nodiscard]] static Core::Handle<Material> DuplicateMaterial(const Core::Handle<Material> handle, const char* name = "") {
 				//if (!IsHandleValid(material)) {
 				//	CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid Material handle passed to DuplicateMaterial, returning placeholder material.");

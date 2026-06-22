@@ -1,7 +1,6 @@
 #pragma once
 //implementation based on https://github.com/rigtorp/SPSCQueue
 
-
 namespace Cori {
 	namespace Threading {
 		template<typename T>
@@ -18,7 +17,7 @@ namespace Cori {
 
 				m_Capacity = std::clamp(m_Capacity, 2ul, UINT64_MAX - 2 * s_SlotPadding);
 
-				m_Storage = new(m_Capacity + 2 * s_SlotPadding, std::align_val_t{ alignof(T) }) T;
+				m_Storage = static_cast<T*>(::operator new((m_Capacity + 2 * s_SlotPadding) * sizeof(T), std::align_val_t{ alignof(T) }));
 			}
 
 			~SPSCRing() {
@@ -26,7 +25,7 @@ namespace Cori {
 					Pop();
 				}
 
-				delete m_Storage;
+				::operator delete(m_Storage, std::align_val_t{ alignof(T) });
 			}
 
 			SPSCRing(const SPSCRing&) = delete;
@@ -94,6 +93,15 @@ namespace Cori {
 					if (m_HeadCache == tail) {
 						return nullptr;
 					}
+				}
+
+				return &m_Storage[tail + s_SlotPadding];
+			}
+
+			[[nodiscard]] T* FrontWait() noexcept {
+				const uint64_t tail = m_Tail.load(std::memory_order_relaxed);
+				while (tail != m_HeadCache) {
+					m_HeadCache = m_Head.load(std::memory_order_acquire);
 				}
 
 				return &m_Storage[tail + s_SlotPadding];

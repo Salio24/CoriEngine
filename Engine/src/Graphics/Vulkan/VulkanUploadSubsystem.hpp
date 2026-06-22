@@ -1674,7 +1674,7 @@ namespace Cori {
 			sul::dynamic_bitset<> m_SlotStates{};
 		private:
 			std::deque<SizeT> m_Holes{};
-			std::conditional_t<ENABLE_VERSIONING, std::vector<uint32_t>, void> m_Versions{};
+			std::conditional_t<ENABLE_VERSIONING, std::vector<uint32_t>, uint8_t> m_Versions{};
 			uint32_t m_ReusedIndexCounter{ 0 };
 		};
 
