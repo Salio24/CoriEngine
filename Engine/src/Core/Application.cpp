@@ -12,8 +12,7 @@
 #include "Core/AssetManager/AssetManager2.hpp"
 
 //FIXME: remove include later
-#include "Threading/SPSCRing.hpp"
-#include "AssetManager/AssetHandleAllocator.hpp"
+#include "Graphics/Vulkan/Renderer/MasterRenderer.hpp"
 
 namespace Cori {
 	namespace Core {
@@ -39,7 +38,6 @@ namespace Cori {
 			AssetManager2::Init();
 			World::SceneManager::Init();
 			Audio::Mixer::Init();
-			Graphics::SceneRenderer::Init();
 
 			m_GameTimer.SetTickrate(120);
 			m_GameTimer.SetTickrateUpdateFunc(CORI_BIND_EVENT_FN(Application::TickrateUpdate, CORI_PLACEHOLDERS(1)));
@@ -47,7 +45,6 @@ namespace Cori {
 		}
 
 		Application::~Application() {
-			Graphics::SceneRenderer::Shutdown();
 			Audio::Mixer::Shutdown();
 			World::SceneManager::Shutdown();
 			AssetManager2::Shutdown();
@@ -117,10 +114,8 @@ namespace Cori {
 					m_GameTimer.Update();
 
 					for (Layer* layer : m_LayerStack) {
-						layer->ActiveScene.BeginRender();
 						layer->OnUpdate(m_GameTimer);
 						layer->SceneUpdate(m_GameTimer);
-						layer->ActiveScene.EndRender();
 					}
 
 					{
@@ -140,9 +135,35 @@ namespace Cori {
 						m_ImGuiLayer->EndFrame();
 					}
 
+					{
+						CORI_PROFILE_SCOPE("FrameData preparation");
+						bool success = false;
+					while (success == false) {
+							success = true;
+
+							for (Layer* layer : m_LayerStack) {
+								success = layer->ActiveScene.PrepareFrameData();
+							}
+						}
+					}
+
+					{
+						CORI_PROFILE_SCOPE("Application submit to renderer");
+						bool success = false;
+						while (success == false) {
+							success = true;
+
+							for (Layer* layer : m_LayerStack) {
+								success = layer->ActiveScene.SubmitForRender();
+							}
+						}
+					}
+
+					Graphics::MasterRenderer::Get().Loop();
+
 					//AssetManager2::OnUpdate(m_GameTimer);
 
-					Graphics::SceneRenderer::Get().Render();
+					//Graphics::SceneRenderer::Get().Render();
 
 					m_Window->OnUpdate();
 
@@ -152,6 +173,8 @@ namespace Cori {
 		}
 
 		void Application::TickrateUpdate(GameTimer& gameTimer) {
+			CORI_PROFILE_SCOPE("Tick Update");
+
 			for (Layer* layer : m_LayerStack) {
 				layer->SceneTickrateUpdate(gameTimer);
 				layer->OnTickUpdate(gameTimer);

@@ -184,6 +184,10 @@ namespace Cori {
 				return Get().m_SwapChainImageViews[Get().m_CurrentSwapChainImageIndex];
 			}
 
+			static vk::Image GetSwapChainImage() {
+				return Get().m_SwapChainImages[Get().m_CurrentSwapChainImageIndex];
+			}
+
 			static vk::Extent2D GetSwapChainExtent() {
 				return Get().m_SwapChainExtent;
 			}
@@ -196,6 +200,7 @@ namespace Cori {
 				return Get().m_SwapChainImages.size();
 			}
 
+			//TODO: remove this
 			static void ReportWindowResize() {
 				Get().m_SwapChainResizeNeeded = true;
 			}

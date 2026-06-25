@@ -13,6 +13,7 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include "VulkanMaterialSystem.hpp"
 #include "VulkanUploadSubsystem.hpp"
 #include "DeletionQueue.hpp"
+#include "Renderer/MasterRenderer.hpp"
 
 const std::vector g_ValidationLayers = {
 	"VK_LAYER_KHRONOS_validation"
@@ -123,12 +124,14 @@ namespace Cori {
 			VulkanMaterialSystem::Init();
 			VulkanVirtualBufferAllocator::Init();
 			VulkanDynamicContainerUploadManager::Init();
+			MasterRenderer::Init();
 		}
 
 		VulkanEngine::~VulkanEngine() {
 			auto result = m_Device.waitIdle();
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Calling wait idle on device has failed. Error: {}", vk::to_string(result));
 
+			MasterRenderer::Shutdown();
 			VulkanDynamicContainerUploadManager::Shutdown();
 			VulkanVirtualBufferAllocator::Shutdown();
 			VulkanMaterialSystem::Shutdown();
@@ -226,7 +229,7 @@ namespace Cori {
 
 			vk::ImageMemoryBarrier2 barrier {
 				.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-				.srcAccessMask = {},
+				.srcAccessMask = vk::AccessFlagBits2::eNone,
 				.dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
 				.dstAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
 				.oldLayout = vk::ImageLayout::eUndefined,

@@ -103,6 +103,10 @@ namespace Cori {
 
 			static SceneRenderer& Get();
 
+			[[nodiscard]] Core::Handle<RenderObject> AllocateRenderObjectHandle() {
+				return m_RenderObjectAllocator.Allocate();
+			}
+
 			void RegisterObject(const Core::Handle<RenderObject> handle, Core::AssetRef<Mesh> mesh, Core::AssetRef<Material> material, const glm::mat4& transform, const glm::vec4& UVs = { 0.0f, 0.0f, 1.0f, 1.0f } ) {
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle passed to SceneRenderer::RegisterObject");
 
@@ -133,7 +137,8 @@ namespace Cori {
 					DestroyBatch(object.m_OwnerBatch);
 				}
 
-				m_Objects.Remove(handle);
+				m_Objects.RemoveAt(handle.GetIndex());
+				m_RenderObjectAllocator.Free(handle);
 			}
 
 			[[nodiscard]] bool IsHandleValid(const Core::Handle<RenderObject> handle) const {
@@ -271,13 +276,17 @@ namespace Cori {
 			}
 
 			[[nodiscard]] FrameData* PopRecycledFrameData() {
-				FrameData* ptr = *m_RecycleRing.FrontWait();
-				m_RecycleRing.Pop();
-				return ptr;
+				FrameData* ptr = *m_RecycleRing.Front();
+				if (ptr) {
+					m_RecycleRing.Pop();
+					return ptr;
+				}
+
+				return nullptr;
 			}
 
-			void PushFrameData(FrameData* frameData) {
-				m_ReadyRing.Emplace(frameData);
+			bool PushFrameData(FrameData* frameData) {
+				return m_ReadyRing.TryEmplace(frameData);
 			}
 
 			[[nodiscard]] bool IsReady() {
@@ -286,6 +295,10 @@ namespace Cori {
 
 			[[nodiscard]] FrameData** PeekFrameData() {
 				return m_ReadyRing.Front();
+			}
+
+			[[nodiscard]] PersistentRenderTarget& GetPRT() {
+				return m_PRT;
 			}
 
 			void ProcessFrameData();
@@ -383,6 +396,10 @@ namespace Cori {
 					auto InstanceAtomicCounterHandle = graph.CreateBuffer({ sizeof(uint32_t), alignof(uint32_t) }, "Instance Atomic Counter"); //atomic uint32_t, CPU - none, GPU - compute write/read atomic, immediate mode
 					auto CompactedInstanceListBufferHandle = graph.CreateBuffer({ m_Objects.RawSize() * sizeof(uint32_t), alignof(uint32_t) }, "Compacted Instance List Buffer"); //per visible instance <uint32_t> CPU - none, GPU - compute write -> vertex/fragment read, immediate mode
 
+					vk::Image prtImage = m_PRT.GetImage().m_Image;
+					vk::ImageView prtImageView = m_PRT.GetImageView();
+					vk::Extent2D prtExtent = { m_PRT.GetImage().m_Extent3D.width, m_PRT.GetImage().m_Extent3D.height };
+
 					auto& bufferCleanupPass = graph.CreatePass("Buffer Cleanup");
 					bufferCleanupPass.Writes(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
 					bufferCleanupPass.Writes(InstanceAtomicCounterHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
@@ -394,6 +411,7 @@ namespace Cori {
 						commandBuffer.fillBuffer(dccb.GetHeapHandle(), dccb.GetStartOffset(), dccb.GetSize(), 0);
 						commandBuffer.fillBuffer(iac.GetHeapHandle(), iac.GetStartOffset(), iac.GetSize(), 0);
 						commandBuffer.fillBuffer(cilb.GetHeapHandle(), cilb.GetStartOffset(), cilb.GetSize(), 0);
+
 					});
 
 					auto& cullPass = graph.CreatePass("Cull Pass");
@@ -518,10 +536,33 @@ namespace Cori {
 						auto& indirectCommandBuffer = registry.GetResource(DrawCommandBufferHandle);
 						auto& indirectCommandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle);
 
+						//this is temporary, need to add support to external images to the render graph
+						{
+							vk::ImageMemoryBarrier2 prtBar{
+							   .srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
+							   .srcAccessMask = vk::AccessFlagBits2::eTransferWrite,
+							   .dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+							   .dstAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
+							   .oldLayout = vk::ImageLayout::eTransferDstOptimal,
+							   .newLayout = vk::ImageLayout::eColorAttachmentOptimal,
+							   .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+							   .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+							   .image = prtImage,
+							   .subresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 }
+						   };
+
+						   vk::DependencyInfo depInfo{
+							   .imageMemoryBarrierCount = 1,
+							   .pImageMemoryBarriers = &prtBar
+						   };
+
+						   commandBuffer.pipelineBarrier2(depInfo);
+						}
+
 						//temp
 						vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 0.0f);
 						vk::RenderingAttachmentInfo attachmentInfo = {
-							.imageView = VulkanEngine::GetSwapChainImageView(),
+							.imageView = prtImageView,
 							.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
 							.loadOp = vk::AttachmentLoadOp::eClear,
 							.storeOp = vk::AttachmentStoreOp::eStore,
@@ -529,7 +570,7 @@ namespace Cori {
 						};
 
 						vk::RenderingInfo renderingInfo = {
-							.renderArea = {.offset = { 0, 0 }, .extent = VulkanEngine::GetSwapChainExtent()},
+							.renderArea = { .offset = { 0, 0 }, .extent = prtExtent },
 							.layerCount = 1,
 							.colorAttachmentCount = 1,
 							.pColorAttachments = &attachmentInfo
@@ -565,6 +606,29 @@ namespace Cori {
 						}
 
 						commandBuffer.endRendering();
+
+						//this is temporary, need to add support to external images to the render graph
+						{
+							vk::ImageMemoryBarrier2 prtBar{
+									.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+									.srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
+									.dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
+									.dstAccessMask = vk::AccessFlagBits2::eTransferRead,
+									.oldLayout = vk::ImageLayout::eColorAttachmentOptimal,
+									.newLayout = vk::ImageLayout::eTransferSrcOptimal,
+									.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+									.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+									.image = prtImage,
+									.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+								};
+
+							vk::DependencyInfo depInfo{
+									.imageMemoryBarrierCount = 1,
+									.pImageMemoryBarriers = &prtBar
+								};
+
+							commandBuffer.pipelineBarrier2(depInfo);
+						}
 					});
 				}
 

@@ -30,7 +30,12 @@ namespace Cori {
 					} else {
 						transform.m_WorldTransform = transform.m_LastParentTransform * transform.GetLocalTransform();
 					}
+
 					transform.m_DirtyTransform = false;
+
+					if (!m_Owner.GetRegistry().all_of<Components::Entity::Internal::TransformDirtyForRendererFlag>(entity)) {
+						m_Owner.GetRegistry().emplace<Components::Entity::Internal::TransformDirtyForRendererFlag>(entity);
+					}
 				}
 				if (layerDirty) {
 					int16_t unclamped = parentDepth + transform.GetLocalDepthOffset();

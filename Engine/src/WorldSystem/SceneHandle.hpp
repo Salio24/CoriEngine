@@ -203,6 +203,13 @@ namespace Cori {
 				m_SceneRaw.lock()->RemoveContextComponent<T>();
 			}
 
+			//FIXME: add docs
+			template<typename... T>
+			void Clear() {
+				CORI_CORE_ASSERT(!m_SceneRaw.expired(), "No scene is currently bound.");
+				m_SceneRaw.lock()->Clear<T...>();
+			}
+
 			/**
 			 * @brief Registers the system for the scene.
 			 * @tparam T System to register.
@@ -289,16 +296,20 @@ namespace Cori {
 			friend Core::Layer;
 			friend Core::Application;
 
-			void BeginRender() {
+			bool PrepareFrameData() {
 				if (!m_SceneRaw.expired()) {
-					m_SceneRaw.lock()->BeginRender();
+					return m_SceneRaw.lock()->PrepareFrameData();
 				}
+
+				return true;
 			}
 
-			void EndRender() {
+			bool SubmitForRender() {
 				if (!m_SceneRaw.expired()) {
-					m_SceneRaw.lock()->EndRender();
+					return m_SceneRaw.lock()->SubmitForRender();
 				}
+
+				return true;
 			}
 
 			void OnUpdate(Core::GameTimer& gameTimer) {

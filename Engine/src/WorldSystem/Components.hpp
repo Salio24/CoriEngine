@@ -4,6 +4,7 @@
 #include "Entity.hpp"
 #include "Graphics/Texture.hpp"
 #include "Audio/Track.hpp"
+#include "Graphics/Vulkan/Renderer/SceneRenderer.hpp"
 
 namespace Cori {
 	namespace Physics {
@@ -27,6 +28,7 @@ namespace Cori {
 			class Transform;
 			class Hierarchy;
 			class Animation;
+			class RenderSync;
 		}
 
 		/**
@@ -44,7 +46,20 @@ namespace Cori {
 					 */
 					struct DirtyTransformFlag {
 						DirtyTransformFlag() = default;
+					private:
+						// entt cant create fully empty components
+						[[maybe_unused]] bool bober{};
+					};
 
+					struct TransformDirtyForRendererFlag {
+						TransformDirtyForRendererFlag() = default;
+					private:
+						// entt cant create fully empty components
+						[[maybe_unused]] bool bober{};
+					};
+
+					struct RenderComponentDirtyFlag {
+						RenderComponentDirtyFlag() = default;
 					private:
 						// entt cant create fully empty components
 						[[maybe_unused]] bool bober{};
@@ -277,6 +292,65 @@ namespace Cori {
 					bool m_Detached{ false };
 					bool m_DirtyTransform{ true };
 					bool m_DirtyDepth{ true };
+				};
+
+				struct Rendering {
+					Rendering(Core::AssetRef<Graphics::Mesh> mesh, Core::AssetRef<Graphics::Material> material, const glm::vec4& uvOffsets) : m_Mesh(std::move(mesh)), m_Material(std::move(material)), m_UvOffsets(uvOffsets) {}
+
+					void ChangeMesh(Core::AssetRef<Graphics::Mesh> newMesh) {
+						m_Mesh = std::move(newMesh);
+
+						m_MeshDirty = true;
+
+						if (!m_Owner.HasComponents<Internal::RenderComponentDirtyFlag>()) {
+							m_Owner.AddComponent<Internal::RenderComponentDirtyFlag>();
+						}
+					}
+
+					void ChangeMaterial(Core::AssetRef<Graphics::Material> newMaterial) {
+						m_Material = std::move(newMaterial);
+
+						m_MaterialDirty = true;
+
+						if (!m_Owner.HasComponents<Internal::RenderComponentDirtyFlag>()) {
+							m_Owner.AddComponent<Internal::RenderComponentDirtyFlag>();
+						}
+					}
+
+					void ChangeUVOffsets(const glm::vec4& newUvOffsets) {
+						m_UvOffsets = newUvOffsets;
+
+						m_UvOffsetsDirty = true;
+
+						if (!m_Owner.HasComponents<Internal::RenderComponentDirtyFlag>()) {
+							m_Owner.AddComponent<Internal::RenderComponentDirtyFlag>();
+						}
+					}
+
+					Core::AssetRef<Graphics::Mesh> GetMesh() const {
+						return m_Mesh;
+					}
+
+					Core::AssetRef<Graphics::Material> GetMaterial() const {
+						return m_Material;
+					}
+
+					glm::vec4 GetUVOffsets() const {
+						return m_UvOffsets;
+					}
+
+				protected:
+					friend Systems::RenderSync;
+					Core::Handle<Graphics::SceneRenderer::RenderObject> m_RenderObjectHandle;
+					World::Entity m_Owner;
+				private:
+					Core::AssetRef<Graphics::Mesh> m_Mesh;
+					Core::AssetRef<Graphics::Material> m_Material;
+					glm::vec4 m_UvOffsets{ 0.0f, 0.0f, 1.0f, 1.0f };
+					bool m_MeshDirty{ true };
+					bool m_MaterialDirty{ true };
+					bool m_UvOffsetsDirty{ true };
+					bool m_NewRegister{ true };
 				};
 
 				/**

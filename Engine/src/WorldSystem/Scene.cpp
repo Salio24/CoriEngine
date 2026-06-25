@@ -3,6 +3,7 @@
 #include "Physics/Triggers/Trigger.hpp"
 #include "Graphics/Renderer2D.hpp"
 #include "Graphics/Animator/QuadAnimator.hpp"
+#include "Systems/RenderSync.hpp"
 
 namespace Cori {
 	namespace World {
@@ -88,12 +89,24 @@ namespace Cori {
 			}
 		}
 
-		void Scene::BeginRender() {
+		bool Scene::SubmitForRender() {
+			auto result = GetSystem<Systems::RenderSync>();
+			if (result) {
+				return result.value().lock()->SubmitForRendering();
+			}
 
+			result.error().Ignore();
+			return true;
 		}
 
-		void Scene::EndRender() {
+		bool Scene::PrepareFrameData() {
+			auto result = GetSystem<Systems::RenderSync>();
+			if (result) {
+				return result.value().lock()->PrepareFrameData();
+			}
 
+			result.error().Ignore();
+			return true;
 		}
 
 		bool Scene::OnBind() {

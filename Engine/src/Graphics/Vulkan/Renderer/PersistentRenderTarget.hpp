@@ -44,6 +44,12 @@ namespace Cori {
 				#endif
 
 				m_Image = VulkanImage::Create(info);
+				VulkanImage::ImageViewKey viewKey{
+					.type = vk::ImageViewType::e2D,
+					.subresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 }
+				};
+
+				m_ImageView = m_Image.GetView(viewKey);
 			}
 
 			~PersistentRenderTarget() {
@@ -56,6 +62,10 @@ namespace Cori {
 
 			VulkanImage& GetImage() {
 				return m_Image;
+			}
+
+			vk::ImageView GetImageView() {
+				return m_ImageView;
 			}
 
 			void Resize(vk::Extent2D extent) {
@@ -98,14 +108,15 @@ namespace Cori {
 
 				m_Image = VulkanImage::Create(info);
 
-				if (m_RegisterWithImGui) {
-					VulkanImage::ImageViewKey viewKey{
-						.type = vk::ImageViewType::e2D,
-						.subresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 }
-					};
+				VulkanImage::ImageViewKey viewKey{
+					.type = vk::ImageViewType::e2D,
+					.subresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 }
+				};
 
-					vk::ImageView view = m_Image.GetView(viewKey);
-					VkDescriptorSet set = ImGui_ImplVulkan_AddTexture(view, static_cast<VkImageLayout>(vk::ImageLayout::eShaderReadOnlyOptimal));
+				m_ImageView = m_Image.GetView(viewKey);
+
+				if (m_RegisterWithImGui) {
+					VkDescriptorSet set = ImGui_ImplVulkan_AddTexture(m_ImageView, static_cast<VkImageLayout>(vk::ImageLayout::eShaderReadOnlyOptimal));
 					m_ImGuiDescriptorSet.store(std::bit_cast<uint64_t>(set), std::memory_order_release);
 				}
 			}
@@ -130,6 +141,7 @@ namespace Cori {
 		private:
 			VulkanImage m_Image;
 			vk::Format m_Format;
+			vk::ImageView m_ImageView;
 			std::atomic<uint64_t> m_ImGuiDescriptorSet{ 0 };
 			std::atomic<bool> m_IsDirectlyBlit{ false };
 			bool m_RegisterWithImGui{ false };

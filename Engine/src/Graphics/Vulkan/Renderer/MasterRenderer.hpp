@@ -39,7 +39,7 @@ namespace Cori {
 			~MasterRenderer() {
 
 			}
-		protected:
+		//protected:
 			void Loop() {
 				uint64_t wakeBefore = RenderThreadWakeup::Snapshot();
 
@@ -65,7 +65,13 @@ namespace Cori {
 			}
 
 		private:
+			static constexpr uint32_t s_MaxSceneRendererCount{ 16 };
+
 			MasterRenderer() {
+				//temporary
+				for (auto& renderer : m_SceneRenderers) {
+					delete renderer.load(std::memory_order_relaxed);
+				}
 
 			}
 
@@ -122,7 +128,8 @@ namespace Cori {
 
 						ptr->MarkNonDormant();
 						maxWatermark = std::max(maxWatermark, (*dataPtr)->rtcqWatermark);
-						nonDormant[nonDormantCounter++];
+						nonDormantCounter++;
+						nonDormant[nonDormantCounter - 1] = ptr;
 					}
 				}
 
@@ -143,27 +150,27 @@ namespace Cori {
 				frameContexts.clear();
 
 				VulkanEngine::Get().CPUFrameStart();
-				for (uint32_t i = 0; i < nonDormantCounter; i++) {
-					SceneRenderer* ptr = nonDormant[i];
+				for (uint32_t i = 1; i < nonDormantCounter; i++) {
+					SceneRenderer* ptr = nonDormant[i - 1];
 					frameContexts.push_back(ptr->Stage1());
 				}
 
 				auto& frameInfo = VulkanEngine::Get().GPUFrameBegin();
 
 				if (!frameInfo.m_SkippedFrame) {
-					for (uint32_t i = 0; i < nonDormantCounter; i++) {
-						SceneRenderer* ptr = nonDormant[i];
-						ptr->Stage2(frameInfo, frameContexts[i]);
+					for (uint32_t i = 1; i < nonDormantCounter; i++) {
+						SceneRenderer* ptr = nonDormant[i - 1];
+						ptr->Stage2(frameInfo, frameContexts[i - 1]);
 					}
 
 					VulkanEngine::Get().GPUFrameMiddlePointSync();
 
-					for (uint32_t i = 0; i < nonDormantCounter; i++) {
-						SceneRenderer* ptr = nonDormant[i];
-						ptr->Stage3(frameInfo, frameContexts[i]);
+					for (uint32_t i = 1; i < nonDormantCounter; i++) {
+						SceneRenderer* ptr = nonDormant[i - 1];
+						ptr->Stage3(frameInfo, frameContexts[i - 1]);
 					}
 
-					Composite(frameInfo.m_CommandBuffer);
+					Composite(frameInfo.m_CommandBuffer, nonDormant, nonDormantCounter);
 				}
 
 
@@ -171,11 +178,50 @@ namespace Cori {
 				return true;
 			}
 
-			void Composite(vk::CommandBuffer cmb) {
+
+			void Composite(vk::CommandBuffer cmb, std::array<SceneRenderer*, s_MaxSceneRendererCount>& nonDormantRenderers, const uint32_t nonDormantRendererCount) {
+				if (nonDormantRendererCount == 1) {
+					auto* renderer = nonDormantRenderers[0];
+
+					vk::ImageMemoryBarrier2 scBar{
+						.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+						.srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
+						.dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
+						.dstAccessMask = vk::AccessFlagBits2::eTransferWrite,
+						.oldLayout = vk::ImageLayout::eColorAttachmentOptimal,
+						.newLayout = vk::ImageLayout::eTransferDstOptimal,
+						.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+						.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+						.image = VulkanEngine::GetSwapChainImage(),
+						.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+					};
+
+					vk::DependencyInfo depInfo{
+						.imageMemoryBarrierCount = 1,
+						.pImageMemoryBarriers = &scBar
+					};
+
+					cmb.pipelineBarrier2(depInfo);
+
+					vk::Extent2D prtExtent = { renderer->GetPRT().GetImage().m_Extent3D.width, renderer->GetPRT().GetImage().m_Extent3D.height };
+					vk::Extent2D scExtent = VulkanEngine::GetSwapChainExtent();
+
+					std::array srcOffsets = { vk::Offset3D{ 0, 0, 0 }, vk::Offset3D{ static_cast<int32_t>(prtExtent.width), static_cast<int32_t>(prtExtent.height), 0 } };
+					std::array dstOffsets = { vk::Offset3D{ 0, 0, 0 }, vk::Offset3D{ static_cast<int32_t>(scExtent.width), static_cast<int32_t>(scExtent.height), 0 } };
+
+					vk::ImageBlit blit{
+						.srcSubresource = { vk::ImageAspectFlagBits::eColor, 0, 0, 1 },
+						.srcOffsets = srcOffsets,
+						.dstSubresource = { vk::ImageAspectFlagBits::eColor, 0, 0, 1 },
+						.dstOffsets = dstOffsets
+					};
+
+					cmb.blitImage(renderer->GetPRT().GetImage().m_Image, vk::ImageLayout::eTransferSrcOptimal, VulkanEngine::GetSwapChainImage(), vk::ImageLayout::eTransferDstOptimal, blit, vk::Filter::eNearest);
+
+				}
 
 			}
 
-			static constexpr uint32_t s_MaxSceneRendererCount{ 16 };
 
 			std::array<std::atomic<SceneRenderer*>, s_MaxSceneRendererCount> m_SceneRenderers{ nullptr };
 			std::deque<std::pair<SceneRendererHandle, SceneRenderer::CreateInfo>> m_PendingCreations;

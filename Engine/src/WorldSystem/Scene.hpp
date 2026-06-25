@@ -110,6 +110,11 @@ namespace Cori {
 				m_Registry.ctx().erase<T>();
 			}
 
+			template<typename... T>
+			void Clear() {
+				m_Registry.clear<T...>();
+			}
+
 			template <typename T, typename... Args> requires IsSystem<T>
 			void RegisterSystem(Args&&... args) {
 				if (m_RegisteredSystems.contains(std::type_index(typeid(T)))) {
@@ -171,9 +176,9 @@ namespace Cori {
 				return m_SceneID;
 			}
 
-			void BeginRender();
+			bool PrepareFrameData();
 
-			void EndRender();
+			bool SubmitForRender();
 
 		protected:
 			//friend Core::Layer;

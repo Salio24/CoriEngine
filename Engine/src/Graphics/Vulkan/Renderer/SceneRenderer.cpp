@@ -136,7 +136,7 @@ namespace Cori {
 			//auto image = Image::Create(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "placeholders/uv_sample.png");
 			//texture = Core::AssetManager2::Load<Texture2>("assets/AssetNew.json");
 			//swordAlbedo = Core::AssetManager2::Load<Texture2>("assets/Textures/Sword_T_albedo.json");
-			sword = Core::AssetManager2::Load<Mesh>("assets/Sword_M.json");
+			//sword = Core::AssetManager2::Load<Mesh>("assets/Sword_M.json");
 
 			//texture = VulkanTextureManager::CreateTexture(vk::ImageType::e2D, vk::Format::eR8G8B8A8Srgb, { image->GetHeight(), image->GetWidth(), 1 }, 1, 1, vk::SampleCountFlagBits::e1, "UV sample texture");
 			//VulkanTextureManager::UpdateTexture(texture, std::span{ static_cast<Byte*>(image->GetPixelData()), image->GetHeight() * image->GetWidth() * 4 }, { 0, 0, 0 }, { image->GetHeight(), image->GetWidth(), 1 }, { vk::ImageAspectFlagBits::eColor, 0, 0, 1 });
@@ -170,14 +170,13 @@ namespace Cori {
 
 				#endif
 
-			glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(0.2f), glm::vec3(0.5f, 0.5, 0.5f));
-			swordMaterial = Core::AssetManager2::Load<Material>("assets/Sword_Material.json");
-			auto result = RegisterObject(sword, swordMaterial, transform);
-			transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0f));
-
-			if (!result) {
-				CORI_DEBUG("{}", to_string(result.error()));
-			}
+			//glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(0.2f), glm::vec3(0.5f, 0.5, 0.5f));
+			//swordMaterial = Core::AssetManager2::Load<Material>("assets/Sword_Material.json");
+			//auto result = RegisterObject(sword, swordMaterial, transform);
+			//transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0f));
+			//if (!result) {
+			//	CORI_DEBUG("{}", to_string(result.error()));
+			//}
 
 			//RegisterObject(quad, material2, transform);
 
@@ -189,21 +188,6 @@ namespace Cori {
 				ptr = new FrameData();
 				m_RecycleRing.Emplace(ptr);
 			}
-		}
-		std::unique_ptr<SceneRenderer> SceneRenderer::s_Instance{ nullptr };
-
-		void SceneRenderer::Init() {
-			CORI_CORE_ASSERT(!s_Instance, "Renderer is already initialized.")
-			s_Instance = std::unique_ptr<SceneRenderer>(new SceneRenderer());
-		}
-
-		void SceneRenderer::Shutdown() {
-			s_Instance.reset();
-		}
-
-		SceneRenderer& SceneRenderer::Get() {
-			CORI_CORE_ASSERT(s_Instance, "Calling Renderer::Get but it was already destroyed or not yet created.");
-			return *s_Instance;
 		}
 	}
 }
