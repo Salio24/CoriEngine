@@ -16,6 +16,25 @@ namespace {
 
 namespace Cori {
 	namespace Graphics {
+		void SceneRenderer::OnMaterialShaderEffectChanged(void* instance, const Core::Handle<Material> material, const Core::ConstHandle<ShaderEffect> oldShaderEffect, const Core::ConstHandle<ShaderEffect> newShaderEffect) {
+			auto* renderer = static_cast<SceneRenderer*>(instance);
+			for (auto it = renderer->m_Objects.cbegin(); it != renderer->m_Objects.cend(); ++it) {
+				if (it->m_Material.GetHandle() == material) {
+					auto& oldBatch = renderer->m_Batches[it->m_OwnerBatch];
+					auto mesh = oldBatch.m_Mesh;
+
+					oldBatch.DecrementObjectCounter();
+					if (oldBatch.GetObjectCount() == 0) {
+						renderer->DestroyBatch(it->m_OwnerBatch);
+					}
+
+					auto [newGroup, newBatch] = renderer->FindAppropriateGroupAndBatch(newShaderEffect, std::move(mesh));
+					renderer->m_Objects[it.GetHandle()].m_OwnerBatch = newBatch;
+					renderer->m_Batches[newBatch].IncrementObjectCounter();
+				}
+			}
+		}
+
 		void SceneRenderer::ProcessFrameData() {
 			FrameData* ptr = *m_ReadyRing.Front();
 			CORI_CORE_ASSERT(ptr, "SceneRenderer FrameData wasn't ready when ProcessFrameData was called.")
@@ -55,6 +74,10 @@ namespace Cori {
 			if (ptr->resizeRequest.has_value()) {
 				m_PRT.Resize(ptr->resizeRequest.value());
 			}
+		}
+
+		SceneRenderer::~SceneRenderer() {
+			VulkanMaterialSystem::RemoveOnShaderEffectSwappedListener(this);
 		}
 
 		SceneRenderer::SceneRenderer(CreateInfo&& createInfo) : m_PRT(createInfo.initialPRTExtent, createInfo.PRTFormat, createInfo.registerPRTWithImGui, GetNameForPRT(createInfo)) {
@@ -180,7 +203,7 @@ namespace Cori {
 
 			//RegisterObject(quad, material2, transform);
 
-			VulkanMaterialSystem::AddOnShaderEffectSwappedListener(OnMaterialShaderEffectChanged);
+			VulkanMaterialSystem::AddOnShaderEffectSwappedListener(this, OnMaterialShaderEffectChanged);
 			//FIXME: renderer crashes if we try to run it with no objects added, because we try to allocate virtual upload buffer with size 0 and vma becomes all whiny
 
 

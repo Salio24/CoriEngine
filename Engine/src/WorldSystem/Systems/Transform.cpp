@@ -13,12 +13,12 @@ namespace Cori {
 				const auto view1 = m_Owner.GetRegistry().view<Components::Entity::Internal::DirtyTransformFlag>();
 
 				for (const auto entity : view1) {
-					UpdateTransformRecursive(entity, glm::mat3(1.0f), 1, false, false);
+					UpdateTransformRecursive(entity, glm::mat4(1.0f), 1, false, false);
 				}
 				m_Owner.GetRegistry().clear<Components::Entity::Internal::DirtyTransformFlag>();
 			}
 
-			void Transform::UpdateTransformRecursive(entt::entity entity, const glm::mat3& parentTransform, const uint8_t parentDepth, const bool parentTransformDirty, const bool parentDepthDirty) {
+			void Transform::UpdateTransformRecursive(entt::entity entity, const glm::mat4& parentTransform, const uint8_t parentDepth, const bool parentTransformDirty, const bool parentDepthDirty) {
 				auto& transform = m_Owner.GetRegistry().get<Components::Entity::Transform>(entity);
 				const bool transformDirty = transform.m_DirtyTransform || parentTransformDirty;
 				const bool layerDirty = transform.m_DirtyDepth || parentDepthDirty;

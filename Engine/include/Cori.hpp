@@ -52,6 +52,7 @@
 #include "../src/WorldSystem/Systems/Transform.hpp"
 #include "../src/WorldSystem/Systems/Trigger.hpp"
 #include "../src/WorldSystem/Systems/Physics.hpp"
+#include "../src/WorldSystem/Systems/RenderSync.hpp"
 
 #include "../src/Physics/Physics.hpp"
 #include "../src/Physics/Triggers/Trigger.hpp"

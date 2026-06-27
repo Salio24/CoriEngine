@@ -52,7 +52,7 @@ namespace Cori {
 				JsonAssetData AssetData;
 			};
 		public:
-			using OnShaderEffectSwappedFn = std::function<void(const Core::Handle<Material>, const Core::ConstHandle<ShaderEffect> oldFx, const Core::ConstHandle<ShaderEffect> newFx)>;
+			using OnShaderEffectSwappedFn = std::function<void(void* instance, const Core::Handle<Material> material, const Core::ConstHandle<ShaderEffect> oldFx, const Core::ConstHandle<ShaderEffect> newFx)>;
 
 			static void Init();
 
@@ -172,8 +172,24 @@ namespace Cori {
 				return Get().m_Materials.IsHandleValid(handle);
 			}
 
-			static void AddOnShaderEffectSwappedListener(OnShaderEffectSwappedFn func) {
-				Get().m_OnShaderEffectSwappedListeners.emplace_back(std::move(func));
+			static void AddOnShaderEffectSwappedListener(void* instance, OnShaderEffectSwappedFn func) {
+				Get().m_OnShaderEffectSwappedListeners.emplace_back(instance, std::move(func));
+			}
+
+			static void RemoveOnShaderEffectSwappedListener(const void* instance) {
+				std::vector<std::pair<void*, OnShaderEffectSwappedFn>>::iterator result;
+				bool isFound = false;
+				for (auto it = Get().m_OnShaderEffectSwappedListeners.begin(); it != Get().m_OnShaderEffectSwappedListeners.end(); it++) {
+					if (it->first == instance) {
+						result = it;
+						isFound = true;
+						break;
+					}
+				}
+
+				if (isFound) {
+					Get().m_OnShaderEffectSwappedListeners.erase(result);
+				}
 			}
 
 			static void ClearOnShaderEffectSwappedListeners() {
@@ -188,7 +204,9 @@ namespace Cori {
 				return Get().m_Materials.GetVulkanBuffer().GetBDA();
 			}
 
-			~VulkanMaterialSystem() = default;
+			~VulkanMaterialSystem() {
+				VulkanShaderEffectManager::RemoveOnShaderEffectDeleteListener(this);
+			}
 
 			static constexpr bool EnableHotReload = false;
 
@@ -248,8 +266,8 @@ namespace Cori {
 				auto& material = Get().m_Materials[handle];
 
 				if (!Get().m_OnShaderEffectSwappedListeners.empty()) {
-					for (auto& func : Get().m_OnShaderEffectSwappedListeners) {
-						func(handle, newShaderEffect.GetHandle(), material.shaderEffect.GetHandle());
+					for (auto& [ptr, func] : Get().m_OnShaderEffectSwappedListeners) {
+						func(ptr, handle, newShaderEffect.GetHandle(), material.shaderEffect.GetHandle());
 					}
 				}
 
@@ -343,9 +361,11 @@ namespace Cori {
 				};
 
 				m_PlaceholderMaterial = m_Materials.Emplace(Material{ .customData = std::move(placeholderData), .shaderEffect = Core::AssetRef(VulkanShaderEffectManager::GetPlaceholder<ShaderEffect>()) });
+
+				VulkanShaderEffectManager::AddOnShaderEffectDeleteListener(this, ShaderEffectDeletedListener);
 			}
 
-			static void ShaderEffectDeletedListener(const Core::Handle<ShaderEffect> handle) {
+			static void ShaderEffectDeletedListener([[maybe_unused]] void* instance, const Core::Handle<ShaderEffect> handle) {
 				for (auto it = Get().m_Materials.cbegin(); it != Get().m_Materials.cend(); ++it) {
 					auto& material = *it;
 					if (material.shaderEffect.GetHandle() == handle) {
@@ -361,7 +381,7 @@ namespace Cori {
 
 			Core::Handle<Material> m_PlaceholderMaterial;
 
-			std::vector<OnShaderEffectSwappedFn> m_OnShaderEffectSwappedListeners;
+			std::vector<std::pair<void*, OnShaderEffectSwappedFn>> m_OnShaderEffectSwappedListeners;
 
 			static std::unique_ptr<VulkanMaterialSystem> s_Instance;
 		};

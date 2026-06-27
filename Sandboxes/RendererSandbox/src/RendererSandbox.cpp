@@ -9,6 +9,20 @@ public:
 		Cori::World::SceneManager::CreateScene("Test Scene");
 		BindScene("Test Scene");
 		ActiveScene.GetActiveCamera().CreateOrthoCamera(0, 2560, 0, 1080, 50);
+		Cori::Graphics::SceneRenderer::CreateInfo info{
+			.initialPRTExtent = { 1920, 1080 },
+			.PRTFormat = vk::Format::eR8G8B8A8Srgb,
+			.name = "Test renderer",
+			.registerPRTWithImGui = false
+		};
+
+		ActiveScene.RegisterSystem<Cori::World::Systems::RenderSync>(std::move(info));
+		auto swordMaterial = Cori::Core::AssetManager2::Load<Cori::Graphics::Material>("assets/Sword_Material.json");
+		auto swordMesh = Cori::Core::AssetManager2::Load<Cori::Graphics::Mesh>("assets/Sword_M.json");
+		auto entity = ActiveScene.CreateEntity("Test ent");
+		entity.AddComponent<Cori::World::Components::Entity::Rendering>(std::move(swordMesh), std::move(swordMaterial), glm::vec4{ 0.0f, 0.0f, 1.0f, 1.0f });
+		auto& tc = entity.GetComponents<Cori::World::Components::Entity::Transform>();
+		tc.SetLocalScale({ 0.5f, 0.5f, 0.5f });
 
 	}
 

@@ -32,12 +32,15 @@ namespace Cori {
 			}
 
 			SceneRenderer* Resolve(SceneRendererHandle handle) {
-				CORI_CORE_ASSERT(handle > s_MaxSceneRendererCount - 1, "Invalid scene renderer handle passed to MasterRenderer::Resolve.");
+				CORI_CORE_ASSERT(handle <= s_MaxSceneRendererCount, "Invalid scene renderer handle passed to MasterRenderer::Resolve.");
 				return m_SceneRenderers[handle].load(std::memory_order_acquire);
 			}
 
 			~MasterRenderer() {
-
+				//temporary
+				for (auto& renderer : m_SceneRenderers) {
+					delete renderer.load(std::memory_order_relaxed);
+				}
 			}
 		//protected:
 			void Loop() {
@@ -68,11 +71,9 @@ namespace Cori {
 			static constexpr uint32_t s_MaxSceneRendererCount{ 16 };
 
 			MasterRenderer() {
-				//temporary
-				for (auto& renderer : m_SceneRenderers) {
-					delete renderer.load(std::memory_order_relaxed);
+				for (uint32_t i = 0; i < s_MaxSceneRendererCount; i++) {
+					m_FreeList.emplace_back(i);
 				}
-
 			}
 
 			void ProcessPendingSceneRendererCreations() {
@@ -116,13 +117,13 @@ namespace Cori {
 
 				for (auto& renderer : m_SceneRenderers) {
 					SceneRenderer* ptr = renderer.load(std::memory_order_relaxed);
-					if (ptr->IsDormant()) {
-						continue;
-					}
-
 					if (ptr) {
 						FrameData** dataPtr = ptr->PeekFrameData();
 						if (!dataPtr) {
+							if (ptr->IsDormant()) {
+								continue;
+							}
+
 							return false;
 						}
 
@@ -150,24 +151,24 @@ namespace Cori {
 				frameContexts.clear();
 
 				VulkanEngine::Get().CPUFrameStart();
-				for (uint32_t i = 1; i < nonDormantCounter; i++) {
-					SceneRenderer* ptr = nonDormant[i - 1];
+				for (uint32_t i = 0; i < nonDormantCounter; i++) {
+					SceneRenderer* ptr = nonDormant[i];
 					frameContexts.push_back(ptr->Stage1());
 				}
 
 				auto& frameInfo = VulkanEngine::Get().GPUFrameBegin();
 
 				if (!frameInfo.m_SkippedFrame) {
-					for (uint32_t i = 1; i < nonDormantCounter; i++) {
-						SceneRenderer* ptr = nonDormant[i - 1];
-						ptr->Stage2(frameInfo, frameContexts[i - 1]);
+					for (uint32_t i = 0; i < nonDormantCounter; i++) {
+						SceneRenderer* ptr = nonDormant[i];
+						ptr->Stage2(frameInfo, frameContexts[i]);
 					}
 
 					VulkanEngine::Get().GPUFrameMiddlePointSync();
 
-					for (uint32_t i = 1; i < nonDormantCounter; i++) {
-						SceneRenderer* ptr = nonDormant[i - 1];
-						ptr->Stage3(frameInfo, frameContexts[i - 1]);
+					for (uint32_t i = 0; i < nonDormantCounter; i++) {
+						SceneRenderer* ptr = nonDormant[i];
+						ptr->Stage3(frameInfo, frameContexts[i]);
 					}
 
 					Composite(frameInfo.m_CommandBuffer, nonDormant, nonDormantCounter);
@@ -180,15 +181,13 @@ namespace Cori {
 
 
 			void Composite(vk::CommandBuffer cmb, std::array<SceneRenderer*, s_MaxSceneRendererCount>& nonDormantRenderers, const uint32_t nonDormantRendererCount) {
-				if (nonDormantRendererCount == 1) {
-					auto* renderer = nonDormantRenderers[0];
-
+				{
 					vk::ImageMemoryBarrier2 scBar{
-						.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-						.srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
+						.srcStageMask = vk::PipelineStageFlagBits2::eTopOfPipe,
+						.srcAccessMask = vk::AccessFlagBits2::eNone,
 						.dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
 						.dstAccessMask = vk::AccessFlagBits2::eTransferWrite,
-						.oldLayout = vk::ImageLayout::eColorAttachmentOptimal,
+						.oldLayout = vk::ImageLayout::eUndefined,
 						.newLayout = vk::ImageLayout::eTransferDstOptimal,
 						.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
 						.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
@@ -202,12 +201,16 @@ namespace Cori {
 					};
 
 					cmb.pipelineBarrier2(depInfo);
+				}
+
+				if (nonDormantRendererCount == 1) {
+					auto* renderer = nonDormantRenderers[0];
 
 					vk::Extent2D prtExtent = { renderer->GetPRT().GetImage().m_Extent3D.width, renderer->GetPRT().GetImage().m_Extent3D.height };
 					vk::Extent2D scExtent = VulkanEngine::GetSwapChainExtent();
 
-					std::array srcOffsets = { vk::Offset3D{ 0, 0, 0 }, vk::Offset3D{ static_cast<int32_t>(prtExtent.width), static_cast<int32_t>(prtExtent.height), 0 } };
-					std::array dstOffsets = { vk::Offset3D{ 0, 0, 0 }, vk::Offset3D{ static_cast<int32_t>(scExtent.width), static_cast<int32_t>(scExtent.height), 0 } };
+					std::array srcOffsets = { vk::Offset3D{ 0, 0, 0 }, vk::Offset3D{ static_cast<int32_t>(prtExtent.width), static_cast<int32_t>(prtExtent.height), 1 } };
+					std::array dstOffsets = { vk::Offset3D{ 0, 0, 0 }, vk::Offset3D{ static_cast<int32_t>(scExtent.width), static_cast<int32_t>(scExtent.height), 1 } };
 
 					vk::ImageBlit blit{
 						.srcSubresource = { vk::ImageAspectFlagBits::eColor, 0, 0, 1 },
@@ -217,9 +220,29 @@ namespace Cori {
 					};
 
 					cmb.blitImage(renderer->GetPRT().GetImage().m_Image, vk::ImageLayout::eTransferSrcOptimal, VulkanEngine::GetSwapChainImage(), vk::ImageLayout::eTransferDstOptimal, blit, vk::Filter::eNearest);
-
 				}
 
+				{
+					vk::ImageMemoryBarrier2 scBar{
+						.srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
+						.srcAccessMask = vk::AccessFlagBits2::eTransferWrite,
+						.dstStageMask = vk::PipelineStageFlagBits2::eBottomOfPipe,
+						.dstAccessMask = vk::AccessFlagBits2::eNone,
+						.oldLayout = vk::ImageLayout::eTransferDstOptimal,
+						.newLayout = vk::ImageLayout::ePresentSrcKHR,
+						.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+						.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+						.image = VulkanEngine::GetSwapChainImage(),
+						.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+					};
+
+					vk::DependencyInfo depInfo{
+						.imageMemoryBarrierCount = 1,
+						.pImageMemoryBarriers = &scBar
+					};
+
+					cmb.pipelineBarrier2(depInfo);
+				}
 			}
 
 

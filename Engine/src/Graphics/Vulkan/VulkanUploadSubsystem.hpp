@@ -1429,7 +1429,9 @@ namespace Cori {
 					index = m_Holes.front();
 					m_Holes.pop_front();
 
-					m_Data[index] = std::move(T(std::forward<Args>(args)...));
+					new (&m_Data[index]) T(std::forward<Args>(args)...);
+
+					//m_Data[index] = std::move(T(std::forward<Args>(args)...));
 
 					if constexpr (ENABLE_VERSIONING) {
 						m_Versions[index]++;
@@ -1463,19 +1465,24 @@ namespace Cori {
 			template<typename... Args>
 			bool EmplaceAt(const SizeT index, Args&&... args) {
 				static_assert(ENABLE_VERSIONING == false, "Index version of EmplaceAt should only be used with versioning turned off.");
-				CORI_CORE_ASSERT(index < RawSize(), "VulkanFlatSlotMap::EmplaceAt index '{}' out of bounds.", index);
+				CORI_CORE_ASSERT(index <= RawSize(), "VulkanFlatSlotMap::EmplaceAt index '{}' violates the index allocation sequence.", index);
 
-				if (IsIndexOccupied(index)) {
-					return false;
+				if (index == RawSize()) {
+					m_Data.EmplaceBack(std::forward<Args>(args)...);
+					m_SlotStates.push_back(true);
+				} else {
+					if (m_SlotStates[index]) {
+						return false;
+					}
+					new (&m_Data[index]) T(std::forward<Args>(args)...);
+					m_SlotStates[index] = true;
+
+					//m_Data[index] = std::move(T(std::forward<Args>(args)...));
 				}
 
 				if constexpr (requires { m_Data[index].valid = bool{}; }) {
 					m_Data[index].valid = true;
 				}
-
-				m_Data[index] = std::move(T(std::forward<Args>(args)...));
-
-				m_SlotStates[index] = true;
 
 				return true;
 			}
@@ -1487,7 +1494,7 @@ namespace Cori {
 
 				SizeT index = handle.GetIndex();
 
-				m_Data[index] = T{};
+				m_Data[index].~T();
 
 				m_SlotStates[index] = false;
 				m_Holes.emplace_back(index);
@@ -1500,7 +1507,7 @@ namespace Cori {
 					return;
 				}
 
-				m_Data[index] = T{};
+				m_Data[index].~T();
 
 				m_SlotStates[index] = false;
 			}
@@ -1639,12 +1646,6 @@ namespace Cori {
 
 			[[nodiscard]] bool IsIndexValid(const SizeT index) const {
 				return index < RawSize() && m_SlotStates[index];
-			}
-
-			[[nodiscard]] bool IsIndexOccupied(const SizeT index) const {
-				CORI_CORE_ASSERT(index < RawSize(), "VulkanFlatSlotMap: IsIndexOccupied index out of bounds.");
-
-				return m_SlotStates[index];
 			}
 
 			[[nodiscard]] Handle GetIndexHandle(const SizeT index) const {

@@ -85,7 +85,7 @@ namespace Cori {
 			};
 
 			struct RenderObject {
-				RenderObject() = default;
+				RenderObject() = delete;
 				RenderObject(const glm::mat4& transform, const glm::vec4& uvOffsets, Core::AssetRef<Material> material, const BatchIndex batch) : m_Transform(transform), m_UVOffsets(uvOffsets), m_Material(std::move(material)), m_OwnerBatch(batch) {}
 			private:
 				friend SceneRenderer;
@@ -96,12 +96,6 @@ namespace Cori {
 			public:
 				uint32_t valid{ 0 };
 			};
-
-			static void Init();
-
-			static void Shutdown();
-
-			static SceneRenderer& Get();
 
 			[[nodiscard]] Core::Handle<RenderObject> AllocateRenderObjectHandle() {
 				return m_RenderObjectAllocator.Allocate();
@@ -120,6 +114,10 @@ namespace Cori {
 
 				m_Batches[batchIndex].IncrementObjectCounter();
 				m_TotalObjectCount++;
+
+				if (handle.GetIndex() >= m_Objects.RawSize()) {
+					m_Objects.Reserve(handle.GetIndex() * 2);
+				}
 
 				m_Objects.EmplaceAt(handle.GetIndex(), transform, UVs, std::move(material), batchIndex);
 			}
@@ -249,23 +247,7 @@ namespace Cori {
 				m_Batches[newBatch].IncrementObjectCounter();
 			}
 
-			static void OnMaterialShaderEffectChanged(const Core::Handle<Material> material, [[maybe_unused]] const Core::ConstHandle<ShaderEffect> oldShaderEffect, const Core::ConstHandle<ShaderEffect> newShaderEffect) {
-				for (auto it = Get().m_Objects.cbegin(); it != Get().m_Objects.cend(); ++it) {
-					if (it->m_Material.GetHandle() == material) {
-						auto& oldBatch = Get().m_Batches[it->m_OwnerBatch];
-						auto mesh = oldBatch.m_Mesh;
-
-						oldBatch.DecrementObjectCounter();
-						if (oldBatch.GetObjectCount() == 0) {
-							Get().DestroyBatch(it->m_OwnerBatch);
-						}
-
-						auto [newGroup, newBatch] = Get().FindAppropriateGroupAndBatch(newShaderEffect, std::move(mesh));
-						Get().m_Objects[it.GetHandle()].m_OwnerBatch = newBatch;
-						Get().m_Batches[newBatch].IncrementObjectCounter();
-					}
-				}
-			}
+			static void OnMaterialShaderEffectChanged(void* instance, const Core::Handle<Material> material, [[maybe_unused]] const Core::ConstHandle<ShaderEffect> oldShaderEffect, const Core::ConstHandle<ShaderEffect> newShaderEffect);
 
 			[[nodiscard]] bool IsDormant() const {
 				return m_IsDormant;
@@ -328,6 +310,10 @@ namespace Cori {
 
 				UniformData uniformData;
 
+				vk::Image prtImage = m_PRT.GetImage().m_Image;
+				vk::ImageView prtImageView = m_PRT.GetImageView();
+				vk::Extent2D prtExtent = { m_PRT.GetImage().m_Extent3D.width, m_PRT.GetImage().m_Extent3D.height };
+
 				static auto startTime = std::chrono::high_resolution_clock::now();
 				auto currentTime = std::chrono::high_resolution_clock::now();
 				float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
@@ -336,8 +322,7 @@ namespace Cori {
 				uniformData.model = glm::translate(uniformData.model, glm::vec3(0.0f, 0.0f, 0.0f));
 
 				uniformData.view = lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-				auto swapChainExtent = VulkanEngine::GetSwapChainExtent();
-				uniformData.proj = glm::perspective(glm::radians(45.0f), static_cast<float>(swapChainExtent.width) / static_cast<float>(swapChainExtent.height), 0.1f, 10.0f);
+				uniformData.proj = glm::perspective(glm::radians(45.0f), static_cast<float>(prtExtent.width) / static_cast<float>(prtExtent.height), 0.1f, 10.0f);
 				uniformData.proj[1][1] *= -1;
 
 				{
@@ -395,10 +380,6 @@ namespace Cori {
 					auto BatchIntermediateInfoBufferHandle = graph.CreateBuffer({ m_Batches.RawSize() * sizeof(uint64_t), alignof(uint64_t) }, "Batch Intermediate Info"); //per batch <uint64_t> CPU - none, GPU - compute write/read atomic, immediate mode
 					auto InstanceAtomicCounterHandle = graph.CreateBuffer({ sizeof(uint32_t), alignof(uint32_t) }, "Instance Atomic Counter"); //atomic uint32_t, CPU - none, GPU - compute write/read atomic, immediate mode
 					auto CompactedInstanceListBufferHandle = graph.CreateBuffer({ m_Objects.RawSize() * sizeof(uint32_t), alignof(uint32_t) }, "Compacted Instance List Buffer"); //per visible instance <uint32_t> CPU - none, GPU - compute write -> vertex/fragment read, immediate mode
-
-					vk::Image prtImage = m_PRT.GetImage().m_Image;
-					vk::ImageView prtImageView = m_PRT.GetImageView();
-					vk::Extent2D prtExtent = { m_PRT.GetImage().m_Extent3D.width, m_PRT.GetImage().m_Extent3D.height };
 
 					auto& bufferCleanupPass = graph.CreatePass("Buffer Cleanup");
 					bufferCleanupPass.Writes(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
@@ -543,7 +524,7 @@ namespace Cori {
 							   .srcAccessMask = vk::AccessFlagBits2::eTransferWrite,
 							   .dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
 							   .dstAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
-							   .oldLayout = vk::ImageLayout::eTransferDstOptimal,
+							   .oldLayout = vk::ImageLayout::eUndefined,
 							   .newLayout = vk::ImageLayout::eColorAttachmentOptimal,
 							   .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
 							   .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
@@ -558,6 +539,9 @@ namespace Cori {
 
 						   commandBuffer.pipelineBarrier2(depInfo);
 						}
+
+						commandBuffer.setViewportWithCount(vk::Viewport(0.0f, 0.0f, static_cast<float>(prtExtent.width), static_cast<float>(prtExtent.height), 0.0f, 1.0f));
+						commandBuffer.setScissorWithCount(vk::Rect2D(vk::Offset2D(0, 0), prtExtent));
 
 						//temp
 						vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 0.0f);
@@ -703,9 +687,9 @@ namespace Cori {
 				frameContext.graph.Execute(frameData.m_CommandBuffer);
 			}
 
-			~SceneRenderer() = default;
+			~SceneRenderer();
 
-			SceneRenderer(CreateInfo&& createInfo);
+			explicit SceneRenderer(CreateInfo&& createInfo);
 
 		private:
 			[[nodiscard]] std::pair<DrawGroupIndex, BatchIndex> FindAppropriateGroupAndBatch(const Core::ConstHandle<ShaderEffect> shaderEffect, Core::AssetRef<Mesh> mesh) {

@@ -131,7 +131,7 @@ namespace Cori {
 					 * @param localPosition Local position to set.
 					 * @detals Local position is the position relative to the Entity parent transform (I mean matrix transform in this context), if an Entity doesn't have a parent, and thus is a root entity, the local position is its world position.
 					 */
-					void SetLocalPosition(const glm::vec2 localPosition) {
+					void SetLocalPosition(const glm::vec3& localPosition) {
 						if (m_LocalPosition != localPosition) {
 							m_LocalPosition = localPosition;
 							m_DirtyTransform = true;
@@ -177,7 +177,7 @@ namespace Cori {
 					 * @param localScale Local scale to set.
 					 * @detals Local scale is the scale relative to the Entity parent transform (matrix), if an Entity doesn't have a parent, and thus is a root entity, the local scale is its world scale.
 					 */
-					void SetLocalScale(const glm::vec2 localScale) {
+					void SetLocalScale(const glm::vec3& localScale) {
 						if (m_LocalScale != localScale) {
 							m_LocalScale = localScale;
 							m_DirtyTransform = true;
@@ -222,7 +222,7 @@ namespace Cori {
 					 * @brief Retries the local position.
 					 * @return Local position.
 					 */
-					[[nodiscard]] glm::vec2 GetLocalPosition() const {
+					[[nodiscard]] glm::vec3 GetLocalPosition() const {
 						return m_LocalPosition;
 					}
 
@@ -230,7 +230,7 @@ namespace Cori {
 					 * @brief Retries the local scale.
 					 * @return Local scale.
 					 */
-					[[nodiscard]] glm::vec2 GetLocalScale() const {
+					[[nodiscard]] glm::vec3 GetLocalScale() const {
 						return m_LocalScale;
 					}
 
@@ -271,21 +271,23 @@ namespace Cori {
 					 * @brief Calculates a local transform (matrix) of the Entity, combines all the positions (position, rotation, scale, depth) data, but does take into account parent transform.
 					 * @return Calculated local transform (matrix).
 					 */
-					[[nodiscard]] glm::mat3 GetLocalTransform() const {
-						return glm::translate(glm::mat3(1.0f), m_LocalPosition) *
-								glm::rotate(glm::mat3(1.0f), glm::radians(m_LocalRotation)) *
-									glm::scale(glm::mat3(1.0f), m_LocalScale);
+					[[nodiscard]] glm::mat4 GetLocalTransform() const {
+						return glm::translate(glm::mat4(1.0f), m_LocalPosition) *
+								//glm::rotate(glm::mat4(1.0f), glm::radians(m_LocalRotation)) *
+									glm::scale(glm::mat4(1.0f), m_LocalScale);
 					}
 
 				private:
 					friend Systems::Transform;
-					glm::vec2 m_LocalPosition{ 0.0f, 0.0f };
-					glm::vec2 m_LocalScale{ 1.0f, 1.0f };
+					glm::vec3 m_LocalPosition{ 0.0f, 0.0f, 0.0f };
+					glm::vec3 m_LocalScale{ 1.0f, 1.0f, 1.0f };
+
+					//use quaternions
 					float m_LocalRotation{ 0.0f };
-					glm::mat3 m_LastParentTransform{ 1.0f };
+					glm::mat4 m_LastParentTransform{ 1.0f };
 					World::Entity m_Owner;
 				public:
-					glm::mat3 m_WorldTransform{ 1.0f };
+					glm::mat4 m_WorldTransform{ 1.0f };
 					uint8_t m_WorldDepth{ 1 };
 				private:
 					int16_t m_LocalDepthOffset{ 0 };
@@ -327,15 +329,15 @@ namespace Cori {
 						}
 					}
 
-					Core::AssetRef<Graphics::Mesh> GetMesh() const {
+					[[nodiscard]] Core::AssetRef<Graphics::Mesh> GetMesh() const {
 						return m_Mesh;
 					}
 
-					Core::AssetRef<Graphics::Material> GetMaterial() const {
+					[[nodiscard]] Core::AssetRef<Graphics::Material> GetMaterial() const {
 						return m_Material;
 					}
 
-					glm::vec4 GetUVOffsets() const {
+					[[nodiscard]] glm::vec4 GetUVOffsets() const {
 						return m_UvOffsets;
 					}
 

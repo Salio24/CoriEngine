@@ -28,7 +28,7 @@ namespace Cori {
 				},
 				[](Entity& entity) {
 					auto& tr = entity.GetComponents<Components::Entity::Transform>();
-					tr.SetLocalScale({ 0.0f, 0.0f });
+					tr.SetLocalScale({ 0.0f, 0.0f, 0.0f });
 					entity.UnlinkFromParent();
 					entity.DestroyChildren();
 				});

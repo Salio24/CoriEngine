@@ -77,7 +77,7 @@ namespace Cori {
 				JsonAssetData AssetData;
 			};
 		public:
-			using OnShaderEffectDeletedFn = std::function<void(const Core::Handle<ShaderEffect>)>;
+			using OnShaderEffectDeletedFn = std::function<void(void* instance, const Core::Handle<ShaderEffect> handle)>;
 
 			static void Init();
 
@@ -207,8 +207,24 @@ namespace Cori {
 				return Get().m_ShaderEffects.IsHandleValid(handle);
 			}
 
-			static void AddOnShaderEffectDeleteListener(OnShaderEffectDeletedFn func) {
-				Get().m_OnShaderEffectDeletedListeners.emplace_back(std::move(func));
+			static void AddOnShaderEffectDeleteListener(void* instance, OnShaderEffectDeletedFn func) {
+				Get().m_OnShaderEffectDeletedListeners.emplace_back(instance, std::move(func));
+			}
+
+			static void RemoveOnShaderEffectDeleteListener(const void* instance) {
+				std::vector<std::pair<void*, OnShaderEffectDeletedFn>>::iterator result;
+				bool isFound = false;
+				for (auto it = Get().m_OnShaderEffectDeletedListeners.begin(); it != Get().m_OnShaderEffectDeletedListeners.end(); it++) {
+					if (it->first == instance) {
+						result = it;
+						isFound = true;
+						break;
+					}
+				}
+
+				if (isFound) {
+					Get().m_OnShaderEffectDeletedListeners.erase(result);
+				}
 			}
 
 			static void ClearOnShaderEffectDeleteListeners() {
@@ -223,7 +239,9 @@ namespace Cori {
 				return Get().m_ShaderEffectData.GetVulkanBuffer().GetBDA();
 			}
 
-			~VulkanShaderEffectManager() = default;
+			~VulkanShaderEffectManager() {
+				VulkanShaderManager::RemoveOnVertFragShaderPairDeletedListener(this);
+			}
 
 			static constexpr bool EnableHotReload = false;
 
@@ -371,8 +389,8 @@ namespace Cori {
 					return;
 				}
 
-				for (auto& func : m_OnShaderEffectDeletedListeners) {
-					func(handle);
+				for (auto& [ptr, func] : m_OnShaderEffectDeletedListeners) {
+					func(ptr, handle);
 				}
 
 				m_RefCounts[handle.GetIndex()] = 0;
@@ -386,10 +404,10 @@ namespace Cori {
 
 				m_PlaceholderEffect = m_ShaderEffects.Emplace(ShaderEffect{ .shaders = Core::AssetRef(VulkanShaderManager::GetPlaceholder<VertFragShaderPair>()) });
 
-				VulkanShaderManager::AddOnVertFragShaderPairDeletedListener(ShaderPairDeleteListener);
+				VulkanShaderManager::AddOnVertFragShaderPairDeletedListener(this, ShaderPairDeleteListener);
 			}
 
-			static void ShaderPairDeleteListener(const Core::Handle<VertFragShaderPair> handle) {
+			static void ShaderPairDeleteListener([[maybe_unused]] void* instance, const Core::Handle<VertFragShaderPair> handle) {
 				for (auto& effect : Get().m_ShaderEffects) {
 					if (effect.shaders.GetHandle() == handle) {
 						effect.shaders = Core::AssetRef(VulkanShaderManager::GetPlaceholder<VertFragShaderPair>());
@@ -404,7 +422,7 @@ namespace Cori {
 
 			Core::Handle<ShaderEffect> m_PlaceholderEffect;
 
-			std::vector<OnShaderEffectDeletedFn> m_OnShaderEffectDeletedListeners;
+			std::vector<std::pair<void*, OnShaderEffectDeletedFn>> m_OnShaderEffectDeletedListeners;
 
 			static std::unique_ptr<VulkanShaderEffectManager> s_Instance;
 		};

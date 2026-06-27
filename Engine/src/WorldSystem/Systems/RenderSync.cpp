@@ -53,7 +53,8 @@ namespace Cori {
 						rc.m_UvOffsetsDirty = false;
 					}
 
-					patch.transform = tc.GetLocalTransform();
+					patch.transform = tc.m_WorldTransform;
+
 					patch.isNewTransform = true;
 
 					if (rc.m_NewRegister) {
@@ -74,7 +75,7 @@ namespace Cori {
 						rc.m_RenderObjectHandle = renderer->AllocateRenderObjectHandle();
 						rc.m_NewRegister = true;
 						auto& tc = view2.Get<Components::Entity::Transform>(e);
-						patch.transform = tc.GetLocalTransform();
+						patch.transform = tc.m_WorldTransform;
 						patch.isNewTransform = true;
 					}
 
@@ -109,7 +110,7 @@ namespace Cori {
 
 					Graphics::Patch patch;
 
-					patch.transform = tc.GetLocalTransform();
+					patch.transform = tc.m_WorldTransform;
 					patch.isNewTransform = true;
 
 					patch.handle = rc.m_RenderObjectHandle;
@@ -129,6 +130,7 @@ namespace Cori {
 
 				m_RendererHandle = Graphics::MasterRenderer::Get().CreateSceneRenderer(std::move(createInfo));
 				m_PendingRemovals.reserve(512);
+				return true;
 			}
 
 			bool RenderSync::SubmitForRendering() {

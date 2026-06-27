@@ -53,7 +53,7 @@ namespace Cori {
 			};
 
 		public:
-			using OnVertFragShaderPairDeletedFn = std::function<void(const Core::Handle<VertFragShaderPair>)>;
+			using OnVertFragShaderPairDeletedFn = std::function<void(void* instance, const Core::Handle<VertFragShaderPair> handle)>;
 
 			static void Init();
 
@@ -309,8 +309,24 @@ namespace Cori {
 				return Get().m_PairShaders.IsHandleValid(handle);
 			}
 
-			static void AddOnVertFragShaderPairDeletedListener(OnVertFragShaderPairDeletedFn func) {
-				Get().m_Listeners.emplace_back(std::move(func));
+			static void AddOnVertFragShaderPairDeletedListener(void* instance, OnVertFragShaderPairDeletedFn func) {
+				Get().m_Listeners.emplace_back(instance, std::move(func));
+			}
+
+			static void RemoveOnVertFragShaderPairDeletedListener(const void* instance) {
+				std::vector<std::pair<void*, OnVertFragShaderPairDeletedFn>>::iterator result;
+				bool isFound = false;
+				for (auto it = Get().m_Listeners.begin(); it != Get().m_Listeners.end(); it++) {
+					if (it->first == instance) {
+						result = it;
+						isFound = true;
+						break;
+					}
+				}
+
+				if (isFound) {
+					Get().m_Listeners.erase(result);
+				}
 			}
 
 			static void ClearOnVertFragShaderPairDeletedListener() {
@@ -562,8 +578,8 @@ namespace Cori {
 				m_PairShadersRefCounts[handle.GetIndex()] = 0;
 				m_PairShaders.Remove(handle);
 
-				for (auto& func : m_Listeners) {
-					func(handle);
+				for (auto& [ptr, func] : m_Listeners) {
+					func(ptr, handle);
 				}
 			}
 
@@ -621,7 +637,7 @@ namespace Cori {
 			std::vector<uint32_t> m_ComputeShadersRefCounts;
 			std::vector<uint32_t> m_PairShadersRefCounts;
 
-			std::vector<OnVertFragShaderPairDeletedFn> m_Listeners;
+			std::vector<std::pair<void*, OnVertFragShaderPairDeletedFn>> m_Listeners;
 
 			static std::unique_ptr<VulkanShaderManager> s_Instance;
 		};

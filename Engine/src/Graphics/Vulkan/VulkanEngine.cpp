@@ -227,6 +227,7 @@ namespace Cori {
 			result = frameData.m_CommandBuffer.begin(beginInfo);
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to begin command buffer recording. Error: {}", vk::to_string(result));
 
+			#if 0
 			vk::ImageMemoryBarrier2 barrier {
 				.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
 				.srcAccessMask = vk::AccessFlagBits2::eNone,
@@ -252,6 +253,7 @@ namespace Cori {
 			};
 
 			frameData.m_CommandBuffer.pipelineBarrier2(depInfo);
+			#endif
 
 			frameData.m_CommandBuffer.setViewportWithCount(vk::Viewport(0.0f, 0.0f, static_cast<float>(m_SwapChainExtent.width), static_cast<float>(m_SwapChainExtent.height), 0.0f, 1.0f));
 			frameData.m_CommandBuffer.setScissorWithCount(vk::Rect2D(vk::Offset2D(0, 0), m_SwapChainExtent));
@@ -323,6 +325,7 @@ namespace Cori {
 			FrameInfo& frameData = m_FrameData[m_CurrentFrameInFlight];
 
 			if (!frameData.m_SkippedFrame) {
+				#if 0
 				vk::ImageMemoryBarrier2 barrier {
 					.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
 					.srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
@@ -348,6 +351,7 @@ namespace Cori {
 				};
 
 				frameData.m_CommandBuffer.pipelineBarrier2(depInfo);
+				#endif
 
 				auto result = frameData.m_CommandBuffer.end();
 
@@ -862,7 +866,7 @@ namespace Cori {
 				.imageColorSpace = m_SwapChainImageFormat.colorSpace,
 				.imageExtent = m_SwapChainExtent,
 				.imageArrayLayers =1,
-				.imageUsage = vk::ImageUsageFlagBits::eColorAttachment,
+				.imageUsage = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eTransferDst,
 				.imageSharingMode = vk::SharingMode::eExclusive,
 				.preTransform = surfaceCapabilities.currentTransform,
 				.compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque,

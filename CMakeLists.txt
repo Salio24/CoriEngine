@@ -25,7 +25,7 @@ if(CLANG_VARIANT STREQUAL "MSYS2")
     endif()
 endif ()
 
-option(CORI_CLANG_TIDY "Enable clang tidy" OFF)
+option(CORI_CLANG_TIDY "Enable clang tidy for 3rd party libs where possible" OFF)
 option(CORI_BUILD_SANDBOX_APPS "Build sandbox apps. (99% chance that it will fail, i rarely update them)" OFF)
 option(CORI_BUILD_DOCS "Build CoriEngine documentation" OFF)
 option(CORI_SANITIZE "Enable address sanitization" OFF)

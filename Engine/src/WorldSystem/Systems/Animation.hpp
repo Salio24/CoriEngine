@@ -36,9 +36,9 @@ namespace Cori {
 						Entity entity = result.value().first;
 						uint16_t index = result.value().second;
 						auto& tr = entity.GetComponents<Components::Entity::Transform>();
-						tr.SetLocalPosition(position);
+						//tr.SetLocalPosition(position);
 						tr.SetLocalDepth(depth);
-						tr.SetLocalScale(scale);
+						//tr.SetLocalScale(scale);
 						tr.SetLocalRotation(rotation);
 
 						auto& qa = entity.GetComponents<Components::Entity::QuadAnimator>();
