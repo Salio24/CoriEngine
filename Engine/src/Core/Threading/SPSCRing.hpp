@@ -42,7 +42,7 @@ namespace Cori {
 				}
 
 				while (nextHead == m_TailCache) {
-					nextHead = m_Head.load(std::memory_order_acquire);
+					m_TailCache = m_Tail.load(std::memory_order_acquire);
 				}
 
 				new (&m_Storage[head + s_SlotPadding]) T(std::forward<Args>(args)...);
@@ -117,7 +117,7 @@ namespace Cori {
 					nextTail = 0;
 				}
 
-				m_Head.store(nextTail, std::memory_order_release);
+				m_Tail.store(nextTail, std::memory_order_release);
 			}
 
 			[[nodiscard]] uint64_t Size() const noexcept {

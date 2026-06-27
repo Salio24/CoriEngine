@@ -45,11 +45,12 @@ namespace Cori {
 		}
 
 		Application::~Application() {
-			Audio::Mixer::Shutdown();
 			World::SceneManager::Shutdown();
+			m_LayerStack.ClearStack();
+			m_VulkanEngine.reset();
+			Audio::Mixer::Shutdown();
 			AssetManager2::Shutdown();
 			AssetManager::Shutdown();
-			m_LayerStack.ClearStack();
 		}
 
 		void Application::EmitEvent(Event& event) {

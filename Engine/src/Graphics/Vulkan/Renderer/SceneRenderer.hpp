@@ -258,10 +258,10 @@ namespace Cori {
 			}
 
 			[[nodiscard]] FrameData* PopRecycledFrameData() {
-				FrameData* ptr = *m_RecycleRing.Front();
+				FrameData** ptr = m_RecycleRing.Front();
 				if (ptr) {
 					m_RecycleRing.Pop();
-					return ptr;
+					return *ptr;
 				}
 
 				return nullptr;

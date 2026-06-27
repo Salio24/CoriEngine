@@ -36,8 +36,9 @@ namespace Cori {
 		}
 
 		void SceneRenderer::ProcessFrameData() {
-			FrameData* ptr = *m_ReadyRing.Front();
-			CORI_CORE_ASSERT(ptr, "SceneRenderer FrameData wasn't ready when ProcessFrameData was called.")
+			FrameData** ptr_ = m_ReadyRing.Front();
+			CORI_CORE_ASSERT(ptr_, "SceneRenderer FrameData wasn't ready when ProcessFrameData was called.")
+			FrameData* ptr = *ptr_;
 			m_ReadyRing.Pop();
 			// do i really need a fence here?
 			std::atomic_thread_fence(std::memory_order_acquire);
@@ -74,6 +75,8 @@ namespace Cori {
 			if (ptr->resizeRequest.has_value()) {
 				m_PRT.Resize(ptr->resizeRequest.value());
 			}
+
+			m_RecycleRing.Emplace(ptr);
 		}
 
 		SceneRenderer::~SceneRenderer() {
