@@ -192,15 +192,15 @@ namespace Cori {
 					return;
 				}
 
+				auto drawGroupID = std::as_const(m_BatchGPUInfo)[batchID].owner;
+				auto shaderEffect = m_DrawGroups[drawGroupID].m_ShaderEffect;
+
 				batch.DecrementObjectCounter();
 				if (batch.GetObjectCount() == 0) {
 					DestroyBatch(batchID);
 				}
 
-				auto drawGroupID = std::as_const(m_BatchGPUInfo)[batchID].owner;
-				auto& group = m_DrawGroups[drawGroupID];
-
-				auto [newGroup, newBatch] = FindAppropriateGroupAndBatch(group.m_ShaderEffect, std::move(newMesh));
+				auto [newGroup, newBatch] = FindAppropriateGroupAndBatch(shaderEffect, std::move(newMesh));
 				m_Objects[handle].m_OwnerBatch = newBatch;
 				m_Batches[newBatch].IncrementObjectCounter();
 			}

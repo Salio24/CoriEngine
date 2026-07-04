@@ -28,11 +28,13 @@ namespace Cori {
 
 			void DestroySceneRenderer(SceneRendererHandle handle) {
 				std::lock_guard lk(m_QueueMutex);
-				m_PendingDestructions.emplace_back(handle);
+				m_PendingDestructions.emplace_back(m_SceneRenderers[handle].load(std::memory_order_relaxed));
+				m_SceneRenderers[handle].store(nullptr, std::memory_order_release);
+				m_FreeList.push_back(handle);
 			}
 
 			SceneRenderer* Resolve(SceneRendererHandle handle) {
-				CORI_CORE_ASSERT(handle <= s_MaxSceneRendererCount, "Invalid scene renderer handle passed to MasterRenderer::Resolve.");
+				CORI_CORE_ASSERT(handle < s_MaxSceneRendererCount, "Invalid scene renderer handle passed to MasterRenderer::Resolve.");
 				return m_SceneRenderers[handle].load(std::memory_order_acquire);
 			}
 
@@ -77,23 +79,33 @@ namespace Cori {
 			}
 
 			void ProcessPendingSceneRendererCreations() {
-				std::lock_guard lk(m_QueueMutex);
-				for (auto& pendingCreation : m_PendingCreations) {
+				static std::vector<std::pair<SceneRendererHandle, SceneRenderer::CreateInfo>> copy;
+
+				{
+					std::lock_guard lk(m_QueueMutex);
+					copy.swap(m_PendingCreations);
+				}
+
+				for (auto& pendingCreation : copy) {
 					m_SceneRenderers[pendingCreation.first].store(new SceneRenderer(std::move(pendingCreation.second)), std::memory_order_release);
 				}
 
-				m_PendingCreations.clear();
+				copy.clear();
 			}
 
 			void ProcessPendingSceneRendererDestructions() {
-				std::lock_guard lk(m_QueueMutex);
-				for (auto handle : m_PendingDestructions) {
-					delete m_SceneRenderers[handle].load(std::memory_order_relaxed);
-					m_SceneRenderers[handle].store(nullptr, std::memory_order_release);
-					m_FreeList.push_back(handle);
+				static std::vector<SceneRenderer*> copy;
+
+				{
+					std::lock_guard lk(m_QueueMutex);
+					copy.swap(m_PendingDestructions);
 				}
 
-				m_PendingDestructions.clear();
+				for (auto ptr : copy) {
+					delete ptr;
+				}
+
+				copy.clear();
 			}
 
 			bool HasNonDormantScene() {
@@ -247,8 +259,8 @@ namespace Cori {
 
 
 			std::array<std::atomic<SceneRenderer*>, s_MaxSceneRendererCount> m_SceneRenderers{ nullptr };
-			std::deque<std::pair<SceneRendererHandle, SceneRenderer::CreateInfo>> m_PendingCreations;
-			std::deque<SceneRendererHandle> m_PendingDestructions;
+			std::vector<std::pair<SceneRendererHandle, SceneRenderer::CreateInfo>> m_PendingCreations;
+			std::vector<SceneRenderer*> m_PendingDestructions;
 			std::deque<SceneRendererHandle> m_FreeList;
 			std::mutex m_QueueMutex;
 

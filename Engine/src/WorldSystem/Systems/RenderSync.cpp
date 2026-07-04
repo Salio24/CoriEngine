@@ -31,12 +31,13 @@ namespace Cori {
 					auto& rc = view1.Get<Components::Entity::Rendering>(e);
 					auto& tc = view1.Get<Components::Entity::Transform>(e);
 
+					Graphics::Patch patch;
 					if (rc.m_NewRegister) {
+						rc.m_NewRegister = false;
 						rc.m_RenderObjectHandle = renderer->AllocateRenderObjectHandle();
-						rc.m_NewRegister = true;
+						patch.isRegisterRequest = true;
 					}
 
-					Graphics::Patch patch;
 					if (rc.m_MaterialDirty) {
 						patch.material = rc.GetMaterial();
 						rc.m_MaterialDirty = false;
@@ -57,11 +58,6 @@ namespace Cori {
 
 					patch.isNewTransform = true;
 
-					if (rc.m_NewRegister) {
-						patch.isRegisterRequest = true;
-						rc.m_NewRegister = false;
-					}
-
 					patch.handle = rc.m_RenderObjectHandle;
 					fd->patches.emplace_back(patch);
 				}
@@ -72,11 +68,12 @@ namespace Cori {
 					Graphics::Patch patch;
 
 					if (rc.m_NewRegister) {
+						rc.m_NewRegister = false;
 						rc.m_RenderObjectHandle = renderer->AllocateRenderObjectHandle();
-						rc.m_NewRegister = true;
 						auto& tc = view2.Get<Components::Entity::Transform>(e);
 						patch.transform = tc.m_WorldTransform;
 						patch.isNewTransform = true;
+						patch.isRegisterRequest = true;
 					}
 
 					if (rc.m_MaterialDirty) {
@@ -93,11 +90,6 @@ namespace Cori {
 						patch.uvOffsets = rc.GetUVOffsets();
 						patch.isNewUvOffsets = true;
 						rc.m_UvOffsetsDirty = false;
-					}
-
-					if (rc.m_NewRegister) {
-						patch.isRegisterRequest = true;
-						rc.m_NewRegister = false;
 					}
 
 					patch.handle = rc.m_RenderObjectHandle;
@@ -116,6 +108,9 @@ namespace Cori {
 					patch.handle = rc.m_RenderObjectHandle;
 					fd->patches.emplace_back(patch);
 				}
+
+				fd->deletedObjects.swap(m_PendingRemovals);
+				m_PendingRemovals.clear();
 
 				m_Owner.Clear<Components::Entity::Internal::RenderComponentDirtyFlag, Components::Entity::Internal::TransformDirtyForRendererFlag>();
 
@@ -143,7 +138,9 @@ namespace Cori {
 					return true;
 				}
 
-				CORI_CORE_ASSERT(m_Pending, "FrameData is not ready for SubmitForRendering, but the scene renderer is already created.");
+				if (!m_Pending) {
+					return true;
+				}
 
 				m_Pending->rtcqWatermark = Graphics::RenderThreadCommandQueue::CurrentPushCount();
 

@@ -20,9 +20,9 @@ namespace Cori {
 			}
 
 			static void PushDeleter(std::function<void()>&& deleter, uint32_t delay) {
-				if (delay > s_BucketCount) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay provided to PushDeleter is higher '{}' than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
-					delay = s_BucketCount;
+				if (delay >= s_BucketCount) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushDeleter is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
+					delay = GetMaxDelay();
 				}
 
 				delay = (delay + Get().m_Counter) % s_BucketCount;
@@ -35,9 +35,9 @@ namespace Cori {
 			}
 
 			static void PushBuffer(VulkanBuffer& buffer, uint32_t delay) {
-				if (delay > s_BucketCount) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay provided to PushBuffer is higher '{}' than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
-					delay = s_BucketCount;
+				if (delay >= s_BucketCount) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushBuffer is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
+					delay = GetMaxDelay();
 				}
 
 				delay = (delay + Get().m_Counter) % s_BucketCount;
@@ -50,9 +50,9 @@ namespace Cori {
 			}
 
 			static void PushImage(VulkanImage& image, uint32_t delay) {
-				if (delay > s_BucketCount) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay provided to PushImage is higher '{}' than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
-					delay = s_BucketCount;
+				if (delay >= s_BucketCount) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushImage is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
+					delay = GetMaxDelay();
 				}
 
 				delay = (delay + Get().m_Counter) % s_BucketCount;
@@ -65,9 +65,9 @@ namespace Cori {
 			}
 
 			static void PushShaderObject(vk::ShaderEXT object, uint32_t delay) {
-				if (delay > s_BucketCount) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay provided to PushShaderObject is higher '{}' than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
-					delay = s_BucketCount;
+				if (delay >= s_BucketCount) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushShaderObject is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
+					delay = GetMaxDelay();
 				}
 
 				delay = (delay + Get().m_Counter) % s_BucketCount;
@@ -80,9 +80,9 @@ namespace Cori {
 			}
 
 			static void PushVirtualAlloc(vma::VirtualAllocation allocation, vma::VirtualBlock block, uint32_t delay) {
-				if (delay > s_BucketCount) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay provided to PushVirtualAlloc is higher '{}' than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
-					delay = s_BucketCount;
+				if (delay >= s_BucketCount) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushVirtualAlloc is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
+					delay = GetMaxDelay();
 				}
 
 				delay = (delay + Get().m_Counter) % s_BucketCount;
@@ -95,9 +95,9 @@ namespace Cori {
 			}
 
 			static void PushVirtualBlock(vma::VirtualBlock block, uint32_t delay) {
-				if (delay > s_BucketCount) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay provided to PushVirtualBlock is higher '{}' than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
-					delay = s_BucketCount;
+				if (delay >= s_BucketCount) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushVirtualBlock is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
+					delay = GetMaxDelay();
 				}
 
 				delay = (delay + Get().m_Counter) % s_BucketCount;
@@ -106,6 +106,10 @@ namespace Cori {
 			}
 
 			static void Flush();
+
+			static constexpr uint32_t GetMaxDelay() {
+				return s_BucketCount - 1;
+			}
 
 		protected:
 			friend VulkanEngine;
@@ -124,7 +128,7 @@ namespace Cori {
 			}
 
 			static constexpr uint32_t s_DefaultDelay{ FRAMES_IN_FLIGHT - 1 };
-			static constexpr uint32_t s_BucketCount{ FRAMES_IN_FLIGHT * 2 + 1 };
+			static constexpr uint32_t s_BucketCount{ FRAMES_IN_FLIGHT * 2 + 2 };
 			uint32_t m_Counter{ 0 };
 
 			std::array<std::vector<std::function<void()>>, s_BucketCount> m_Deleters;

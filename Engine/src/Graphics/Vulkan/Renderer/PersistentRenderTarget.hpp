@@ -53,10 +53,10 @@ namespace Cori {
 			}
 
 			~PersistentRenderTarget() {
-				DeletionQueue::PushImage(m_Image, FRAMES_IN_FLIGHT * 2 + 1);
+				DeletionQueue::PushImage(m_Image, DeletionQueue::GetMaxDelay());
 				uint64_t raw = m_ImGuiDescriptorSet.load(std::memory_order_relaxed);
 				if (raw != 0) {
-					DeletionQueue::PushDeleter([raw]{ ImGui_ImplVulkan_RemoveTexture(std::bit_cast<VkDescriptorSet>(raw)); }, FRAMES_IN_FLIGHT * 2 + 1);
+					DeletionQueue::PushDeleter([raw]{ ImGui_ImplVulkan_RemoveTexture(std::bit_cast<VkDescriptorSet>(raw)); }, DeletionQueue::GetMaxDelay());
 				}
 			}
 
@@ -73,10 +73,10 @@ namespace Cori {
 					return;
 				}
 
-				DeletionQueue::PushImage(m_Image, FRAMES_IN_FLIGHT * 2 + 1);
+				DeletionQueue::PushImage(m_Image, DeletionQueue::GetMaxDelay());
 				uint64_t raw = m_ImGuiDescriptorSet.load(std::memory_order_relaxed);
 				if (raw != 0) {
-					DeletionQueue::PushDeleter([raw]{ ImGui_ImplVulkan_RemoveTexture(std::bit_cast<VkDescriptorSet>(raw)); }, FRAMES_IN_FLIGHT * 2 + 1);
+					DeletionQueue::PushDeleter([raw]{ ImGui_ImplVulkan_RemoveTexture(std::bit_cast<VkDescriptorSet>(raw)); }, DeletionQueue::GetMaxDelay());
 				}
 
 				vk::ImageCreateInfo imageInfo{

@@ -8,6 +8,10 @@ namespace Cori {
 		template<typename T, typename UnloadF, uint16_t REUSE_THRESHOLD = 64> requires std::invocable<UnloadF, uint32_t, AssetID>
 		class AssetHandleAllocator : public Cori::Threading::ConcurrentHandleAllocatorBase<AssetHandleAllocator<T, UnloadF, REUSE_THRESHOLD>, T, REUSE_THRESHOLD> {
 		public:
+			AssetHandleAllocator() {
+				m_LoadGenerations.reserve(8);
+			}
+
 			void AddRef(const Handle<T> handle) {
 				CORI_CORE_ASSERT(IsHandleValid(handle), "AssetHandleAllocator::AddRef called with an invalid handle");
 
@@ -32,7 +36,7 @@ namespace Cori {
 			void RemoveRef(const Handle<T> handle) {
 				CORI_CORE_ASSERT(IsHandleValid(handle), "AssetHandleAllocator::BoundAssetID called with an invalid handle");
 
-				uint32_t prev = m_RefCounts[handle.GetIndex()].load(std::memory_order_acq_rel);
+				uint32_t prev = m_RefCounts[handle.GetIndex()].fetch_sub(1, std::memory_order_acq_rel);
 				if (prev != 1) {
 					return;
 				}
@@ -71,7 +75,7 @@ namespace Cori {
 					m_LoadGenerations.resize(index * 1.5f);
 				}
 
-				return m_LoadGenerations[index]++;
+				return ++m_LoadGenerations[index];
 			}
 
 			[[nodiscard]] uint32_t GetGeneration(const uint32_t index) const {

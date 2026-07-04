@@ -139,11 +139,11 @@ namespace Cori {
 					{
 						CORI_PROFILE_SCOPE("FrameData preparation");
 						bool success = false;
-					while (success == false) {
+						while (success == false) {
 							success = true;
 
 							for (Layer* layer : m_LayerStack) {
-								success = layer->ActiveScene.PrepareFrameData();
+								success &= layer->ActiveScene.PrepareFrameData();
 							}
 						}
 					}
@@ -155,7 +155,7 @@ namespace Cori {
 							success = true;
 
 							for (Layer* layer : m_LayerStack) {
-								success = layer->ActiveScene.SubmitForRender();
+								success &= layer->ActiveScene.SubmitForRender();
 							}
 						}
 					}

@@ -78,7 +78,7 @@ namespace Cori {
 				}
 
 				while (nextHead == m_TailCache) {
-					nextHead = m_Head.load(std::memory_order_acquire);
+					m_TailCache = m_Tail.load(std::memory_order_acquire);
 					work();
 				}
 
@@ -100,7 +100,7 @@ namespace Cori {
 
 			[[nodiscard]] T* FrontWait() noexcept {
 				const uint64_t tail = m_Tail.load(std::memory_order_relaxed);
-				while (tail != m_HeadCache) {
+				while (tail == m_HeadCache) {
 					m_HeadCache = m_Head.load(std::memory_order_acquire);
 				}
 

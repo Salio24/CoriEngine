@@ -41,11 +41,14 @@ namespace Cori {
 				block.free(alloc);
 			}
 
+			Get().m_VirtAllocQueue[Get().m_Counter].clear();
+
 			for (auto shaderObject : Get().m_ShaderObjectQueue[Get().m_Counter] | std::views::reverse) {
 				VulkanEngine::GetLogicalDevice().destroyShaderEXT(shaderObject);
 			}
 
-			Get().m_VirtAllocQueue[Get().m_Counter].clear();
+			Get().m_ShaderObjectQueue[Get().m_Counter].clear();
+
 
 			for (auto& block : Get().m_VirtBlockQueue[Get().m_Counter] | std::views::reverse) {
 				if (!block.isVirtualBlockEmpty()) {
@@ -84,6 +87,8 @@ namespace Cori {
 				for (auto shaderObject : m_ShaderObjectQueue[i] | std::views::reverse) {
 					VulkanEngine::GetLogicalDevice().destroyShaderEXT(shaderObject);
 				}
+
+				m_ShaderObjectQueue[i].clear();
 
 				for (auto [alloc, block] : m_VirtAllocQueue[i] | std::views::reverse) {
 					block.free(alloc);

@@ -101,10 +101,19 @@ namespace Cori {
 			}
 
 			AssetRef& operator=(const AssetRef& other) noexcept {
-				m_Handle = other.m_Handle;
-				if (T::Manager::IsHandleValid(m_Handle)) {
-					T::Manager::AddRef(m_Handle);
+				if (&other == this) {
+					return *this;
 				}
+
+				if (T::Manager::IsHandleValid(other.m_Handle)) {
+					T::Manager::AddRef(other.m_Handle);
+				}
+
+				if (T::Manager::IsHandleValid(m_Handle)) {
+					T::Manager::RemoveRef(m_Handle);
+				}
+
+				m_Handle = other.m_Handle;
 
 				return *this;
 			}
@@ -114,6 +123,7 @@ namespace Cori {
 					return *this;
 				}
 
+				//TODO: poison the AssetRef after a move, so that later we can assert on it. Moves are the only place where AssetRef validity invariance breaks
 				if (T::Manager::IsHandleValid(m_Handle)) {
 					T::Manager::RemoveRef(m_Handle);
 				}
