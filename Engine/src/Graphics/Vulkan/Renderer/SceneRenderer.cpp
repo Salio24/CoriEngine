@@ -40,8 +40,6 @@ namespace Cori {
 			CORI_CORE_ASSERT(ptr_, "SceneRenderer FrameData wasn't ready when ProcessFrameData was called.")
 			FrameData* ptr = *ptr_;
 			m_ReadyRing.Pop();
-			// do i really need a fence here?
-			std::atomic_thread_fence(std::memory_order_acquire);
 			for (auto& patch : ptr->patches) {
 				CORI_CORE_ASSERT(IsHandleValid(patch.handle), "FrameData contains a patch with invalid RenderObject handle");
 
@@ -81,6 +79,10 @@ namespace Cori {
 
 		SceneRenderer::~SceneRenderer() {
 			VulkanMaterialSystem::RemoveOnShaderEffectSwappedListener(this);
+
+			for (auto ptr : m_FrameDataAllocated) {
+				delete ptr;
+			}
 		}
 
 		SceneRenderer::SceneRenderer(CreateInfo&& createInfo) : m_PRT(createInfo.initialPRTExtent, createInfo.PRTFormat, createInfo.registerPRTWithImGui, GetNameForPRT(createInfo)) {

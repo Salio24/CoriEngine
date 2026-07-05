@@ -8,6 +8,8 @@ namespace Cori {
 		namespace Systems {
 			class RenderSync final : public System {
 			public:
+				~RenderSync() override;
+
 				bool PrepareFrameData();
 
 				bool SubmitForRendering();

@@ -5,13 +5,9 @@
 namespace Cori {
 	namespace Core {
 		//only used in spokes that live outside main thread
-		template<typename T, typename UnloadF, uint16_t REUSE_THRESHOLD = 64> requires std::invocable<UnloadF, uint32_t, AssetID>
+		template<typename T, auto UnloadF, uint16_t REUSE_THRESHOLD = 64> requires std::invocable<decltype(UnloadF), Handle<T>, size_t>
 		class AssetHandleAllocator : public Cori::Threading::ConcurrentHandleAllocatorBase<AssetHandleAllocator<T, UnloadF, REUSE_THRESHOLD>, T, REUSE_THRESHOLD> {
 		public:
-			AssetHandleAllocator() {
-				m_LoadGenerations.reserve(8);
-			}
-
 			void AddRef(const Handle<T> handle) {
 				CORI_CORE_ASSERT(IsHandleValid(handle), "AssetHandleAllocator::AddRef called with an invalid handle");
 
@@ -34,14 +30,21 @@ namespace Cori {
 			}
 
 			void RemoveRef(const Handle<T> handle) {
-				CORI_CORE_ASSERT(IsHandleValid(handle), "AssetHandleAllocator::BoundAssetID called with an invalid handle");
+				CORI_CORE_ASSERT(IsHandleValid(handle), "AssetHandleAllocator::RemoveRef called with an invalid handle");
 
 				uint32_t prev = m_RefCounts[handle.GetIndex()].fetch_sub(1, std::memory_order_acq_rel);
 				if (prev != 1) {
 					return;
 				}
 
-				if (m_DeletionPolicies[handle.GetIndex()].load(std::memory_order_acquire) != AssetDeletionPolicy::eRefCounted) {
+				const uint32_t n = m_ReservedCount.load(std::memory_order_acquire);
+				for (uint32_t i = 0; i < n; i++) {
+					if (Handle<T>(m_ReservedHandles[i].load(std::memory_order_relaxed)) == handle) {
+						return;
+					}
+				}
+
+				if (AssetManager2::GetDeletionPoliciesVector()[GetBoundVectorKey(handle)].load(std::memory_order_acquire) != AssetDeletionPolicy::eRefCounted) {
 					return;
 				}
 
@@ -50,37 +53,46 @@ namespace Cori {
 				//RenderThreadCommandQueue::Push([handle, id]{ T::Manager::Unload(handle, id); });
 			}
 
-			[[nodiscard]] AssetID BoundAssetID(const Handle<T> handle) const {
-				CORI_CORE_ASSERT(IsHandleValid(handle), "AssetHandleAllocator::BoundAssetID called with an invalid handle");
-
-				return m_AssetIDs[handle.GetIndex()].load(std::memory_order_acquire);
+			[[nodiscard]] AssetID GetBoundAssetID(const Handle<T> handle) const {
+				CORI_CORE_ASSERT(IsHandleValid(handle), "AssetHandleAllocator::GetBoundAssetID called with an invalid handle");
+				AssetID result = m_AssetIDs[handle.GetIndex()].load(std::memory_order_acquire);
+				CORI_CORE_ASSERT(result != UINT64_MAX, "AssetHandleAllocator::GetBoundAssetID called with a reserved handle.");
+				return result;
 			}
+
+			[[nodiscard]] uint32_t GetBoundVectorKey(const Handle<T> handle) const {
+				CORI_CORE_ASSERT(IsHandleValid(handle), "AssetHandleAllocator::GetBoundVectorKey called with an invalid handle");
+				uint32_t vectorKey = m_VectorKeys[handle.GetIndex()].load(std::memory_order_acquire);
+				CORI_CORE_ASSERT(vectorKey != UINT32_MAX, "AssetHandleAllocator::GetBoundVectorKey called with a reserved handle.");
+				return vectorKey;
+			}
+
+			[[nodiscard]] uint32_t GetGeneration(const Handle<T> handle) const {
+				CORI_CORE_ASSERT(IsHandleValid(handle), "AssetHandleAllocator::GetGeneration called with an invalid handle");
+				return m_LoadGenerations[handle.GetIndex()].load(std::memory_order_acquire);
+			}
+
+			//init time only
+			void AddReservedHandle(const Handle<T> handle) {
+				const uint32_t i = m_ReservedCount.load(std::memory_order_relaxed);
+				m_ReservedHandles[i].store(handle.ToRaw(), std::memory_order_relaxed);
+				m_ReservedCount.store(i + 1, std::memory_order_release);
+
+				m_VectorKeys[handle.GetIndex()].store(UINT32_MAX, std::memory_order_release);
+				m_AssetIDs[handle.GetIndex()].store(UINT64_MAX, std::memory_order_release);
+			}
+
+		protected:
+			friend AssetManager2;
 
 			//under AM mutex only
-			void BindAssetID(const uint32_t index, const AssetID id) {
-				CORI_CORE_ASSERT(!AssetManager2::GetMutex().try_lock(), "AssetHandleAllocator::BindAssetID called with AssetManager mutex unlocked");
-				// it is atomic so mutex is not required memory wise, but this method should only be used from asset manager methods that use the lock
+			void BindAsset(const uint32_t index, const AssetID id, const uint32_t vectorKey) {
 				m_AssetIDs[index].store(id, std::memory_order_release);
-			}
-
-			void BindDeletionPolicy(const uint32_t index, const AssetDeletionPolicy policy) {
-				CORI_CORE_ASSERT(!AssetManager2::GetMutex().try_lock(), "AssetHandleAllocator::BindDeletionPolicy called with AssetManager mutex unlocked");
-				// it is atomic so mutex is not required memory wise, but this method should only be used from asset manager methods that use the lock
-				m_DeletionPolicies[index].store(policy, std::memory_order_release);
+				m_VectorKeys[index].store(vectorKey, std::memory_order_release);
 			}
 
 			[[nodiscard]] uint32_t BumpGeneration(const uint32_t index) {
-				CORI_CORE_ASSERT(!AssetManager2::GetMutex().try_lock(), "AssetHandleAllocator::BumpGeneration called with AssetManager mutex unlocked");
-				if (index >= m_LoadGenerations.size()) {
-					m_LoadGenerations.resize(index * 1.5f);
-				}
-
-				return ++m_LoadGenerations[index];
-			}
-
-			[[nodiscard]] uint32_t GetGeneration(const uint32_t index) const {
-				CORI_CORE_ASSERT(!AssetManager2::GetMutex().try_lock(), "AssetHandleAllocator::GetGeneration called with AssetManager mutex unlocked");
-				return m_LoadGenerations[index];
+				return m_LoadGenerations[index].fetch_add(1, std::memory_order_relaxed) + 1;
 			}
 
 		private:
@@ -91,20 +103,36 @@ namespace Cori {
 					m_RefCounts.grow_to_at_least(newSizePowerOfTwo);
 				}
 
-				if (newSizePowerOfTwo >= m_DeletionPolicies.size()) {
-					m_DeletionPolicies.grow_to_at_least(newSizePowerOfTwo);
+				if (newSizePowerOfTwo >= m_VectorKeys.size()) {
+					m_VectorKeys.grow_to_at_least(newSizePowerOfTwo, UINT32_MAX);
 				}
 
 				if (newSizePowerOfTwo >= m_AssetIDs.size()) {
-					m_AssetIDs.grow_to_at_least(newSizePowerOfTwo);
+					m_AssetIDs.grow_to_at_least(newSizePowerOfTwo, UINT64_MAX);
+				}
+
+				if (newSizePowerOfTwo >= m_LoadGenerations.size()) {
+					m_LoadGenerations.grow_to_at_least(newSizePowerOfTwo);
 				}
 			}
 
-			tbb::concurrent_vector<std::atomic<uint32_t>> m_RefCounts;
-			tbb::concurrent_vector<std::atomic<AssetDeletionPolicy>> m_DeletionPolicies;
-			tbb::concurrent_vector<std::atomic<uint64_t>> m_AssetIDs;
+			void AllocateExtras([[maybe_unused]] const Handle<T> handle) {
+				m_VectorKeys[handle.GetIndex()].store(0, std::memory_order_release);
+				m_AssetIDs[handle.GetIndex()].store(0, std::memory_order_release);
+			}
 
-			std::vector<uint32_t> m_LoadGenerations;
+			void FreeExtras(const Handle<T> handle) {
+				m_LoadGenerations[handle.GetIndex()].store(0, std::memory_order_release);
+			}
+
+			tbb::concurrent_vector<std::atomic<uint32_t>> m_RefCounts;
+			tbb::concurrent_vector<std::atomic<uint32_t>> m_VectorKeys;
+			tbb::concurrent_vector<std::atomic<uint64_t>> m_AssetIDs;
+			tbb::concurrent_vector<std::atomic<uint32_t>> m_LoadGenerations;
+
+			std::array<std::atomic<uint64_t>, 8> m_ReservedHandles{};
+			std::atomic<uint32_t> m_ReservedCount{ 0 };
+
 		};
 	}
 }

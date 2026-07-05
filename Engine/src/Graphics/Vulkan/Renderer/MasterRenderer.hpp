@@ -9,6 +9,11 @@ namespace Cori {
 		using SceneRendererHandle = uint32_t;
 
 		class MasterRenderer {
+			struct PendingCreation {
+				SceneRendererHandle handle;
+				SceneRenderer::CreateInfo creationInfo;
+				uint32_t generation;
+			};
 		public:
 			static void Init();
 
@@ -17,20 +22,31 @@ namespace Cori {
 			static MasterRenderer& Get();
 
 			SceneRendererHandle CreateSceneRenderer(SceneRenderer::CreateInfo&& info) {
-				std::lock_guard lk(m_QueueMutex);
-				CORI_CORE_ASSERT(!m_FreeList.empty(), "Out of scene renderer slots.");
+				SceneRendererHandle handle;
 
-				SceneRendererHandle handle = m_FreeList.front();
-				m_FreeList.pop_front();
-				m_PendingCreations.emplace_back(handle, info);
+				{
+					std::lock_guard lk(m_QueueMutex);
+					CORI_CORE_ASSERT(!m_FreeList.empty(), "Out of scene renderer slots.");
+					handle = m_FreeList.front();
+					const auto old = m_Generation[handle].fetch_add(1, std::memory_order_release);
+					m_FreeList.pop_front();
+					m_PendingCreations.emplace_back(handle, std::move(info), old + 1);
+				}
+
+				RenderThreadWakeup::Wake();
 				return handle;
 			}
 
 			void DestroySceneRenderer(SceneRendererHandle handle) {
-				std::lock_guard lk(m_QueueMutex);
-				m_PendingDestructions.emplace_back(m_SceneRenderers[handle].load(std::memory_order_relaxed));
-				m_SceneRenderers[handle].store(nullptr, std::memory_order_release);
-				m_FreeList.push_back(handle);
+				{
+					std::lock_guard lk(m_QueueMutex);
+					m_Generation[handle].fetch_add(1, std::memory_order_release);
+					m_PendingDestructions.emplace_back(m_SceneRenderers[handle].load(std::memory_order_acquire));
+					m_SceneRenderers[handle].store(nullptr, std::memory_order_release);
+					m_FreeList.push_back(handle);
+				}
+
+				RenderThreadWakeup::Wake();
 			}
 
 			SceneRenderer* Resolve(SceneRendererHandle handle) {
@@ -43,6 +59,9 @@ namespace Cori {
 				for (auto& renderer : m_SceneRenderers) {
 					delete renderer.load(std::memory_order_relaxed);
 				}
+
+				ProcessPendingSceneRendererCreations();
+				ProcessPendingSceneRendererDestructions();
 			}
 		//protected:
 			void Loop() {
@@ -64,9 +83,10 @@ namespace Cori {
 					return;
 				}
 
-				if (HasNonDormantScene()) {
-					RenderThreadWakeup::WaitChanged(wakeBefore);
-				}
+				//if (HasNonDormantScene()) {
+				//}
+				
+				RenderThreadWakeup::WaitChanged(wakeBefore);
 			}
 
 		private:
@@ -79,7 +99,8 @@ namespace Cori {
 			}
 
 			void ProcessPendingSceneRendererCreations() {
-				static std::vector<std::pair<SceneRendererHandle, SceneRenderer::CreateInfo>> copy;
+				static std::vector<PendingCreation> copy;
+				std::array<std::pair<SceneRenderer*, uint32_t>, s_MaxSceneRendererCount> createdRenderers{};
 
 				{
 					std::lock_guard lk(m_QueueMutex);
@@ -87,7 +108,24 @@ namespace Cori {
 				}
 
 				for (auto& pendingCreation : copy) {
-					m_SceneRenderers[pendingCreation.first].store(new SceneRenderer(std::move(pendingCreation.second)), std::memory_order_release);
+					if (m_Generation[pendingCreation.handle].load(std::memory_order_acquire) == pendingCreation.generation) {
+						createdRenderers[pendingCreation.handle] = { new SceneRenderer(std::move(pendingCreation.creationInfo)), pendingCreation.generation };
+					}
+				}
+
+				{
+					std::lock_guard lk(m_QueueMutex);
+
+					for (uint32_t i = 0; i < s_MaxSceneRendererCount; i++) {
+						auto [ptr, gen] = createdRenderers[i];
+						if (ptr) {
+							if (m_Generation[i].load(std::memory_order_acquire) == gen) {
+								m_SceneRenderers[i].store(ptr, std::memory_order_release);
+							} else {
+								delete ptr;
+							}
+						}
+					}
 				}
 
 				copy.clear();
@@ -257,9 +295,10 @@ namespace Cori {
 				}
 			}
 
-
 			std::array<std::atomic<SceneRenderer*>, s_MaxSceneRendererCount> m_SceneRenderers{ nullptr };
-			std::vector<std::pair<SceneRendererHandle, SceneRenderer::CreateInfo>> m_PendingCreations;
+			std::array<std::atomic<uint32_t>, s_MaxSceneRendererCount> m_Generation{};
+
+			std::vector<PendingCreation> m_PendingCreations;
 			std::vector<SceneRenderer*> m_PendingDestructions;
 			std::deque<SceneRendererHandle> m_FreeList;
 			std::mutex m_QueueMutex;

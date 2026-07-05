@@ -19,7 +19,9 @@ namespace Cori {
 					if (m_ReusedIndexCounter.compare_exchange_weak(currentCounter, currentCounter - 1, std::memory_order_acq_rel, std::memory_order_acquire)) {
 						if (m_Holes.try_pop(index)) {
 							popped = true;
-							break;
+						}
+						else {
+							m_ReusedIndexCounter.store(0, std::memory_order_release);
 						}
 
 						break;
@@ -49,7 +51,9 @@ namespace Cori {
 					version = 1;
 				}
 
-				return Core::Handle<T>{ index, version };
+				auto handle = Core::Handle<T>{ index, version };
+				static_cast<Derived*>(this)->AllocateExtras(handle);
+				return handle;
 			}
 
 			void Free(const Core::Handle<T> handle) {
@@ -57,11 +61,12 @@ namespace Cori {
 
 				uint32_t index = handle.GetIndex();
 				m_Versions[index].fetch_add(1, std::memory_order_release);
+				static_cast<Derived*>(this)->FreeExtras(handle);
 				m_Holes.push(index);
 			}
 
 			[[nodiscard]] bool IsHandleValid(const Core::ConstHandle<T> handle) const {
-				return handle.GetIndex() < m_Versions.size() && m_Versions[handle.GetIndex()].load(std::memory_order_acquire) == handle.GetVersion();
+				return handle.GetIndex() < m_Versions.size() && m_Versions[handle.GetIndex()].load(std::memory_order_acquire) == handle.GetVersion() && handle.GetVersion() != 0;
 			}
 
 			void Resize(const uint64_t newSize) {
@@ -85,6 +90,8 @@ namespace Cori {
 		class ConcurrentHandleAllocator : public ConcurrentHandleAllocatorBase<ConcurrentHandleAllocator<T, REUSE_THRESHOLD>, T, REUSE_THRESHOLD> {
 		public:
 			void ResizeExtras([[maybe_unused]] const uint64_t newSize) {}
+			void AllocateExtras([[maybe_unused]] const Core::Handle<T> handle) {}
+			void FreeExtras([[maybe_unused]] const Core::Handle<T> handle) {}
 		};
 	}
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include <oneapi/tbb/concurrent_vector.h>
 #include "Core/DataStructures/FlatSlotMap.hpp"
 #include "AssetManagerEnums.hpp"
 #include "AssetManager/AssetLoadStatus.hpp"
@@ -9,6 +10,7 @@
 #include "Utility/CleanTypeName.hpp"
 #include "Utility/GlazeUtils.hpp"
 #include "Core/Time.hpp"
+#include "Utility/BitHelpers.hpp"
 
 #define CORI_ADD_ASSET_TRAITS(T, ...) \
 template <> struct AssetTraits<__VA_ARGS__ __VA_OPT__(::) T> { \
@@ -85,13 +87,13 @@ namespace Cori {
 			}
 
 			~AssetRef() {
-				if (T::Manager::IsHandleValid(m_Handle)) {
+				if (m_Handle.IsSet()) {
 					T::Manager::RemoveRef(m_Handle);
 				}
 			}
 
 			AssetRef(const AssetRef& other) : m_Handle(other.m_Handle) {
-				if (T::Manager::IsHandleValid(m_Handle)) {
+				if (m_Handle.IsSet()) {
 					T::Manager::AddRef(m_Handle);
 				}
 			}
@@ -105,15 +107,16 @@ namespace Cori {
 					return *this;
 				}
 
-				if (T::Manager::IsHandleValid(other.m_Handle)) {
+				if (other.m_Handle.IsSet()) {
 					T::Manager::AddRef(other.m_Handle);
 				}
 
-				if (T::Manager::IsHandleValid(m_Handle)) {
-					T::Manager::RemoveRef(m_Handle);
-				}
-
+				auto oldHandle = m_Handle;
 				m_Handle = other.m_Handle;
+
+				if (oldHandle.IsSet()) {
+					T::Manager::RemoveRef(oldHandle);
+				}
 
 				return *this;
 			}
@@ -123,13 +126,13 @@ namespace Cori {
 					return *this;
 				}
 
-				//TODO: poison the AssetRef after a move, so that later we can assert on it. Moves are the only place where AssetRef validity invariance breaks
-				if (T::Manager::IsHandleValid(m_Handle)) {
-					T::Manager::RemoveRef(m_Handle);
-				}
-
+				auto oldHandle = m_Handle;
 				m_Handle = other.m_Handle;
 				other.m_Handle = {};
+
+				if (oldHandle.IsSet()) {
+					T::Manager::RemoveRef(oldHandle);
+				}
 
 				return *this;
 			}
@@ -143,15 +146,15 @@ namespace Cori {
 			}
 
 			[[nodiscard]] bool IsInitialized() const {
-				return m_Handle.GetIndex() != UINT32_MAX && m_Handle.GetVersion() != 0;
+				return m_Handle.IsSet();
 			}
 
-			[[nodiscard]] AssetID GetAssetID() {
-				if (T::Manager::IsHandleValid(m_Handle)) {
+			[[nodiscard]] AssetID GetAssetID() const {
+				if (m_Handle.IsSet()) {
 					return T::Manager::GetAssetID(m_Handle);
 				}
 
-				CORI_CORE_ERROR("GetAssetID called on a AssetRef<{}>, that holds an invalid handle, returning 0.", CORI_CLEAN_TYPE_NAME(T));
+				CORI_CORE_ERROR("GetAssetID called on a moved AssetRef<{}>, returning 0.", CORI_CLEAN_TYPE_NAME(T));
 
 				return 0;
 			}
@@ -242,6 +245,8 @@ namespace Cori {
 			AssetType type{ AssetType::eUndefined };
 			AssetDeletionPolicy deletionPolicy{ AssetDeletionPolicy::eRefCounted };
 			std::string name{};
+
+			uint32_t vectorKey{};
 
 			uint64_t assetTypenameHash{ 0 };
 			uint32_t rawHandleIndex{ UINT32_MAX };
@@ -365,6 +370,14 @@ namespace Cori {
 				return Get().m_Mutex;
 			}
 
+			static tbb::concurrent_vector<std::atomic<AssetStatus>>& GetAssetStatusesVector() {
+				return Get().m_AssetStatuses;
+			}
+
+			static tbb::concurrent_vector<std::atomic<AssetDeletionPolicy>>& GetDeletionPoliciesVector() {
+				return Get().m_DeletionPolicies;
+			}
+
 			~AssetManager2() = default;
 
 		private:
@@ -404,7 +417,27 @@ namespace Cori {
 
 				auto relativeAssetPath = std::filesystem::relative(assetFilePath, Get().m_AppRootPath);
 				AssetID pathHash = Utility::HashString64(relativeAssetPath.string());
-				auto& entry = Get().m_AssetDatabase[pathHash];
+				//auto& entry = Get().m_AssetDatabase[pathHash];
+				auto [it, isNew] = Get().m_AssetDatabase.try_emplace(pathHash);
+				auto& entry = it->second;
+
+				if (isNew) {
+					uint32_t vectorKey = Get().m_NextVectorKey++;
+					const uint64_t newSizePowerOfTwo = Utility::GetNextPowerOfTwo(vectorKey + 1);
+
+					if (newSizePowerOfTwo >= Get().m_AssetStatuses.size()) {
+						Get().m_AssetStatuses.grow_to_at_least(newSizePowerOfTwo);
+					}
+
+					if (newSizePowerOfTwo >= Get().m_DeletionPolicies.size()) {
+						Get().m_DeletionPolicies.grow_to_at_least(newSizePowerOfTwo);
+					}
+
+					Get().m_AssetStatuses[vectorKey].store(AssetStatus::eUnloaded, std::memory_order_release);
+					Get().m_DeletionPolicies[vectorKey].store(l.Metadata.assetDeletionPolicy.value_or(AssetDeletionPolicy::eRefCounted), std::memory_order_release);
+
+					entry.vectorKey = vectorKey;
+				}
 
 				entry.path = relativeAssetPath;
 				entry.pathTimestamp = std::filesystem::last_write_time(Get().m_AppRootPath / entry.path);
@@ -414,6 +447,9 @@ namespace Cori {
 			}
 
 			std::unordered_map<AssetID, AssetRecord> m_AssetDatabase;
+			tbb::concurrent_vector<std::atomic<AssetStatus>> m_AssetStatuses;
+			tbb::concurrent_vector<std::atomic<AssetDeletionPolicy>> m_DeletionPolicies;
+			uint32_t m_NextVectorKey{ 0 };
 
 			std::filesystem::path m_AppRootPath;
 

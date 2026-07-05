@@ -4,6 +4,10 @@
 namespace Cori {
 	namespace World {
 		namespace Systems {
+			RenderSync::~RenderSync() {
+				Graphics::MasterRenderer::Get().DestroySceneRenderer(m_RendererHandle);
+			}
+
 			bool RenderSync::PrepareFrameData() {
 				if (m_Pending) {
 					return true;

@@ -16,6 +16,8 @@ namespace Cori {
 		struct VersionedHandleBase {
 			VersionedHandleBase() = default;
 			VersionedHandleBase(const uint32_t index, const uint32_t version) : index(index), version(version) {}
+			explicit VersionedHandleBase(const uint64_t raw) : index(raw >> 32), version(raw & 0xFFFFFFFFULL) {}
+
 
 			[[nodiscard]] uint32_t GetIndex() const {
 				return index;
@@ -23,6 +25,14 @@ namespace Cori {
 
 			[[nodiscard]] uint32_t GetVersion() const {
 				return version;
+			}
+
+			[[nodiscard]] bool IsSet() const {
+				return !(index == UINT32_MAX && version == 0);
+			}
+
+			[[nodiscard]] uint64_t ToRaw() const {
+				return static_cast<uint64_t>(index) << 32 | version;
 			}
 
 			[[nodiscard]] bool operator==(const VersionedHandleBase& other) const = default;
