@@ -22,7 +22,7 @@ namespace Cori {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Failed to load Font from '{}', checking if placeholder is available.", path.string());
 					if (AssetManager::HasPlaceholder<Font>()) {
 						CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "Placeholder is available for <{}>, asset status set to PLACEHOLDER.", CORI_CLEAN_TYPE_NAME(Font));
-						coriFont->m_Status = AssetStatus::ePlaceholder;
+						//coriFont->m_Status = AssetStatus::ePlaceholder;
 					} else {
 						CORI_CORE_FATAL_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Font }, "No placeholder is available for <{}>, asset status set to FAILED.", CORI_CLEAN_TYPE_NAME(Font));
 						coriFont->m_Status = AssetStatus::eLoadFailed;

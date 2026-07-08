@@ -28,7 +28,7 @@ namespace Cori {
 
 				bool m_FrameSubmitted{ false };
 
-				std::vector<Core::Handle<Graphics::SceneRenderer::RenderObject>> m_PendingRemovals;
+				std::vector<Core::Handle<Graphics::RenderObject>> m_PendingRemovals;
 			};
 		}
 	}

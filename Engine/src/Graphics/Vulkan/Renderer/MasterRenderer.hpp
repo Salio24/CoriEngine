@@ -56,12 +56,12 @@ namespace Cori {
 
 			~MasterRenderer() {
 				//temporary
+				ProcessPendingSceneRendererCreations();
+				ProcessPendingSceneRendererDestructions();
+
 				for (auto& renderer : m_SceneRenderers) {
 					delete renderer.load(std::memory_order_relaxed);
 				}
-
-				ProcessPendingSceneRendererCreations();
-				ProcessPendingSceneRendererDestructions();
 			}
 		//protected:
 			void Loop() {

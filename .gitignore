@@ -1,21 +1,13 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
-
-/.vs
-/Obsidian-Vault
+﻿/Obsidian-Vault
 /Obsidian
 
-# i have sold my soul to the devil xD
 /.idea
-/.cmake-build-debug-mingw_llvm
-/.cmake-build-release-mingw_llvm
-/.cmake-build-relwithdebinfo-mingw_llvm
 
 # build directories 
 /Engine/bin/*
 /Engine/docs/temp/*
 /Engine/tools/TracyGUI/*
+/cmake-*
 
 # git submodules 
 /Engine/thirdparty/freetype/*
@@ -71,3 +63,4 @@ rmSub.sh
 /notes.txt
 
 *.a
+*.so

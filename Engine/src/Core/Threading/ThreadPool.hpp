@@ -2,8 +2,7 @@
 
 #if 1
 namespace Cori {
-	//FIXME: remove core namespace
-	namespace Core {
+
 		namespace Threading {
 			class ThreadPool {
 			public:
@@ -90,6 +89,6 @@ namespace Cori {
 				bool m_Stop{ false };
 			};
 		}
-	}
+
 }
 #endif

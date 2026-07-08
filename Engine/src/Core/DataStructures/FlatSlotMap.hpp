@@ -203,7 +203,9 @@ namespace Cori {
 					index = m_Holes.front();
 					m_Holes.pop_front();
 
-					m_Data[index] = std::move(T(std::forward<Args>(args)...));
+					new (&m_Data[index]) T(std::forward<Args>(args)...);
+
+					//m_Data[index] = std::move(T(std::forward<Args>(args)...));
 
 					if constexpr (ENABLE_VERSIONING) {
 						m_Versions[index]++;
@@ -220,11 +222,44 @@ namespace Cori {
 					}
 				}
 
+				if constexpr (requires { m_Data[index].version = uint32_t{}; } && ENABLE_VERSIONING){
+					m_Data[index].version = m_Versions[index];
+				}
+
+				if constexpr (requires { m_Data[index].valid = bool{}; }) {
+					m_Data[index].valid = true;
+				}
+
 				if constexpr (ENABLE_VERSIONING) {
 					return Handle{ index, m_Versions[index] };
 				}
 
 				return Handle{ index, 1 };
+			}
+
+			template<typename... Args>
+			bool EmplaceAt(const SizeT index, Args&&... args) {
+				static_assert(ENABLE_VERSIONING == false, "Index version of EmplaceAt should only be used with versioning turned off.");
+				CORI_CORE_ASSERT(index <= RawSize(), "FlatSlotMap::EmplaceAt index '{}' violates the index allocation sequence.", index);
+
+				if (index == RawSize()) {
+					m_Data.emplace_back(std::forward<Args>(args)...);
+					m_SlotStates.push_back(true);
+				} else {
+					if (m_SlotStates[index]) {
+						return false;
+					}
+					new (&m_Data[index]) T(std::forward<Args>(args)...);
+					m_SlotStates[index] = true;
+
+					//m_Data[index] = std::move(T(std::forward<Args>(args)...));
+				}
+
+				if constexpr (requires { m_Data[index].valid = bool{}; }) {
+					m_Data[index].valid = true;
+				}
+
+				return true;
 			}
 
 			void Remove(const Handle handle) {
@@ -234,10 +269,28 @@ namespace Cori {
 
 				SizeT index = handle.GetIndex();
 
-				m_Data[index] = T{};
+				auto& obj = m_Data[index];
+				obj.~T();
+
+				std::memset(&obj, 0, sizeof(T));
 
 				m_SlotStates[index] = false;
 				m_Holes.emplace_back(index);
+			}
+
+			void RemoveAt(const SizeT index) {
+				static_assert(ENABLE_VERSIONING == false, "Index version of RemoveAt should only be used with versioning turned off.");
+
+				if (!IsIndexValid(index)) {
+					return;
+				}
+
+				auto& obj = m_Data[index];
+				obj.~T();
+
+				std::memset(&obj, 0, sizeof(T));
+
+				m_SlotStates[index] = false;
 			}
 
 			[[nodiscard]] std::optional<std::reference_wrapper<T>> TryGet(const Handle handle) {
@@ -364,8 +417,15 @@ namespace Cori {
 				return index < RawSize() && m_SlotStates[index];
 			}
 
+			[[nodiscard]] bool IsIndexOccupied(const SizeT index) const {
+				CORI_CORE_ASSERT(index < RawSize(), "FlatSlotMap::IsIndexOccupied index out of bounds.");
+				return m_SlotStates[index];
+			}
+
+
 			[[nodiscard]] Handle GetIndexHandle(const SizeT index) const {
 				CORI_CORE_ASSERT(IsIndexValid(index), "Invalid index passed to FlatSlotMap::GetIndexHandle.");
+
 				if constexpr(ENABLE_VERSIONING) {
 					return { index, m_Versions[index] };
 				}

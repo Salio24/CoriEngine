@@ -19,10 +19,24 @@
 
 namespace Cori {
 	namespace Graphics {
+		using BatchIndex = uint32_t;
+
 		struct FrameData;
 
+		struct RenderObject {
+			RenderObject() = delete;
+			RenderObject(const glm::mat4& transform, const glm::vec4& uvOffsets, Core::AssetRef<Material> material, const BatchIndex batch) : m_Transform(transform), m_UVOffsets(uvOffsets), m_Material(std::move(material)), m_OwnerBatch(batch) {}
+		private:
+			friend SceneRenderer;
+			alignas(16) glm::mat4 m_Transform{ 0.0f };
+			alignas(16) glm::vec4 m_UVOffsets{ 0.0f, 0.0f, 1.0f, 1.0f };
+			Core::AssetRef<Material> m_Material;
+			BatchIndex m_OwnerBatch{ 0 };
+		public:
+			uint32_t valid{ 0 };
+		};
+
 		class SceneRenderer {
-			using BatchIndex = uint32_t;
 			using DrawGroupIndex = uint32_t;
 
 			class DrawGroup {
@@ -82,19 +96,6 @@ namespace Cori {
 				std::string name;
 				#endif
 				bool registerPRTWithImGui;
-			};
-
-			struct RenderObject {
-				RenderObject() = delete;
-				RenderObject(const glm::mat4& transform, const glm::vec4& uvOffsets, Core::AssetRef<Material> material, const BatchIndex batch) : m_Transform(transform), m_UVOffsets(uvOffsets), m_Material(std::move(material)), m_OwnerBatch(batch) {}
-			private:
-				friend SceneRenderer;
-				alignas(16) glm::mat4 m_Transform{ 0.0f };
-				alignas(16) glm::vec4 m_UVOffsets{ 0.0f, 0.0f, 1.0f, 1.0f };
-				Core::AssetRef<Material> m_Material;
-				BatchIndex m_OwnerBatch{ 0 };
-			public:
-				uint32_t valid{ 0 };
 			};
 
 			[[nodiscard]] Core::Handle<RenderObject> AllocateRenderObjectHandle() {

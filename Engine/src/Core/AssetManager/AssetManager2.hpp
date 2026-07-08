@@ -76,8 +76,11 @@ namespace Cori {
 		&& (std::derived_from<T, PrimaryAssetBase> || std::derived_from<T, SecondaryAssetBase>)
 		&& (!T::Manager::EnableHotReload || CanHotReload<T>);
 
-		template<IsValidAsset T>
+
+		//template<IsValidAsset T>
+		template<typename T> //temporary
 		struct AssetRef {
+			//make private later
 			AssetRef() = default;
 
 			explicit AssetRef(Handle<T> handle) {
@@ -157,6 +160,15 @@ namespace Cori {
 				CORI_CORE_ERROR("GetAssetID called on a moved AssetRef<{}>, returning 0.", CORI_CLEAN_TYPE_NAME(T));
 
 				return 0;
+			}
+		protected:
+			friend class AssetManager2;
+
+			static AssetRef<T> AdoptExisting(const Handle<T> handle) {
+				CORI_CORE_ASSERT(T::Manager::IsHandleValid(handle), "AssetRef<{}>::AdoptExisting called with an invalid handle, asserting.", CORI_CLEAN_TYPE_NAME(T));
+				AssetRef<T> inst;
+				inst.m_Handle = handle;
+				return inst;
 			}
 
 		private:
@@ -262,34 +274,65 @@ namespace Cori {
 
 			static AssetManager2& Get();
 
-			template<IsValidAsset T>
+			//template<IsValidAsset T>
+			template<typename T> //temporary
 			static AssetRef<T> Load(const char* path) {
 				AssetID id = Utility::HashString64(path);
-				if (!Get().m_AssetDatabase.contains(id)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::AssetManager }, "Load failed, no asset with path '{}' found in the data base. Placeholder for '{}' returned.", path, CORI_CLEAN_TYPE_NAME(T));
-					return AssetRef<T>(T::Manager::template GetPlaceholder<T>());
+				Handle<T> handle;
+				uint32_t gen;
+				uint32_t vectorKey;
+				std::filesystem::path fsPath;
+				std::string name;
+
+				{
+					std::lock_guard lk(GetMutex());
+					if (!Get().m_AssetDatabase.contains(id)) {
+						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::AssetManager }, "Load failed, no asset with path '{}' found in the data base. Placeholder for '{}' returned.", path, CORI_CLEAN_TYPE_NAME(T));
+						return AssetRef<T>(T::Manager::template GetPlaceholder<T>());
+					}
+
+					auto& record = Get().m_AssetDatabase[id];
+					if (record.assetTypenameHash != AssetTraits<T>::TypeHash) {
+						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::AssetManager }, "Load failed, typename hash mismatch, type provided '{}', it's hash '{}', but expected hash is '{}'. Asset with path '{}'. Placeholder will be returned.", CORI_CLEAN_TYPE_NAME(T), AssetTraits<T>::TypeHash, record.assetTypenameHash, path);
+						return AssetRef<T>(T::Manager::template GetPlaceholder<T>());
+					}
+
+					handle = Handle<T>(record.rawHandleIndex, record.rawHandleVersion);
+					if (handle.IsSet()) {
+						if (T::Manager::TryAddRef(handle)) {
+							return AssetRef<T>::AdoptExisting(handle);
+						}
+					}
+
+					handle = T::Manager::template AllocateHandle<T>();
+					gen = T::Manager::BumpGeneration(handle);
+					vectorKey = record.vectorKey;
+					T::Manager::BindAsset(handle, id, vectorKey);
+
+					if (GetDeletionPoliciesVector()[vectorKey].load(std::memory_order_acquire) == AssetDeletionPolicy::eKeepAlive) {
+						T::Manager::AddRef(handle);
+					}
+
+					record.rawHandleIndex = handle.GetIndex();
+					record.rawHandleVersion = handle.GetVersion();
+
+					GetAssetStatusesVector()[vectorKey].store(AssetStatus::eLoading, std::memory_order_release);
+					fsPath = GetAssetDir() / record.path;
+					name = record.name;
 				}
-
-				auto& record = Get().m_AssetDatabase[id];
-
-				if (record.assetTypenameHash != AssetTraits<T>::TypeHash) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::AssetManager }, "Load failed, typename hash mismatch, type provided '{}', it's hash '{}', but expected hash is '{}'. Asset with path '{}'. Placeholder will be returned.", CORI_CLEAN_TYPE_NAME(T), AssetTraits<T>::TypeHash, record.assetTypenameHash, path);
-					return AssetRef<T>(T::Manager::template GetPlaceholder<T>());
-				}
-
-				if (record.status == AssetStatus::eLoaded || record.status == AssetStatus::eLoading || record.status == AssetStatus::eLoadQueued || record.status == AssetStatus::eLoadFailed) {
-					return AssetRef<T>(Handle<T>{ record.rawHandleIndex, record.rawHandleVersion });
-				}
-
-				//record.status = AssetStatus::eLoading;
 
 				if constexpr (std::derived_from<T, PrimaryAssetBase>) {
-
+					static_assert("not yet");
 				}
 				else if constexpr (std::derived_from<T, SecondaryAssetBase>) {
-					return AssetRef<T>(T::Manager::template Load<T>(id));
+					#ifdef DEBUG_BUILD
+					T::Manager::Load(handle, id, gen, vectorKey, std::move(fsPath), std::move(name));
+					#else
+					T::Manager::Load(handle, id, gen, vectorKey, std::move(fsPath));
+					#endif
 				}
 
+				return AssetRef<T>::AdoptExisting(handle);
 			}
 
 			static AssetRecord& GetAssetRecord(const AssetID id) {

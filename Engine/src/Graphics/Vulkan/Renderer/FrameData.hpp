@@ -5,7 +5,7 @@
 namespace Cori {
 	namespace Graphics {
 		struct Patch {
-			Core::Handle<SceneRenderer::RenderObject> handle;
+			Core::Handle<RenderObject> handle;
 			std::optional<Core::AssetRef<Mesh>> mesh;
 			std::optional<Core::AssetRef<Material>> material;
 			glm::mat4 transform;
@@ -22,7 +22,7 @@ namespace Cori {
 			}
 
 			std::vector<Patch> patches;
-			std::vector<Core::Handle<SceneRenderer::RenderObject>> deletedObjects;
+			std::vector<Core::Handle<RenderObject>> deletedObjects;
 			std::optional<CameraSnapshot> cameraSnapshot;
 			std::optional<vk::Extent2D> resizeRequest;
 			uint64_t rtcqWatermark{ 0 };

@@ -200,8 +200,7 @@ project(CoriEngine)
     )
 
     # my shared lib
-    add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES}
-            src/Core/AssetManager/ttt.cpp)
+    add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES})
 
     target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG_BUILD>

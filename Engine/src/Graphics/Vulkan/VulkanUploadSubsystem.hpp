@@ -1295,7 +1295,7 @@ namespace Cori {
 
 		};
 
-		template<std::copy_constructible T, uint16_t REUSE_THRESHOLD = 64, bool ENABLE_VERSIONING = true, Core::IsVersionedHandle HandleT = Core::Handle<T>, typename ConstHandleT = Core::ConstHandle<T>> requires std::derived_from<HandleT, ConstHandleT>
+		template<typename T, uint16_t REUSE_THRESHOLD = 64, bool ENABLE_VERSIONING = true, Core::IsVersionedHandle HandleT = Core::Handle<T>, typename ConstHandleT = Core::ConstHandle<T>> requires std::derived_from<HandleT, ConstHandleT>
 		class VulkanFlatSlotMap {
 		public:
 			using Handle = HandleT;
@@ -1442,6 +1442,7 @@ namespace Cori {
 					index = m_Data.Size();
 					m_Data.EmplaceBack(std::forward<Args>(args)...);
 					m_SlotStates.push_back(true);
+
 					if constexpr (ENABLE_VERSIONING) {
 						m_Versions.emplace_back(1);
 					}
@@ -1494,7 +1495,10 @@ namespace Cori {
 
 				SizeT index = handle.GetIndex();
 
-				m_Data[index].~T();
+				auto& obj = m_Data[index];
+				obj.~T();
+
+				std::memset(&obj, 0, sizeof(T));
 
 				m_SlotStates[index] = false;
 				m_Holes.emplace_back(index);
@@ -1507,7 +1511,10 @@ namespace Cori {
 					return;
 				}
 
-				m_Data[index].~T();
+				auto& obj = m_Data[index];
+				obj.~T();
+
+				std::memset(&obj, 0, sizeof(T));
 
 				m_SlotStates[index] = false;
 			}
@@ -1646,6 +1653,11 @@ namespace Cori {
 
 			[[nodiscard]] bool IsIndexValid(const SizeT index) const {
 				return index < RawSize() && m_SlotStates[index];
+			}
+
+			[[nodiscard]] bool IsIndexOccupied(const SizeT index) const {
+				CORI_CORE_ASSERT(index < RawSize(), "VulkanFlatSlotMap::IsIndexOccupied index out of bounds.");
+				return m_SlotStates[index];
 			}
 
 			[[nodiscard]] Handle GetIndexHandle(const SizeT index) const {

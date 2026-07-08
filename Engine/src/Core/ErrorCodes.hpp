@@ -11,7 +11,10 @@ namespace Cori {
 		eInvalidObject,
 		eObjectDoesNotExist,
 		eObjectAlreadyExists,
-		eImmutableObject
+		eImmutableObject,
+		eFailedToOpenFile,
+		eParseFailure,
+		eCreationFailure
 	};
 
 	inline constexpr std::string_view to_string(ErrorCode code) {

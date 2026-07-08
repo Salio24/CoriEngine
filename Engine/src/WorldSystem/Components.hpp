@@ -18,6 +18,9 @@ namespace Cori {
 }
 
 namespace Cori {
+	namespace Graphics {
+		struct RenderObject;
+	}
 	/**
 	 * @brief Anything connected to WorldSystem (ECS) is in this namespace.
 	 */
@@ -343,7 +346,7 @@ namespace Cori {
 
 				protected:
 					friend Systems::RenderSync;
-					Core::Handle<Graphics::SceneRenderer::RenderObject> m_RenderObjectHandle;
+					Core::Handle<Graphics::RenderObject> m_RenderObjectHandle;
 					World::Entity m_Owner;
 				private:
 					Core::AssetRef<Graphics::Mesh> m_Mesh;

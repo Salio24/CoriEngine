@@ -2,7 +2,7 @@
 
 #if 1
 namespace Cori {
-	namespace Core {
+
 		//FIXME: remove Threading namespace
 		namespace Threading {
 			class MainThreadQueue {
@@ -45,6 +45,6 @@ namespace Cori {
 				std::mutex m_Mutex;
 			};
 		}
-	}
+
 }
 #endif
