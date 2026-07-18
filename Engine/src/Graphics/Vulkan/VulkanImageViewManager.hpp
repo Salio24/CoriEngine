@@ -26,6 +26,7 @@ namespace Cori {
 			friend VulkanImage;
 
 			[[nodiscard]] static vk::ImageView GetView(const VulkanImage& image, const VulkanImage::ImageViewKey& key) {
+				std::lock_guard lk(Get().m_MapMutex);
 				auto& viewCache = Get().m_ImageViews[image.GetRawHandle()];
 
 				auto& view = viewCache[key];
@@ -44,14 +45,15 @@ namespace Cori {
 				};
 
 				auto result = VulkanEngine::GetLogicalDevice().createImageView(&createInfo, nullptr, &view);
-				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to create image view for image '{}'. Error: {}", image.m_Name, vk::to_string(result));
+				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to create image view for image '{}'. Error: {}", image.GetName(), vk::to_string(result));
 
-				VulkanEngine::SetDebugName(view, std::format("Image view of image '{}', subresource: baseMip '{}', levelCount '{}', baseLayer '{}', layerCount '{}'", image.m_Name, key.subresourceRange.baseMipLevel, key.subresourceRange.levelCount, key.subresourceRange.baseArrayLayer, key.subresourceRange.layerCount));
+				VulkanEngine::SetDebugName(view, std::format("Image view of image '{}', subresource: baseMip '{}', levelCount '{}', baseLayer '{}', layerCount '{}'", image.GetName(), key.subresourceRange.baseMipLevel, key.subresourceRange.levelCount, key.subresourceRange.baseArrayLayer, key.subresourceRange.layerCount));
 
 				return view;
 			}
 
 			static void DestroyView(const VulkanImage& image, const VulkanImage::ImageViewKey& key) {
+				std::lock_guard lk(Get().m_MapMutex);
 				auto& viewCache = Get().m_ImageViews[image.GetRawHandle()];
 				auto it = viewCache.find(key);
 
@@ -65,6 +67,7 @@ namespace Cori {
 			}
 
 			static void UnregisterImage(const VulkanImage& image) {
+				std::lock_guard lk(Get().m_MapMutex);
 				auto it = Get().m_ImageViews.find(image.GetRawHandle());
 				if (it != Get().m_ImageViews.end()) {
 					for (auto& view : it->second | std::views::values) {
@@ -79,6 +82,7 @@ namespace Cori {
 
 		private:
 			std::unordered_map<uint64_t, std::unordered_map<VulkanImage::ImageViewKey, vk::ImageView, VulkanImage::ImageViewKey::Hasher>> m_ImageViews;
+			std::mutex m_MapMutex;
 
 			static std::unique_ptr<VulkanImageViewManager> s_Instance;
 		};

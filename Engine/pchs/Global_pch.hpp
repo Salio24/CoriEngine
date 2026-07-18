@@ -46,6 +46,7 @@
 #include <future>
 #include <condition_variable>
 #include <source_location>
+#include <stacktrace>
 
 #ifdef CORI_USE_SMID
 	#define GLM_FORCE_INTRINSICS

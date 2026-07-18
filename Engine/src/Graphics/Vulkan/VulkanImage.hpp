@@ -43,7 +43,6 @@ namespace Cori {
 				};
 			};
 
-
 			[[nodiscard]] static VulkanImage Create(const CreateInfo& info);
 
 			void Destroy();
@@ -73,13 +72,24 @@ namespace Cori {
 				return reinterpret_cast<uint64_t>(static_cast<VkImage>(m_Image));
 			}
 
+			[[nodiscard]] std::string_view GetName() {
+				#ifdef DEBUG_BUILD
+				return m_Name;
+				#else
+				return "Name unavailable in release build.";
+				#endif
+			}
+
 			vk::Image m_Image = nullptr;
 			vma::Allocation m_Allocation = nullptr;
 			vk::Extent3D m_Extent3D;
 			vk::Format m_Format;
 			uint32_t m_MipLevels{ 0 };
 			uint32_t m_ArrayLayers{ 0 };
+		private:
+			#ifdef DEBUG_BUILD
 			std::string m_Name{ "Unnamed Image" };
+			#endif
 		};
 	}
 }

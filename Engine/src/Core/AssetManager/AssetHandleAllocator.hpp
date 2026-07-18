@@ -73,16 +73,15 @@ namespace Cori {
 				return m_LoadGenerations[handle.GetIndex()].load(std::memory_order_acquire);
 			}
 
-			//init time only
-			//void AddReservedHandle(const Handle<T> handle) {
-			//	const uint32_t i = m_ReservedCount.load(std::memory_order_relaxed);
-			//	m_ReservedHandles[i].store(handle.ToRaw(), std::memory_order_relaxed);
-			//	m_ReservedCount.store(i + 1, std::memory_order_release);
-//
-			//	m_VectorKeys[handle.GetIndex()].store(UINT32_MAX, std::memory_order_release);
-			//	m_AssetIDs[handle.GetIndex()].store(UINT64_MAX, std::memory_order_release);
-			//}
-			//LMAO just add 1 ref to reserved handles lol
+			void SetAssetStatus(const Handle<T> handle, const AssetStatus newStatus) {
+				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::SetAssetStatus called with an invalid handle");
+				m_AssetStatuses[handle.GetIndex()].store(newStatus, std::memory_order_release);
+			}
+
+			[[nodiscard]] AssetStatus GetAssetStatus(const Handle<T> handle) const {
+				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::GetAssetStatus called with an invalid handle");
+				return m_AssetStatuses[handle.GetIndex()].load(std::memory_order_acquire);
+			}
 
 			void UnbindAsset(const Handle<T> handle) {
 				m_VectorKeys[handle.GetIndex()].store(UINT32_MAX, std::memory_order_release);
@@ -119,11 +118,16 @@ namespace Cori {
 				if (newSizePowerOfTwo >= m_LoadGenerations.size()) {
 					m_LoadGenerations.grow_to_at_least(newSizePowerOfTwo);
 				}
+
+				if (newSizePowerOfTwo >= m_AssetStatuses.size()) {
+					m_AssetStatuses.grow_to_at_least(newSizePowerOfTwo);
+				}
 			}
 
 			void AllocateExtras(const Handle<T> handle) {
 				UnbindAsset(handle);
 				m_RefCounts[handle.GetIndex()].store(1, std::memory_order_release);
+				m_AssetStatuses[handle.GetIndex()].store(AssetStatus::eUnloaded, std::memory_order_release);
 				if constexpr (requires { T::Manager::AllocateExtras(handle); }) {
 					T::Manager::AllocateExtras(handle);
 				}
@@ -140,6 +144,7 @@ namespace Cori {
 			tbb::concurrent_vector<std::atomic<uint32_t>> m_VectorKeys;
 			tbb::concurrent_vector<std::atomic<uint64_t>> m_AssetIDs;
 			tbb::concurrent_vector<std::atomic<uint32_t>> m_LoadGenerations;
+			tbb::concurrent_vector<std::atomic<AssetStatus>> m_AssetStatuses;
 
 			std::array<std::atomic<uint64_t>, 8> m_ReservedHandles{};
 			std::atomic<uint32_t> m_ReservedCount{ 0 };

@@ -25,7 +25,7 @@ namespace Cori {
 
 		void VulkanBuffer::Destroy() {
 			VulkanEngine::GetAllocator().destroyBuffer(m_Buffer, m_Allocation);
-			m_Buffer = VK_NULL_HANDLE;
+			m_Buffer = nullptr;
 			m_Size = 0;
 		}
 	}

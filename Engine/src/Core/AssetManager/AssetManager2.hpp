@@ -253,9 +253,7 @@ namespace Cori {
 		struct AssetRecord {
 			std::filesystem::path path;
 			std::filesystem::file_time_type pathTimestamp;
-			AssetStatus status{ AssetStatus::eUnloaded };
 			AssetType type{ AssetType::eUndefined };
-			AssetDeletionPolicy deletionPolicy{ AssetDeletionPolicy::eRefCounted };
 			std::string name{};
 
 			uint32_t vectorKey{};
@@ -316,7 +314,9 @@ namespace Cori {
 					record.rawHandleIndex = handle.GetIndex();
 					record.rawHandleVersion = handle.GetVersion();
 
-					GetAssetStatusesVector()[vectorKey].store(AssetStatus::eLoading, std::memory_order_release);
+					T::Manager::SetAssetStatus(handle, AssetStatus::eLoading);
+
+					//GetAssetStatusesVector()[vectorKey].store(AssetStatus::eLoading, std::memory_order_release);
 					fsPath = GetAssetDir() / record.path;
 					name = record.name;
 				}
@@ -336,6 +336,7 @@ namespace Cori {
 			}
 
 			static AssetRecord& GetAssetRecord(const AssetID id) {
+				CORI_CORE_ASSERT(Get().m_AssetDatabase.contains(id), "Invalid AssetID.");
 				return Get().m_AssetDatabase[id];
 			}
 
@@ -413,9 +414,9 @@ namespace Cori {
 				return Get().m_Mutex;
 			}
 
-			static tbb::concurrent_vector<std::atomic<AssetStatus>>& GetAssetStatusesVector() {
-				return Get().m_AssetStatuses;
-			}
+			//static tbb::concurrent_vector<std::atomic<AssetStatus>>& GetAssetStatusesVector() {
+			//	return Get().m_AssetStatuses;
+			//}
 
 			static tbb::concurrent_vector<std::atomic<AssetDeletionPolicy>>& GetDeletionPoliciesVector() {
 				return Get().m_DeletionPolicies;
@@ -468,29 +469,28 @@ namespace Cori {
 					uint32_t vectorKey = Get().m_NextVectorKey++;
 					const uint64_t newSizePowerOfTwo = Utility::GetNextPowerOfTwo(vectorKey + 1);
 
-					if (newSizePowerOfTwo >= Get().m_AssetStatuses.size()) {
-						Get().m_AssetStatuses.grow_to_at_least(newSizePowerOfTwo);
-					}
+					//if (newSizePowerOfTwo >= Get().m_AssetStatuses.size()) {
+					//	Get().m_AssetStatuses.grow_to_at_least(newSizePowerOfTwo);
+					//}
 
 					if (newSizePowerOfTwo >= Get().m_DeletionPolicies.size()) {
 						Get().m_DeletionPolicies.grow_to_at_least(newSizePowerOfTwo);
 					}
 
-					Get().m_AssetStatuses[vectorKey].store(AssetStatus::eUnloaded, std::memory_order_release);
+					//Get().m_AssetStatuses[vectorKey].store(AssetStatus::eUnloaded, std::memory_order_release);
 					Get().m_DeletionPolicies[vectorKey].store(l.Metadata.assetDeletionPolicy.value_or(AssetDeletionPolicy::eRefCounted), std::memory_order_release);
 
 					entry.vectorKey = vectorKey;
 				}
 
-				entry.path = relativeAssetPath;
+				entry.path = std::move(relativeAssetPath);
 				entry.pathTimestamp = std::filesystem::last_write_time(Get().m_AppRootPath / entry.path);
 				entry.type = l.Metadata.assetType;
 				entry.assetTypenameHash = Utility::HashString64(l.Metadata.assetTypename);
-				entry.deletionPolicy = l.Metadata.assetDeletionPolicy.value_or(AssetDeletionPolicy::eRefCounted);
 			}
 
 			std::unordered_map<AssetID, AssetRecord> m_AssetDatabase;
-			tbb::concurrent_vector<std::atomic<AssetStatus>> m_AssetStatuses;
+			//tbb::concurrent_vector<std::atomic<AssetStatus>> m_AssetStatuses;
 			tbb::concurrent_vector<std::atomic<AssetDeletionPolicy>> m_DeletionPolicies;
 			uint32_t m_NextVectorKey{ 0 };
 
@@ -521,6 +521,7 @@ namespace glz {
 	struct to<JSON, Cori::Core::AssetRef<T>> {
 		template <auto Opts>
 		static void op(const Cori::Core::AssetRef<T>& from, is_context auto&& ctx, auto&& b, auto&& ix) noexcept {
+			CORI_CORE_ASSERT(false, "to json was called for AssetRef")
 			Cori::Core::AssetID id = from.GetAssetID();
 			std::string path = Cori::Core::AssetManager2::GetPath(id).value().get().filename().string();
 			serialize<JSON>::op<Opts>(path, ctx, b, ix);

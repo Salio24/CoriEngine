@@ -1648,7 +1648,7 @@ namespace Cori {
 					return IsIndexValid(handle.GetIndex()) && m_Versions[handle.GetIndex()] == handle.GetVersion();
 				}
 
-				return IsIndexValid(handle.GetIndex()) && handle.GetVersion() == 1;
+				return IsIndexValid(handle.GetIndex());
 			}
 
 			[[nodiscard]] bool IsIndexValid(const SizeT index) const {
@@ -1661,13 +1661,9 @@ namespace Cori {
 			}
 
 			[[nodiscard]] Handle GetIndexHandle(const SizeT index) const {
+				static_assert(ENABLE_VERSIONING == false, "GetIndexHandle should only be used with versioning turned on.");
 				CORI_CORE_ASSERT(IsIndexValid(index), "Invalid index passed to VulkanFlatSlotMap::GetIndexHandle.");
-
-				if constexpr (ENABLE_VERSIONING) {
-					return { index, m_Versions[index] };
-				}
-
-				return Handle{ index, 1 };
+				return { index, m_Versions[index] };
 			}
 
 			void Clear() {
@@ -2097,7 +2093,7 @@ namespace Cori {
 							.pSignalSemaphores = &Get().m_TimelineSemaphore
 						};
 
-						result = VulkanEngine::GetTransferQueue().submit(1, &submitInfo, VK_NULL_HANDLE);
+						result = VulkanEngine::GetTransferQueue().submit(1, &submitInfo, nullptr);
 						CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Transfer queue submission failed in VulkanStreamingLine. Error: {}", vk::to_string(result));
 
 						Get().m_BufferBarriersCache.clear();

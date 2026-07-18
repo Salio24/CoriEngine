@@ -19,6 +19,21 @@ namespace Cori {
 			return *s_Instance;
 		}
 
+		void VulkanShaderManager::RegisterAtSlot(const Core::Handle<VertFragShaderPair> handle) {
+			RenderThreadCommandQueue::Push([handle]() mutable {
+				if (!IsHandleValid(handle)) {
+					return;
+				}
+
+				if (Get().m_PairShaders.IsIndexOccupied(handle.GetIndex())) {
+					return;
+				}
+
+				Get().m_PairShaders.EmplaceAt(handle.GetIndex());
+				Get().AssignPlaceholder(handle);
+			});
+		}
+
 		void VulkanShaderManager::Load(const Core::Handle<ComputeShader> handle, const Core::AssetID id, const uint32_t gen, const uint32_t vectorKey, std::filesystem::path path, std::string name) {
 			RenderThreadCommandQueue::Push([handle]() mutable {
 				if (!IsHandleValid(handle)) {
@@ -32,7 +47,7 @@ namespace Cori {
 				Get().m_ComputeShaders.EmplaceAt(handle.GetIndex());
 			});
 
-			auto future = Core::Application::SubmitWorkerTask([path = std::move(path), name = std::move(name), handle, id]() mutable -> WorkerPayloadCompute {
+			auto future = Core::Application::SubmitWorkerTask([path = std::move(path), name = std::move(name), handle, id, vectorKey]() mutable -> WorkerPayloadCompute {
 				std::string buffer;
 				auto readError = glz::file_to_buffer(buffer, path.c_str());
 				CORI_CORE_ASSERT(readError == glz::error_code::none, "Load({}), compute shader handle [{},{}], failed to open asset file '{}'. Error '{}'", id, handle.GetIndex(), handle.GetVersion(), path.string(), glz::enum_to_string(readError));
@@ -67,18 +82,16 @@ namespace Cori {
 
 				VulkanEngine::SetDebugName(shaderObject, std::format("Compute shader '{}'", name));
 
-				return WorkerPayloadCompute{shaderObject};
+				return WorkerPayloadCompute{ shaderObject };
 			});
 
-			RenderThreadCommandQueue::Push([handle, gen, future = std::move(future)]() mutable {
+			RenderThreadCommandQueue::Push([handle, gen, future = std::move(future), vectorKey]() mutable {
 				future.wait();
 				if (!IsHandleValid(handle)) {
-					VulkanEngine::GetLogicalDevice().destroyShaderEXT(future.get().computeShader);
 					return;
 				}
 
 				if (Get().m_ComputeShaderHandleAllocator.GetGeneration(handle) != gen) {
-					VulkanEngine::GetLogicalDevice().destroyShaderEXT(future.get().computeShader);
 					return;
 				}
 
@@ -89,39 +102,26 @@ namespace Cori {
 				Get().DestroyShader(handle);
 
 				auto& obj = Get().m_ComputeShaders[handle];
-				obj.m_ComputeShaderObject = future.get().computeShader;
+				auto payload = future.get();
+				obj.m_ComputeShaderObject = payload.m_ComputeShader;
+				payload.Release();
 
-				Core::AssetManager2::GetAssetStatusesVector()[Get().m_ComputeShaderHandleAllocator.GetBoundVectorKey(handle)].store(AssetStatus::eLoaded, std::memory_order_release);
+				SetAssetStatus(handle, AssetStatus::eLoaded);
 			});
 		}
 
 		void VulkanShaderManager::Load(const Core::Handle<VertFragShaderPair> handle, const Core::AssetID id, const uint32_t gen, const uint32_t vectorKey, std::filesystem::path path, std::string name) {
-			RenderThreadCommandQueue::Push([handle]() mutable {
-				if (!IsHandleValid(handle)) {
-					return;
-				}
+			RegisterAtSlot(handle);
 
-				if (Get().m_PairShaders.IsIndexOccupied(handle.GetIndex())) {
-					return;
-				}
-
-				Get().m_PairShaders.EmplaceAt(handle.GetIndex());
-				Get().AssignPlaceholder(handle);
-			});
-
-			Core::Application::SubmitWorkerTask([path = std::move(path), name = std::move(name), handle, id, gen]() mutable {
-				auto FinalizeLoad = [](const Core::Handle<VertFragShaderPair> handle_, const uint32_t gen_, std::expected<WorkerPayloadPair, ErrorCode> payload) {
+			Core::Application::SubmitWorkerTask([path = std::move(path), name = std::move(name), handle, id, gen, vectorKey]() mutable {
+				auto FinalizeLoad = [](const Core::Handle<VertFragShaderPair> handle_, const uint32_t gen_, const uint32_t vectorKey_, std::expected<WorkerPayloadPair, ErrorCode>&& payload) {
 					if (payload) {
-						RenderThreadCommandQueue::Push([handle_, gen_, payload = payload.value()]() {
+						RenderThreadCommandQueue::Push([handle_, gen_, payload = std::move(payload.value()), vectorKey_]() mutable {
 							if (!IsHandleValid(handle_)) {
-								VulkanEngine::GetLogicalDevice().destroyShaderEXT(payload.vertexShader);
-								VulkanEngine::GetLogicalDevice().destroyShaderEXT(payload.fragmentShader);
 								return;
 							}
 
 							if (Get().m_VertFragPairHandleAllocator.GetGeneration(handle_) != gen_) {
-								VulkanEngine::GetLogicalDevice().destroyShaderEXT(payload.vertexShader);
-								VulkanEngine::GetLogicalDevice().destroyShaderEXT(payload.fragmentShader);
 								return;
 							}
 
@@ -132,14 +132,15 @@ namespace Cori {
 							Get().DestroyShader(handle_);
 
 							auto& obj = Get().m_PairShaders[handle_];
-							obj.m_VertFragPair[0] = payload.vertexShader;
-							obj.m_VertFragPair[1] = payload.fragmentShader;
+							obj.m_VertFragPair[0] = payload.m_VertexShader;
+							obj.m_VertFragPair[1] = payload.m_FragmentShader;
+							payload.Release();
 
-							Core::AssetManager2::GetAssetStatusesVector()[Get().m_VertFragPairHandleAllocator.GetBoundVectorKey(handle_)].store(AssetStatus::eLoaded, std::memory_order_release);
+							SetAssetStatus(handle_, AssetStatus::eLoaded);
 						});
 					}
 					else {
-						RenderThreadCommandQueue::Push([handle_, gen_]() {
+						RenderThreadCommandQueue::Push([handle_, gen_, vectorKey_]() {
 							if (!IsHandleValid(handle_)) {
 								return;
 							}
@@ -153,7 +154,7 @@ namespace Cori {
 								Get().AssignPlaceholder(handle_);
 							}
 
-							Core::AssetManager2::GetAssetStatusesVector()[Get().m_VertFragPairHandleAllocator.GetBoundVectorKey(handle_)].store(AssetStatus::eLoadFailed, std::memory_order_release);
+							SetAssetStatus(handle_, AssetStatus::eLoadFailed);
 						});
 					}
 				};
@@ -162,7 +163,7 @@ namespace Cori {
 				auto readError = glz::file_to_buffer(buffer, path.c_str());
 				if (readError != glz::error_code::none) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderManager }, "Load({}), shader pair handle [{},{}], failed to open asset file '{}', error '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead.", id, handle.GetIndex(), handle.GetVersion(), path.string(), glz::enum_to_string(readError));
-					FinalizeLoad(handle, gen, std::unexpected(ErrorCode::eFailedToOpenFile));
+					FinalizeLoad(handle, gen, vectorKey, std::unexpected(ErrorCode::eFailedToOpenFile));
 					return;
 				}
 
@@ -170,7 +171,7 @@ namespace Cori {
 				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
 				if (parseError) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderManager }, "Load({}), shader pair handle [{},{}], failed to parse asset file '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead. Error: {}", id, handle.GetIndex(), handle.GetVersion(), path.string(), glz::format_error(parseError, buffer));
-					FinalizeLoad(handle, gen, std::unexpected(ErrorCode::eParseFailure));
+					FinalizeLoad(handle, gen, vectorKey, std::unexpected(ErrorCode::eParseFailure));
 					return;
 				}
 
@@ -180,7 +181,7 @@ namespace Cori {
 
 				if (!spvData.good()) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderManager }, "Load({}), shader pair handle [{},{}], failed to open spv file '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead.", id, handle.GetIndex(), handle.GetVersion(), path.string());
-					FinalizeLoad(handle, gen, std::unexpected(ErrorCode::eFailedToOpenFile));
+					FinalizeLoad(handle, gen, vectorKey, std::unexpected(ErrorCode::eFailedToOpenFile));
 					return;
 				}
 
@@ -219,25 +220,22 @@ namespace Cori {
 				auto vkResult = VulkanEngine::GetLogicalDevice().createShadersEXT(2, infos.data(), nullptr, shaderObjects.data());
 				if (vkResult != vk::Result::eSuccess) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderManager }, "Failed to create Vert+Frag Shader pair '{}'. Error: {}. Using placeholder.", name, vk::to_string(vkResult));
-					if (shaderObjects[0] != VK_NULL_HANDLE) {
+					if (shaderObjects[0] != nullptr) {
 						VulkanEngine::GetLogicalDevice().destroyShaderEXT(shaderObjects[0]);
 					}
 
-					if (shaderObjects[1] != VK_NULL_HANDLE) {
+					if (shaderObjects[1] != nullptr) {
 						VulkanEngine::GetLogicalDevice().destroyShaderEXT(shaderObjects[1]);
 					}
 
-					FinalizeLoad(handle, gen, std::unexpected(ErrorCode::eCreationFailure));
+					FinalizeLoad(handle, gen, vectorKey, std::unexpected(ErrorCode::eCreationFailure));
 					return;
 				}
 
 				VulkanEngine::SetDebugName(shaderObjects[0], std::format("Vertex shader from Shader Pair '{}'", name));
 				VulkanEngine::SetDebugName(shaderObjects[1], std::format("Fragment shader from Shader Pair '{}'", name));
 
-				FinalizeLoad(handle, gen, WorkerPayloadPair{
-					.vertexShader = shaderObjects[0],
-					.fragmentShader = shaderObjects[1],
-				});
+				FinalizeLoad(handle, gen, vectorKey, WorkerPayloadPair{ shaderObjects[0], shaderObjects[1] });
 			});
 		}
 	}

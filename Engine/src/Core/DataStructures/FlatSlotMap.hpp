@@ -410,7 +410,7 @@ namespace Cori {
 					return IsIndexValid(handle.GetIndex()) && m_Versions[handle.GetIndex()] == handle.GetVersion();
 				}
 
-				return IsIndexValid(handle.GetIndex()) && handle.GetVersion() == 1;
+				return IsIndexValid(handle.GetIndex());
 			}
 
 			[[nodiscard]] bool IsIndexValid(const SizeT index) const {
@@ -422,15 +422,10 @@ namespace Cori {
 				return m_SlotStates[index];
 			}
 
-
 			[[nodiscard]] Handle GetIndexHandle(const SizeT index) const {
+				static_assert(ENABLE_VERSIONING == false, "GetIndexHandle should only be used with versioning turned on.");
 				CORI_CORE_ASSERT(IsIndexValid(index), "Invalid index passed to FlatSlotMap::GetIndexHandle.");
-
-				if constexpr(ENABLE_VERSIONING) {
-					return { index, m_Versions[index] };
-				}
-
-				return Handle{ index, 1 };
+				return { index, m_Versions[index] };
 			}
 
 			void Clear() {

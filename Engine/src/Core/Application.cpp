@@ -26,6 +26,7 @@ namespace Cori {
 			FileSystem::PathManager::Get();
 
 			m_Window = Window::Create(windowName, false);
+			Graphics::RenderThreadCommandQueue::SetExecuterThreadId(std::this_thread::get_id());
 			m_VulkanEngine = Graphics::VulkanEngine::Create(m_Window->GetNativeWindow(), true);
 
 			m_Window->SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent, CORI_PLACEHOLDERS(1)));

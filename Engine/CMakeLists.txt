@@ -297,7 +297,7 @@ project(CoriEngine)
     target_compile_options(${ENGINE_LIBRARY_NAME} PUBLIC -freflection)
 
     # should be public
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite exprtk boost_pfr Vulkan::Headers GPUOpen::VulkanMemoryAllocator VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp Vulkan::Loader gch::small_vector sul::dynamic_bitset fast_obj_lib glaze_glaze tbb SDL3::SDL3-static)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite exprtk boost_pfr Vulkan::Headers GPUOpen::VulkanMemoryAllocator VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp Vulkan::Loader gch::small_vector sul::dynamic_bitset fast_obj_lib glaze_glaze tbb SDL3::SDL3-static stdc++exp)
 
     if (CORI_ENABLE_TRACY_PROFILER)
         target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC Tracy::TracyClient)

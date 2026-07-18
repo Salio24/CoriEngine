@@ -20,18 +20,14 @@ namespace Cori {
 			static constexpr bool NOPLACEHOLDER{ true };
 			using Manager = VulkanShaderManager;
 
-			vk::ShaderEXT m_ComputeShaderObject{ VK_NULL_HANDLE };
-			//Core::AssetID assetID{ 0 };
-			//Core::AssetDeletionPolicy deletionPolicy{};
+			vk::ShaderEXT m_ComputeShaderObject{ nullptr };
 			bool placeholderAssigned{ false };
 		};
 
 		struct VertFragShaderPair : public Core::SecondaryAssetBase {
 			using Manager = VulkanShaderManager;
 
-			std::array<vk::ShaderEXT, 2> m_VertFragPair{ VK_NULL_HANDLE, VK_NULL_HANDLE };
-			//Core::AssetID assetID{ 0 };
-			//Core::AssetDeletionPolicy deletionPolicy{};
+			std::array<vk::ShaderEXT, 2> m_VertFragPair{ nullptr, nullptr };
 			bool placeholderAssigned{ false };
 		};
 
@@ -57,13 +53,89 @@ namespace Cori {
 				ComputeShaderJsonAssetData AssetData;
 			};
 
-			struct WorkerPayloadPair {
-				vk::ShaderEXT vertexShader;
-				vk::ShaderEXT fragmentShader;
+			class WorkerPayloadPair {
+			public:
+				WorkerPayloadPair() = delete;
+				WorkerPayloadPair(const vk::ShaderEXT vert, const vk::ShaderEXT frag) : m_VertexShader(vert), m_FragmentShader(frag) {}
+
+				~WorkerPayloadPair() {
+					if (m_VertexShader) {
+						VulkanEngine::GetLogicalDevice().destroyShaderEXT(m_VertexShader);
+					}
+
+					if (m_FragmentShader) {
+						VulkanEngine::GetLogicalDevice().destroyShaderEXT(m_FragmentShader);
+					}
+				}
+
+				WorkerPayloadPair(const WorkerPayloadPair& other) = delete;
+				WorkerPayloadPair& operator=(const WorkerPayloadPair& other) = delete;
+
+				WorkerPayloadPair(WorkerPayloadPair&& other) noexcept {
+					m_VertexShader = other.m_VertexShader;
+					m_FragmentShader = other.m_FragmentShader;
+					other.Release();
+				}
+
+				WorkerPayloadPair& operator=(WorkerPayloadPair&& other) noexcept {
+					if (m_VertexShader) {
+						VulkanEngine::GetLogicalDevice().destroyShaderEXT(m_VertexShader);
+					}
+
+					if (m_FragmentShader) {
+						VulkanEngine::GetLogicalDevice().destroyShaderEXT(m_FragmentShader);
+					}
+
+					m_VertexShader = other.m_VertexShader;
+					m_FragmentShader = other.m_FragmentShader;
+					other.Release();
+					return *this;
+				}
+
+
+				void Release() {
+					m_VertexShader = nullptr;
+					m_FragmentShader = nullptr;
+				}
+
+				vk::ShaderEXT m_VertexShader;
+				vk::ShaderEXT m_FragmentShader;
 			};
 
-			struct WorkerPayloadCompute {
-				vk::ShaderEXT computeShader;
+			class WorkerPayloadCompute {
+			public:
+				WorkerPayloadCompute() = delete;
+				explicit WorkerPayloadCompute(const vk::ShaderEXT shader) : m_ComputeShader(shader) {}
+
+				~WorkerPayloadCompute() {
+					if (m_ComputeShader) {
+						VulkanEngine::GetLogicalDevice().destroyShaderEXT(m_ComputeShader);
+					}
+				}
+
+				WorkerPayloadCompute(const WorkerPayloadCompute& other) = delete;
+				WorkerPayloadCompute& operator=(const WorkerPayloadCompute& other) = delete;
+
+				WorkerPayloadCompute(WorkerPayloadCompute&& other) noexcept {
+					m_ComputeShader = other.m_ComputeShader;
+					other.Release();
+				}
+
+				WorkerPayloadCompute& operator=(WorkerPayloadCompute&& other) noexcept {
+					if (m_ComputeShader) {
+						VulkanEngine::GetLogicalDevice().destroyShaderEXT(m_ComputeShader);
+					}
+
+					m_ComputeShader = other.m_ComputeShader;
+					other.Release();
+					return *this;
+				}
+
+				void Release() {
+					m_ComputeShader = nullptr;
+				}
+
+				vk::ShaderEXT m_ComputeShader;
 			};
 
 		public:
@@ -74,6 +146,12 @@ namespace Cori {
 			static void Shutdown();
 
 			static VulkanShaderManager& Get();
+
+			static void RegisterAtSlot([[maybe_unused]] const Core::Handle<ComputeShader> handle) {
+				//empty cuz compute shaders are guaranteed to be loaded next frame cuz there is no sticky placeholder for them. They are kind of an exception.
+			}
+
+			static void RegisterAtSlot(const Core::Handle<VertFragShaderPair> handle);
 
 			static void Load(const Core::Handle<ComputeShader> handle, const Core::AssetID id, const uint32_t gen, const uint32_t vectorKey, std::filesystem::path path, std::string name = "");
 
@@ -159,8 +237,11 @@ namespace Cori {
 					if (record.rawHandleIndex == handle.GetIndex() && record.rawHandleVersion == handle.GetVersion()) {
 						record.rawHandleIndex = UINT32_MAX;
 						record.rawHandleVersion = 0;
-						Core::AssetManager2::GetAssetStatusesVector()[Get().m_VertFragPairHandleAllocator.GetBoundVectorKey(handle)].store(AssetStatus::eUnloaded, std::memory_order_release);
 					}
+				}
+
+				for (auto& [ptr, func] : Get().m_Listeners) {
+					func(ptr, handle);
 				}
 
 				Get().m_VertFragPairHandleAllocator.Free(handle);
@@ -183,7 +264,6 @@ namespace Cori {
 					if (record.rawHandleIndex == handle.GetIndex() && record.rawHandleVersion == handle.GetVersion()) {
 						record.rawHandleIndex = UINT32_MAX;
 						record.rawHandleVersion = 0;
-						Core::AssetManager2::GetAssetStatusesVector()[Get().m_ComputeShaderHandleAllocator.GetBoundVectorKey(handle)].store(AssetStatus::eUnloaded, std::memory_order_release);
 					}
 				}
 
@@ -275,6 +355,22 @@ namespace Cori {
 				return Get().m_VertFragPairHandleAllocator.GetBoundAssetID(handle);
 			}
 
+			static void SetAssetStatus(const Core::Handle<ComputeShader> handle, const AssetStatus newStatus) {
+				Get().m_ComputeShaderHandleAllocator.SetAssetStatus(handle, newStatus);
+			}
+
+			[[nodiscard]] static AssetStatus GetAssetStatus(const Core::Handle<ComputeShader> handle) {
+				return Get().m_ComputeShaderHandleAllocator.GetAssetStatus(handle);
+			}
+
+			static void SetAssetStatus(const Core::Handle<VertFragShaderPair> handle, const AssetStatus newStatus) {
+				Get().m_VertFragPairHandleAllocator.SetAssetStatus(handle, newStatus);
+			}
+
+			[[nodiscard]] static AssetStatus GetAssetStatus(const Core::Handle<VertFragShaderPair> handle) {
+				return Get().m_VertFragPairHandleAllocator.GetAssetStatus(handle);
+			}
+
 		private:
 			void AssignPlaceholder(const Core::Handle<VertFragShaderPair> handle) {
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Shader pair handle passed to AssignPlaceholder is invalid.");
@@ -329,7 +425,7 @@ namespace Cori {
 				auto& object = m_ComputeShaders[handle];
 
 				if (!object.placeholderAssigned) {
-					if (m_ComputeShaders[handle].m_ComputeShaderObject != VK_NULL_HANDLE) {
+					if (m_ComputeShaders[handle].m_ComputeShaderObject != nullptr) {
 						DeletionQueue::PushShaderObject(m_ComputeShaders[handle].m_ComputeShaderObject);
 					}
 				}
@@ -345,11 +441,11 @@ namespace Cori {
 				auto& pair = m_PairShaders[handle];
 
 				if (!pair.placeholderAssigned) {
-					if (pair.m_VertFragPair[0] != VK_NULL_HANDLE) {
+					if (pair.m_VertFragPair[0] != nullptr) {
 						DeletionQueue::PushShaderObject(pair.m_VertFragPair[0]);
 					}
 
-					if (pair.m_VertFragPair[1] != VK_NULL_HANDLE) {
+					if (pair.m_VertFragPair[1] != nullptr) {
 						DeletionQueue::PushShaderObject(pair.m_VertFragPair[1]);
 					}
 				}
@@ -357,17 +453,9 @@ namespace Cori {
 				pair.placeholderAssigned = false;
 			}
 
-			static void FreeExtras(const Core::Handle<VertFragShaderPair> handle) {
-				for (auto& [ptr, func] : Get().m_Listeners) {
-					func(ptr, handle);
-				}
-			}
-
 			VulkanShaderManager() {
 				m_ComputeShaders.Reserve(64);
 				m_PairShaders.Reserve(64);
-				m_ComputeShadersRefCounts.resize(64);
-				m_PairShadersRefCounts.resize(64);
 
 				std::ifstream file(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "shaders/DefaultShader.spv", std::ios::ate | std::ios::binary);
 
@@ -398,9 +486,6 @@ namespace Cori {
 
 			Core::FlatSlotMap<ComputeShader, 0, false> m_ComputeShaders;
 			Core::FlatSlotMap<VertFragShaderPair, 0, false> m_PairShaders;
-
-			std::vector<uint32_t> m_ComputeShadersRefCounts;
-			std::vector<uint32_t> m_PairShadersRefCounts;
 
 			std::vector<std::pair<void*, OnVertFragShaderPairDeletedFn>> m_Listeners;
 

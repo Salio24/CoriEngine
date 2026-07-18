@@ -7,6 +7,8 @@ namespace Cori {
 		eLoading,
 		eLoadQueued,
 		eLoaded,
-		eLoadFailed
+		eLoadFailed,
+		eStreaming,
+		eStreamingQueued
 	};
 }

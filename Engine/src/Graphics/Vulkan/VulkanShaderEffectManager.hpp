@@ -42,11 +42,14 @@ namespace Cori {
 
 			Core::AssetRef<VertFragShaderPair> shaders;
 			PipelineState pipelineState{};
-			Core::AssetDeletionPolicy deletionPolicy{};
-			Core::AssetID assetID{};
 		};
-
+		
 		class VulkanShaderEffectManager {
+			struct WorkerPayload {
+				ShaderEffect effect;
+				ShaderEffectData data;
+			};
+
 			struct JsonAssetData {
 				Core::AssetRef<VertFragShaderPair> shaderPair;
 				struct PipelineStateGlaze {
@@ -85,126 +88,98 @@ namespace Cori {
 
 			static VulkanShaderEffectManager& Get();
 
-			template<typename T> requires std::same_as<ShaderEffect, T>
-			[[nodiscard]] static Core::Handle<T> Load(const Core::AssetID id) {
-				auto& record = Core::AssetManager2::GetAssetRecord(id);
-				const auto& dir = Core::AssetManager2::GetAssetDir();
-				auto assetFilePath = dir / record.path;
+			static void RegisterAtSlot(const Core::Handle<ShaderEffect> handle);
 
-				auto handle = Get().AllocateHandle();
-				Get().m_ShaderEffects[handle].assetID = id;
-				Get().m_ShaderEffects[handle].deletionPolicy = record.deletionPolicy;
-				record.rawHandleIndex = handle.GetIndex();
-				record.rawHandleVersion = handle.GetVersion();
-
-				std::string buffer;
-				auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
-				if (readError != glz::error_code::none) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Load({}), handle [{},{}], failed to open asset file '{}', error '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead.", id, handle.GetIndex(), handle.GetVersion(), assetFilePath.string(), glz::enum_to_string(readError));
-					Get().AssignPlaceholder(handle);
-					return handle;
-				}
-
-				JsonAssetDataCombined data;
-				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
-				if (parseError) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Load({}), handle [{},{}], failed to parse asset file '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead. Error: {}", id, handle.GetIndex(), handle.GetVersion(), assetFilePath.string(), glz::format_error(parseError, buffer));
-					Get().AssignPlaceholder(handle);
-					return handle;
-				}
-
-				ShaderEffectData customData{
-					.custom1 = { data.AssetData.customData.custom1.value_or(0.0f), data.AssetData.customData.custom2.value_or(0.0f), data.AssetData.customData.custom3.value_or(0.0f), data.AssetData.customData.custom4.value_or(0.0f) },
-					.custom2 = { data.AssetData.customData.custom5.value_or(0.0f), data.AssetData.customData.custom6.value_or(0.0f), data.AssetData.customData.custom7.value_or(0.0f), data.AssetData.customData.custom8.value_or(0.0f) }
-				};
-
-				PipelineState state{
-					.cullMode = data.AssetData.pipelineState.cullMode,
-					.frontFace = data.AssetData.pipelineState.frontFace,
-					.depthCompareOp = data.AssetData.pipelineState.depthCompareOp,
-					.depthTestEnable = data.AssetData.pipelineState.depthTestEnable,
-					.depthBoundsTestEnable = data.AssetData.pipelineState.depthBoundsTestEnable,
-					.depthBiasEnable = data.AssetData.pipelineState.depthBiasEnable,
-					.stencilTestEnable = data.AssetData.pipelineState.stencilTestEnable,
-					.logicOpEnable = data.AssetData.pipelineState.logicOpEnable
-				};
-
-				Get().CreateShaderEffect(handle, std::move(data.AssetData.shaderPair), state, customData);
-				return handle;
-			}
+			static void Load(const Core::Handle<ShaderEffect> handle, const Core::AssetID id, const uint32_t gen, const uint32_t vectorKey, std::filesystem::path path, std::string name = "");
 
 			static void Unload(const Core::Handle<ShaderEffect> handle) {
-				if (!IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Invalid ShaderEffect handle passed to Unload, skipping call.");
-					return;
-				}
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Handle passed to Unload is invalid.");
+				CORI_CORE_ASSERT(handle != Get().m_PlaceholderEffect, "Placeholder shader effect handle was passed, can't unload it.")
 
-				auto& record = Core::AssetManager2::GetAssetRecord(GetAssetID(handle));
-				record.status = AssetStatus::eUnloaded;
-				record.rawHandleIndex = UINT32_MAX;
-				record.rawHandleVersion = 0;
-
-				Get().DestroyShaderEffect(handle);
-				Get().FreeHandle(handle);
-			}
-
-			static bool ChangeDeletionPolicy(const Core::Handle<ShaderEffect> handle, const Core::AssetDeletionPolicy newPolicy) {
-				if (!Get().m_ShaderEffects.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Handle passed to ChangeDeletionPolicy is invalid, skipping call.");
-					return false;
-				}
-
-				auto& effect = Get().m_ShaderEffects[handle];
-				if (effect.deletionPolicy == newPolicy) {
-					return false;
-				}
-
-				if (effect.deletionPolicy == Core::AssetDeletionPolicy::eKeepAlive) {
-					auto refCount = Get().m_RefCounts[handle.GetIndex()];
-					if (refCount == 0) {
-						Unload(handle);
-						return true;
+				Core::AssetID id = Get().m_HandleAllocator.GetBoundAssetID(handle);
+				{
+					std::lock_guard lk(Core::AssetManager2::GetMutex());
+					auto& record = Core::AssetManager2::GetAssetRecord(id);
+					if (record.rawHandleIndex == handle.GetIndex() && record.rawHandleVersion == handle.GetVersion()) {
+						record.rawHandleIndex = UINT32_MAX;
+						record.rawHandleVersion = 0;
 					}
 				}
 
-				effect.deletionPolicy = newPolicy;
-				return false;
+				Get().m_HandleAllocator.Free(handle);
+
+				if (!Get().m_ShaderEffects.IsIndexOccupied(handle.GetIndex())) {
+					return;
+				}
+
+				Get().m_ShaderEffects.RemoveAt(handle.GetIndex());
 			}
 
 			[[nodiscard]] static Core::AssetID GetAssetID(const Core::Handle<ShaderEffect> handle) {
-				CORI_CORE_ASSERT(IsHandleValid(handle), "Handle passed to GetAssetID in VulkanShaderEffectManager is invalid.");
-
-				return Get().m_ShaderEffects[handle].assetID;
+				CORI_CORE_ASSERT(IsHandleValid(handle), "ShaderEffect handle passed to GetAssetID is invalid.");
+				return Get().m_HandleAllocator.GetBoundAssetID(handle);
 			}
 
 			template<typename T> requires std::same_as<ShaderEffect, T>
-			[[nodiscard]] static Core::Handle<T> GetPlaceholder() {
+			[[nodiscard]] static Core::Handle<ShaderEffect> GetPlaceholder() {
 				return Get().m_PlaceholderEffect;
 			}
 
-			static void AddRef(const Core::Handle<ShaderEffect> handle) {
-				if (!IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Invalid ShaderEffect handle passed to AddRef, skipping call.");
-					return;
-				}
+			static uint32_t BumpGeneration(const Core::Handle<ShaderEffect> handle) {
+				return Get().m_HandleAllocator.BumpGeneration(handle);
+			}
 
-				Get().m_RefCounts[handle.GetIndex()]++;
+			static void BindAsset(const Core::Handle<ShaderEffect> handle, const Core::AssetID id, const uint32_t vectorKey) {
+				return Get().m_HandleAllocator.BindAsset(handle, id, vectorKey);
+			}
+
+			static void AddRef(const Core::Handle<ShaderEffect> handle) {
+				Get().m_HandleAllocator.AddRef(handle);
 			}
 
 			static void RemoveRef(const Core::Handle<ShaderEffect> handle) {
-				if (!IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Invalid ShaderEffect handle passed to RemoveRef, skipping call.");
-					return;
-				}
+				Get().m_HandleAllocator.RemoveRef(handle);
+			}
 
-				auto count = --Get().m_RefCounts[handle.GetIndex()];
-				if (count == 0 && Get().m_ShaderEffects[handle].deletionPolicy == Core::AssetDeletionPolicy::eRefCounted && handle != Get().m_PlaceholderEffect) {
-					Unload(handle);
-				}
+			static bool TryAddRef(const Core::Handle<ShaderEffect> handle) {
+				return Get().m_HandleAllocator.TryAddRef(handle);
 			}
 
 			[[nodiscard]] static bool IsHandleValid(const Core::ConstHandle<ShaderEffect> handle) {
-				return Get().m_ShaderEffects.IsHandleValid(handle);
+				return Get().m_HandleAllocator.IsHandleValid(handle);
+			}
+
+			void AssignPlaceholder(const Core::Handle<ShaderEffect> handle) {
+				CORI_CORE_ASSERT(IsHandleValid(handle), "ShaderEffect handle passed to AssignPlaceholder is invalid.");
+
+				m_ShaderEffects[handle] = m_ShaderEffects[m_PlaceholderEffect];
+			}
+
+			template<typename T> requires std::same_as<ShaderEffect, T>
+			[[nodiscard]] static Core::Handle<ShaderEffect> AllocateHandle() {
+				return Get().m_HandleAllocator.Allocate();
+			}
+
+			void CreateShaderEffect(const Core::Handle<ShaderEffect> handle, Core::AssetRef<VertFragShaderPair> shaderPair, const PipelineState& state, const ShaderEffectData& data = {}) {
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid ShaderEffect handle passed to CreateShaderEffect");
+
+				auto& effect = m_ShaderEffects[handle];
+				effect.shaders = std::move(shaderPair);
+				effect.pipelineState = state;
+
+				m_ShaderEffectData[handle.GetIndex()] = data;
+			}
+
+			static void QueueUnload(const Core::Handle<ShaderEffect> handle) {
+				RenderThreadCommandQueue::Push([handle]{ Unload(handle); });
+			}
+
+			static void SetAssetStatus(const Core::Handle<ShaderEffect> handle, const AssetStatus newStatus) {
+				Get().m_HandleAllocator.SetAssetStatus(handle, newStatus);
+			}
+
+			[[nodiscard]] static AssetStatus GetAssetStatus(const Core::Handle<ShaderEffect> handle) {
+				return Get().m_HandleAllocator.GetAssetStatus(handle);
 			}
 
 			static void AddOnShaderEffectDeleteListener(void* instance, OnShaderEffectDeletedFn func) {
@@ -240,7 +215,7 @@ namespace Cori {
 			}
 
 			~VulkanShaderEffectManager() {
-				VulkanShaderManager::RemoveOnVertFragShaderPairDeletedListener(this);
+				//VulkanShaderManager::RemoveOnVertFragShaderPairDeletedListener(this);
 			}
 
 			static constexpr bool EnableHotReload = false;
@@ -320,104 +295,30 @@ namespace Cori {
 			}
 
 		private:
-			void AssignPlaceholder(const Core::Handle<ShaderEffect> handle) {
-				if (!IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Invalid ShaderEffect handle passed to AssignPlaceholder, skipping call.");
-					return;
-				}
-
-				m_ShaderEffects[handle] = m_ShaderEffects[m_PlaceholderEffect];
-			}
-
-			[[nodiscard]] Core::Handle<ShaderEffect> AllocateHandle() {
-				auto handle = m_ShaderEffects.Emplace();
-				if (handle.GetIndex() >= m_RefCounts.size()) {
-					m_RefCounts.resize(m_RefCounts.size() * 1.5f);
-				}
-				if (handle.GetIndex() >= m_ShaderEffectData.Size()) {
-					m_ShaderEffectData.Resize(m_ShaderEffectData.Size() * 1.5f);
-				}
-
-				return handle;
-			}
-
-			void CreateShaderEffect(const Core::Handle<ShaderEffect> handle, Core::AssetRef<VertFragShaderPair> shaderPair, const PipelineState& state, const ShaderEffectData& data = {}) {
-				if (!IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Invalid ShaderEffect handle passed to CreateShaderEffect, skipping call.");
-					return;
-				}
-
-				if (!shaderPair.IsInitialized()) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Uninitialized VertFragShaderPair AssetRef was passed to CreateShaderEffect, skipping call.");
-					return;
-				}
-
-				auto& effect = m_ShaderEffects[handle];
-				effect.shaders = std::move(shaderPair);
-				effect.pipelineState = state;
-
-				m_ShaderEffectData[handle.GetIndex()] = data;
-			}
-
-			void DestroyShaderEffect(const Core::Handle<ShaderEffect> handle) {
-				if (!IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Invalid ShaderEffect handle was passed to DestroyMaterial.");
-					return;
-				}
-
-				if (m_PlaceholderEffect == handle) {
-					return;
-				}
-
-				//for (auto it = Get().m_Materials.cbegin(); it != Get().m_Materials.cend(); ++it) {
-				//	auto& material = *it;
-				//	if (material.shaderEffectIndex == shaderEffect.GetIndex()) {
-				//		ChangeMaterialShaderEffect(it.GetHandle(), Get().m_PlaceholderEffect); //NOLINT
-				//	}
-				//}
-
-				AssignPlaceholder(handle);
-			}
-
-			void FreeHandle(const Core::Handle<ShaderEffect> handle) {
-				if (!IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Invalid ShaderEffect handle passed to FreeHandle, skipping call.");
-					return;
-				}
-
-				if (m_PlaceholderEffect == handle) {
-					return;
-				}
-
-				for (auto& [ptr, func] : m_OnShaderEffectDeletedListeners) {
-					func(ptr, handle);
-				}
-
-				m_RefCounts[handle.GetIndex()] = 0;
-				m_ShaderEffects.Remove(handle);
-			}
-
 			VulkanShaderEffectManager() {
-				m_RefCounts.resize(32);
 				m_ShaderEffects.Reserve(32);
 				m_ShaderEffectData.Resize(32);
 
-				m_PlaceholderEffect = m_ShaderEffects.Emplace(ShaderEffect{ .shaders = Core::AssetRef(VulkanShaderManager::GetPlaceholder<VertFragShaderPair>()) });
+				m_PlaceholderEffect = m_HandleAllocator.Allocate();
+				m_HandleAllocator.AddRef(m_PlaceholderEffect);
 
-				VulkanShaderManager::AddOnVertFragShaderPairDeletedListener(this, ShaderPairDeleteListener);
+				m_ShaderEffects.EmplaceAt(m_PlaceholderEffect.GetIndex(), ShaderEffect{ .shaders = Core::AssetRef(VulkanShaderManager::GetPlaceholder<VertFragShaderPair>()) });
+
+				//no longer needed due to refcounting
+				//VulkanShaderManager::AddOnVertFragShaderPairDeletedListener(this, ShaderPairDeleteListener);
 			}
 
-			static void ShaderPairDeleteListener([[maybe_unused]] void* instance, const Core::Handle<VertFragShaderPair> handle) {
-				for (auto& effect : Get().m_ShaderEffects) {
-					if (effect.shaders.GetHandle() == handle) {
-						effect.shaders = Core::AssetRef(VulkanShaderManager::GetPlaceholder<VertFragShaderPair>());
-					}
-				}
-			}
+			//static void ShaderPairDeleteListener([[maybe_unused]] void* instance, const Core::Handle<VertFragShaderPair> handle) {
+			//	for (auto& effect : Get().m_ShaderEffects) {
+			//		if (effect.shaders.GetHandle() == handle) {
+			//			effect.shaders = Core::AssetRef(VulkanShaderManager::GetPlaceholder<VertFragShaderPair>());
+			//		}
+			//	}
+			//}
 
-			std::vector<uint32_t> m_RefCounts;
+			Core::AssetHandleAllocator<ShaderEffect> m_HandleAllocator;
 
-			Core::FlatSlotMap<ShaderEffect> m_ShaderEffects;
+			Core::FlatSlotMap<ShaderEffect, 0, false> m_ShaderEffects;
 			VulkanDynamicVector<ShaderEffectData> m_ShaderEffectData{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Shader Effect Data Buffer" };
 
 			Core::Handle<ShaderEffect> m_PlaceholderEffect;

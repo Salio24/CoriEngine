@@ -97,6 +97,10 @@ namespace Cori {
 
 			static std::pair<vk::SharingMode, std::vector<uint32_t>>& GetBufferSharingSettings(const QueueUsageFlags usage);
 
+			static vk::raii::Context& GetContext() {
+				return Get().m_Context;
+			}
+
 			static vk::Instance GetInstance() {
 				return Get().m_Instance;
 			}

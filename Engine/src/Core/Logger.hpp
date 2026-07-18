@@ -11,7 +11,6 @@
 #define BUGTRAP std::abort()
 #endif
 
-
 namespace Cori {
 
 	/**
@@ -62,16 +61,15 @@ namespace Cori {
 				};
 
 
-				// API Tags
-				// Only used like this: [OpenGL] or [Vulkan] then [Tag]
-				// vvv
-
+				//TODO: remove vvv
 				static constexpr char ShaderProgram[] = "Shader Program";
 				static constexpr char VertexBuffer[] = "Vertex Buffer";
 				static constexpr char IndexBuffer[] = "Index Buffer";
 				static constexpr char VertexArray[] = "Vertex Array";
 				static constexpr char Texture2D[] = "Texture2D";
 				static constexpr char GraphicsContext[] = "Graphics Context";
+				//^^^
+
 				static constexpr char Font[] = "Font";
 
 				// Generic Tags
@@ -1032,8 +1030,8 @@ inline const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') +
 	#define CORI_CORE_DEBUG_TAGGED(...) ::Cori::Logger::CoreLogDebugTagged(__VA_ARGS__)
 	#define CORI_CORE_INFO_TAGGED(...)  ::Cori::Logger::CoreLogInfoTagged(__VA_ARGS__)
 
-	#define CORI_CORE_ASSERT(x, ...) if (!(x)) { (SPDLOG_LOGGER_CRITICAL(::Cori::Logger::GetCoreLogger(), "Assertion failed. Message: " __VA_ARGS__), ::Cori::Logger::GetCoreLogger()->critical("    Function: {} \n Assertion: {}", __PRETTY_FUNCTION__, std::string(#x)), spdlog::shutdown(), BUGTRAP); }
-	#define CORI_CORE_VERIFY(x, ...) (!(x) ? (SPDLOG_LOGGER_CRITICAL(::Cori::Logger::GetCoreLogger(), "Verify failed. Message: " __VA_ARGS__), ::Cori::Logger::GetCoreLogger()->critical("    Function: {} \n Verify: {}", __PRETTY_FUNCTION__, std::string(#x)), true) : false)
+	#define CORI_CORE_ASSERT(x, ...) if (!(x)) { (SPDLOG_LOGGER_CRITICAL(::Cori::Logger::GetCoreLogger(), "Assertion failed. Message: " __VA_ARGS__), ::Cori::Logger::GetCoreLogger()->critical("    Assertion: {} \n Stacktrace: \n{}", std::string(#x), std::to_string(std::stacktrace::current())), spdlog::shutdown(), BUGTRAP); }
+	#define CORI_CORE_VERIFY(x, ...) (!(x) ? (SPDLOG_LOGGER_CRITICAL(::Cori::Logger::GetCoreLogger(), "Verify failed. Message: " __VA_ARGS__), ::Cori::Logger::GetCoreLogger()->critical("    Function: {} \n Verify: {}", __PRETTY_FUNCTION__, std::string(#x)), true) : false) //TODO: remove
 
 #else
 
@@ -1058,15 +1056,15 @@ inline const std::string CORI_SECOND_LINE_SPACING = "[" + std::string(43, '-') +
 #define CORI_CORE_ERROR_TAGGED(...) ::Cori::Logger::CoreLogErrorTagged(__VA_ARGS__)
 #define CORI_CORE_FATAL_TAGGED(...) ::Cori::Logger::CoreLogFatalTagged(__VA_ARGS__)
 
-#define CORI_CORE_CHECK(x, ...) (!(x) ? (SPDLOG_LOGGER_ERROR(::Cori::Logger::GetCoreLogger(), "Check failed. Message: " __VA_ARGS__), ::Cori::Logger::GetCoreLogger()->error("    Function: {} \n Check: {}", __PRETTY_FUNCTION__, std::string(#x)), true) : false)
-#define CORI_CORE_CHECK_EXPECTED(x) CORI_CORE_CHECK(x, "std::expected returned an error, message: {}", x.error().what())
+#define CORI_CORE_CHECK(x, ...) (!(x) ? (SPDLOG_LOGGER_ERROR(::Cori::Logger::GetCoreLogger(), "Check failed. Message: " __VA_ARGS__), ::Cori::Logger::GetCoreLogger()->error("    Function: {} \n Check: {}", __PRETTY_FUNCTION__, std::string(#x)), true) : false) //TODO: remove
+#define CORI_CORE_CHECK_EXPECTED(x) CORI_CORE_CHECK(x, "std::expected returned an error, message: {}", x.error().what()) //TODO: remove
 
 // vvv User Side
 
-#define CORI_ASSERT(x, ...) if (!(x)) { (SPDLOG_LOGGER_CRITICAL(::Cori::Logger::GetClientLogger(), "Assertion failed. Message: " __VA_ARGS__), ::Cori::Logger::GetClientLogger()->critical("    Function: {} \n Assertion: {}", __PRETTY_FUNCTION__, std::string(#x)), spdlog::shutdown(), BUGTRAP); }
-#define CORI_VERIFY(x, ...) (!(x) ? (SPDLOG_LOGGER_CRITICAL(::Cori::Logger::GetClientLogger(), "Verify failed. Message: " __VA_ARGS__), ::Cori::Logger::GetClientLogger()->critical("    Function: {} \n Verify: {}", __PRETTY_FUNCTION__, std::string(#x)), true) : false)
-#define CORI_CHECK(x, ...) (!(x) ? (SPDLOG_LOGGER_ERROR(::Cori::Logger::GetClientLogger(), "Check failed. Message: " __VA_ARGS__), ::Cori::Logger::GetClientLogger()->error("    Function: {} \n Check: {}", __PRETTY_FUNCTION__, std::string(#x)), true) : false)
-#define CORI_CHECK_EXPECTED(x) CORI_CHECK(x, "std::expected returned an error, message: {}", x.error().what())
+#define CORI_ASSERT(x, ...) if (!(x)) { (SPDLOG_LOGGER_CRITICAL(::Cori::Logger::GetClientLogger(), "Assertion failed. Message: " __VA_ARGS__), ::Cori::Logger::GetClientLogger()->critical("    Assertion: {} \n Stacktrace: \n{}", std::string(#x), std::to_string(std::stacktrace::current())), spdlog::shutdown(), BUGTRAP); }
+#define CORI_VERIFY(x, ...) (!(x) ? (SPDLOG_LOGGER_CRITICAL(::Cori::Logger::GetClientLogger(), "Verify failed. Message: " __VA_ARGS__), ::Cori::Logger::GetClientLogger()->critical("    Function: {} \n Verify: {}", __PRETTY_FUNCTION__, std::string(#x)), true) : false) //TODO: remove
+#define CORI_CHECK(x, ...) (!(x) ? (SPDLOG_LOGGER_ERROR(::Cori::Logger::GetClientLogger(), "Check failed. Message: " __VA_ARGS__), ::Cori::Logger::GetClientLogger()->error("    Function: {} \n Check: {}", __PRETTY_FUNCTION__, std::string(#x)), true) : false) //TODO: remove
+#define CORI_CHECK_EXPECTED(x) CORI_CHECK(x, "std::expected returned an error, message: {}", x.error().what()) //TODO: remove
 
 #define CORI_TRACE(...)      ::Cori::Logger::ClientLogTrace(__VA_ARGS__)
 #define CORI_DEBUG(...)      ::Cori::Logger::ClientLogDebug(__VA_ARGS__)

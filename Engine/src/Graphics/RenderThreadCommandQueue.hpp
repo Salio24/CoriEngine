@@ -46,25 +46,16 @@ namespace Cori {
 				return s_DrainedCount.load(std::memory_order_acquire);
 			}
 
-			static void EnterThreadedMode() {
-				s_ThreadedMode.store(true, std::memory_order_release);
+			static void SetExecuterThreadId(const std::thread::id id) {
+				s_ExecutorThreadId.store(id, std::memory_order_release);
 			}
 
-			static void ExitThreadedMode() {
-				s_ThreadedMode.store(false, std::memory_order_release);
-				s_RenderThreadId.store({}, std::memory_order_release);
-			}
-
-			static void SetRenderThreadId(const std::thread::id id) {
-				s_RenderThreadId.store(id, std::memory_order_release);
+			static void ClearExecuterThreadId() {
+				s_ExecutorThreadId.store({}, std::memory_order_release);
 			}
 
 			static bool IsInlineMode() {
-				if (!s_ThreadedMode.load(std::memory_order_acquire)) {
-					return true;
-				}
-
-				return std::this_thread::get_id() == s_RenderThreadId.load(std::memory_order_acquire);
+				return std::this_thread::get_id() == s_ExecutorThreadId.load(std::memory_order_acquire);
 			}
 			
 		private:
@@ -73,8 +64,7 @@ namespace Cori {
 			static inline std::vector<Command> s_Draining;
 			static inline std::atomic<uint64_t> s_PushCount{ 0 };
 			static inline std::atomic<uint64_t> s_DrainedCount{ 0 };
-			static inline std::atomic<std::thread::id> s_RenderThreadId{};
-			static inline std::atomic<bool> s_ThreadedMode{ false };
+			static inline std::atomic<std::thread::id> s_ExecutorThreadId{};
 		};
 	}
 }

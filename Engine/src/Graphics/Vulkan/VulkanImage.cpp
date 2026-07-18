@@ -15,20 +15,23 @@ namespace Cori {
 			image.m_MipLevels = info.imageCreateInfo->mipLevels;
 			image.m_ArrayLayers = info.imageCreateInfo->arrayLayers;
 
+			#ifdef DEBUG_BUILD
 			if (strcmp(info.name, "") != 0) {
 				image.m_Name = info.name;
 				VulkanEngine::SetDebugName(image.m_Image, info.name);
 			}
+			#endif
 
 			return image;
 		}
 
 		void VulkanImage::Destroy() {
-			VulkanImageViewManager::UnregisterImage(*this);
+			if (m_Image) {
+				VulkanImageViewManager::UnregisterImage(*this);
+				VulkanEngine::GetAllocator().destroyImage(m_Image, m_Allocation);
+			}
 
-			VulkanEngine::GetAllocator().destroyImage(m_Image, m_Allocation);
-
-			m_Image = VK_NULL_HANDLE;
+			m_Image = nullptr;
 
 			m_Name = "";
 			m_Extent3D = vk::Extent3D();
