@@ -35,18 +35,6 @@ namespace Cori {
 		}
 
 		void VulkanShaderManager::Load(const Core::Handle<ComputeShader> handle, const Core::AssetID id, const uint32_t gen, const uint32_t vectorKey, std::filesystem::path path, std::string name) {
-			RenderThreadCommandQueue::Push([handle]() mutable {
-				if (!IsHandleValid(handle)) {
-					return;
-				}
-
-				if (Get().m_ComputeShaders.IsIndexOccupied(handle.GetIndex())) {
-					return;
-				}
-
-				Get().m_ComputeShaders.EmplaceAt(handle.GetIndex());
-			});
-
 			auto future = Core::Application::SubmitWorkerTask([path = std::move(path), name = std::move(name), handle, id, vectorKey]() mutable -> WorkerPayloadCompute {
 				std::string buffer;
 				auto readError = glz::file_to_buffer(buffer, path.c_str());
@@ -86,7 +74,6 @@ namespace Cori {
 			});
 
 			RenderThreadCommandQueue::Push([handle, gen, future = std::move(future), vectorKey]() mutable {
-				future.wait();
 				if (!IsHandleValid(handle)) {
 					return;
 				}

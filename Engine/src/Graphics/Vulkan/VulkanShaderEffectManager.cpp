@@ -35,8 +35,8 @@ namespace Cori {
 					Get().m_ShaderEffectData.Resize(std::max<uint64_t>(static_cast<float>(size) * 1.5f, index + 1));
 				}
 
-				Get().m_ShaderEffects.EmplaceAt(handle.GetIndex());
-				Get().AssignPlaceholder(handle);
+				Get().m_ShaderEffects.EmplaceAt(handle.GetIndex(), Get().m_ShaderEffects[Get().m_PlaceholderEffect]);
+				//Get().AssignPlaceholder(handle);
 			});
 		}
 
@@ -61,12 +61,13 @@ namespace Cori {
 									Get().m_ShaderEffectData.Resize(std::max<uint64_t>(static_cast<float>(size) * 1.5f, index + 1));
 								}
 
-								Get().m_ShaderEffects.EmplaceAt(handle_.GetIndex());
+								VulkanShaderManager::RegisterAtSlot(payload.effect.shaders.GetHandle());
+								Get().m_ShaderEffects.EmplaceAt(handle_.GetIndex(), std::move(payload.effect));
+							} else {
+								VulkanShaderManager::RegisterAtSlot(payload.effect.shaders.GetHandle());
+								Get().m_ShaderEffects[handle_] = std::move(payload.effect);
 							}
 
-							VulkanShaderManager::RegisterAtSlot(payload.effect.shaders.GetHandle());
-
-							Get().m_ShaderEffects[handle_] = std::move(payload.effect);
 							Get().m_ShaderEffectData[handle_.GetIndex()] = payload.data;
 
 							SetAssetStatus(handle_, AssetStatus::eLoaded);
@@ -89,10 +90,9 @@ namespace Cori {
 									Get().m_ShaderEffectData.Resize(std::max<uint64_t>(static_cast<float>(size) * 1.5f, index + 1));
 								}
 
-								Get().m_ShaderEffects.EmplaceAt(handle_.GetIndex());
-								Get().AssignPlaceholder(handle_);
+								Get().m_ShaderEffects.EmplaceAt(handle_.GetIndex(), Get().m_ShaderEffects[Get().m_PlaceholderEffect]);
+								//Get().AssignPlaceholder(handle_);
 							}
-
 
 							SetAssetStatus(handle_, AssetStatus::eLoadFailed);
 						});

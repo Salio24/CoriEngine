@@ -20,6 +20,7 @@ namespace Cori {
 			static constexpr bool NOPLACEHOLDER{ true };
 			using Manager = VulkanShaderManager;
 
+			static constexpr bool EnableAutoHotReload = true;
 			vk::ShaderEXT m_ComputeShaderObject{ nullptr };
 			bool placeholderAssigned{ false };
 		};
@@ -225,6 +226,7 @@ namespace Cori {
 			}
 
 			static constexpr bool EnableHotReload = true;
+			static constexpr bool EnableAutoHotReload = true;
 
 			static void Unload(const Core::Handle<VertFragShaderPair> handle) {
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Handle passed to Unload is invalid.");

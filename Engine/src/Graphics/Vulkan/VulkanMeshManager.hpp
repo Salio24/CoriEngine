@@ -340,35 +340,12 @@ namespace Cori {
 							meshData.indexCount = inTransferMesh.indexCount;
 							meshData.firstIndex = inTransferMesh.indexOffset;
 
-							Get().m_BarrierCache.emplace_back(vk::BufferMemoryBarrier2{
-								.srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
-								.srcAccessMask = vk::AccessFlagBits2::eTransferWrite,
-								.dstStageMask = vk::PipelineStageFlagBits2::eVertexShader,
-								.dstAccessMask = vk::AccessFlagBits2::eShaderStorageRead,
-								.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-								.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-								.buffer = inTransferMesh.vertexStorageBuffer,
-								.offset = inTransferMesh.vertexByteOffset,
-								.size = inTransferMesh.vertexByteSize
-							});
-
-							Get().m_BarrierCache.emplace_back(vk::BufferMemoryBarrier2{
-								.srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
-								.srcAccessMask = vk::AccessFlagBits2::eTransferWrite,
-								.dstStageMask = vk::PipelineStageFlagBits2::eIndexInput,
-								.dstAccessMask = vk::AccessFlagBits2::eIndexRead,
-								.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-								.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-								.buffer = Get().m_IndexBuffer.m_Buffer,
-								.offset = inTransferMesh.indexOffset * sizeof(uint32_t),
-								.size = inTransferMesh.indexCount * sizeof(uint32_t)
-							});
-
-
 							auto& meta = Get().m_MeshMetadata[inTransferMesh.mesh.GetIndex()];
 							meta.loaded = true;
 							SetAssetStatus(inTransferMesh.mesh, AssetStatus::eLoaded);
 						}
+
+						VulkanEngine::AddWaitTimelineSemaphore(VulkanStreamingLine::GetTimelineSemaphoreHandle(), ticket, vk::PipelineStageFlagBits::eVertexShader);
 
 						inTransferAssets.clear();
 					}
@@ -481,6 +458,7 @@ namespace Cori {
 			}
 
 			static constexpr bool EnableHotReload = true;
+			static constexpr bool EnableAutoHotReload = true;
 
 		private:
 			VulkanMeshManager() {

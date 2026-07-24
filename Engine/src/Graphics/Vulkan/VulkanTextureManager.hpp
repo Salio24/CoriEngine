@@ -272,7 +272,7 @@ namespace Cori {
 								.srcAccessMask = vk::AccessFlagBits2::eNone,
 								.dstStageMask = vk::PipelineStageFlagBits2::eFragmentShader,
 								.dstAccessMask = vk::AccessFlagBits2::eShaderSampledRead,
-								.oldLayout = s_DstLayout,
+								.oldLayout = vk::ImageLayout::eTransferDstOptimal,
 								.newLayout = s_DstLayout,
 								.srcQueueFamilyIndex = VulkanEngine::GetTransferQueueFamilyIndex(),
 								.dstQueueFamilyIndex = VulkanEngine::GetGraphicsQueueFamilyIndex(),
@@ -284,6 +284,8 @@ namespace Cori {
 
 							SetAssetStatus(inTransferTexture.texture, AssetStatus::eLoaded);
 						}
+
+						VulkanEngine::AddWaitTimelineSemaphore(VulkanStreamingLine::GetTimelineSemaphoreHandle(), ticket, vk::PipelineStageFlagBits::eFragmentShader);
 
 						inTransferAssets.clear();
 					}
@@ -357,6 +359,7 @@ namespace Cori {
 			}
 
 			static constexpr bool EnableHotReload = true;
+			static constexpr bool EnableAutoHotReload = true;
 
 		private:
 			VulkanTextureManager() {

@@ -214,11 +214,9 @@ namespace Cori {
 				return Get().m_ShaderEffectData.GetVulkanBuffer().GetBDA();
 			}
 
-			~VulkanShaderEffectManager() {
-				//VulkanShaderManager::RemoveOnVertFragShaderPairDeletedListener(this);
-			}
-
-			static constexpr bool EnableHotReload = false;
+			~VulkanShaderEffectManager() = default;
+			static constexpr bool EnableHotReload = true;
+			static constexpr bool EnableAutoHotReload = false;
 
 		protected:
 			friend class SceneRenderer;

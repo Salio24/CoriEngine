@@ -171,8 +171,12 @@ namespace Cori {
 
 			static void AddWaitTimelineSemaphore(const vk::Semaphore semaphore, const uint64_t value, const vk::PipelineStageFlags waitDstStageMask) {
 				for (uint32_t i = 0; i < Get().m_WaitSemaphores.size(); i++) {
-					if (Get().m_WaitSemaphores[i] == semaphore && Get().m_WaitDstStageMasks[i] == waitDstStageMask && Get().m_TimelineWaitValues[i] < value) {
-						Get().m_TimelineWaitValues[i] = value;
+					if (Get().m_WaitSemaphores[i] == semaphore && Get().m_WaitDstStageMasks[i] == waitDstStageMask) {
+						if (Get().m_TimelineWaitValues[i] < value) {
+							Get().m_TimelineWaitValues[i] = value;
+							return;
+						}
+						
 						return;
 					}
 				}

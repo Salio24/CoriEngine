@@ -32,11 +32,6 @@ namespace Cori {
 		};
 
 		class VulkanMaterialSystem {
-			struct MaterialCPUData {
-				Core::AssetID assetID;
-				Core::AssetDeletionPolicy deletionPolicy;
-			};
-
 			struct JsonAssetData {
 				struct JsonMaterialData {
 					std::array<float, 4> colorFactor;
@@ -51,6 +46,18 @@ namespace Cori {
 				glz::skip Metadata;
 				JsonAssetData AssetData;
 			};
+
+			struct WorkerPayloadData {
+				std::array<float, 4> colorFactor;
+				Core::AssetRef<Texture2> albedoTexture;
+				std::string albedoSampler;
+
+				Core::AssetRef<ShaderEffect> shaderEffect;
+			};
+
+			struct WorkerPayload {
+				std::optional<WorkerPayloadData> actualPayload;
+			};
 		public:
 			using OnShaderEffectSwappedFn = std::function<void(void* instance, const Core::Handle<Material> material, const Core::ConstHandle<ShaderEffect> oldFx, const Core::ConstHandle<ShaderEffect> newFx)>;
 
@@ -60,116 +67,67 @@ namespace Cori {
 
 			static VulkanMaterialSystem& Get();
 
-			template<typename T> requires std::same_as<Material, T>
-			[[nodiscard]] static Core::Handle<T> Load(const Core::AssetID id) {
-				auto& record = Core::AssetManager2::GetAssetRecord(id);
-				const auto& dir = Core::AssetManager2::GetAssetDir();
-				auto assetFilePath = dir / record.path;
-
-				auto handle = Get().AllocateHandle();
-				Get().m_MaterialCPUData[handle.GetIndex()].assetID = id;
-				Get().m_MaterialCPUData[handle.GetIndex()].deletionPolicy = record.deletionPolicy;
-				record.rawHandleIndex = handle.GetIndex();
-				record.rawHandleVersion = handle.GetVersion();
-
-				std::string buffer;
-				auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
-				if (readError != glz::error_code::none) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Load({}), handle [{},{}], failed to open asset file '{}', error '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead.", id, handle.GetIndex(), handle.GetVersion(), assetFilePath.string(), glz::enum_to_string(readError));
-					Get().AssignPlaceholder(handle);
-					return handle;
-				}
-
-				JsonAssetDataCombined data;
-				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
-				if (parseError) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Load({}), handle [{},{}], failed to parse asset file '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead. Error: {}", id, handle.GetIndex(), handle.GetVersion(), assetFilePath.string(), glz::format_error(parseError, buffer));
-					Get().AssignPlaceholder(handle);
-					return handle;
-				}
-
-				MaterialData materialData {
-					.colorFactor = { data.AssetData.materialData.colorFactor[0], data.AssetData.materialData.colorFactor[1], data.AssetData.materialData.colorFactor[2], data.AssetData.materialData.colorFactor[3] },
-					.albedoTexture = std::move(data.AssetData.materialData.albedoTexture),
-					.albedoSampler = VulkanTextureManager::GetSampler(data.AssetData.materialData.albedoSampler.c_str())
-				};
-
-				Get().CreateMaterial(handle, std::move(data.AssetData.shaderEffect), std::move(materialData));
-				return handle;
+			static void RegisterAtSlot(const Core::Handle<Material> handle) {
+				//empty cuz materials are guaranteed to be loaded next frame. Like the compute shaders they are kind of an exception, but for a different reason, to avoid constant rebatching in the scene renderer.
 			}
+
+			static void Load(const Core::Handle<Material> handle, const Core::AssetID id, const uint32_t gen, const uint32_t vectorKey, std::filesystem::path path, std::string name = "");
 
 			static void Unload(const Core::Handle<Material> handle) {
-				if (!IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid Material handle passed to Unload, skipping call.");
-					return;
-				}
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Handle passed to Unload is invalid.");
+				CORI_CORE_ASSERT(handle != Get().m_PlaceholderMaterial, "Placeholder material handle was passed, can't unload it.")
 
-				auto& record = Core::AssetManager2::GetAssetRecord(GetAssetID(handle));
-				record.status = AssetStatus::eUnloaded;
-				record.rawHandleIndex = UINT32_MAX;
-				record.rawHandleVersion = 0;
-
-				Get().DestroyMaterial(handle);
-				Get().FreeHandle(handle);
-			}
-
-			static bool ChangeDeletionPolicy(const Core::Handle<Material> handle, const Core::AssetDeletionPolicy newPolicy) {
-				if (!Get().m_Materials.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Handle passed to ChangeDeletionPolicy is invalid, skipping call.");
-					return false;
-				}
-
-				auto& material = Get().m_MaterialCPUData[handle.GetIndex()];
-				if (material.deletionPolicy == newPolicy) {
-					return false;
-				}
-
-				if (material.deletionPolicy == Core::AssetDeletionPolicy::eKeepAlive) {
-					auto refCount = Get().m_RefCounts[handle.GetIndex()];
-					if (refCount == 0) {
-						Unload(handle);
-						return true;
+				Core::AssetID id = Get().m_HandleAllocator.GetBoundAssetID(handle);
+				{
+					std::lock_guard lk(Core::AssetManager2::GetMutex());
+					auto& record = Core::AssetManager2::GetAssetRecord(id);
+					if (record.rawHandleIndex == handle.GetIndex() && record.rawHandleVersion == handle.GetVersion()) {
+						record.rawHandleIndex = UINT32_MAX;
+						record.rawHandleVersion = 0;
 					}
 				}
 
-				material.deletionPolicy = newPolicy;
-				return false;
+				Get().m_HandleAllocator.Free(handle);
+
+				if (!Get().m_Materials.IsIndexOccupied(handle.GetIndex())) {
+					return;
+				}
+
+				Get().m_Materials.RemoveAt(handle.GetIndex());
 			}
 
 			[[nodiscard]] static Core::AssetID GetAssetID(const Core::Handle<Material> handle) {
-				CORI_CORE_ASSERT(IsHandleValid(handle), "Handle passed to GetAssetID in VulkanMaterialManager is invalid.");
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Material handle passed to GetAssetID is invalid.");
+				return Get().m_HandleAllocator.GetBoundAssetID(handle);
+			}
 
-				return Get().m_MaterialCPUData[handle.GetIndex()].assetID;
+			static bool TryAddRef(const Core::Handle<Material> handle) {
+				return Get().m_HandleAllocator.TryAddRef(handle);
 			}
 
 			static void AddRef(const Core::Handle<Material> handle) {
-				if (!IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid Material handle passed to AddRef, skipping call.");
-					return;
-				}
-
-				Get().m_RefCounts[handle.GetIndex()]++;
+				Get().m_HandleAllocator.AddRef(handle);
 			}
 
 			static void RemoveRef(const Core::Handle<Material> handle) {
-				if (!IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid Material handle passed to RemoveRef, skipping call.");
-					return;
-				}
+				Get().m_HandleAllocator.RemoveRef(handle);
+			}
 
-				auto count = --Get().m_RefCounts[handle.GetIndex()];
-				if (count == 0 && Get().m_MaterialCPUData[handle.GetIndex()].deletionPolicy == Core::AssetDeletionPolicy::eRefCounted && handle != Get().m_PlaceholderMaterial) {
-					Unload(handle);
-				}
+			static void BindAsset(const Core::Handle<Material> handle, const Core::AssetID id, const uint32_t vectorKey) {
+				return Get().m_HandleAllocator.BindAsset(handle, id, vectorKey);
+			}
+
+			static uint32_t BumpGeneration(const Core::Handle<Material> handle) {
+				return Get().m_HandleAllocator.BumpGeneration(handle);
 			}
 
 			template<typename T> requires std::same_as<Material, T>
-			[[nodiscard]] static Core::Handle<T> GetPlaceholder() {
+			[[nodiscard]] static Core::Handle<Material> GetPlaceholder() {
 				return Get().m_PlaceholderMaterial;
 			}
 
 			[[nodiscard]] static bool IsHandleValid(const Core::ConstHandle<Material> handle) {
-				return Get().m_Materials.IsHandleValid(handle);
+				return Get().m_HandleAllocator.IsHandleValid(handle);
 			}
 
 			static void AddOnShaderEffectSwappedListener(void* instance, OnShaderEffectSwappedFn func) {
@@ -204,11 +162,44 @@ namespace Cori {
 				return Get().m_Materials.GetVulkanBuffer().GetBDA();
 			}
 
-			~VulkanMaterialSystem() {
-				VulkanShaderEffectManager::RemoveOnShaderEffectDeleteListener(this);
+			~VulkanMaterialSystem() = default;
+
+			static constexpr bool EnableHotReload = true;
+			static constexpr bool EnableAutoHotReload = false;
+
+			void AssignPlaceholder(const Core::Handle<Material> handle) {
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle.");
+
+				auto& data = m_Materials[handle];
+				auto& placeholderData = std::as_const(m_Materials)[m_PlaceholderMaterial];
+				data.shaderEffect = placeholderData.shaderEffect;
+				data.customData = placeholderData.customData;
 			}
 
-			static constexpr bool EnableHotReload = false;
+			template<typename T> requires std::same_as<Material, T>
+			[[nodiscard]] static Core::Handle<Material> AllocateHandle() {
+				return Get().m_HandleAllocator.Allocate();
+			}
+
+			void CreateMaterial(const Core::Handle<Material> handle, Core::AssetRef<ShaderEffect> shaderEffect, MaterialData data) {
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle.");
+
+				auto& material = m_Materials[handle];
+				material.shaderEffect = std::move(shaderEffect);
+				material.customData = std::move(data);
+			}
+
+			static void QueueUnload(const Core::Handle<Material> handle) {
+				RenderThreadCommandQueue::Push([handle]{ Unload(handle); });
+			}
+
+			static void SetAssetStatus(const Core::Handle<Material> handle, const AssetStatus newStatus) {
+				Get().m_HandleAllocator.SetAssetStatus(handle, newStatus);
+			}
+
+			[[nodiscard]] static AssetStatus GetAssetStatus(const Core::Handle<Material> handle) {
+				return Get().m_HandleAllocator.GetAssetStatus(handle);
+			}
 
 		protected:
 			friend class SceneRenderer;
@@ -267,7 +258,7 @@ namespace Cori {
 
 				if (!Get().m_OnShaderEffectSwappedListeners.empty()) {
 					for (auto& [ptr, func] : Get().m_OnShaderEffectSwappedListeners) {
-						func(ptr, handle, newShaderEffect.GetHandle(), material.shaderEffect.GetHandle());
+						func(ptr, handle, material.shaderEffect.GetHandle(), newShaderEffect.GetHandle());
 					}
 				}
 
@@ -275,109 +266,36 @@ namespace Cori {
 
 				return {};
 			}
-
 		private:
-			void AssignPlaceholder(const Core::Handle<Material> handle) {
-				if (!IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid Material handle passed to AssignPlaceholder, skipping call.");
-					return;
-				}
-
-				auto& data = Get().m_Materials[handle];
-				auto& placeholderData = std::as_const(m_Materials)[m_PlaceholderMaterial];
-				data.shaderEffect = placeholderData.shaderEffect;
-				data.customData = placeholderData.customData;
-			}
-
-			[[nodiscard]] Core::Handle<Material> AllocateHandle() {
-				auto handle = Get().m_Materials.Emplace();
-				if (handle.GetIndex() >= m_RefCounts.size()) {
-					m_RefCounts.resize(m_RefCounts.size() * 1.5f);
-				}
-
-				if (handle.GetIndex() >= m_MaterialCPUData.size()) {
-					m_MaterialCPUData.resize(m_MaterialCPUData.size() * 1.5f);
-				}
-
-				return handle;
-			}
-
-			void CreateMaterial(const Core::Handle<Material> handle, Core::AssetRef<ShaderEffect> shaderEffect, MaterialData data) {
-				if (!IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid Material handle was passed to CreateMaterial, skipping call.");
-					return;
-				}
-
-				if (!shaderEffect.IsInitialized()) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Uninitialized ShaderEffect AssetRef was passed to CreateMaterial, skipping call.");
-					return;
-				}
-
-				auto& material = m_Materials[handle];
-				material.shaderEffect = std::move(shaderEffect);
-				material.customData = std::move(data);
-			}
-
-			void DestroyMaterial(const Core::Handle<Material> handle) {
-				if (!IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid Material handle was passed to DestroyMaterial, skipping call.");
-					return;
-				}
-
-				if (m_PlaceholderMaterial == handle) {
-					return;
-				}
-
-				//!!!! If i ever wand to add hot reloading support to this, i will need fire the callback in the AssignPlaceholder func as we might change the shader effect there
-				//AssignPlaceholder(material);
-			}
-
-			void FreeHandle(const Core::Handle<Material> handle) {
-				if (!IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MaterialSystem }, "Invalid Material handle passed to FreeHandle, skipping call.");
-					return;
-				}
-
-				if (m_PlaceholderMaterial == handle) {
-					return;
-				}
-
-				m_RefCounts[handle.GetIndex()] = 0;
-				m_MaterialCPUData[handle.GetIndex()] = {};
-
-				auto& material = m_Materials[handle];
-				material.shaderEffect = {};
-				material.customData = {};
-			}
 
 			VulkanMaterialSystem() {
 				m_Materials.Reserve(512);
-				m_MaterialCPUData.resize(512);
-				m_RefCounts.resize(512);
+
+				m_PlaceholderMaterial = m_HandleAllocator.Allocate();
+				m_HandleAllocator.AddRef(m_PlaceholderMaterial);
 
 				MaterialData placeholderData{
 					.albedoTexture = Core::AssetRef(VulkanTextureManager::GetPlaceholder<Texture2>()),
 					.albedoSampler = 0
 				};
 
-				m_PlaceholderMaterial = m_Materials.Emplace(Material{ .customData = std::move(placeholderData), .shaderEffect = Core::AssetRef(VulkanShaderEffectManager::GetPlaceholder<ShaderEffect>()) });
+				m_Materials.EmplaceAt(m_PlaceholderMaterial.GetIndex(), Material{ .customData = std::move(placeholderData), .shaderEffect = Core::AssetRef(VulkanShaderEffectManager::GetPlaceholder<ShaderEffect>()), .version = m_PlaceholderMaterial.GetVersion() });
 
-				VulkanShaderEffectManager::AddOnShaderEffectDeleteListener(this, ShaderEffectDeletedListener);
+				//VulkanShaderEffectManager::AddOnShaderEffectDeleteListener(this, ShaderEffectDeletedListener);
 			}
 
-			static void ShaderEffectDeletedListener([[maybe_unused]] void* instance, const Core::Handle<ShaderEffect> handle) {
-				for (auto it = Get().m_Materials.cbegin(); it != Get().m_Materials.cend(); ++it) {
-					auto& material = *it;
-					if (material.shaderEffect.GetHandle() == handle) {
-						static_cast<void>(ChangeMaterialShaderEffect(it.GetHandle(), Core::AssetRef(VulkanShaderEffectManager::GetPlaceholder<ShaderEffect>())));
-					}
-				}
-			}
+			//static void ShaderEffectDeletedListener([[maybe_unused]] void* instance, const Core::Handle<ShaderEffect> handle) {
+			//	for (auto it = Get().m_Materials.cbegin(); it != Get().m_Materials.cend(); ++it) {
+			//		auto& material = *it;
+			//		if (material.shaderEffect.GetHandle() == handle) {
+			//			static_cast<void>(ChangeMaterialShaderEffect(it.GetHandle(), Core::AssetRef(VulkanShaderEffectManager::GetPlaceholder<ShaderEffect>())));
+			//		}
+			//	}
+			//}
 
-			VulkanFlatSlotMap<Material> m_Materials{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Material Slot Map" };
+			Core::AssetHandleAllocator<Material> m_HandleAllocator;
 
-			std::vector<MaterialCPUData> m_MaterialCPUData;
-			std::vector<uint32_t> m_RefCounts;
+			VulkanFlatSlotMap<Material, 0, false> m_Materials{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Material Slot Map" };
 
 			Core::Handle<Material> m_PlaceholderMaterial;
 
