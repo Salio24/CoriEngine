@@ -66,8 +66,8 @@ namespace Cori {
 				cache.m_Children.erase(std::string(subject.GetName()));
 
 				auto& parentHierarchy = registry->get<Components::Entity::Hierarchy>(parent);
-				const entt::entity previousSibling = parentHierarchy.m_PreviousSibling;
-				const entt::entity nextSibling = parentHierarchy.m_NextSibling;
+				const entt::entity previousSibling = hierarchy.m_PreviousSibling;
+				const entt::entity nextSibling = hierarchy.m_NextSibling;
 
 				if (parentHierarchy.m_FirstChild == subject.GetRawHandle().entity()) {
 					parentHierarchy.m_FirstChild = nextSibling;

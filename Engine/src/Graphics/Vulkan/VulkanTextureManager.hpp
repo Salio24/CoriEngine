@@ -1,6 +1,4 @@
 #pragma once
-#include <utility>
-
 #include "VulkanEngine.hpp"
 #include "VulkanImage.hpp"
 #include "Graphics/Image.hpp"
@@ -63,7 +61,7 @@ namespace Cori {
 			class WorkerPayload {
 			public:
 				WorkerPayload() = delete;
-				explicit WorkerPayload(VulkanImage image) : m_Image(std::move(image)) {}
+				WorkerPayload(VulkanImage&& image, std::vector<Byte>&& pixelData) : m_Image(std::move(image)), m_PixelData(std::move(pixelData)) {}
 
 				~WorkerPayload() {
 					m_Image.Destroy();
@@ -93,8 +91,8 @@ namespace Cori {
 					m_Image = {};
 				}
 
-				std::vector<Byte> m_PixelData;
 				VulkanImage m_Image;
+				std::vector<Byte> m_PixelData;
 				Params m_Params;
 			};
 
@@ -510,6 +508,7 @@ namespace Cori {
 
 				auto& texture = m_TexturePool[handle];
 				texture.placeholderAssigned = true;
+				texture.descriptorIndex = s_PlaceholderTextureDescriptorIndex;
 
 				auto& tableEntry = m_GPUAssetTables[handle.GetIndex()];
 				tableEntry.descriptorIndex = s_PlaceholderTextureDescriptorIndex;
@@ -524,7 +523,7 @@ namespace Cori {
 				if (!(extent.width > 0 && extent.height > 0 && extent.depth > 0)) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Invalid texture extent passed to UpdateTexture, skipping load.");
 					SetAssetStatus(handle, AssetStatus::eLoadFailed);
-					texture.image.Destroy();
+					DestroyTexture(handle);
 					return false;
 				}
 
@@ -555,7 +554,7 @@ namespace Cori {
 					if (result.error() == ErrorCode::eInvalidData) {
 						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "VulkanStreamingLine returned with error code eInvalidData during UpdateTexture call, skipping load.");
 						SetAssetStatus(handle, AssetStatus::eLoadFailed);
-						texture.image.Destroy();
+						DestroyTexture(handle);
 						return false;
 					}
 
@@ -649,13 +648,10 @@ namespace Cori {
 					m_FreeTextureDescriptorSlots.emplace_back(texture.descriptorIndex);
 				}
 
-				auto& table = m_GPUAssetTables[handle.GetIndex()];
-				table.descriptorIndex = 0;
+				//AssignPlaceholder(handle);
 
 				texture.image = {};
 				texture.view = nullptr;
-				texture.descriptorIndex = 0;
-				texture.placeholderAssigned = false;
 				texture.loaded = false;
 			}
 
@@ -678,6 +674,8 @@ namespace Cori {
 					bestPick->ticket = value;
 					return bestPick->texturesInTransfer;
 				}
+
+				CORI_CORE_ASSERT(free, "Failed to find any free in transfer slot for a texture.");
 
 				free->ticket = value;
 				return free->texturesInTransfer;
@@ -814,7 +812,7 @@ namespace Cori {
 
 			std::vector<vk::ImageMemoryBarrier2> m_BarrierCache;
 
-			std::array<InTransferSlot, TRANSFERS_IN_FLIGHT + 1> m_TexturesInTransfer;
+			std::array<InTransferSlot, TRANSFERS_IN_FLIGHT + 2> m_TexturesInTransfer;
 			std::queue<QueuedUpload> m_QueuedUploads;
 
 			struct SCIHasher {

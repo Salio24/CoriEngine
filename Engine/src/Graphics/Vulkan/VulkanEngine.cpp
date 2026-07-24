@@ -171,9 +171,9 @@ namespace Cori {
 			s_Instance = nullptr;
 		}
 
-		std::pair<vk::SharingMode, std::vector<uint32_t>>& VulkanEngine::GetBufferSharingSettings(const QueueUsageFlags usage) {
+		const std::pair<vk::SharingMode, std::vector<uint32_t>>& VulkanEngine::GetBufferSharingSettings(const QueueUsageFlags usage) {
 			CORI_CORE_ASSERT(Get().m_SharingSettings.contains(static_cast<QueueUsageFlags::MaskType>(usage)), "Incorrect QueueUsageFlags were passed to VulkanEngine::GetBufferSharingSettings.");
-			return Get().m_SharingSettings[static_cast<QueueUsageFlags::MaskType>(usage)];
+			return Get().m_SharingSettings.at(static_cast<QueueUsageFlags::MaskType>(usage));
 		}
 
 		void VulkanEngine::CPUFrameStart() {

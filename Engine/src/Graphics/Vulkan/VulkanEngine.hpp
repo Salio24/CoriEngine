@@ -95,7 +95,7 @@ namespace Cori {
 				return Get().m_Device.setDebugUtilsObjectNameEXT(info);
 			}
 
-			static std::pair<vk::SharingMode, std::vector<uint32_t>>& GetBufferSharingSettings(const QueueUsageFlags usage);
+			static const std::pair<vk::SharingMode, std::vector<uint32_t>>& GetBufferSharingSettings(const QueueUsageFlags usage);
 
 			static vk::raii::Context& GetContext() {
 				return Get().m_Context;

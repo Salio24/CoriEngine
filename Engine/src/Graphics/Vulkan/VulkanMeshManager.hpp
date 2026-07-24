@@ -5,6 +5,8 @@
 #include "Core/DataStructures/FlatSlotMap.hpp"
 #include "AssetManager/AssetLoadStatus.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
+#include "Core/AssetManager/AssetHandleAllocator.hpp"
+#include "Graphics/RenderThreadCommandQueue.hpp"
 #include <fast_obj.h>
 
 namespace Cori {
@@ -34,9 +36,97 @@ namespace Cori {
 		};
 
 		class VulkanMeshManager {
-			struct VertexStorage {
-				VulkanBuffer buffer;
-				vma::VirtualBlock block;
+			class VertexStorage {
+			public:
+				VertexStorage() = delete;
+
+				VertexStorage(VulkanBuffer buffer, vma::VirtualBlock virtBlock) : m_Buffer(std::move(buffer)), m_Block(virtBlock) {
+					m_Mutex = std::make_shared<std::mutex>();
+					AddStrongRef();
+					AddWeakRef();
+					std::atomic_thread_fence(std::memory_order_release);
+				}
+
+				bool DiscoverStrong() {
+					uint64_t cur = m_RefCountCombined.load(std::memory_order_relaxed);
+					while (Strong(cur) != 0) {
+						if (m_RefCountCombined.compare_exchange_weak(cur, cur + s_Strong, std::memory_order_acquire, std::memory_order_relaxed)) {
+							return true;
+						}
+					}
+
+					return false;
+				}
+
+				bool DiscoverWeak() {
+					uint64_t cur = m_RefCountCombined.load(std::memory_order_relaxed);
+					while (Weak(cur) != 0) {
+						if (m_RefCountCombined.compare_exchange_weak(cur, cur + s_Weak, std::memory_order_acquire, std::memory_order_relaxed)) {
+							return true;
+						}
+					}
+
+					return false;
+				}
+
+				bool DiscoverBoth() {
+					uint64_t cur = m_RefCountCombined.load(std::memory_order_relaxed);
+					while (!(Strong(cur) == 0 || Weak(cur) == 0)) {
+						if (m_RefCountCombined.compare_exchange_weak(cur, cur + s_Strong + s_Weak, std::memory_order_acquire, std::memory_order_relaxed)) {
+							return true;
+						}
+					}
+
+					return false;
+				}
+
+				void AddStrongRef() {
+					m_RefCountCombined.fetch_add(s_Strong, std::memory_order_relaxed);
+				}
+
+				void AddWeakRef() {
+					m_RefCountCombined.fetch_add(s_Weak, std::memory_order_relaxed);
+				}
+
+				void RemoveStrongRef() {
+					m_RefCountCombined.fetch_sub(s_Strong, std::memory_order_release);
+				}
+
+				void RemoveWeakRef() {
+					m_RefCountCombined.fetch_sub(s_Weak, std::memory_order_release);
+				}
+
+				[[nodiscard]] uint32_t GetStrongRefCount() const {
+					return Strong(m_RefCountCombined.load(std::memory_order_acquire));
+				}
+
+				[[nodiscard]] uint32_t GetWeakRefCount() const {
+					return Weak(m_RefCountCombined.load(std::memory_order_acquire));
+				}
+
+				VulkanBuffer m_Buffer;
+				vma::VirtualBlock m_Block;
+				std::shared_ptr<std::mutex> m_Mutex;
+
+			private:
+				static uint32_t Strong(const uint64_t value) {
+					return static_cast<uint32_t>(value >> 32);
+				}
+
+				static uint32_t Weak(const uint64_t value) {
+					return static_cast<uint32_t>(value);
+				}
+
+				std::atomic<uint64_t> m_RefCountCombined;
+
+				static constexpr uint64_t s_Strong = 1ull << 32;
+				static constexpr uint64_t s_Weak   = 1ull;
+			};
+
+			struct CompleteVertexAllocation {
+				vk::DeviceSize offset{};
+				vma::VirtualAllocation allocation;
+				VertexStorage* storage{ nullptr };
 			};
 
 			struct QueuedUpload {
@@ -45,21 +135,27 @@ namespace Cori {
 				std::variant<std::vector<StaticVertex>> vertexData;
 				std::vector<uint32_t> indexData;
 				Core::Handle<Mesh> mesh;
-				vk::Buffer vertexStorageBuffer;
-				uint32_t dataVersion{ 0 };
+				VertexStorage* vertexStorage;
+				vma::VirtualAllocation indexAlloc;
+				vma::VirtualAllocation vertexAlloc;
+				uint32_t loadGen{ 0 };
+				//vk::Buffer vertexStorageBuffer;
+				//std::weak_ptr<std::mutex> vertexBlockMutex;
+				//vma::VirtualAllocation vertexAlloc;
+				//vma::VirtualBlock vertexBlock;
 			};
 
 			struct MeshInTransfer {
 				Core::Handle<Mesh> mesh;
 				vk::Buffer vertexStorageBuffer;
 				vma::VirtualAllocation vertexAllocation;
-				vma::VirtualBlock vertexBlock;
+				VertexStorage* vertexStorage;
 				vma::VirtualAllocation indexAllocation;
 				uint32_t indexCount{ 0 };
 				uint32_t indexOffset{ 0 };
 				uint32_t vertexByteSize{ 0 };
 				uint32_t vertexByteOffset{ 0 };
-				uint32_t dataVersion{ 0 };
+				uint32_t loadGen{ 0 };
 			};
 
 			struct InTransferSlot {
@@ -69,11 +165,9 @@ namespace Cori {
 
 			struct MeshMetadata {
 				vma::VirtualAllocation vertexAllocation;
-				vma::VirtualBlock vertexBlock;
+				VertexStorage* vertexStorage{ nullptr };
+				//vma::VirtualBlock vertexBlock;
 				vma::VirtualAllocation indexAllocation;
-				Core::AssetID assetID{ 0 };
-				Core::AssetDeletionPolicy deletionPolicy{};
-				uint32_t dataVersion{ 0 };
 				bool placeholderAssigned{ false };
 				bool loaded{ false };
 			};
@@ -87,138 +181,104 @@ namespace Cori {
 				JsonAssetData AssetData;
 			};
 
+			class WorkerPayload {
+			public:
+				WorkerPayload() = delete;
+				WorkerPayload(std::variant<std::vector<StaticVertex>>&& vertexData, std::vector<uint32_t>&& indexData, const CompleteVertexAllocation& completeVertexAllocation) : m_VertexData(std::move(vertexData)), m_IndexData(std::move(indexData)), m_CompleteVertexAlloc(completeVertexAllocation) {}
+
+				~WorkerPayload() {
+					if (m_CompleteVertexAlloc.allocation && m_CompleteVertexAlloc.storage) {
+						{
+							std::lock_guard lk(*m_CompleteVertexAlloc.storage->m_Mutex);
+							m_CompleteVertexAlloc.storage->m_Block.free(m_CompleteVertexAlloc.allocation);
+						}
+						m_CompleteVertexAlloc.storage->RemoveStrongRef();
+						m_CompleteVertexAlloc.storage->RemoveWeakRef();
+						m_CompleteVertexAlloc = {};
+					}
+				}
+
+				WorkerPayload(const WorkerPayload& other) = delete;
+				WorkerPayload& operator=(const WorkerPayload& other) = delete;
+
+				WorkerPayload(WorkerPayload&& other) noexcept {
+					m_VertexData = std::move(other.m_VertexData);
+					m_IndexData = std::move(other.m_IndexData);
+					m_CompleteVertexAlloc = other.m_CompleteVertexAlloc;
+
+					other.Release();
+				}
+
+				WorkerPayload& operator=(WorkerPayload&& other) noexcept {
+					m_VertexData = std::move(other.m_VertexData);
+					m_IndexData = std::move(other.m_IndexData);
+
+					if (m_CompleteVertexAlloc.allocation && m_CompleteVertexAlloc.storage) {
+						{
+							std::lock_guard lk(*m_CompleteVertexAlloc.storage->m_Mutex);
+							m_CompleteVertexAlloc.storage->m_Block.free(m_CompleteVertexAlloc.allocation);
+						}
+						m_CompleteVertexAlloc.storage->RemoveStrongRef();
+						m_CompleteVertexAlloc.storage->RemoveWeakRef();
+					}
+
+					m_CompleteVertexAlloc = other.m_CompleteVertexAlloc;
+
+					other.Release();
+					return *this;
+				}
+
+				void Release() {
+					if (m_CompleteVertexAlloc.storage) {
+						//m_CompleteVertexAlloc.storage->RemoveStrongRef();
+						m_CompleteVertexAlloc = {};
+					}
+				}
+
+				std::variant<std::vector<StaticVertex>> m_VertexData;
+				std::vector<uint32_t> m_IndexData;
+				CompleteVertexAllocation m_CompleteVertexAlloc;
+			};
+
+
 		public:
 			static void Init();
 
 			static void Shutdown();
 
 			static VulkanMeshManager& Get();
-			
-			template<typename T> requires std::same_as<Mesh, T>
-			static Core::Handle<T> Load(const Core::AssetID id) {
-				auto& record = Core::AssetManager2::GetAssetRecord(id);
-				const auto& dir = Core::AssetManager2::GetAssetDir();
 
-				auto handle = Get().AllocateHandle();
-				Get().m_MeshMetadata[handle.GetIndex()].assetID = id;
-				Get().m_MeshMetadata[handle.GetIndex()].deletionPolicy = record.deletionPolicy;
-				record.rawHandleIndex = handle.GetIndex();
-				record.rawHandleVersion = handle.GetVersion();
+			static void RegisterAtSlot(const Core::Handle<Mesh> handle);
 
-				auto assetFilePath = dir / record.path;
-
-				std::string buffer;
-				auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
-				if (readError != glz::error_code::none) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Load({}), compute shader handle [{},{}], failed to open asset file '{}', error '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead.", id, handle.GetIndex(), handle.GetVersion(), assetFilePath.string(), glz::enum_to_string(readError));
-					Get().AssignPlaceholder(handle);
-					return handle;
-				}
-
-				JsonAssetDataCombined data;
-				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
-				if (parseError) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Load({}), compute shader handle [{},{}], failed to parse asset file '{}', asset will not be loaded, and a placeholder will be assigned to the handle instead. Error: {}", id, handle.GetIndex(), handle.GetVersion(), assetFilePath.string(), glz::format_error(parseError, buffer));
-					Get().AssignPlaceholder(handle);
-					return handle;
-				}
-
-				std::filesystem::path objPath = assetFilePath.replace_filename(data.AssetData.obj);
-				std::vector<StaticVertex> vertexData;
-				std::vector<uint32_t> indexData;
-
-				LoadObjToEngine(objPath.string().c_str(), vertexData, indexData);
-
-				Get().LoadToMesh(handle, std::move(vertexData), std::move(indexData));
-				return handle;
-			}
-
-			static void Reload(const Core::Handle<Mesh> handle, const Core::AssetID id) {
-				auto& record = Core::AssetManager2::GetAssetRecord(id);
-				const auto& dir = Core::AssetManager2::GetAssetDir();
-				bool deleted = ChangeDeletionPolicy(handle, record.deletionPolicy);
-				if (deleted) {
-					return;
-				}
-
-				auto assetFilePath = dir / record.path;
-
-				std::string buffer;
-				auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
-				if (readError != glz::error_code::none) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Reload([{},{}], {}) failed to open asset file '{}', error '{}', asset will not be reloaded.", handle.GetIndex(), handle.GetVersion(), id, assetFilePath.string(), glz::enum_to_string(readError));
-					return;
-				}
-
-				JsonAssetDataCombined data;
-				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(data, buffer);
-				if (parseError) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Reload([{},{}], {}) failed to parse asset file '{}', asset will not be reloaded. Error: {}", handle.GetIndex(), handle.GetVersion(), id, assetFilePath.string(), glz::format_error(parseError, buffer));
-					return;
-				}
-
-				Get().DestroyMesh(handle);
-				auto& meta = Get().m_MeshMetadata[handle.GetIndex()];
-				if (id != meta.assetID) {
-					record.rawHandleIndex = handle.GetIndex();
-					record.rawHandleVersion = handle.GetVersion();
-					auto& oldRecord = Core::AssetManager2::GetAssetRecord(meta.assetID);
-					oldRecord.rawHandleIndex = UINT32_MAX;
-					oldRecord.rawHandleVersion = 0;
-					oldRecord.status = AssetStatus::eUnloaded;
-				}
-
-				std::filesystem::path objPath = assetFilePath.replace_filename(data.AssetData.obj);
-				std::vector<StaticVertex> vertexData;
-				std::vector<uint32_t>indexData;
-
-				LoadObjToEngine(objPath.string().c_str(), vertexData, indexData);
-
-				Get().LoadToMesh(handle, std::move(vertexData), std::move(indexData));
-			}
+			static void Load(const Core::Handle<Mesh> handle, const Core::AssetID id, const uint32_t gen, const uint32_t vectorKey, std::filesystem::path path, std::string name = "");
 
 			static void Unload(const Core::Handle<Mesh> handle) {
-				if (!Get().m_Meshes.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to Unload is invalid, skipping call.");
-					return;
-				}
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Handle passed to Unload is invalid.");
+				CORI_CORE_ASSERT(handle != Get().m_PlaceholderMesh, "Placeholder mesh handle was passed, can't unload it.")
 
-				auto& record = Core::AssetManager2::GetAssetRecord(GetAssetID(handle));
-				record.status = AssetStatus::eUnloaded;
-				record.rawHandleIndex = UINT32_MAX;
-				record.rawHandleVersion = 0;
-
-				Get().DestroyMesh(handle);
-				Get().FreeHandle(handle);
-			}
-
-			static bool ChangeDeletionPolicy(const Core::Handle<Mesh> handle, const Core::AssetDeletionPolicy newPolicy) {
-				if (!Get().m_Meshes.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to ChangeDeletionPolicy is invalid, skipping call.");
-					return false;
-				}
-
-				auto& meta = Get().m_MeshMetadata[handle.GetIndex()];
-				if (meta.deletionPolicy == newPolicy) {
-					return false;
-				}
-
-				if (meta.deletionPolicy == Core::AssetDeletionPolicy::eKeepAlive) {
-					auto refCount = Get().m_RefCounts[handle.GetIndex()];
-					if (refCount == 0) {
-						Unload(handle);
-						return true;
+				Core::AssetID id = Get().m_HandleAllocator.GetBoundAssetID(handle);
+				{
+					std::lock_guard lk(Core::AssetManager2::GetMutex());
+					auto& record = Core::AssetManager2::GetAssetRecord(id);
+					if (record.rawHandleIndex == handle.GetIndex() && record.rawHandleVersion == handle.GetVersion()) {
+						record.rawHandleIndex = UINT32_MAX;
+						record.rawHandleVersion = 0;
 					}
 				}
 
-				meta.deletionPolicy = newPolicy;
-				return false;
+				Get().m_HandleAllocator.Free(handle);
+
+				if (!Get().m_Meshes.IsIndexOccupied(handle.GetIndex())) {
+					return;
+				}
+
+				Get().DestroyMesh(handle);
+				Get().m_Meshes.RemoveAt(handle.GetIndex());
 			}
 
 			static Core::AssetID GetAssetID(const Core::Handle<Mesh> handle) {
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Handle passed to GetAssetID in VulkanMeshManager is invalid.");
-
-				return Get().m_MeshMetadata[handle.GetIndex()].assetID;
+				return Get().m_HandleAllocator.GetBoundAssetID(handle);
 			}
 
 			template<typename T> requires std::same_as<Mesh, T>
@@ -226,26 +286,29 @@ namespace Cori {
 				return Get().m_PlaceholderMesh;
 			}
 
+			static uint32_t BumpGeneration(const Core::Handle<Mesh> handle) {
+				return Get().m_HandleAllocator.BumpGeneration(handle);
+			}
+
+			static void BindAsset(const Core::Handle<Mesh> handle, const Core::AssetID id, const uint32_t vectorKey) {
+				Get().m_HandleAllocator.BindAsset(handle, id, vectorKey);
+			}
+
+
+			static bool TryAddRef(const Core::Handle<Mesh> handle) {
+				return Get().m_HandleAllocator.TryAddRef(handle);
+			}
+
 			static void AddRef(Core::Handle<Mesh> handle) {
-				if (!Get().m_Meshes.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to AddRef is invalid, skipping call.");
-					return;
-				}
-
-				Get().m_RefCounts[handle.GetIndex()]++;
-
+				Get().m_HandleAllocator.AddRef(handle);
 			}
 
 			static void RemoveRef(Core::Handle<Mesh> handle) {
-				if (!Get().m_Meshes.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to RemoveRef is invalid, skipping call.");
-					return;
-				}
+				Get().m_HandleAllocator.RemoveRef(handle);
+			}
 
-				auto count = --Get().m_RefCounts[handle.GetIndex()];
-				if (count == 0 && Get().m_MeshMetadata[handle.GetIndex()].deletionPolicy == Core::AssetDeletionPolicy::eRefCounted && handle != Get().m_PlaceholderMesh) {
-					Unload(handle);
-				}
+			static void QueueUnload(const Core::Handle<Mesh> handle) {
+				RenderThreadCommandQueue::Push([handle]{ Unload(handle); });
 			}
 
 			static void ProcessUpdates(vk::CommandBuffer cmb) {
@@ -255,18 +318,23 @@ namespace Cori {
 				for (auto& [ticket, inTransferAssets] : Get().m_MeshesInTransfer) {
 					if (currentTimelineValue >= ticket) {
 						for (auto& inTransferMesh : inTransferAssets) {
-							if (!Get().m_Meshes.IsHandleValid(inTransferMesh.mesh)) {
-								DeletionQueue::PushVirtualAlloc(inTransferMesh.vertexAllocation, inTransferMesh.vertexBlock);
+							if (!IsHandleValid(inTransferMesh.mesh)) {
+								DeletionQueue::PushVirtualAlloc(inTransferMesh.vertexAllocation, inTransferMesh.vertexStorage->m_Block, inTransferMesh.vertexStorage->m_Mutex);
 								DeletionQueue::PushVirtualAlloc(inTransferMesh.indexAllocation, Get().m_IndexBufferBlock);
+								inTransferMesh.vertexStorage->RemoveStrongRef();
+								inTransferMesh.vertexStorage->RemoveWeakRef();
 								continue;
 							}
 
-							auto& meta = Get().m_MeshMetadata[inTransferMesh.mesh.GetIndex()];
-							if (meta.dataVersion != inTransferMesh.dataVersion) {
-								DeletionQueue::PushVirtualAlloc(inTransferMesh.vertexAllocation, inTransferMesh.vertexBlock);
+							if (Get().m_HandleAllocator.GetGeneration(inTransferMesh.mesh) != inTransferMesh.loadGen) {
+								DeletionQueue::PushVirtualAlloc(inTransferMesh.vertexAllocation, inTransferMesh.vertexStorage->m_Block, inTransferMesh.vertexStorage->m_Mutex);
 								DeletionQueue::PushVirtualAlloc(inTransferMesh.indexAllocation, Get().m_IndexBufferBlock);
+								inTransferMesh.vertexStorage->RemoveStrongRef();
+								inTransferMesh.vertexStorage->RemoveWeakRef();
 								continue;
 							}
+
+							inTransferMesh.vertexStorage->RemoveStrongRef();
 
 							auto& meshData = Get().m_Meshes[inTransferMesh.mesh];
 							meshData.indexCount = inTransferMesh.indexCount;
@@ -296,8 +364,10 @@ namespace Cori {
 								.size = inTransferMesh.indexCount * sizeof(uint32_t)
 							});
 
+
+							auto& meta = Get().m_MeshMetadata[inTransferMesh.mesh.GetIndex()];
 							meta.loaded = true;
-							Core::AssetManager2::GetAssetRecord(GetAssetID(inTransferMesh.mesh)).status = AssetStatus::eLoaded;
+							SetAssetStatus(inTransferMesh.mesh, AssetStatus::eLoaded);
 						}
 
 						inTransferAssets.clear();
@@ -315,15 +385,28 @@ namespace Cori {
 
 				while (!Get().m_QueuedUploads.empty()) {
 					auto& upload = Get().m_QueuedUploads.front();
-					if (!Get().m_Meshes.IsHandleValid(upload.mesh)) {
+					if (!IsHandleValid(upload.mesh)) {
+						{
+							std::lock_guard lk(*upload.vertexStorage->m_Mutex);
+							upload.vertexStorage->m_Block.free(upload.vertexAlloc);
+						}
+						Get().m_IndexBufferBlock.free(upload.indexAlloc);
+						upload.vertexStorage->RemoveStrongRef();
+						upload.vertexStorage->RemoveWeakRef();
 						Get().m_QueuedUploads.pop();
 						continue;
 					}
 
-					auto& meta = Get().m_MeshMetadata[upload.mesh.GetIndex()];
-
-					if (upload.dataVersion != meta.dataVersion) {
+					if (upload.loadGen != Get().m_HandleAllocator.GetGeneration(upload.mesh)) {
+						{
+							std::lock_guard lk(*upload.vertexStorage->m_Mutex);
+							upload.vertexStorage->m_Block.free(upload.vertexAlloc);
+						}
+						Get().m_IndexBufferBlock.free(upload.indexAlloc);
+						upload.vertexStorage->RemoveStrongRef();
+						upload.vertexStorage->RemoveWeakRef();
 						Get().m_QueuedUploads.pop();
+						continue;
 					}
 
 					std::array<VulkanStreamingLine::GenericUpload, 2> requests;
@@ -343,22 +426,24 @@ namespace Cori {
 						.data = std::span<Byte>(reinterpret_cast<Byte*>(upload.indexData.data()), upload.indexData.size() * sizeof(uint32_t))
 					};
 
+					auto& meta = Get().m_MeshMetadata[upload.mesh.GetIndex()];
 					auto result = VulkanStreamingLine::SubmitUploads(requests);
 
 					if (result) {
 						Get().FindInTransferSlot(result.value()).emplace_back(MeshInTransfer{
 							.mesh = upload.mesh,
-							.vertexStorageBuffer = upload.vertexStorageBuffer,
-							.vertexAllocation = meta.vertexAllocation,
-							.vertexBlock = meta.vertexBlock,
-							.indexAllocation = meta.indexAllocation,
+							.vertexStorageBuffer = upload.vertexStorage->m_Buffer.m_Buffer,
+							.vertexAllocation = upload.vertexAlloc,
+							.vertexStorage = upload.vertexStorage,
+							.indexAllocation = upload.indexAlloc,
 							.indexCount = static_cast<uint32_t>(upload.indexData.size()),
 							.indexOffset = static_cast<uint32_t>(upload.indexUpload.range.offset / sizeof(uint32_t)),
 							.vertexByteSize = vertexDataSize,
 							.vertexByteOffset = static_cast<uint32_t>(upload.vertexUpload.range.offset),
-							.dataVersion = upload.dataVersion,
+							.loadGen = upload.loadGen,
 						});
-						Core::AssetManager2::GetAssetRecord(GetAssetID(upload.mesh)).status = AssetStatus::eLoaded;
+
+						SetAssetStatus(upload.mesh, AssetStatus::eStreaming);
 						Get().m_QueuedUploads.pop();
 					} else {
 						break;
@@ -377,15 +462,19 @@ namespace Cori {
 			}
 
 			static bool IsHandleValid(const Core::Handle<Mesh> handle) {
-				return Get().m_Meshes.IsHandleValid(handle);
+				return Get().m_HandleAllocator.IsHandleValid(handle);
+			}
+
+			static void SetAssetStatus(const Core::Handle<Mesh> handle, const AssetStatus newStatus) {
+				Get().m_HandleAllocator.SetAssetStatus(handle, newStatus);
 			}
 
 			~VulkanMeshManager() {
 				DeletionQueue::PushVirtualBlock(m_IndexBufferBlock);
 
 				for (auto& vertexStorage : m_VertexStorages) {
-					DeletionQueue::PushBuffer(vertexStorage.buffer);
-					DeletionQueue::PushVirtualBlock(vertexStorage.block);
+					DeletionQueue::PushBuffer(vertexStorage.m_Buffer);
+					DeletionQueue::PushVirtualBlock(vertexStorage.m_Block);
 				}
 
 				DeletionQueue::PushBuffer(m_IndexBuffer);
@@ -430,9 +519,9 @@ namespace Cori {
 
 				m_Meshes.Reserve(512);
 				m_MeshMetadata.resize(512);
-				m_RefCounts.resize(512);
 
-				m_PlaceholderMesh = AllocateHandle();
+				m_PlaceholderMesh = AllocateHandle<Mesh>();
+				m_HandleAllocator.AddRef(m_PlaceholderMesh);
 
 				std::vector<StaticVertex> placeholderVertexData{
 					// +Y
@@ -481,27 +570,28 @@ namespace Cori {
 					20, 21, 22, 20, 22, 23 // -Z
 				};
 
-				LoadToMesh<StaticVertex, false>(m_PlaceholderMesh, std::move(placeholderVertexData), std::move(placeholderIndexData));
+				m_Meshes.EmplaceAt(m_PlaceholderMesh.GetIndex());
+
+				uint32_t indexCount = placeholderIndexData.size();
+				auto [success, indexOffset, ticket] = LoadToMesh<StaticVertex>(m_PlaceholderMesh, std::move(placeholderVertexData), std::move(placeholderIndexData), 0);
+				CORI_CORE_ASSERT(success, "Failed to load placeholder mesh.");
+				if (!ticket) {
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "The load of placeholder was rejected by the streaming like due to backpressure, it was queued and will be loaded a bit later. AssignPlaceholder calls will assign an empty mesh in that window.");
+				} else {
+					VulkanEngine::AddWaitTimelineSemaphore(VulkanStreamingLine::GetTimelineSemaphoreHandle(), ticket.value(), vk::PipelineStageFlagBits::eAllCommands);
+					auto& placeholder = m_Meshes[m_PlaceholderMesh];
+					placeholder.indexCount = indexCount;
+					placeholder.firstIndex = indexOffset;
+				}
 			}
 
-			[[nodiscard]] Core::Handle<Mesh> AllocateHandle() {
-				auto handle = m_Meshes.Emplace();
-				if (handle.GetIndex() >= m_MeshMetadata.size()) {
-					m_MeshMetadata.resize(m_MeshMetadata.size() * 1.5f);
-				}
-
-				if (handle.GetIndex() >= m_RefCounts.size()) {
-					m_RefCounts.resize(m_RefCounts.size() * 1.5f);
-				}
-
-				return handle;
+			template<typename T> requires std::same_as<Mesh, T>
+			[[nodiscard]] static Core::Handle<Mesh> AllocateHandle() {
+				return Get().m_HandleAllocator.Allocate();
 			}
 
 			void AssignPlaceholder(const Core::Handle<Mesh> handle) {
-				if (!m_Meshes.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to AssignPlaceholderMesh is invalid, skipping call.");
-					return;
-				}
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle.");
 
 				auto placeholderData = std::as_const(m_Meshes)[m_PlaceholderMesh];
 				placeholderData.version = handle.GetVersion();
@@ -510,58 +600,26 @@ namespace Cori {
 				m_MeshMetadata[handle.GetIndex()].placeholderAssigned = true;
 			}
 
-			void FreeHandle(const Core::Handle<Mesh> handle) {
-				if (!m_Meshes.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to FreeHandle is invalid, skipping call.");
-					return;
-				}
-
-				if (handle == m_PlaceholderMesh) {
-					return;
-				}
-
-				m_MeshMetadata[handle.GetIndex()] = {};
-				m_Meshes[handle] = Mesh{};
-				m_RefCounts[handle.GetIndex()] = 0;
-				m_Meshes.Remove(handle);
-			}
-
-			template<typename VertexT = StaticVertex, bool UpdateAssetRecord = true> requires std::same_as<VertexT, StaticVertex>
-			void LoadToMesh(const Core::Handle<Mesh> handle, std::vector<VertexT>&& vertices, std::vector<uint32_t>&& indices) {
+			template<typename VertexT = StaticVertex> requires std::same_as<VertexT, StaticVertex>
+			std::tuple<bool, vk::DeviceSize, std::optional<uint64_t>> LoadToMesh(const Core::Handle<Mesh> handle, std::vector<VertexT>&& vertices, std::vector<uint32_t>&& indices, const uint32_t loadGen, const std::optional<CompleteVertexAllocation>& completeVertexAlloc = std::nullopt) {
 				constexpr VertexType vertexType = []{
 					if constexpr (std::is_same_v<VertexT, StaticVertex>) {
 						return VertexType::eStatic;
 					}
 				}();
 
-				if (!m_Meshes.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to LoadToMesh is invalid, skipping call.");
-					return;
-				}
-
-				Core::AssetRecord* record = nullptr;
-
-				if constexpr (UpdateAssetRecord) {
-					record = &Core::AssetManager2::GetAssetRecord(GetAssetID(handle));
-				}
-
-				if constexpr (UpdateAssetRecord) {
-					if (record->status != AssetStatus::eUnloaded) {
-						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to LoadToMesh is pointing to an already loaded mesh, skipping call.");
-						return;
-					}
-				}
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle.");
 
 				vma::VirtualAllocationCreateInfo indicesAllocInfo {
 					.size = indices.size() * sizeof(uint32_t),
 					.alignment = alignof(uint32_t),
-					.flags = vma::VirtualAllocationCreateFlagBits::eStrategyMinMemory
+					.flags = s_IndexAllocFlags
 				};
 
 				vma::VirtualAllocationCreateInfo verticesAllocInfo {
 					.size = vertices.size() * sizeof(VertexT),
 					.alignment = alignof(VertexT),
-					.flags = vma::VirtualAllocationCreateFlagBits::eStrategyMinMemory
+					.flags = s_VertexAllocFlags
 				};
 
 				vk::DeviceSize indexOffset;
@@ -572,57 +630,23 @@ namespace Cori {
 				vma::VirtualAllocation vertexAlloc;
 				VertexStorage* vertexStorage = nullptr;
 
-				for (auto& storage : m_VertexStorages) {
-					auto [result_, alloc] = storage.block.virtualAllocate(verticesAllocInfo, vertexOffset);
-					if (result_ == vk::Result::eSuccess) {
-						vertexAlloc = alloc;
-						vertexStorage = &storage;
-						break;
-					}
-				}
+				if (!completeVertexAlloc) {
+					vertexStorage = AllocateNewVertexStorage();
+					vertexStorage->DiscoverBoth();
 
-				if (!vertexStorage) {
-					auto& sharingSettings = VulkanEngine::GetBufferSharingSettings(BUFFER_USAGE);
-					vk::BufferCreateInfo vkBufferInfo{
-						.size = VERTEX_STORAGE_SIZE,
-						.usage = vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eStorageBuffer,
-						.sharingMode = sharingSettings.first,
-						.queueFamilyIndexCount = static_cast<uint32_t>(sharingSettings.second.size()),
-						.pQueueFamilyIndices = sharingSettings.second.data()
-					};
-
-					vma::AllocationCreateInfo bufferAllocInfo{
-						.flags = vma::AllocationCreateFlagBits::eDedicatedMemory,
-						.usage = vma::MemoryUsage::eAuto
-					};
-
-					VulkanBuffer::CreateInfo createInfo {
-						.bufferCreateInfo = &vkBufferInfo,
-						.allocationCreateInfo = &bufferAllocInfo
-					};
-
-					#ifdef DEBUG_BUILD
-					std::string name = std::format("Mesh Manager vertex storage buffer {}", m_VertexStorageBufferCounter++);
-					createInfo.name = name.c_str();
-					#endif
-
-					vma::VirtualBlockCreateInfo vertexBlockCreateInfo{
-						.size = VERTEX_STORAGE_SIZE
-					};
-
-					auto [result1, vertexBlock] = vma::createVirtualBlock(vertexBlockCreateInfo);
-					CORI_CORE_ASSERT(result1 == vk::Result::eSuccess, "Failed to create vma vertex storage virtual block. Error: {}", vk::to_string(result1));
-
-					auto& storage = m_VertexStorages.emplace_back(VulkanBuffer::Create(createInfo), vertexBlock);
-					vertexStorage = &storage;
-
-					auto [result2, alloc] = storage.block.virtualAllocate(verticesAllocInfo, vertexOffset);
+					std::lock_guard lk(*vertexStorage->m_Mutex);
+					auto [result2, alloc] = vertexStorage->m_Block.virtualAllocate(verticesAllocInfo, vertexOffset);
 					CORI_CORE_ASSERT(result2 == vk::Result::eSuccess, "VulkanMeshManager failed to allocate memory for new vertices in a newly created vertex storage, error: {}", vk::to_string(result2));
 					vertexAlloc = alloc;
+				} else {
+					const auto& cva = completeVertexAlloc.value();
+					vertexOffset = cva.offset;
+					vertexAlloc = cva.allocation;
+					vertexStorage = cva.storage;
 				}
 
 				VulkanStreamingLine::BufferUpload vertexUpload{
-					.resource = vertexStorage->buffer,
+					.resource = vertexStorage->m_Buffer,
 					.range = {.offset = vertexOffset, .alignment = alignof(VertexT) },
 					.srcPipelineStages = vk::PipelineStageFlagBits2::eTopOfPipe,
 					.srcAccessFlags = vk::AccessFlagBits2::eNone
@@ -630,7 +654,7 @@ namespace Cori {
 
 				VulkanStreamingLine::BufferUpload indexUpload{
 					.resource = m_IndexBuffer,
-					.range = {.offset = indexOffset, .alignment = alignof(VertexT) },
+					.range = {.offset = indexOffset, .alignment = alignof(uint32_t) },
 					.srcPipelineStages = vk::PipelineStageFlagBits2::eTopOfPipe,
 					.srcAccessFlags = vk::AccessFlagBits2::eNone
 				};
@@ -653,7 +677,7 @@ namespace Cori {
 					Mesh mesh{
 						.indexCount = 0,
 						.firstIndex = 0,
-						.firstVertexAddress = vertexStorage->buffer.GetBDA() + vertexOffset,
+						.firstVertexAddress = vertexStorage->m_Buffer.GetBDA() + vertexOffset,
 						.vertexType = std::to_underlying(vertexType),
 						.version = handle.GetVersion()
 					};
@@ -663,76 +687,113 @@ namespace Cori {
 					auto& meta = m_MeshMetadata[handle.GetIndex()];
 
 					meta.vertexAllocation = vertexAlloc;
-					meta.vertexBlock = vertexStorage->block;
+					meta.vertexStorage = vertexStorage;
 					meta.indexAllocation = indexAlloc;
 
-					if constexpr (UpdateAssetRecord) {
-						record->status = AssetStatus::eLoading;
-					}
+					SetAssetStatus(handle, AssetStatus::eStreaming);
 
 					FindInTransferSlot(streamingResult.value()).emplace_back(MeshInTransfer{
-							.mesh = handle,
-							.vertexStorageBuffer = vertexStorage->buffer.m_Buffer,
-							.vertexAllocation = meta.vertexAllocation,
-							.vertexBlock = meta.vertexBlock,
-							.indexAllocation = meta.indexAllocation,
-							.indexCount = static_cast<uint32_t>(indices.size()),
-							.indexOffset = static_cast<uint32_t>(indexOffset / sizeof(uint32_t)),
-							.vertexByteSize = static_cast<uint32_t>(vertices.size() * sizeof(VertexT)),
-							.vertexByteOffset =  static_cast<uint32_t>(vertexOffset),
-							.dataVersion = meta.dataVersion
-						});
+						.mesh = handle,
+						.vertexStorageBuffer = vertexStorage->m_Buffer.m_Buffer,
+						.vertexAllocation = meta.vertexAllocation,
+						.vertexStorage = meta.vertexStorage,
+						.indexAllocation = meta.indexAllocation,
+						.indexCount = static_cast<uint32_t>(indices.size()),
+						.indexOffset = static_cast<uint32_t>(indexOffset / sizeof(uint32_t)),
+						.vertexByteSize = static_cast<uint32_t>(vertices.size() * sizeof(VertexT)),
+						.vertexByteOffset =  static_cast<uint32_t>(vertexOffset),
+						.loadGen = loadGen
+					});
 
-					return;
+					return { true, indexOffset, streamingResult.value() };
 				}
 
 				if (streamingResult.error() == ErrorCode::eInvalidData) {
-					vertexStorage->block.free(vertexAlloc);
+					{
+						std::lock_guard lk(*vertexStorage->m_Mutex);
+						vertexStorage->m_Block.free(vertexAlloc);
+					}
+					vertexStorage->RemoveStrongRef();
+					vertexStorage->RemoveWeakRef();
 					m_IndexBufferBlock.free(indexAlloc);
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "VulkanStreamingLine returned with error code eInvalidData during CreateMesh call, using placeholder.");
 
-					auto placeholderData = std::as_const(m_Meshes)[m_PlaceholderMesh];
-					placeholderData.version = handle.GetVersion();
-					m_Meshes[handle] = placeholderData;
+					AssignPlaceholder(handle);
 
-					auto& meta = m_MeshMetadata[handle.GetIndex()];
-					meta.placeholderAssigned = true;
+					SetAssetStatus(handle, AssetStatus::eLoadFailed);
 
-					if constexpr (UpdateAssetRecord) {
-						record->status = AssetStatus::eLoadFailed;
-					}
-
-					return;
+					return { false, indexOffset, std::nullopt };
 				}
 
-				std::vector<Byte> verticesBytes(vertices.size() * sizeof(VertexT));
-				memcpy(verticesBytes.data(), vertices.data(), vertices.size() * sizeof(VertexT));
+				Mesh mesh{
+					.indexCount = 0,
+					.firstIndex = 0,
+					.firstVertexAddress = vertexStorage->m_Buffer.GetBDA() + vertexOffset,
+					.vertexType = std::to_underlying(vertexType),
+					.version = handle.GetVersion()
+				};
 
-				auto& meshData = m_Meshes[handle];
-				meshData.indexCount = 0;
-				meshData.firstIndex = 0;
-				meshData.firstVertexAddress = vertexStorage->buffer.GetBDA() + vertexOffset;
-				meshData.vertexType = std::to_underlying(vertexType);
+				m_Meshes[handle] = mesh;
 
 				auto& meta = m_MeshMetadata[handle.GetIndex()];
 
 				meta.vertexAllocation = vertexAlloc;
-				meta.vertexBlock = vertexStorage->block;
+				meta.vertexStorage = vertexStorage;
 				meta.indexAllocation = indexAlloc;
 
-				if constexpr (UpdateAssetRecord) {
-					record->status = AssetStatus::eLoadQueued;
-				}
+				SetAssetStatus(handle, AssetStatus::eStreamingQueued);
 
-				m_QueuedUploads.emplace(vertexUpload, indexUpload, std::move(vertices), std::move(indices), handle, vertexStorage->buffer.m_Buffer, meta.dataVersion);
+				m_QueuedUploads.emplace(QueuedUpload{
+					.vertexUpload = vertexUpload,
+					.indexUpload = indexUpload,
+					.vertexData = std::move(vertices),
+					.indexData = std::move(indices),
+					.mesh = handle,
+					.vertexStorage = vertexStorage,
+					.indexAlloc = indexAlloc,
+					.vertexAlloc = vertexAlloc,
+					.loadGen = loadGen
+				});
+				return { true, indexOffset, std::nullopt };
+			}
+
+			VertexStorage* AllocateNewVertexStorage() {
+				auto& sharingSettings = VulkanEngine::GetBufferSharingSettings(BUFFER_USAGE);
+				vk::BufferCreateInfo vkBufferInfo{
+					.size = VERTEX_STORAGE_SIZE,
+					.usage = vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eStorageBuffer,
+					.sharingMode = sharingSettings.first,
+					.queueFamilyIndexCount = static_cast<uint32_t>(sharingSettings.second.size()),
+					.pQueueFamilyIndices = sharingSettings.second.data()
+				};
+
+				vma::AllocationCreateInfo bufferAllocInfo{
+					.flags = vma::AllocationCreateFlagBits::eDedicatedMemory,
+					.usage = vma::MemoryUsage::eAuto
+				};
+
+				VulkanBuffer::CreateInfo createInfo {
+					.bufferCreateInfo = &vkBufferInfo,
+					.allocationCreateInfo = &bufferAllocInfo
+				};
+
+				#ifdef DEBUG_BUILD
+				std::string name = std::format("Mesh Manager vertex storage buffer {}", m_VertexStorageBufferCounter.fetch_add(1, std::memory_order_relaxed));
+				createInfo.name = name.c_str();
+				#endif
+
+				vma::VirtualBlockCreateInfo vertexBlockCreateInfo{
+					.size = VERTEX_STORAGE_SIZE
+				};
+
+				auto [result1, vertexBlock] = vma::createVirtualBlock(vertexBlockCreateInfo);
+				CORI_CORE_ASSERT(result1 == vk::Result::eSuccess, "Failed to create vma vertex storage virtual block. Error: {}", vk::to_string(result1));
+
+				auto storage = m_VertexStorages.emplace_back(VulkanBuffer::Create(createInfo), vertexBlock);
+				return &*storage;
 			}
 
 			void DestroyMesh(Core::Handle<Mesh> handle) {
-				if (!m_Meshes.IsHandleValid(handle)) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "Handle passed to DestroyMesh is invalid, skipping call.");
-					return;
-				}
-
 				if (handle == m_PlaceholderMesh) {
 					return;
 				}
@@ -740,13 +801,13 @@ namespace Cori {
 				auto& meta = m_MeshMetadata[handle.GetIndex()];
 
 				if (!meta.placeholderAssigned && meta.loaded) {
-					DeletionQueue::PushVirtualAlloc(meta.vertexAllocation, meta.vertexBlock);
+					DeletionQueue::PushVirtualAlloc(meta.vertexAllocation, meta.vertexStorage->m_Block, meta.vertexStorage->m_Mutex);
 					DeletionQueue::PushVirtualAlloc(meta.indexAllocation, Get().m_IndexBufferBlock);
+					meta.vertexStorage->RemoveWeakRef();
 				}
 
 				meta.loaded = false;
 				meta.placeholderAssigned = false;
-				meta.dataVersion++;
 
 				auto& meshData = m_Meshes[handle];
 				meshData.indexCount = 0;
@@ -774,6 +835,8 @@ namespace Cori {
 					bestPick->ticket = value;
 					return bestPick->meshesInTransfer;
 				}
+
+				CORI_CORE_ASSERT(free, "Failed to find any free in transfer slot for a mesh.");
 
 				free->ticket = value;
 				return free->meshesInTransfer;
@@ -976,27 +1039,32 @@ namespace Cori {
 				return true;
 			}
 
-			std::vector<uint32_t> m_RefCounts;
+			Core::AssetHandleAllocator<Mesh> m_HandleAllocator;
 
-			VulkanFlatSlotMap<Mesh> m_Meshes{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Mesh assets data buffer" };
+			VulkanFlatSlotMap<Mesh, 0, false> m_Meshes{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Mesh assets data buffer" };
 
 			std::vector<MeshMetadata> m_MeshMetadata;
 
-			std::vector<VertexStorage> m_VertexStorages;
+			// need to add holes tracking to this!
+			tbb::concurrent_vector<VertexStorage> m_VertexStorages;
 
 			vma::VirtualBlock m_IndexBufferBlock;
 			VulkanBuffer m_IndexBuffer;
 
-			std::array<InTransferSlot, TRANSFERS_IN_FLIGHT + 1> m_MeshesInTransfer;
+			std::array<InTransferSlot, TRANSFERS_IN_FLIGHT + 2> m_MeshesInTransfer;
 			std::queue<QueuedUpload> m_QueuedUploads;
 
 			Core::Handle<Mesh> m_PlaceholderMesh;
 
 			std::vector<vk::BufferMemoryBarrier2> m_BarrierCache;
 
-			uint32_t m_VertexStorageBufferCounter{ 0 }; //used for giving debug names
+			std::atomic<uint32_t> m_VertexStorageBufferCounter{ 0 }; //used for giving debug names
 
 			static std::unique_ptr<VulkanMeshManager> s_Instance;
+
+			static constexpr vma::VirtualAllocationCreateFlags s_IndexAllocFlags{ vma::VirtualAllocationCreateFlagBits::eStrategyMinMemory };
+
+			static constexpr vma::VirtualAllocationCreateFlags s_VertexAllocFlags{ vma::VirtualAllocationCreateFlagBits::eStrategyMinMemory };
 
 			static constexpr QueueUsageFlags BUFFER_USAGE{ QueueUsageFlagBits::eGraphics | QueueUsageFlagBits::eTransfer };
 

@@ -230,6 +230,7 @@ namespace Cori {
 					m_Data[index].valid = true;
 				}
 
+				m_OccupancyCounter++;
 				if constexpr (ENABLE_VERSIONING) {
 					return Handle{ index, m_Versions[index] };
 				}
@@ -240,25 +241,33 @@ namespace Cori {
 			template<typename... Args>
 			bool EmplaceAt(const SizeT index, Args&&... args) {
 				static_assert(ENABLE_VERSIONING == false, "Index version of EmplaceAt should only be used with versioning turned off.");
-				CORI_CORE_ASSERT(index <= RawSize(), "FlatSlotMap::EmplaceAt index '{}' violates the index allocation sequence.", index);
+
+				if (index > RawSize()) {
+					if (index >= Capacity()) {
+						SizeT newSize = m_Data.capacity() == 0 ? 4 : m_Data.capacity() * 2.0f;
+						m_Data.reserve(newSize);
+						m_SlotStates.reserve(newSize);
+					}
+
+					m_Data.resize(index);
+					m_SlotStates.resize(index);
+				}
 
 				if (index == RawSize()) {
 					m_Data.emplace_back(std::forward<Args>(args)...);
 					m_SlotStates.push_back(true);
 				} else {
-					if (m_SlotStates[index]) {
-						return false;
-					}
+					CORI_CORE_ASSERT(!m_SlotStates[index], "Double emplace at the same index {}", index);
+
 					new (&m_Data[index]) T(std::forward<Args>(args)...);
 					m_SlotStates[index] = true;
-
-					//m_Data[index] = std::move(T(std::forward<Args>(args)...));
 				}
 
 				if constexpr (requires { m_Data[index].valid = bool{}; }) {
 					m_Data[index].valid = true;
 				}
 
+				m_OccupancyCounter++;
 				return true;
 			}
 
@@ -276,6 +285,7 @@ namespace Cori {
 
 				m_SlotStates[index] = false;
 				m_Holes.emplace_back(index);
+				m_OccupancyCounter--;
 			}
 
 			void RemoveAt(const SizeT index) {
@@ -291,6 +301,7 @@ namespace Cori {
 				std::memset(&obj, 0, sizeof(T));
 
 				m_SlotStates[index] = false;
+				m_OccupancyCounter--;
 			}
 
 			[[nodiscard]] std::optional<std::reference_wrapper<T>> TryGet(const Handle handle) {
@@ -418,7 +429,10 @@ namespace Cori {
 			}
 
 			[[nodiscard]] bool IsIndexOccupied(const SizeT index) const {
-				CORI_CORE_ASSERT(index < RawSize(), "FlatSlotMap::IsIndexOccupied index out of bounds.");
+				if (index >= RawSize()) {
+					return false;
+				}
+
 				return m_SlotStates[index];
 			}
 
@@ -435,6 +449,7 @@ namespace Cori {
 				}
 				m_Holes.clear();
 				m_SlotStates.clear();
+				m_OccupancyCounter = 0;
 			}
 
 		protected:
@@ -443,6 +458,7 @@ namespace Cori {
 
 			std::vector<T> m_Data{};
 			sul::dynamic_bitset<> m_SlotStates{};
+			SizeT m_OccupancyCounter{ 0 };
 		private:
 			std::deque<SizeT> m_Holes{};
 			std::conditional_t<ENABLE_VERSIONING, std::vector<uint32_t>, uint8_t> m_Versions{};

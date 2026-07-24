@@ -23,10 +23,21 @@ namespace Cori {
 				return VulkanEngine::GetLogicalDevice().getBufferAddress({ .buffer = m_Buffer });
 			}
 
+			[[nodiscard]] std::string_view GetName() {
+				#ifdef DEBUG_BUILD
+				return m_Name;
+				#else
+				return "Name unavailable in release build.";
+				#endif
+			}
+
 			vk::Buffer m_Buffer = nullptr;
 			vma::Allocation m_Allocation = nullptr;
 			size_t m_Size{ 0 };
-			std::string m_Name{"Unnamed Buffer"};
+		private:
+			#ifdef DEBUG_BUILD
+			std::string m_Name{ "Unnamed Buffer" };
+			#endif
 		};
 	}
 }

@@ -55,6 +55,7 @@ namespace Cori {
 
 							Get().DestroyTexture(handle_);
 							auto& texture = Get().m_TexturePool[handle_];
+							texture.placeholderAssigned = false;
 							texture.image = payload.m_Image;
 							texture.descriptorIndex = Get().m_FreeTextureDescriptorSlots.back();
 							Get().m_FreeTextureDescriptorSlots.pop_back();
@@ -68,10 +69,11 @@ namespace Cori {
 							bool success = Get().UpdateTexture(handle_, std::move(payload.m_PixelData), { 0, 0, 0 }, { texture.image.m_Extent3D.width, texture.image.m_Extent3D.height, texture.image.m_Extent3D.depth }, {vk::ImageAspectFlagBits::eColor, 0, 0, 1}, gen_);
 							if (success) {
 								Get().ChangeView(handle_, vk::ImageViewType::e2D, {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
+							} else {
+								Get().AssignPlaceholder(handle_);
 							}
 
 							payload.Release();
-							texture.placeholderAssigned = false;
 						});
 					}
 					else {
@@ -143,10 +145,11 @@ namespace Cori {
 					info.name = name.c_str();
 				}
 
-				WorkerPayload payload(VulkanImage::Create(info));
 
-				payload.m_PixelData.resize(pixelDatSize);
-				memcpy(payload.m_PixelData.data(), image->GetPixelData(), pixelDatSize);
+				std::vector<Byte> pixelData;
+				pixelData.resize(pixelDatSize);
+				memcpy(pixelData.data(), image->GetPixelData(), pixelDatSize);
+				WorkerPayload payload(VulkanImage::Create(info), std::move(pixelData));
 
 				FinalizeLoad(handle, gen, vectorKey, std::move(payload));
 			});

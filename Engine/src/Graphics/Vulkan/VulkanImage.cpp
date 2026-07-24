@@ -5,6 +5,8 @@ namespace Cori {
 	namespace Graphics {
 		VulkanImage VulkanImage::Create(const CreateInfo& info) {
 			VulkanImage image;
+			CORI_CORE_ASSERT(info.imageCreateInfo, "ImageCreateInfo that is null was passed to VulkanImage::Create, image name '{}'", info.name);
+			CORI_CORE_ASSERT(info.allocationCreateInfo, "AllocationCreateInfo that is null was passed to VulkanImage::Create, image name '{}'", info.name);
 			auto [result, value] = VulkanEngine::GetAllocator().createImage(*info.imageCreateInfo, *info.allocationCreateInfo);
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to create image '{}'. Error: {}", info.name, vk::to_string(result));
 

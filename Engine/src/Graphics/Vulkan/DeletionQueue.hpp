@@ -5,6 +5,12 @@
 namespace Cori {
 	namespace Graphics {
 		class DeletionQueue {
+			struct QueuedVirtualAlloc {
+				vma::VirtualAllocation alloc;
+				vma::VirtualBlock block;
+				std::optional<std::weak_ptr<std::mutex>> mutex;
+			};
+
 		public:
 			~DeletionQueue() {
 				FlushAll();
@@ -75,11 +81,11 @@ namespace Cori {
 				Get().m_ShaderObjectQueue[delay].push_back(object);
 			}
 
-			static void PushVirtualAlloc(vma::VirtualAllocation allocation, vma::VirtualBlock block) {
-				PushVirtualAlloc(allocation, block, s_DefaultDelay);
+			static void PushVirtualAlloc(vma::VirtualAllocation allocation, vma::VirtualBlock block, const std::optional<std::weak_ptr<std::mutex>>& mutex = std::nullopt) {
+				PushVirtualAlloc(allocation, block, s_DefaultDelay, mutex);
 			}
 
-			static void PushVirtualAlloc(vma::VirtualAllocation allocation, vma::VirtualBlock block, uint32_t delay) {
+			static void PushVirtualAlloc(vma::VirtualAllocation allocation, vma::VirtualBlock block, uint32_t delay, const std::optional<std::weak_ptr<std::mutex>>& mutex = std::nullopt) {
 				if (delay >= s_BucketCount) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushVirtualAlloc is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
 					delay = GetMaxDelay();
@@ -87,7 +93,7 @@ namespace Cori {
 
 				delay = (delay + Get().m_Counter) % s_BucketCount;
 
-				Get().m_VirtAllocQueue[delay].emplace_back(allocation, block);
+				Get().m_VirtAllocQueue[delay].emplace_back(allocation, block, mutex);
 			}
 
 			static void PushVirtualBlock(vma::VirtualBlock block) {
@@ -135,7 +141,7 @@ namespace Cori {
 			std::array<std::vector<VulkanBuffer>, s_BucketCount> m_BufferQueue;
 			std::array<std::vector<VulkanImage>, s_BucketCount> m_ImageQueue;
 			std::array<std::vector<vk::ShaderEXT>, s_BucketCount> m_ShaderObjectQueue;
-			std::array<std::vector<std::pair<vma::VirtualAllocation, vma::VirtualBlock>>, s_BucketCount> m_VirtAllocQueue;
+			std::array<std::vector<QueuedVirtualAlloc>, s_BucketCount> m_VirtAllocQueue;
 			std::array<std::vector<vma::VirtualBlock>, s_BucketCount> m_VirtBlockQueue;
 
 

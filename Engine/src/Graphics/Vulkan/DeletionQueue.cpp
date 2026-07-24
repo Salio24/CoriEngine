@@ -37,7 +37,16 @@ namespace Cori {
 
 			Get().m_ImageQueue[Get().m_Counter].clear();
 
-			for (auto [alloc, block] : Get().m_VirtAllocQueue[Get().m_Counter] | std::views::reverse) {
+			for (const auto& [alloc, block, mutex] : Get().m_VirtAllocQueue[Get().m_Counter] | std::views::reverse) {
+				if (mutex) {
+					auto locked = mutex->lock();
+					if (locked) {
+						std::lock_guard lk(*locked);
+						block.free(alloc);
+						continue;
+					}
+				}
+
 				block.free(alloc);
 			}
 
@@ -90,7 +99,16 @@ namespace Cori {
 
 				m_ShaderObjectQueue[i].clear();
 
-				for (auto [alloc, block] : m_VirtAllocQueue[i] | std::views::reverse) {
+				for (auto [alloc, block, mutex] : m_VirtAllocQueue[i] | std::views::reverse) {
+					if (mutex) {
+						auto locked = mutex->lock();
+						if (locked) {
+							std::lock_guard lk(*locked);
+							block.free(alloc);
+							continue;
+						}
+					}
+
 					block.free(alloc);
 				}
 

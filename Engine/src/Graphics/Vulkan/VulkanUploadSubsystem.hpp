@@ -870,7 +870,6 @@ namespace Cori {
 			using Reference = T&;
 			using ConstReference = const T&;
 
-			//TODO: range based variant
 			void InsertRange(const std::span<T>& data, uint64_t offset) {
 				if (offset + data.size() >= m_CPUShadow.capacity()) {
 					uint64_t newCap = std::max(m_CPUShadow.capacity() == 0 ? 4 : m_CPUShadow.capacity() * 2, m_CPUShadow.capacity() + data.size());
@@ -885,7 +884,6 @@ namespace Cori {
 				memcpy(reinterpret_cast<void*>(reinterpret_cast<uint64_t>(m_CPUShadow.data()) + offset), data.data(), data.size_bytes());
 			}
 
-			//TODO: range based variant
 			void AppendRange(const std::span<T>& data) {
 				uint64_t changeStart = m_CPUShadow.size();
 				if (changeStart + data.size() >= m_CPUShadow.capacity()) {
@@ -1172,7 +1170,6 @@ namespace Cori {
 				return m_GPUBuffers[frameIndex];
 			}
 
-		private:
 			void ReportChange(const uint64_t startOffset, const uint64_t size) {
 				uint32_t affectedSectorStart = std::floor(startOffset / SECTOR_SIZE);
 				uint32_t affectedSectorEnd = std::floor((startOffset + size - 1) / SECTOR_SIZE);
@@ -1195,6 +1192,7 @@ namespace Cori {
 
 				m_CPUShadow.resize(newSize);
 			}
+		private:
 
 			void ResizeBuffers(const uint64_t newSize) {
 				auto& sharingSettings = VulkanEngine::GetBufferSharingSettings(m_QueueUsageFlags);
@@ -1456,6 +1454,8 @@ namespace Cori {
 					m_Data[index].valid = true;
 				}
 
+				m_OccupancyCounter++;
+
 				if constexpr (ENABLE_VERSIONING) {
 					return Handle{ index, m_Versions[index] };
 				}
@@ -1466,25 +1466,35 @@ namespace Cori {
 			template<typename... Args>
 			bool EmplaceAt(const SizeT index, Args&&... args) {
 				static_assert(ENABLE_VERSIONING == false, "Index version of EmplaceAt should only be used with versioning turned off.");
-				CORI_CORE_ASSERT(index <= RawSize(), "VulkanFlatSlotMap::EmplaceAt index '{}' violates the index allocation sequence.", index);
+
+				// turned out i actually need pseudo sparse container capabilities here. Not idea as we construct all items inbetween the end and the index, but to fix that i need to use raw memory instead of a vector.
+				// but, regardless its not that common.
+				if (index > RawSize()) {
+					if (index >= Capacity()) {
+						SizeT newSize = m_Data.Capacity() == 0 ? 4 : m_Data.Capacity() * 2.0f;
+						m_Data.Reserve(newSize);
+						m_SlotStates.reserve(newSize);
+					}
+
+					m_Data.ResizeNonReporting(index);
+					m_SlotStates.resize(index);
+				}
 
 				if (index == RawSize()) {
 					m_Data.EmplaceBack(std::forward<Args>(args)...);
 					m_SlotStates.push_back(true);
 				} else {
-					if (m_SlotStates[index]) {
-						return false;
-					}
+					CORI_CORE_ASSERT(!m_SlotStates[index], "Double emplace at the same index {}", index);
+
 					new (&m_Data[index]) T(std::forward<Args>(args)...);
 					m_SlotStates[index] = true;
-
-					//m_Data[index] = std::move(T(std::forward<Args>(args)...));
 				}
 
 				if constexpr (requires { m_Data[index].valid = bool{}; }) {
 					m_Data[index].valid = true;
 				}
 
+				m_OccupancyCounter++;
 				return true;
 			}
 
@@ -1502,6 +1512,7 @@ namespace Cori {
 
 				m_SlotStates[index] = false;
 				m_Holes.emplace_back(index);
+				m_OccupancyCounter--;
 			}
 
 			void RemoveAt(const SizeT index) {
@@ -1517,6 +1528,7 @@ namespace Cori {
 				std::memset(&obj, 0, sizeof(T));
 
 				m_SlotStates[index] = false;
+				m_OccupancyCounter--;
 			}
 
 			[[nodiscard]] std::optional<Reference> TryGet(const Handle handle) {
@@ -1616,7 +1628,7 @@ namespace Cori {
 			}
 
 			[[nodiscard]] SizeT Size() const {
-				return m_Data.Size() - m_Holes.size();
+				return m_OccupancyCounter;
 			}
 
 			[[nodiscard]] SizeT RawSize() const {
@@ -1656,7 +1668,10 @@ namespace Cori {
 			}
 
 			[[nodiscard]] bool IsIndexOccupied(const SizeT index) const {
-				CORI_CORE_ASSERT(index < RawSize(), "VulkanFlatSlotMap::IsIndexOccupied index out of bounds.");
+				if (index >= RawSize()) {
+					return false;
+				}
+
 				return m_SlotStates[index];
 			}
 
@@ -1673,6 +1688,7 @@ namespace Cori {
 				}
 				m_Holes.clear();
 				m_SlotStates.clear();
+				m_OccupancyCounter = 0;
 			}
 
 		protected:
@@ -1681,6 +1697,7 @@ namespace Cori {
 
 			VulkanDynamicVector<T> m_Data{};
 			sul::dynamic_bitset<> m_SlotStates{};
+			SizeT m_OccupancyCounter{ 0 };
 		private:
 			std::deque<SizeT> m_Holes{};
 			std::conditional_t<ENABLE_VERSIONING, std::vector<uint32_t>, uint8_t> m_Versions{};

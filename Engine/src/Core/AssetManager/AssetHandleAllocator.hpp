@@ -33,10 +33,11 @@ namespace Cori {
 			void RemoveRef(const Handle<T> handle) {
 				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::RemoveRef called with an invalid handle");
 
-				uint32_t prev = m_RefCounts[handle.GetIndex()].fetch_sub(1, std::memory_order_acq_rel);
+				uint32_t prev = m_RefCounts[handle.GetIndex()].fetch_sub(1, std::memory_order_release);
 				if (prev != 1) {
 					return;
 				}
+				std::atomic_thread_fence(std::memory_order_acquire);
 
 				//const uint32_t n = m_ReservedCount.load(std::memory_order_acquire);
 				//for (uint32_t i = 0; i < n; i++) {
