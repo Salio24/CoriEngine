@@ -23,7 +23,7 @@ namespace Cori {
 				return VulkanEngine::GetLogicalDevice().getBufferAddress({ .buffer = m_Buffer });
 			}
 
-			[[nodiscard]] std::string_view GetName() {
+			[[nodiscard]] std::string_view GetName() const {
 				#ifdef DEBUG_BUILD
 				return m_Name;
 				#else

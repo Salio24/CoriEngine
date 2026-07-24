@@ -242,16 +242,17 @@ namespace Cori {
 			bool EmplaceAt(const SizeT index, Args&&... args) {
 				static_assert(ENABLE_VERSIONING == false, "Index version of EmplaceAt should only be used with versioning turned off.");
 
-				if (index > RawSize()) {
-					if (index >= Capacity()) {
-						SizeT newSize = m_Data.capacity() == 0 ? 4 : m_Data.capacity() * 2.0f;
-						m_Data.reserve(newSize);
-						m_SlotStates.reserve(newSize);
-					}
-
-					m_Data.resize(index);
-					m_SlotStates.resize(index);
-				}
+				//if (index > RawSize()) {
+				//	if (index >= Capacity()) {
+				//		SizeT newSize = m_Data.capacity() == 0 ? 4 : m_Data.capacity() * 2.0f;
+				//		m_Data.reserve(newSize);
+				//		m_SlotStates.reserve(newSize);
+				//	}
+				//
+				//	m_Data.resize(index);
+				//	m_SlotStates.resize(index);
+				//}
+				//i need true sparse map (((
 
 				if (index == RawSize()) {
 					m_Data.emplace_back(std::forward<Args>(args)...);
@@ -437,7 +438,7 @@ namespace Cori {
 			}
 
 			[[nodiscard]] Handle GetIndexHandle(const SizeT index) const {
-				static_assert(ENABLE_VERSIONING == false, "GetIndexHandle should only be used with versioning turned on.");
+				static_assert(ENABLE_VERSIONING == true, "GetIndexHandle should only be used with versioning turned on.");
 				CORI_CORE_ASSERT(IsIndexValid(index), "Invalid index passed to FlatSlotMap::GetIndexHandle.");
 				return { index, m_Versions[index] };
 			}

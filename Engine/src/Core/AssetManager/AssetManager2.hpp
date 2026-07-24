@@ -81,7 +81,9 @@ namespace Cori {
 		template<typename T> //temporary
 		struct AssetRef {
 			//make private later
+		//private:
 			AssetRef() = default;
+		//public:
 
 			explicit AssetRef(Handle<T> handle) {
 				CORI_CORE_ASSERT(T::Manager::IsHandleValid(handle), "Trying to construct AssetRef<{}> with an invalid handle, asserting.", CORI_CLEAN_TYPE_NAME(T));

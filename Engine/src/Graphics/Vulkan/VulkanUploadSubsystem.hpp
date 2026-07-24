@@ -1353,6 +1353,10 @@ namespace Cori {
 					return m_Map->GetIndexHandle(m_Index);
 				}
 
+				[[nodiscard]] SizeT GetIndex() const {
+					return m_Index;
+				}
+
 				MapType* m_Map;
 
 			protected:
@@ -1469,16 +1473,17 @@ namespace Cori {
 
 				// turned out i actually need pseudo sparse container capabilities here. Not idea as we construct all items inbetween the end and the index, but to fix that i need to use raw memory instead of a vector.
 				// but, regardless its not that common.
-				if (index > RawSize()) {
-					if (index >= Capacity()) {
-						SizeT newSize = m_Data.Capacity() == 0 ? 4 : m_Data.Capacity() * 2.0f;
-						m_Data.Reserve(newSize);
-						m_SlotStates.reserve(newSize);
-					}
-
-					m_Data.ResizeNonReporting(index);
-					m_SlotStates.resize(index);
-				}
+				//if (index > RawSize()) {
+				//	if (index >= Capacity()) {
+				//		SizeT newSize = m_Data.Capacity() == 0 ? 4 : m_Data.Capacity() * 2.0f;
+				//		m_Data.Reserve(newSize);
+				//		m_SlotStates.reserve(newSize);
+				//	}
+				//
+				//	m_Data.ResizeNonReporting(index);
+				//	m_SlotStates.resize(index);
+				//}
+				//i need true sparse map (((
 
 				if (index == RawSize()) {
 					m_Data.EmplaceBack(std::forward<Args>(args)...);
@@ -1676,7 +1681,7 @@ namespace Cori {
 			}
 
 			[[nodiscard]] Handle GetIndexHandle(const SizeT index) const {
-				static_assert(ENABLE_VERSIONING == false, "GetIndexHandle should only be used with versioning turned on.");
+				static_assert(ENABLE_VERSIONING == true, "GetIndexHandle should only be used with versioning turned on.");
 				CORI_CORE_ASSERT(IsIndexValid(index), "Invalid index passed to VulkanFlatSlotMap::GetIndexHandle.");
 				return { index, m_Versions[index] };
 			}

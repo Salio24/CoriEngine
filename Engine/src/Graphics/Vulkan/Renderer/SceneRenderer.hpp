@@ -740,7 +740,7 @@ namespace Cori {
 					m_SubBatchLookup.at(group.m_ShaderEffect).second.erase(mesh.GetHandle());
 				}
 
-				m_Batches.Remove(m_Batches.GetIndexHandle(batchID));
+				m_Batches.RemoveAt(batchID);
 			}
 
 			void DestroyGroup(const DrawGroupIndex groupID) {
@@ -748,7 +748,7 @@ namespace Cori {
 
 				m_SubBatchLookup.erase(group.m_ShaderEffect);
 
-				m_DrawGroups.Remove(m_DrawGroups.GetIndexHandle(groupID));
+				m_DrawGroups.RemoveAt(groupID);
 			}
 
 			Threading::ConcurrentHandleAllocator<RenderObject, 64> m_RenderObjectAllocator;

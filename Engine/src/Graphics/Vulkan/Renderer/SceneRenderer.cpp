@@ -29,7 +29,7 @@ namespace Cori {
 					}
 
 					auto [newGroup, newBatch] = renderer->FindAppropriateGroupAndBatch(newShaderEffect, std::move(mesh));
-					renderer->m_Objects[it.GetHandle()].m_OwnerBatch = newBatch;
+					renderer->m_Objects[it.GetIndex()].m_OwnerBatch = newBatch;
 					renderer->m_Batches[newBatch].IncrementObjectCounter();
 				}
 			}

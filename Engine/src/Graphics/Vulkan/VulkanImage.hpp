@@ -72,7 +72,7 @@ namespace Cori {
 				return reinterpret_cast<uint64_t>(static_cast<VkImage>(m_Image));
 			}
 
-			[[nodiscard]] std::string_view GetName() {
+			[[nodiscard]] std::string_view GetName() const {
 				#ifdef DEBUG_BUILD
 				return m_Name;
 				#else

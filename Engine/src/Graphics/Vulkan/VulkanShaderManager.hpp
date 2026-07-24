@@ -420,7 +420,6 @@ namespace Cori {
 
 				VulkanEngine::SetDebugName(object.m_VertFragPair[0], std::format("Vertex shader from Vertex Shader pair '{}'", shaderName));
 				VulkanEngine::SetDebugName(object.m_VertFragPair[1], std::format("Fragment shader from Vertex Shader pair '{}'", shaderName));
-
 			}
 
 			void DestroyShader(const Core::Handle<ComputeShader> handle) {
@@ -471,6 +470,7 @@ namespace Cori {
 				m_PlaceholderShaderPair = m_VertFragPairHandleAllocator.Allocate();
 				m_VertFragPairHandleAllocator.AddRef(m_PlaceholderShaderPair);
 
+				m_PairShaders.EmplaceAt(m_PlaceholderShaderPair.GetIndex());
 				CreateShaderPair(m_PlaceholderShaderPair, buffer.data(), buffer.size(), "vertMain", buffer.data(), buffer.size(), "fragMain", "Placeholder Vert+Frag Shader Pair");
 
 				CORI_CORE_ASSERT(m_PairShaders[m_PlaceholderShaderPair].m_VertFragPair[0] && m_PairShaders[m_PlaceholderShaderPair].m_VertFragPair[1], "Placeholder Vert+Frag shader pair creation failed.");

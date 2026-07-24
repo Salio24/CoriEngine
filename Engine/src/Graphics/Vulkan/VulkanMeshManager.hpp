@@ -438,12 +438,17 @@ namespace Cori {
 				return Get().m_Meshes.GetVulkanBuffer().GetBDA();
 			}
 
-			static bool IsHandleValid(const Core::Handle<Mesh> handle) {
-				return Get().m_HandleAllocator.IsHandleValid(handle);
+			[[nodiscard]] static bool IsHandleValid(const Core::Handle<Mesh> handle) {
+				return Get().IsHandleValidImpl(handle);
 			}
 
 			static void SetAssetStatus(const Core::Handle<Mesh> handle, const AssetStatus newStatus) {
-				Get().m_HandleAllocator.SetAssetStatus(handle, newStatus);
+				Get().SetAssetStatusImpl(handle, newStatus);
+			}
+
+			template<typename T> requires std::same_as<Mesh, T>
+			[[nodiscard]] static Core::Handle<Mesh> AllocateHandle() {
+				return Get().m_HandleAllocator.Allocate();
 			}
 
 			~VulkanMeshManager() {
@@ -461,6 +466,14 @@ namespace Cori {
 			static constexpr bool EnableAutoHotReload = true;
 
 		private:
+			void SetAssetStatusImpl(const Core::Handle<Mesh> handle, const AssetStatus newStatus) {
+				m_HandleAllocator.SetAssetStatus(handle, newStatus);
+			}
+
+			[[nodiscard]] bool IsHandleValidImpl(const Core::Handle<Mesh> handle) const {
+				return m_HandleAllocator.IsHandleValid(handle);
+			}
+
 			VulkanMeshManager() {
 				auto& sharingSettings = VulkanEngine::GetBufferSharingSettings(BUFFER_USAGE);
 
@@ -498,7 +511,7 @@ namespace Cori {
 				m_Meshes.Reserve(512);
 				m_MeshMetadata.resize(512);
 
-				m_PlaceholderMesh = AllocateHandle<Mesh>();
+				m_PlaceholderMesh = m_HandleAllocator.Allocate();
 				m_HandleAllocator.AddRef(m_PlaceholderMesh);
 
 				std::vector<StaticVertex> placeholderVertexData{
@@ -563,13 +576,8 @@ namespace Cori {
 				}
 			}
 
-			template<typename T> requires std::same_as<Mesh, T>
-			[[nodiscard]] static Core::Handle<Mesh> AllocateHandle() {
-				return Get().m_HandleAllocator.Allocate();
-			}
-
 			void AssignPlaceholder(const Core::Handle<Mesh> handle) {
-				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle.");
+				CORI_CORE_ASSERT(IsHandleValidImpl(handle), "Invalid handle.");
 
 				auto placeholderData = std::as_const(m_Meshes)[m_PlaceholderMesh];
 				placeholderData.version = handle.GetVersion();
@@ -586,7 +594,7 @@ namespace Cori {
 					}
 				}();
 
-				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle.");
+				CORI_CORE_ASSERT(IsHandleValidImpl(handle), "Invalid handle.");
 
 				vma::VirtualAllocationCreateInfo indicesAllocInfo {
 					.size = indices.size() * sizeof(uint32_t),
@@ -668,7 +676,7 @@ namespace Cori {
 					meta.vertexStorage = vertexStorage;
 					meta.indexAllocation = indexAlloc;
 
-					SetAssetStatus(handle, AssetStatus::eStreaming);
+					SetAssetStatusImpl(handle, AssetStatus::eStreaming);
 
 					FindInTransferSlot(streamingResult.value()).emplace_back(MeshInTransfer{
 						.mesh = handle,
@@ -698,7 +706,7 @@ namespace Cori {
 
 					AssignPlaceholder(handle);
 
-					SetAssetStatus(handle, AssetStatus::eLoadFailed);
+					SetAssetStatusImpl(handle, AssetStatus::eLoadFailed);
 
 					return { false, indexOffset, std::nullopt };
 				}
@@ -719,7 +727,7 @@ namespace Cori {
 				meta.vertexStorage = vertexStorage;
 				meta.indexAllocation = indexAlloc;
 
-				SetAssetStatus(handle, AssetStatus::eStreamingQueued);
+				SetAssetStatusImpl(handle, AssetStatus::eStreamingQueued);
 
 				m_QueuedUploads.emplace(QueuedUpload{
 					.vertexUpload = vertexUpload,
