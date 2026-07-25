@@ -8,7 +8,8 @@ namespace Cori {
 			public:
 				explicit ThreadPool(const uint16_t numThreads) : m_WorkerCount(numThreads) {
 					for (uint16_t i = 0; i < numThreads; ++i) {
-						m_Workers.emplace_back([this] {
+						m_Workers.emplace_back([this, i] {
+							SetThreadName("Worker-" + std::to_string(i));
 							while (true) {
 								std::function<void()> task;
 								{

@@ -137,7 +137,11 @@ project(CoriEngine)
     if (CORI_ENABLE_TRACY_PROFILER)
         set(TRACY_STATIC ON CACHE BOOL "")
         set(TRACY_ENABLE ON CACHE BOOL "")
-        set(TRACY_ON_DEMAND ON CACHE BOOL "")
+        set(TRACY_NO_EXIT ON CACHE BOOL "")
+        if (CORI_MY_CONFIG)
+            set(TRACY_DEBUGINFOD ON CACHE BOOL "")
+        endif ()
+        set(TRACY_VERBOSE ON CACHE BOOL "")
         add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/tracy EXCLUDE_FROM_ALL)
     endif ()
 
@@ -200,7 +204,8 @@ project(CoriEngine)
     )
 
     # my shared lib
-    add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES})
+    add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES}
+            src/Core/GlobalFuncs.hpp)
 
     target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG_BUILD>

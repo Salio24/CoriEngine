@@ -47,6 +47,7 @@
 #include <condition_variable>
 #include <source_location>
 #include <stacktrace>
+#include <cinttypes>
 
 #ifdef CORI_USE_SMID
 	#define GLM_FORCE_INTRINSICS
@@ -69,6 +70,7 @@
 #include "../src/Utility/Macros.hpp"
 #include "../src/Core/Logger.hpp"
 #include "../src/Profiling/Profiler.hpp"
+#include "../src/Core/GlobalFuncs.hpp"
 #include "../src/Core/Uuid.hpp"
 #include "../src/Core/Error.hpp"
 #include "../src/Core/ErrorCodes.hpp"

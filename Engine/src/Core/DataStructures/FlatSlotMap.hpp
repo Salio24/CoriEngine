@@ -11,8 +11,6 @@ namespace Cori {
 			typename T::Hasher;
 		};
 
-
-
 		struct VersionedHandleBase {
 			VersionedHandleBase() = default;
 			VersionedHandleBase(const uint32_t index, const uint32_t version) : index(index), version(version) {}

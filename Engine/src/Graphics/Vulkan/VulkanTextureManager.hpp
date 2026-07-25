@@ -108,6 +108,8 @@ namespace Cori {
 			static void Load(const Core::Handle<Texture2> handle, const Core::AssetID id, const uint32_t gen, const uint32_t vectorKey, std::filesystem::path path, std::string name = "");
 
 			static void Unload(const Core::Handle<Texture2> handle) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Destroy);
+				CORI_PROFILER_MSG_CFP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Destroy, "%s Handle=[%u, %u] UNLOAD (destroying texture, freeing handle)", CORI_CLEAN_TYPE_NAME(Texture2), handle.GetIndex(), handle.GetVersion());
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Handle passed to Unload is invalid.");
 				CORI_CORE_ASSERT(handle != Get().m_PlaceholderTexture, "Placeholder texture handle was passed, can't unload it.")
 
@@ -239,13 +241,19 @@ namespace Cori {
 			}
 
 			static void ProcessUpdates(vk::CommandBuffer cmb) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Process);
 				Get().m_BarrierCache.clear();
 				auto currentTimelineValue = VulkanStreamingLine::GetTimelineValue();
 
 				for (auto& [ticket, inTransferAssets] : Get().m_TexturesInTransfer) {
 					if (currentTimelineValue >= ticket) {
 						for (auto& inTransferTexture : inTransferAssets) {
+							CORI_PROFILE_SCOPE_CP(Cori::ProfileParts::RenderingAssets, "ProcessUpdates: Texture transfer complete", Cori::ProfileColors::Loaded);
+							CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u]", inTransferTexture.texture.GetIndex(), inTransferTexture.texture.GetVersion());
+							CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Ticket=%llu, Current timeline value=%llu", static_cast<unsigned long long>(ticket), static_cast<unsigned long long>(currentTimelineValue));
 							if (!IsHandleValid(inTransferTexture.texture)) {
+								CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: Handle invalid, discarded transferred image");
+								CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::Warning, Cori::ProfileColors::Stale, "%s Handle=[%u, %u] transfer done but handle invalid, discarded image (ticket %llu)", CORI_CLEAN_TYPE_NAME(Texture2), inTransferTexture.texture.GetIndex(), inTransferTexture.texture.GetVersion(), static_cast<unsigned long long>(ticket));
 								DeletionQueue::PushImage(inTransferTexture.image);
 								continue;
 							}
@@ -253,6 +261,8 @@ namespace Cori {
 							auto& texture = Get().m_TexturePool[inTransferTexture.texture];
 
 							if (Get().m_HandleAllocator.GetGeneration(inTransferTexture.texture) != inTransferTexture.loadGen) {
+								CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Outcome: STALE (loadGen=%u, current gen=%u), discarded transferred image", inTransferTexture.loadGen, Get().m_HandleAllocator.GetGeneration(inTransferTexture.texture));
+								CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::Warning, Cori::ProfileColors::Stale, "%s Handle=[%u, %u] transfer STALE (loadGen=%u, current gen=%u) (ticket %llu), discarded image", CORI_CLEAN_TYPE_NAME(Texture2), inTransferTexture.texture.GetIndex(), inTransferTexture.texture.GetVersion(), inTransferTexture.loadGen, Get().m_HandleAllocator.GetGeneration(inTransferTexture.texture), static_cast<unsigned long long>(ticket));
 								DeletionQueue::PushImage(inTransferTexture.image);
 								continue;
 							}
@@ -283,6 +293,8 @@ namespace Cori {
 							texture.loaded = true;
 
 							SetAssetStatus(inTransferTexture.texture, AssetStatus::eLoaded);
+							CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Outcome: LOADED, real texture now visible (descriptor %u)", texture.descriptorIndex);
+							CORI_PROFILER_MSG_CFP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Loaded, "%s Handle=[%u, %u] LOADED, real texture now visible (descriptor %u) (ticket %llu)", CORI_CLEAN_TYPE_NAME(Texture2), inTransferTexture.texture.GetIndex(), inTransferTexture.texture.GetVersion(), texture.descriptorIndex, static_cast<unsigned long long>(ticket));
 						}
 
 						VulkanEngine::AddWaitTimelineSemaphore(VulkanStreamingLine::GetTimelineSemaphoreHandle(), ticket, vk::PipelineStageFlagBits::eFragmentShader);
@@ -302,13 +314,20 @@ namespace Cori {
 
 				while (!Get().m_QueuedUploads.empty()) {
 					auto& upload = Get().m_QueuedUploads.front();
+					CORI_PROFILE_SCOPE_CP(Cori::ProfileParts::RenderingAssets, "ProcessUpdates: Queued upload retry", Cori::ProfileColors::Upload);
+					CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u]", upload.texture.GetIndex(), upload.texture.GetVersion());
+
 					if (!IsHandleValid(upload.texture)) {
+						CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: Handle invalid, queued upload dropped");
+						CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::Warning, Cori::ProfileColors::Stale, "%s Handle=[%u, %u] queued upload dropped (handle invalid) (gen=%u)", CORI_CLEAN_TYPE_NAME(Texture2), upload.texture.GetIndex(), upload.texture.GetVersion(), upload.loadGen);
 						upload.imageUpload.resource.Destroy();
 						Get().m_QueuedUploads.pop();
 						continue;
 					}
 
 					if (upload.loadGen != Get().m_HandleAllocator.GetGeneration(upload.texture)) {
+						CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Outcome: STALE (loadGen=%u, current gen=%u), queued upload dropped", upload.loadGen, Get().m_HandleAllocator.GetGeneration(upload.texture));
+						CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::Warning, Cori::ProfileColors::Stale, "%s Handle=[%u, %u] queued upload dropped (STALE loadGen=%u, current gen=%u)", CORI_CLEAN_TYPE_NAME(Texture2), upload.texture.GetIndex(), upload.texture.GetVersion(), upload.loadGen, Get().m_HandleAllocator.GetGeneration(upload.texture));
 						upload.imageUpload.resource.Destroy();
 						Get().m_QueuedUploads.pop();
 						continue;
@@ -330,6 +349,8 @@ namespace Cori {
 						});
 
 						SetAssetStatus(upload.texture, AssetStatus::eStreaming);
+						CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Outcome: SUBMITTED (ticket=%llu), status=Streaming", static_cast<unsigned long long>(result.value()));
+						CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::Debug, Cori::ProfileColors::Upload, "%s Handle=[%u, %u] queued upload SUBMITTED (ticket=%llu) (gen=%u), status=Streaming", CORI_CLEAN_TYPE_NAME(Texture2), upload.texture.GetIndex(), upload.texture.GetVersion(), static_cast<unsigned long long>(result.value()), upload.loadGen);
 
 						Get().m_QueuedUploads.pop();
 					} else {
@@ -507,6 +528,7 @@ namespace Cori {
 			}
 
 			void AssignPlaceholder(const Core::Handle<Texture2> handle) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Missing);
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle.");
 
 				auto& texture = m_TexturePool[handle];
@@ -516,9 +538,30 @@ namespace Cori {
 				auto& tableEntry = m_GPUAssetTables[handle.GetIndex()];
 				tableEntry.descriptorIndex = s_PlaceholderTextureDescriptorIndex;
 				tableEntry.version = handle.GetVersion();
+
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u] -> MISSING placeholder (descriptor %u)", handle.GetIndex(), handle.GetVersion(), s_PlaceholderTextureDescriptorIndex);
+				CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::Debug, Cori::ProfileColors::Missing, "%s Handle=[%u, %u] assigned MISSING placeholder (descriptor %u)", CORI_CLEAN_TYPE_NAME(Texture2), handle.GetIndex(), handle.GetVersion(), s_PlaceholderTextureDescriptorIndex);
+			}
+
+			void AssignWhitePlaceholder(const Core::Handle<Texture2> handle) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::White);
+				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle.");
+
+				auto& texture = m_TexturePool[handle];
+				texture.placeholderAssigned = true;
+				texture.descriptorIndex = s_WhiteTextureDescriptorIndex;
+
+				auto& tableEntry = m_GPUAssetTables[handle.GetIndex()];
+				tableEntry.descriptorIndex = s_WhiteTextureDescriptorIndex;
+				tableEntry.version = handle.GetVersion();
+
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u] -> WHITE placeholder (descriptor %u)", handle.GetIndex(), handle.GetVersion(), s_WhiteTextureDescriptorIndex);
+				CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::Debug, Cori::ProfileColors::White, "%s Handle=[%u, %u] assigned WHITE placeholder (descriptor %u)", CORI_CLEAN_TYPE_NAME(Texture2), handle.GetIndex(), handle.GetVersion(), s_WhiteTextureDescriptorIndex);
 			}
 
 			bool UpdateTexture(const Core::Handle<Texture2> handle, std::vector<Byte>&& pixels, const vk::Offset3D& offset, const vk::Extent3D& extent, const vk::ImageSubresourceLayers& subresourceLayers, const uint32_t loadGen) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Upload);
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u] loadGen=%u", handle.GetIndex(), handle.GetVersion(), loadGen);
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle.");
 
 				auto& texture = m_TexturePool[handle];
@@ -553,16 +596,22 @@ namespace Cori {
 					});
 
 					SetAssetStatus(handle, AssetStatus::eStreaming);
+					CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Outcome: Upload SUBMITTED to streaming line (ticket=%llu), status=Streaming", static_cast<unsigned long long>(result.value()));
+					CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::Debug, Cori::ProfileColors::Upload, "%s Handle=[%u, %u] upload SUBMITTED to streaming line (ticket=%llu), status=Streaming", CORI_CLEAN_TYPE_NAME(Texture2), handle.GetIndex(), handle.GetVersion(), static_cast<unsigned long long>(result.value()));
 				} else {
 					if (result.error() == ErrorCode::eInvalidData) {
 						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "VulkanStreamingLine returned with error code eInvalidData during UpdateTexture call, skipping load.");
 						SetAssetStatus(handle, AssetStatus::eLoadFailed);
 						DestroyTexture(handle);
+						CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: streaming line returned eInvalidData, status=LoadFailed");
+						CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::Error, Cori::ProfileColors::Destroy, "%s Handle=[%u, %u] UpdateTexture FAILED: streaming line eInvalidData, status=LoadFailed", CORI_CLEAN_TYPE_NAME(Texture2), handle.GetIndex(), handle.GetVersion());
 						return false;
 					}
 
 					m_QueuedUploads.emplace(resUpload, std::move(pixels), handle, loadGen);
 					SetAssetStatus(handle, AssetStatus::eStreamingQueued);
+					CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: streaming line full, upload QUEUED, status=StreamingQueued (still sampling WHITE)");
+					CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::Debug, Cori::ProfileColors::Upload, "%s Handle=[%u, %u] upload QUEUED (streaming line full), status=StreamingQueued", CORI_CLEAN_TYPE_NAME(Texture2), handle.GetIndex(), handle.GetVersion());
 				}
 
 				return true;
@@ -582,11 +631,13 @@ namespace Cori {
 			}
 
 			void UpdateView(const Core::Handle<Texture2> handle) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Loaded);
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle.");
 
 				auto& texture = m_TexturePool[handle];
 
 				VulkanGlobalLayoutManager::UpdateSampledTextureDescriptor(texture.descriptorIndex, texture.view);
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u] descriptor %u -> REAL texture view (transfer done)", handle.GetIndex(), handle.GetVersion(), texture.descriptorIndex);
 			}
 
 			void CreateTexture(const Core::Handle<Texture2> handle, const vk::ImageType type, const vk::Format format, const vk::Extent3D& extent, const uint32_t mipCount, const uint32_t layerCount, const vk::SampleCountFlagBits sampleFlags, const char* name = "") {
@@ -634,11 +685,15 @@ namespace Cori {
 			}
 
 			void DestroyTexture(const Core::Handle<Texture2> handle) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Destroy);
 				if (handle == m_PlaceholderTexture || handle == m_WhiteTexture) {
 					return;
 				}
 
 				auto& texture = m_TexturePool[handle];
+
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u] descriptor %u (placeholderAssigned=%d, loaded=%d)", handle.GetIndex(), handle.GetVersion(), texture.descriptorIndex, static_cast<int>(texture.placeholderAssigned), static_cast<int>(texture.loaded));
+				CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::Debug, Cori::ProfileColors::Destroy, "%s Handle=[%u, %u] DestroyTexture (descriptor %u, placeholderAssigned=%d, loaded=%d)", CORI_CLEAN_TYPE_NAME(Texture2), handle.GetIndex(), handle.GetVersion(), texture.descriptorIndex, static_cast<int>(texture.placeholderAssigned), static_cast<int>(texture.loaded));
 
 				if (!texture.placeholderAssigned && texture.loaded) {
 					DeletionQueue::PushImage(texture.image);
@@ -649,6 +704,7 @@ namespace Cori {
 				if (texture.descriptorIndex != s_PlaceholderTextureDescriptorIndex && texture.descriptorIndex != s_WhiteTextureDescriptorIndex) {
 					VulkanGlobalLayoutManager::UpdateSampledTextureDescriptor(texture.descriptorIndex, m_PlaceholderView);
 					m_FreeTextureDescriptorSlots.emplace_back(texture.descriptorIndex);
+					CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Released descriptor %u (rebound to MISSING placeholder view, slot returned to free list)", texture.descriptorIndex);
 				}
 
 				//AssignPlaceholder(handle);
@@ -659,6 +715,7 @@ namespace Cori {
 			}
 
 			std::vector<TextureInTransfer>& FindInTransferSlot(const uint64_t value) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Upload);
 				InTransferSlot* free = nullptr;
 				InTransferSlot* bestPick = nullptr;
 

@@ -1,5 +1,8 @@
 #include "Logger.hpp"
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/pattern_formatter.h>
+#include <spdlog/details/os.h>
+#include <shared_mutex>
 
 #ifdef PLATFORM_WINDOWS
 #include <windows.h>
@@ -8,6 +11,62 @@
 namespace {
 	std::mutex s_CoreTagMutex;
 	std::mutex s_ClientTagMutex;
+
+	std::shared_mutex s_ThreadNameMutex;
+	std::unordered_map<size_t, std::string> s_ThreadNames;
+
+	class ThreadNameFlagFormatter final : public spdlog::custom_flag_formatter {
+	public:
+		void format(const spdlog::details::log_msg& msg, const std::tm&, spdlog::memory_buf_t& dest) override {
+			std::string label;
+			{
+				std::shared_lock lock(s_ThreadNameMutex);
+				if (const auto it = s_ThreadNames.find(msg.thread_id); it != s_ThreadNames.end()) {
+					label = it->second;
+				}
+			}
+			if (label.empty()) {
+				label = std::to_string(msg.thread_id);
+			}
+
+			const std::string_view text = label;
+			const auto append = [&dest](const std::string_view s) {
+				dest.append(s.data(), s.data() + s.size());
+			};
+
+			const auto appendSpaces = [&dest](const size_t n) {
+				const std::string sp(n, ' '); dest.append(sp.data(), sp.data() + sp.size());
+			};
+
+			if (padinfo_.enabled() && text.size() < padinfo_.width_) {
+				const size_t pad = padinfo_.width_ - text.size();
+				using pad_side = spdlog::details::padding_info::pad_side;
+				switch (padinfo_.side_) {
+				case pad_side::left:
+					appendSpaces(pad);
+					append(text);
+					break;
+				case pad_side::center:
+					appendSpaces(pad / 2);
+					append(text);
+					appendSpaces(pad - pad / 2);
+					break;
+				case pad_side::right:
+				default:
+					append(text);
+					appendSpaces(pad);
+					break;
+				}
+			}
+			else {
+				append(text);
+			}
+		}
+
+		[[nodiscard]] std::unique_ptr<spdlog::custom_flag_formatter> clone() const override {
+			return spdlog::details::make_unique<ThreadNameFlagFormatter>();
+		}
+	};
 }
 
 namespace Cori {
@@ -47,8 +106,16 @@ namespace Cori {
 
 		int32_t maxSize = 1048576 * 20;
 		int32_t maxFiles = 5;
+
+		constexpr const char* pattern = "%^[%Y-%m-%d %H:%M:%S.%e] [%-10N] [%-6n] [%-8l]: %v%$ %@";
+		const auto makeFormatter = [pattern] {
+			auto formatter = std::make_unique<spdlog::pattern_formatter>();
+			formatter->add_flag<ThreadNameFlagFormatter>('N').set_pattern(pattern);
+			return formatter;
+		};
+
 		const auto fileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("logs/cori_log.txt", maxSize, maxFiles);
-		fileSink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [Thread %t] [%-6n] [%-8l]: %v%$ %@");
+		fileSink->set_formatter(makeFormatter());
 		std::vector<spdlog::sink_ptr> coreSinks;
 		std::vector<spdlog::sink_ptr> clientSinks;
 
@@ -60,7 +127,7 @@ namespace Cori {
 
 #ifdef DEBUG_BUILD
 		const auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-		consoleSink->set_pattern("%^[%Y-%m-%d %H:%M:%S.%e] [Thread %t] [%-6n] [%-8l]: %v%$ %@");
+		consoleSink->set_formatter(makeFormatter());
 
 		coreSinks.push_back(consoleSink);
 		clientSinks.push_back(consoleSink);
@@ -87,11 +154,19 @@ namespace Cori {
 
 		s_Initialized = true;
 
+		Cori::SetThreadName("Main");
+
 		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "------------- NEW LOG SESSION -------------");
 		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "|  Logger initialized. Mode: {} |", async ? "Asynchronous" : "Synchronous ");
 		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "-------------------------------------------");
 		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "|     File logging is: {}           |", fileWrite ? "Enabled " : "Disabled");
 		CORI_CORE_INFO_TAGGED({ Tags::Core::Self, Tags::Core::Logger }, "-------------------------------------------");
+	}
+
+	void Logger::SetThreadName(const std::string& name) {
+		const size_t id = spdlog::details::os::thread_id();
+		std::unique_lock lock(s_ThreadNameMutex);
+		s_ThreadNames[id] = name;
 	}
 
 	bool Logger::GetStatus() {

@@ -177,6 +177,8 @@ namespace Cori {
 
 		static void Init(bool async, bool fileWrite);
 
+		static void SetThreadName(const std::string& name);
+
 		static bool GetStatus();
 
 		static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }

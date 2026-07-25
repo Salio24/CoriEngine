@@ -35,7 +35,7 @@ namespace Cori {
 			m_ImGuiLayer = new Internal::ImGuiLayer();
 			m_LayerStack.PushOverlay(m_ImGuiLayer);
 
-			AssetManager::Init();
+			//AssetManager::Init();
 			AssetManager2::Init();
 			World::SceneManager::Init();
 			Audio::Mixer::Init();
@@ -51,7 +51,7 @@ namespace Cori {
 			m_VulkanEngine.reset();
 			Audio::Mixer::Shutdown();
 			AssetManager2::Shutdown();
-			AssetManager::Shutdown();
+			//AssetManager::Shutdown();
 		}
 
 		void Application::EmitEvent(Event& event) {

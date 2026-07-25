@@ -12,7 +12,8 @@ namespace Cori {
 			void AddRef(const Handle<T> handle) {
 				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::AddRef called with an invalid handle");
 
-				m_RefCounts[handle.GetIndex()].fetch_add(1, std::memory_order_relaxed);
+				const uint32_t prev = m_RefCounts[handle.GetIndex()].fetch_add(1, std::memory_order_relaxed);
+				CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::Assets, Cori::Trace, Cori::ProfileColors::Refcount, "%s Handle=[%u, %u] AddRef refs %u -> %u", CORI_CLEAN_TYPE_NAME(T), handle.GetIndex(), handle.GetVersion(), prev, prev + 1);
 			}
 
 			[[nodiscard]] bool TryAddRef(const Handle<T> handle) {
@@ -23,10 +24,12 @@ namespace Cori {
 
 				while (cur != 0) {
 					if (rc.compare_exchange_weak(cur, cur + 1, std::memory_order_acquire, std::memory_order_relaxed)) {
+						CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::Assets, Cori::Trace, Cori::ProfileColors::Refcount, "%s Handle=[%u, %u] TryAddRef refs %u -> %u", CORI_CLEAN_TYPE_NAME(T), handle.GetIndex(), handle.GetVersion(), cur, cur + 1);
 						return true;
 					}
 				}
 
+				CORI_PROFILER_MSG_SCF(Cori::Trace, Cori::ProfileColors::Refcount, "%s Handle=[%u, %u] TryAddRef failed (refs were 0)", CORI_CLEAN_TYPE_NAME(T), handle.GetIndex(), handle.GetVersion());
 				return false;
 			}
 
@@ -34,6 +37,7 @@ namespace Cori {
 				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::RemoveRef called with an invalid handle");
 
 				uint32_t prev = m_RefCounts[handle.GetIndex()].fetch_sub(1, std::memory_order_release);
+				CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::Assets, Cori::Trace, Cori::ProfileColors::Refcount, "%s Handle=[%u, %u] RemoveRef refs %u -> %u%s", CORI_CLEAN_TYPE_NAME(T), handle.GetIndex(), handle.GetVersion(), prev, prev - 1, prev == 1 ? " (terminal, queueing unload)" : "");
 				if (prev != 1) {
 					return;
 				}
@@ -92,10 +96,13 @@ namespace Cori {
 			void BindAsset(const Handle<T> handle, const AssetID id, const uint32_t vectorKey) {
 				m_AssetIDs[handle.GetIndex()].store(id, std::memory_order_release);
 				m_VectorKeys[handle.GetIndex()].store(vectorKey, std::memory_order_release);
+				CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::Assets, Cori::Debug, Cori::ProfileColors::Bind, "%s Handle=[%u, %u] bound asset id=%llu vectorKey=%u", CORI_CLEAN_TYPE_NAME(T), handle.GetIndex(), handle.GetVersion(), static_cast<unsigned long long>(id), vectorKey);
 			}
 
 			[[nodiscard]] uint32_t BumpGeneration(const Handle<T> handle) {
-				return m_LoadGenerations[handle.GetIndex()].fetch_add(1, std::memory_order_relaxed) + 1;
+				const uint32_t gen = m_LoadGenerations[handle.GetIndex()].fetch_add(1, std::memory_order_relaxed) + 1;
+				CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::Assets, Cori::Debug, Cori::ProfileColors::Bind, "%s Handle=[%u, %u] generation bumped -> %u", CORI_CLEAN_TYPE_NAME(T), handle.GetIndex(), handle.GetVersion(), gen);
+				return gen;
 			}
 
 		private:
@@ -129,12 +136,14 @@ namespace Cori {
 				UnbindAsset(handle);
 				m_RefCounts[handle.GetIndex()].store(1, std::memory_order_release);
 				m_AssetStatuses[handle.GetIndex()].store(AssetStatus::eUnloaded, std::memory_order_release);
+				CORI_PROFILER_MSG_CFP(Cori::ProfileParts::Assets, Cori::ProfileColors::Alloc, "%s Handle=[%u, %u] ALLOCATED (refs=1)", CORI_CLEAN_TYPE_NAME(T), handle.GetIndex(), handle.GetVersion());
 				if constexpr (requires { T::Manager::AllocateExtras(handle); }) {
 					T::Manager::AllocateExtras(handle);
 				}
 			}
 
 			void FreeExtras(const Handle<T> handle) {
+				CORI_PROFILER_MSG_CFP(Cori::ProfileParts::Assets, Cori::ProfileColors::Free, "%s Handle=[%u, %u] FREED", CORI_CLEAN_TYPE_NAME(T), handle.GetIndex(), handle.GetVersion());
 				m_LoadGenerations[handle.GetIndex()].store(0, std::memory_order_release);
 				if constexpr (requires { T::Manager::FreeExtras(handle); }) {
 					T::Manager::FreeExtras(handle);
