@@ -1,3 +1,5 @@
+//legacy from old 2d renderer, need to rewire
+#if 0
 #include "QuadAnimator.hpp"
 #include "WorldSystem/Components.hpp"
 
@@ -109,3 +111,4 @@ namespace Cori {
 		}
 	}
 }
+#endif

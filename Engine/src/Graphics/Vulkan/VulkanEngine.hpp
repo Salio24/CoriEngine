@@ -157,6 +157,14 @@ namespace Cori {
 				return Get().m_TransferCommandPool;
 			}
 
+			static GPUProfilerContext GetGraphicsGPUProfilerContext() {
+				return Get().m_GraphicsGPUProfilerContext;
+			}
+
+			static GPUProfilerContext GetTransferGPUProfilerContext() {
+				return Get().m_TransferGPUProfilerContext;
+			}
+
 			static void AddWaitSemaphore(const vk::Semaphore semaphore, const vk::PipelineStageFlags waitDstStageMask) {
 				for (uint32_t i = 0; i < Get().m_WaitSemaphores.size(); i++) {
 					if (Get().m_WaitSemaphores[i] == semaphore && Get().m_WaitDstStageMasks[i] == waitDstStageMask) {
@@ -237,6 +245,8 @@ namespace Cori {
 
 			void CreateDevice();
 
+			void CreateGPUProfilerContexts();
+
 			void InitializeVMA();
 
 			void CreateSwapChain();
@@ -300,6 +310,9 @@ namespace Cori {
 			uint32_t m_PresentQueueFamilyIndex;
 			uint32_t m_ComputeQueueFamilyIndex;
 
+			GPUProfilerContext m_GraphicsGPUProfilerContext{ nullptr };
+			GPUProfilerContext m_TransferGPUProfilerContext{ nullptr };
+			GPUProfilerSpanZone m_GPUFrameZone;
 
 			static std::vector<const char*> m_DeviceExtensions;
 			static std::vector<const char*> m_InstanceExtensions;

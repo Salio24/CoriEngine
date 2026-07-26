@@ -253,12 +253,17 @@ namespace Cori {
 			static void Load(const Core::Handle<Mesh> handle, const Core::AssetID id, const uint32_t gen, const uint32_t vectorKey, std::filesystem::path path, std::string name = "");
 
 			static void Unload(const Core::Handle<Mesh> handle) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Destroy);
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u]", handle.GetIndex(), handle.GetVersion());
+				CORI_PROFILER_MSG_CFP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Destroy, "%s Handle=[%u, %u] UNLOAD (destroying mesh, freeing handle)", CORI_CLEAN_TYPE_NAME(Mesh), handle.GetIndex(), handle.GetVersion());
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Handle passed to Unload is invalid.");
 				CORI_CORE_ASSERT(handle != Get().m_PlaceholderMesh, "Placeholder mesh handle was passed, can't unload it.")
 
 				Core::AssetID id = Get().m_HandleAllocator.GetBoundAssetID(handle);
 				{
-					std::lock_guard lk(Core::AssetManager2::GetMutex());
+					auto& mutex = Core::AssetManager2::GetMutex();
+					std::lock_guard lk(mutex);
+					CORI_PROFILER_LOCK_MARK(mutex);
 					auto& record = Core::AssetManager2::GetAssetRecord(id);
 					if (record.rawHandleIndex == handle.GetIndex() && record.rawHandleVersion == handle.GetVersion()) {
 						record.rawHandleIndex = UINT32_MAX;
@@ -269,11 +274,13 @@ namespace Cori {
 				Get().m_HandleAllocator.Free(handle);
 
 				if (!Get().m_Meshes.IsIndexOccupied(handle.GetIndex())) {
+					CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: Handle freed, no mesh slot was occupied");
 					return;
 				}
 
 				Get().DestroyMesh(handle);
 				Get().m_Meshes.RemoveAt(handle.GetIndex());
+				CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: Handle freed, mesh destroyed and slot released");
 			}
 
 			static Core::AssetID GetAssetID(const Core::Handle<Mesh> handle) {
@@ -312,13 +319,21 @@ namespace Cori {
 			}
 
 			static void ProcessUpdates(vk::CommandBuffer cmb) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Process);
 				Get().m_BarrierCache.clear();
 				auto currentTimelineValue = VulkanStreamingLine::GetTimelineValue();
 
 				for (auto& [ticket, inTransferAssets] : Get().m_MeshesInTransfer) {
 					if (currentTimelineValue >= ticket) {
 						for (auto& inTransferMesh : inTransferAssets) {
+							CORI_PROFILE_SCOPE_CP(Cori::ProfileParts::RenderingAssets, "ProcessUpdates: Mesh transfer complete", Cori::ProfileColors::Loaded);
+							CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u]", inTransferMesh.mesh.GetIndex(), inTransferMesh.mesh.GetVersion());
+							CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Ticket=%llu, Current timeline value=%llu", static_cast<unsigned long long>(ticket), static_cast<unsigned long long>(currentTimelineValue));
+							CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Indices=%u @ firstIndex=%u, vertices=%u bytes @ storage=%p +%u", inTransferMesh.indexCount, inTransferMesh.indexOffset, inTransferMesh.vertexByteSize, static_cast<void*>(inTransferMesh.vertexStorage), inTransferMesh.vertexByteOffset);
+
 							if (!IsHandleValid(inTransferMesh.mesh)) {
+								CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: Handle invalid, freed vertex/index allocations");
+								CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eWarning, Cori::ProfileColors::Stale, "%s Handle=[%u, %u] transfer done but handle invalid, freed vertex/index allocations (ticket %llu)", CORI_CLEAN_TYPE_NAME(Mesh), inTransferMesh.mesh.GetIndex(), inTransferMesh.mesh.GetVersion(), static_cast<unsigned long long>(ticket));
 								DeletionQueue::PushVirtualAlloc(inTransferMesh.vertexAllocation, inTransferMesh.vertexStorage->m_Block, inTransferMesh.vertexStorage->m_Mutex);
 								DeletionQueue::PushVirtualAlloc(inTransferMesh.indexAllocation, Get().m_IndexBufferBlock);
 								inTransferMesh.vertexStorage->RemoveStrongRef();
@@ -327,6 +342,8 @@ namespace Cori {
 							}
 
 							if (Get().m_HandleAllocator.GetGeneration(inTransferMesh.mesh) != inTransferMesh.loadGen) {
+								CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Outcome: STALE (loadGen=%u, current gen=%u), freed vertex/index allocations", inTransferMesh.loadGen, Get().m_HandleAllocator.GetGeneration(inTransferMesh.mesh));
+								CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eWarning, Cori::ProfileColors::Stale, "%s Handle=[%u, %u] transfer STALE (loadGen=%u, current gen=%u) (ticket %llu), freed vertex/index allocations", CORI_CLEAN_TYPE_NAME(Mesh), inTransferMesh.mesh.GetIndex(), inTransferMesh.mesh.GetVersion(), inTransferMesh.loadGen, Get().m_HandleAllocator.GetGeneration(inTransferMesh.mesh), static_cast<unsigned long long>(ticket));
 								DeletionQueue::PushVirtualAlloc(inTransferMesh.vertexAllocation, inTransferMesh.vertexStorage->m_Block, inTransferMesh.vertexStorage->m_Mutex);
 								DeletionQueue::PushVirtualAlloc(inTransferMesh.indexAllocation, Get().m_IndexBufferBlock);
 								inTransferMesh.vertexStorage->RemoveStrongRef();
@@ -343,6 +360,8 @@ namespace Cori {
 							auto& meta = Get().m_MeshMetadata[inTransferMesh.mesh.GetIndex()];
 							meta.loaded = true;
 							SetAssetStatus(inTransferMesh.mesh, AssetStatus::eLoaded);
+							CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Outcome: LOADED, real mesh now drawable (indexCount=%u, firstIndex=%u, firstVertexAddress=0x%llx), storage refs strong=%u weak=%u", meshData.indexCount, meshData.firstIndex, static_cast<unsigned long long>(meshData.firstVertexAddress), inTransferMesh.vertexStorage->GetStrongRefCount(), inTransferMesh.vertexStorage->GetWeakRefCount());
+							CORI_PROFILER_MSG_CFP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Loaded, "%s Handle=[%u, %u] LOADED, real mesh now drawable (indexCount=%u, firstIndex=%u) (ticket %llu)", CORI_CLEAN_TYPE_NAME(Mesh), inTransferMesh.mesh.GetIndex(), inTransferMesh.mesh.GetVersion(), meshData.indexCount, meshData.firstIndex, static_cast<unsigned long long>(ticket));
 						}
 
 						VulkanEngine::AddWaitTimelineSemaphore(VulkanStreamingLine::GetTimelineSemaphoreHandle(), ticket, vk::PipelineStageFlagBits::eVertexShader);
@@ -362,7 +381,13 @@ namespace Cori {
 
 				while (!Get().m_QueuedUploads.empty()) {
 					auto& upload = Get().m_QueuedUploads.front();
+					CORI_PROFILE_SCOPE_CP(Cori::ProfileParts::RenderingAssets, "ProcessUpdates: Queued upload retry", Cori::ProfileColors::Upload);
+					CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u]", upload.mesh.GetIndex(), upload.mesh.GetVersion());
+					CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Indices=%llu @ byte offset %llu, vertex storage=%p @ byte offset %llu", static_cast<unsigned long long>(upload.indexData.size()), static_cast<unsigned long long>(upload.indexUpload.range.offset), static_cast<void*>(upload.vertexStorage), static_cast<unsigned long long>(upload.vertexUpload.range.offset));
+
 					if (!IsHandleValid(upload.mesh)) {
+						CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: Handle invalid, queued upload dropped and allocations freed");
+						CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eWarning, Cori::ProfileColors::Stale, "%s Handle=[%u, %u] queued upload dropped (handle invalid) (gen=%u)", CORI_CLEAN_TYPE_NAME(Mesh), upload.mesh.GetIndex(), upload.mesh.GetVersion(), upload.loadGen);
 						{
 							std::lock_guard lk(*upload.vertexStorage->m_Mutex);
 							upload.vertexStorage->m_Block.free(upload.vertexAlloc);
@@ -375,6 +400,8 @@ namespace Cori {
 					}
 
 					if (upload.loadGen != Get().m_HandleAllocator.GetGeneration(upload.mesh)) {
+						CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Outcome: STALE (loadGen=%u, current gen=%u), queued upload dropped and allocations freed", upload.loadGen, Get().m_HandleAllocator.GetGeneration(upload.mesh));
+						CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eWarning, Cori::ProfileColors::Stale, "%s Handle=[%u, %u] queued upload dropped (STALE loadGen=%u, current gen=%u)", CORI_CLEAN_TYPE_NAME(Mesh), upload.mesh.GetIndex(), upload.mesh.GetVersion(), upload.loadGen, Get().m_HandleAllocator.GetGeneration(upload.mesh));
 						{
 							std::lock_guard lk(*upload.vertexStorage->m_Mutex);
 							upload.vertexStorage->m_Block.free(upload.vertexAlloc);
@@ -421,8 +448,12 @@ namespace Cori {
 						});
 
 						SetAssetStatus(upload.mesh, AssetStatus::eStreaming);
+						CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Outcome: SUBMITTED (ticket=%llu), status=Streaming", static_cast<unsigned long long>(result.value()));
+						CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eDebug, Cori::ProfileColors::Upload, "%s Handle=[%u, %u] queued upload SUBMITTED (ticket=%llu) (gen=%u), status=Streaming", CORI_CLEAN_TYPE_NAME(Mesh), upload.mesh.GetIndex(), upload.mesh.GetVersion(), static_cast<unsigned long long>(result.value()), upload.loadGen);
+
 						Get().m_QueuedUploads.pop();
 					} else {
+						CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: streaming line still full, retry deferred to next frame");
 						break;
 					}
 				}
@@ -577,6 +608,7 @@ namespace Cori {
 			}
 
 			void AssignPlaceholder(const Core::Handle<Mesh> handle) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Missing);
 				CORI_CORE_ASSERT(IsHandleValidImpl(handle), "Invalid handle.");
 
 				auto placeholderData = std::as_const(m_Meshes)[m_PlaceholderMesh];
@@ -584,6 +616,30 @@ namespace Cori {
 				m_Meshes[handle] = placeholderData;
 
 				m_MeshMetadata[handle.GetIndex()].placeholderAssigned = true;
+
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u] -> PLACEHOLDER cube mesh (indexCount=%u, firstIndex=%u)", handle.GetIndex(), handle.GetVersion(), placeholderData.indexCount, placeholderData.firstIndex);
+				CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eDebug, Cori::ProfileColors::Missing, "%s Handle=[%u, %u] assigned PLACEHOLDER cube mesh (indexCount=%u, firstIndex=%u)", CORI_CLEAN_TYPE_NAME(Mesh), handle.GetIndex(), handle.GetVersion(), placeholderData.indexCount, placeholderData.firstIndex);
+			}
+
+			void AssignEmptyMesh(const Core::Handle<Mesh> handle) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Missing);
+				CORI_CORE_ASSERT(IsHandleValidImpl(handle), "Invalid handle.");
+
+				m_Meshes[handle] = Mesh{ .version = handle.GetVersion() };
+				m_MeshMetadata[handle.GetIndex()].placeholderAssigned = true;
+
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u] -> PLACEHOLDER empty mesh (indexCount=0, nothing drawn)", handle.GetIndex(), handle.GetVersion());
+				CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eDebug, Cori::ProfileColors::Missing, "%s Handle=[%u, %u] assigned PLACEHOLDER empty mesh (indexCount=0, nothing drawn)", CORI_CLEAN_TYPE_NAME(Mesh), handle.GetIndex(), handle.GetVersion());
+			}
+
+			std::pair<uint32_t, uint32_t> EnsureMetadataSlot(const uint32_t index) {
+				const auto size = static_cast<uint32_t>(m_MeshMetadata.size());
+				if (index < size) {
+					return { size, size };
+				}
+
+				m_MeshMetadata.resize(std::max<uint64_t>(static_cast<float>(size) * 1.5f, index + 1));
+				return { size, static_cast<uint32_t>(m_MeshMetadata.size()) };
 			}
 
 			template<typename VertexT = StaticVertex> requires std::same_as<VertexT, StaticVertex>
@@ -594,6 +650,8 @@ namespace Cori {
 					}
 				}();
 
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Upload);
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u] loadGen=%u vertices=%llu (%llu bytes) indices=%llu (%llu bytes)", handle.GetIndex(), handle.GetVersion(), loadGen, static_cast<unsigned long long>(vertices.size()), static_cast<unsigned long long>(vertices.size() * sizeof(VertexT)), static_cast<unsigned long long>(indices.size()), static_cast<unsigned long long>(indices.size() * sizeof(uint32_t)));
 				CORI_CORE_ASSERT(IsHandleValidImpl(handle), "Invalid handle.");
 
 				vma::VirtualAllocationCreateInfo indicesAllocInfo {
@@ -624,11 +682,13 @@ namespace Cori {
 					auto [result2, alloc] = vertexStorage->m_Block.virtualAllocate(verticesAllocInfo, vertexOffset);
 					CORI_CORE_ASSERT(result2 == vk::Result::eSuccess, "VulkanMeshManager failed to allocate memory for new vertices in a newly created vertex storage, error: {}", vk::to_string(result2));
 					vertexAlloc = alloc;
+					CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Vertex alloc: NEW storage %p @ byte offset %llu, index alloc @ byte offset %llu", static_cast<void*>(vertexStorage), static_cast<unsigned long long>(vertexOffset), static_cast<unsigned long long>(indexOffset));
 				} else {
 					const auto& cva = completeVertexAlloc.value();
 					vertexOffset = cva.offset;
 					vertexAlloc = cva.allocation;
 					vertexStorage = cva.storage;
+					CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Vertex alloc: reused worker allocation in storage %p @ byte offset %llu, index alloc @ byte offset %llu", static_cast<void*>(vertexStorage), static_cast<unsigned long long>(vertexOffset), static_cast<unsigned long long>(indexOffset));
 				}
 
 				VulkanStreamingLine::BufferUpload vertexUpload{
@@ -691,6 +751,9 @@ namespace Cori {
 						.loadGen = loadGen
 					});
 
+					CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Outcome: Upload SUBMITTED to streaming line (ticket=%llu), status=Streaming", static_cast<unsigned long long>(streamingResult.value()));
+					CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eDebug, Cori::ProfileColors::Upload, "%s Handle=[%u, %u] upload SUBMITTED to streaming line (ticket=%llu, indices=%llu, vertexBytes=%llu), status=Streaming", CORI_CLEAN_TYPE_NAME(Mesh), handle.GetIndex(), handle.GetVersion(), static_cast<unsigned long long>(streamingResult.value()), static_cast<unsigned long long>(indices.size()), static_cast<unsigned long long>(vertices.size() * sizeof(VertexT)));
+
 					return { true, indexOffset, streamingResult.value() };
 				}
 
@@ -707,6 +770,9 @@ namespace Cori {
 					AssignPlaceholder(handle);
 
 					SetAssetStatusImpl(handle, AssetStatus::eLoadFailed);
+
+					CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: streaming line returned eInvalidData, PLACEHOLDER assigned, status=LoadFailed");
+					CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eError, Cori::ProfileColors::Destroy, "%s Handle=[%u, %u] LoadToMesh FAILED: streaming line eInvalidData, PLACEHOLDER assigned, status=LoadFailed", CORI_CLEAN_TYPE_NAME(Mesh), handle.GetIndex(), handle.GetVersion());
 
 					return { false, indexOffset, std::nullopt };
 				}
@@ -729,6 +795,9 @@ namespace Cori {
 
 				SetAssetStatusImpl(handle, AssetStatus::eStreamingQueued);
 
+				CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: streaming line full, upload QUEUED, status=StreamingQueued (still showing placeholder)");
+				CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eDebug, Cori::ProfileColors::Upload, "%s Handle=[%u, %u] upload QUEUED (streaming line full), status=StreamingQueued", CORI_CLEAN_TYPE_NAME(Mesh), handle.GetIndex(), handle.GetVersion());
+
 				m_QueuedUploads.emplace(QueuedUpload{
 					.vertexUpload = vertexUpload,
 					.indexUpload = indexUpload,
@@ -744,6 +813,7 @@ namespace Cori {
 			}
 
 			VertexStorage* AllocateNewVertexStorage() {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Alloc);
 				auto& sharingSettings = VulkanEngine::GetBufferSharingSettings(BUFFER_USAGE);
 				vk::BufferCreateInfo vkBufferInfo{
 					.size = VERTEX_STORAGE_SIZE,
@@ -776,20 +846,30 @@ namespace Cori {
 				CORI_CORE_ASSERT(result1 == vk::Result::eSuccess, "Failed to create vma vertex storage virtual block. Error: {}", vk::to_string(result1));
 
 				auto storage = m_VertexStorages.emplace_back(VulkanBuffer::Create(createInfo), vertexBlock);
+
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "New vertex storage %p (%llu bytes), total storages=%llu", static_cast<void*>(&*storage), static_cast<unsigned long long>(VERTEX_STORAGE_SIZE), static_cast<unsigned long long>(m_VertexStorages.size()));
+				CORI_PROFILER_MSG_CFP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Alloc, "%s vertex storage ALLOCATED %p (%llu bytes), total storages=%llu", CORI_CLEAN_TYPE_NAME(Mesh), static_cast<void*>(&*storage), static_cast<unsigned long long>(VERTEX_STORAGE_SIZE), static_cast<unsigned long long>(m_VertexStorages.size()));
+
 				return &*storage;
 			}
 
 			void DestroyMesh(Core::Handle<Mesh> handle) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Destroy);
 				if (handle == m_PlaceholderMesh) {
+					CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Skipped: placeholder mesh is never destroyed");
 					return;
 				}
 
 				auto& meta = m_MeshMetadata[handle.GetIndex()];
 
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u] (placeholderAssigned=%d, loaded=%d)", handle.GetIndex(), handle.GetVersion(), static_cast<int>(meta.placeholderAssigned), static_cast<int>(meta.loaded));
+				CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eDebug, Cori::ProfileColors::Destroy, "%s Handle=[%u, %u] DestroyMesh (placeholderAssigned=%d, loaded=%d)", CORI_CLEAN_TYPE_NAME(Mesh), handle.GetIndex(), handle.GetVersion(), static_cast<int>(meta.placeholderAssigned), static_cast<int>(meta.loaded));
+
 				if (!meta.placeholderAssigned && meta.loaded) {
 					DeletionQueue::PushVirtualAlloc(meta.vertexAllocation, meta.vertexStorage->m_Block, meta.vertexStorage->m_Mutex);
 					DeletionQueue::PushVirtualAlloc(meta.indexAllocation, Get().m_IndexBufferBlock);
 					meta.vertexStorage->RemoveWeakRef();
+					CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Queued vertex/index allocations for deletion (storage=%p, refs now strong=%u weak=%u)", static_cast<void*>(meta.vertexStorage), meta.vertexStorage->GetStrongRefCount(), meta.vertexStorage->GetWeakRefCount());
 				}
 
 				meta.loaded = false;
@@ -803,6 +883,7 @@ namespace Cori {
 			}
 
 			std::vector<MeshInTransfer>& FindInTransferSlot(const uint64_t value) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Upload);
 				InTransferSlot* free = nullptr;
 				InTransferSlot* bestPick = nullptr;
 
@@ -871,8 +952,17 @@ namespace Cori {
 
 			//temporary and writen by gemini. quick and dirty and does its job, will move to gltf and engine specific asset types once i have an editor
 			static bool LoadObjToEngine(const char* filepath, std::vector<StaticVertex>& outVertices, std::vector<uint32_t>& outIndices) {
-				fastObjMesh* mesh = fast_obj_read(filepath);
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Decode);
+				fastObjMesh* mesh = nullptr;
+				{
+					CORI_PROFILE_SCOPE_CP(Cori::ProfileParts::RenderingAssets, "OBJ read (fast_obj)", Cori::ProfileColors::Decode);
+					CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "File: %s", filepath);
+					mesh = fast_obj_read(filepath);
+				}
+
 				if (!mesh) {
+					//the handle-scoped LOAD FAILED message is emitted by the caller, which knows the handle
+					CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Outcome: fast_obj_read could not read '%s'", filepath);
 					std::cerr << "Failed to load obj: " << filepath << std::endl;
 					return false;
 				}
@@ -1020,6 +1110,8 @@ namespace Cori {
 
 					outVertices[i].tangent = PackTangent(orthoTangent, bitangentSign);
 				}
+
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Outcome: Parsed %u faces -> %llu unique vertices (%llu bytes), %llu indices (%llu bytes)", mesh->face_count, static_cast<unsigned long long>(outVertices.size()), static_cast<unsigned long long>(outVertices.size() * sizeof(StaticVertex)), static_cast<unsigned long long>(outIndices.size()), static_cast<unsigned long long>(outIndices.size() * sizeof(uint32_t)));
 
 				fast_obj_destroy(mesh);
 				return true;

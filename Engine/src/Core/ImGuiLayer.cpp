@@ -27,8 +27,6 @@ namespace Cori {
 					style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 				}
 
-				std::list<int> t;
-
 				Graphics::ImGuiRenderer::Init(Application::GetWindow().GetNativeWindow());
 
 				CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::ImGui }, "ImGuiLayer created");

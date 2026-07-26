@@ -93,12 +93,17 @@ namespace Cori {
 			static void Load(const Core::Handle<ShaderEffect> handle, const Core::AssetID id, const uint32_t gen, const uint32_t vectorKey, std::filesystem::path path, std::string name = "");
 
 			static void Unload(const Core::Handle<ShaderEffect> handle) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Destroy);
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u]", handle.GetIndex(), handle.GetVersion());
+				CORI_PROFILER_MSG_CFP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Destroy, "%s Handle=[%u, %u] UNLOAD (releasing the shader pair ref, freeing handle)", CORI_CLEAN_TYPE_NAME(ShaderEffect), handle.GetIndex(), handle.GetVersion());
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Handle passed to Unload is invalid.");
 				CORI_CORE_ASSERT(handle != Get().m_PlaceholderEffect, "Placeholder shader effect handle was passed, can't unload it.")
 
 				Core::AssetID id = Get().m_HandleAllocator.GetBoundAssetID(handle);
 				{
-					std::lock_guard lk(Core::AssetManager2::GetMutex());
+					auto& mutex = Core::AssetManager2::GetMutex();
+					std::lock_guard lk(mutex);
+					CORI_PROFILER_LOCK_MARK(mutex);
 					auto& record = Core::AssetManager2::GetAssetRecord(id);
 					if (record.rawHandleIndex == handle.GetIndex() && record.rawHandleVersion == handle.GetVersion()) {
 						record.rawHandleIndex = UINT32_MAX;
@@ -109,10 +114,12 @@ namespace Cori {
 				Get().m_HandleAllocator.Free(handle);
 
 				if (!Get().m_ShaderEffects.IsIndexOccupied(handle.GetIndex())) {
+					CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: Handle freed, no shader effect slot was occupied");
 					return;
 				}
 
 				Get().m_ShaderEffects.RemoveAt(handle.GetIndex());
+				CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: Handle freed, slot released (shader pair ref dropped, stale data left in the shader effect data buffer)");
 			}
 
 			[[nodiscard]] static Core::AssetID GetAssetID(const Core::Handle<ShaderEffect> handle) {
@@ -150,9 +157,13 @@ namespace Cori {
 			}
 
 			void AssignPlaceholder(const Core::Handle<ShaderEffect> handle) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Missing);
 				CORI_CORE_ASSERT(IsHandleValid(handle), "ShaderEffect handle passed to AssignPlaceholder is invalid.");
 
 				m_ShaderEffects[handle] = m_ShaderEffects[m_PlaceholderEffect];
+
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u] -> PLACEHOLDER shader effect (copied from handle [%u, %u], placeholder shader pair refd)", handle.GetIndex(), handle.GetVersion(), m_PlaceholderEffect.GetIndex(), m_PlaceholderEffect.GetVersion());
+				CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eDebug, Cori::ProfileColors::Missing, "%s Handle=[%u, %u] assigned PLACEHOLDER shader effect (copied from handle [%u, %u])", CORI_CLEAN_TYPE_NAME(ShaderEffect), handle.GetIndex(), handle.GetVersion(), m_PlaceholderEffect.GetIndex(), m_PlaceholderEffect.GetVersion());
 			}
 
 			template<typename T> requires std::same_as<ShaderEffect, T>
@@ -161,13 +172,20 @@ namespace Cori {
 			}
 
 			void CreateShaderEffect(const Core::Handle<ShaderEffect> handle, Core::AssetRef<VertFragShaderPair> shaderPair, const PipelineState& state, const ShaderEffectData& data = {}) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Load);
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid ShaderEffect handle passed to CreateShaderEffect");
+
+				[[maybe_unused]] const auto shaderPairHandle = shaderPair.GetHandle();
 
 				auto& effect = m_ShaderEffects[handle];
 				effect.shaders = std::move(shaderPair);
 				effect.pipelineState = state;
 
 				m_ShaderEffectData[handle.GetIndex()] = data;
+
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u], shader pair handle=[%u, %u], cullMode=%s, frontFace=%s, depthCompareOp=%s", handle.GetIndex(), handle.GetVersion(), shaderPairHandle.GetIndex(), shaderPairHandle.GetVersion(), vk::to_string(state.cullMode).c_str(), vk::to_string(state.frontFace).c_str(), vk::to_string(state.depthCompareOp).c_str());
+				CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: Shader effect created directly into the slot (no streaming, no asset file)");
+				CORI_PROFILER_MSG_CFP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Load, "%s Handle=[%u, %u] CREATED in place (shader pair handle=[%u, %u])", CORI_CLEAN_TYPE_NAME(ShaderEffect), handle.GetIndex(), handle.GetVersion(), shaderPairHandle.GetIndex(), shaderPairHandle.GetVersion());
 			}
 
 			static void QueueUnload(const Core::Handle<ShaderEffect> handle) {
@@ -207,6 +225,7 @@ namespace Cori {
 			}
 
 			static void Sync() {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Process);
 				Get().m_ShaderEffectData.Sync();
 			}
 

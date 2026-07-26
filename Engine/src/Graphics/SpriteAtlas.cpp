@@ -1,3 +1,5 @@
+//legacy from old 2d renderer, need to rewire
+#if 0
 #include "SpriteAtlas.hpp"
 #include "FileSystem/PathManager.hpp"
 
@@ -80,3 +82,4 @@ namespace Cori {
 		}
 	}
 }
+#endif

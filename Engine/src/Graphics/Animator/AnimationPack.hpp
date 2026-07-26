@@ -1,4 +1,6 @@
 #pragma once
+//legacy from old 2d renderer, need to rewire
+#if 0
 #include "Profiling/Trackable.hpp"
 #include "Graphics/SpriteAtlas.hpp"
 #include "Animation.hpp"
@@ -166,3 +168,4 @@ namespace Cori {
 		};
 	}
 }
+#endif

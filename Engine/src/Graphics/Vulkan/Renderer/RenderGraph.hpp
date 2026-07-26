@@ -925,6 +925,7 @@ namespace Cori {
 					}
 
 					CORI_PROFILE_SCOPE_DYNAMIC_NAME(pass.m_Name);
+					CORI_PROFILE_GPU_ZONE_DYNAMIC_NAME_CP(Cori::ProfileParts::RenderingLoop, VulkanEngine::GetGraphicsGPUProfilerContext(), cmb, pass.m_Name, Cori::ProfileColors::GPUPass);
 
 					if (pass.m_ImageBarriers.size() > 0 || pass.m_BufferBarriers.size() > 0) {
 						vk::DependencyInfo depInfo {

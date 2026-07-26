@@ -7,6 +7,7 @@
 /Engine/bin/*
 /Engine/docs/temp/*
 /Engine/tools/TracyGUI/*
+/Engine/tools/TracyCapture/*
 /cmake-*
 
 # git submodules 
@@ -64,3 +65,5 @@ rmSub.sh
 
 *.a
 *.so
+
+Tools/profiling-env.sh

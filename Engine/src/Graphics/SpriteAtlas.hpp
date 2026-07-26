@@ -1,4 +1,6 @@
 #pragma once
+//legacy from old 2d renderer, need to rewire
+#if 0
 #include "Texture.hpp"
 #include "Image.hpp"
 #include "Profiling/Trackable.hpp"
@@ -113,3 +115,4 @@ namespace Cori {
 		};
 	}
 }
+#endif

@@ -1,7 +1,5 @@
 #pragma once
 #include "EventSystem/Event.hpp"
-#include "Graphics/GraphicsAPIs.hpp"
-#include "Profiling/Trackable.hpp"
 
 namespace Cori {
 	namespace Core {
@@ -35,7 +33,7 @@ namespace Cori {
 		/**
 		 * @brief This class manages everything that is connected with physical Window management, i might add multiwindow support later, but for now, only one Window per application.
 		 */
-		class Window : public Profiling::Trackable<Window> {
+		class Window {
 		public:
 			~Window();
 
@@ -50,12 +48,6 @@ namespace Cori {
 			 * @return Window height in pixels.
 			 */
 			[[nodiscard]] int32_t GetHeight() const;
-
-			/**
-			 * @brief Returns the graphical API used by this window.
-			 * @return API enumerator.
-			 */
-			[[nodiscard]] static Graphics::GraphicsAPIs GetCurrentAPI() { return s_API; } // NOLINT
 
 			/**
 			 * @brief Changes the VSync state.
@@ -121,7 +113,6 @@ namespace Cori {
 
 			explicit Window(std::string title, const bool vsync = false);
 
-			inline static auto s_API = Graphics::GraphicsAPIs::OpenGL;
 			struct Data;
 			Data* m_Data{nullptr};
 		};

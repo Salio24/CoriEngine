@@ -285,7 +285,10 @@ namespace Cori {
 				std::string name;
 
 				{
-					std::lock_guard lk(GetMutex());
+					auto& mutex = GetMutex();
+					std::lock_guard lk(mutex);
+					CORI_PROFILER_LOCK_MARK(mutex);
+
 					if (!Get().m_AssetDatabase.contains(id)) {
 						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::AssetManager }, "Load failed, no asset with path '{}' found in the data base. Placeholder for '{}' returned.", path, CORI_CLEAN_TYPE_NAME(T));
 						return AssetRef<T>(T::Manager::template GetPlaceholder<T>());
@@ -412,7 +415,7 @@ namespace Cori {
 				CORI_DEBUG("checked '{}', changed '{}'", counter, counter2);
 			}
 
-			static std::mutex& GetMutex() {
+			static CORI_PROFILE_LOCKABLE_TYPE(std::mutex)& GetMutex() {
 				return Get().m_Mutex;
 			}
 
@@ -498,7 +501,7 @@ namespace Cori {
 
 			std::filesystem::path m_AppRootPath;
 
-			std::mutex m_Mutex;
+			CORI_PROFILE_LOCKABLE_N(std::mutex, m_Mutex, "AssetManager2 registry lock");
 
 			static std::unique_ptr<AssetManager2> s_Instance;
 		};

@@ -83,7 +83,7 @@ namespace Cori {
 			SceneHandle handle = SceneHandle(scene);
 			s_Data->m_Handles.insert({ id, handle });
 			scene->RegisterSystem<Systems::Transform>();
-			scene->RegisterSystem<Systems::Animation>();
+			//scene->RegisterSystem<Systems::Animation>();
 			scene->RegisterSystem<Systems::StateMachine>();
 			scene->RegisterSystem<Systems::Hierarchy>();
 			return handle;

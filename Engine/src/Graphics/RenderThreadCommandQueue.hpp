@@ -27,19 +27,36 @@ namespace Cori {
 			}
 
 			static uint64_t DrainOnRenderThread() {
+				CORI_PROFILE_FUNCTION();
+
 				{
 					std::lock_guard lk(s_Mutex);
 					std::swap(s_Queue, s_Draining);
 				}
 
-				for (auto& cmd : s_Draining) {
-					cmd();
+				{
+					CORI_PROFILE_SCOPE("Lp11");
+					for (auto& cmd : s_Draining) {
+						cmd();
+					}
 				}
-
-				s_DrainedCount.fetch_add(s_Draining.size(), std::memory_order_release);
-				const uint64_t n = s_Draining.size();
-				s_Draining.clear();
-				return n;
+				uint64_t n;
+				{
+					CORI_PROFILE_SCOPE("Lp12");
+					s_DrainedCount.fetch_add(s_Draining.size(), std::memory_order_release);
+				}
+				{
+					CORI_PROFILE_SCOPE("Lp13");
+					n = s_Draining.size();
+				}
+				{
+					CORI_PROFILE_SCOPE("Lp14");
+					s_Draining.clear();
+				}
+				{
+					CORI_PROFILE_SCOPE("Lp15");
+					return n;
+				}
 			}
 
 			static uint64_t DrainedCount() {

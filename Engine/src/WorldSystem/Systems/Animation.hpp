@@ -1,4 +1,6 @@
 #pragma once
+//legacy from old 2d renderer, need to rewire
+#if 0
 #include "System.hpp"
 #include "WorldSystem/DisposableEntityPool.hpp"
 #include "Graphics/Animator/QuadAnimator.hpp"
@@ -66,3 +68,4 @@ namespace Cori {
 		}
 	}
 }
+#endif

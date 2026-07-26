@@ -179,11 +179,75 @@ project(CoriEngine)
     set(glaze_ENABLE_REFLECTION26 ON CACHE BOOL "")
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/glaze EXCLUDE_FROM_ALL)
 
+    #hwloc.
+    set(CORI_HWLOC_VERSION 2.14.0 CACHE STRING "hwloc release to vendor")
+    string(REGEX MATCH "^[0-9]+\\.[0-9]+" CORI_HWLOC_SERIES ${CORI_HWLOC_VERSION})
+    set(CORI_HWLOC_URL "https://download.open-mpi.org/release/hwloc/v${CORI_HWLOC_SERIES}/hwloc-${CORI_HWLOC_VERSION}.tar.gz")
+
+    include(FetchContent)
+    if (WIN32)
+        set(HWLOC_SKIP_LSTOPO 1)
+        set(HWLOC_SKIP_TOOLS 1)
+        FetchContent_Declare(hwloc
+            URL ${CORI_HWLOC_URL}
+            DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+            SOURCE_SUBDIR contrib/windows-cmake
+            EXCLUDE_FROM_ALL)
+        FetchContent_MakeAvailable(hwloc)
+        add_library(HWLOC::hwloc_static ALIAS hwloc)
+    else()
+        FetchContent_Declare(hwloc
+            URL ${CORI_HWLOC_URL}
+            DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+        FetchContent_MakeAvailable(hwloc)
+
+        set(CORI_HWLOC_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/hwloc-install)
+        set(CORI_HWLOC_LIB ${CORI_HWLOC_PREFIX}/lib/libhwloc.a)
+        set(CORI_HWLOC_INC ${CORI_HWLOC_PREFIX}/include)
+
+        include(ProcessorCount)
+        ProcessorCount(CORI_HWLOC_JOBS)
+        if (CORI_HWLOC_JOBS EQUAL 0)
+            set(CORI_HWLOC_JOBS 1)
+        endif()
+
+        include(ExternalProject)
+        ExternalProject_Add(hwloc_ext
+            SOURCE_DIR ${hwloc_SOURCE_DIR}
+            CONFIGURE_COMMAND ${hwloc_SOURCE_DIR}/configure
+                --prefix=${CORI_HWLOC_PREFIX}
+                --libdir=${CORI_HWLOC_PREFIX}/lib
+                --enable-static --disable-shared
+                --with-pic
+                "CFLAGS=-O2 -g -fPIC"
+                --disable-io --disable-libxml2 --disable-cairo --disable-libudev
+                --disable-plugin-dlopen --disable-plugin-ltdl
+                "CC=${CMAKE_C_COMPILER}"
+            BUILD_COMMAND make -j${CORI_HWLOC_JOBS}
+            INSTALL_COMMAND make install
+            BUILD_BYPRODUCTS ${CORI_HWLOC_LIB})
+
+        file(MAKE_DIRECTORY ${CORI_HWLOC_INC})
+
+        add_library(HWLOC::hwloc_static STATIC IMPORTED GLOBAL)
+        set_target_properties(HWLOC::hwloc_static PROPERTIES
+            IMPORTED_LOCATION ${CORI_HWLOC_LIB}
+            INTERFACE_INCLUDE_DIRECTORIES ${CORI_HWLOC_INC})
+    endif()
+
+    set(CORI_HWLOC_TARGET HWLOC::hwloc_static)
+
     set(TBB_TEST OFF CACHE BOOL "")
-    set(TBB_STRICT OFF CACHE BOOL "") 
+    set(TBB_STRICT OFF CACHE BOOL "")
     set(BUILD_SHARED_LIBS ON)
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/oneTBB EXCLUDE_FROM_ALL)
     set(BUILD_SHARED_LIBS OFF)
+
+    #explicit tbb dependency
+    if (NOT WIN32 AND TARGET tbbbind)
+        add_dependencies(tbbbind hwloc_ext)
+    endif()
+
 
 #find_package (Vulkan REQUIRED)
 
@@ -204,8 +268,7 @@ project(CoriEngine)
     )
 
     # my shared lib
-    add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES}
-            src/Core/GlobalFuncs.hpp)
+    add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES})
 
     target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
@@ -309,7 +372,15 @@ project(CoriEngine)
     endif ()
 
     # can be private 
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static msdf-atlas-gen)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE SDL3_mixer::SDL3_mixer-static SDL3_image::SDL3_image-static msdf-atlas-gen ${CORI_HWLOC_TARGET})
+
+    if (NOT WIN32 AND TARGET hwloc_ext)
+        add_dependencies(${ENGINE_LIBRARY_NAME} hwloc_ext)
+    endif()
+
+    if (TARGET tbbbind)
+        add_dependencies(${ENGINE_LIBRARY_NAME} tbbbind)
+    endif()
 
     if(CORI_BUILD_DOCS)
         message(STATUS "CoriEngine documentation build is enabled.")

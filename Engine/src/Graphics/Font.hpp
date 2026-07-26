@@ -1,4 +1,6 @@
 #pragma once
+//legacy from old 2d renderer, need to rewire
+#if 0
 #include "Profiling/Trackable.hpp"
 #include "AssetManager/AssetLoadStatus.hpp"
 
@@ -110,3 +112,4 @@ namespace Cori {
 		};
 	}
 }
+#endif

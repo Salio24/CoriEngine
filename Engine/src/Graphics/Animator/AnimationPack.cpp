@@ -1,4 +1,6 @@
 #include "AnimationPack.hpp"
+//legacy from old 2d renderer, need to rewire
+#if 0
 #include "Core/Application.hpp"
 #include "Graphics/Image.hpp"
 #include "AssetManager/EngineAssets.hpp"
@@ -260,3 +262,4 @@ namespace Cori {
 	}
 }
 
+#endif

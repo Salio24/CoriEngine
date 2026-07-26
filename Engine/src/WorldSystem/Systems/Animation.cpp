@@ -1,3 +1,5 @@
+//legacy from old 2d renderer, need to rewire
+#if 0
 #include "Animation.hpp"
 #include "Graphics/Animator/QuadAnimator.hpp"
 
@@ -46,3 +48,4 @@ namespace Cori {
 		}
 	}
 }
+#endif

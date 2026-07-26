@@ -1,4 +1,6 @@
 #pragma once
+//legacy from old 2d renderer, need to rewire
+#if 0
 #include <msdf-atlas-gen/msdf-atlas-gen.h>
 
 #include "Texture.hpp"
@@ -16,3 +18,4 @@ namespace Cori {
 		}
 	}
 }
+#endif

@@ -1,5 +1,6 @@
 #pragma once
-
+//legacy from old 2d renderer, need to rewire
+#if 0
 namespace Cori {
 	namespace Graphics {
 		class AnimationPack;
@@ -37,3 +38,4 @@ namespace Cori {
 		concept IsAnimationWithParams = std::is_same_v<T, AnimationWithParams>;
 	}
 }
+#endif

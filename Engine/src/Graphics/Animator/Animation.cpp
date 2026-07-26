@@ -1,3 +1,5 @@
+//legacy from old 2d renderer, need to rewire
+#if 0
 #include "Animation.hpp"
 #include "AnimationPack.hpp"
 
@@ -9,3 +11,4 @@ namespace Cori {
 
 	}
 }
+#endif

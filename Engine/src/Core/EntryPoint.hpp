@@ -1,19 +1,23 @@
 #pragma once
+#include <malloc.h>
 #ifdef CORI_ENABLE_PROFILING
 #include <tracy/Tracy.hpp>
+#include "Profiling/CallStackDepthDef.hpp"
 #undef TRACY_ON_DEMAND
 #define TRACY_NO_EXIT 1
+#if CORI_PROFILER_STACK_DEPTH > 0
 void* operator new(std::size_t count)
 {
 	auto ptr= malloc(count);
-	TracyAllocS(ptr, count, 35);
+	TracyAllocS(ptr, count, CORI_PROFILER_STACK_DEPTH);
 	return ptr;
 }
 void operator delete(void* ptr) noexcept
 {
-	TracyFreeS(ptr, 35);
+	TracyFreeS(ptr, CORI_PROFILER_STACK_DEPTH);
 	free(ptr);
 }
+#endif
 #endif
 
 #include "Engine.hpp"
@@ -21,6 +25,7 @@ void operator delete(void* ptr) noexcept
 extern Cori::Core::Application* Cori::Core::CreateApplication();
 
 int32_t main([[maybe_unused]] int32_t argc, [[maybe_unused]] char** argv) {
+	mallopt(M_MMAP_THRESHOLD, 512<<20);
 	#ifdef CORI_ENABLE_PROFILING
 	{
 		const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(7);

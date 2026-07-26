@@ -74,12 +74,17 @@ namespace Cori {
 			static void Load(const Core::Handle<Material> handle, const Core::AssetID id, const uint32_t gen, const uint32_t vectorKey, std::filesystem::path path, std::string name = "");
 
 			static void Unload(const Core::Handle<Material> handle) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Destroy);
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u]", handle.GetIndex(), handle.GetVersion());
+				CORI_PROFILER_MSG_CFP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Destroy, "%s Handle=[%u, %u] UNLOAD (releasing the shader effect and albedo texture refs, freeing handle)", CORI_CLEAN_TYPE_NAME(Material), handle.GetIndex(), handle.GetVersion());
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Handle passed to Unload is invalid.");
 				CORI_CORE_ASSERT(handle != Get().m_PlaceholderMaterial, "Placeholder material handle was passed, can't unload it.")
 
 				Core::AssetID id = Get().m_HandleAllocator.GetBoundAssetID(handle);
 				{
-					std::lock_guard lk(Core::AssetManager2::GetMutex());
+					auto& mutex = Core::AssetManager2::GetMutex();
+					std::lock_guard lk(mutex);
+					CORI_PROFILER_LOCK_MARK(mutex);
 					auto& record = Core::AssetManager2::GetAssetRecord(id);
 					if (record.rawHandleIndex == handle.GetIndex() && record.rawHandleVersion == handle.GetVersion()) {
 						record.rawHandleIndex = UINT32_MAX;
@@ -90,10 +95,12 @@ namespace Cori {
 				Get().m_HandleAllocator.Free(handle);
 
 				if (!Get().m_Materials.IsIndexOccupied(handle.GetIndex())) {
+					CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: Handle freed, no material slot was occupied");
 					return;
 				}
 
 				Get().m_Materials.RemoveAt(handle.GetIndex());
+				CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: Handle freed, slot released (shader effect and albedo texture refs dropped, stale data left in the material slot map buffer)");
 			}
 
 			[[nodiscard]] static Core::AssetID GetAssetID(const Core::Handle<Material> handle) {
@@ -155,6 +162,7 @@ namespace Cori {
 			}
 
 			static void Sync() {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Process);
 				Get().m_Materials.Sync();
 			}
 
@@ -168,12 +176,16 @@ namespace Cori {
 			static constexpr bool EnableAutoHotReload = false;
 
 			void AssignPlaceholder(const Core::Handle<Material> handle) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Missing);
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle.");
 
 				auto& data = m_Materials[handle];
 				auto& placeholderData = std::as_const(m_Materials)[m_PlaceholderMaterial];
 				data.shaderEffect = placeholderData.shaderEffect;
 				data.customData = placeholderData.customData;
+
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u] -> PLACEHOLDER material (copied from handle [%u, %u], placeholder shader effect and albedo texture refd)", handle.GetIndex(), handle.GetVersion(), m_PlaceholderMaterial.GetIndex(), m_PlaceholderMaterial.GetVersion());
+				CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eDebug, Cori::ProfileColors::Missing, "%s Handle=[%u, %u] assigned PLACEHOLDER material (copied from handle [%u, %u])", CORI_CLEAN_TYPE_NAME(Material), handle.GetIndex(), handle.GetVersion(), m_PlaceholderMaterial.GetIndex(), m_PlaceholderMaterial.GetVersion());
 			}
 
 			template<typename T> requires std::same_as<Material, T>
@@ -182,11 +194,20 @@ namespace Cori {
 			}
 
 			void CreateMaterial(const Core::Handle<Material> handle, Core::AssetRef<ShaderEffect> shaderEffect, MaterialData data) {
+				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Load);
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle.");
+
+				[[maybe_unused]] const auto shaderEffectHandle = shaderEffect.GetHandle();
+				[[maybe_unused]] const auto albedoTextureHandle = data.albedoTexture.GetHandle();
+				[[maybe_unused]] const auto albedoSampler = data.albedoSampler;
 
 				auto& material = m_Materials[handle];
 				material.shaderEffect = std::move(shaderEffect);
 				material.customData = std::move(data);
+
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u], shader effect handle=[%u, %u], albedo texture handle=[%u, %u], albedo sampler=%u", handle.GetIndex(), handle.GetVersion(), shaderEffectHandle.GetIndex(), shaderEffectHandle.GetVersion(), albedoTextureHandle.GetIndex(), albedoTextureHandle.GetVersion(), albedoSampler);
+				CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: Material created directly into the slot (no streaming, no asset file)");
+				CORI_PROFILER_MSG_CFP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Load, "%s Handle=[%u, %u] CREATED in place (shader effect handle=[%u, %u], albedo texture handle=[%u, %u])", CORI_CLEAN_TYPE_NAME(Material), handle.GetIndex(), handle.GetVersion(), shaderEffectHandle.GetIndex(), shaderEffectHandle.GetVersion(), albedoTextureHandle.GetIndex(), albedoTextureHandle.GetVersion());
 			}
 
 			static void QueueUnload(const Core::Handle<Material> handle) {

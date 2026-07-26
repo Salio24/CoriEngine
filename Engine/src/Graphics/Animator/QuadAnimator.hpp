@@ -1,4 +1,6 @@
 #pragma once
+//legacy from old 2d renderer, need to rewire
+#if 0
 #include "AnimationPack.hpp"
 #include "WorldSystem/Entity.hpp"
 
@@ -109,3 +111,4 @@ namespace Cori {
 		}
 	}
 }
+#endif

@@ -31,7 +31,6 @@ namespace Cori {
 				#endif
 
 				if (offset % m_Alignment != 0) {
-					offset = Math::AlignUp(offset, m_Alignment);
 					#ifdef DEBUG_BUILD
 					CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::VirtualBuffer }, "Offset '{}' provided when calling UploadToAllocation of VirtualBuffer '{}' is misaligned to its alignment of '{}', no upload will be made.", offset, m_Name, m_Alignment);
 					#else
@@ -272,6 +271,8 @@ namespace Cori {
 					};
 
 					cmb.pipelineBarrier2(depInfo2);
+
+					Get().m_CopyRegions.clear();
 				}
 
 			}
@@ -1236,7 +1237,8 @@ namespace Cori {
 					m_GPUBuffers[i] = VulkanBuffer::Create(info);
 				}
 
-				std::array<bool, FRAMES_IN_FLIGHT> isBufferBAR{ true };
+				std::array<bool, FRAMES_IN_FLIGHT> isBufferBAR{};
+				isBufferBAR.fill(true);
 				m_IsBAR = true;
 
 				uint32_t lastSectorSize = newSize % SECTOR_SIZE;
@@ -1996,6 +1998,10 @@ namespace Cori {
 						CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to begin secondary command buffer recording in VulkanStreamingLine. Error: {}", vk::to_string(result));
 
 						for (auto& pending : slot.pendingUploads) {
+							CORI_PROFILE_GPU_ZONE_C(VulkanEngine::GetTransferGPUProfilerContext(), slot.secondaryCmb, "Streaming Copy", Cori::ProfileColors::GPUTransfer);
+							CORI_PROFILE_SCOPE_CP(Cori::ProfileParts::RenderingAssets, "Record streaming copy", Cori::ProfileColors::Upload);
+							CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "%llu bytes", static_cast<unsigned long long>(pending.stagingSize));
+
 							if (std::holds_alternative<ImageUpload>(pending.resourceUpload)) {
 								auto& resourceUpload = std::get<ImageUpload>(pending.resourceUpload);
 

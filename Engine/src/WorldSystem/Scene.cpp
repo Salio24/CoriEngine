@@ -1,7 +1,6 @@
 #include "Scene.hpp"
 #include "Graphics/CameraController.hpp"
 #include "Physics/Triggers/Trigger.hpp"
-#include "Graphics/Renderer2D.hpp"
 #include "Graphics/Animator/QuadAnimator.hpp"
 #include "Systems/RenderSync.hpp"
 

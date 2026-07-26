@@ -1,3 +1,5 @@
+//legacy from old 2d renderer, need to rewire
+#if 0
 #include "Font.hpp"
 #include "FontData.hpp"
 #include "FileSystem/PathManager.hpp"
@@ -272,3 +274,4 @@ namespace Cori {
 		}
 	}
 }
+#endif

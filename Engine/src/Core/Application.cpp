@@ -1,24 +1,22 @@
 #include "Application.hpp"
-#include "Graphics/API.hpp"
 #include "WorldSystem/SceneManager.hpp"
 #include "WorldSystem/Components.hpp"
-#include "AssetManager/AssetManager.hpp"
 #include "EventSystem/Event.hpp"
 #include "EventSystem/AppEvent.hpp"
 #include "EventSystem/KeyEvent.hpp"
 #include "FileSystem/PathManager.hpp"
-#include "Graphics/Renderer2D.hpp"
 #include "../Graphics/Vulkan/Renderer/SceneRenderer.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
 
 //FIXME: remove include later
 #include "Graphics/Vulkan/Renderer/MasterRenderer.hpp"
+#include "Threading/CpuTopology.hpp"
 
 namespace Cori {
 	namespace Core {
 		Application* Application::s_Instance{ nullptr };
 
-		Application::Application(const char* windowName) : m_WorkerPool(std::thread::hardware_concurrency() == 1 ? 1 : std::thread::hardware_concurrency() - 1) {
+		Application::Application(const char* windowName) : m_WorkerPool(std::thread::hardware_concurrency() == 1 ? 1 : std::max(1u, std::thread::hardware_concurrency() - 4)) {
 			//m_ManualStep = true;
 			CORI_CORE_ASSERT(!s_Instance, "Trying to construct application for the second time. Application already exists!");
 			s_Instance = this;
@@ -27,6 +25,11 @@ namespace Cori {
 
 			m_Window = Window::Create(windowName, false);
 			Graphics::RenderThreadCommandQueue::SetExecuterThreadId(std::this_thread::get_id());
+
+			if (Threading::CpuTopology::ShouldBind()) {
+				Threading::CpuTopology::BindCurrentThreadToDomain(Threading::CpuTopology::PreferredDomain());
+			}
+
 			m_VulkanEngine = Graphics::VulkanEngine::Create(m_Window->GetNativeWindow(), true);
 
 			m_Window->SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent, CORI_PLACEHOLDERS(1)));
@@ -35,7 +38,6 @@ namespace Cori {
 			m_ImGuiLayer = new Internal::ImGuiLayer();
 			m_LayerStack.PushOverlay(m_ImGuiLayer);
 
-			//AssetManager::Init();
 			AssetManager2::Init();
 			World::SceneManager::Init();
 			Audio::Mixer::Init();
@@ -51,7 +53,6 @@ namespace Cori {
 			m_VulkanEngine.reset();
 			Audio::Mixer::Shutdown();
 			AssetManager2::Shutdown();
-			//AssetManager::Shutdown();
 		}
 
 		void Application::EmitEvent(Event& event) {
@@ -114,6 +115,8 @@ namespace Cori {
 					CORI_PROFILE_SCOPE("Cori Engine Global Update");
 					m_CommandQueue.Execute();
 					m_GameTimer.Update();
+
+					CORI_PROFILER_PLOT("Main thread CPU", Threading::CpuTopology::CurrentCpu());
 
 					for (Layer* layer : m_LayerStack) {
 						layer->OnUpdate(m_GameTimer);

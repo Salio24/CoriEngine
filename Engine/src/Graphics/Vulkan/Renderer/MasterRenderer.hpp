@@ -65,14 +65,18 @@ namespace Cori {
 			}
 		//protected:
 			void Loop() {
+				CORI_PROFILE_FUNCTION();
 				uint64_t wakeBefore = RenderThreadWakeup::Snapshot();
 
 				ProcessPendingSceneRendererCreations();
 				ProcessPendingSceneRendererDestructions();
 
-				if (TryRunFrame()) {
-					RenderThreadCommandQueue::DrainOnRenderThread();
-					return;
+				{
+					CORI_PROFILE_SCOPE("Lp1");
+					if (TryRunFrame()) {
+						RenderThreadCommandQueue::DrainOnRenderThread();
+						return;
+					}
 				}
 
 				if (RenderThreadCommandQueue::DrainOnRenderThread() > 0) {
@@ -83,10 +87,11 @@ namespace Cori {
 					return;
 				}
 
+
 				//if (HasNonDormantScene()) {
 				//}
 				
-				RenderThreadWakeup::WaitChanged(wakeBefore);
+				//RenderThreadWakeup::WaitChanged(wakeBefore);
 			}
 
 		private:

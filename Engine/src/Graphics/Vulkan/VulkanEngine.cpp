@@ -99,6 +99,9 @@ namespace Cori {
 			//m_DeviceExtensions.push_back(vk::KHRUnifiedImageLayoutsExtensionName);
 			m_DeviceExtensions.push_back(vk::EXTExtendedDynamicState3ExtensionName);
 			m_DeviceExtensions.push_back(vk::EXTDescriptorBufferExtensionName);
+				#ifdef CORI_ENABLE_PROFILING
+			m_DeviceExtensions.push_back(vk::EXTCalibratedTimestampsExtensionName);
+				#endif
 
 			m_InstanceExtensions.push_back(vk::EXTDebugUtilsExtensionName);
 
@@ -107,6 +110,7 @@ namespace Cori {
 			CreateSurface();
 			PickPhysicalDevice();
 			CreateDevice();
+			CreateGPUProfilerContexts();
 			InitializeVMA();
 			CreateSwapChain();
 			CreateCommandPools();
@@ -143,6 +147,12 @@ namespace Cori {
 			VulkanStreamingLine::Shutdown();
 			DeletionQueue::Shutdown();
 			VulkanImageViewManager::Shutdown();
+
+			if (m_TransferGPUProfilerContext != m_GraphicsGPUProfilerContext) {
+				CORI_PROFILE_GPU_CONTEXT_DESTROY(m_TransferGPUProfilerContext);
+			}
+			m_TransferGPUProfilerContext = nullptr;
+			CORI_PROFILE_GPU_CONTEXT_DESTROY(m_GraphicsGPUProfilerContext);
 
 			for (auto& semaphore : m_RenderFinishedSemaphores) {
 				m_Device.destroySemaphore(semaphore);
@@ -196,6 +206,14 @@ namespace Cori {
 				while (vk::Result::eTimeout == m_Device.waitForFences(frameData.m_DrawFence, vk::True, UINT64_MAX)) {}
 			}
 
+			{
+				CORI_PROFILE_SCOPE("GPU Profiler Collect");
+				CORI_PROFILE_GPU_COLLECT(m_GraphicsGPUProfilerContext);
+				if (m_TransferGPUProfilerContext != m_GraphicsGPUProfilerContext) {
+					CORI_PROFILE_GPU_COLLECT(m_TransferGPUProfilerContext);
+				}
+			}
+
 			if (m_SwapChainResizeNeeded) {
 				ResizeSwapChain();
 				m_SwapChainResizeNeeded = false;
@@ -203,7 +221,14 @@ namespace Cori {
 				return frameData;
 			}
 
-			auto [result_, imageIndex] = m_Device.acquireNextImageKHR(m_SwapChain, UINT64_MAX, frameData.m_PresentCompleteSemaphore, nullptr);
+			vk::Result result_;
+			uint32_t imageIndex;
+			{
+				CORI_PROFILE_SCOPE("Acquire image");
+				auto [result__, imageIndex_] = m_Device.acquireNextImageKHR(m_SwapChain, UINT64_MAX, frameData.m_PresentCompleteSemaphore, nullptr);
+				result_ = result__;
+				imageIndex = imageIndex_;
+			}
 
 			if (result_ == vk::Result::eErrorOutOfDateKHR) {
 				ResizeSwapChain();
@@ -226,6 +251,8 @@ namespace Cori {
 			vk::CommandBufferBeginInfo beginInfo = { .flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit };
 			result = frameData.m_CommandBuffer.begin(beginInfo);
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to begin command buffer recording. Error: {}", vk::to_string(result));
+
+			CORI_PROFILE_GPU_SPAN_BEGIN_C(m_GPUFrameZone, m_GraphicsGPUProfilerContext, frameData.m_CommandBuffer, "GPU Frame", Cori::ProfileColors::GPUFrame);
 
 			#if 0
 			vk::ImageMemoryBarrier2 barrier {
@@ -306,16 +333,20 @@ namespace Cori {
 
 			FrameInfo& frameData = m_FrameData[m_CurrentFrameInFlight];
 
-			VulkanTextureManager::ProcessUpdates(frameData.m_CommandBuffer);
-			VulkanMeshManager::ProcessUpdates(frameData.m_CommandBuffer);
-			VulkanShaderEffectManager::Sync();
-			VulkanMaterialSystem::Sync();
-			VulkanGlobalLayoutManager::Sync();
+			{
+				CORI_PROFILE_GPU_ZONE_C(m_GraphicsGPUProfilerContext, frameData.m_CommandBuffer, "Frame Sync Point", Cori::ProfileColors::GPUSync);
+
+				VulkanTextureManager::ProcessUpdates(frameData.m_CommandBuffer);
+				VulkanMeshManager::ProcessUpdates(frameData.m_CommandBuffer);
+				VulkanShaderEffectManager::Sync();
+				VulkanMaterialSystem::Sync();
+				VulkanGlobalLayoutManager::Sync();
 
 
-			VulkanStreamingLine::ProcessUploads();
-			VulkanVirtualBufferAllocator::SubmitCopies(frameData.m_CommandBuffer);
-			VulkanDynamicContainerUploadManager::ProcessUpdates(frameData.m_CommandBuffer);
+				VulkanStreamingLine::ProcessUploads();
+				VulkanVirtualBufferAllocator::SubmitCopies(frameData.m_CommandBuffer);
+				VulkanDynamicContainerUploadManager::ProcessUpdates(frameData.m_CommandBuffer);
+			}
 		}
 
 
@@ -352,6 +383,8 @@ namespace Cori {
 
 				frameData.m_CommandBuffer.pipelineBarrier2(depInfo);
 				#endif
+
+				CORI_PROFILE_GPU_SPAN_END(m_GPUFrameZone);
 
 				auto result = frameData.m_CommandBuffer.end();
 
@@ -477,7 +510,7 @@ namespace Cori {
 
 			auto [result, debugMessenger] = m_Instance.createDebugUtilsMessengerEXT(debugUtilsMessengerCreateInfoEXT);
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to create debug messenger. Error: {}", vk::to_string(result));
-			m_DebugMessenger = std::move(debugMessenger);
+			m_DebugMessenger = debugMessenger;
 		}
 
 		void VulkanEngine::CreateSurface() {
@@ -654,6 +687,8 @@ namespace Cori {
 						.runtimeDescriptorArray = true,
 						.samplerFilterMinmax = true,
 						.scalarBlockLayout = true,
+
+						.hostQueryReset = true,
 						.timelineSemaphore = true,
 						.bufferDeviceAddress = true
 					},
@@ -786,6 +821,62 @@ namespace Cori {
 			}
 		}
 
+		void VulkanEngine::CreateGPUProfilerContexts() {
+			#ifdef CORI_ENABLE_PROFILING
+			#if defined(_WIN32)
+			constexpr vk::TimeDomainEXT requiredTimeDomain = vk::TimeDomainEXT::eQueryPerformanceCounter;
+			#else
+			constexpr vk::TimeDomainEXT requiredTimeDomain = vk::TimeDomainEXT::eClockMonotonicRaw;
+			#endif
+
+			if (m_PhysicalDeviceProperties.limits.timestampPeriod == 0.0f) {
+				CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self }, "Physical device reports a timestampPeriod of 0, GPU timestamps are unsupported. Tracy GPU zones will be disabled.");
+				return;
+			}
+
+			auto [domainsResult, timeDomains] = m_PhysicalDevice.getCalibrateableTimeDomainsEXT();
+			if (domainsResult != vk::Result::eSuccess) {
+				CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self }, "Failed to query calibrateable time domains ({}). Tracy GPU zones will be disabled.", vk::to_string(domainsResult));
+				return;
+			}
+
+			if (std::ranges::find(timeDomains, requiredTimeDomain) == timeDomains.end()) {
+				CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self }, "Device does not expose the '{}' calibrateable time domain that Tracy requires to put GPU timestamps on the CPU clock. Tracy GPU zones will be disabled.", vk::to_string(requiredTimeDomain));
+				return;
+			}
+
+			const auto queueFamilyProperties = m_PhysicalDevice.getQueueFamilyProperties();
+
+			auto queueFamilySupportsTimestamps = [&queueFamilyProperties](const uint32_t familyIndex) {
+				return familyIndex < queueFamilyProperties.size() && queueFamilyProperties[familyIndex].timestampValidBits > 0;
+			};
+
+			if (queueFamilySupportsTimestamps(m_GraphicsQueueFamilyIndex)) {
+				m_GraphicsGPUProfilerContext = CORI_PROFILE_GPU_CONTEXT(m_PhysicalDevice, m_Device,
+					VULKAN_HPP_DEFAULT_DISPATCHER.vkResetQueryPool,
+					VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceCalibrateableTimeDomainsEXT,
+					VULKAN_HPP_DEFAULT_DISPATCHER.vkGetCalibratedTimestampsEXT);
+				CORI_PROFILE_GPU_CONTEXT_NAME(m_GraphicsGPUProfilerContext, "Graphics Queue");
+			} else {
+				CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self }, "Graphics queue family {} reports 0 valid timestamp bits, its Tracy GPU context will be disabled.", m_GraphicsQueueFamilyIndex);
+			}
+
+			if (m_DedicatedTransferQueue) {
+				if (queueFamilySupportsTimestamps(m_TransferQueueFamilyIndex)) {
+					m_TransferGPUProfilerContext = CORI_PROFILE_GPU_CONTEXT(m_PhysicalDevice, m_Device,
+						VULKAN_HPP_DEFAULT_DISPATCHER.vkResetQueryPool,
+						VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceCalibrateableTimeDomainsEXT,
+						VULKAN_HPP_DEFAULT_DISPATCHER.vkGetCalibratedTimestampsEXT);
+					CORI_PROFILE_GPU_CONTEXT_NAME(m_TransferGPUProfilerContext, "Transfer Queue");
+				} else {
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self }, "Transfer queue family {} reports 0 valid timestamp bits, its Tracy GPU context will be disabled.", m_TransferQueueFamilyIndex);
+				}
+			} else {
+				m_TransferGPUProfilerContext = m_GraphicsGPUProfilerContext;
+			}
+			#endif
+		}
+
 		void VulkanEngine::InitializeVMA() {
 			vma::AllocatorCreateInfo info{
 				.flags = vma::AllocatorCreateFlagBits::eBufferDeviceAddress | vma::AllocatorCreateFlagBits::eExtMemoryBudget | vma::AllocatorCreateFlagBits::eExtMemoryPriority,
@@ -824,7 +915,7 @@ namespace Cori {
 
 			auto ChooseMode = [&]{
 				for (const auto& availablePresentMode : availablePresentModes) {
-					if (availablePresentMode == vk::PresentModeKHR::eMailbox) {
+					if (availablePresentMode == vk::PresentModeKHR::eImmediate) {
 						return availablePresentMode;
 					}
 				}
@@ -853,7 +944,7 @@ namespace Cori {
 			m_SwapChainImageFormat = ChooseFormat();
 			auto mode = ChooseMode();
 			m_SwapChainExtent = ChooseExtent();
-			auto minImageCount = std::max( 3u, surfaceCapabilities.minImageCount );
+			auto minImageCount = std::max( 5u, surfaceCapabilities.minImageCount );
 			if ((0 < surfaceCapabilities.maxImageCount) && (surfaceCapabilities.maxImageCount < minImageCount)) {
 				minImageCount = surfaceCapabilities.maxImageCount;
 			}

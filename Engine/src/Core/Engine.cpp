@@ -1,4 +1,5 @@
 #include "Engine.hpp"
+#include "Threading/CpuTopology.hpp"
 #include <SDL3_image/SDL_image.h>
 
 namespace Cori {
@@ -8,6 +9,8 @@ namespace Cori {
 				Logger::EnableVirtualTerminalProcessing();
 
 				Logger::Init(asyncLogging, fileLogging);
+
+				Threading::CpuTopology::Init();
 
 				CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self }, "Starting Cori Engine.");
 
@@ -27,6 +30,8 @@ namespace Cori {
 
 			void Engine::Stop() {
 				SDL_Quit();
+
+				Threading::CpuTopology::Shutdown();
 
 				CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self }, "Cori Engine stopped.");
 				CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self }, "Bye");
