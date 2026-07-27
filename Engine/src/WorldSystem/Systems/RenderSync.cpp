@@ -113,6 +113,13 @@ namespace Cori {
 					fd->patches.emplace_back(patch);
 				}
 
+				const auto& camera = m_Owner.GetActiveCamera();
+				fd->cameraSnapshot = Graphics::CameraSnapshot{
+					.view = camera.GetViewMatrix(),
+					.projection = camera.GetProjectionMatrix(),
+					.viewportSize = m_ViewportExtent
+				};
+
 				fd->deletedObjects.swap(m_PendingRemovals);
 				m_PendingRemovals.clear();
 
@@ -124,6 +131,8 @@ namespace Cori {
 			}
 
 			bool RenderSync::Create(Graphics::SceneRenderer::CreateInfo&& createInfo) {
+				m_ViewportExtent = createInfo.initialPRTExtent;
+
 				m_Owner.GetRegistry().on_construct<Components::Entity::Rendering>().connect<&RenderSync::OnRenderComponentCreate>(this);
 				m_Owner.GetRegistry().on_destroy<Components::Entity::Rendering>().connect<&RenderSync::OnRenderComponentDestroy>(this);
 

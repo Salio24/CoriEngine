@@ -8,7 +8,6 @@ namespace Cori {
 }
 
 #define CORI_PROFILE_GPU_CONTEXT(physicalDevice, device, resetQueryPool, getTimeDomains, getTimestamps) TracyVkContextHostCalibrated(static_cast<VkPhysicalDevice>(physicalDevice), static_cast<VkDevice>(device), resetQueryPool, getTimeDomains, getTimestamps)
-
 #define CORI_PROFILE_GPU_CONTEXT_NAME(ctx, name) do { if (ctx) { TracyVkContextName(ctx, name, static_cast<uint16_t>(sizeof(name) - 1)); } } while(0)
 #define CORI_PROFILE_GPU_CONTEXT_DESTROY(ctx) do { if (ctx) { TracyVkDestroy(ctx); (ctx) = nullptr; } } while(0)
 #define CORI_PROFILE_GPU_COLLECT(ctx) do { if (ctx) { TracyVkCollectHost(ctx); } } while(0)
@@ -16,7 +15,6 @@ namespace Cori {
 #define CORI_PROFILE_GPU_ZONE(ctx, cmdbuf, name) SuppressVarShadowWarning( TracyVkNamedZone(ctx, ___cori_gpu_zone, static_cast<VkCommandBuffer>(cmdbuf), name, (ctx) != nullptr) )
 #define CORI_PROFILE_GPU_ZONE_C(ctx, cmdbuf, name, color) SuppressVarShadowWarning( TracyVkNamedZoneC(ctx, ___cori_gpu_zone, static_cast<VkCommandBuffer>(cmdbuf), name, color, (ctx) != nullptr) )
 #define CORI_PROFILE_GPU_ZONE_CP(part, ctx, cmdbuf, name, color) SuppressVarShadowWarning( TracyVkNamedZoneC(ctx, ___cori_gpu_zone, static_cast<VkCommandBuffer>(cmdbuf), name, color, (ctx) != nullptr && CORI_PROFILE_PART_ENABLED(part)) )
-
 #define CORI_PROFILE_GPU_ZONE_DYNAMIC_NAME_CP(part, ctx, cmdbuf, name, color) std::string_view TracyConcat(__cori_gpu_name, TracyLine){ name }; SuppressVarShadowWarning( tracy::VkCtxScope ___cori_gpu_zone(ctx, TracyLine, TracyFile, strlen(TracyFile), TracyFunction, strlen(TracyFunction), TracyConcat(__cori_gpu_name, TracyLine).data(), TracyConcat(__cori_gpu_name, TracyLine).size(), static_cast<VkCommandBuffer>(cmdbuf), (ctx) != nullptr && CORI_PROFILE_PART_ENABLED(part)) )
 
 namespace Cori {

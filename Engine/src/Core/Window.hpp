@@ -62,6 +62,26 @@ namespace Cori {
 			[[nodiscard]] bool IsVSync() const;
 
 			/**
+			 * @brief Enables or disables relative mouse mode.
+			 * @details While it is on the cursor is hidden and confined to the window, and the mouse reports movement deltas instead of a position, which is what a camera wants. Turning it back off returns the cursor to where it was when the mode was entered.
+			 * @param status
+			 */
+			void SetRelativeMouseMode(const bool status);
+
+			/**
+			 * @brief Checks whether relative mouse mode is currently enabled.
+			 * @return True enabled, false disabled.
+			 */
+			[[nodiscard]] bool IsRelativeMouseMode() const;
+
+			/**
+			 * @brief Gives how far the mouse moved during the last event pump, in pixels.
+			 * @details Reported in both mouse modes, but only relative mode keeps producing motion once the cursor would have run into the edge of the screen. Reading it twice in a frame gives the same answer, it is replaced by the next pump rather than consumed.
+			 * @return Movement delta since the previous pump.
+			 */
+			[[nodiscard]] glm::vec2 GetMouseDelta() const;
+
+			/**
 			 * @brief Retrieves a list of all available ScreenMode.
 			 * @return A const reference to the vector containing all available ScreenMode.
 			 */

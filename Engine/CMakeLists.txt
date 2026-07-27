@@ -357,9 +357,12 @@ project(CoriEngine)
     # lib linking
 
     if (CORI_SANITIZE)
-        target_compile_options(${ENGINE_LIBRARY_NAME} PUBLIC -fsanitize=address)
-        target_link_options(${ENGINE_LIBRARY_NAME} PUBLIC -fsanitize=address)
+        #target_compile_options(${ENGINE_LIBRARY_NAME} PUBLIC -fsanitize=address)
+        #target_link_options(${ENGINE_LIBRARY_NAME} PUBLIC -fsanitize=address)
     endif ()
+
+    #target_compile_options(${ENGINE_LIBRARY_NAME} PUBLIC -fsanitize=thread)
+    #target_link_options(${ENGINE_LIBRARY_NAME} PUBLIC -fsanitize=thread)
     #target_link_libraries()
 
     target_compile_options(${ENGINE_LIBRARY_NAME} PUBLIC -freflection)

@@ -174,6 +174,7 @@ namespace Cori {
 					.frontFace = data.AssetData.pipelineState.frontFace,
 					.depthCompareOp = data.AssetData.pipelineState.depthCompareOp,
 					.depthTestEnable = data.AssetData.pipelineState.depthTestEnable,
+					.depthWriteEnable = data.AssetData.pipelineState.depthWriteEnable,
 					.depthBoundsTestEnable = data.AssetData.pipelineState.depthBoundsTestEnable,
 					.depthBiasEnable = data.AssetData.pipelineState.depthBiasEnable,
 					.stencilTestEnable = data.AssetData.pipelineState.stencilTestEnable,
@@ -182,7 +183,7 @@ namespace Cori {
 
 				[[maybe_unused]] const auto shaderPairHandle = data.AssetData.shaderPair.GetHandle();
 				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Parsed: shader pair handle=[%u, %u], cullMode=%s, frontFace=%s, depthCompareOp=%s", shaderPairHandle.GetIndex(), shaderPairHandle.GetVersion(), vk::to_string(state.cullMode).c_str(), vk::to_string(state.frontFace).c_str(), vk::to_string(state.depthCompareOp).c_str());
-				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Parsed: depthTest=%d, depthBoundsTest=%d, depthBias=%d, stencilTest=%d, logicOp=%d", static_cast<int>(state.depthTestEnable), static_cast<int>(state.depthBoundsTestEnable), static_cast<int>(state.depthBiasEnable), static_cast<int>(state.stencilTestEnable), static_cast<int>(state.logicOpEnable));
+				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Parsed: depthTest=%d, depthWrite=%d, depthBoundsTest=%d, depthBias=%d, stencilTest=%d, logicOp=%d", static_cast<int>(state.depthTestEnable), static_cast<int>(state.depthWriteEnable), static_cast<int>(state.depthBoundsTestEnable), static_cast<int>(state.depthBiasEnable), static_cast<int>(state.stencilTestEnable), static_cast<int>(state.logicOpEnable));
 
 				CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: Parsed, handed to FinalizeLoad");
 				CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eDebug, Cori::ProfileColors::Decode, "%s Handle=[%u, %u] parsed shader effect (shader pair handle=[%u, %u]), (gen=%u) (id=%llu)", CORI_CLEAN_TYPE_NAME(ShaderEffect), handle.GetIndex(), handle.GetVersion(), shaderPairHandle.GetIndex(), shaderPairHandle.GetVersion(), gen, static_cast<unsigned long long>(id));

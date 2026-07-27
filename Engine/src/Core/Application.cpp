@@ -123,6 +123,7 @@ namespace Cori {
 						layer->SceneUpdate(m_GameTimer);
 					}
 
+					#if 0
 					{
 						CORI_PROFILE_SCOPE("ImGui Render");
 						m_ImGuiLayer->StartFrame();
@@ -139,6 +140,7 @@ namespace Cori {
 
 						m_ImGuiLayer->EndFrame();
 					}
+					#endif
 
 					{
 						CORI_PROFILE_SCOPE("FrameData preparation");

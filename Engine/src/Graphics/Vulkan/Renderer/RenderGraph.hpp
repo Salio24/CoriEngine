@@ -216,7 +216,7 @@ namespace Cori {
 		public:
 			RenderGraphResourceRegistry() {
 				m_Nodes.resize(CORI_RENDER_GRAPH_RESOURCE_REGISTRY_INLINE_SIZE);
-				m_ImageStateCache.reserve(64); //TODO: move to define
+				m_ImageStateCache.resize(64); //TODO: move to define.
 			}
 
 			void Reset(const uint64_t currentFrameIndex) {
@@ -288,7 +288,7 @@ namespace Cori {
 
 			Internal::ImageStateHandle GetFreeImageState() {
 				if (m_ImageStateCacheSize >= m_ImageStateCache.size()) {
-					m_ImageStateCache.resize(m_ImageStateCache.size() * 1.5f);
+					m_ImageStateCache.resize(std::max<std::size_t>(m_ImageStateCache.size() * 1.5f, m_ImageStateCacheSize + 1));
 				}
 
 				Internal::ImageState& state = m_ImageStateCache[m_ImageStateCacheSize];
@@ -303,7 +303,7 @@ namespace Cori {
 				auto& bucket = m_ImagePool[desc];
 
 				for (auto& entry : bucket) {
-					if (entry.lastFrameUsed != currentFrameIndex) {
+					if (currentFrameIndex - entry.lastFrameUsed >= FRAMES_IN_FLIGHT) {
 						entry.lastFrameUsed = currentFrameIndex;
 						return entry.image;
 					}
@@ -634,7 +634,7 @@ namespace Cori {
 							}
 						}
 
-						for (const auto& writeDep : pass.m_Reads) {
+						for (const auto& writeDep : pass.m_Writes) {
 							Internal::GraphResourceHandleBase handle = writeDep.resource;
 							auto& node = m_ResourceRegistry->GetNode(handle);
 

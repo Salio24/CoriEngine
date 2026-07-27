@@ -238,7 +238,7 @@ namespace Cori {
 			void Composite(vk::CommandBuffer cmb, std::array<SceneRenderer*, s_MaxSceneRendererCount>& nonDormantRenderers, const uint32_t nonDormantRendererCount) {
 				{
 					vk::ImageMemoryBarrier2 scBar{
-						.srcStageMask = vk::PipelineStageFlagBits2::eTopOfPipe,
+						.srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
 						.srcAccessMask = vk::AccessFlagBits2::eNone,
 						.dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
 						.dstAccessMask = vk::AccessFlagBits2::eTransferWrite,

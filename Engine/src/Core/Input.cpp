@@ -1,4 +1,5 @@
 #include "Input.hpp"
+#include "Application.hpp"
 
 namespace Cori {
 	namespace Core {
@@ -28,6 +29,18 @@ namespace Cori {
 			float x, y;
 			SDL_GetMouseState(&x, &y);
 			return { x, y };
+		}
+
+		glm::vec2 Input::GetMouseDelta() {
+			return Application::GetWindow().GetMouseDelta();
+		}
+
+		void Input::SetRelativeMouseMode(const bool status) {
+			Application::GetWindow().SetRelativeMouseMode(status);
+		}
+
+		bool Input::IsRelativeMouseMode() {
+			return Application::GetWindow().IsRelativeMouseMode();
 		}
 	}
 }

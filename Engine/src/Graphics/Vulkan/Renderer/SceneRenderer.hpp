@@ -319,16 +319,9 @@ namespace Cori {
 				vk::ImageView prtImageView = m_PRT.GetImageView();
 				vk::Extent2D prtExtent = { m_PRT.GetImage().m_Extent3D.width, m_PRT.GetImage().m_Extent3D.height };
 
-				static auto startTime = std::chrono::high_resolution_clock::now();
-				auto currentTime = std::chrono::high_resolution_clock::now();
-				float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
-				uniformData.model = rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-				uniformData.model = glm::translate(uniformData.model, glm::vec3(0.0f, 0.0f, 0.0f));
-
-				uniformData.view = lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-				uniformData.proj = glm::perspective(glm::radians(45.0f), static_cast<float>(prtExtent.width) / static_cast<float>(prtExtent.height), 0.1f, 10.0f);
-				uniformData.proj[1][1] *= -1;
+				uniformData.model = glm::mat4(1.0f);
+				uniformData.view = m_CameraSnapshot.view;
+				uniformData.proj = m_CameraSnapshot.projection;
 
 				{
 					CORI_PROFILE_SCOPE("Render Graph registry reset");
@@ -351,6 +344,30 @@ namespace Cori {
 					uint32_t maxObjectCount = m_Objects.RawSize();
 					uint32_t maxBatchCount = m_Batches.RawSize();
 					uint32_t maxGroupCount = m_DrawGroups.RawSize();
+
+					#ifdef CORI_VALIDATION_LAYER
+					for (uint32_t objectIndex = 0; objectIndex < maxObjectCount; objectIndex++) {
+						if (!m_Objects.IsIndexValid(objectIndex)) {
+							continue;
+						}
+
+						const auto& object = std::as_const(m_Objects)[objectIndex];
+
+						if (object.valid == 0) {
+							continue;
+						}
+
+						if (object.m_OwnerBatch >= maxBatchCount) {
+							CORI_CORE_ASSERT(false, "Object {} is valid but references batch {}, out of range (batch count {}). The culling shaders would index the batch intermediate info buffer out of bounds.", objectIndex, object.m_OwnerBatch, maxBatchCount);
+							continue;
+						}
+
+						const auto& batch = std::as_const(m_BatchGPUInfo)[object.m_OwnerBatch];
+
+						CORI_CORE_ASSERT(batch.owner < maxGroupCount, "Batch {} (reached via object {}) references draw group {}, out of range (group count {}).", object.m_OwnerBatch, objectIndex, batch.owner, maxGroupCount);
+						CORI_CORE_ASSERT(VulkanMeshManager::IsHandleValid(batch.mesh), "Batch {} (reached via object {}) holds mesh handle [{}, {}], which is not valid. The vertex shader would fetch a garbage firstVertexAddress from it.", object.m_OwnerBatch, objectIndex, batch.mesh.GetIndex(), batch.mesh.GetVersion());
+					}
+					#endif
 
 					struct ComputePS{
 						uint64_t objectDataBuffer;
@@ -382,22 +399,50 @@ namespace Cori {
 
 					auto DrawCommandBufferHandle = graph.CreateBuffer({ INDIRECT_COMMAND_SIZE * m_Batches.RawSize(), INDIRECT_COMMAND_SIZE }, "Draw Command Buffer"); //per batch <VkDrawIndexedIndirectCommand> CPU - none, GPU - compute write -> command submit read, immediate mode
 					auto DrawCommandCountBufferHandle = graph.CreateBuffer({ m_DrawGroups.RawSize() * sizeof(uint32_t), alignof(uint32_t) }, "Draw Command Count"); //per group <uint32_t> CPU - none, GPU - compute write -> indirect command read, immediate mode
-					auto BatchIntermediateInfoBufferHandle = graph.CreateBuffer({ m_Batches.RawSize() * sizeof(uint64_t), alignof(uint64_t) }, "Batch Intermediate Info"); //per batch <uint64_t> CPU - none, GPU - compute write/read atomic, immediate mode
+					auto BatchIntermediateInfoBufferHandle = graph.CreateBuffer({ m_Batches.RawSize() * sizeof(uint32_t), alignof(uint32_t) }, "Batch Intermediate Info"); //per batch <uint32_t> CPU - none, GPU - compute write/read atomic, immediate mode
 					auto InstanceAtomicCounterHandle = graph.CreateBuffer({ sizeof(uint32_t), alignof(uint32_t) }, "Instance Atomic Counter"); //atomic uint32_t, CPU - none, GPU - compute write/read atomic, immediate mode
 					auto CompactedInstanceListBufferHandle = graph.CreateBuffer({ m_Objects.RawSize() * sizeof(uint32_t), alignof(uint32_t) }, "Compacted Instance List Buffer"); //per visible instance <uint32_t> CPU - none, GPU - compute write -> vertex/fragment read, immediate mode
+
+					vk::ImageCreateInfo depthImageInfo{
+						.imageType = vk::ImageType::e2D,
+						.format = s_DepthFormat,
+						.extent = { prtExtent.width, prtExtent.height, 1 },
+						.mipLevels = 1,
+						.arrayLayers = 1,
+						.samples = vk::SampleCountFlagBits::e1,
+						.tiling = vk::ImageTiling::eOptimal,
+						.usage = vk::ImageUsageFlagBits::eDepthStencilAttachment,
+						.sharingMode = vk::SharingMode::eExclusive,
+						.initialLayout = vk::ImageLayout::eUndefined
+					};
+
+					vma::AllocationCreateInfo depthAllocInfo{
+						.usage = vma::MemoryUsage::eAuto,
+						.requiredFlags = vk::MemoryPropertyFlagBits::eDeviceLocal
+					};
+
+					VulkanImage::CreateInfo depthCreateInfo{
+						.imageCreateInfo = &depthImageInfo,
+						.allocationCreateInfo = &depthAllocInfo,
+						.name = "Scene Depth Buffer"
+					};
+
+					auto DepthBufferHandle = graph.CreateImage(depthCreateInfo, "Scene Depth Buffer");
 
 					auto& bufferCleanupPass = graph.CreatePass("Buffer Cleanup");
 					bufferCleanupPass.Writes(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
 					bufferCleanupPass.Writes(InstanceAtomicCounterHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
 					bufferCleanupPass.Writes(CompactedInstanceListBufferHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
+					bufferCleanupPass.Writes(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
 					bufferCleanupPass.AssignWork([=](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
 						auto& dccb = registry.GetResource(DrawCommandCountBufferHandle);
 						auto& iac = registry.GetResource(InstanceAtomicCounterHandle);
 						auto& cilb = registry.GetResource(CompactedInstanceListBufferHandle);
+						auto& bii = registry.GetResource(BatchIntermediateInfoBufferHandle);
 						commandBuffer.fillBuffer(dccb.GetHeapHandle(), dccb.GetStartOffset(), dccb.GetSize(), 0);
 						commandBuffer.fillBuffer(iac.GetHeapHandle(), iac.GetStartOffset(), iac.GetSize(), 0);
 						commandBuffer.fillBuffer(cilb.GetHeapHandle(), cilb.GetStartOffset(), cilb.GetSize(), 0);
-
+						commandBuffer.fillBuffer(bii.GetHeapHandle(), bii.GetStartOffset(), bii.GetSize(), 0);
 					});
 
 					auto& cullPass = graph.CreatePass("Cull Pass");
@@ -429,6 +474,7 @@ namespace Cori {
 					});
 
 					auto& cmgPass = graph.CreatePass("Indirect Command Generation Pass");
+					cmgPass.Reads(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageRead });
 					cmgPass.Writes(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
 					cmgPass.Writes(DrawCommandBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
 					cmgPass.Writes(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
@@ -461,6 +507,7 @@ namespace Cori {
 					});
 
 					auto& compactPass = graph.CreatePass("Compact Pass");
+					compactPass.Reads(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageRead });
 					compactPass.Writes(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
 					compactPass.Writes(CompactedInstanceListBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
 					compactPass.Reads(ObjectBufferHandle);
@@ -496,6 +543,12 @@ namespace Cori {
 					indirectPass.Reads(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eDrawIndirect, vk::AccessFlagBits2::eIndirectCommandRead });
 					indirectPass.Reads(UniformDataBufferHandle);
 					indirectPass.Reads(BatchInfoBufferHandle);
+					indirectPass.Writes(DepthBufferHandle, {
+						.stageMask = vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
+						.accessMask = vk::AccessFlagBits2::eDepthStencilAttachmentRead | vk::AccessFlagBits2::eDepthStencilAttachmentWrite,
+						.imageLayout = vk::ImageLayout::eDepthAttachmentOptimal,
+						.subrange = { vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 }
+					});
 					indirectPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
 						DrawPS ps {
 							.objectDataBuffer = registry.GetResource(ObjectBufferHandle).GetVulkanBuffer().GetBDA(),
@@ -558,11 +611,25 @@ namespace Cori {
 							.clearValue = clearColor
 						};
 
+						VulkanImage::ImageViewKey depthViewKey{
+							.type = vk::ImageViewType::e2D,
+							.subresourceRange = { vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 }
+						};
+
+						vk::RenderingAttachmentInfo depthAttachmentInfo = {
+							.imageView = registry.GetResource(DepthBufferHandle).GetView(depthViewKey),
+							.imageLayout = vk::ImageLayout::eDepthAttachmentOptimal,
+							.loadOp = vk::AttachmentLoadOp::eClear,
+							.storeOp = vk::AttachmentStoreOp::eDontCare,
+							.clearValue = vk::ClearDepthStencilValue(0.0f, 0)
+						};
+
 						vk::RenderingInfo renderingInfo = {
 							.renderArea = { .offset = { 0, 0 }, .extent = prtExtent },
 							.layerCount = 1,
 							.colorAttachmentCount = 1,
-							.pColorAttachments = &attachmentInfo
+							.pColorAttachments = &attachmentInfo,
+							.pDepthAttachment = &depthAttachmentInfo
 						};
 						commandBuffer.beginRendering(renderingInfo);
 						//temp
@@ -596,7 +663,6 @@ namespace Cori {
 
 						commandBuffer.endRendering();
 
-						//this is temporary, need to add support to external images to the render graph
 						{
 							vk::ImageMemoryBarrier2 prtBar{
 									.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
@@ -795,6 +861,8 @@ namespace Cori {
 			std::array<FrameData*, FRAMES_IN_FLIGHT> m_FrameDataAllocated;
 
 			static constexpr uint32_t INDIRECT_COMMAND_SIZE = 20;
+
+			static constexpr vk::Format s_DepthFormat = vk::Format::eD32Sfloat;
 
 			static std::unique_ptr<SceneRenderer> s_Instance;
 		};

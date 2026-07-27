@@ -1,0 +1,10 @@
+{
+    "Metadata": {
+        "assetTypename": "Mesh",
+        "assetType": "eSecondary",
+        "assetDeletionPolicy": "eRefCounted"
+    },
+    "AssetData": {
+        "obj": "Sponza_Mesh_018.obj"
+    }
+}

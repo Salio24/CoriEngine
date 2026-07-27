@@ -24,6 +24,8 @@ namespace Cori {
 
 				Graphics::SceneRendererHandle m_RendererHandle{ 0 };
 
+				vk::Extent2D m_ViewportExtent{};
+
 				Graphics::FrameData* m_Pending{ nullptr };
 
 				bool m_FrameSubmitted{ false };

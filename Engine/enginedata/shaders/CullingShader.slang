@@ -1,10 +1,5 @@
 #include "Defines.slang"
 
-struct BatchIntermediateInfo {
-	Atomic<uint32_t> visibilityCount;
-	uint32_t outputOffset;
-};
-
 //struct RedirectID {
 //	uint32_t objectID;
 //};
@@ -12,6 +7,8 @@ struct BatchIntermediateInfo {
 typealias GroupCommandOffset = uint32_t;
 
 typealias GlobalAtomic = Atomic<uint32_t>;
+
+typealias BatchIntermediateInfo = Atomic<uint32_t>;
 
 struct VkDrawIndexedIndirectCommand2 {
 	uint32_t indexCount;
@@ -65,7 +62,7 @@ void cullMain(uint3 threadID : SV_DispatchThreadID) {
 
 	if (bool(obj.valid) && IsVisible(obj)) {
 		uint32_t batchID = obj.ownerBatch;
-		pc.bii[batchID].visibilityCount.add(1);
+		pc.bii[batchID].add(1);
 	}
 }
 
@@ -75,12 +72,12 @@ void cmgMain(uint3 threadID : SV_DispatchThreadID) {
 	uint32_t batchID = threadID.x;
 	if (batchID >= pc.totalBatchCount) { return; }
 
-	uint32_t visibleCount = pc.bii[batchID].visibilityCount.load();
+	uint32_t visibleCount = pc.bii[batchID].load();
 
 	if (visibleCount > 0) {
 		uint32_t startOffset = pc.globalAtomic.add(visibleCount);
 
-		pc.bii[batchID].outputOffset = startOffset;
+		pc.bii[batchID].store(startOffset);
 
 		BatchInfo batchInfo = pc.batchInfos[batchID];
 
@@ -113,11 +110,9 @@ void compactMain(uint3 threadID : SV_DispatchThreadID) {
 	if (bool(obj.valid) && IsVisible(obj)) {
 		uint32_t batchID = obj.ownerBatch;
 
-		uint32_t localID = pc.bii[batchID].visibilityCount.sub(1);
-
-		uint32_t finalCompactedID = localID + pc.bii[batchID].outputOffset;
-		pc.compactedObjectIDBuffer[finalCompactedID] = unorderedObjectID;
-		//pc.bii[batchID].outputOffset = 0;
+		uint32_t slot = pc.bii[batchID].add(1);
+		if (slot >= pc.totalInstanceCount) { return; }
+		pc.compactedObjectIDBuffer[slot] = unorderedObjectID;
 	}
 }
 

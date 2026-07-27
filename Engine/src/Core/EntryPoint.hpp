@@ -28,10 +28,10 @@ int32_t main([[maybe_unused]] int32_t argc, [[maybe_unused]] char** argv) {
 	mallopt(M_MMAP_THRESHOLD, 512<<20);
 	#ifdef CORI_ENABLE_PROFILING
 	{
-		const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(7);
-		while (!TracyIsConnected && std::chrono::steady_clock::now() < deadline) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
-		}
+		//const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(7);
+		//while (!TracyIsConnected && std::chrono::steady_clock::now() < deadline) {
+		//	std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		//}
 	}
 	#endif
 

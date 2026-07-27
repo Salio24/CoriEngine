@@ -882,7 +882,7 @@ namespace Cori {
 				}
 
 				ReportChange(offset * sizeof(T), data.size_bytes());
-				memcpy(reinterpret_cast<void*>(reinterpret_cast<uint64_t>(m_CPUShadow.data()) + offset), data.data(), data.size_bytes());
+				memcpy(reinterpret_cast<void*>(reinterpret_cast<uint64_t>(m_CPUShadow.data()) + offset * sizeof(T)), data.data(), data.size_bytes());
 			}
 
 			void AppendRange(const std::span<T>& data) {
@@ -895,7 +895,7 @@ namespace Cori {
 				ResizeNonReporting(changeStart + data.size());
 
 				ReportChange(changeStart * sizeof(T), data.size_bytes());
-				memcpy(reinterpret_cast<void*>(reinterpret_cast<uint64_t>(m_CPUShadow.data()) + changeStart), data.data(), data.size_bytes());
+				memcpy(reinterpret_cast<void*>(reinterpret_cast<uint64_t>(m_CPUShadow.data()) + changeStart * sizeof(T)), data.data(), data.size_bytes());
 			}
 
 			void PushBack(const T& value) {
@@ -1093,9 +1093,8 @@ namespace Cori {
 						uint64_t currentRangeEnd = m_SectorStates[frameIndex].find_sequence_end(currentRangeBeginning);
 
 						uint64_t offset = currentRangeBeginning * SECTOR_SIZE;
-						uint64_t size = (currentRangeEnd - currentRangeBeginning) * SECTOR_SIZE;
-
-						size += m_LastSectorSize;
+						const uint64_t lastSector = m_SectorStates[frameIndex].size() - 1;
+						uint64_t size = (currentRangeEnd - currentRangeBeginning) * SECTOR_SIZE + (currentRangeEnd == lastSector ? m_LastSectorSize : SECTOR_SIZE);
 
 						if (m_IsBAR) {
 							auto result = VulkanEngine::GetAllocator().copyMemoryToAllocation(reinterpret_cast<void*>(reinterpret_cast<uint64_t>(m_CPUShadow.data()) + offset), m_GPUBuffers[frameIndex].m_Allocation, offset, size);
@@ -1115,6 +1114,39 @@ namespace Cori {
 
 					Utility::Reset(m_IsDirtyMask, frameIndex);
 				}
+
+				#ifdef CORI_VALIDATION_LAYER
+				VerifyGPUMirror();
+				#endif
+			}
+
+			void VerifyGPUMirror() {
+				#ifdef CORI_VALIDATION_LAYER
+				const uint32_t frameIndex = VulkanEngine::GetCurrentFrameInFlight();
+
+				if (!m_IsBAR || m_CPUShadow.empty() || !m_GPUBuffers[frameIndex].m_Buffer) {
+					return;
+				}
+
+				const uint64_t byteSize = m_CPUShadow.size() * sizeof(T);
+
+				std::vector<Byte> readback(byteSize);
+				auto result = VulkanEngine::GetAllocator().copyAllocationToMemory(m_GPUBuffers[frameIndex].m_Allocation, 0, readback.data(), byteSize);
+				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "VulkanDynamicVector '{}' failed to read back its GPU buffer for verification. Error: {}", m_Name, vk::to_string(result));
+
+				const auto* cpuBytes = reinterpret_cast<const Byte*>(m_CPUShadow.data());
+
+				if (memcmp(readback.data(), cpuBytes, byteSize) == 0) {
+					return;
+				}
+
+				uint64_t firstDiff = 0;
+				while (firstDiff < byteSize && readback[firstDiff] == cpuBytes[firstDiff]) {
+					firstDiff++;
+				}
+
+				CORI_CORE_ASSERT(false, "VulkanDynamicVector '{}' GPU buffer diverged from CPU shadow on frame {}: first mismatch at byte {} (element {}, sector {} of {}), CPU=0x{:02x} GPU=0x{:02x}. The dirty sector flush missed this write.", m_Name, frameIndex, firstDiff, firstDiff / sizeof(T), firstDiff / SECTOR_SIZE, m_SectorStates[frameIndex].size(), cpuBytes[firstDiff], readback[firstDiff]);
+				#endif
 			}
 
 			//TODO: poison uninitialized memory in debug builds
@@ -1241,7 +1273,8 @@ namespace Cori {
 				isBufferBAR.fill(true);
 				m_IsBAR = true;
 
-				uint32_t lastSectorSize = newSize % SECTOR_SIZE;
+				const uint64_t totalBytes = newSize * sizeof(T);
+				uint32_t lastSectorSize = totalBytes % SECTOR_SIZE;
 				m_LastSectorSize = lastSectorSize != 0 ? lastSectorSize : SECTOR_SIZE;
 
 				for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {

@@ -18,6 +18,7 @@ namespace Cori {
 			vk::FrontFace frontFace{ vk::FrontFace::eCounterClockwise };
 			vk::CompareOp depthCompareOp{ vk::CompareOp::eGreater };
 			bool depthTestEnable{ false };
+			bool depthWriteEnable{ false };
 			bool depthBoundsTestEnable{ false };
 			bool depthBiasEnable{ false };
 			bool stencilTestEnable{ false };
@@ -27,6 +28,7 @@ namespace Cori {
 				cmb.setCullMode(cullMode);
 				cmb.setFrontFace(frontFace);
 				cmb.setDepthTestEnable(depthTestEnable);
+				cmb.setDepthWriteEnable(depthWriteEnable);
 				cmb.setDepthCompareOp(depthCompareOp);
 				cmb.setDepthBoundsTestEnable(depthBoundsTestEnable);
 				cmb.setDepthBiasEnable(depthBiasEnable);
@@ -57,6 +59,7 @@ namespace Cori {
 					Utility::GlazeWithFallback<vk::FrontFace, vk::FrontFace::eCounterClockwise, "frontFace from VulkanShaderEffectManager::Load"> frontFace;
 					Utility::GlazeWithFallback<vk::CompareOp, vk::CompareOp::eGreater, "depthCompareOp from VulkanShaderEffectManager::Load"> depthCompareOp;
 					Utility::GlazeWithFallback<bool, false, "depthTestEnable from VulkanShaderEffectManager::Load"> depthTestEnable;
+					Utility::GlazeWithFallback<bool, false, "depthWriteEnable from VulkanShaderEffectManager::Load"> depthWriteEnable;
 					Utility::GlazeWithFallback<bool, false, "depthBoundsTestEnable from VulkanShaderEffectManager::Load"> depthBoundsTestEnable;
 					Utility::GlazeWithFallback<bool, false, "depthBiasEnable from VulkanShaderEffectManager::Load"> depthBiasEnable;
 					Utility::GlazeWithFallback<bool, false, "stencilTestEnable from VulkanShaderEffectManager::Load"> stencilTestEnable;

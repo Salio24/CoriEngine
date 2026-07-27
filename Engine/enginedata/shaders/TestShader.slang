@@ -31,10 +31,10 @@ struct VSOutput {
 };
 
 [shader("vertex")]
-VSOutput vertMain(uint32_t instanceID : SV_VulkanInstanceID, uint32_t baseInstance : SV_StartInstanceLocation, uint32_t vertexID : SV_VertexID) {
+VSOutput vertMain(uint32_t instanceIndex : SV_VulkanInstanceID, uint32_t vertexID : SV_VertexID) {
     VSOutput output;
 
-    uint32_t objectID = pc.compactedObjectIDBuffer[baseInstance + instanceID];
+    uint32_t objectID = pc.compactedObjectIDBuffer[instanceIndex];
     ObjectData obj = pc.objectDataBuffer[objectID];
 
     MaterialData material = pc.materialDataBuffer[obj.material.index].customData;

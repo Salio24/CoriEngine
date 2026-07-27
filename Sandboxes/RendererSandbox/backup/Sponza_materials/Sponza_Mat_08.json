@@ -1,0 +1,20 @@
+{
+    "Metadata": {
+        "assetTypename": "Material",
+        "assetType": "eSecondary",
+        "assetDeletionPolicy": "eRefCounted"
+    },
+    "AssetData": {
+        "materialData": {
+            "colorFactor": [
+                0.3446,
+                0.588,
+                0.3234,
+                1.0
+            ],
+            "albedoTexture": "assets/Sponza/textures/Sponza_Tex_08.json",
+            "albedoSampler": "SponzaRepeat"
+        },
+        "shaderEffect": "assets/Sponza/effects/Sponza_Effect_08.json"
+    }
+}

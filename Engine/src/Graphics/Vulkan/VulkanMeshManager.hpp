@@ -353,6 +353,8 @@ namespace Cori {
 
 							inTransferMesh.vertexStorage->RemoveStrongRef();
 
+
+
 							auto& meshData = Get().m_Meshes[inTransferMesh.mesh];
 							meshData.indexCount = inTransferMesh.indexCount;
 							meshData.firstIndex = inTransferMesh.indexOffset;
@@ -603,7 +605,7 @@ namespace Cori {
 					VulkanEngine::AddWaitTimelineSemaphore(VulkanStreamingLine::GetTimelineSemaphoreHandle(), ticket.value(), vk::PipelineStageFlagBits::eAllCommands);
 					auto& placeholder = m_Meshes[m_PlaceholderMesh];
 					placeholder.indexCount = indexCount;
-					placeholder.firstIndex = indexOffset;
+					placeholder.firstIndex = indexOffset / sizeof(uint32_t);
 				}
 			}
 
@@ -653,6 +655,17 @@ namespace Cori {
 				CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Upload);
 				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u] loadGen=%u vertices=%llu (%llu bytes) indices=%llu (%llu bytes)", handle.GetIndex(), handle.GetVersion(), loadGen, static_cast<unsigned long long>(vertices.size()), static_cast<unsigned long long>(vertices.size() * sizeof(VertexT)), static_cast<unsigned long long>(indices.size()), static_cast<unsigned long long>(indices.size() * sizeof(uint32_t)));
 				CORI_CORE_ASSERT(IsHandleValidImpl(handle), "Invalid handle.");
+
+				#ifdef CORI_VALIDATION_LAYER
+				CORI_CORE_ASSERT(indices.size() % 3 == 0, "Mesh [{}, {}] tried loading with {} indices, which is not a whole number of triangles.", handle.GetIndex(), handle.GetVersion(), indices.size());
+
+				for (uint64_t i = 0; i < indices.size(); i++) {
+					if (indices[i] >= vertices.size()) {
+						CORI_CORE_ASSERT(false, "Mesh [{}, {}] index {} of {} has value {}, out of range for a mesh with {} vertices. The vertex shader would fetch {} bytes past the start of this mesh's vertex block.", handle.GetIndex(), handle.GetVersion(), i, indices.size(), indices[i], vertices.size(), static_cast<uint64_t>(indices[i]) * sizeof(VertexT));
+						break;
+					}
+				}
+				#endif
 
 				vma::VirtualAllocationCreateInfo indicesAllocInfo {
 					.size = indices.size() * sizeof(uint32_t),

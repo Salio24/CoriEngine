@@ -22,6 +22,8 @@ namespace Cori {
 			SDL_Window* m_Window{ nullptr };
 			bool m_VSync{ false };
 
+			glm::vec2 m_MouseDelta{ 0.0f };
+
 			EventCallbackFn m_EventCallback;
 
 			~Data() {
@@ -141,6 +143,8 @@ namespace Cori {
 			CORI_PROFILE_FUNCTION();
 			SDL_Event e;
 
+			m_Data->m_MouseDelta = { 0.0f, 0.0f };
+
 			while (SDL_PollEvent(&e)) {
 				ImGui_ImplSDL3_ProcessEvent(&e);
 
@@ -177,6 +181,8 @@ namespace Cori {
 					}
 				case SDL_EVENT_MOUSE_MOTION:
 					{
+						m_Data->m_MouseDelta += glm::vec2{ e.motion.xrel, e.motion.yrel };
+
 						MouseMovedEvent mouseMovedEvent(static_cast<int32_t>(e.motion.x), static_cast<int32_t>(e.motion.y));
 						m_Data->m_EventCallback(mouseMovedEvent);
 						break;
@@ -237,6 +243,26 @@ namespace Cori {
 
 		bool Window::IsVSync() const {
 			return m_Data->m_VSync;
+		}
+
+		// ReSharper disable once CppMemberFunctionMayBeConst
+		void Window::SetRelativeMouseMode(const bool status) {
+			if (!SDL_SetWindowRelativeMouseMode(m_Data->m_Window, status)) {
+				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to {} relative mouse mode. SDL_Error: {}", status ? "enable" : "disable", SDL_GetError());
+				return;
+			}
+
+			m_Data->m_MouseDelta = { 0.0f, 0.0f };
+
+			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Relative mouse mode is now set to: {}", status);
+		}
+
+		bool Window::IsRelativeMouseMode() const {
+			return SDL_GetWindowRelativeMouseMode(m_Data->m_Window);
+		}
+
+		glm::vec2 Window::GetMouseDelta() const {
+			return m_Data->m_MouseDelta;
 		}
 
 		void* Window::GetNativeWindow() const {

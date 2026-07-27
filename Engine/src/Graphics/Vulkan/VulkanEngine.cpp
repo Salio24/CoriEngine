@@ -240,7 +240,7 @@ namespace Cori {
 			auto result = m_Device.resetFences(frameData.m_DrawFence);
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to reset fence. Error: {}", vk::to_string(result));
 
-			AddWaitSemaphore(frameData.m_PresentCompleteSemaphore, vk::PipelineStageFlagBits::eColorAttachmentOutput);
+			AddWaitSemaphore(frameData.m_PresentCompleteSemaphore, vk::PipelineStageFlagBits::eTransfer);
 
 			frameData.m_SwapChainImageIndex = imageIndex;
 
@@ -311,6 +311,7 @@ namespace Cori {
 			frameData.m_CommandBuffer.setFrontFace(vk::FrontFace::eCounterClockwise);
 
 			frameData.m_CommandBuffer.setDepthTestEnable(vk::False);
+			frameData.m_CommandBuffer.setDepthWriteEnable(vk::False);
 			frameData.m_CommandBuffer.setDepthCompareOp(vk::CompareOp::eGreater);
 			frameData.m_CommandBuffer.setDepthBoundsTestEnable(vk::False);
 			frameData.m_CommandBuffer.setDepthBiasEnable(vk::False);
@@ -915,7 +916,7 @@ namespace Cori {
 
 			auto ChooseMode = [&]{
 				for (const auto& availablePresentMode : availablePresentModes) {
-					if (availablePresentMode == vk::PresentModeKHR::eImmediate) {
+					if (availablePresentMode == vk::PresentModeKHR::eMailbox) {
 						return availablePresentMode;
 					}
 				}

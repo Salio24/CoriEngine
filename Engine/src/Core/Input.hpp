@@ -42,6 +42,26 @@ namespace Cori {
 			 * @return Mouse position in screen coordinates.
 			 */
 			static glm::ivec2 GetMousePosition();
+
+			/**
+			 * @brief Retrieves how far the mouse moved during the last event pump.
+			 * @details Prefer this over differencing GetMousePosition for anything that turns a camera: it keeps working once the cursor would have hit the edge of the screen, provided relative mouse mode is on. Reading it twice in a frame gives the same answer.
+			 * @return Movement delta in pixels.
+			 */
+			static glm::vec2 GetMouseDelta();
+
+			/**
+			 * @brief Enables or disables relative mouse mode.
+			 * @details While it is on the cursor is hidden and confined to the window, and the mouse only reports deltas. Turning it back off returns the cursor to where it was when the mode was entered.
+			 * @param status
+			 */
+			static void SetRelativeMouseMode(const bool status);
+
+			/**
+			 * @brief Checks whether relative mouse mode is currently enabled.
+			 * @return True enabled, false disabled.
+			 */
+			static bool IsRelativeMouseMode();
 		};
 	}
 }
