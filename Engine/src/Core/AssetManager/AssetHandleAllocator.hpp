@@ -137,7 +137,7 @@ namespace Cori {
 				m_RefCounts[handle.GetIndex()].store(1, std::memory_order_release);
 				m_AssetStatuses[handle.GetIndex()].store(AssetStatus::eUnloaded, std::memory_order_release);
 				CORI_PROFILER_MSG_CFP(Cori::ProfileParts::Assets, Cori::ProfileColors::Alloc, "%s Handle=[%u, %u] ALLOCATED (refs=1)", CORI_CLEAN_TYPE_NAME(T), handle.GetIndex(), handle.GetVersion());
-				if constexpr (requires { T::Manager::AllocateExtras(handle); }) {
+				if constexpr (SpokeHasAllocateExtras<T>) {
 					T::Manager::AllocateExtras(handle);
 				}
 			}
@@ -145,7 +145,7 @@ namespace Cori {
 			void FreeExtras(const Handle<T> handle) {
 				CORI_PROFILER_MSG_CFP(Cori::ProfileParts::Assets, Cori::ProfileColors::Free, "%s Handle=[%u, %u] FREED", CORI_CLEAN_TYPE_NAME(T), handle.GetIndex(), handle.GetVersion());
 				m_LoadGenerations[handle.GetIndex()].store(0, std::memory_order_release);
-				if constexpr (requires { T::Manager::FreeExtras(handle); }) {
+				if constexpr (SpokeHasFreeExtras<T>) {
 					T::Manager::FreeExtras(handle);
 				}
 			}

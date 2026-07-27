@@ -58,27 +58,89 @@ namespace Cori {
 		};
 
 		template<typename T>
-		concept CanHotReload = requires(const Handle<T> a, const AssetID b) {
-			{ T::Manager::Reload(a, b) } -> std::same_as<void>;
+		concept IsAssetBase = std::derived_from<T, PrimaryAssetBase> || std::derived_from<T, SecondaryAssetBase>;
+
+		template<typename T>
+		concept IsRegisteredAsset = requires {
+			typename T::Manager;
+			requires std::same_as<Utility::StringHash64, std::remove_cvref_t<decltype(AssetTraits<T>::TypeHash)>>;
 		};
 
 		template<typename T>
-		concept IsValidAsset = requires(const Handle<T> a, const AssetID b) {
-			{ T::Manager::IsHandleValid(a) } -> std::same_as<bool>;
-			{ T::Manager::GetAssetID(a) } -> std::same_as<AssetID>;
+		concept AssetHasNoPlaceholder = requires { requires T::NOPLACEHOLDER; };
+
+		template<typename T>
+		inline constexpr bool AssetHotReloadEnabled = []{
+			if constexpr (requires { { T::EnableHotReload } -> std::convertible_to<bool>; }) {
+				return static_cast<bool>(T::EnableHotReload);
+			}
+			else if constexpr (requires { { T::Manager::EnableHotReload } -> std::convertible_to<bool>; }) {
+				return static_cast<bool>(T::Manager::EnableHotReload);
+			}
+			else {
+				return false;
+			}
+		}();
+
+		template<typename T>
+		inline constexpr bool AssetAutoHotReloadEnabled = AssetHotReloadEnabled<T> && []{
+			if constexpr (requires { { T::EnableAutoHotReload } -> std::convertible_to<bool>; }) {
+				return static_cast<bool>(T::EnableAutoHotReload);
+			}
+			else if constexpr (requires { { T::Manager::EnableAutoHotReload } -> std::convertible_to<bool>; }) {
+				return static_cast<bool>(T::Manager::EnableAutoHotReload);
+			}
+			else {
+				return false;
+			}
+		}();
+
+		template<typename T>
+		concept SpokeSuppliesPlaceholder = requires {
 			{ T::Manager::template GetPlaceholder<T>() } -> std::same_as<Handle<T>>;
-			{ T::Manager::template Load<T>(b) } -> std::same_as<Handle<T>>; // add Unload method requirement, add 'Serialize' method requirement for assets that can be saved to disk (e.g. ShaderEffect, Material etc, all the assets that are just configs)
-			requires std::same_as<Utility::StringHash64, std::remove_cvref_t<decltype(AssetTraits<T>::TypeHash)>>;
-			requires std::same_as<bool, std::remove_cvref_t<decltype(T::Manager::EnableHotReload)>>;
-			T::Manager::AddRef(a);
-			T::Manager::RemoveRef(a);
-		}
-		&& (std::derived_from<T, PrimaryAssetBase> || std::derived_from<T, SecondaryAssetBase>)
-		&& (!T::Manager::EnableHotReload || CanHotReload<T>);
+		};
+
+		template<typename T>
+		concept SpokeDeclaresHotReloadPolicy = requires {
+			{ T::Manager::EnableHotReload } -> std::convertible_to<bool>;
+			{ T::Manager::EnableAutoHotReload } -> std::convertible_to<bool>;
+		};
+
+		template<typename T>
+		concept SpokeHasAllocateExtras = requires(const Handle<T> handle) {
+			{ T::Manager::AllocateExtras(handle) } -> std::same_as<void>;
+		};
+
+		template<typename T>
+		concept SpokeHasFreeExtras = requires(const Handle<T> handle) {
+			{ T::Manager::FreeExtras(handle) } -> std::same_as<void>;
+		};
+
+		//TODO: add a 'Serialize' requirement for the asset types that can be saved back to disk (e.g. ShaderEffect, Material etc, all the assets that are just configs)
+		template<typename T>
+		concept HasValidSpoke = requires(const Handle<T> handle, const AssetID id, const uint32_t vectorKey, const AssetStatus status,  const uint32_t gen, std::filesystem::path path, std::string name) {
+			{ T::Manager::template AllocateHandle<T>() } -> std::same_as<Handle<T>>;
+			{ T::Manager::BindAsset(handle, id, vectorKey) } -> std::same_as<void>;
+			{ T::Manager::BumpGeneration(handle) } -> std::same_as<uint32_t>;
+			{ T::Manager::IsHandleValid(handle) } -> std::same_as<bool>;
+			{ T::Manager::GetAssetID(handle) } -> std::same_as<AssetID>;
+			{ T::Manager::TryAddRef(handle) } -> std::same_as<bool>;
+			{ T::Manager::AddRef(handle) } -> std::same_as<void>;
+			{ T::Manager::RemoveRef(handle) } -> std::same_as<void>;
+			{ T::Manager::SetAssetStatus(handle, status) } -> std::same_as<void>;
+			{ T::Manager::GetAssetStatus(handle) } -> std::same_as<AssetStatus>;
+			{ T::Manager::Load(handle, id, gen, vectorKey, std::move(path)) } -> std::same_as<void>;
+			{ T::Manager::Load(handle, id, gen, vectorKey, std::move(path), std::move(name)) } -> std::same_as<void>;
+		} && SpokeDeclaresHotReloadPolicy<T> && (SpokeSuppliesPlaceholder<T> || AssetHasNoPlaceholder<T>);
 
 
-		//template<IsValidAsset T>
-		template<typename T> //temporary
+		template<typename T>
+		concept IsValidAsset = IsAssetBase<T> && IsRegisteredAsset<T> && HasValidSpoke<T>;
+
+		template<typename T>
+		concept CanHotReload = AssetHotReloadEnabled<T> && HasValidSpoke<T>;
+
+		template<IsValidAsset T>
 		struct AssetRef {
 			//make private later
 		//private:
@@ -274,8 +336,7 @@ namespace Cori {
 
 			static AssetManager2& Get();
 
-			//template<IsValidAsset T>
-			template<typename T> //temporary
+			template<IsValidAsset T>
 			static AssetRef<T> Load(const char* path) {
 				AssetID id = Utility::HashString64(path);
 				Handle<T> handle;
@@ -321,7 +382,6 @@ namespace Cori {
 
 					T::Manager::SetAssetStatus(handle, AssetStatus::eLoading);
 
-					//GetAssetStatusesVector()[vectorKey].store(AssetStatus::eLoading, std::memory_order_release);
 					fsPath = GetAssetDir() / record.path;
 					name = record.name;
 				}
