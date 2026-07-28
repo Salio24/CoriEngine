@@ -41,6 +41,7 @@ namespace Cori {
 				static constexpr char OpenGL[] = "OpenGL";
 				struct Vulkan {
 					static constexpr char Self[] = "Vulkan";
+					static constexpr char Vma[] = "VMA";
 					static constexpr char ValidationLayers[] = "Validation Layers";
 					static constexpr char ResourceTracker[] = "Resource Tracker";
 					static constexpr char RenderGraph[] = "Render Graph";
@@ -104,6 +105,7 @@ namespace Cori {
 				struct Glaze {
 					static constexpr char Self[] = "Glaze";
 					static constexpr char GlazeWithFallback[] = "GlazeWithFallback";
+					static constexpr char MissingKeys[] = "MissingKeys";
 				};
 
 				static constexpr char Logger[] = "Logger";

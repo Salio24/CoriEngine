@@ -41,6 +41,10 @@ private:
 
 namespace Cori {
 	namespace Core {
+		namespace Internal {
+			struct EmptyRefTag { EmptyRefTag() = default; };
+			inline constexpr EmptyRefTag EmptyRef{};
+		}
 
 		using AssetID = Utility::StringHash64;
 
@@ -143,9 +147,10 @@ namespace Cori {
 		template<IsValidAsset T>
 		struct AssetRef {
 			//make private later
-		//private:
+		private:
 			AssetRef() = default;
-		//public:
+		public:
+			constexpr explicit AssetRef(Internal::EmptyRefTag) {}   // deliberately empty; for parse targets
 
 			explicit AssetRef(Handle<T> handle) {
 				CORI_CORE_ASSERT(T::Manager::IsHandleValid(handle), "Trying to construct AssetRef<{}> with an invalid handle, asserting.", CORI_CLEAN_TYPE_NAME(T));

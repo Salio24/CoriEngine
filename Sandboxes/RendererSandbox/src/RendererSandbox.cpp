@@ -5,6 +5,8 @@
 #include <format>
 #define SPONZA
 
+#define CORI_MOUSE_TEMP_DEBUG
+
 class ExampleLayer : public Cori::Core::Layer {
 public:
 	ExampleLayer() : Layer("Example") {
@@ -167,12 +169,12 @@ public:
 
 private:
 	void UpdateMouseLook() {
-		const bool canLook = m_MouseLookActive || !ImGui::GetIO().WantCaptureMouse;
+		const bool imGuiWantsMouse = ImGui::GetCurrentContext() != nullptr && ImGui::GetIO().WantCaptureMouse;
+		const bool canLook = m_MouseLookActive || !imGuiWantsMouse;
 		const bool wantLook = Cori::Core::Input::IsMouseKeyDown(Cori::Core::CORI_MOUSEBUTTON_RIGHT) && canLook;
 
 		if (wantLook != m_MouseLookActive) {
-			Cori::Core::Input::SetRelativeMouseMode(wantLook);
-			m_MouseLookActive = wantLook;
+			m_MouseLookActive = Cori::Core::Input::SetRelativeMouseMode(wantLook) ? wantLook : false;
 		}
 
 		if (!m_MouseLookActive) {
@@ -184,6 +186,12 @@ private:
 		m_CameraYaw -= delta.x * s_MouseSensitivity;
 		m_CameraPitch -= delta.y * s_MouseSensitivity;
 		m_CameraPitch = std::clamp(m_CameraPitch, -89.0f, 89.0f);
+
+		#ifdef CORI_MOUSE_TEMP_DEBUG
+		if (delta != glm::vec2{ 0.0f, 0.0f }) {
+			CORI_DEBUG("Camera consumed delta ({}, {}) -> yaw {}, pitch {}", delta.x, delta.y, m_CameraYaw, m_CameraPitch);
+		}
+		#endif
 	}
 
 	static constexpr glm::vec3 s_InitialCameraPosition{ -13.0f, 0.0f, 0.7f };

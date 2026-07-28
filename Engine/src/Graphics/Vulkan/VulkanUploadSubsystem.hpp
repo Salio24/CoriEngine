@@ -4,6 +4,7 @@
 #include "VulkanEngine.hpp"
 #include "VulkanBuffer.hpp"
 #include "DeletionQueue.hpp"
+#include "VmaLeakLog.hpp"
 #include "Core/DataStructures/FlatSlotMap.hpp"
 #include "Utility/TemplateUtils.hpp"
 #include "Utility/BitHelpers.hpp"
@@ -115,6 +116,9 @@ namespace Cori {
 					DeletionQueue::PushBuffer(gpuArena);
 					DeletionQueue::PushBuffer(cpuArena);
 				}
+
+				m_GPUScratchBlock.clearVirtualBlock();
+				m_UploadArenaBlock.clearVirtualBlock();
 
 				DeletionQueue::PushVirtualBlock(m_GPUScratchBlock);
 				DeletionQueue::PushVirtualBlock(m_UploadArenaBlock);
@@ -556,6 +560,7 @@ namespace Cori {
 
 		protected:
 			template <Utility::NotBool T> friend class VulkanDynamicVector;
+			template <typename T, QueueUsageFlags QUEUE_USAGE, vk::BufferUsageFlags BUFFER_USAGE, glz::string_literal NAME, typename Allocator> friend class VulkanGPUSyncedSequentialStorage;
 
 			static void BeginUpdate(vk::Buffer dstBuffer) {
 				Get().m_UploaderMutex.lock();
@@ -727,8 +732,12 @@ namespace Cori {
 			}
 
 			~VulkanDynamicVector() {
-				if (m_GPUBuffers[0].m_Buffer) {
-					for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
+				for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
+					if (m_PendingReallocations[i].active) {
+						DeletionQueue::PushBuffer(m_PendingReallocations[i].srcBuffer, i);
+					}
+
+					if (m_GPUBuffers[i].m_Buffer) {
 						DeletionQueue::PushBuffer(m_GPUBuffers[i], i);
 					}
 				}
@@ -797,7 +806,7 @@ namespace Cori {
 			struct IteratorImpl {
 				using iterator_category = std::vector<T>::iterator::iterator_category;
 				using difference_type = std::vector<T>::iterator::difference_type;
-				using value_type = std::vector<T>::iterator::value_type;
+				using ValueType = std::vector<T>::iterator::ValueType;
 				using pointer = std::vector<T>::iterator::pointer;
 				using reference = std::vector<T>::iterator::reference;
 
@@ -1257,7 +1266,7 @@ namespace Cori {
 
 					if (m_GPUBuffers[i].m_Buffer) {
 						m_PendingReallocations[i].srcBuffer = m_GPUBuffers[i];
-						m_PendingReallocations[i].size = sizeof(T) * m_OldSize;
+						m_PendingReallocations[i].size = std::min<uint64_t>(sizeof(T) * m_OldSize, m_GPUBuffers[i].m_Size);
 						m_PendingReallocations[i].active = true;
 					}
 
@@ -1340,7 +1349,7 @@ namespace Cori {
 			struct IteratorImpl {
 				using iterator_category = std::bidirectional_iterator_tag;
 				using difference_type = std::ptrdiff_t;
-				using value_type = T;
+				using ValueType = T;
 				using pointer = typename std::conditional<IsConst, const T*, T*>::type;
 				using reference = typename std::conditional<IsConst, typename VulkanDynamicVector<T>::ConstReference, typename VulkanDynamicVector<T>::Reference>::type;
 				using MapType = typename std::conditional<IsConst, const VulkanFlatSlotMap, VulkanFlatSlotMap>::type;
@@ -1546,9 +1555,7 @@ namespace Cori {
 				SizeT index = handle.GetIndex();
 
 				auto& obj = m_Data[index];
-				obj.~T();
-
-				std::memset(&obj, 0, sizeof(T));
+				obj = {};
 
 				m_SlotStates[index] = false;
 				m_Holes.emplace_back(index);
@@ -1563,9 +1570,7 @@ namespace Cori {
 				}
 
 				auto& obj = m_Data[index];
-				obj.~T();
-
-				std::memset(&obj, 0, sizeof(T));
+				obj = {};
 
 				m_SlotStates[index] = false;
 				m_OccupancyCounter--;
@@ -1856,7 +1861,7 @@ namespace Cori {
 							if (alloc) {
 								slot.pendingUploads.emplace_back(bufferUpload, data.size_bytes(), alloc.value());
 							} else {
-								success = false;
+								outOfMemory = true;
 								break;
 							}
 						} else {
@@ -1986,7 +1991,11 @@ namespace Cori {
 					}
 				}
 
-				return Get().m_NextTicket;
+				if (startOffset == 0) {
+					slot.completionTicket = Get().m_NextTicket++;
+				}
+
+				return slot.completionTicket;
 			}
 
 			[[nodiscard]] static bool CheckTicket(const uint64_t ticket) {
@@ -2013,8 +2022,16 @@ namespace Cori {
 
 			static void ProcessUploads() {
 				CORI_PROFILE_FUNCTION();
-				for (auto& slot : Get().m_Slots) {
+
+				uint64_t targetTicket = UINT64_MAX;
+				for (const auto& slot : Get().m_Slots) {
 					if (!slot.pendingUploads.empty() && slot.isBusy == false) {
+						targetTicket = std::min(targetTicket, slot.completionTicket);
+					}
+				}
+
+				for (auto& slot : Get().m_Slots) {
+					if (!slot.pendingUploads.empty() && slot.isBusy == false && slot.completionTicket == targetTicket) {
 
 						vk::CommandBufferInheritanceInfo inherit{
 							.pNext = nullptr,
@@ -2156,7 +2173,7 @@ namespace Cori {
 
 						vk::TimelineSemaphoreSubmitInfo timelineInfo {
 							.signalSemaphoreValueCount = 1,
-							.pSignalSemaphoreValues = &Get().m_NextTicket
+							.pSignalSemaphoreValues = &slot.completionTicket
 						};
 
 						vk::SubmitInfo submitInfo{
@@ -2175,7 +2192,6 @@ namespace Cori {
 						Get().m_ReleaseImageBarriersCache.clear();
 
 						slot.isBusy = true;
-						slot.completionTicket = Get().m_NextTicket++;
 						break;
 					}
 				}
@@ -2255,6 +2271,7 @@ namespace Cori {
 				VulkanBuffer::CreateInfo stagingInfo {
 					.bufferCreateInfo = &stagingCreateInfo,
 					.allocationCreateInfo = &allocCreateInfo,
+					.name = "VulkanStreamingLine ring staging buffer"
 				};
 
 				m_RingStagingBuffer = VulkanBuffer::Create(stagingInfo);
@@ -2287,13 +2304,15 @@ namespace Cori {
 				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to get value of the timeline semaphore in the streaming line. Error: {}", vk::to_string(result));
 
 				for (const auto& slot : m_Slots) {
-					if (currentValue >= slot.completionTicket) {
+					if (slot.isBusy == false) {
 						if (freeSlot == UINT32_MAX) {
 							freeSlot = slotCounter;
 						}
+					} else if (currentValue >= slot.completionTicket) {
+						ScrubSlot(slotCounter);
 
-						if (slot.isBusy == true) {
-							ScrubSlot(slotCounter);
+						if (freeSlot == UINT32_MAX) {
+							freeSlot = slotCounter;
 						}
 					}
 
@@ -2360,5 +2379,366 @@ namespace Cori {
 			static std::unique_ptr<VulkanStreamingLine> s_Instance;
 
 		};
+
+		template <typename T, QueueUsageFlags QUEUE_USAGE, vk::BufferUsageFlags BUFFER_USAGE, glz::string_literal NAME, typename Allocator = std::allocator<T>>
+		class VulkanGPUSyncedSequentialStorage {
+			struct PendingReallocation {
+				VulkanBuffer srcBuffer;
+				uint64_t size{};
+				bool active{ false };
+			};
+		public:
+			using ValueType = T;
+			using SizeType = std::allocator_traits<Allocator>::size_type;
+
+			using Reference = T&;
+			using ConstReference = const T&;
+
+			VulkanGPUSyncedSequentialStorage() = default;
+
+			explicit VulkanGPUSyncedSequentialStorage(const SizeType capacity) {
+				ReallocateNonReporting(capacity);
+			}
+
+			~VulkanGPUSyncedSequentialStorage() {
+				ReleaseResources();
+			}
+
+			VulkanGPUSyncedSequentialStorage(const VulkanGPUSyncedSequentialStorage&) = delete;
+			VulkanGPUSyncedSequentialStorage& operator=(const VulkanGPUSyncedSequentialStorage&) = delete;
+
+			VulkanGPUSyncedSequentialStorage(VulkanGPUSyncedSequentialStorage&& other) noexcept {
+				Steal(std::move(other));
+			}
+
+			VulkanGPUSyncedSequentialStorage& operator=(VulkanGPUSyncedSequentialStorage&& other) noexcept {
+				if (this == &other) {
+					return *this;
+				}
+
+				ReleaseResources();
+				Steal(std::move(other));
+
+				return *this;
+			}
+
+			[[nodiscard]] ConstReference operator[](const SizeType index) const {
+				CORI_CORE_ASSERT(index < m_Capacity, "VulkanGPUSyncedSequentialStorage '{}' index '{}' out of bounds.", NAME.sv(), index);
+				return m_Data[index];
+			}
+
+			[[nodiscard]] Reference operator[](const SizeType index) {
+				CORI_CORE_ASSERT(index < m_Capacity, "VulkanGPUSyncedSequentialStorage '{}' index '{}' out of bounds.", NAME.sv(), index);
+				ReportChange(index * sizeof(T), sizeof(T));
+				return m_Data[index];
+			}
+
+			[[nodiscard]] T* Data() {
+				return m_Data;
+			}
+
+			[[nodiscard]] const T* Data() const {
+				return m_Data;
+			}
+
+			[[nodiscard]] SizeType Capacity() const {
+				return m_Capacity;
+			}
+
+			void Sync() {
+				if (m_ResizeRequired) {
+					ResizeBuffers(m_Capacity);
+					m_ResizeRequired = false;
+				}
+
+				uint32_t frameIndex = VulkanEngine::GetCurrentFrameInFlight();
+
+				auto& reaclloc = m_PendingReallocations[frameIndex];
+				if (reaclloc.active) {
+					reaclloc.active = false;
+
+					if (m_IsBAR) {
+						ReportChange(0, reaclloc.size);
+						reaclloc.srcBuffer.Destroy();
+					}
+					else {
+						VulkanDynamicContainerUploadManager::RecordCopy(reaclloc.srcBuffer, m_GPUBuffers[frameIndex].m_Buffer, reaclloc.size);
+					}
+				}
+
+				if (Utility::IsSet(m_IsDirtyMask, frameIndex)) {
+
+					if (!m_IsBAR) {
+						VulkanDynamicContainerUploadManager::BeginUpdate(m_GPUBuffers[frameIndex].m_Buffer);
+					}
+
+					uint64_t currentRangeBeginning = m_SectorStates[frameIndex].find_first();
+					while (currentRangeBeginning != sul::dynamic_bitset<>::npos) {
+						uint64_t currentRangeEnd = m_SectorStates[frameIndex].find_sequence_end(currentRangeBeginning);
+
+						uint64_t offset = currentRangeBeginning * SECTOR_SIZE;
+						const uint64_t lastSector = m_SectorStates[frameIndex].size() - 1;
+						uint64_t size = (currentRangeEnd - currentRangeBeginning) * SECTOR_SIZE + (currentRangeEnd == lastSector ? m_LastSectorSize : SECTOR_SIZE);
+
+						if (m_IsBAR) {
+							auto result = VulkanEngine::GetAllocator().copyMemoryToAllocation(reinterpret_cast<void*>(reinterpret_cast<uint64_t>(m_Data) + offset), m_GPUBuffers[frameIndex].m_Allocation, offset, size);
+							CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to copy upload data to allocation of VulkanGPUSyncedSequentialStorage. Error: {}", vk::to_string(result));
+						} else {
+							VulkanDynamicContainerUploadManager::Upload(reinterpret_cast<void*>(reinterpret_cast<uint64_t>(m_Data) + offset), size, offset);
+						}
+
+						currentRangeBeginning = m_SectorStates[frameIndex].find_next(currentRangeEnd);
+					}
+
+					if (!m_IsBAR) {
+						VulkanDynamicContainerUploadManager::EndUpdate();
+					}
+
+					m_SectorStates[frameIndex].reset();
+
+					Utility::Reset(m_IsDirtyMask, frameIndex);
+				}
+			}
+
+			void Reallocate(const SizeType newCapacity) {
+				ReallocateNonReporting(newCapacity);
+
+				if (m_Capacity != 0) {
+					ReportChange(0, m_Capacity * sizeof(T));
+				}
+			}
+
+			void ReallocateNonReporting(const SizeType newCapacity) {
+				if (newCapacity == m_Capacity) {
+					return;
+				}
+
+				T* newData = newCapacity != 0 ? std::allocator_traits<Allocator>::allocate(m_Allocator, newCapacity) : nullptr;
+
+				const SizeType carriedOverCount = std::min(m_Capacity, newCapacity);
+
+				if (m_Data) {
+					if (carriedOverCount != 0) {
+						memcpy(newData, m_Data, carriedOverCount * sizeof(T));
+					}
+
+					std::allocator_traits<Allocator>::deallocate(m_Allocator, m_Data, m_Capacity);
+				}
+
+				m_Data = newData;
+				m_Capacity = newCapacity;
+				m_OldSize = carriedOverCount;
+
+				for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
+					m_SectorStates[i].resize(std::ceil(static_cast<float>(newCapacity * sizeof(T)) / static_cast<float>(SECTOR_SIZE)), false);
+				}
+
+				m_ResizeRequired = newCapacity != 0;
+
+				if (newCapacity == 0) {
+					ReleaseGPUBuffers();
+					return;
+				}
+
+				PoisonRange(carriedOverCount, newCapacity - carriedOverCount);
+			}
+
+			void PoisonRange([[maybe_unused]] const SizeType start, [[maybe_unused]] const SizeType count) {
+				#ifdef DEBUG_BUILD
+				if (count == 0) {
+					return;
+				}
+
+				CORI_CORE_ASSERT(start + count <= m_Capacity, "Range '{}' to '{}' passed to PoisonRange of VulkanGPUSyncedSequentialStorage '{}' is out of the storage bounds of '{}' elements.", start, start + count, NAME.sv(), m_Capacity);
+
+				const uint64_t startByte = start * sizeof(T);
+				const uint64_t byteCount = count * sizeof(T);
+
+				auto* bytes = reinterpret_cast<Byte*>(m_Data);
+				const auto* pattern = reinterpret_cast<const Byte*>(&s_PoisonValue);
+
+				for (uint64_t i = startByte; i < startByte + byteCount; i++) {
+					bytes[i] = pattern[i % sizeof(s_PoisonValue)];
+				}
+
+				ReportChange(startByte, byteCount);
+				#endif
+			}
+
+			void ReportChange(const uint64_t startOffset, const uint64_t size) {
+				uint32_t affectedSectorStart = std::floor(startOffset / SECTOR_SIZE);
+				uint32_t affectedSectorEnd = std::floor((startOffset + size - 1) / SECTOR_SIZE);
+
+				CORI_CORE_ASSERT(size != 0 && affectedSectorEnd < m_SectorStates[0].size(), "Change reported to VulkanGPUSyncedSequentialStorage '{}' at offset '{}' with size '{}' is out of the storage bounds.", NAME.sv(), startOffset, size);
+
+				for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
+					m_SectorStates[i].set(affectedSectorStart, affectedSectorEnd - affectedSectorStart + 1, true);
+				}
+
+				m_IsDirtyMask = UINT8_MAX;
+			}
+
+			[[nodiscard]] VulkanBuffer& GetVulkanBuffer() {
+				uint32_t frameIndex = VulkanEngine::GetCurrentFrameInFlight();
+				return m_GPUBuffers[frameIndex];
+			}
+
+			[[nodiscard]] const VulkanBuffer& GetVulkanBuffer() const {
+				uint32_t frameIndex = VulkanEngine::GetCurrentFrameInFlight();
+				return m_GPUBuffers[frameIndex];
+			}
+
+		private:
+
+			void ResizeBuffers(const uint64_t newSize) {
+				auto& sharingSettings = VulkanEngine::GetBufferSharingSettings(QUEUE_USAGE);
+				vk::BufferCreateInfo bufferCreateInfo{
+					.size = newSize * sizeof(T),
+					.usage = BUFFER_USAGE | vk::BufferUsageFlagBits::eTransferSrc | vk::BufferUsageFlagBits::eTransferDst,
+					.sharingMode = sharingSettings.first,
+					.queueFamilyIndexCount = static_cast<uint32_t>(sharingSettings.second.size()),
+					.pQueueFamilyIndices = sharingSettings.second.data()
+				};
+
+				vma::AllocationCreateInfo BARAlloc {
+					.flags = vma::AllocationCreateFlagBits::eHostAccessSequentialWrite | vma::AllocationCreateFlagBits::eHostAccessAllowTransferInstead | vma::AllocationCreateFlagBits::eMapped,
+					.usage = vma::MemoryUsage::eAuto,
+					.requiredFlags = vk::MemoryPropertyFlagBits::eDeviceLocal
+				};
+
+				vma::AllocationCreateInfo localAlloc {
+					.usage = vma::MemoryUsage::eAuto,
+					.requiredFlags = vk::MemoryPropertyFlagBits::eDeviceLocal
+				};
+
+
+				for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; ++i) {
+					VulkanBuffer::CreateInfo info {
+						.bufferCreateInfo = &bufferCreateInfo,
+						.allocationCreateInfo = &BARAlloc,
+					};
+
+					if (m_GPUBuffers[i].m_Buffer) {
+						m_PendingReallocations[i].srcBuffer = m_GPUBuffers[i];
+						m_PendingReallocations[i].size = std::min<uint64_t>(sizeof(T) * m_OldSize, m_GPUBuffers[i].m_Size);
+						m_PendingReallocations[i].active = true;
+					}
+
+					#ifdef DEBUG_BUILD
+					std::string name = std::format("{} GPU buffer {}", NAME.sv(), i);
+					info.name = name.c_str();
+					#endif
+
+					m_GPUBuffers[i] = VulkanBuffer::Create(info);
+				}
+
+				std::array<bool, FRAMES_IN_FLIGHT> isBufferBAR{};
+				isBufferBAR.fill(true);
+				m_IsBAR = true;
+
+				const uint64_t totalBytes = newSize * sizeof(T);
+				uint32_t lastSectorSize = totalBytes % SECTOR_SIZE;
+				m_LastSectorSize = lastSectorSize != 0 ? lastSectorSize : SECTOR_SIZE;
+
+				for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
+					auto propertyFlags = VulkanEngine::GetAllocator().getAllocationMemoryProperties(m_GPUBuffers[i].m_Allocation);
+					if (!(propertyFlags & vk::MemoryPropertyFlagBits::eHostVisible)) {
+						isBufferBAR[i] = false;
+						m_IsBAR = false;
+					}
+				}
+
+				if (!m_IsBAR) {
+					VulkanDynamicContainerUploadManager::FallbackListener();
+					for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
+						if (isBufferBAR[i]) {
+
+							VulkanBuffer::CreateInfo info {
+								.bufferCreateInfo = &bufferCreateInfo,
+								.allocationCreateInfo = &localAlloc,
+							};
+
+							m_GPUBuffers[i].Destroy();
+
+							#ifdef DEBUG_BUILD
+							std::string name = std::format("{} GPU buffer {}", NAME.sv(), i);
+							info.name = name.c_str();
+							#endif
+
+							m_GPUBuffers[i] = VulkanBuffer::Create(info);
+						}
+					}
+				}
+			}
+
+			void ReleaseGPUBuffers() {
+				for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
+					if (m_PendingReallocations[i].active) {
+						DeletionQueue::PushBuffer(m_PendingReallocations[i].srcBuffer, i);
+						m_PendingReallocations[i] = PendingReallocation{};
+					}
+
+					if (m_GPUBuffers[i].m_Buffer) {
+						DeletionQueue::PushBuffer(m_GPUBuffers[i], i);
+						m_GPUBuffers[i] = VulkanBuffer{};
+					}
+				}
+
+				m_LastSectorSize = SECTOR_SIZE;
+				m_IsBAR = false;
+				m_IsDirtyMask = 0;
+			}
+
+			void ReleaseResources() {
+				ReleaseGPUBuffers();
+
+				if (m_Data) {
+					std::allocator_traits<Allocator>::deallocate(m_Allocator, m_Data, m_Capacity);
+				}
+			}
+
+			void Steal(VulkanGPUSyncedSequentialStorage&& other) noexcept {
+				m_Allocator = std::move(other.m_Allocator);
+				m_Data = other.m_Data;
+				other.m_Data = nullptr;
+				m_Capacity = other.m_Capacity;
+				other.m_Capacity = 0;
+
+				for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; i++) {
+					m_GPUBuffers[i] = other.m_GPUBuffers[i];
+					other.m_GPUBuffers[i] = VulkanBuffer{};
+					m_SectorStates[i] = std::move(other.m_SectorStates[i]);
+					m_PendingReallocations[i] = other.m_PendingReallocations[i];
+					other.m_PendingReallocations[i] = PendingReallocation{};
+				}
+
+				m_LastSectorSize = other.m_LastSectorSize;
+				other.m_LastSectorSize = SECTOR_SIZE;
+				m_IsBAR = other.m_IsBAR;
+				other.m_IsBAR = false;
+				m_IsDirtyMask = other.m_IsDirtyMask;
+				other.m_IsDirtyMask = 0;
+				m_ResizeRequired = other.m_ResizeRequired;
+				other.m_ResizeRequired = false;
+				m_OldSize = other.m_OldSize;
+				other.m_OldSize = 0;
+			}
+
+			[[no_unique_address]] Allocator m_Allocator{};
+			T* m_Data{ nullptr };
+			SizeType m_Capacity{ 0 };
+			std::array<VulkanBuffer, FRAMES_IN_FLIGHT> m_GPUBuffers;
+			std::array<sul::dynamic_bitset<>, FRAMES_IN_FLIGHT> m_SectorStates;
+			std::array<PendingReallocation, FRAMES_IN_FLIGHT> m_PendingReallocations;
+			uint32_t m_LastSectorSize{ SECTOR_SIZE };
+			bool m_IsBAR{ false };
+			uint8_t m_IsDirtyMask{ 0 };
+			bool m_ResizeRequired{ false };
+			uint64_t m_OldSize{ 0 };
+
+			static constexpr uint32_t SECTOR_SIZE{ 4 * 1024 }; //4kb
+		};
+
+
 	}
 }

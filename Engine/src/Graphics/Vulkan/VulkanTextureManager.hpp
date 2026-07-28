@@ -9,6 +9,7 @@
 #include "VulkanFlagsGlaze.hpp"
 #include "Graphics/RenderThreadCommandQueue.hpp"
 #include "Core/AssetManager/AssetHandleAllocator.hpp"
+#include "Core/DataStructures/SparseFlatSlotMap.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -297,7 +298,10 @@ namespace Cori {
 			void LoadSamplers();
 
 			Core::AssetHandleAllocator<Texture2> m_HandleAllocator;
-			Core::FlatSlotMap<Texture2, 0, false> m_TexturePool;
+
+			Core::SparseFlatSlotMap<Texture2, 0, false> m_TexturePool;
+
+			//Core::FlatSlotMap<Texture2, 0, false> m_TexturePool;
 
 			Core::Handle<Texture2> m_PlaceholderTexture;
 			Core::Handle<Texture2> m_WhiteTexture;

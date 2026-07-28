@@ -1,4 +1,5 @@
 #include "DeletionQueue.hpp"
+#include "VmaLeakLog.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -61,7 +62,8 @@ namespace Cori {
 
 			for (auto& block : Get().m_VirtBlockQueue[Get().m_Counter] | std::views::reverse) {
 				if (!block.isVirtualBlockEmpty()) {
-					CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Deleting vma virtual block, but some allocations made from this block are still not freed, they will be forcibly freed now. You should generally free all allocation before deleting a block, not doing that can lead to a crash under certain circumstances (e.g., freeing a virtual allocation after the block was deleted via deletion queue in the next frame).");
+					const vma::Statistics statistics = block.getVirtualBlockStatistics();
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Deleting vma virtual block, but {} allocation(s) holding {} bytes made from this block are still not freed, they will be forcibly freed now. You should generally free all allocation before deleting a block, not doing that can lead to a crash under certain circumstances (e.g., freeing a virtual allocation after the block was deleted via deletion queue in the next frame).", statistics.allocationCount, static_cast<uint64_t>(statistics.allocationBytes));
 					block.clearVirtualBlock();
 				}
 
@@ -117,6 +119,13 @@ namespace Cori {
 
 			for (uint32_t i = 0; i < s_BucketCount; i++) {
 				for (auto& block : m_VirtBlockQueue[i] | std::views::reverse) {
+					if (!block.isVirtualBlockEmpty()) {
+						const vma::Statistics statistics = block.getVirtualBlockStatistics();
+						CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Flushing the deletion queue with {} allocation(s) (this is always 0 for block with linear algorithm) holding {} bytes still live in a vma virtual block, they will be forcibly freed now.", statistics.allocationCount, static_cast<uint64_t>(statistics.allocationBytes));
+					}
+
+					block.clearVirtualBlock();
+
 					block.clearVirtualBlock();
 					block.destroy();
 				}

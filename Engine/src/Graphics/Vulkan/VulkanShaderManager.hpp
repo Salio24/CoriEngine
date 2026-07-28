@@ -6,6 +6,7 @@
 #include "FileSystem/PathManager.hpp"
 #include "Utility/GlazeUtils.hpp"
 #include "Core/AssetManager/AssetHandleAllocator.hpp"
+#include "Core/DataStructures/SparseFlatSlotMap.hpp"
 #include "Core/Threading/ThreadPool.hpp"
 #include "Graphics/RenderThreadCommandQueue.hpp"
 
@@ -254,8 +255,12 @@ namespace Cori {
 
 			Core::Handle<VertFragShaderPair> m_PlaceholderShaderPair;
 
-			Core::FlatSlotMap<ComputeShader, 0, false> m_ComputeShaders;
-			Core::FlatSlotMap<VertFragShaderPair, 0, false> m_PairShaders;
+			//Core::FlatSlotMap<ComputeShader, 0, false> m_ComputeShaders;
+			//Core::FlatSlotMap<VertFragShaderPair, 0, false> m_PairShaders;
+
+			Core::SparseFlatSlotMap<ComputeShader, 0, false> m_ComputeShaders;
+
+			Core::SparseFlatSlotMap<VertFragShaderPair, 0, false> m_PairShaders;
 
 			std::vector<std::pair<void*, OnVertFragShaderPairDeletedFn>> m_Listeners;
 

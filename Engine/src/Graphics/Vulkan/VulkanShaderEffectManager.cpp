@@ -211,6 +211,11 @@ namespace Cori {
 					return;
 				}
 
+				auto errorMessage = Utility::CheckForMissingKeys(data.AssetData);
+				if (errorMessage) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::ShaderEffectManager }, "Load({}), handle [{},{}], asset file '{}' | {}", id, handle.GetIndex(), handle.GetVersion(), path.string(), errorMessage.value());
+				}
+
 				ShaderEffectData customData{
 					.custom1 = { data.AssetData.customData.custom1.value_or(0.0f), data.AssetData.customData.custom2.value_or(0.0f), data.AssetData.customData.custom3.value_or(0.0f), data.AssetData.customData.custom4.value_or(0.0f) },
 					.custom2 = { data.AssetData.customData.custom5.value_or(0.0f), data.AssetData.customData.custom6.value_or(0.0f), data.AssetData.customData.custom7.value_or(0.0f), data.AssetData.customData.custom8.value_or(0.0f) }

@@ -3,6 +3,8 @@
 #include "VulkanShaderManager.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
 #include "VulkanFlagsGlaze.hpp"
+#include "Core/DataStructures/SequentialStorage.hpp"
+#include "Core/DataStructures/SparseFlatSlotMap.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -53,8 +55,10 @@ namespace Cori {
 			};
 
 			struct JsonAssetData {
-				Core::AssetRef<VertFragShaderPair> shaderPair;
+				static constexpr std::array<std::string_view, 1> RequiredKeys{ "shaderPair" };
+				Core::AssetRef<VertFragShaderPair> shaderPair{ Core::Internal::EmptyRef };
 				struct PipelineStateGlaze {
+					static constexpr std::array<std::string_view, 0> RequiredKeys{};
 					Utility::GlazeWithFallback<vk::CullModeFlags, vk::CullModeFlagBits::eNone | vk::CullModeFlagBits::eFront, "cullMode from VulkanShaderEffectManager::Load"> cullMode;
 					Utility::GlazeWithFallback<vk::FrontFace, vk::FrontFace::eCounterClockwise, "frontFace from VulkanShaderEffectManager::Load"> frontFace;
 					Utility::GlazeWithFallback<vk::CompareOp, vk::CompareOp::eGreater, "depthCompareOp from VulkanShaderEffectManager::Load"> depthCompareOp;
@@ -169,7 +173,10 @@ namespace Cori {
 
 			Core::AssetHandleAllocator<ShaderEffect> m_HandleAllocator;
 
-			Core::FlatSlotMap<ShaderEffect, 0, false> m_ShaderEffects;
+			//Core::FlatSlotMap<ShaderEffect, 0, false> m_ShaderEffects;
+
+			Core::SparseFlatSlotMap<ShaderEffect, 0, false> m_ShaderEffects;
+
 			VulkanDynamicVector<ShaderEffectData> m_ShaderEffectData{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Shader Effect Data Buffer" };
 
 			Core::Handle<ShaderEffect> m_PlaceholderEffect;

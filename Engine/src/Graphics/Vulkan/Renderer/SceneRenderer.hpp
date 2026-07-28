@@ -335,9 +335,6 @@ namespace Cori {
 				{
 					CORI_PROFILE_SCOPE("Render Graph configuring");
 
-					auto ObjectBufferHandle = graph.ImportFlatSlotMap(m_Objects, "Object Data");
-					auto BatchInfoBufferHandle = graph.ImportDynamicVector(m_BatchGPUInfo, "Batch Info");
-
 					auto GroupCommandOffsetsBufferHandle = graph.ImportBuffer(commandOffsetsBuffer, "Group Command Offsets Buffer"); // per group <uint32_t>, CPU - write, GPU - compute read, semi-retained mode
 					auto UniformDataBufferHandle = graph.ImportBuffer(uniformBuffer, "Uniform Data Buffer"); // per group <uint32_t>, CPU - write, GPU - compute read, semi-retained mode
 
@@ -447,15 +444,14 @@ namespace Cori {
 
 					auto& cullPass = graph.CreatePass("Cull Pass");
 					cullPass.Writes(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
-					cullPass.Reads(ObjectBufferHandle);
 					cullPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
 						ComputePS ps {
-							.objectDataBuffer = registry.GetResource(ObjectBufferHandle).GetVulkanBuffer().GetBDA(),
+							.objectDataBuffer = m_Objects.GetVulkanBuffer().GetBDA(),
 							.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
 							.bii = registry.GetResource(BatchIntermediateInfoBufferHandle).GetBDA(),
 							.commandBuffer = registry.GetResource(DrawCommandBufferHandle).GetBDA(),
 							.commandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle).GetBDA(),
-							.batchInfos = registry.GetResource(BatchInfoBufferHandle).GetVulkanBuffer().GetBDA(),
+							.batchInfos = m_BatchGPUInfo.GetVulkanBuffer().GetBDA(),
 							.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
 							.globalAtomic = registry.GetResource(InstanceAtomicCounterHandle).GetBDA(),
 							.commandOffsets = registry.GetResource(GroupCommandOffsetsBufferHandle).GetBDA(),
@@ -479,16 +475,15 @@ namespace Cori {
 					cmgPass.Writes(DrawCommandBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
 					cmgPass.Writes(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
 					cmgPass.Writes(InstanceAtomicCounterHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
-					cmgPass.Reads(BatchInfoBufferHandle);
 					cmgPass.Reads(GroupCommandOffsetsBufferHandle);
 					cmgPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
 						ComputePS ps {
-							.objectDataBuffer = registry.GetResource(ObjectBufferHandle).GetVulkanBuffer().GetBDA(),
+							.objectDataBuffer = m_Objects.GetVulkanBuffer().GetBDA(),
 							.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
 							.bii = registry.GetResource(BatchIntermediateInfoBufferHandle).GetBDA(),
 							.commandBuffer = registry.GetResource(DrawCommandBufferHandle).GetBDA(),
 							.commandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle).GetBDA(),
-							.batchInfos = registry.GetResource(BatchInfoBufferHandle).GetVulkanBuffer().GetBDA(),
+							.batchInfos = m_BatchGPUInfo.GetVulkanBuffer().GetBDA(),
 							.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
 							.globalAtomic = registry.GetResource(InstanceAtomicCounterHandle).GetBDA(),
 							.commandOffsets = registry.GetResource(GroupCommandOffsetsBufferHandle).GetBDA(),
@@ -510,15 +505,14 @@ namespace Cori {
 					compactPass.Reads(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageRead });
 					compactPass.Writes(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
 					compactPass.Writes(CompactedInstanceListBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
-					compactPass.Reads(ObjectBufferHandle);
 					compactPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
 						ComputePS ps {
-							.objectDataBuffer = registry.GetResource(ObjectBufferHandle).GetVulkanBuffer().GetBDA(),
+							.objectDataBuffer = m_Objects.GetVulkanBuffer().GetBDA(),
 							.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
 							.bii = registry.GetResource(BatchIntermediateInfoBufferHandle).GetBDA(),
 							.commandBuffer = registry.GetResource(DrawCommandBufferHandle).GetBDA(),
 							.commandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle).GetBDA(),
-							.batchInfos = registry.GetResource(BatchInfoBufferHandle).GetVulkanBuffer().GetBDA(),
+							.batchInfos = m_BatchGPUInfo.GetVulkanBuffer().GetBDA(),
 							.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
 							.globalAtomic = registry.GetResource(InstanceAtomicCounterHandle).GetBDA(),
 							.commandOffsets = registry.GetResource(GroupCommandOffsetsBufferHandle).GetBDA(),
@@ -537,12 +531,10 @@ namespace Cori {
 					});
 
 					auto& indirectPass = graph.CreatePass("Indirect Pass");
-					indirectPass.Reads(ObjectBufferHandle);
 					indirectPass.Reads(CompactedInstanceListBufferHandle, { vk::PipelineStageFlagBits2::eVertexShader, vk::AccessFlagBits2::eShaderStorageRead });
 					indirectPass.Reads(DrawCommandBufferHandle, { vk::PipelineStageFlagBits2::eDrawIndirect, vk::AccessFlagBits2::eIndirectCommandRead });
 					indirectPass.Reads(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eDrawIndirect, vk::AccessFlagBits2::eIndirectCommandRead });
 					indirectPass.Reads(UniformDataBufferHandle);
-					indirectPass.Reads(BatchInfoBufferHandle);
 					indirectPass.Writes(DepthBufferHandle, {
 						.stageMask = vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
 						.accessMask = vk::AccessFlagBits2::eDepthStencilAttachmentRead | vk::AccessFlagBits2::eDepthStencilAttachmentWrite,
@@ -551,13 +543,13 @@ namespace Cori {
 					});
 					indirectPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
 						DrawPS ps {
-							.objectDataBuffer = registry.GetResource(ObjectBufferHandle).GetVulkanBuffer().GetBDA(),
+							.objectDataBuffer = m_Objects.GetVulkanBuffer().GetBDA(),
 							.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
 							.materialDataBuffer = VulkanMaterialSystem::GetMaterialSlotMapBDA(),
 							.shaderEffectDataBuffer = VulkanShaderEffectManager::GetShaderEffectDataBufferBDA(),
 							.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
 							.textureAssetTable = VulkanTextureManager::GetTextureAssetTableBDA(),
-							.batchInfo = registry.GetResource(BatchInfoBufferHandle).GetVulkanBuffer().GetBDA(),
+							.batchInfo = m_BatchGPUInfo.GetVulkanBuffer().GetBDA(),
 							.uniformData = registry.GetResource(UniformDataBufferHandle).GetBDA()
 						};
 
@@ -818,12 +810,16 @@ namespace Cori {
 			}
 
 			Threading::ConcurrentHandleAllocator<RenderObject, 64> m_RenderObjectAllocator;
-			VulkanFlatSlotMap<RenderObject, 0, false> m_Objects{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Render Object SlotMap" };
+			//VulkanFlatSlotMap<RenderObject, 0, false> m_Objects{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Render Object SlotMap" };
 
-			Core::FlatSlotMap<Batch, 0, false> m_Batches;
+			template<typename T> using ObjectsGPUStorage = VulkanGPUSyncedSequentialStorage<T, QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Render Object SlotMap">;
+
+			Core::SparseFlatSlotMap<RenderObject, 0, false, ObjectsGPUStorage> m_Objects;
+
+			Core::SparseFlatSlotMap<Batch, 0, false> m_Batches;
 			VulkanDynamicVector<BatchGPUInfo> m_BatchGPUInfo{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Batch GPU Data" };
 
-			Core::FlatSlotMap<DrawGroup, 0, false> m_DrawGroups;
+			Core::SparseFlatSlotMap<DrawGroup, 0, false> m_DrawGroups;
 			uint32_t m_TotalObjectCount{ 0 };
 
 			std::unordered_map<Core::ConstHandle<ShaderEffect>, std::pair<DrawGroupIndex, std::unordered_map<Core::Handle<Mesh>, BatchIndex>>> m_SubBatchLookup;
@@ -831,18 +827,6 @@ namespace Cori {
 			Core::AssetRef<ComputeShader> cullShader;
 			Core::AssetRef<ComputeShader> cmgShader;
 			Core::AssetRef<ComputeShader> compactShader;
-
-			//Core::Handle<VertFragShaderPair> testShader;
-			//Core::Handle<VertFragShaderPair> defaultShader;
-
-			Core::AssetRef<Mesh> quad;
-			//Core::AssetRef<Material> material;
-			//Core::AssetRef<Material> material2;
-			Core::AssetRef<Material> swordMaterial;
-			Core::AssetRef<Mesh> sword;
-
-			//Core::AssetRef<Texture2> texture;
-			//Core::AssetRef<Texture2> swordAlbedo;
 
 			RenderGraphResourceRegistry m_GraphResourceRegistry;
 			RenderGraphPassRegistry m_GraphPassRegistry;

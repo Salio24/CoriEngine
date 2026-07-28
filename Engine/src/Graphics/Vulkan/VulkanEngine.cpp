@@ -13,6 +13,7 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include "VulkanMaterialSystem.hpp"
 #include "VulkanUploadSubsystem.hpp"
 #include "DeletionQueue.hpp"
+#include "VmaLeakLog.hpp"
 #include "Renderer/MasterRenderer.hpp"
 
 const std::vector g_ValidationLayers = {
@@ -174,7 +175,11 @@ namespace Cori {
 
 			m_Device.destroySwapchainKHR(m_SwapChain);
 			m_Instance.destroySurfaceKHR(m_Surface);
+
+			VmaLeakLog::DumpLiveAllocations("VulkanEngine teardown");
 			m_Allocator.destroy();
+			VmaLeakLog::LogCollectedLeaks("VulkanEngine teardown");
+
 			m_Device.destroy();
 			m_Instance.destroyDebugUtilsMessengerEXT(m_DebugMessenger);
 			m_Instance.destroy();

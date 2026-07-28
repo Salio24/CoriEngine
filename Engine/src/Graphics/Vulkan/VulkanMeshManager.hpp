@@ -9,6 +9,8 @@
 #include "Graphics/RenderThreadCommandQueue.hpp"
 #include <fast_obj.h>
 
+#include "Core/DataStructures/SparseFlatSlotMap.hpp"
+
 namespace Cori {
 	namespace Graphics {
 
@@ -343,7 +345,11 @@ namespace Cori {
 
 			Core::AssetHandleAllocator<Mesh> m_HandleAllocator;
 
-			VulkanFlatSlotMap<Mesh, 0, false> m_Meshes{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Mesh assets data buffer" };
+			//VulkanFlatSlotMap<Mesh, 0, false> m_Meshes{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Mesh assets data buffer" };
+
+			template<typename T> using MeshGPUStorage = VulkanGPUSyncedSequentialStorage<T, QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Mesh assets data buffer">;
+			Core::SparseFlatSlotMap<Mesh, 0, false, MeshGPUStorage> m_Meshes;
+			//VulkanFlatSlotMap<Mesh, 0, false> m_Meshes{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Mesh assets data buffer" };
 
 			std::vector<MeshMetadata> m_MeshMetadata;
 

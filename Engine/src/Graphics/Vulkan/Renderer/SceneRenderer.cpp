@@ -85,7 +85,11 @@ namespace Cori {
 			}
 		}
 
-		SceneRenderer::SceneRenderer(CreateInfo&& createInfo) : m_PRT(createInfo.initialPRTExtent, createInfo.PRTFormat, createInfo.registerPRTWithImGui, GetNameForPRT(createInfo)) {
+		SceneRenderer::SceneRenderer(CreateInfo&& createInfo)
+			: cullShader(Core::AssetManager2::Load<ComputeShader>("assets/Shaders/Cull_Pass1.json")),
+			cmgShader(Core::AssetManager2::Load<ComputeShader>("assets/Shaders/Cull_Pass2.json")),
+			compactShader(Core::AssetManager2::Load<ComputeShader>("assets/Shaders/Cull_Pass3.json")),
+			m_PRT(createInfo.initialPRTExtent, createInfo.PRTFormat, createInfo.registerPRTWithImGui, GetNameForPRT(createInfo)) {
 			m_Objects.Reserve(256);
 			m_Batches.Reserve(128);
 			m_DrawGroups.Reserve(16);
@@ -102,12 +106,7 @@ namespace Cori {
 			//std::vector<Byte> buffer(file.tellg());
 			//file.seekg(0, std::ios::beg);
 			//file.read(reinterpret_cast<char*>(buffer.data()), static_cast<std::streamsize>(buffer.size()));
-			//file.close();
-
-			cullShader = Core::AssetManager2::Load<ComputeShader>("assets/Shaders/Cull_Pass1.json");
-			cmgShader = Core::AssetManager2::Load<ComputeShader>("assets/Shaders/Cull_Pass2.json");
-			compactShader = Core::AssetManager2::Load<ComputeShader>("assets/Shaders/Cull_Pass3.json");
-
+			//file.close()
 				#if 0
 			std::ifstream file_(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "shaders/TestShader.spv", std::ios::ate | std::ios::binary);
 			if (!file_.is_open()) {
@@ -139,21 +138,21 @@ namespace Cori {
 
 			std::vector<StaticVertex> vertices = {
 					// Bottom-left
-					{ glm::vec3(-0.5f, -0.5f, depth), 0, 0, glm::vec2(0,0), 0xFFFFFFFF },
+					{glm::vec3(-0.5f, -0.5f, depth), 0, 0, glm::vec2(0, 0), 0xFFFFFFFF},
 
 					// Bottom-right
-					{ glm::vec3( 0.5f, -0.5f, depth), 0, 0, glm::vec2(1,0), 0xFFFFFFFF },
+					{glm::vec3(0.5f, -0.5f, depth), 0, 0, glm::vec2(1, 0), 0xFFFFFFFF},
 
 					// Top-right
-					{ glm::vec3( 0.5f,  0.5f, depth), 0, 0, glm::vec2(1,1), 0xFFFFFFFF },
+					{glm::vec3(0.5f, 0.5f, depth), 0, 0, glm::vec2(1, 1), 0xFFFFFFFF},
 
 					// Top-left
-					{ glm::vec3(-0.5f,  0.5f, depth), 0, 0, glm::vec2(0,1), 0xFFFFFFFF }
+					{glm::vec3(-0.5f, 0.5f, depth), 0, 0, glm::vec2(0, 1), 0xFFFFFFFF}
 				};
 
 			std::vector<uint32_t> indices = {
-					0, 1, 2,   // first triangle
-					2, 3, 0    // second triangle
+					0, 1, 2, // first triangle
+					2, 3, 0 // second triangle
 				};
 
 				#endif
@@ -179,14 +178,14 @@ namespace Cori {
 
 			auto shaderEffect = VulkanMaterialSystem::CreateShaderEffect(testShader, state, {}, "Test Shader Effect");
 
-			MaterialData materialData {
-					.colorFactor = { 1.0f, 1.0f, 1.0f, 1.0f },
+			MaterialData materialData{
+					.colorFactor = {1.0f, 1.0f, 1.0f, 1.0f},
 					.albedoTexture = swordAlbedo.GetHandle(),
 					.albedoSampler = 0
 				};
 
-			MaterialData materialData_ {
-					.colorFactor = { 1.0f, 1.0f, 1.0f, 1.0f },
+			MaterialData materialData_{
+					.colorFactor = {1.0f, 1.0f, 1.0f, 1.0f},
 					.albedoTexture = VulkanTextureManager::GetPlaceholder<Texture2>(),
 					.albedoSampler = 0
 				};

@@ -219,6 +219,16 @@ namespace Cori {
 				m_ImageStateCache.resize(64); //TODO: move to define.
 			}
 
+			~RenderGraphResourceRegistry() {
+				for (auto& vector : m_ImagePool | std::ranges::views::values) {
+					for (auto& pooledImage : vector) {
+						if (pooledImage.image.m_Image) {
+							DeletionQueue::PushImage(pooledImage.image);
+						}
+					}
+				}
+			}
+
 			void Reset(const uint64_t currentFrameIndex) {
 				m_SwapChainImageData = {};
 				m_SwapChainImageRetrieved = false;

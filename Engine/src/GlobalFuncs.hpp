@@ -1,5 +1,5 @@
 #pragma once
-#include "Logger.hpp"
+#include "Core/Logger.hpp"
 #include  "Profiling/Profiler.hpp"
 
 namespace Cori {

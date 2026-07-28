@@ -6,6 +6,7 @@
 #include "VulkanShaderEffectManager.hpp"
 #include "Core/DataStructures/FlatSlotMap.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
+#include "Core/DataStructures/SparseFlatSlotMap.hpp"
 #include "FileSystem/PathManager.hpp"
 
 namespace Cori {
@@ -22,7 +23,7 @@ namespace Cori {
 		struct Material : Core::SecondaryAssetBase {
 			using Manager = VulkanMaterialSystem;
 			MaterialData customData;
-			Core::AssetRef<ShaderEffect> shaderEffect{};
+			Core::AssetRef<ShaderEffect> shaderEffect;
 			uint32_t version{ 0 };
 			uint32_t pad1{ 0 };
 			uint32_t pad2{ 0 };
@@ -35,11 +36,11 @@ namespace Cori {
 			struct JsonAssetData {
 				struct JsonMaterialData {
 					std::array<float, 4> colorFactor;
-					Core::AssetRef<Texture2> albedoTexture;
+					Core::AssetRef<Texture2> albedoTexture{ Core::Internal::EmptyRef };
 					std::string albedoSampler;
 				} materialData;
 
-				Core::AssetRef<ShaderEffect> shaderEffect;
+				Core::AssetRef<ShaderEffect> shaderEffect{ Core::Internal::EmptyRef };
 			};
 
 			struct JsonAssetDataCombined {
@@ -141,7 +142,9 @@ namespace Cori {
 
 			Core::AssetHandleAllocator<Material> m_HandleAllocator;
 
-			VulkanFlatSlotMap<Material, 0, false> m_Materials{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Material Slot Map" };
+			template<typename T> using MaterialGPUStorage = VulkanGPUSyncedSequentialStorage<T, QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Material Slot Map">;
+			Core::SparseFlatSlotMap<Material, 0, false, MaterialGPUStorage> m_Materials;
+			//VulkanFlatSlotMap<Material, 0, false> m_Materials{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Material Slot Map" };
 
 			Core::Handle<Material> m_PlaceholderMaterial;
 

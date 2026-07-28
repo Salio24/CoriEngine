@@ -9,4 +9,14 @@
 #define CORI_PIXELS_PER_METER 16
 #define CORI_DISPOSABLE_ANIMATION_POOL_SIZE 32
 
+#ifdef DEBUG_BUILD
+	#define CORI_VMA_LEAK_INSTRUMENTATION
+#endif
+
+//#define CORI_VMA_VERBOSE_ALLOCATION_LOGGING
+
+namespace Cori {
+	static constexpr uint32_t s_PoisonValue{ 0xBAADF00D };
+}
+
 #endif

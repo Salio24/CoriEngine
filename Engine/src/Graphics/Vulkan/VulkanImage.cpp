@@ -22,6 +22,8 @@ namespace Cori {
 				image.m_Name = info.name;
 				VulkanEngine::SetDebugName(image.m_Image, info.name);
 			}
+
+			VulkanEngine::GetAllocator().setAllocationName(image.m_Allocation, image.m_Name.c_str());
 			#endif
 
 			return image;

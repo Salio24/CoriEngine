@@ -54,8 +54,9 @@ namespace Cori {
 			 * @brief Enables or disables relative mouse mode.
 			 * @details While it is on the cursor is hidden and confined to the window, and the mouse only reports deltas. Turning it back off returns the cursor to where it was when the mode was entered.
 			 * @param status
+			 * @returns True on success, false otherwise.
 			 */
-			static void SetRelativeMouseMode(const bool status);
+			static bool SetRelativeMouseMode(const bool status);
 
 			/**
 			 * @brief Checks whether relative mouse mode is currently enabled.

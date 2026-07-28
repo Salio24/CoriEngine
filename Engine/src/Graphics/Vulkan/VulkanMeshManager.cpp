@@ -1,6 +1,8 @@
 #include "VulkanMeshManager.hpp"
 #include "Core/Application.hpp"
 
+static uint64_t counter = 0;
+
 namespace Cori {
 	namespace Graphics {
 		std::unique_ptr<VulkanMeshManager> VulkanMeshManager::s_Instance{ nullptr };
@@ -108,6 +110,9 @@ namespace Cori {
 		}
 
 		VulkanMeshManager::~VulkanMeshManager() {
+			auto& placeholder = m_MeshMetadata[m_PlaceholderMesh.GetIndex()];
+			DeletionQueue::PushVirtualAlloc(placeholder.indexAllocation, m_IndexBufferBlock);
+			DeletionQueue::PushVirtualAlloc(placeholder.vertexAllocation, placeholder.vertexStorage->m_Block);
 			DeletionQueue::PushVirtualBlock(m_IndexBufferBlock);
 
 			for (auto& vertexStorage : m_VertexStorages) {
@@ -453,8 +458,6 @@ namespace Cori {
 
 						inTransferMesh.vertexStorage->RemoveStrongRef();
 
-
-
 						auto& meshData = Get().m_Meshes[inTransferMesh.mesh];
 						meshData.indexCount = inTransferMesh.indexCount;
 						meshData.firstIndex = inTransferMesh.indexOffset;
@@ -792,6 +795,9 @@ namespace Cori {
 				.vertexAlloc = vertexAlloc,
 				.loadGen = loadGen
 			});
+
+			CORI_DEBUG("Queued");
+			counter++;
 			return { true, indexOffset, std::nullopt };
 		}
 

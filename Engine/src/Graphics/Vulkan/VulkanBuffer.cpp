@@ -18,6 +18,8 @@ namespace Cori {
 				buffer.m_Name = info.name;
 				VulkanEngine::SetDebugName(buffer.m_Buffer, info.name);
 			}
+
+			VulkanEngine::GetAllocator().setAllocationName(buffer.m_Allocation, buffer.m_Name.c_str());
 			#endif
 
 			return buffer;

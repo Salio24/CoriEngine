@@ -109,8 +109,8 @@ namespace Cori {
 			m_HandleAllocator.AddRef(m_PlaceholderTexture);
 			m_HandleAllocator.AddRef(m_WhiteTexture);
 
-			m_TexturePool.EmplaceAt(m_PlaceholderTexture.GetIndex());
-			m_TexturePool.EmplaceAt(m_WhiteTexture.GetIndex());
+			m_TexturePool.EmplaceAt(m_PlaceholderTexture.GetIndex(), missingTexturePlaceholder);
+			m_TexturePool.EmplaceAt(m_WhiteTexture.GetIndex(), whiteTexture);
 
 			auto& table = m_GPUAssetTables[m_PlaceholderTexture.GetIndex()];
 			table.descriptorIndex = s_PlaceholderTextureDescriptorIndex;

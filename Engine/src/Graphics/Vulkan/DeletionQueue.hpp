@@ -14,7 +14,6 @@ namespace Cori {
 		public:
 			~DeletionQueue() {
 				FlushAll();
-
 			}
 
 			static void Init();

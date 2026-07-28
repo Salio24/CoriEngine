@@ -7,6 +7,8 @@
 #include "EventSystem/MouseEvent.hpp"
 #include "FileSystem/BinaryFileManager.hpp"
 
+#define CORI_MOUSE_TEMP_DEBUG
+
 namespace Cori {
 	namespace Core {
 		struct Window::Data {
@@ -183,6 +185,10 @@ namespace Cori {
 					{
 						m_Data->m_MouseDelta += glm::vec2{ e.motion.xrel, e.motion.yrel };
 
+						#ifdef CORI_MOUSE_TEMP_DEBUG
+						CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Mouse motion: pos ({}, {}), rel ({}, {}), mouseID {}, windowID {} (ours {}), relative mode {}, cursor visible {}", e.motion.x, e.motion.y, e.motion.xrel, e.motion.yrel, e.motion.which, e.motion.windowID, SDL_GetWindowID(m_Data->m_Window), SDL_GetWindowRelativeMouseMode(m_Data->m_Window), SDL_CursorVisible());
+						#endif
+
 						MouseMovedEvent mouseMovedEvent(static_cast<int32_t>(e.motion.x), static_cast<int32_t>(e.motion.y));
 						m_Data->m_EventCallback(mouseMovedEvent);
 						break;
@@ -207,6 +213,12 @@ namespace Cori {
 					}
 				}
 			}
+
+			#ifdef CORI_MOUSE_TEMP_DEBUG
+			if (m_Data->m_MouseDelta != glm::vec2{ 0.0f, 0.0f }) {
+				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Mouse delta for this pump: ({}, {})", m_Data->m_MouseDelta.x, m_Data->m_MouseDelta.y);
+			}
+			#endif
 		}
 
 		int32_t Window::GetWidth() const {
@@ -246,15 +258,17 @@ namespace Cori {
 		}
 
 		// ReSharper disable once CppMemberFunctionMayBeConst
-		void Window::SetRelativeMouseMode(const bool status) {
+		bool Window::SetRelativeMouseMode(const bool status) {
 			if (!SDL_SetWindowRelativeMouseMode(m_Data->m_Window, status)) {
 				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to {} relative mouse mode. SDL_Error: {}", status ? "enable" : "disable", SDL_GetError());
-				return;
+				return false;
 			}
 
 			m_Data->m_MouseDelta = { 0.0f, 0.0f };
 
-			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Relative mouse mode is now set to: {}", status);
+			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Relative mouse mode requested: {}, reads back as: {}, cursor visible: {}, window focused: {}", status, SDL_GetWindowRelativeMouseMode(m_Data->m_Window), SDL_CursorVisible(), (SDL_GetWindowFlags(m_Data->m_Window) & SDL_WINDOW_INPUT_FOCUS) != 0);
+
+			return true;
 		}
 
 		bool Window::IsRelativeMouseMode() const {

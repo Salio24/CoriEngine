@@ -35,8 +35,8 @@ namespace Cori {
 			return Application::GetWindow().GetMouseDelta();
 		}
 
-		void Input::SetRelativeMouseMode(const bool status) {
-			Application::GetWindow().SetRelativeMouseMode(status);
+		bool Input::SetRelativeMouseMode(const bool status) {
+			return Application::GetWindow().SetRelativeMouseMode(status);
 		}
 
 		bool Input::IsRelativeMouseMode() {
