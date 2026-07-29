@@ -1,5 +1,6 @@
 #include "VulkanShaderManager.hpp"
 #include "Core/Application.hpp"
+#include "DeviceLossDebug/VulkanDeviceLossDebug.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -190,6 +191,8 @@ namespace Cori {
 
 				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "SPIR-V: %s (%llu bytes), compute entry '%s'", data.AssetData.spv.c_str(), static_cast<unsigned long long>(spvBuffer.size()), data.AssetData.computeEntry.c_str());
 
+				VulkanDeviceLossDebug::RegisterShaderBinary(spvBuffer.data(), spvBuffer.size(), data.AssetData.spv);
+
 				vk::ShaderCreateInfoEXT createInfo{
 						.stage = vk::ShaderStageFlagBits::eCompute,
 						.codeType = vk::ShaderCodeTypeEXT::eSpirv,
@@ -370,6 +373,8 @@ namespace Cori {
 				spvData.close();
 
 				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "SPIR-V: %s (%llu bytes), vertex entry '%s', fragment entry '%s'", data.AssetData.spv.c_str(), static_cast<unsigned long long>(spvBuffer.size()), data.AssetData.vertexEntry.c_str(), data.AssetData.fragmentEntry.c_str());
+
+				VulkanDeviceLossDebug::RegisterShaderBinary(spvBuffer.data(), spvBuffer.size(), data.AssetData.spv);
 
 				std::array<vk::ShaderCreateInfoEXT, 2> infos;
 				infos[0] = {
@@ -557,6 +562,11 @@ namespace Cori {
 			CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Load);
 			CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u] '%s', vertex entry '%s' (%llu bytes), fragment entry '%s' (%llu bytes)", handle.GetIndex(), handle.GetVersion(), shaderName, vertexEntryPoint, static_cast<unsigned long long>(vertexSourceSize), fragmentEntryPoint, static_cast<unsigned long long>(fragmentSourceSize));
 
+			VulkanDeviceLossDebug::RegisterShaderBinary(vertexSource, vertexSourceSize, shaderName);
+			if (fragmentSource != vertexSource) {
+				VulkanDeviceLossDebug::RegisterShaderBinary(fragmentSource, fragmentSourceSize, shaderName);
+			}
+
 			std::array<vk::ShaderCreateInfoEXT, 2> infos;
 			infos[0] = {
 				.stage = vk::ShaderStageFlagBits::eVertex,
@@ -586,10 +596,7 @@ namespace Cori {
 			auto& object = m_PairShaders[handle];
 			std::array<vk::ShaderEXT, 2> shaderObjects{};
 
-			auto result = [&] {
-				CORI_PROFILE_SCOPE_CP(Cori::ProfileParts::RenderingAssets, "createShadersEXT (vert+frag)", Cori::ProfileColors::Upload);
-				return VulkanEngine::GetLogicalDevice().createShadersEXT(2, infos.data(), nullptr, shaderObjects.data());
-			}();
+			auto result = VulkanEngine::GetLogicalDevice().createShadersEXT(2, infos.data(), nullptr, shaderObjects.data());
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to create placeholder shader pair.")
 
 			object.m_VertFragPair = shaderObjects;

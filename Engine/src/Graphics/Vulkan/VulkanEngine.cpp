@@ -14,6 +14,7 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include "VulkanUploadSubsystem.hpp"
 #include "DeletionQueue.hpp"
 #include "VmaLeakLog.hpp"
+#include "DeviceLossDebug/VulkanDeviceLossDebug.hpp"
 #include "Renderer/MasterRenderer.hpp"
 
 const std::vector g_ValidationLayers = {
@@ -22,10 +23,49 @@ const std::vector g_ValidationLayers = {
 
 
 std::vector<const char*> Cori::Graphics::VulkanEngine::m_DeviceExtensions;
+std::vector<const char*> Cori::Graphics::VulkanEngine::m_OptionalDeviceExtensions;
+std::vector<const char*> Cori::Graphics::VulkanEngine::m_EnabledDeviceExtensions;
 std::vector<const char*> Cori::Graphics::VulkanEngine::m_InstanceExtensions;
 bool Cori::Graphics::VulkanEngine::s_VerboseValidationLayerLogging = false;
 
+#if defined(DEBUG_BUILD) && !defined(CORI_ENABLE_PROFILING)
+bool Cori::Graphics::VulkanEngine::s_EnableDeviceAddressBindingReport = true;
+#else
+bool Cori::Graphics::VulkanEngine::s_EnableDeviceAddressBindingReport = false;
+#endif
+
 static VKAPI_ATTR vk::Bool32 VKAPI_CALL DebugCallback(vk::DebugUtilsMessageSeverityFlagBitsEXT severity, vk::DebugUtilsMessageTypeFlagsEXT type, const vk::DebugUtilsMessengerCallbackDataEXT* pCallbackData, void*) {
+	if (!!(type & vk::DebugUtilsMessageTypeFlagBitsEXT::eDeviceAddressBinding)) {
+		bool bindingHandled = false;
+
+		for (const auto* next = static_cast<const vk::BaseInStructure*>(pCallbackData->pNext); next != nullptr; next = next->pNext) {
+			if (next->sType != vk::StructureType::eDeviceAddressBindingCallbackDataEXT) {
+				continue;
+			}
+
+			const auto& binding = *reinterpret_cast<const vk::DeviceAddressBindingCallbackDataEXT*>(next);
+
+			const bool unbind = binding.bindingType == vk::DeviceAddressBindingTypeEXT::eUnbind;
+			const bool internalObject = !!(binding.flags & vk::DeviceAddressBindingFlagBitsEXT::eInternalObject);
+
+			vk::ObjectType objectType = vk::ObjectType::eUnknown;
+			uint64_t objectHandle = 0;
+
+			if (pCallbackData->objectCount > 0) {
+				objectType = pCallbackData->pObjects[0].objectType;
+				objectHandle = pCallbackData->pObjects[0].objectHandle;
+			}
+
+			Cori::Graphics::VulkanDeviceLossDebug::RecordAddressBinding(binding.baseAddress, binding.size, unbind, internalObject, objectType, objectHandle);
+
+			bindingHandled = true;
+		}
+
+		if (bindingHandled) {
+			return vk::False;
+		}
+	}
+
 	std::stringstream message;
 
 	message << "Vulkan validation layer: "
@@ -104,6 +144,18 @@ namespace Cori {
 			m_DeviceExtensions.push_back(vk::EXTCalibratedTimestampsExtensionName);
 				#endif
 
+			VulkanDeviceLossDebug::Init();
+
+			m_OptionalDeviceExtensions.push_back(vk::EXTDeviceFaultExtensionName);
+
+			if (s_EnableDeviceAddressBindingReport) {
+				m_OptionalDeviceExtensions.push_back(vk::EXTDeviceAddressBindingReportExtensionName);
+			}
+
+			#ifdef CORI_VK_DL_DEBUG_AMD
+			m_OptionalDeviceExtensions.push_back(vk::AMDBufferMarkerExtensionName);
+			#endif
+
 			m_InstanceExtensions.push_back(vk::EXTDebugUtilsExtensionName);
 
 			CreateInstance();
@@ -117,6 +169,8 @@ namespace Cori {
 			CreateCommandPools();
 			CreateCommandBuffer();
 			CreateSyncObjects();
+
+			VulkanDeviceLossDebug::InitDeviceResources();
 
 			VulkanImageViewManager::Init();
 			DeletionQueue::Init();
@@ -134,6 +188,7 @@ namespace Cori {
 
 		VulkanEngine::~VulkanEngine() {
 			auto result = m_Device.waitIdle();
+			VulkanDeviceLossDebug::CheckResult(result, "vkDeviceWaitIdle during VulkanEngine teardown");
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Calling wait idle on device has failed. Error: {}", vk::to_string(result));
 
 			MasterRenderer::Shutdown();
@@ -148,6 +203,8 @@ namespace Cori {
 			VulkanStreamingLine::Shutdown();
 			DeletionQueue::Shutdown();
 			VulkanImageViewManager::Shutdown();
+
+			VulkanDeviceLossDebug::Shutdown();
 
 			if (m_TransferGPUProfilerContext != m_GraphicsGPUProfilerContext) {
 				CORI_PROFILE_GPU_CONTEXT_DESTROY(m_TransferGPUProfilerContext);
@@ -208,7 +265,12 @@ namespace Cori {
 
 			{
 				CORI_PROFILE_SCOPE("Wait for Fences");
-				while (vk::Result::eTimeout == m_Device.waitForFences(frameData.m_DrawFence, vk::True, UINT64_MAX)) {}
+
+				vk::Result fenceResult = vk::Result::eTimeout;
+				while (vk::Result::eTimeout == (fenceResult = m_Device.waitForFences(frameData.m_DrawFence, vk::True, UINT64_MAX))) {}
+
+				VulkanDeviceLossDebug::CheckResult(fenceResult, "vkWaitForFences on the draw fence");
+				CORI_CORE_ASSERT(fenceResult == vk::Result::eSuccess, "Waiting on the draw fence has failed. Error: {}", vk::to_string(fenceResult));
 			}
 
 			{
@@ -242,6 +304,8 @@ namespace Cori {
 				return frameData;
 			}
 
+			VulkanDeviceLossDebug::CheckResult(result_, "vkAcquireNextImageKHR");
+
 			auto result = m_Device.resetFences(frameData.m_DrawFence);
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to reset fence. Error: {}", vk::to_string(result));
 
@@ -258,6 +322,10 @@ namespace Cori {
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to begin command buffer recording. Error: {}", vk::to_string(result));
 
 			CORI_PROFILE_GPU_SPAN_BEGIN_C(m_GPUFrameZone, m_GraphicsGPUProfilerContext, frameData.m_CommandBuffer, "GPU Frame", Cori::ProfileColors::GPUFrame);
+
+			CORI_VK_LABEL_BEGIN_F(frameData.m_CommandBuffer, DebugLabelColors::Frame, "Frame {} (slot {}, swapchain image {})", m_CurrentFrameIndex, m_CurrentFrameInFlight, imageIndex);
+
+			VulkanDeviceLossDebug::BeginFrame(m_CurrentFrameIndex);
 
 			#if 0
 			vk::ImageMemoryBarrier2 barrier {
@@ -341,6 +409,7 @@ namespace Cori {
 
 			{
 				CORI_PROFILE_GPU_ZONE_C(m_GraphicsGPUProfilerContext, frameData.m_CommandBuffer, "Frame Sync Point", Cori::ProfileColors::GPUSync);
+				CORI_VK_LABEL(frameData.m_CommandBuffer, "Frame Sync Point", DebugLabelColors::Sync);
 
 				VulkanTextureManager::ProcessUpdates(frameData.m_CommandBuffer);
 				VulkanMeshManager::ProcessUpdates(frameData.m_CommandBuffer);
@@ -392,6 +461,8 @@ namespace Cori {
 
 				CORI_PROFILE_GPU_SPAN_END(m_GPUFrameZone);
 
+				CORI_VK_LABEL_END(frameData.m_CommandBuffer);
+
 				auto result = frameData.m_CommandBuffer.end();
 
 				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to end command buffer recording. Error: {}", vk::to_string(result));
@@ -415,7 +486,10 @@ namespace Cori {
 					submitInfo.pNext = &timelineInfo;
 				}
 
+				CORI_VK_QUEUE_LABEL_INSERT_F(m_GraphicsQueue, DebugLabelColors::Frame, "Submit frame {}", frameData.m_FrameIndex);
+
 				result = m_GraphicsQueue.submit(submitInfo, frameData.m_DrawFence);
+				VulkanDeviceLossDebug::CheckResult(result, "vkQueueSubmit on the graphics queue");
 				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Graphics queue submission failed. Error: {}", vk::to_string(result));
 
 				vk::PresentInfoKHR presentInfoKHR{
@@ -427,6 +501,8 @@ namespace Cori {
 				};
 
 				result = m_PresentQueue.presentKHR(presentInfoKHR);
+
+				VulkanDeviceLossDebug::CheckResult(result, "vkQueuePresentKHR");
 
 				if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) {
 					ResizeSwapChain();
@@ -502,12 +578,16 @@ namespace Cori {
 			m_Instance = vk::Instance(instance);
 			VULKAN_HPP_DEFAULT_DISPATCHER.init(m_Instance);
 
+			#ifdef DEBUG_BUILD
+			VulkanDebugLabels::Enable();
+			#endif
+
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self }, "Vulkan instance has been created.");
 		}
 
 		void VulkanEngine::SetupDebugMessenger() {
 			vk::DebugUtilsMessageSeverityFlagsEXT severityFlags( vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose | vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo | vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning | vk::DebugUtilsMessageSeverityFlagBitsEXT::eError );
-			vk::DebugUtilsMessageTypeFlagsEXT    messageTypeFlags( vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation );
+			vk::DebugUtilsMessageTypeFlagsEXT    messageTypeFlags( vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation | vk::DebugUtilsMessageTypeFlagBitsEXT::eDeviceAddressBinding );
 			vk::DebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCreateInfoEXT{
 				.messageSeverity = severityFlags,
 				.messageType = messageTypeFlags,
@@ -662,6 +742,41 @@ namespace Cori {
 
 			CORI_CORE_ASSERT(!(m_GraphicsQueueFamilyIndex == queueFamilyProperties.size() || m_PresentQueueFamilyIndex == queueFamilyProperties.size()), "Could not find a queue for graphics or present -> terminating");
 
+			m_NvidiaInstrumentation = VulkanDeviceLossDebug::IsNvidiaInstrumentationSupported(m_PhysicalDevice);
+
+			if (m_NvidiaInstrumentation) {
+				m_OptionalDeviceExtensions.push_back(vk::NVDeviceDiagnosticCheckpointsExtensionName);
+				m_OptionalDeviceExtensions.push_back(vk::NVDeviceDiagnosticsConfigExtensionName);
+			}
+
+			m_EnabledDeviceExtensions = m_DeviceExtensions;
+			{
+				auto [extensionResult, availableDeviceExtensions] = m_PhysicalDevice.enumerateDeviceExtensionProperties();
+				CORI_CORE_ASSERT(extensionResult == vk::Result::eSuccess, "Failed to enumerate available physical device extensions. Error: {}", vk::to_string(extensionResult));
+
+				for (const auto& optionalExtension : m_OptionalDeviceExtensions) {
+					const bool supported = std::ranges::any_of(availableDeviceExtensions, [optionalExtension](auto const& availableDeviceExtension) {
+						return strcmp(availableDeviceExtension.extensionName, optionalExtension) == 0;
+					});
+
+					if (supported) {
+						m_EnabledDeviceExtensions.push_back(optionalExtension);
+						CORI_CORE_INFO_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self }, "Optional device extension '{}' is supported and will be enabled.", optionalExtension);
+					} else {
+						CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self }, "Optional device extension '{}' is not supported, the tooling relying on it will be unavailable.", optionalExtension);
+					}
+				}
+			}
+
+			const bool deviceFaultEnabled = IsDeviceExtensionEnabled(vk::EXTDeviceFaultExtensionName);
+
+			bool addressBindingReportEnabled = IsDeviceExtensionEnabled(vk::EXTDeviceAddressBindingReportExtensionName);
+
+			if (addressBindingReportEnabled) {
+				auto addressBindingFeatures = m_PhysicalDevice.getFeatures2<vk::PhysicalDeviceFeatures2, vk::PhysicalDeviceAddressBindingReportFeaturesEXT>();
+				addressBindingReportEnabled = addressBindingFeatures.get<vk::PhysicalDeviceAddressBindingReportFeaturesEXT>().reportAddressBinding;
+			}
+
 			vk::StructureChain<vk::PhysicalDeviceFeatures2,
 			                   vk::PhysicalDeviceVulkan13Features,
 			                   vk::PhysicalDeviceVulkan12Features,
@@ -669,11 +784,14 @@ namespace Cori {
 			                   vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT,
 			                   vk::PhysicalDeviceMemoryPriorityFeaturesEXT,
 			                   vk::PhysicalDeviceShaderObjectFeaturesEXT,
-			                   vk::PhysicalDeviceDescriptorBufferFeaturesEXT> featureChain = {
+			                   vk::PhysicalDeviceDescriptorBufferFeaturesEXT,
+			                   vk::PhysicalDeviceFaultFeaturesEXT,
+			                   vk::PhysicalDeviceAddressBindingReportFeaturesEXT> featureChain = {
 					{
 						.features = {
 							.multiDrawIndirect = true,
-							.samplerAnisotropy = true
+							.samplerAnisotropy = true,
+							.shaderInt64 = true
 						}
 					},
 					{
@@ -702,8 +820,18 @@ namespace Cori {
 					{.extendedDynamicState = true},
 					{.memoryPriority = true},
 					{.shaderObject = true},
-					{.descriptorBuffer = true}
+					{.descriptorBuffer = true},
+					{ .deviceFault = deviceFaultEnabled },
+					{ .reportAddressBinding = addressBindingReportEnabled }
 				};
+
+			if (!deviceFaultEnabled) {
+				featureChain.unlink<vk::PhysicalDeviceFaultFeaturesEXT>();
+			}
+
+			if (!addressBindingReportEnabled) {
+				featureChain.unlink<vk::PhysicalDeviceAddressBindingReportFeaturesEXT>();
+			}
 
 			float graphicsAndPresentQueuePriority = 1.0f;
 			float transferQueuePriority = 0.7f;
@@ -749,12 +877,29 @@ namespace Cori {
 				}
 			}
 
-			vk::DeviceCreateInfo deviceCreateInfo{
+			m_NvidiaInstrumentation = m_NvidiaInstrumentation
+				&& IsDeviceExtensionEnabled(vk::NVDeviceDiagnosticCheckpointsExtensionName)
+				&& IsDeviceExtensionEnabled(vk::NVDeviceDiagnosticsConfigExtensionName);
+
+			vk::PhysicalDeviceDiagnosticsConfigFeaturesNV nvidiaDiagnosticsFeatures{
 				.pNext = &featureChain.get<vk::PhysicalDeviceFeatures2>(),
+				.diagnosticsConfig = vk::True
+			};
+
+			vk::DeviceDiagnosticsConfigCreateInfoNV nvidiaDiagnosticsConfig{
+				.pNext = &nvidiaDiagnosticsFeatures,
+				.flags = vk::DeviceDiagnosticsConfigFlagBitsNV::eEnableResourceTracking
+					| vk::DeviceDiagnosticsConfigFlagBitsNV::eEnableAutomaticCheckpoints
+					| vk::DeviceDiagnosticsConfigFlagBitsNV::eEnableShaderDebugInfo
+					| vk::DeviceDiagnosticsConfigFlagBitsNV::eEnableShaderErrorReporting
+			};
+
+			vk::DeviceCreateInfo deviceCreateInfo{
+				.pNext = m_NvidiaInstrumentation ? static_cast<const void*>(&nvidiaDiagnosticsConfig) : static_cast<const void*>(&featureChain.get<vk::PhysicalDeviceFeatures2>()),
 				.queueCreateInfoCount = static_cast<uint32_t>(graphicsAndPresentQueueFamilies.size()),
 				.pQueueCreateInfos = graphicsAndPresentQueueFamilies.data(),
-				.enabledExtensionCount = static_cast<uint32_t>(m_DeviceExtensions.size()),
-				.ppEnabledExtensionNames = m_DeviceExtensions.data()
+				.enabledExtensionCount = static_cast<uint32_t>(m_EnabledDeviceExtensions.size()),
+				.ppEnabledExtensionNames = m_EnabledDeviceExtensions.data()
 			};
 
 			VkDevice device;
@@ -762,6 +907,9 @@ namespace Cori {
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to create logical device. Error: {}", vk::to_string(result));
 			m_Device = vk::Device(device);
 			VULKAN_HPP_DEFAULT_DISPATCHER.init(m_Device);
+
+			VulkanDeviceLossDebug::SetAmdSupport(deviceFaultEnabled, addressBindingReportEnabled, IsDeviceExtensionEnabled(vk::AMDBufferMarkerExtensionName));
+			VulkanDeviceLossDebug::SetNvidiaInstrumented(m_NvidiaInstrumentation);
 
 			m_Device.getQueue(m_GraphicsQueueFamilyIndex, 0, &m_GraphicsQueue);
 			SetDebugName(m_GraphicsQueue, "Graphics Queue");

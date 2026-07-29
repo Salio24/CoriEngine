@@ -12,6 +12,9 @@
 #include "Graphics/Vulkan/Renderer/MasterRenderer.hpp"
 #include "Threading/CpuTopology.hpp"
 
+//temporary
+static std::thread g_RenderThread;
+
 namespace Cori {
 	namespace Core {
 		Application* Application::s_Instance{ nullptr };
@@ -44,6 +47,15 @@ namespace Cori {
 
 			m_GameTimer.SetTickrate(120);
 			m_GameTimer.SetTickrateUpdateFunc(CORI_BIND_EVENT_FN(Application::TickrateUpdate, CORI_PLACEHOLDERS(1)));
+
+			g_RenderThread = std::move(std::thread([this]() {
+				SetThreadName("RenderThread");
+				Graphics::RenderThreadCommandQueue::SetExecuterThreadId(std::this_thread::get_id());
+				while (true) {
+					Graphics::MasterRenderer::Get().Loop();
+				}
+			}));
+
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self }, "Cori Engine started.");
 		}
 
@@ -165,8 +177,6 @@ namespace Cori {
 							}
 						}
 					}
-
-					Graphics::MasterRenderer::Get().Loop();
 
 					//AssetManager2::OnUpdate(m_GameTimer);
 

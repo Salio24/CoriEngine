@@ -10,6 +10,8 @@
 //#include <vulkan/vulkan_to_string.hpp>
 //#include <vulkan/vulkan_format_traits.hpp>
 #include "vk_mem_alloc.hpp"
+#include "VulkanDebugLabels.hpp"
+#include "DeviceLossDebug/VulkanDeviceLossDebug.hpp"
 
 #define CORI_CHECK_VK_RESULT(result) (result == vk::Result::eSuccess || result == vk::Result::eSuboptimalKHR)
 
@@ -56,8 +58,18 @@ namespace Cori {
 				m_DeviceExtensions.push_back(extension);
 			}
 
+			static void RequestOptionalDeviceExtension(const char* extension) {
+				m_OptionalDeviceExtensions.push_back(extension);
+			}
+
 			static void RequestInstanceExtension(const char* extension) {
 				m_InstanceExtensions.push_back(extension);
+			}
+
+			[[nodiscard]] static bool IsDeviceExtensionEnabled(const std::string_view extension) {
+				return std::ranges::any_of(m_EnabledDeviceExtensions, [extension](const char* enabled) {
+					return extension == enabled;
+				});
 			}
 
 			static std::unique_ptr<VulkanEngine> Create(void* window, const bool enableValidationLayers) {
@@ -79,11 +91,14 @@ namespace Cori {
 					.pObjectName = name.c_str()
 				};
 
+				VulkanDeviceLossDebug::RecordObjectName(info.objectHandle, info.pObjectName);
+
 				return Get().m_Device.setDebugUtilsObjectNameEXT(info);
 			}
 
 			template<typename HandleType>
 			static vk::Result SetDebugName(const HandleType& handle, const char* name) {
+				#ifdef DEBUG_BUILD
 				static_assert(vk::isVulkanHandleType<HandleType>::value, "HandleType must be a Vulkan handle type" );
 
 				vk::DebugUtilsObjectNameInfoEXT info {
@@ -92,7 +107,12 @@ namespace Cori {
 					.pObjectName = name
 				};
 
+				VulkanDeviceLossDebug::RecordObjectName(info.objectHandle, info.pObjectName);
+
 				return Get().m_Device.setDebugUtilsObjectNameEXT(info);
+				#else
+				return vk::Result::eSuccess;
+				#endif
 			}
 
 			static const std::pair<vk::SharingMode, std::vector<uint32_t>>& GetBufferSharingSettings(const QueueUsageFlags usage);
@@ -232,6 +252,7 @@ namespace Cori {
 			~VulkanEngine();
 
 			static bool s_VerboseValidationLayerLogging;
+			static bool s_EnableDeviceAddressBindingReport;
 		private:
 			VulkanEngine(void* window, const bool enableValidationLayers);
 
@@ -315,7 +336,11 @@ namespace Cori {
 			GPUProfilerSpanZone m_GPUFrameZone;
 
 			static std::vector<const char*> m_DeviceExtensions;
+			static std::vector<const char*> m_OptionalDeviceExtensions;
+			static std::vector<const char*> m_EnabledDeviceExtensions;
 			static std::vector<const char*> m_InstanceExtensions;
+
+			bool m_NvidiaInstrumentation{ false };
 
 			bool m_ValidationLayers;
 

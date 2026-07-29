@@ -34,6 +34,8 @@ option(CORI_USE_NATIVE "Adds -march=native compiler flag if CORI_FORCE_AVX2 is O
 option(CORI_FORCE_AVX2 "Force AVX2, default OFF, -march=native is used by default. You need to do clean configuration+build after changing this." OFF)
 option(CORI_ENABLE_TRACY_PROFILER "Enables Tracy profiler in debug builds. You need to do clean configuration+build after changing this." OFF)
 option(CORI_USE_MOLD "Adds -fuse-ld=mold link flag globally to enable the use of mold linker, off by default." OFF)
+option(CORI_VK_DL_DEBUG_AMD "Enables the AMD device loss debugging path: VK_EXT_device_fault, VK_EXT_device_address_binding_report and VK_AMD_buffer_marker breadcrumbs. Off by default." OFF)
+option(CORI_VK_DL_DEBUG_NVIDIA "Enables the NVIDIA device loss debugging path: Nsight Aftermath GPU crash dumps and VK_NV_device_diagnostic_checkpoints. Requires the Aftermath SDK under Engine/thirdparty. Off by default." OFF)
 
 if (NOT CORI_USE_AVX2)
     set(CORI_FORCE_AVX2 OFF)

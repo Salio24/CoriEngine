@@ -4,6 +4,7 @@
 #include "Graphics/Vulkan/VulkanBuffer.hpp"
 #include "Graphics/Vulkan/VulkanLayoutManager.hpp"
 #include "Graphics/Vulkan/VulkanUploadSubsystem.hpp"
+#include "Graphics/Vulkan/DeviceLossDebug/VulkanDeviceLossDebug.hpp"
 #include "Utility/StringHash.hpp"
 #include "Utility/HashCombine.hpp"
 
@@ -936,6 +937,8 @@ namespace Cori {
 
 					CORI_PROFILE_SCOPE_DYNAMIC_NAME(pass.m_Name);
 					CORI_PROFILE_GPU_ZONE_DYNAMIC_NAME_CP(Cori::ProfileParts::RenderingLoop, VulkanEngine::GetGraphicsGPUProfilerContext(), cmb, pass.m_Name, Cori::ProfileColors::GPUPass);
+					CORI_VK_LABEL(cmb, pass.m_Name, DebugLabelColors::Pass);
+					CORI_VK_DL_MARKER_SCOPE(cmb, pass.m_Name);
 
 					if (pass.m_ImageBarriers.size() > 0 || pass.m_BufferBarriers.size() > 0) {
 						vk::DependencyInfo depInfo {
@@ -944,6 +947,8 @@ namespace Cori {
 							.imageMemoryBarrierCount = static_cast<uint32_t>(pass.m_ImageBarriers.size()),
 							.pImageMemoryBarriers = pass.m_ImageBarriers.data()
 						};
+
+						CORI_VK_LABEL_INSERT_F(cmb, DebugLabelColors::Barrier, "Barriers: {} image, {} buffer", pass.m_ImageBarriers.size(), pass.m_BufferBarriers.size());
 
 						cmb.pipelineBarrier2(depInfo);
 					}

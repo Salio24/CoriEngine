@@ -747,6 +747,8 @@ namespace Cori {
 			}
 
 			void Stage3(VulkanEngine::FrameInfo& frameData, FrameContext& frameContext) {
+				CORI_VK_LABEL_F(frameData.m_CommandBuffer, DebugLabelColors::Scene, "Scene '{}'", m_Name);
+
 				frameContext.graph.Execute(frameData.m_CommandBuffer);
 			}
 

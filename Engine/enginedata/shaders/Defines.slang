@@ -24,7 +24,7 @@ struct ObjectData {
 struct Mesh {
 	uint32_t indexCount;
 	uint32_t firstIndex;
-	Vertex* firstVertexAddress;
+	uint64_t firstVertexAddress;
 	uint32_t vertexType;
 	uint32_t version;
 };

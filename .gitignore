@@ -6,9 +6,9 @@
 # build directories 
 /Engine/bin/*
 /Engine/docs/temp/*
-/Engine/Tools/TracyGUI/*
-/Engine/Tools/TracyCapture/*
-/Engine/Tools/internal/*
+/Tools/TracyGUI/*
+/Tools/TracyCapture/*
+/Tools/internal/*
 /cmake-*
 
 # git submodules 

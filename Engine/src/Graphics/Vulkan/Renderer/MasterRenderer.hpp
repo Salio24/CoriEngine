@@ -91,7 +91,7 @@ namespace Cori {
 				//if (HasNonDormantScene()) {
 				//}
 				
-				//RenderThreadWakeup::WaitChanged(wakeBefore);
+				RenderThreadWakeup::WaitChanged(wakeBefore);
 			}
 
 		private:
@@ -236,7 +236,11 @@ namespace Cori {
 
 
 			void Composite(vk::CommandBuffer cmb, std::array<SceneRenderer*, s_MaxSceneRendererCount>& nonDormantRenderers, const uint32_t nonDormantRendererCount) {
+				CORI_VK_LABEL_F(cmb, DebugLabelColors::Composite, "Composite {} scene(s)", nonDormantRendererCount);
+
 				{
+					CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> TransferDstOptimal", DebugLabelColors::Barrier);
+
 					vk::ImageMemoryBarrier2 scBar{
 						.srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
 						.srcAccessMask = vk::AccessFlagBits2::eNone,
@@ -274,10 +278,14 @@ namespace Cori {
 						.dstOffsets = dstOffsets
 					};
 
+					CORI_VK_LABEL_INSERT_F(cmb, DebugLabelColors::Composite, "Blit PRT {}x{} -> swapchain {}x{}", prtExtent.width, prtExtent.height, scExtent.width, scExtent.height);
+
 					cmb.blitImage(renderer->GetPRT().GetImage().m_Image, vk::ImageLayout::eTransferSrcOptimal, VulkanEngine::GetSwapChainImage(), vk::ImageLayout::eTransferDstOptimal, blit, vk::Filter::eNearest);
 				}
 
 				{
+					CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> PresentSrcKHR", DebugLabelColors::Barrier);
+
 					vk::ImageMemoryBarrier2 scBar{
 						.srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
 						.srcAccessMask = vk::AccessFlagBits2::eTransferWrite,

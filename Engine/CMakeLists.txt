@@ -145,6 +145,62 @@ project(CoriEngine)
         add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/tracy EXCLUDE_FROM_ALL)
     endif ()
 
+    #nsight aftermath
+    # Binary-only SDK, not a submodule. Grab it from https://developer.nvidia.com/nsight-aftermath
+    # and unpack it into thirdparty/ - either as 'NsightAftermath' or under its original versioned directory name, both are picked up.
+    set(CORI_AFTERMATH_FOUND OFF)
+
+    if (CORI_VK_DL_DEBUG_NVIDIA)
+        set(CORI_AFTERMATH_DIR ${CORI_ENGINE_SOURCE_DIR}/thirdparty/NsightAftermath)
+
+        if (NOT EXISTS ${CORI_AFTERMATH_DIR}/include/GFSDK_Aftermath.h)
+            file(GLOB CORI_AFTERMATH_CANDIDATES ${CORI_ENGINE_SOURCE_DIR}/thirdparty/NVIDIA_Nsight_Aftermath_SDK_*)
+            foreach (candidate ${CORI_AFTERMATH_CANDIDATES})
+                if (EXISTS ${candidate}/include/GFSDK_Aftermath.h)
+                    set(CORI_AFTERMATH_DIR ${candidate})
+                    break()
+                endif ()
+            endforeach ()
+        endif ()
+
+        if (NOT EXISTS ${CORI_AFTERMATH_DIR}/include/GFSDK_Aftermath.h)
+            message(STATUS "CORI_VK_DL_DEBUG_NVIDIA is ON but the Nsight Aftermath SDK was not found under '${CORI_ENGINE_SOURCE_DIR}/thirdparty'. GPU crash dumps will be disabled.")
+        else ()
+            if (WIN32)
+                set(CORI_AFTERMATH_RUNTIME ${CORI_AFTERMATH_DIR}/lib/x64/GFSDK_Aftermath_Lib.x64.dll)
+                set(CORI_AFTERMATH_IMPLIB ${CORI_AFTERMATH_DIR}/lib/x64/GFSDK_Aftermath_Lib.x64.lib)
+            else ()
+                set(CORI_AFTERMATH_RUNTIME ${CORI_AFTERMATH_DIR}/lib/x64/libGFSDK_Aftermath_Lib.x64.so)
+                set(CORI_AFTERMATH_IMPLIB ${CORI_AFTERMATH_RUNTIME})
+            endif ()
+
+            if (NOT EXISTS ${CORI_AFTERMATH_RUNTIME})
+                message(STATUS "Nsight Aftermath SDK headers were found, but '${CORI_AFTERMATH_RUNTIME}' is missing. GPU crash dumps will be disabled.")
+            else ()
+                add_library(Aftermath::Aftermath SHARED IMPORTED GLOBAL)
+                set_target_properties(Aftermath::Aftermath PROPERTIES
+                    IMPORTED_LOCATION ${CORI_AFTERMATH_RUNTIME}
+                    IMPORTED_IMPLIB ${CORI_AFTERMATH_IMPLIB}
+                    INTERFACE_INCLUDE_DIRECTORIES ${CORI_AFTERMATH_DIR}/include)
+
+                set(CORI_AFTERMATH_FOUND ON)
+                message(STATUS "Nsight Aftermath SDK found in '${CORI_AFTERMATH_DIR}', GPU crash dump collection is enabled.")
+            endif ()
+        endif ()
+    endif ()
+
+    # Puts the Aftermath runtime library next to <target>'s executable. Only needed on Windows,
+    # elsewhere CMake adds the SDK directory to the build rpath of everything linking the engine.
+    function(cori_deploy_aftermath TARGET_NAME)
+        if (NOT TARGET Aftermath::Aftermath OR NOT WIN32)
+            return()
+        endif ()
+
+        add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                $<TARGET_FILE:Aftermath::Aftermath> $<TARGET_FILE_DIR:${TARGET_NAME}>)
+    endfunction()
+
     #ExprTK
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/ExprTK EXCLUDE_FROM_ALL)
 
@@ -269,6 +325,21 @@ project(CoriEngine)
 
     # my shared lib
     add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES})
+    if (CORI_MY_CONFIG)
+        target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
+                $<$<CONFIG:Debug>:CORI_MY_CONFIG>
+                $<$<CONFIG:RelWithDebInfo>:CORI_MY_CONFIG>
+                $<$<CONFIG:Release>:CORI_MY_CONFIG>)
+    endif ()
+
+    if (CORI_VK_DL_DEBUG_AMD)
+        target_compile_definitions(${ENGINE_LIBRARY_NAME} PUBLIC CORI_VK_DL_DEBUG_AMD)
+    endif ()
+
+    if (CORI_AFTERMATH_FOUND)
+        target_compile_definitions(${ENGINE_LIBRARY_NAME} PUBLIC CORI_VK_DL_DEBUG_NVIDIA)
+        target_link_libraries(${ENGINE_LIBRARY_NAME} PRIVATE Aftermath::Aftermath)
+    endif ()
 
     target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG_BUILD>

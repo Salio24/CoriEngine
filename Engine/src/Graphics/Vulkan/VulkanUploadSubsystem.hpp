@@ -207,6 +207,8 @@ namespace Cori {
 
 			static void SubmitCopies(vk::CommandBuffer cmb) {
 				if (Get().m_UploadArenaType == UploadArenaType::STAGING) {
+					CORI_VK_LABEL_F(cmb, DebugLabelColors::Upload, "Upload arena staging copies ({} region(s))", Get().m_CopyRegions.size());
+
 					auto [gpu, cpu] = std::get<std::pair<VulkanBuffer, VulkanBuffer>>(Get().m_UploadArenaHeap);
 
 					std::array<vk::BufferMemoryBarrier2, 2> startBarriers;
@@ -2047,6 +2049,8 @@ namespace Cori {
 						auto result = slot.secondaryCmb.begin(secondaryBeginInfo);
 						CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to begin secondary command buffer recording in VulkanStreamingLine. Error: {}", vk::to_string(result));
 
+						CORI_VK_LABEL_BEGIN_F(slot.secondaryCmb, DebugLabelColors::Transfer, "Streaming copies (ticket {}, {} upload(s))", slot.completionTicket, slot.pendingUploads.size());
+
 						for (auto& pending : slot.pendingUploads) {
 							CORI_PROFILE_GPU_ZONE_C(VulkanEngine::GetTransferGPUProfilerContext(), slot.secondaryCmb, "Streaming Copy", Cori::ProfileColors::GPUTransfer);
 							CORI_PROFILE_SCOPE_CP(Cori::ProfileParts::RenderingAssets, "Record streaming copy", Cori::ProfileColors::Upload);
@@ -2054,6 +2058,8 @@ namespace Cori {
 
 							if (std::holds_alternative<ImageUpload>(pending.resourceUpload)) {
 								auto& resourceUpload = std::get<ImageUpload>(pending.resourceUpload);
+
+								CORI_VK_LABEL_INSERT_F(slot.secondaryCmb, DebugLabelColors::Transfer, "Image upload, {} bytes", pending.stagingSize);
 
 								vk::BufferImageCopy region{
 									.bufferOffset = pending.stagingAllocation.offset,
@@ -2103,6 +2109,8 @@ namespace Cori {
 							} else {
 								auto& resourceUpload = std::get<BufferUpload>(pending.resourceUpload);
 
+								CORI_VK_LABEL_INSERT_F(slot.secondaryCmb, DebugLabelColors::Transfer, "Buffer upload, {} bytes", pending.stagingSize);
+
 								Get().m_BufferBarriersCache.emplace_back(vk::BufferMemoryBarrier2{
 									.srcStageMask = resourceUpload.srcPipelineStages,
 									.srcAccessMask = resourceUpload.srcAccessFlags,
@@ -2125,6 +2133,8 @@ namespace Cori {
 							}
 						}
 
+						CORI_VK_LABEL_END(slot.secondaryCmb);
+
 						result = slot.secondaryCmb.end();
 						CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to end secondary command buffer recording in VulkanStreamingLine. Error: {}", vk::to_string(result));
 
@@ -2134,6 +2144,8 @@ namespace Cori {
 
 						result = slot.primaryCmb.begin(primaryBeginInfo);
 						CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to begin primary command buffer recording in VulkanStreamingLine. Error: {}", vk::to_string(result));
+
+						CORI_VK_LABEL_BEGIN_F(slot.primaryCmb, DebugLabelColors::Transfer, "Streaming line ticket {}", slot.completionTicket);
 
 						vk::DependencyInfo depInfoIn{};
 						bool inEmpty = true;
@@ -2168,6 +2180,8 @@ namespace Cori {
 							slot.primaryCmb.pipelineBarrier2(depInfoOut);
 						}
 
+						CORI_VK_LABEL_END(slot.primaryCmb);
+
 						result = slot.primaryCmb.end();
 						CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to end primary command buffer recording in VulkanStreamingLine. Error: {}", vk::to_string(result));
 
@@ -2184,7 +2198,10 @@ namespace Cori {
 							.pSignalSemaphores = &Get().m_TimelineSemaphore
 						};
 
+						CORI_VK_QUEUE_LABEL_INSERT_F(VulkanEngine::GetTransferQueue(), DebugLabelColors::Transfer, "Submit streaming line ticket {}", slot.completionTicket);
+
 						result = VulkanEngine::GetTransferQueue().submit(1, &submitInfo, nullptr);
+						VulkanDeviceLossDebug::CheckResult(result, "vkQueueSubmit on the transfer queue (VulkanStreamingLine)");
 						CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Transfer queue submission failed in VulkanStreamingLine. Error: {}", vk::to_string(result));
 
 						Get().m_BufferBarriersCache.clear();

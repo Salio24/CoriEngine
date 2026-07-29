@@ -43,6 +43,8 @@ namespace Cori {
 					static constexpr char Self[] = "Vulkan";
 					static constexpr char Vma[] = "VMA";
 					static constexpr char ValidationLayers[] = "Validation Layers";
+					static constexpr char DeviceFault[] = "Device Fault";
+					static constexpr char Aftermath[] = "Nsight Aftermath";
 					static constexpr char ResourceTracker[] = "Resource Tracker";
 					static constexpr char RenderGraph[] = "Render Graph";
 					static constexpr char UploadSubsystem[] = "Upload Subsystem";

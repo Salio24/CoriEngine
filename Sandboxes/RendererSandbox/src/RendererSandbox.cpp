@@ -92,6 +92,11 @@ public:
 
 		CORI_INFO("Sponza: requested {} meshes over {} materials", std::size(sponzaMeshMaterials), sponzaMaterialCount);
 		#endif
+
+		bool success = Cori::Core::Input::SetRelativeMouseMode(m_MouseLookActive);
+		if (!success) {
+			m_MouseLookActive = false;
+		}
 	}
 
 	~ExampleLayer() {
@@ -101,6 +106,17 @@ public:
 	void OnEvent(Cori::Core::Event& event) override {
 
 		Cori::Core::EventDispatcher dispatcher(event);
+
+		dispatcher.Dispatch<Cori::Core::KeyPressedEvent>([this](const Cori::Core::KeyPressedEvent& e) -> bool {
+			if (e.GetKeyCode() == Cori::Core::CORI_KEY_K) {
+				bool success = Cori::Core::Input::SetRelativeMouseMode(!m_MouseLookActive);
+				if (success) {
+					m_MouseLookActive = !m_MouseLookActive;
+				}
+			}
+
+			return true;
+		});
 
 	}
 
@@ -169,14 +185,6 @@ public:
 
 private:
 	void UpdateMouseLook() {
-		const bool imGuiWantsMouse = ImGui::GetCurrentContext() != nullptr && ImGui::GetIO().WantCaptureMouse;
-		const bool canLook = m_MouseLookActive || !imGuiWantsMouse;
-		const bool wantLook = Cori::Core::Input::IsMouseKeyDown(Cori::Core::CORI_MOUSEBUTTON_RIGHT) && canLook;
-
-		if (wantLook != m_MouseLookActive) {
-			m_MouseLookActive = Cori::Core::Input::SetRelativeMouseMode(wantLook) ? wantLook : false;
-		}
-
 		if (!m_MouseLookActive) {
 			return;
 		}
@@ -206,7 +214,7 @@ private:
 	float m_CameraYaw{ s_InitialCameraYaw };
 	float m_CameraPitch{ s_InitialCameraPitch };
 
-	bool m_MouseLookActive{ false };
+	bool m_MouseLookActive{ true };
 };
 
 class Sandbox : public Cori::Core::Application {
