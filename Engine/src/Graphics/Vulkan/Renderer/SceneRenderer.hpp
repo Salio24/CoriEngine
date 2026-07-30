@@ -258,13 +258,24 @@ namespace Cori {
 				m_IsDormant = false;
 			}
 
-			static constexpr uint32_t s_AdmitDepth = 100;
+			static constexpr uint32_t s_AdmitDepth = 1;
 
 			[[nodiscard]] FrameData* PopRecycledFrameData() {
 				if (m_ReadyRing.Size() < s_AdmitDepth) {
 					FrameData** ptr = m_RecycleRing.Front();
 					if (ptr) {
 						m_RecycleRing.Pop();
+						return *ptr;
+					}
+				}
+
+				return nullptr;
+			}
+
+			[[nodiscard]] FrameData* PeekRecycledFrameData() {
+				if (m_ReadyRing.Size() < s_AdmitDepth) {
+					FrameData** ptr = m_RecycleRing.Front();
+					if (ptr) {
 						return *ptr;
 					}
 				}

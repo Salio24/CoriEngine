@@ -7,8 +7,6 @@
 #include "EventSystem/MouseEvent.hpp"
 #include "FileSystem/BinaryFileManager.hpp"
 
-#define CORI_MOUSE_TEMP_DEBUG
-
 namespace Cori {
 	namespace Core {
 		struct Window::Data {
@@ -145,6 +143,8 @@ namespace Cori {
 			CORI_PROFILE_FUNCTION();
 			SDL_Event e;
 
+			static bool test_{ false };
+
 			m_Data->m_MouseDelta = { 0.0f, 0.0f };
 
 			while (SDL_PollEvent(&e)) {
@@ -172,6 +172,10 @@ namespace Cori {
 				case SDL_EVENT_KEY_DOWN:
 					{
 						KeyPressedEvent keyPressedEvent(static_cast<CoriKeycode>(e.key.scancode), e.key.repeat);
+						if (keyPressedEvent.GetKeyCode() == CORI_KEY_O) {
+							test_ = !test_;
+							CORI_WARN("change2");
+						}
 						m_Data->m_EventCallback(keyPressedEvent);
 						break;
 					}
@@ -184,10 +188,9 @@ namespace Cori {
 				case SDL_EVENT_MOUSE_MOTION:
 					{
 						m_Data->m_MouseDelta += glm::vec2{ e.motion.xrel, e.motion.yrel };
-
-						#ifdef CORI_MOUSE_TEMP_DEBUG
-						CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Mouse motion: pos ({}, {}), rel ({}, {}), mouseID {}, windowID {} (ours {}), relative mode {}, cursor visible {}", e.motion.x, e.motion.y, e.motion.xrel, e.motion.yrel, e.motion.which, e.motion.windowID, SDL_GetWindowID(m_Data->m_Window), SDL_GetWindowRelativeMouseMode(m_Data->m_Window), SDL_CursorVisible());
-						#endif
+						if (test_) {
+							CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Mouse motion: pos ({}, {}), rel ({}, {}), mouse '{}' (ID {}), windowID {} (ours {}), relative mode {}, cursor visible {}", e.motion.x, e.motion.y, e.motion.xrel, e.motion.yrel, SDL_GetMouseNameForID(e.motion.which) ? SDL_GetMouseNameForID(e.motion.which) : "unknown", e.motion.which, e.motion.windowID, SDL_GetWindowID(m_Data->m_Window), SDL_GetWindowRelativeMouseMode(m_Data->m_Window), SDL_CursorVisible());
+						}
 
 						MouseMovedEvent mouseMovedEvent(static_cast<int32_t>(e.motion.x), static_cast<int32_t>(e.motion.y));
 						m_Data->m_EventCallback(mouseMovedEvent);
@@ -214,11 +217,11 @@ namespace Cori {
 				}
 			}
 
-			#ifdef CORI_MOUSE_TEMP_DEBUG
-			if (m_Data->m_MouseDelta != glm::vec2{ 0.0f, 0.0f }) {
-				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Mouse delta for this pump: ({}, {})", m_Data->m_MouseDelta.x, m_Data->m_MouseDelta.y);
+			if (test_) {
+				if (m_Data->m_MouseDelta != glm::vec2{ 0.0f, 0.0f }) {
+					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Mouse delta for this pump: ({}, {})", m_Data->m_MouseDelta.x, m_Data->m_MouseDelta.y);
+				}
 			}
-			#endif
 		}
 
 		int32_t Window::GetWidth() const {
@@ -259,6 +262,11 @@ namespace Cori {
 
 		// ReSharper disable once CppMemberFunctionMayBeConst
 		bool Window::SetRelativeMouseMode(const bool status) {
+			if (status && !(SDL_GetWindowFlags(m_Data->m_Window) & SDL_WINDOW_INPUT_FOCUS)) {
+				CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Refused to enable relative mouse mode, window '{}' does not have input focus. Relative motion will not be enabled.", m_Data->m_WindowTitle);
+				return false;
+			}
+
 			if (!SDL_SetWindowRelativeMouseMode(m_Data->m_Window, status)) {
 				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to {} relative mouse mode. SDL_Error: {}", status ? "enable" : "disable", SDL_GetError());
 				return false;

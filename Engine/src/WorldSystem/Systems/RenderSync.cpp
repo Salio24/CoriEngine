@@ -8,6 +8,24 @@ namespace Cori {
 				Graphics::MasterRenderer::Get().DestroySceneRenderer(m_RendererHandle);
 			}
 
+			bool RenderSync::WaitForFrameData() {
+				if (m_Pending) {
+					return true;
+				}
+
+				auto* renderer = Graphics::MasterRenderer::Get().Resolve(m_RendererHandle);
+				if (!renderer) {
+					return true;
+				}
+
+				Graphics::FrameData* fd = renderer->PeekRecycledFrameData();
+				if (!fd) {
+					return false;
+				}
+
+				return true;
+			}
+
 			bool RenderSync::PrepareFrameData() {
 				if (m_Pending) {
 					return true;

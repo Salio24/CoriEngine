@@ -20,6 +20,8 @@ namespace Cori {
 						if (std::getenv("ENABLE_VULKAN_RENDERDOC_CAPTURE" ) || std::getenv("ENABLE_NVIDIA_NSIGHT_CAPTURE")) {
 							CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self }, "RenderDoc or nsight environment variable detected. Current session is wayland, switching to XWayland for them to be happy.");
 							SDL_SetHint("SDL_VIDEO_DRIVER", "x11");
+						} else {
+							//wSDL_SetHint("SDL_VIDEO_DRIVER", "wayland");
 						}
 					}
 				}

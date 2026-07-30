@@ -72,6 +72,12 @@ namespace Cori {
 			static bool IsInlineMode() {
 				return std::this_thread::get_id() == s_ExecutorThreadId.load(std::memory_order_acquire);
 			}
+
+			static void Clear() {
+				std::lock_guard lk(s_Mutex);
+
+				s_Queue.clear();
+			}
 			
 		private:
 			static inline CORI_PROFILE_LOCKABLE_N(std::mutex, s_Mutex, "RTCQ mutex");

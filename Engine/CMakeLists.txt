@@ -11,6 +11,7 @@ project(CoriEngine)
 
     # SDL3
     set(SDL_SHARED OFF)
+    set(SDL_X11_XTEST OFF)
     if (CORI_CLANG_TIDY)
         set(SDL_CLANG_TIDY ON CACHE BOOL "")
     endif()
@@ -60,7 +61,7 @@ project(CoriEngine)
     ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_vulkan.cpp
     ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_sdl3.cpp
     )
-    target_include_directories(imgui PUBLIC ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui)
+    target_include_directories(imgui PUBLIC ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui_club)
     target_link_libraries(imgui PRIVATE SDL3::SDL3-static)
 
     # spdlog

@@ -3,6 +3,7 @@
 #include "FrameData.hpp"
 #include "Graphics/RenderThreadCommandQueue.hpp"
 #include "Graphics/RenderThreadWakeup.hpp"
+#include "Core/Threading/CpuTopology.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -55,46 +56,75 @@ namespace Cori {
 			}
 
 			~MasterRenderer() {
-				//temporary
-				ProcessPendingSceneRendererCreations();
+				RenderThreadCommandQueue::Clear();
+				m_PendingCreations.clear();
 				ProcessPendingSceneRendererDestructions();
 
 				for (auto& renderer : m_SceneRenderers) {
 					delete renderer.load(std::memory_order_relaxed);
 				}
+
 			}
-		//protected:
-			void Loop() {
-				CORI_PROFILE_FUNCTION();
-				uint64_t wakeBefore = RenderThreadWakeup::Snapshot();
+		protected:
+			friend VulkanEngine;
+			void EnterThreadedMode() {
+				RenderThreadCommandQueue::ClearExecuterThreadId();
+				m_RenderThread = std::move(std::thread([this] {
+					RtTask();
+				}));
+			}
 
-				ProcessPendingSceneRendererCreations();
-				ProcessPendingSceneRendererDestructions();
+			void ExitThreadedMode() {
+				m_Running.store(false, std::memory_order_release);
+				RenderThreadWakeup::Wake();
+				m_RenderThread.join();
 
-				{
-					CORI_PROFILE_SCOPE("Lp1");
-					if (TryRunFrame()) {
-						RenderThreadCommandQueue::DrainOnRenderThread();
-						return;
-					}
-				}
+				RenderThreadCommandQueue::SetExecuterThreadId(std::this_thread::get_id());
+				RenderThreadCommandQueue::DrainOnRenderThread();
 
-				if (RenderThreadCommandQueue::DrainOnRenderThread() > 0) {
-					return;
-				}
-
-				if (RenderThreadWakeup::Snapshot() != wakeBefore) {
-					return;
-				}
-
-
-				//if (HasNonDormantScene()) {
-				//}
-				
-				RenderThreadWakeup::WaitChanged(wakeBefore);
 			}
 
 		private:
+			void RtTask() {
+				SetThreadName("Render");
+				if (Threading::CpuTopology::ShouldBind()) {
+					Threading::CpuTopology::BindCurrentThreadToDomain(Threading::CpuTopology::PreferredDomain());
+				}
+
+				RenderThreadCommandQueue::SetExecuterThreadId(std::this_thread::get_id());
+
+				while (m_Running.load(std::memory_order_acquire)) {
+					CORI_PROFILE_FUNCTION();
+					CORI_PROFILER_PLOT("Render thread CPU", Threading::CpuTopology::CurrentCpu());
+					uint64_t wakeBefore = RenderThreadWakeup::Snapshot();
+
+					ProcessPendingSceneRendererCreations();
+					ProcessPendingSceneRendererDestructions();
+
+					if (!m_Running.load(std::memory_order_acquire)) {
+						break;
+					}
+
+					{
+						CORI_PROFILE_SCOPE("Master Frame");
+						if (TryRunFrame()) {
+							RenderThreadCommandQueue::DrainOnRenderThread();
+							continue;
+						}
+					}
+
+					if (RenderThreadCommandQueue::DrainOnRenderThread() > 0) {
+						continue;
+					}
+
+					if (RenderThreadWakeup::Snapshot() != wakeBefore) {
+						continue;
+					}
+
+					RenderThreadWakeup::WaitChanged(wakeBefore);
+				}
+			}
+
 			static constexpr uint32_t s_MaxSceneRendererCount{ 16 };
 
 			MasterRenderer() {
@@ -189,8 +219,14 @@ namespace Cori {
 					}
 				}
 
-				if (nonDormantCounter != 0) {
+				bool ghostFrame = false;
+				if (nonDormantCounter == 0) {
 					// check imgui snapshot gen, if the same, return, if diff, fall throught
+					if (false /*gen check*/) {
+						ghostFrame = true;
+					} else {
+						return false;
+					}
 				}
 
 				if (RenderThreadCommandQueue::DrainedCount() < maxWatermark) {
@@ -212,6 +248,9 @@ namespace Cori {
 				}
 
 				auto& frameInfo = VulkanEngine::Get().GPUFrameBegin();
+				if (!ghostFrame && !frameInfo.m_SkippedFrame) {
+					DeletionQueue::Flush();
+				}
 
 				if (!frameInfo.m_SkippedFrame) {
 					for (uint32_t i = 0; i < nonDormantCounter; i++) {
@@ -315,6 +354,9 @@ namespace Cori {
 			std::vector<SceneRenderer*> m_PendingDestructions;
 			std::deque<SceneRendererHandle> m_FreeList;
 			std::mutex m_QueueMutex;
+
+			std::thread m_RenderThread;
+			std::atomic<bool> m_Running{ true };
 
 			static std::unique_ptr<MasterRenderer> s_Instance;
 		};

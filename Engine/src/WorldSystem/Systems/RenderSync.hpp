@@ -10,6 +10,8 @@ namespace Cori {
 			public:
 				~RenderSync() override;
 
+				bool WaitForFrameData();
+
 				bool PrepareFrameData();
 
 				bool SubmitForRendering();

@@ -5,7 +5,7 @@
 #include <format>
 #define SPONZA
 
-#define CORI_MOUSE_TEMP_DEBUG
+bool test{ false };
 
 class ExampleLayer : public Cori::Core::Layer {
 public:
@@ -15,7 +15,7 @@ public:
 		constexpr vk::Extent2D prtExtent{ 3440, 1440 };
 
 		auto& camera = ActiveScene.GetActiveCamera();
-		camera.CreatePerspectiveCamera(60.0f, static_cast<float>(prtExtent.width) / static_cast<float>(prtExtent.height), 0.1f, 100.0f);
+		camera.CreatePerspectiveCamera(90.0f, static_cast<float>(prtExtent.width) / static_cast<float>(prtExtent.height), 0.1f, 100.0f);
 		camera.SetPosition3D(m_CameraPosition);
 		camera.SetYawPitch(m_CameraYaw, m_CameraPitch);
 		camera.RecalculateVP();
@@ -35,7 +35,7 @@ public:
 		#ifndef SPONZA
 		{
 			auto swordMaterial = Cori::Core::AssetManager2::Load<Cori::Graphics::Material>("assets/Sword_Material.json");
-			auto swordMesh = Cori::Core::AssetManager2::Load<Cori::Graphics::Mesh>("assets/Sponza/meshes/Sponza_Mesh_015.json");
+			auto swordMesh = Cori::Core::AssetManager2::Load<Cori::Graphics::Mesh>("assets/Sword_Mesh.json");
 			auto entity = ActiveScene.CreateEntity("awd");
 			entity.AddComponent<Cori::World::Components::Entity::Rendering>(std::move(swordMesh), std::move(swordMaterial), glm::vec4{ 0.0f, 0.0f, 1.0f, 1.0f });
 			auto& tc = entity.GetComponents<Cori::World::Components::Entity::Transform>();
@@ -43,18 +43,6 @@ public:
 			tc.SetLocalScale({ sponzaScale, sponzaScale, sponzaScale });
 			tc.SetLocalPosition(sponzaOffset);
 		}
-
-		{
-			auto swordMaterial = Cori::Core::AssetManager2::Load<Cori::Graphics::Material>("assets/Sword_Material.json");
-			auto swordMesh = Cori::Core::AssetManager2::Load<Cori::Graphics::Mesh>("assets/Sponza/meshes/Sponza_Mesh_016.json");
-			auto entity = ActiveScene.CreateEntity("awd");
-			entity.AddComponent<Cori::World::Components::Entity::Rendering>(std::move(swordMesh), std::move(swordMaterial), glm::vec4{ 0.0f, 0.0f, 1.0f, 1.0f });
-			auto& tc = entity.GetComponents<Cori::World::Components::Entity::Transform>();
-			//tc.SetLocalScale({ 0.5f, 0.5f, 0.5f });
-			tc.SetLocalScale({ sponzaScale, sponzaScale, sponzaScale });
-			tc.SetLocalPosition(sponzaOffset);
-		}
-
 
 		#else
 		static constexpr uint8_t sponzaMeshMaterials[] = {
@@ -113,6 +101,10 @@ public:
 				if (success) {
 					m_MouseLookActive = !m_MouseLookActive;
 				}
+			}
+
+			if (e.GetKeyCode() == Cori::Core::CORI_KEY_O) {
+				test = !test;
 			}
 
 			return true;
@@ -189,17 +181,17 @@ private:
 			return;
 		}
 
-		const glm::vec2 delta = Cori::Core::Input::GetMouseDelta();
+		const glm::vec2 delta = Cori::Core::Input::GetMouseDelta() * 0.25f;
 
 		m_CameraYaw -= delta.x * s_MouseSensitivity;
 		m_CameraPitch -= delta.y * s_MouseSensitivity;
 		m_CameraPitch = std::clamp(m_CameraPitch, -89.0f, 89.0f);
 
-		#ifdef CORI_MOUSE_TEMP_DEBUG
-		if (delta != glm::vec2{ 0.0f, 0.0f }) {
-			CORI_DEBUG("Camera consumed delta ({}, {}) -> yaw {}, pitch {}", delta.x, delta.y, m_CameraYaw, m_CameraPitch);
+		if (test) {
+			if (delta != glm::vec2{ 0.0f, 0.0f }) {
+				CORI_DEBUG("Camera consumed delta ({}, {}) -> yaw {}, pitch {}", delta.x, delta.y, m_CameraYaw, m_CameraPitch);
+			}
 		}
-		#endif
 	}
 
 	static constexpr glm::vec3 s_InitialCameraPosition{ -13.0f, 0.0f, 0.7f };

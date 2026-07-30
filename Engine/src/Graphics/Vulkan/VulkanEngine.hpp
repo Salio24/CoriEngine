@@ -72,9 +72,9 @@ namespace Cori {
 				});
 			}
 
-			static std::unique_ptr<VulkanEngine> Create(void* window, const bool enableValidationLayers) {
-				return std::unique_ptr<VulkanEngine>(new VulkanEngine(window, enableValidationLayers));
-			}
+			static void Start(void* window, const bool enableValidationLayers, const vk::Extent2D swapChainExtent);
+
+			static void Stop();
 
 			static VulkanEngine& Get() {
 				CORI_CORE_ASSERT(s_Instance, "Calling VulkanEngine::Get but engine was already destroyed or not yet created.")
@@ -114,6 +114,10 @@ namespace Cori {
 				return vk::Result::eSuccess;
 				#endif
 			}
+
+			static void EnterThreadedMode();
+
+			static void ExitThreadedMode();
 
 			static const std::pair<vk::SharingMode, std::vector<uint32_t>>& GetBufferSharingSettings(const QueueUsageFlags usage);
 
@@ -236,9 +240,9 @@ namespace Cori {
 				return Get().m_SwapChainImages.size();
 			}
 
-			//TODO: remove this
-			static void ReportWindowResize() {
-				Get().m_SwapChainResizeNeeded = true;
+			static void ReportWindowResize(const glm::ivec2 newSize) {
+				Get().m_NewWindowSizeX.store(newSize.x, std::memory_order_release);
+				Get().m_NewWindowSizeY.store(newSize.y, std::memory_order_release);
 			}
 
 			void CPUFrameStart();
@@ -254,7 +258,7 @@ namespace Cori {
 			static bool s_VerboseValidationLayerLogging;
 			static bool s_EnableDeviceAddressBindingReport;
 		private:
-			VulkanEngine(void* window, const bool enableValidationLayers);
+			VulkanEngine(void* window, const bool enableValidationLayers, const vk::Extent2D swapChainExtent);
 
 			void CreateInstance();
 
@@ -270,7 +274,7 @@ namespace Cori {
 
 			void InitializeVMA();
 
-			void CreateSwapChain();
+			void CreateSwapChain(const vk::Extent2D newExtent);
 
 			void ResizeSwapChain();
 
@@ -344,7 +348,8 @@ namespace Cori {
 
 			bool m_ValidationLayers;
 
-			bool m_SwapChainResizeNeeded{ false };
+			std::atomic<uint32_t> m_NewWindowSizeX{};
+			std::atomic<uint32_t> m_NewWindowSizeY{};
 
 			void* m_Window; // sdl window
 

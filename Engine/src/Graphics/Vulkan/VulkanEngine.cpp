@@ -120,7 +120,7 @@ namespace Cori {
 	namespace Graphics {
 		VulkanEngine* VulkanEngine::s_Instance{ nullptr };
 
-		VulkanEngine::VulkanEngine(void* window, const bool enableValidationLayers) {
+		VulkanEngine::VulkanEngine(void* window, const bool enableValidationLayers, const vk::Extent2D swapChainExtent) {
 			s_Instance = this;
 			PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = (PFN_vkGetInstanceProcAddr)SDL_Vulkan_GetVkGetInstanceProcAddr();
 			VULKAN_HPP_DEFAULT_DISPATCHER.init(vkGetInstanceProcAddr);
@@ -158,6 +158,9 @@ namespace Cori {
 
 			m_InstanceExtensions.push_back(vk::EXTDebugUtilsExtensionName);
 
+			m_NewWindowSizeX.store(swapChainExtent.width, std::memory_order_relaxed);
+			m_NewWindowSizeY.store(swapChainExtent.height, std::memory_order_relaxed);
+
 			CreateInstance();
 			SetupDebugMessenger();
 			CreateSurface();
@@ -165,7 +168,7 @@ namespace Cori {
 			CreateDevice();
 			CreateGPUProfilerContexts();
 			InitializeVMA();
-			CreateSwapChain();
+			CreateSwapChain(swapChainExtent);
 			CreateCommandPools();
 			CreateCommandBuffer();
 			CreateSyncObjects();
@@ -187,11 +190,12 @@ namespace Cori {
 		}
 
 		VulkanEngine::~VulkanEngine() {
+			MasterRenderer::Shutdown();
+
 			auto result = m_Device.waitIdle();
 			VulkanDeviceLossDebug::CheckResult(result, "vkDeviceWaitIdle during VulkanEngine teardown");
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Calling wait idle on device has failed. Error: {}", vk::to_string(result));
 
-			MasterRenderer::Shutdown();
 			VulkanDynamicContainerUploadManager::Shutdown();
 			VulkanVirtualBufferAllocator::Shutdown();
 			VulkanMaterialSystem::Shutdown();
@@ -243,6 +247,23 @@ namespace Cori {
 			s_Instance = nullptr;
 		}
 
+		void VulkanEngine::Start(void* window, const bool enableValidationLayers, const vk::Extent2D swapChainExtent) {
+			CORI_CORE_ASSERT(!s_Instance, "VulkanEngine is already initialized.");
+			new VulkanEngine(window, enableValidationLayers, swapChainExtent);
+		}
+
+		void VulkanEngine::Stop() {
+			delete s_Instance;
+		}
+
+		void VulkanEngine::EnterThreadedMode() {
+			MasterRenderer::Get().EnterThreadedMode();
+		}
+
+		void VulkanEngine::ExitThreadedMode() {
+			MasterRenderer::Get().ExitThreadedMode();
+		}
+
 		const std::pair<vk::SharingMode, std::vector<uint32_t>>& VulkanEngine::GetBufferSharingSettings(const QueueUsageFlags usage) {
 			CORI_CORE_ASSERT(Get().m_SharingSettings.contains(static_cast<QueueUsageFlags::MaskType>(usage)), "Incorrect QueueUsageFlags were passed to VulkanEngine::GetBufferSharingSettings.");
 			return Get().m_SharingSettings.at(static_cast<QueueUsageFlags::MaskType>(usage));
@@ -281,9 +302,8 @@ namespace Cori {
 				}
 			}
 
-			if (m_SwapChainResizeNeeded) {
+			if (m_NewWindowSizeX.load(std::memory_order_acquire) != m_SwapChainExtent.width || m_NewWindowSizeY.load(std::memory_order_acquire) != m_SwapChainExtent.height) {
 				ResizeSwapChain();
-				m_SwapChainResizeNeeded = false;
 				frameData.m_SkippedFrame = true;
 				return frameData;
 			}
@@ -299,7 +319,6 @@ namespace Cori {
 
 			if (result_ == vk::Result::eErrorOutOfDateKHR) {
 				ResizeSwapChain();
-				m_SwapChainResizeNeeded = false;
 				frameData.m_SkippedFrame = true;
 				return frameData;
 			}
@@ -396,8 +415,6 @@ namespace Cori {
 
 			vk::ColorComponentFlags ccFlags = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
 			frameData.m_CommandBuffer.setColorWriteMaskEXT(0, 1, &ccFlags);
-
-			DeletionQueue::Flush();
 
 			return frameData;
 		}
@@ -1046,7 +1063,7 @@ namespace Cori {
 			m_Allocator = alloc;
 		}
 
-		void VulkanEngine::CreateSwapChain() {
+		void VulkanEngine::CreateSwapChain(const vk::Extent2D newExtent) {
 			auto [result, surfaceCapabilities] = m_PhysicalDevice.getSurfaceCapabilitiesKHR(m_Surface);
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to get surface capabilities. Error: {}", vk::to_string(result));
 
@@ -1069,7 +1086,7 @@ namespace Cori {
 
 			auto ChooseMode = [&]{
 				for (const auto& availablePresentMode : availablePresentModes) {
-					if (availablePresentMode == vk::PresentModeKHR::eMailbox) {
+					if (availablePresentMode == vk::PresentModeKHR::eFifoRelaxed) {
 						return availablePresentMode;
 					}
 				}
@@ -1077,28 +1094,29 @@ namespace Cori {
 				return vk::PresentModeKHR::eFifo;
 			};
 
-			auto caps = m_PhysicalDevice.getSurfaceCapabilitiesKHR(m_Surface);
-
 			auto ChooseExtent = [&] -> vk::Extent2D {
 				if (surfaceCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
 					return surfaceCapabilities.currentExtent;
 				}
 
-				int width;
-				int height;
-				SDL_GetWindowSizeInPixels(static_cast<SDL_Window*>(m_Window), &width, &height);
-				//FIXME: this will cause issues as SDL_GetWindowSizeInPixels is not threads safe and should only be called from the main thread
+				vk::Extent2D unclamped;
+				auto caps = m_PhysicalDevice.getSurfaceCapabilitiesKHR(m_Surface);
+				if (caps->currentExtent.height != 0xFFFFFFFF && caps->currentExtent.height != 0xFFFFFFFF) {
+					unclamped = caps->currentExtent;
+				} else {
+					unclamped = newExtent;
+				}
 
 				return {
-					std::clamp<uint32_t>(width, surfaceCapabilities.minImageExtent.width, surfaceCapabilities.maxImageExtent.width),
-					std::clamp<uint32_t>(height, surfaceCapabilities.minImageExtent.height, surfaceCapabilities.maxImageExtent.height)
+					std::clamp<uint32_t>(unclamped.width, caps->minImageExtent.width, caps->maxImageExtent.width),
+					std::clamp<uint32_t>(unclamped.height, caps->minImageExtent.height, caps->maxImageExtent.height)
 				};
 			};
 
 			m_SwapChainImageFormat = ChooseFormat();
 			auto mode = ChooseMode();
 			m_SwapChainExtent = ChooseExtent();
-			auto minImageCount = std::max( 5u, surfaceCapabilities.minImageCount );
+			auto minImageCount = std::max( 3u, surfaceCapabilities.minImageCount );
 			if ((0 < surfaceCapabilities.maxImageCount) && (surfaceCapabilities.maxImageCount < minImageCount)) {
 				minImageCount = surfaceCapabilities.maxImageCount;
 			}
@@ -1162,17 +1180,8 @@ namespace Cori {
 		}
 
 		void VulkanEngine::ResizeSwapChain() {
-			int width;
-			int height;
-			SDL_GetWindowSizeInPixels(static_cast<SDL_Window*>(m_Window), &width, &height);
-			while (width == 0 || height == 0) {
-				SDL_GetWindowSizeInPixels(static_cast<SDL_Window*>(m_Window), &width, &height);
-			}
-
 			auto result = m_Device.waitIdle();
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Calling wait idle on device has failed. Error: {}", vk::to_string(result));
-
-			m_SwapChainExtent = vk::Extent2D{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 
 			for (auto& imageView : m_SwapChainImageViews) {
 				m_Device.destroyImageView(imageView);
@@ -1180,7 +1189,8 @@ namespace Cori {
 
 			m_SwapChainImageViews.clear();
 			m_Device.destroySwapchainKHR(m_SwapChain);
-			CreateSwapChain();
+			vk::Extent2D newExtent = { m_NewWindowSizeX.load(std::memory_order_acquire), m_NewWindowSizeY.load(std::memory_order_acquire) };
+			CreateSwapChain(newExtent);
 		}
 
 		void VulkanEngine::CreateCommandPools() {

@@ -82,3 +82,6 @@
 [submodule "Engine/thirdparty/oneTBB"]
 	path = Engine/thirdparty/oneTBB
 	url = https://github.com/uxlfoundation/oneTBB
+[submodule "Engine/thirdparty/imgui_club"]
+	path = Engine/thirdparty/imgui_club
+	url = https://github.com/ocornut/imgui_club

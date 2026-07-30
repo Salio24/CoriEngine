@@ -296,6 +296,14 @@ namespace Cori {
 			friend Core::Layer;
 			friend Core::Application;
 
+			bool WaitForFrameData() {
+				if (!m_SceneRaw.expired()) {
+					return m_SceneRaw.lock()->WaitForFrameData();
+				}
+
+				return true;
+			}
+
 			bool PrepareFrameData() {
 				if (!m_SceneRaw.expired()) {
 					return m_SceneRaw.lock()->PrepareFrameData();

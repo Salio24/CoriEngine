@@ -12,9 +12,6 @@
 #include "Graphics/Vulkan/Renderer/MasterRenderer.hpp"
 #include "Threading/CpuTopology.hpp"
 
-//temporary
-static std::thread g_RenderThread;
-
 namespace Cori {
 	namespace Core {
 		Application* Application::s_Instance{ nullptr };
@@ -33,10 +30,10 @@ namespace Cori {
 				Threading::CpuTopology::BindCurrentThreadToDomain(Threading::CpuTopology::PreferredDomain());
 			}
 
-			m_VulkanEngine = Graphics::VulkanEngine::Create(m_Window->GetNativeWindow(), true);
-
 			m_Window->SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent, CORI_PLACEHOLDERS(1)));
 			m_Window->SetVSync(false);
+
+			Graphics::VulkanEngine::Start(m_Window->GetNativeWindow(), true, { m_Window->GetWidth(), m_Window->GetHeight() });
 
 			m_ImGuiLayer = new Internal::ImGuiLayer();
 			m_LayerStack.PushOverlay(m_ImGuiLayer);
@@ -48,22 +45,17 @@ namespace Cori {
 			m_GameTimer.SetTickrate(120);
 			m_GameTimer.SetTickrateUpdateFunc(CORI_BIND_EVENT_FN(Application::TickrateUpdate, CORI_PLACEHOLDERS(1)));
 
-			g_RenderThread = std::move(std::thread([this]() {
-				SetThreadName("RenderThread");
-				Graphics::RenderThreadCommandQueue::SetExecuterThreadId(std::this_thread::get_id());
-				while (true) {
-					Graphics::MasterRenderer::Get().Loop();
-				}
-			}));
+			Graphics::VulkanEngine::EnterThreadedMode();
 
 			CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self }, "Cori Engine started.");
 		}
 
 		Application::~Application() {
+			Graphics::VulkanEngine::ExitThreadedMode();
 			World::SceneManager::Shutdown();
 			m_LayerStack.ClearStack();
-			m_VulkanEngine.reset();
 			Audio::Mixer::Shutdown();
+			Graphics::VulkanEngine::Stop();
 			AssetManager2::Shutdown();
 		}
 
@@ -86,7 +78,7 @@ namespace Cori {
 				return false;
 			});
 			dispatcher.Dispatch<WindowResizeEvent>([](const WindowResizeEvent& e) -> bool {
-				Graphics::VulkanEngine::ReportWindowResize();
+				Graphics::VulkanEngine::ReportWindowResize({ e.GetWidth(), e.GetHeight() });
 				//Graphics::Internal::API::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
 				return false;
 			});
@@ -126,14 +118,10 @@ namespace Cori {
 				{
 					CORI_PROFILE_SCOPE("Cori Engine Global Update");
 					m_CommandQueue.Execute();
-					m_GameTimer.Update();
 
 					CORI_PROFILER_PLOT("Main thread CPU", Threading::CpuTopology::CurrentCpu());
 
-					for (Layer* layer : m_LayerStack) {
-						layer->OnUpdate(m_GameTimer);
-						layer->SceneUpdate(m_GameTimer);
-					}
+
 
 					#if 0
 					{
@@ -153,6 +141,26 @@ namespace Cori {
 						m_ImGuiLayer->EndFrame();
 					}
 					#endif
+
+					{
+						CORI_PROFILE_SCOPE("FrameData wait");
+						bool success = false;
+						while (success == false) {
+							success = true;
+
+							for (Layer* layer : m_LayerStack) {
+								success &= layer->ActiveScene.WaitForFrameData();
+							}
+						}
+					}
+
+					m_Window->OnUpdate();
+					m_GameTimer.Update();
+
+					for (Layer* layer : m_LayerStack) {
+						layer->OnUpdate(m_GameTimer);
+						layer->SceneUpdate(m_GameTimer);
+					}
 
 					{
 						CORI_PROFILE_SCOPE("FrameData preparation");
@@ -178,11 +186,12 @@ namespace Cori {
 						}
 					}
 
+					//Graphics::MasterRenderer::Get().Loop();
+
 					//AssetManager2::OnUpdate(m_GameTimer);
 
 					//Graphics::SceneRenderer::Get().Render();
 
-					m_Window->OnUpdate();
 
 					m_LayerStack.ProcessQueue();
 				}

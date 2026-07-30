@@ -98,6 +98,16 @@ namespace Cori {
 			return true;
 		}
 
+		bool Scene::WaitForFrameData() {
+			auto result = GetSystem<Systems::RenderSync>();
+			if (result) {
+				return result.value().lock()->WaitForFrameData();
+			}
+
+			result.error().Ignore();
+			return true;
+		}
+
 		bool Scene::PrepareFrameData() {
 			auto result = GetSystem<Systems::RenderSync>();
 			if (result) {

@@ -176,6 +176,8 @@ namespace Cori {
 				return m_SceneID;
 			}
 
+			bool WaitForFrameData();
+
 			bool PrepareFrameData();
 
 			bool SubmitForRender();
