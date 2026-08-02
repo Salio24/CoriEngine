@@ -51,7 +51,7 @@ rmSub.sh
 /Sandboxes/RendererSandbox/bin/Debug/*
 /Sandboxes/RendererSandbox/bin/Release/*
 /Sandboxes/RendererSandbox/bin/RelWithDebInfo/*
-/Sandboxes/RendererSandbox/assets/Junk/*
+/Sandboxes/RendererSandbox/assets/junk/*
 
 /Sandboxes/PhysicsSandbox/bin/Debug/*
 /Sandboxes/PhysicsSandbox/bin/Release/*

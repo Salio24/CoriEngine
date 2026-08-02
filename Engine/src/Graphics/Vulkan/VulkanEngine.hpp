@@ -12,6 +12,7 @@
 #include "vk_mem_alloc.hpp"
 #include "VulkanDebugLabels.hpp"
 #include "DeviceLossDebug/VulkanDeviceLossDebug.hpp"
+#include "VulkanPresentTiming.hpp"
 
 #define CORI_CHECK_VK_RESULT(result) (result == vk::Result::eSuccess || result == vk::Result::eSuboptimalKHR)
 
@@ -251,7 +252,7 @@ namespace Cori {
 
 			void GPUFrameMiddlePointSync();
 
-			void GPUFrameEnd();
+			void GPUFrameEnd(const FrameLatencyStamps& latencyStamps);
 
 			~VulkanEngine();
 
@@ -273,8 +274,9 @@ namespace Cori {
 			void CreateGPUProfilerContexts();
 
 			void InitializeVMA();
+			vk::Extent2D GetTargetSwapChainExtent();
 
-			void CreateSwapChain(const vk::Extent2D newExtent);
+			void CreateSwapChain();
 
 			void ResizeSwapChain();
 

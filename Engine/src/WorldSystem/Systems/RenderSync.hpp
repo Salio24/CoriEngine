@@ -16,6 +16,8 @@ namespace Cori {
 
 				bool SubmitForRendering();
 
+				void RequestResize(const vk::Extent2D extent);
+
 				bool Create(Graphics::SceneRenderer::CreateInfo&& createInfo);
 
 				static constexpr SystemPriority Priority = UINT16_MAX;
@@ -27,6 +29,7 @@ namespace Cori {
 				Graphics::SceneRendererHandle m_RendererHandle{ 0 };
 
 				vk::Extent2D m_ViewportExtent{};
+				bool m_NewExtent{ false };
 
 				Graphics::FrameData* m_Pending{ nullptr };
 

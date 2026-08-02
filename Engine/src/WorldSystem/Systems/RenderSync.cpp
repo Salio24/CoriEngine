@@ -1,5 +1,6 @@
 #include "RenderSync.hpp"
 #include "WorldSystem/Components.hpp"
+#include "Core/Application.hpp"
 
 namespace Cori {
 	namespace World {
@@ -138,6 +139,11 @@ namespace Cori {
 					.viewportSize = m_ViewportExtent
 				};
 
+				if (m_NewExtent) {
+					fd->resizeRequest = m_ViewportExtent;
+					m_NewExtent = false;
+				}
+
 				fd->deletedObjects.swap(m_PendingRemovals);
 				m_PendingRemovals.clear();
 
@@ -184,6 +190,11 @@ namespace Cori {
 				}
 
 				return false;
+			}
+
+			void RenderSync::RequestResize(const vk::Extent2D extent) {
+				m_ViewportExtent = extent;
+				m_NewExtent = true;
 			}
 
 			void RenderSync::OnRenderComponentCreate(entt::registry& registry, entt::entity entity) {

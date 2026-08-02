@@ -38,7 +38,7 @@ namespace Cori {
 		 * @note Only usable in Layer OnImGuiRender method.
 		 */
 		[[maybe_unused]] static void ScreenModeAndResolutionDropdowns() {
-			const char* items[] = {"Windowed", "Borderless Windowed", "Exclusive Fullscreen"};
+			const char* items[] = {"Windowed", "Borderless Windowed", "Exclusive Fullscreen", "Resizable"};
 
 			int32_t oneToDisplay = 0;
 			const Core::WindowMode currentMode = Core::Application::GetWindow().GetWindowMode();
@@ -50,6 +50,9 @@ namespace Cori {
 			}
 			else if (currentMode == Core::WindowMode::EXCLUSIVE_FULLSCREEN) {
 				oneToDisplay = 2;
+			}
+			else if (currentMode == Core::WindowMode::RESIZABLE) {
+				oneToDisplay = 3;
 			}
 
 			const char* windowModeDropdownPreview = items[oneToDisplay];
@@ -81,6 +84,14 @@ namespace Cori {
 								}
 							}
 						}
+						else if (i == 3) {
+							if (currentMode != Core::WindowMode::RESIZABLE) {
+								const auto result = Core::Application::GetWindow().SetWindowMode(Core::WindowMode::RESIZABLE);
+								if (!result) {
+									CORI_ERROR("Failed to set window mode. Error: {}", result.error().what());
+								}
+							}
+						}
 					}
 
 					if (isSelected) {
@@ -92,7 +103,7 @@ namespace Cori {
 
 			Core::Window& window = Core::Application::GetWindow();
 
-			ImGui::BeginDisabled(currentMode == Core::WindowMode::BORDERLESS_WINDOWED);
+			ImGui::BeginDisabled(currentMode == Core::WindowMode::BORDERLESS_WINDOWED || currentMode == Core::WindowMode::RESIZABLE);
 			const char* resolutionDropdownPreview = window.GetScreenModes().at(window.GetCurrentScreenMode()).m_ModeName.c_str();
 			if (ImGui::BeginCombo("Resolution", resolutionDropdownPreview)) {
 				for (int32_t i = 0; i < window.GetScreenModes().size(); i++) {

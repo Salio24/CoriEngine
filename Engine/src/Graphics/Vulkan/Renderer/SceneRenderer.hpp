@@ -63,7 +63,6 @@ namespace Cori {
 
 			class Batch {
 			public:
-				Batch() = default;
 				explicit Batch(Core::AssetRef<Mesh> mesh) : m_Mesh(std::move(mesh)) {}
 
 				[[nodiscard]] uint32_t GetObjectCount() const {
@@ -258,30 +257,9 @@ namespace Cori {
 				m_IsDormant = false;
 			}
 
-			static constexpr uint32_t s_AdmitDepth = 1;
+			[[nodiscard]] FrameData* PopRecycledFrameData();
 
-			[[nodiscard]] FrameData* PopRecycledFrameData() {
-				if (m_ReadyRing.Size() < s_AdmitDepth) {
-					FrameData** ptr = m_RecycleRing.Front();
-					if (ptr) {
-						m_RecycleRing.Pop();
-						return *ptr;
-					}
-				}
-
-				return nullptr;
-			}
-
-			[[nodiscard]] FrameData* PeekRecycledFrameData() {
-				if (m_ReadyRing.Size() < s_AdmitDepth) {
-					FrameData** ptr = m_RecycleRing.Front();
-					if (ptr) {
-						return *ptr;
-					}
-				}
-
-				return nullptr;
-			}
+			[[nodiscard]] FrameData* PeekRecycledFrameData();
 
 			bool PushFrameData(FrameData* frameData) {
 				return m_ReadyRing.TryEmplace(frameData);

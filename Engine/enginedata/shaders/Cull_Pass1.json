@@ -1,0 +1,11 @@
+{
+    "Metadata": {
+        "assetTypename": "ComputeShader",
+        "assetType": "eSecondary",
+        "assetDeletionPolicy": "eRefCounted"
+    },
+    "AssetData": {
+        "spv": "CullingShader.spv",
+        "computeEntry": "cullMain"
+    }
+}

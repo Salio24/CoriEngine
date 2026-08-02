@@ -89,8 +89,6 @@
 #include <vulkan/vk_platform.h>
 #include <vulkan/vulkan_to_string.hpp>
 #include <vulkan/vulkan_format_traits.hpp>
-//must come after the vulkan headers, TracyVulkan.hpp needs them
 #include "../src/Profiling/GPUProfiler.hpp"
-
 
 #endif

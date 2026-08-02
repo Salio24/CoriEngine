@@ -1,5 +1,6 @@
 #pragma once
 #include <oneapi/tbb/concurrent_vector.h>
+#include <oneapi/tbb/concurrent_unordered_map.h>
 #include "Core/DataStructures/FlatSlotMap.hpp"
 #include "AssetManagerEnums.hpp"
 #include "AssetManager/AssetLoadStatus.hpp"
@@ -47,6 +48,7 @@ namespace Cori {
 		}
 
 		using AssetID = Utility::StringHash64;
+		using AssetDirID = uint16_t;
 
 		template <typename T>
 		struct AssetTraits {
@@ -320,18 +322,23 @@ namespace Cori {
 		#endif
 
 		struct AssetRecord {
-			std::filesystem::path path;
-			std::filesystem::file_time_type pathTimestamp;
-			AssetType type{ AssetType::eUndefined };
-			std::string name{};
+			//std::filesystem::path path;
+			//std::filesystem::file_time_type pathTimestamp;
+			//AssetType type{ AssetType::eUndefined };
+			//std::string name{};
 
 			uint32_t vectorKey{};
 
 			uint64_t assetTypenameHash{ 0 };
-			uint32_t rawHandleIndex{ UINT32_MAX };
-			uint32_t rawHandleVersion{ 0 };
+			//uint32_t rawHandleIndex{ UINT32_MAX };
+			//uint32_t rawHandleVersion{ 0 };
 		};
 
+		struct AssetDir {
+			const char* label;
+			std::filesystem::path dir;
+			std::filesystem::file_time_type dirTimestamp;
+		};
 
 		class AssetManager2 {
 		public:
@@ -361,12 +368,13 @@ namespace Cori {
 					}
 
 					auto& record = Get().m_AssetDatabase[id];
-					if (record.assetTypenameHash != AssetTraits<T>::TypeHash) {
-						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::AssetManager }, "Load failed, typename hash mismatch, type provided '{}', it's hash '{}', but expected hash is '{}'. Asset with path '{}'. Placeholder will be returned.", CORI_CLEAN_TYPE_NAME(T), AssetTraits<T>::TypeHash, record.assetTypenameHash, path);
+					vectorKey = record.vectorKey;
+					if (record.assetTypenameHash != Utility::HashString64(std::meta::identifier_of(^^T).data())) {
+						CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::AssetManager }, "Load failed, typename hash mismatch, type provided '{}', it's hash '{}', but expected hash is '{}'. Asset with path '{}'. Placeholder will be returned.", CORI_CLEAN_TYPE_NAME(T), std::meta::identifier_of(^^T), record.assetTypenameHash, path);
 						return AssetRef<T>(T::Manager::template GetPlaceholder<T>());
 					}
 
-					handle = Handle<T>(record.rawHandleIndex, record.rawHandleVersion);
+					handle = Handle<T>(Get().m_RawHandles[vectorKey].load(std::memory_order_acquire));
 					if (handle.IsSet()) {
 						if (T::Manager::TryAddRef(handle)) {
 							return AssetRef<T>::AdoptExisting(handle);
@@ -375,20 +383,18 @@ namespace Cori {
 
 					handle = T::Manager::template AllocateHandle<T>();
 					gen = T::Manager::BumpGeneration(handle);
-					vectorKey = record.vectorKey;
 					T::Manager::BindAsset(handle, id, vectorKey);
 
 					if (GetDeletionPoliciesVector()[vectorKey].load(std::memory_order_acquire) == AssetDeletionPolicy::eKeepAlive) {
 						T::Manager::AddRef(handle);
 					}
 
-					record.rawHandleIndex = handle.GetIndex();
-					record.rawHandleVersion = handle.GetVersion();
+					Get().m_RawHandles[vectorKey].store(handle.ToRaw(), std::memory_order_release);
 
 					T::Manager::SetAssetStatus(handle, AssetStatus::eLoading);
 
-					fsPath = GetAssetDir() / record.path;
-					name = record.name;
+					fsPath = Get().m_AssetDirs[Get().m_ParentDirIDs[vectorKey].load(std::memory_order_acquire)].dir / Get().m_Paths[vectorKey];
+					name = Get().m_Names[vectorKey];
 				}
 
 				if constexpr (std::derived_from<T, PrimaryAssetBase>) {
@@ -405,48 +411,33 @@ namespace Cori {
 				return AssetRef<T>::AdoptExisting(handle);
 			}
 
+			static uint64_t GetRawHandle(const uint32_t vectorKey) {
+				return Get().m_RawHandles[vectorKey].load(std::memory_order_acquire);
+			}
+
+			static void SetRawHandle(const uint32_t vectorKey, const uint64_t newHandle) {
+				Get().m_RawHandles[vectorKey].store(newHandle, std::memory_order_release);
+			}
+
 			static AssetRecord& GetAssetRecord(const AssetID id) {
 				CORI_CORE_ASSERT(Get().m_AssetDatabase.contains(id), "Invalid AssetID.");
 				return Get().m_AssetDatabase[id];
-			}
-
-			static std::expected<void, ErrorCode> AddAssetRecord(const AssetID id, const AssetRecord& record) {
-				auto [_, result] = Get().m_AssetDatabase.try_emplace(id, record);
-				if (!result) {
-					return std::unexpected(ErrorCode::eObjectAlreadyExists);
-				}
-
-				return {};
 			}
 
 			static void UnloadAsset(AssetID id) {
 
 			}
 
-			static void ScanDirectory(const std::filesystem::path& assetDirPath) {
-				if (!exists(assetDirPath)) {
-					return;
-				}
+			static void ScanDirectory(const AssetDirID dirID) {
+				const auto& assetDirPath = Get().m_AssetDirs[dirID].dir;
 
 				for (const auto& entry : std::filesystem::recursive_directory_iterator(assetDirPath)) {
 					if (entry.is_regular_file()) {
 						if (entry.path().extension() == ".json") {
-							ProcessFile(entry.path());
+							ProcessFile(entry.path(), dirID);
 						}
 					}
 				}
-			}
-
-			static std::expected<std::reference_wrapper<std::filesystem::path>, ErrorCode> GetPath(const AssetID assetID) {
-				if (Get().m_AssetDatabase.contains(assetID)) {
-					return Get().m_AssetDatabase[assetID].path;
-				}
-
-				return std::unexpected(ErrorCode::eObjectDoesNotExist);
-			}
-
-			static const std::filesystem::path& GetAssetDir() {
-				return Get().m_AppRootPath;
 			}
 
 			static void OnUpdate(GameTimer& timer) {
@@ -459,25 +450,58 @@ namespace Cori {
 				}
 			}
 
+			static void ScanAndReload(const AssetDirID dirID) {
+				CORI_PROFILE_FUNCTION();
+				uint32_t counter = 0;
+				for (const auto& rawHandle : Get().m_RawHandles) {
+					uint32_t currentKey = counter++;
+					//check if type support hot reload
+					if (rawHandle.load(std::memory_order_acquire) != VersionedHandleBase::Null) {
+						auto& path = Get().m_Paths[currentKey];
+						auto oldTime = Get().m_JsonTimestamp[currentKey];
+						auto currentTime = last_write_time(path);
+						if (oldTime < currentTime) {
+							if (true /*check if it support auto hot reload*/) {
+								// call Load????
+							}
+						}
+
+					}
+				}
+			}
+
 			static void TestCase() {
-				ScopedTimer test("awea");
+				#if 0
+				CORI_PROFILE_FUNCTION();
 				uint64_t counter = 0;
 				uint64_t counter2 = 0;
 
-				auto copy = Get().m_AssetDatabase;
-
-				for (auto& entry : copy | std::views::values) {
-					auto newStamp = std::filesystem::last_write_time(Get().m_AppRootPath / entry.path);
-					if (entry.pathTimestamp < newStamp) {
-						CORI_DEBUG("{}", entry.path.string());
-						entry.pathTimestamp = newStamp;
-						counter2++;
+				static std::unordered_map<AssetID, AssetRecord> copy;
+				{
+					std::lock_guard lk(GetMutex());
+					{
+						CORI_PROFILE_SCOPE("Copy");
+						copy = Get().m_AssetDatabase;
 					}
+				}
 
-					counter++;
+
+				{
+					CORI_PROFILE_SCOPE("Disk");
+					for (auto& entry : copy | std::views::values) {
+						auto newStamp = std::filesystem::last_write_time(Get().m_AppRootPath / entry.path);
+						if (entry.pathTimestamp < newStamp) {
+							CORI_DEBUG("{}", entry.path.string());
+							entry.pathTimestamp = newStamp;
+							counter2++;
+						}
+
+						counter++;
+					}
 				}
 
 				CORI_DEBUG("checked '{}', changed '{}'", counter, counter2);
+				#endif
 			}
 
 			static CORI_PROFILE_LOCKABLE_TYPE(std::mutex)& GetMutex() {
@@ -492,18 +516,50 @@ namespace Cori {
 				return Get().m_DeletionPolicies;
 			}
 
+			static std::optional<AssetDirID> AddAssetDir(const char* label, const std::filesystem::path& dir) {
+				if (!exists(dir)) {
+					return std::nullopt;
+				}
+
+				AssetDirID key = Get().m_NextAssetDir++;
+				const uint64_t newSizePowerOfTwo = Utility::GetNextPowerOfTwo(key + 1);
+				if (newSizePowerOfTwo >= Get().m_AssetDirs.size()) {
+					Get().m_AssetDirs.grow_to_at_least(newSizePowerOfTwo);
+				}
+
+				Get().m_AssetDirs[key] = AssetDir{ .label = label, .dir = dir, .dirTimestamp = last_write_time(dir) };
+				return key;
+			}
+
 			~AssetManager2() = default;
 
 		private:
 			AssetManager2() {
 				s_Instance = std::unique_ptr<AssetManager2>(this);
 
-				m_AppRootPath = FileSystem::PathManager::GetAliasedPath("APP_ROOT");
-				ScanDirectory(FileSystem::PathManager::GetAliasedPath("ASSET_DIR"));
+				auto key = AddAssetDir("assets", FileSystem::PathManager::GetAliasedPath("ASSET_DIR"));
+				auto key2 = AddAssetDir("enginedata", FileSystem::PathManager::GetAliasedPath("ENGINE_DATA"));
+				ScanDirectory(key.value());
+				ScanDirectory(key2.value());
 			}
 
-			static void ProcessFile(const std::filesystem::path& assetFilePath) {
+			static void ProcessFile(const std::filesystem::path& assetFilePath, const AssetDirID dirID) {
 				if (assetFilePath.filename() == "Samplers.json") {
+					return;
+				}
+
+				const auto& dirEntry = Get().m_AssetDirs[dirID];
+
+				std::string hashString;
+				hashString.reserve(strlen(dirEntry.label) + 3);
+				hashString.append(dirEntry.label);
+				hashString.append("://");
+				auto relativeAssetPath = std::filesystem::relative(assetFilePath, dirEntry.dir);
+				hashString.append(relativeAssetPath);
+
+				AssetID pathHash = Utility::HashString64(hashString);
+
+				if (Get().m_AssetDatabase.contains(pathHash)) {
 					return;
 				}
 
@@ -511,6 +567,7 @@ namespace Cori {
 					struct Metadata {
 						std::string assetTypename;
 						AssetType assetType;
+						std::optional<std::vector<std::string>> assetFiles;
 						std::optional<Utility::GlazeWithFallback<AssetDeletionPolicy, AssetDeletionPolicy::eRefCounted, "from Metadata declared in AssetManager::ProcessFile">> assetDeletionPolicy;
 					} Metadata;
 					glz::raw_json_view AssetData;
@@ -529,42 +586,120 @@ namespace Cori {
 					return;
 				}
 
-				auto relativeAssetPath = std::filesystem::relative(assetFilePath, Get().m_AppRootPath);
-				AssetID pathHash = Utility::HashString64(relativeAssetPath.string());
-				//auto& entry = Get().m_AssetDatabase[pathHash];
-				auto [it, isNew] = Get().m_AssetDatabase.try_emplace(pathHash);
-				auto& entry = it->second;
+				AssetRecord entry;
 
-				if (isNew) {
-					uint32_t vectorKey = Get().m_NextVectorKey++;
-					const uint64_t newSizePowerOfTwo = Utility::GetNextPowerOfTwo(vectorKey + 1);
+				uint32_t vectorKey = Get().m_NextVectorKey++;
+				entry.vectorKey = vectorKey;
+				entry.assetTypenameHash = Utility::HashString64(l.Metadata.assetTypename);
 
-					//if (newSizePowerOfTwo >= Get().m_AssetStatuses.size()) {
-					//	Get().m_AssetStatuses.grow_to_at_least(newSizePowerOfTwo);
-					//}
+				#if 0
+				const uint64_t newSizePowerOfTwo = Utility::GetNextPowerOfTwo(vectorKey + 1);
 
-					if (newSizePowerOfTwo >= Get().m_DeletionPolicies.size()) {
-						Get().m_DeletionPolicies.grow_to_at_least(newSizePowerOfTwo);
-					}
-
-					//Get().m_AssetStatuses[vectorKey].store(AssetStatus::eUnloaded, std::memory_order_release);
-					Get().m_DeletionPolicies[vectorKey].store(l.Metadata.assetDeletionPolicy.value_or(AssetDeletionPolicy::eRefCounted), std::memory_order_release);
-
-					entry.vectorKey = vectorKey;
+				if (newSizePowerOfTwo >= Get().m_DeletionPolicies.size()) {
+					Get().m_DeletionPolicies.grow_to_at_least(newSizePowerOfTwo);
 				}
 
-				entry.path = std::move(relativeAssetPath);
-				entry.pathTimestamp = std::filesystem::last_write_time(Get().m_AppRootPath / entry.path);
-				entry.type = l.Metadata.assetType;
-				entry.assetTypenameHash = Utility::HashString64(l.Metadata.assetTypename);
+				if (newSizePowerOfTwo >= Get().m_Paths.size()) {
+					Get().m_Paths.grow_to_at_least(newSizePowerOfTwo);
+				}
+
+				if (newSizePowerOfTwo >= Get().m_RawHandles.size()) {
+					Get().m_RawHandles.grow_to_at_least(newSizePowerOfTwo);
+				}
+
+				if (newSizePowerOfTwo >= Get().m_Names.size()) {
+					Get().m_Names.grow_to_at_least(newSizePowerOfTwo);
+				}
+
+				if (newSizePowerOfTwo >= Get().m_Names.size()) {
+					Get().m_Names.grow_to_at_least(newSizePowerOfTwo);
+				}
+
+				if (newSizePowerOfTwo >= Get().m_JsonTimestamp.size()) {
+					Get().m_JsonTimestamp.grow_to_at_least(newSizePowerOfTwo);
+				}
+
+				if (newSizePowerOfTwo >= Get().m_AssetFileTimestamp.size()) {
+					Get().m_AssetFileTimestamp.grow_to_at_least(newSizePowerOfTwo);
+				}
+
+				if (newSizePowerOfTwo >= Get().m_AssetTypes.size()) {
+					Get().m_AssetTypes.grow_to_at_least(newSizePowerOfTwo);
+				}
+
+				if (newSizePowerOfTwo >= Get().m_ParentDirIDs.size()) {
+					Get().m_ParentDirIDs.grow_to_at_least(newSizePowerOfTwo);
+				}
+
+				if (newSizePowerOfTwo >= Get().m_ReverseLookup.size()) {
+					Get().m_ReverseLookup.grow_to_at_least(newSizePowerOfTwo);
+				}
+				#endif
+
+
+				//Get().m_DeletionPolicies[vectorKey].store(l.Metadata.assetDeletionPolicy.value_or(AssetDeletionPolicy::eRefCounted), std::memory_order_relaxed);
+				Get().m_DeletionPolicies.emplace_back(l.Metadata.assetDeletionPolicy.value_or(AssetDeletionPolicy::eRefCounted));
+
+				//Get().m_JsonTimestamp[vectorKey] = std::filesystem::last_write_time(dirEntry.dir / relativeAssetPath);
+				//Get().m_Paths[vectorKey] = std::move(relativeAssetPath);
+				//Get().m_RawHandles[vectorKey].store(VersionedHandleBase::Null, std::memory_order_relaxed);
+				//Get().m_ReverseLookup[vectorKey].store(pathHash, std::memory_order_relaxed);
+				//Get().m_Names[vectorKey] = "Noname";
+
+				Get().m_JsonTimestamp.emplace_back(std::filesystem::last_write_time(dirEntry.dir / relativeAssetPath));
+				Get().m_Paths.emplace_back(std::move(relativeAssetPath));
+				Get().m_RawHandles.emplace_back(VersionedHandleBase::Null);
+				Get().m_ReverseLookup.emplace_back(pathHash);
+				Get().m_Names.emplace_back("Noname");
+
+				if (l.Metadata.assetFiles) {
+					auto& val = l.Metadata.assetFiles.value();
+					if (!val.empty()) {
+						std::filesystem::file_time_type timeLargest;
+
+						for (auto& assetPath : val) {
+							std::filesystem::path path = assetPath;
+							auto time = last_write_time(path);
+							if (time >  timeLargest) {
+								timeLargest = time;
+							}
+						}
+
+						Get().m_AssetFileTimestamp.emplace_back(timeLargest);
+					} else {
+						Get().m_AssetFileTimestamp.emplace_back(std::filesystem::file_time_type::min());
+					}
+				} else {
+					Get().m_AssetFileTimestamp.emplace_back(std::filesystem::file_time_type::min());
+				}
+
+				Get().m_AssetTypes.emplace_back(l.Metadata.assetType);
+
+				Get().m_ParentDirIDs.emplace_back(dirID);
+
+				Get().m_AssetDatabase.emplace(pathHash, entry);
 			}
 
-			std::unordered_map<AssetID, AssetRecord> m_AssetDatabase;
-			//tbb::concurrent_vector<std::atomic<AssetStatus>> m_AssetStatuses;
+			//std::unordered_map<AssetID, AssetRecord> m_AssetDatabase;
+
+			tbb::concurrent_unordered_map<AssetID, AssetRecord> m_AssetDatabase;
+			tbb::concurrent_vector<AssetDir> m_AssetDirs;
+
+			tbb::concurrent_vector<std::atomic<AssetID>> m_ReverseLookup;
 			tbb::concurrent_vector<std::atomic<AssetDeletionPolicy>> m_DeletionPolicies;
+			tbb::concurrent_vector<std::filesystem::path> m_Paths;
+			tbb::concurrent_vector<std::atomic<AssetDirID>> m_ParentDirIDs;
+			tbb::concurrent_vector<std::atomic<uint64_t>> m_RawHandles;
+			tbb::concurrent_vector<std::string> m_Names;
+			tbb::concurrent_vector<std::filesystem::file_time_type> m_JsonTimestamp;
+			tbb::concurrent_vector<std::filesystem::file_time_type> m_AssetFileTimestamp;
+			tbb::concurrent_vector<AssetType> m_AssetTypes;
+
+
+			AssetDirID m_NextAssetDir{ 0 };
 			uint32_t m_NextVectorKey{ 0 };
 
-			std::filesystem::path m_AppRootPath;
+			//std::filesystem::path m_AppRootPath;
 
 			CORI_PROFILE_LOCKABLE_N(std::mutex, m_Mutex, "AssetManager2 registry lock");
 
@@ -587,14 +722,14 @@ namespace glz {
 		}
 	};
 
-	template <class T>
-	struct to<JSON, Cori::Core::AssetRef<T>> {
-		template <auto Opts>
-		static void op(const Cori::Core::AssetRef<T>& from, is_context auto&& ctx, auto&& b, auto&& ix) noexcept {
-			CORI_CORE_ASSERT(false, "to json was called for AssetRef")
-			Cori::Core::AssetID id = from.GetAssetID();
-			std::string path = Cori::Core::AssetManager2::GetPath(id).value().get().filename().string();
-			serialize<JSON>::op<Opts>(path, ctx, b, ix);
-		}
-	};
+	//template <class T>
+	//struct to<JSON, Cori::Core::AssetRef<T>> {
+	//	template <auto Opts>
+	//	static void op(const Cori::Core::AssetRef<T>& from, is_context auto&& ctx, auto&& b, auto&& ix) noexcept {
+	//		CORI_CORE_ASSERT(false, "to json was called for AssetRef")
+	//		Cori::Core::AssetID id = from.GetAssetID();
+	//		std::string path = Cori::Core::AssetManager2::GetPath(id).value().get().filename().string();
+	//		serialize<JSON>::op<Opts>(path, ctx, b, ix);
+	//	}
+	//};
 }

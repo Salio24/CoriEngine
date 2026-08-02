@@ -66,7 +66,9 @@ namespace Cori {
 
 			void ImGuiLayer::EndFrame() {
 				CORI_PROFILE_FUNCTION();
+				ImGui::EndFrame();
 				ImGui::Render();
+				Graphics::ImGuiRenderer::EndFrame();
 			}
 		}
 	}

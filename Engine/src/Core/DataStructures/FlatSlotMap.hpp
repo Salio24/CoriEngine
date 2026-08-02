@@ -16,6 +16,7 @@ namespace Cori {
 			VersionedHandleBase(const uint32_t index, const uint32_t version) : index(index), version(version) {}
 			explicit VersionedHandleBase(const uint64_t raw) : index(raw >> 32), version(raw & 0xFFFFFFFFULL) {}
 
+			static constexpr uint64_t Null{ 0xFFFFFFFF00000000 };
 
 			[[nodiscard]] uint32_t GetIndex() const {
 				return index;
@@ -58,7 +59,6 @@ namespace Cori {
 		template<typename T>
 		struct Handle : ConstHandle<T> {
 			using Type = T;
-
 			using ConstHandle<T>::ConstHandle;
 
 			[[nodiscard]] bool operator==(const Handle<T>& other) const = default;

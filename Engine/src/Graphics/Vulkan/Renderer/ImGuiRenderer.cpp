@@ -1,10 +1,32 @@
 #include "ImGuiRenderer.hpp"
 #include <backends/imgui_impl_vulkan.h>
 #include <backends/imgui_impl_sdl3.h>
+#include <imgui_threaded_rendering/imgui_threaded_rendering.h>
+#include "Core/Threading/SPSCRing.hpp"
 
 namespace Cori {
 	namespace Graphics {
+		struct ImGuiRenderer::Data {
+			std::array<ImDrawDataSnapshot, FRAMES_IN_FLIGHT + 1> m_Snapshots;
+			ImDrawDataSnapshot* m_InFlight{ nullptr };
+
+			Threading::SPSCRing<ImDrawDataSnapshot*> m_ReadyRing{ FRAMES_IN_FLIGHT + 1 };
+			Threading::SPSCRing<ImDrawDataSnapshot*> m_RecycleRing{ FRAMES_IN_FLIGHT + 1 };
+
+			ImTextureQueue m_TexQueue;
+			std::mutex m_TexQueueMutex;
+		};
+
+		std::unique_ptr<ImGuiRenderer::Data> ImGuiRenderer::s_Data{};
+
 		void ImGuiRenderer::Init(void* window) {
+			CORI_CORE_ASSERT(!s_Data, "ImGuiRenderer::Init called twice.");
+
+			s_Data = std::make_unique<Data>();
+			for (auto& inst : s_Data->m_Snapshots) {
+				s_Data->m_RecycleRing.Emplace(&inst);
+			}
+
 			ImGui_ImplSDL3_InitForVulkan(static_cast<SDL_Window*>(window));
 
 			ImGui_ImplVulkan_InitInfo vulkanInfo{
@@ -33,22 +55,67 @@ namespace Cori {
 
 			bool success = ImGui_ImplVulkan_Init(&vulkanInfo);
 			CORI_CORE_ASSERT(success, "Failed to initialize ImGui with Vulkan.");
+
+			s_Data->m_TexQueue.UpdateTexFunc = ImGui_ImplVulkan_UpdateTexture;
+			s_Data->m_TexQueue.InFlightFrames = FRAMES_IN_FLIGHT;
 		}
 
 		void ImGuiRenderer::Shutdown() {
 			auto result = VulkanEngine::GetLogicalDevice().waitIdle();
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Calling wait idle on device has failed. Error: {}", vk::to_string(result));
 
+			s_Data->m_TexQueue.Shutdown();
+			for (auto& inst : s_Data->m_Snapshots) {
+				inst.Clear();
+			}
+
 			ImGui_ImplVulkan_Shutdown();
 			ImGui_ImplSDL3_Shutdown();
 		}
 
 		void ImGuiRenderer::StartFrame() {
-			ImGui_ImplVulkan_NewFrame();
+			{
+				std::lock_guard lk(s_Data->m_TexQueueMutex);
+				s_Data->m_TexQueue.PreNewFrame();
+			}
 			ImGui_ImplSDL3_NewFrame();
 		}
 
-		void ImGuiRenderer::Render(vk::CommandBuffer cmb, vk::ImageView swapChainImageView, const vk::Extent2D swapChainExtent, const bool frameSkip) {
+		void ImGuiRenderer::EndFrame() {
+			CORI_PROFILE_FUNCTION();
+			ImDrawData* drawData = ImGui::GetDrawData();
+			{
+				std::lock_guard lk(s_Data->m_TexQueueMutex);
+				s_Data->m_TexQueue.QueueRequests(drawData);
+			}
+
+			ImDrawDataSnapshot* snapshot = *s_Data->m_RecycleRing.FrontWait();
+			s_Data->m_RecycleRing.Pop();
+			snapshot->SnapUsingSwap(drawData, ImGui::GetTime());
+			s_Data->m_ReadyRing.Emplace(snapshot);
+		}
+
+		void ImGuiRenderer::ProcessTexQueueRequests() {
+			CORI_PROFILE_FUNCTION();
+			CORI_CORE_ASSERT(!s_Data->m_InFlight, "ProcessTexQueueRequests called but some snapshot was still in flight.");
+			s_Data->m_InFlight = *s_Data->m_ReadyRing.FrontWait();
+			s_Data->m_ReadyRing.Pop();
+
+			{
+				std::lock_guard lk(s_Data->m_TexQueueMutex);
+				s_Data->m_TexQueue.ProcessRequests(&s_Data->m_InFlight->DrawData);
+			}
+		}
+
+		void ImGuiRenderer::Render(vk::CommandBuffer cmb) {
+			CORI_PROFILE_FUNCTION();
+			CORI_CORE_ASSERT(s_Data->m_InFlight, "Render called but no snapshot is in flight.");
+			CORI_PROFILE_GPU_ZONE_CP(Cori::ProfileParts::RenderingLoop, VulkanEngine::GetGraphicsGPUProfilerContext(), cmb, "ImGui Rendering", Cori::ProfileColors::GPUPass);
+			CORI_VK_LABEL(cmb, "ImGui Rendering", DebugLabelColors::Pass);
+
+			ImGui_ImplVulkan_RenderDrawData(&s_Data->m_InFlight->DrawData, cmb);
+
+			#if 0
 			ImDrawData* drawData = ImGui::GetDrawData();
 			if (drawData && !frameSkip) {
 				vk::RenderingAttachmentInfo colorAttachment = {
@@ -67,7 +134,6 @@ namespace Cori {
 
 				cmb.beginRendering(renderInfo);
 
-				ImGui_ImplVulkan_RenderDrawData(drawData, cmb);
 
 				cmb.endRendering();
 
@@ -80,6 +146,14 @@ namespace Cori {
 			//	ImGui::UpdatePlatformWindows();
 			//	ImGui::RenderPlatformWindowsDefault();
 			//}
+			#endif
+		}
+
+		void ImGuiRenderer::RecycleSnapshot() {
+			CORI_CORE_ASSERT(s_Data->m_InFlight, "RecycleSnapshot called but no snapshot is in flight.");
+			ImDrawDataSnapshot* ptr = s_Data->m_InFlight;
+			s_Data->m_InFlight = nullptr;
+			s_Data->m_RecycleRing.Emplace(ptr);
 		}
 	}
 }

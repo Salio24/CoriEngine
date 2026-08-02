@@ -79,7 +79,6 @@ namespace Cori {
 			});
 			dispatcher.Dispatch<WindowResizeEvent>([](const WindowResizeEvent& e) -> bool {
 				Graphics::VulkanEngine::ReportWindowResize({ e.GetWidth(), e.GetHeight() });
-				//Graphics::Internal::API::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
 				return false;
 			});
 
@@ -121,9 +120,34 @@ namespace Cori {
 
 					CORI_PROFILER_PLOT("Main thread CPU", Threading::CpuTopology::CurrentCpu());
 
+					m_FramePacer.WaitForFrameStart();
 
+					{
+						CORI_PROFILE_SCOPE("MasterFrameData wait");
+						Graphics::MasterRenderer::Get().WaitForRecycledFrameData();
+					}
 
-					#if 0
+					{
+						CORI_PROFILE_SCOPE("FrameData wait");
+						bool success = false;
+						while (success == false) {
+							success = true;
+
+							for (Layer* layer : m_LayerStack) {
+								success &= layer->ActiveScene.WaitForFrameData();
+							}
+						}
+					}
+
+					//Stamped after the slot wait rather than after the pacing wait, so whatever the
+					//spin costs is folded into the next frame's budget instead of being spent behind
+					//the pacer's back.
+					m_FrameStartHostTime = Graphics::VulkanPresentTiming::HostNow();
+
+					m_Window->OnUpdate();
+					m_GameTimer.Update();
+					AssetManager2::OnUpdate(m_GameTimer);
+
 					{
 						CORI_PROFILE_SCOPE("ImGui Render");
 						m_ImGuiLayer->StartFrame();
@@ -140,27 +164,21 @@ namespace Cori {
 
 						m_ImGuiLayer->EndFrame();
 					}
-					#endif
-
-					{
-						CORI_PROFILE_SCOPE("FrameData wait");
-						bool success = false;
-						while (success == false) {
-							success = true;
-
-							for (Layer* layer : m_LayerStack) {
-								success &= layer->ActiveScene.WaitForFrameData();
-							}
-						}
-					}
-
-					m_Window->OnUpdate();
-					m_GameTimer.Update();
 
 					for (Layer* layer : m_LayerStack) {
 						layer->OnUpdate(m_GameTimer);
 						layer->SceneUpdate(m_GameTimer);
 					}
+
+					Graphics::MasterFrameData* MFD = Graphics::MasterRenderer::Get().PopRecycledFrameData();
+
+					MFD->latencyStamps = Graphics::FrameLatencyStamps{
+						.inputTimestampSdl = m_Window->GetOldestInputTimestamp(),
+						.frameStartHost = GetFrameStartHostTime()
+					};
+
+					bool result = Graphics::MasterRenderer::Get().PushFrameData(MFD);
+					CORI_CORE_ASSERT(result, "Push failed");
 
 					{
 						CORI_PROFILE_SCOPE("FrameData preparation");

@@ -7,9 +7,9 @@
     "AssetData": {
         "materialData": {
             "colorFactor": [ 1.0, 1.0, 1.0, 1.0 ],
-            "albedoTexture": "assets/Textures/Sword_T_albedo.json",
+            "albedoTexture": "assets://Textures/Sword_T_albedo.json",
             "albedoSampler": "Default"
         },
-        "shaderEffect": "assets/Sword_Effect.json"
+        "shaderEffect": "assets://Sword_Effect.json"
     }
 }

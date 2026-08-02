@@ -12,7 +12,7 @@ public:
 	ExampleLayer() : Layer("Example") {
 		Cori::World::SceneManager::CreateScene("Test Scene");
 		BindScene("Test Scene");
-		constexpr vk::Extent2D prtExtent{ 3440, 1440 };
+		vk::Extent2D prtExtent{ static_cast<uint32_t>(Cori::Core::Application::GetWindow().GetWidth()), static_cast<uint32_t>(Cori::Core::Application::GetWindow().GetHeight()) };
 
 		auto& camera = ActiveScene.GetActiveCamera();
 		camera.CreatePerspectiveCamera(90.0f, static_cast<float>(prtExtent.width) / static_cast<float>(prtExtent.height), 0.1f, 100.0f);
@@ -34,8 +34,8 @@ public:
 
 		#ifndef SPONZA
 		{
-			auto swordMaterial = Cori::Core::AssetManager2::Load<Cori::Graphics::Material>("assets/Sword_Material.json");
-			auto swordMesh = Cori::Core::AssetManager2::Load<Cori::Graphics::Mesh>("assets/Sword_Mesh.json");
+			auto swordMaterial = Cori::Core::AssetManager2::Load<Cori::Graphics::Material>("assets://Sword_Material.json");
+			auto swordMesh = Cori::Core::AssetManager2::Load<Cori::Graphics::Mesh>("assets://Sword_M.json");
 			auto entity = ActiveScene.CreateEntity("awd");
 			entity.AddComponent<Cori::World::Components::Entity::Rendering>(std::move(swordMesh), std::move(swordMaterial), glm::vec4{ 0.0f, 0.0f, 1.0f, 1.0f });
 			auto& tc = entity.GetComponents<Cori::World::Components::Entity::Transform>();
@@ -62,12 +62,12 @@ public:
 
 		for (uint32_t i = 0; i < sponzaMaterialCount; i++) {
 			sponzaMaterials.emplace_back(Cori::Core::AssetManager2::Load<Cori::Graphics::Material>(
-				std::format("assets/Sponza/materials/Sponza_Mat_{:02}.json", i).c_str()));
+				std::format("assets://Sponza/materials/Sponza_Mat_{:02}.json", i).c_str()));
 		}
 
 		for (uint32_t i = 0; i < std::size(sponzaMeshMaterials); i++) {
 			auto sponzaMesh = Cori::Core::AssetManager2::Load<Cori::Graphics::Mesh>(
-				std::format("assets/Sponza/meshes/Sponza_Mesh_{:03}.json", i).c_str());
+				std::format("assets://Sponza/meshes/Sponza_Mesh_{:03}.json", i).c_str());
 
 			auto sponzaEntity = ActiveScene.CreateEntity(std::format("Sponza_{:03}", i));
 			sponzaEntity.AddComponent<Cori::World::Components::Entity::Rendering>(
@@ -108,6 +108,15 @@ public:
 			}
 
 			return true;
+		});
+
+		dispatcher.Dispatch<Cori::Core::WindowResizeEvent>([this](const Cori::Core::WindowResizeEvent& e) -> bool {
+			auto rs = ActiveScene.GetSystem<Cori::World::Systems::RenderSync>();
+			rs.value().lock()->RequestResize({ e.GetWidth(), e.GetHeight() });
+			auto& camera = ActiveScene.GetActiveCamera();
+			camera.CreatePerspectiveCamera(90.0f, static_cast<float>(e.GetWidth()) / static_cast<float>(e.GetHeight()), 0.1f, 100.0f);
+
+			return false;
 		});
 
 	}

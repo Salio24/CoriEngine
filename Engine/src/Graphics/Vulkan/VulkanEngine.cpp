@@ -145,6 +145,8 @@ namespace Cori {
 				#endif
 
 			VulkanDeviceLossDebug::Init();
+			VulkanPresentTiming::RequestExtensions();
+			VulkanPresentTiming::SetPresentQueueDepth(2);
 
 			m_OptionalDeviceExtensions.push_back(vk::EXTDeviceFaultExtensionName);
 
@@ -168,7 +170,7 @@ namespace Cori {
 			CreateDevice();
 			CreateGPUProfilerContexts();
 			InitializeVMA();
-			CreateSwapChain(swapChainExtent);
+			CreateSwapChain();
 			CreateCommandPools();
 			CreateCommandBuffer();
 			CreateSyncObjects();
@@ -209,6 +211,7 @@ namespace Cori {
 			VulkanImageViewManager::Shutdown();
 
 			VulkanDeviceLossDebug::Shutdown();
+			VulkanPresentTiming::Shutdown();
 
 			if (m_TransferGPUProfilerContext != m_GraphicsGPUProfilerContext) {
 				CORI_PROFILE_GPU_CONTEXT_DESTROY(m_TransferGPUProfilerContext);
@@ -328,7 +331,7 @@ namespace Cori {
 			auto result = m_Device.resetFences(frameData.m_DrawFence);
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to reset fence. Error: {}", vk::to_string(result));
 
-			AddWaitSemaphore(frameData.m_PresentCompleteSemaphore, vk::PipelineStageFlagBits::eTransfer);
+			AddWaitSemaphore(frameData.m_PresentCompleteSemaphore, vk::PipelineStageFlagBits::eColorAttachmentOutput);
 
 			frameData.m_SwapChainImageIndex = imageIndex;
 
@@ -442,7 +445,7 @@ namespace Cori {
 		}
 
 
-		void VulkanEngine::GPUFrameEnd() {
+		void VulkanEngine::GPUFrameEnd(const FrameLatencyStamps& latencyStamps) {
 			CORI_PROFILE_FUNCTION();
 
 			FrameInfo& frameData = m_FrameData[m_CurrentFrameInFlight];
@@ -510,6 +513,7 @@ namespace Cori {
 				CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Graphics queue submission failed. Error: {}", vk::to_string(result));
 
 				vk::PresentInfoKHR presentInfoKHR{
+					.pNext = VulkanPresentTiming::PreparePresent(latencyStamps),
 					.waitSemaphoreCount = 1,
 					.pWaitSemaphores = &m_RenderFinishedSemaphores[m_CurrentSwapChainImageIndex],
 					.swapchainCount = 1,
@@ -519,12 +523,19 @@ namespace Cori {
 
 				result = m_PresentQueue.presentKHR(presentInfoKHR);
 
+				VulkanPresentTiming::FinishPresent(result);
 				VulkanDeviceLossDebug::CheckResult(result, "vkQueuePresentKHR");
 
-				if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR) {
+				if (result == vk::Result::eErrorOutOfDateKHR) {
 					ResizeSwapChain();
+				} else if (result == vk::Result::eSuboptimalKHR) {
+					if (m_NewWindowSizeX.load(std::memory_order_relaxed) != m_SwapChainExtent.width || m_NewWindowSizeY.load(std::memory_order_relaxed) != m_SwapChainExtent.height) {
+						ResizeSwapChain();
+					}
 				} else if (result != vk::Result::eSuccess) {
 					CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Presentation failed. Error: {}", vk::to_string(result));
+				} else {
+					VulkanPresentTiming::Poll();
 				}
 			}
 
@@ -794,6 +805,9 @@ namespace Cori {
 				addressBindingReportEnabled = addressBindingFeatures.get<vk::PhysicalDeviceAddressBindingReportFeaturesEXT>().reportAddressBinding;
 			}
 
+			const bool presentTimingEnabled = VulkanPresentTiming::ResolveSupport(m_PhysicalDevice, m_Surface);
+			const bool presentWaitEnabled = VulkanPresentTiming::IsPresentQueueThrottleSupported();
+
 			vk::StructureChain<vk::PhysicalDeviceFeatures2,
 			                   vk::PhysicalDeviceVulkan13Features,
 			                   vk::PhysicalDeviceVulkan12Features,
@@ -803,7 +817,10 @@ namespace Cori {
 			                   vk::PhysicalDeviceShaderObjectFeaturesEXT,
 			                   vk::PhysicalDeviceDescriptorBufferFeaturesEXT,
 			                   vk::PhysicalDeviceFaultFeaturesEXT,
-			                   vk::PhysicalDeviceAddressBindingReportFeaturesEXT> featureChain = {
+			                   vk::PhysicalDeviceAddressBindingReportFeaturesEXT,
+			                   vk::PhysicalDevicePresentTimingFeaturesEXT,
+			                   vk::PhysicalDevicePresentId2FeaturesKHR,
+			                   vk::PhysicalDevicePresentWait2FeaturesKHR> featureChain = {
 					{
 						.features = {
 							.multiDrawIndirect = true,
@@ -839,7 +856,10 @@ namespace Cori {
 					{.shaderObject = true},
 					{.descriptorBuffer = true},
 					{ .deviceFault = deviceFaultEnabled },
-					{ .reportAddressBinding = addressBindingReportEnabled }
+					{ .reportAddressBinding = addressBindingReportEnabled },
+					{ .presentTiming = presentTimingEnabled },
+					{ .presentId2 = presentTimingEnabled },
+					{ .presentWait2 = presentWaitEnabled }
 				};
 
 			if (!deviceFaultEnabled) {
@@ -848,6 +868,15 @@ namespace Cori {
 
 			if (!addressBindingReportEnabled) {
 				featureChain.unlink<vk::PhysicalDeviceAddressBindingReportFeaturesEXT>();
+			}
+
+			if (!presentTimingEnabled) {
+				featureChain.unlink<vk::PhysicalDevicePresentTimingFeaturesEXT>();
+				featureChain.unlink<vk::PhysicalDevicePresentId2FeaturesKHR>();
+			}
+
+			if (!presentWaitEnabled) {
+				featureChain.unlink<vk::PhysicalDevicePresentWait2FeaturesKHR>();
 			}
 
 			float graphicsAndPresentQueuePriority = 1.0f;
@@ -927,6 +956,7 @@ namespace Cori {
 
 			VulkanDeviceLossDebug::SetAmdSupport(deviceFaultEnabled, addressBindingReportEnabled, IsDeviceExtensionEnabled(vk::AMDBufferMarkerExtensionName));
 			VulkanDeviceLossDebug::SetNvidiaInstrumented(m_NvidiaInstrumentation);
+			VulkanPresentTiming::OnDeviceCreated(m_Device);
 
 			m_Device.getQueue(m_GraphicsQueueFamilyIndex, 0, &m_GraphicsQueue);
 			SetDebugName(m_GraphicsQueue, "Graphics Queue");
@@ -1063,7 +1093,22 @@ namespace Cori {
 			m_Allocator = alloc;
 		}
 
-		void VulkanEngine::CreateSwapChain(const vk::Extent2D newExtent) {
+		vk::Extent2D VulkanEngine::GetTargetSwapChainExtent() {
+			vk::Extent2D unclamped;
+			auto caps = m_PhysicalDevice.getSurfaceCapabilitiesKHR(m_Surface);
+			if (caps->currentExtent.height != 0xFFFFFFFF && caps->currentExtent.width != 0xFFFFFFFF) {
+				unclamped = caps->currentExtent;
+			} else {
+				unclamped = vk::Extent2D{ m_NewWindowSizeX.load(std::memory_order_relaxed), m_NewWindowSizeY.load(std::memory_order_relaxed) };
+			}
+
+			return {
+				std::clamp<uint32_t>(unclamped.width, caps->minImageExtent.width, caps->maxImageExtent.width),
+				std::clamp<uint32_t>(unclamped.height, caps->minImageExtent.height, caps->maxImageExtent.height)
+			};
+		}
+
+		void VulkanEngine::CreateSwapChain() {
 			auto [result, surfaceCapabilities] = m_PhysicalDevice.getSurfaceCapabilitiesKHR(m_Surface);
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Failed to get surface capabilities. Error: {}", vk::to_string(result));
 
@@ -1086,7 +1131,7 @@ namespace Cori {
 
 			auto ChooseMode = [&]{
 				for (const auto& availablePresentMode : availablePresentModes) {
-					if (availablePresentMode == vk::PresentModeKHR::eFifoRelaxed) {
+					if (availablePresentMode == vk::PresentModeKHR::eMailbox) {
 						return availablePresentMode;
 					}
 				}
@@ -1094,35 +1139,16 @@ namespace Cori {
 				return vk::PresentModeKHR::eFifo;
 			};
 
-			auto ChooseExtent = [&] -> vk::Extent2D {
-				if (surfaceCapabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
-					return surfaceCapabilities.currentExtent;
-				}
-
-				vk::Extent2D unclamped;
-				auto caps = m_PhysicalDevice.getSurfaceCapabilitiesKHR(m_Surface);
-				if (caps->currentExtent.height != 0xFFFFFFFF && caps->currentExtent.height != 0xFFFFFFFF) {
-					unclamped = caps->currentExtent;
-				} else {
-					unclamped = newExtent;
-				}
-
-				return {
-					std::clamp<uint32_t>(unclamped.width, caps->minImageExtent.width, caps->maxImageExtent.width),
-					std::clamp<uint32_t>(unclamped.height, caps->minImageExtent.height, caps->maxImageExtent.height)
-				};
-			};
-
 			m_SwapChainImageFormat = ChooseFormat();
 			auto mode = ChooseMode();
-			m_SwapChainExtent = ChooseExtent();
+			m_SwapChainExtent = GetTargetSwapChainExtent();
 			auto minImageCount = std::max( 3u, surfaceCapabilities.minImageCount );
 			if ((0 < surfaceCapabilities.maxImageCount) && (surfaceCapabilities.maxImageCount < minImageCount)) {
 				minImageCount = surfaceCapabilities.maxImageCount;
 			}
 
 			vk::SwapchainCreateInfoKHR swapChainCreateInfo{
-				.flags = vk::SwapchainCreateFlagsKHR(),
+				.flags = VulkanPresentTiming::GetSwapChainCreateFlags(),
 				.surface = m_Surface,
 				.minImageCount = minImageCount,
 				.imageFormat = m_SwapChainImageFormat.format,
@@ -1150,7 +1176,12 @@ namespace Cori {
 			CORI_CORE_ASSERT(result____ == vk::Result::eSuccess, "Failed to get swapchain images. Error: {}", vk::to_string(result____));
 			m_SwapChainImages = std::move(images);
 
+			m_NewWindowSizeX.store(m_SwapChainExtent.width, std::memory_order_relaxed);
+			m_NewWindowSizeY.store(m_SwapChainExtent.height, std::memory_order_relaxed);
+
 			SetDebugName(m_SwapChain, "Main SwapChain");
+
+			VulkanPresentTiming::OnSwapChainCreated(m_SwapChain, static_cast<uint32_t>(m_SwapChainImages.size()));
 
 			vk::ImageViewCreateInfo imageViewCreateInfo{
 				.viewType = vk::ImageViewType::e2D,
@@ -1183,14 +1214,15 @@ namespace Cori {
 			auto result = m_Device.waitIdle();
 			CORI_CORE_ASSERT(result == vk::Result::eSuccess, "Calling wait idle on device has failed. Error: {}", vk::to_string(result));
 
+			VulkanPresentTiming::OnSwapChainDestroyed();
+
 			for (auto& imageView : m_SwapChainImageViews) {
 				m_Device.destroyImageView(imageView);
 			}
 
 			m_SwapChainImageViews.clear();
 			m_Device.destroySwapchainKHR(m_SwapChain);
-			vk::Extent2D newExtent = { m_NewWindowSizeX.load(std::memory_order_acquire), m_NewWindowSizeY.load(std::memory_order_acquire) };
-			CreateSwapChain(newExtent);
+			CreateSwapChain();
 		}
 
 		void VulkanEngine::CreateCommandPools() {

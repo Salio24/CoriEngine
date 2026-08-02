@@ -9,6 +9,7 @@
 #include "Core/Threading/MainThreadComandQueue.hpp"
 #include "Core/Threading/ThreadPool.hpp"
 #include "Graphics/Vulkan/VulkanEngine.hpp"
+#include "FramePacer.hpp"
 
 /**
  * @brief Global engine namespace.
@@ -85,6 +86,14 @@ namespace Cori {
 			static GameTimer& GetGameTimer() { return s_Instance->m_GameTimer; }
 
 			/**
+			 * @brief Host clock reading taken at the top of the current update iteration, after the pacing wait.
+			 * @details Stamped into FrameData so the present timing subsystem can measure how long a
+			 * frame takes to reach the present call, which is the budget the pacer places its wake up
+			 * against. Zero when latency measurement is unavailable.
+			 */
+			static uint64_t GetFrameStartHostTime() { return s_Instance->m_FrameStartHostTime; }
+
+			/**
 			 * @brief Emits the event and propagates it thought the LayerStack.
 			 * @param event Event reference to emit.
 			 */
@@ -145,6 +154,10 @@ namespace Cori {
 			Threading::ThreadPool m_WorkerPool;
 
 			GameTimer m_GameTimer;
+
+			FramePacer m_FramePacer;
+
+			uint64_t m_FrameStartHostTime{ 0 };
 
 			bool m_Running{ true };
 

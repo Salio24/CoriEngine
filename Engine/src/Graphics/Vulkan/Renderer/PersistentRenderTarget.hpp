@@ -69,6 +69,7 @@ namespace Cori {
 			}
 
 			void Resize(vk::Extent2D extent) {
+				CORI_DEBUG("{}x{} -> {}x{}", m_Image.m_Extent3D.width, m_Image.m_Extent3D.height, extent.width, extent.height);
 				if (extent.width == m_Image.m_Extent3D.width && extent.height == m_Image.m_Extent3D.height) {
 					return;
 				}

@@ -9,6 +9,14 @@ namespace Cori {
 	namespace Graphics {
 		using SceneRendererHandle = uint32_t;
 
+		struct MasterFrameData {
+			FrameLatencyStamps latencyStamps{};
+
+			void Clear() {
+				latencyStamps = {};
+			}
+		};
+
 		class MasterRenderer {
 			struct PendingCreation {
 				SceneRendererHandle handle;
@@ -55,6 +63,36 @@ namespace Cori {
 				return m_SceneRenderers[handle].load(std::memory_order_acquire);
 			}
 
+			[[nodiscard]] MasterFrameData* PopRecycledFrameData() {
+				if (m_ReadyRing.Size() < GetAdmitDepth()) {
+					MasterFrameData** ptr = m_RecycleRing.Front();
+					if (ptr) {
+						m_RecycleRing.Pop();
+						return *ptr;
+					}
+				}
+
+				return nullptr;
+			}
+
+			void WaitForRecycledFrameData() {
+				MasterFrameData* result = nullptr;
+				while (result == nullptr) {
+					if (m_ReadyRing.Size() < GetAdmitDepth()) {
+						MasterFrameData** ptr = m_RecycleRing.Front();
+						if (ptr) {
+							result = *ptr;
+						}
+					}
+				}
+			}
+
+			bool PushFrameData(MasterFrameData* frameData) {
+				bool result = m_ReadyRing.TryEmplace(frameData);
+				RenderThreadWakeup::Wake();
+				return result;
+			}
+
 			~MasterRenderer() {
 				RenderThreadCommandQueue::Clear();
 				m_PendingCreations.clear();
@@ -67,6 +105,7 @@ namespace Cori {
 			}
 		protected:
 			friend VulkanEngine;
+			friend SceneRenderer;
 			void EnterThreadedMode() {
 				RenderThreadCommandQueue::ClearExecuterThreadId();
 				m_RenderThread = std::move(std::thread([this] {
@@ -81,7 +120,10 @@ namespace Cori {
 
 				RenderThreadCommandQueue::SetExecuterThreadId(std::this_thread::get_id());
 				RenderThreadCommandQueue::DrainOnRenderThread();
+			}
 
+			constexpr static uint32_t GetAdmitDepth() {
+				return 1;
 			}
 
 		private:
@@ -130,6 +172,10 @@ namespace Cori {
 			MasterRenderer() {
 				for (uint32_t i = 0; i < s_MaxSceneRendererCount; i++) {
 					m_FreeList.emplace_back(i);
+				}
+
+				for (auto& inst : m_FrameDataStorage) {
+					m_RecycleRing.Emplace(&inst);
 				}
 			}
 
@@ -196,6 +242,7 @@ namespace Cori {
 
 			bool TryRunFrame() {
 				uint64_t maxWatermark = 0;
+				FrameLatencyStamps latencyStamps{};
 
 				std::array<SceneRenderer*, s_MaxSceneRendererCount> nonDormant{ nullptr };
 				uint32_t nonDormantCounter = 0;
@@ -214,6 +261,7 @@ namespace Cori {
 
 						ptr->MarkNonDormant();
 						maxWatermark = std::max(maxWatermark, (*dataPtr)->rtcqWatermark);
+
 						nonDormantCounter++;
 						nonDormant[nonDormantCounter - 1] = ptr;
 					}
@@ -221,15 +269,43 @@ namespace Cori {
 
 				bool ghostFrame = false;
 				if (nonDormantCounter == 0) {
-					// check imgui snapshot gen, if the same, return, if diff, fall throught
-					if (false /*gen check*/) {
+					if (m_ReadyRing.Front()) {
 						ghostFrame = true;
-					} else {
+					}
+					else {
 						return false;
 					}
 				}
 
 				if (RenderThreadCommandQueue::DrainedCount() < maxWatermark) {
+					return false;
+				}
+
+				VulkanPresentTiming::ThrottlePresentQueue();
+
+				MasterFrameData** frameData = m_ReadyRing.Front();
+				if (!frameData) {
+					return false;
+				}
+
+				m_ReadyRing.Pop();
+
+				ImGuiRenderer::ProcessTexQueueRequests();
+
+				const FrameLatencyStamps& sceneStamps = (*frameData)->latencyStamps;
+
+				if (sceneStamps.inputTimestampSdl != 0) {
+					latencyStamps.inputTimestampSdl = sceneStamps.inputTimestampSdl;
+				}
+
+				if (sceneStamps.frameStartHost != 0) {
+					latencyStamps.frameStartHost = sceneStamps.frameStartHost;
+				}
+
+				(*frameData)->Clear();
+				m_RecycleRing.Emplace(*frameData);
+
+				if (nonDormantCounter == 0 && !ghostFrame) {
 					return false;
 				}
 
@@ -268,8 +344,9 @@ namespace Cori {
 					Composite(frameInfo.m_CommandBuffer, nonDormant, nonDormantCounter);
 				}
 
+				ImGuiRenderer::RecycleSnapshot();
 
-				VulkanEngine::Get().GPUFrameEnd();
+				VulkanEngine::Get().GPUFrameEnd(latencyStamps);
 				return true;
 			}
 
@@ -281,7 +358,7 @@ namespace Cori {
 					CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> TransferDstOptimal", DebugLabelColors::Barrier);
 
 					vk::ImageMemoryBarrier2 scBar{
-						.srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
+						.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
 						.srcAccessMask = vk::AccessFlagBits2::eNone,
 						.dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
 						.dstAccessMask = vk::AccessFlagBits2::eTransferWrite,
@@ -290,7 +367,7 @@ namespace Cori {
 						.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
 						.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
 						.image = VulkanEngine::GetSwapChainImage(),
-						.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+						.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 }
 					};
 
 					vk::DependencyInfo depInfo{
@@ -323,14 +400,58 @@ namespace Cori {
 				}
 
 				{
-					CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> PresentSrcKHR", DebugLabelColors::Barrier);
+					CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> eColorAttachmentOutput", DebugLabelColors::Barrier);
 
 					vk::ImageMemoryBarrier2 scBar{
 						.srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
 						.srcAccessMask = vk::AccessFlagBits2::eTransferWrite,
+						.dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+						.dstAccessMask = vk::AccessFlagBits2::eColorAttachmentRead | vk::AccessFlagBits2::eColorAttachmentWrite,
+						.oldLayout = vk::ImageLayout::eTransferDstOptimal,
+						.newLayout = vk::ImageLayout::eColorAttachmentOptimal,
+						.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+						.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+						.image = VulkanEngine::GetSwapChainImage(),
+						.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+					};
+
+					vk::DependencyInfo depInfo{
+						.imageMemoryBarrierCount = 1,
+						.pImageMemoryBarriers = &scBar
+					};
+
+					cmb.pipelineBarrier2(depInfo);
+				}
+
+				vk::RenderingAttachmentInfo colorAttachment = {
+					.imageView = VulkanEngine::GetSwapChainImageView(),
+					.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
+					.loadOp = vk::AttachmentLoadOp::eLoad,
+					.storeOp = vk::AttachmentStoreOp::eStore
+				};
+
+				vk::RenderingInfo renderInfo = {
+					.renderArea = {{0, 0}, VulkanEngine::GetSwapChainExtent()},
+					.layerCount = 1,
+					.colorAttachmentCount = 1,
+					.pColorAttachments = &colorAttachment
+				};
+
+				cmb.beginRendering(renderInfo);
+
+				ImGuiRenderer::Render(cmb);
+
+				cmb.endRendering();
+
+				{
+					CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> PresentSrcKHR", DebugLabelColors::Barrier);
+
+					vk::ImageMemoryBarrier2 scBar{
+						.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+						.srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
 						.dstStageMask = vk::PipelineStageFlagBits2::eBottomOfPipe,
 						.dstAccessMask = vk::AccessFlagBits2::eNone,
-						.oldLayout = vk::ImageLayout::eTransferDstOptimal,
+						.oldLayout = vk::ImageLayout::eColorAttachmentOptimal,
 						.newLayout = vk::ImageLayout::ePresentSrcKHR,
 						.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
 						.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
@@ -357,6 +478,11 @@ namespace Cori {
 
 			std::thread m_RenderThread;
 			std::atomic<bool> m_Running{ true };
+
+			Threading::SPSCRing<MasterFrameData*> m_ReadyRing{ FRAMES_IN_FLIGHT };
+			Threading::SPSCRing<MasterFrameData*> m_RecycleRing{ FRAMES_IN_FLIGHT };
+			std::array<MasterFrameData, FRAMES_IN_FLIGHT> m_FrameDataStorage;
+
 
 			static std::unique_ptr<MasterRenderer> s_Instance;
 		};

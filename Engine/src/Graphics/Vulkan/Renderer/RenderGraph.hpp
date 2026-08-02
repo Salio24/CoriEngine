@@ -783,7 +783,8 @@ namespace Cori {
 									uint32_t planeOffset = planeCounter++ * image.m_ArrayLayers * image.m_MipLevels;
 
 									for (uint32_t layer = range.baseArrayLayer; layer < range.baseArrayLayer + range.layerCount; ++layer) {
-										uint32_t layerOffset = layer * image.m_ArrayLayers;
+										//uint32_t layerOffset = layer * image.m_ArrayLayers;
+										uint32_t layerOffset = layer;
 										Internal::ResourceState batchSrcState = state.subresourceStates[planeOffset + layerOffset + range.baseMipLevel];
 										uint32_t currentStartMip = range.baseMipLevel;
 										uint32_t mipCount = 0;

@@ -1,5 +1,6 @@
 #include "SceneRenderer.hpp"
 #include "FrameData.hpp"
+#include "MasterRenderer.hpp"
 
 namespace {
 	//hack to pass name to PRT only in debug builds, cuz PRT has move/copy constructors & assigment operators deleted.
@@ -33,6 +34,29 @@ namespace Cori {
 					renderer->m_Batches[newBatch].IncrementObjectCounter();
 				}
 			}
+		}
+
+		FrameData* SceneRenderer::PopRecycledFrameData() {
+			if (m_ReadyRing.Size() < MasterRenderer::GetAdmitDepth()) {
+				FrameData** ptr = m_RecycleRing.Front();
+				if (ptr) {
+					m_RecycleRing.Pop();
+					return *ptr;
+				}
+			}
+
+			return nullptr;
+		}
+
+		FrameData* SceneRenderer::PeekRecycledFrameData() {
+			if (m_ReadyRing.Size() < MasterRenderer::GetAdmitDepth()) {
+				FrameData** ptr = m_RecycleRing.Front();
+				if (ptr) {
+					return *ptr;
+				}
+			}
+
+			return nullptr;
 		}
 
 		void SceneRenderer::ProcessFrameData() {
@@ -86,9 +110,9 @@ namespace Cori {
 		}
 
 		SceneRenderer::SceneRenderer(CreateInfo&& createInfo)
-			: cullShader(Core::AssetManager2::Load<ComputeShader>("assets/Shaders/Cull_Pass1.json")),
-			cmgShader(Core::AssetManager2::Load<ComputeShader>("assets/Shaders/Cull_Pass2.json")),
-			compactShader(Core::AssetManager2::Load<ComputeShader>("assets/Shaders/Cull_Pass3.json")),
+			: cullShader(Core::AssetManager2::Load<ComputeShader>("enginedata://shaders/Cull_Pass1.json")),
+			cmgShader(Core::AssetManager2::Load<ComputeShader>("enginedata://shaders/Cull_Pass2.json")),
+			compactShader(Core::AssetManager2::Load<ComputeShader>("enginedata://shaders/Cull_Pass3.json")),
 			m_PRT(createInfo.initialPRTExtent, createInfo.PRTFormat, createInfo.registerPRTWithImGui, GetNameForPRT(createInfo)) {
 			m_Objects.Reserve(256);
 			m_Batches.Reserve(128);

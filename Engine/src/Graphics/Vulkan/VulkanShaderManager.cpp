@@ -447,9 +447,10 @@ namespace Cori {
 				std::lock_guard lk(mutex);
 				CORI_PROFILER_LOCK_MARK(mutex);
 				auto& record = Core::AssetManager2::GetAssetRecord(id);
-				if (record.rawHandleIndex == handle.GetIndex() && record.rawHandleVersion == handle.GetVersion()) {
-					record.rawHandleIndex = UINT32_MAX;
-					record.rawHandleVersion = 0;
+				uint32_t vectorKey = record.vectorKey;
+				auto old = Core::Handle<ComputeShader>(Core::AssetManager2::GetRawHandle(vectorKey));
+				if (old == handle) {
+					Core::AssetManager2::SetRawHandle(vectorKey, handle.ToRaw());
 				}
 			}
 
@@ -478,9 +479,10 @@ namespace Cori {
 				std::lock_guard lk(mutex);
 				CORI_PROFILER_LOCK_MARK(mutex);
 				auto& record = Core::AssetManager2::GetAssetRecord(id);
-				if (record.rawHandleIndex == handle.GetIndex() && record.rawHandleVersion == handle.GetVersion()) {
-					record.rawHandleIndex = UINT32_MAX;
-					record.rawHandleVersion = 0;
+				uint32_t vectorKey = record.vectorKey;
+				auto old = Core::Handle<VertFragShaderPair>(Core::AssetManager2::GetRawHandle(vectorKey));
+				if (old == handle) {
+					Core::AssetManager2::SetRawHandle(vectorKey, handle.ToRaw());
 				}
 			}
 

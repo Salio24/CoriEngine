@@ -142,7 +142,6 @@ project(CoriEngine)
         if (CORI_MY_CONFIG)
             set(TRACY_DEBUGINFOD ON CACHE BOOL "")
         endif ()
-        set(TRACY_VERBOSE ON CACHE BOOL "")
         add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/tracy EXCLUDE_FROM_ALL)
     endif ()
 
@@ -210,7 +209,7 @@ project(CoriEngine)
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/pfr EXCLUDE_FROM_ALL)
 
 
-    #add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/Vulkan-Headers)
+    add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/Vulkan-Headers)
 
     #vma
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/VulkanMemoryAllocator-Hpp EXCLUDE_FROM_ALL)

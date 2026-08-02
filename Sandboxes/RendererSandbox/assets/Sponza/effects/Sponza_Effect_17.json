@@ -5,7 +5,7 @@
         "assetDeletionPolicy": "eRefCounted"
     },
     "AssetData": {
-        "shaderPair": "assets/Shaders/TestShader.json",
+        "shaderPair": "assets://Shaders/TestShader.json",
         "pipelineState": {
             "cullMode": [
                 "eNone"

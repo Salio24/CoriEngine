@@ -27,7 +27,8 @@ namespace Cori {
 		enum class WindowMode {
 			WINDOWED = 0,
 			BORDERLESS_WINDOWED = 1,
-			EXCLUSIVE_FULLSCREEN = 2
+			EXCLUSIVE_FULLSCREEN = 2,
+			RESIZABLE = 3
 		};
 
 		/**
@@ -83,10 +84,27 @@ namespace Cori {
 			[[nodiscard]] glm::vec2 GetMouseDelta() const;
 
 			/**
+			 * @brief Gives the timestamp of the oldest input event consumed by the last event pump.
+			 * @details In the SDL_GetTicksNS domain. On backends that expose high resolution input
+			 * timestamps (Wayland via zwp_input_timestamps_v1) this is the timestamp the input stack
+			 * recorded, not the moment the engine dequeued the event, so it includes the latency
+			 * incurred before the event ever reached the process. Oldest rather than newest, because
+			 * it is the worst case wait of anything this frame reflects.
+			 * @return Timestamp in nanoseconds, or 0 when the pump consumed no input.
+			 */
+			[[nodiscard]] uint64_t GetOldestInputTimestamp() const;
+
+			/**
 			 * @brief Retrieves a list of all available ScreenMode.
 			 * @return A const reference to the vector containing all available ScreenMode.
 			 */
 			[[nodiscard]] const std::vector<ScreenMode>& GetScreenModes() const;
+
+			/**
+			 * @brief Re-syncs the current ScreenMode with the size the window actually has.
+			 * @details The window manager can resize the window behind our back, which leaves the selected ScreenMode describing a size the window no longer has. This picks the ScreenMode matching the real size (highest refresh rate one when several match) and persists it. Does nothing in WindowMode::RESIZABLE, where the size is the user's to change.
+			 */
+			void VerifyDisplayMode();
 
 			/**
 			 * @brief Changes the current ScreenMode.
@@ -125,7 +143,10 @@ namespace Cori {
 				WindowMode m_WindowMode{};
 				uint32_t m_SDLModeIndex{};
 				uint32_t m_ModeIndex{};
+				bool m_Resizable{};
 			};
+
+			void SaveConfiguration() const;
 
 			friend class Application;
 			[[nodiscard]] static std::unique_ptr<Window> Create(std::string name, const bool vsync = false);
