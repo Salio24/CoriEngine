@@ -3,7 +3,7 @@
 #include <Cori.hpp>
 #include <CoriEntry.hpp>
 #include <format>
-#define SPONZA
+//#define SPONZA
 
 bool test{ false };
 
@@ -34,8 +34,8 @@ public:
 
 		#ifndef SPONZA
 		{
-			auto swordMaterial = Cori::Core::AssetManager2::Load<Cori::Graphics::Material>("assets://Sword_Material.json");
-			auto swordMesh = Cori::Core::AssetManager2::Load<Cori::Graphics::Mesh>("assets://Sword_M.json");
+			auto swordMaterial = Cori::Core::AssetManager2::Load<Cori::Graphics::Material>("assets://test_material.json");
+			auto swordMesh = Cori::Core::AssetManager2::Load<Cori::Graphics::Mesh>("assets://test_mesh.json");
 			auto entity = ActiveScene.CreateEntity("awd");
 			entity.AddComponent<Cori::World::Components::Entity::Rendering>(std::move(swordMesh), std::move(swordMaterial), glm::vec4{ 0.0f, 0.0f, 1.0f, 1.0f });
 			auto& tc = entity.GetComponents<Cori::World::Components::Entity::Transform>();

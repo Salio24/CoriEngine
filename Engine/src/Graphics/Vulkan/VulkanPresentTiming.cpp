@@ -2,7 +2,7 @@
 #include "VulkanEngine.hpp"
 
 #if defined(__linux__)
-	#define CORI_PRESENT_TIMING_HAS_HOST_CLOCK 1
+	#define CORI_PRESENT_TIMING_HAS_HOST_CLOCK 0
 #else
 	#define CORI_PRESENT_TIMING_HAS_HOST_CLOCK 0
 #endif

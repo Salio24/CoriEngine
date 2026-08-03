@@ -30,6 +30,10 @@ namespace Cori {
 			return fnv1a64(str, strlen(str));
 		}
 
+		constexpr StringHash64 HashString64(const std::string_view str) {
+			return fnv1a64(str.data(), str.size());
+		}
+
 		constexpr StringHash64 HashString64(const std::string& str) {
 			return fnv1a64(str.c_str(), str.size());
 		}

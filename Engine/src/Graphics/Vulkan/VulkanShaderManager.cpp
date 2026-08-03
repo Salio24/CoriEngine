@@ -450,7 +450,7 @@ namespace Cori {
 				uint32_t vectorKey = record.vectorKey;
 				auto old = Core::Handle<ComputeShader>(Core::AssetManager2::GetRawHandle(vectorKey));
 				if (old == handle) {
-					Core::AssetManager2::SetRawHandle(vectorKey, handle.ToRaw());
+					Core::AssetManager2::SetRawHandle(vectorKey, Core::VersionedHandleBase::Null);
 				}
 			}
 
@@ -482,7 +482,7 @@ namespace Cori {
 				uint32_t vectorKey = record.vectorKey;
 				auto old = Core::Handle<VertFragShaderPair>(Core::AssetManager2::GetRawHandle(vectorKey));
 				if (old == handle) {
-					Core::AssetManager2::SetRawHandle(vectorKey, handle.ToRaw());
+					Core::AssetManager2::SetRawHandle(vectorKey, Core::VersionedHandleBase::Null);
 				}
 			}
 

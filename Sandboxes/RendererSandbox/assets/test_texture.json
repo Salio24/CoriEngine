@@ -1,0 +1,11 @@
+{
+    "Metadata": {
+        "assetTypename": "Texture2",
+        "assetType": "eSecondary",
+        "assetDeletionPolicy": "eRefCounted",
+        "assetFiles": [ "test.png" ]
+    },
+    "AssetData": {
+        "image": "test.png"
+    }
+}
