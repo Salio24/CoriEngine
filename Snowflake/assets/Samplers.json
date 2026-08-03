@@ -1,0 +1,20 @@
+[
+    {
+        "Alias": "SponzaRepeat",
+        "Flags": [],
+        "MagFilter": "eLinear",
+        "MinFilter": "eLinear",
+        "AddressModeU": "eRepeat",
+        "AddressModeV": "eRepeat",
+        "AddressModeW": "eRepeat",
+        "MipLoadBias": 0.0,
+        "AnisotropyEnable": false,
+        "MaxAnisotropy": 1.0,
+        "CompareEnable": false,
+        "CompareOp": "eNever",
+        "MinLod": 0.0,
+        "MaxLod": 0.0,
+        "BorderColor": "eFloatOpaqueBlack",
+        "UnnormalizedCoordinates": false
+    }
+]

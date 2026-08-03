@@ -197,6 +197,24 @@ namespace Cori {
 				m_NewExtent = true;
 			}
 
+			std::optional<ImTextureID> RenderSync::GetMainPRT() const {
+				auto* renderer = Graphics::MasterRenderer::Get().Resolve(m_RendererHandle);
+				if (!renderer) {
+					return std::nullopt;
+				}
+
+				VkDescriptorSet set = renderer->GetPRT().GetImGuiDescriptorSet();
+				if (std::bit_cast<uint64_t>(set) == 0) {
+					return std::nullopt;
+				}
+
+				return reinterpret_cast<ImTextureID>(set);
+			}
+
+			void RenderSync::Bind() {
+				Graphics::MasterRenderer::ChangeMainRenderer(m_RendererHandle);
+			}
+
 			void RenderSync::OnRenderComponentCreate(entt::registry& registry, entt::entity entity) {
 				if (!registry.all_of<Components::Entity::Internal::RenderComponentDirtyFlag>(entity)) {
 					registry.emplace<Components::Entity::Internal::RenderComponentDirtyFlag>(entity);

@@ -3,7 +3,7 @@
 #include <Cori.hpp>
 #include <CoriEntry.hpp>
 #include <format>
-//#define SPONZA
+#define SPONZA
 
 bool test{ false };
 
@@ -28,6 +28,8 @@ public:
 		};
 
 		ActiveScene.RegisterSystem<Cori::World::Systems::RenderSync>(std::move(info));
+		ActiveScene.GetSystem<Cori::World::Systems::RenderSync>().value().lock()->Bind();
+		Cori::Graphics::MasterRenderer::ChangeCompositeMode(Cori::Graphics::MasterRenderer::Mode::eHybrid);
 		
 		constexpr float sponzaScale = 1.0f;
 		const glm::vec3 sponzaOffset{ 0.0f, 0.0f, 0.0f };

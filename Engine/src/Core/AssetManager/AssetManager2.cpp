@@ -27,7 +27,7 @@ namespace Cori {
 				timer_ = 0.0f;
 				Application::SubmitWorkerTask([] { ScanAndReload(); });
 
-				for (AssetDirID i = 0; i < Get().m_NextAssetDir; i++) {
+				for (AssetDirID i = 0; i < Get().m_PublishedDirCount; i++) {
 					Application::SubmitWorkerTask([i] {
 						ScanDirectory(i);
 					});

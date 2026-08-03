@@ -50,7 +50,7 @@ namespace Cori {
 				//	}
 				//}
 
-				CORI_CORE_ASSERT(AssetManager2::GetDeletionPoliciesVector()[GetBoundVectorKey(handle)].load(std::memory_order_acquire) == AssetDeletionPolicy::eRefCounted, "Keep-alive slot reached terminal zero — self-ref missing.");
+				//CORI_CORE_ASSERT(AssetManager2::GetDeletionPoliciesVector()[GetBoundVectorKey(handle)].load(std::memory_order_acquire) == AssetDeletionPolicy::eRefCounted, "Keep-alive slot reached terminal zero — self-ref missing.");
 
 				//if (AssetManager2::GetDeletionPoliciesVector()[GetBoundVectorKey(handle)].load(std::memory_order_acquire) != AssetDeletionPolicy::eRefCounted) {
 				//	return;

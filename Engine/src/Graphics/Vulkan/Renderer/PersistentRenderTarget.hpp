@@ -118,7 +118,7 @@ namespace Cori {
 
 				if (m_RegisterWithImGui) {
 					VkDescriptorSet set = ImGui_ImplVulkan_AddTexture(m_ImageView, static_cast<VkImageLayout>(vk::ImageLayout::eShaderReadOnlyOptimal));
-					m_ImGuiDescriptorSet.store(std::bit_cast<uint64_t>(set), std::memory_order_release);
+					m_ImGuiDescriptorSet.store(reinterpret_cast<uint64_t>(set), std::memory_order_release);
 				}
 			}
 
@@ -131,12 +131,12 @@ namespace Cori {
 
 					vk::ImageView view = m_Image.GetView(viewKey);
 					VkDescriptorSet set = ImGui_ImplVulkan_AddTexture(view, static_cast<VkImageLayout>(vk::ImageLayout::eShaderReadOnlyOptimal));
-					m_ImGuiDescriptorSet.store(std::bit_cast<uint64_t>(set), std::memory_order_release);
+					m_ImGuiDescriptorSet.store(reinterpret_cast<uint64_t>(set), std::memory_order_release);
 				}
 			}
 
-			VkDescriptorSet GetImGuiDescriptorSet() const {
-				return std::bit_cast<VkDescriptorSet>(m_ImGuiDescriptorSet.load(std::memory_order_acquire));
+			[[nodiscard]] VkDescriptorSet GetImGuiDescriptorSet() const {
+				return reinterpret_cast<VkDescriptorSet>(m_ImGuiDescriptorSet.load(std::memory_order_acquire));
 			}
 
 		private:

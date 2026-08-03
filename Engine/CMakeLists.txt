@@ -324,7 +324,8 @@ project(CoriEngine)
     )
 
     # my shared lib
-    add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES})
+    add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES}
+            src/Core/Threading/OneAtATime.hpp)
     if (CORI_MY_CONFIG)
         target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
                 $<$<CONFIG:Debug>:CORI_MY_CONFIG>

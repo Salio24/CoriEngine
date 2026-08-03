@@ -24,6 +24,12 @@ namespace Cori {
 				uint32_t generation;
 			};
 		public:
+			enum class Mode {
+				eDirectBlit,
+				eHybrid,
+				eDockSpace
+			};
+
 			static void Init();
 
 			static void Shutdown();
@@ -91,6 +97,14 @@ namespace Cori {
 				bool result = m_ReadyRing.TryEmplace(frameData);
 				RenderThreadWakeup::Wake();
 				return result;
+			}
+
+			static void ChangeCompositeMode(const Mode newMode) {
+				Get().m_CurrentMode.store(newMode, std::memory_order_release);
+			}
+
+			static void ChangeMainRenderer(const SceneRendererHandle newRenderer) {
+				Get().m_MainRenderer.store(newRenderer, std::memory_order_release);
 			}
 
 			~MasterRenderer() {
@@ -244,8 +258,10 @@ namespace Cori {
 				uint64_t maxWatermark = 0;
 				FrameLatencyStamps latencyStamps{};
 
-				std::array<SceneRenderer*, s_MaxSceneRendererCount> nonDormant{ nullptr };
+				std::array<std::pair<SceneRenderer*, SceneRendererHandle>, s_MaxSceneRendererCount> nonDormant;
+				nonDormant.fill({ nullptr, UINT32_MAX});
 				uint32_t nonDormantCounter = 0;
+				SceneRendererHandle handleCounter = 0;
 
 				for (auto& renderer : m_SceneRenderers) {
 					SceneRenderer* ptr = renderer.load(std::memory_order_relaxed);
@@ -263,8 +279,10 @@ namespace Cori {
 						maxWatermark = std::max(maxWatermark, (*dataPtr)->rtcqWatermark);
 
 						nonDormantCounter++;
-						nonDormant[nonDormantCounter - 1] = ptr;
+						nonDormant[nonDormantCounter - 1].first = ptr;
+						nonDormant[nonDormantCounter - 1].second = handleCounter;
 					}
+					handleCounter++;
 				}
 
 				bool ghostFrame = false;
@@ -302,6 +320,9 @@ namespace Cori {
 					latencyStamps.frameStartHost = sceneStamps.frameStartHost;
 				}
 
+				SceneRendererHandle requestedHandle = m_MainRenderer.load(std::memory_order_acquire);
+				Mode mode = m_CurrentMode.load(std::memory_order_acquire);
+
 				(*frameData)->Clear();
 				m_RecycleRing.Emplace(*frameData);
 
@@ -310,7 +331,7 @@ namespace Cori {
 				}
 
 				for (uint32_t i = 0; i < nonDormantCounter; i++) {
-					SceneRenderer* ptr = nonDormant[i];
+					SceneRenderer* ptr = nonDormant[i].first;
 					ptr->ProcessFrameData();
 				}
 
@@ -319,7 +340,7 @@ namespace Cori {
 
 				VulkanEngine::Get().CPUFrameStart();
 				for (uint32_t i = 0; i < nonDormantCounter; i++) {
-					SceneRenderer* ptr = nonDormant[i];
+					SceneRenderer* ptr = nonDormant[i].first;
 					frameContexts.push_back(ptr->Stage1());
 				}
 
@@ -330,18 +351,18 @@ namespace Cori {
 
 				if (!frameInfo.m_SkippedFrame) {
 					for (uint32_t i = 0; i < nonDormantCounter; i++) {
-						SceneRenderer* ptr = nonDormant[i];
+						SceneRenderer* ptr = nonDormant[i].first;
 						ptr->Stage2(frameInfo, frameContexts[i]);
 					}
 
 					VulkanEngine::Get().GPUFrameMiddlePointSync();
 
 					for (uint32_t i = 0; i < nonDormantCounter; i++) {
-						SceneRenderer* ptr = nonDormant[i];
+						SceneRenderer* ptr = nonDormant[i].first;
 						ptr->Stage3(frameInfo, frameContexts[i]);
 					}
 
-					Composite(frameInfo.m_CommandBuffer, nonDormant, nonDormantCounter);
+					Composite(frameInfo.m_CommandBuffer, nonDormant, nonDormantCounter, mode, requestedHandle);
 				}
 
 				ImGuiRenderer::RecycleSnapshot();
@@ -351,125 +372,385 @@ namespace Cori {
 			}
 
 
-			void Composite(vk::CommandBuffer cmb, std::array<SceneRenderer*, s_MaxSceneRendererCount>& nonDormantRenderers, const uint32_t nonDormantRendererCount) {
+			void Composite(vk::CommandBuffer cmb, std::array<std::pair<SceneRenderer*, SceneRendererHandle>, s_MaxSceneRendererCount>& nonDormantRenderers, const uint32_t nonDormantRendererCount, const Mode mode, const SceneRendererHandle requestedHandle) {
 				CORI_VK_LABEL_F(cmb, DebugLabelColors::Composite, "Composite {} scene(s)", nonDormantRendererCount);
 
-				{
-					CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> TransferDstOptimal", DebugLabelColors::Barrier);
+				switch (mode) {
+				case Mode::eDirectBlit:
+					{
+						if (nonDormantRendererCount == 0) {
+							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> PresentSrcKHR (skip)", DebugLabelColors::Barrier);
 
-					vk::ImageMemoryBarrier2 scBar{
-						.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-						.srcAccessMask = vk::AccessFlagBits2::eNone,
-						.dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
-						.dstAccessMask = vk::AccessFlagBits2::eTransferWrite,
-						.oldLayout = vk::ImageLayout::eUndefined,
-						.newLayout = vk::ImageLayout::eTransferDstOptimal,
-						.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-						.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-						.image = VulkanEngine::GetSwapChainImage(),
-						.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 }
-					};
+							vk::ImageMemoryBarrier2 scBar{
+									.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+									.srcAccessMask = vk::AccessFlagBits2::eNone,
+									.dstStageMask = vk::PipelineStageFlagBits2::eBottomOfPipe,
+									.dstAccessMask = vk::AccessFlagBits2::eNone,
+									.oldLayout = vk::ImageLayout::eUndefined,
+									.newLayout = vk::ImageLayout::ePresentSrcKHR,
+									.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+									.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+									.image = VulkanEngine::GetSwapChainImage(),
+									.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+								};
 
-					vk::DependencyInfo depInfo{
-						.imageMemoryBarrierCount = 1,
-						.pImageMemoryBarriers = &scBar
-					};
+							vk::DependencyInfo depInfo{
+									.imageMemoryBarrierCount = 1,
+									.pImageMemoryBarriers = &scBar
+								};
 
-					cmb.pipelineBarrier2(depInfo);
-				}
+							cmb.pipelineBarrier2(depInfo);
+							break;
+						}
 
-				if (nonDormantRendererCount == 1) {
-					auto* renderer = nonDormantRenderers[0];
+						SceneRenderer* chosen = nullptr;
+						for (uint32_t i = 0; i < nonDormantRendererCount; i++) {
+							if (nonDormantRenderers[i].second == requestedHandle) {
+								chosen = nonDormantRenderers[i].first;
+							}
+						}
 
-					vk::Extent2D prtExtent = { renderer->GetPRT().GetImage().m_Extent3D.width, renderer->GetPRT().GetImage().m_Extent3D.height };
-					vk::Extent2D scExtent = VulkanEngine::GetSwapChainExtent();
+						if (chosen == nullptr) {
+							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> PresentSrcKHR (skip)", DebugLabelColors::Barrier);
 
-					std::array srcOffsets = { vk::Offset3D{ 0, 0, 0 }, vk::Offset3D{ static_cast<int32_t>(prtExtent.width), static_cast<int32_t>(prtExtent.height), 1 } };
-					std::array dstOffsets = { vk::Offset3D{ 0, 0, 0 }, vk::Offset3D{ static_cast<int32_t>(scExtent.width), static_cast<int32_t>(scExtent.height), 1 } };
+							vk::ImageMemoryBarrier2 scBar{
+								.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+								.srcAccessMask = vk::AccessFlagBits2::eNone,
+								.dstStageMask = vk::PipelineStageFlagBits2::eBottomOfPipe,
+								.dstAccessMask = vk::AccessFlagBits2::eNone,
+								.oldLayout = vk::ImageLayout::eUndefined,
+								.newLayout = vk::ImageLayout::ePresentSrcKHR,
+								.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.image = VulkanEngine::GetSwapChainImage(),
+								.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+							};
 
-					vk::ImageBlit blit{
-						.srcSubresource = { vk::ImageAspectFlagBits::eColor, 0, 0, 1 },
-						.srcOffsets = srcOffsets,
-						.dstSubresource = { vk::ImageAspectFlagBits::eColor, 0, 0, 1 },
-						.dstOffsets = dstOffsets
-					};
+							vk::DependencyInfo depInfo{
+								.imageMemoryBarrierCount = 1,
+								.pImageMemoryBarriers = &scBar
+							};
 
-					CORI_VK_LABEL_INSERT_F(cmb, DebugLabelColors::Composite, "Blit PRT {}x{} -> swapchain {}x{}", prtExtent.width, prtExtent.height, scExtent.width, scExtent.height);
+							cmb.pipelineBarrier2(depInfo);
+							break;
+						}
 
-					cmb.blitImage(renderer->GetPRT().GetImage().m_Image, vk::ImageLayout::eTransferSrcOptimal, VulkanEngine::GetSwapChainImage(), vk::ImageLayout::eTransferDstOptimal, blit, vk::Filter::eNearest);
-				}
+						{
+							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> TransferDstOptimal", DebugLabelColors::Barrier);
 
-				{
-					CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> eColorAttachmentOutput", DebugLabelColors::Barrier);
+							vk::ImageMemoryBarrier2 scBar{
+								.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+								.srcAccessMask = vk::AccessFlagBits2::eNone,
+								.dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
+								.dstAccessMask = vk::AccessFlagBits2::eTransferWrite,
+								.oldLayout = vk::ImageLayout::eUndefined,
+								.newLayout = vk::ImageLayout::eTransferDstOptimal,
+								.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.image = VulkanEngine::GetSwapChainImage(),
+								.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 }
+							};
 
-					vk::ImageMemoryBarrier2 scBar{
-						.srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
-						.srcAccessMask = vk::AccessFlagBits2::eTransferWrite,
-						.dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-						.dstAccessMask = vk::AccessFlagBits2::eColorAttachmentRead | vk::AccessFlagBits2::eColorAttachmentWrite,
-						.oldLayout = vk::ImageLayout::eTransferDstOptimal,
-						.newLayout = vk::ImageLayout::eColorAttachmentOptimal,
-						.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-						.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-						.image = VulkanEngine::GetSwapChainImage(),
-						.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
-					};
+							vk::DependencyInfo depInfo{
+								.imageMemoryBarrierCount = 1,
+								.pImageMemoryBarriers = &scBar
+							};
 
-					vk::DependencyInfo depInfo{
-						.imageMemoryBarrierCount = 1,
-						.pImageMemoryBarriers = &scBar
-					};
+							cmb.pipelineBarrier2(depInfo);
+						}
 
-					cmb.pipelineBarrier2(depInfo);
-				}
+						vk::Extent2D prtExtent = { chosen->GetPRT().GetImage().m_Extent3D.width, chosen->GetPRT().GetImage().m_Extent3D.height };
+						vk::Extent2D scExtent = VulkanEngine::GetSwapChainExtent();
 
-				vk::RenderingAttachmentInfo colorAttachment = {
-					.imageView = VulkanEngine::GetSwapChainImageView(),
-					.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
-					.loadOp = vk::AttachmentLoadOp::eLoad,
-					.storeOp = vk::AttachmentStoreOp::eStore
-				};
+						std::array srcOffsets = { vk::Offset3D{ 0, 0, 0 }, vk::Offset3D{ static_cast<int32_t>(prtExtent.width), static_cast<int32_t>(prtExtent.height), 1 } };
+						std::array dstOffsets = { vk::Offset3D{ 0, 0, 0 }, vk::Offset3D{ static_cast<int32_t>(scExtent.width), static_cast<int32_t>(scExtent.height), 1 } };
 
-				vk::RenderingInfo renderInfo = {
-					.renderArea = {{0, 0}, VulkanEngine::GetSwapChainExtent()},
-					.layerCount = 1,
-					.colorAttachmentCount = 1,
-					.pColorAttachments = &colorAttachment
-				};
+						vk::ImageBlit blit{
+							.srcSubresource = { vk::ImageAspectFlagBits::eColor, 0, 0, 1 },
+							.srcOffsets = srcOffsets,
+							.dstSubresource = { vk::ImageAspectFlagBits::eColor, 0, 0, 1 },
+							.dstOffsets = dstOffsets
+						};
 
-				cmb.beginRendering(renderInfo);
+						CORI_VK_LABEL_INSERT_F(cmb, DebugLabelColors::Composite, "Blit PRT {}x{} -> swapchain {}x{}", prtExtent.width, prtExtent.height, scExtent.width, scExtent.height);
 
-				ImGuiRenderer::Render(cmb);
+						cmb.blitImage(chosen->GetPRT().GetImage().m_Image, vk::ImageLayout::eTransferSrcOptimal, VulkanEngine::GetSwapChainImage(), vk::ImageLayout::eTransferDstOptimal, blit, vk::Filter::eNearest);
 
-				cmb.endRendering();
+						{
+							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> PresentSrcKHR", DebugLabelColors::Barrier);
 
-				{
-					CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> PresentSrcKHR", DebugLabelColors::Barrier);
+							vk::ImageMemoryBarrier2 scBar{
+								.srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
+								.srcAccessMask = vk::AccessFlagBits2::eTransferWrite,
+								.dstStageMask = vk::PipelineStageFlagBits2::eBottomOfPipe,
+								.dstAccessMask = vk::AccessFlagBits2::eNone,
+								.oldLayout = vk::ImageLayout::eTransferDstOptimal,
+								.newLayout = vk::ImageLayout::ePresentSrcKHR,
+								.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.image = VulkanEngine::GetSwapChainImage(),
+								.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+							};
 
-					vk::ImageMemoryBarrier2 scBar{
-						.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-						.srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
-						.dstStageMask = vk::PipelineStageFlagBits2::eBottomOfPipe,
-						.dstAccessMask = vk::AccessFlagBits2::eNone,
-						.oldLayout = vk::ImageLayout::eColorAttachmentOptimal,
-						.newLayout = vk::ImageLayout::ePresentSrcKHR,
-						.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-						.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-						.image = VulkanEngine::GetSwapChainImage(),
-						.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
-					};
+							vk::DependencyInfo depInfo{
+								.imageMemoryBarrierCount = 1,
+								.pImageMemoryBarriers = &scBar
+							};
 
-					vk::DependencyInfo depInfo{
-						.imageMemoryBarrierCount = 1,
-						.pImageMemoryBarriers = &scBar
-					};
+							cmb.pipelineBarrier2(depInfo);
+						}
 
-					cmb.pipelineBarrier2(depInfo);
+						break;
+					}
+				case Mode::eHybrid:
+					{
+						if (nonDormantRendererCount == 0) {
+							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> PresentSrcKHR (skip)", DebugLabelColors::Barrier);
+
+							vk::ImageMemoryBarrier2 scBar{
+								.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+								.srcAccessMask = vk::AccessFlagBits2::eNone,
+								.dstStageMask = vk::PipelineStageFlagBits2::eBottomOfPipe,
+								.dstAccessMask = vk::AccessFlagBits2::eNone,
+								.oldLayout = vk::ImageLayout::eUndefined,
+								.newLayout = vk::ImageLayout::ePresentSrcKHR,
+								.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.image = VulkanEngine::GetSwapChainImage(),
+								.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+							};
+
+							vk::DependencyInfo depInfo{
+								.imageMemoryBarrierCount = 1,
+								.pImageMemoryBarriers = &scBar
+							};
+
+							cmb.pipelineBarrier2(depInfo);
+							break;
+						}
+
+						SceneRenderer* chosen = nullptr;
+						for (uint32_t i = 0; i < nonDormantRendererCount; i++) {
+							if (nonDormantRenderers[i].second == requestedHandle) {
+								chosen = nonDormantRenderers[i].first;
+							}
+						}
+
+						if (chosen == nullptr) {
+							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> PresentSrcKHR (skip)", DebugLabelColors::Barrier);
+
+							vk::ImageMemoryBarrier2 scBar{
+								.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+								.srcAccessMask = vk::AccessFlagBits2::eNone,
+								.dstStageMask = vk::PipelineStageFlagBits2::eBottomOfPipe,
+								.dstAccessMask = vk::AccessFlagBits2::eNone,
+								.oldLayout = vk::ImageLayout::eUndefined,
+								.newLayout = vk::ImageLayout::ePresentSrcKHR,
+								.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.image = VulkanEngine::GetSwapChainImage(),
+								.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+							};
+
+							vk::DependencyInfo depInfo{
+								.imageMemoryBarrierCount = 1,
+								.pImageMemoryBarriers = &scBar
+							};
+
+							cmb.pipelineBarrier2(depInfo);
+							break;
+						}
+
+						{
+							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> TransferDstOptimal", DebugLabelColors::Barrier);
+
+							vk::ImageMemoryBarrier2 scBar{
+								.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+								.srcAccessMask = vk::AccessFlagBits2::eNone,
+								.dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
+								.dstAccessMask = vk::AccessFlagBits2::eTransferWrite,
+								.oldLayout = vk::ImageLayout::eUndefined,
+								.newLayout = vk::ImageLayout::eTransferDstOptimal,
+								.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.image = VulkanEngine::GetSwapChainImage(),
+								.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 }
+							};
+
+							vk::DependencyInfo depInfo{
+								.imageMemoryBarrierCount = 1,
+								.pImageMemoryBarriers = &scBar
+							};
+
+							cmb.pipelineBarrier2(depInfo);
+						}
+
+						vk::Extent2D prtExtent = { chosen->GetPRT().GetImage().m_Extent3D.width, chosen->GetPRT().GetImage().m_Extent3D.height };
+						vk::Extent2D scExtent = VulkanEngine::GetSwapChainExtent();
+
+						std::array srcOffsets = { vk::Offset3D{ 0, 0, 0 }, vk::Offset3D{ static_cast<int32_t>(prtExtent.width), static_cast<int32_t>(prtExtent.height), 1 } };
+						std::array dstOffsets = { vk::Offset3D{ 0, 0, 0 }, vk::Offset3D{ static_cast<int32_t>(scExtent.width), static_cast<int32_t>(scExtent.height), 1 } };
+
+						vk::ImageBlit blit{
+							.srcSubresource = { vk::ImageAspectFlagBits::eColor, 0, 0, 1 },
+							.srcOffsets = srcOffsets,
+							.dstSubresource = { vk::ImageAspectFlagBits::eColor, 0, 0, 1 },
+							.dstOffsets = dstOffsets
+						};
+
+						CORI_VK_LABEL_INSERT_F(cmb, DebugLabelColors::Composite, "Blit PRT {}x{} -> swapchain {}x{}", prtExtent.width, prtExtent.height, scExtent.width, scExtent.height);
+
+						cmb.blitImage(chosen->GetPRT().GetImage().m_Image, vk::ImageLayout::eTransferSrcOptimal, VulkanEngine::GetSwapChainImage(), vk::ImageLayout::eTransferDstOptimal, blit, vk::Filter::eNearest);
+
+						{
+							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> eColorAttachmentOutput", DebugLabelColors::Barrier);
+
+							vk::ImageMemoryBarrier2 scBar{
+								.srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
+								.srcAccessMask = vk::AccessFlagBits2::eTransferWrite,
+								.dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+								.dstAccessMask = vk::AccessFlagBits2::eColorAttachmentRead | vk::AccessFlagBits2::eColorAttachmentWrite,
+								.oldLayout = vk::ImageLayout::eTransferDstOptimal,
+								.newLayout = vk::ImageLayout::eColorAttachmentOptimal,
+								.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.image = VulkanEngine::GetSwapChainImage(),
+								.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+							};
+
+							vk::DependencyInfo depInfo{
+								.imageMemoryBarrierCount = 1,
+								.pImageMemoryBarriers = &scBar
+							};
+
+							cmb.pipelineBarrier2(depInfo);
+						}
+
+						vk::RenderingAttachmentInfo colorAttachment = {
+							.imageView = VulkanEngine::GetSwapChainImageView(),
+							.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
+							.loadOp = vk::AttachmentLoadOp::eLoad,
+							.storeOp = vk::AttachmentStoreOp::eStore
+						};
+
+						vk::RenderingInfo renderInfo = {
+							.renderArea = {{0, 0}, VulkanEngine::GetSwapChainExtent()},
+							.layerCount = 1,
+							.colorAttachmentCount = 1,
+							.pColorAttachments = &colorAttachment
+						};
+
+						cmb.beginRendering(renderInfo);
+
+						ImGuiRenderer::Render(cmb);
+
+						cmb.endRendering();
+
+						{
+							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> PresentSrcKHR", DebugLabelColors::Barrier);
+
+							vk::ImageMemoryBarrier2 scBar{
+								.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+								.srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
+								.dstStageMask = vk::PipelineStageFlagBits2::eBottomOfPipe,
+								.dstAccessMask = vk::AccessFlagBits2::eNone,
+								.oldLayout = vk::ImageLayout::eColorAttachmentOptimal,
+								.newLayout = vk::ImageLayout::ePresentSrcKHR,
+								.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.image = VulkanEngine::GetSwapChainImage(),
+								.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+							};
+
+							vk::DependencyInfo depInfo{
+								.imageMemoryBarrierCount = 1,
+								.pImageMemoryBarriers = &scBar
+							};
+
+							cmb.pipelineBarrier2(depInfo);
+						}
+
+						break;
+					}
+				case Mode::eDockSpace:
+					{
+						{
+							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> eColorAttachmentOutput", DebugLabelColors::Barrier);
+
+							vk::ImageMemoryBarrier2 scBar{
+								.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+								.srcAccessMask = vk::AccessFlagBits2::eNone,
+								.dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+								.dstAccessMask = vk::AccessFlagBits2::eColorAttachmentRead | vk::AccessFlagBits2::eColorAttachmentWrite,
+								.oldLayout = vk::ImageLayout::eUndefined,
+								.newLayout = vk::ImageLayout::eColorAttachmentOptimal,
+								.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.image = VulkanEngine::GetSwapChainImage(),
+								.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+							};
+
+							vk::DependencyInfo depInfo{
+								.imageMemoryBarrierCount = 1,
+								.pImageMemoryBarriers = &scBar
+							};
+
+							cmb.pipelineBarrier2(depInfo);
+						}
+
+						vk::RenderingAttachmentInfo colorAttachment = {
+							.imageView = VulkanEngine::GetSwapChainImageView(),
+							.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
+							.loadOp = vk::AttachmentLoadOp::eLoad,
+							.storeOp = vk::AttachmentStoreOp::eStore
+						};
+
+						vk::RenderingInfo renderInfo = {
+							.renderArea = {{0, 0}, VulkanEngine::GetSwapChainExtent()},
+							.layerCount = 1,
+							.colorAttachmentCount = 1,
+							.pColorAttachments = &colorAttachment
+						};
+
+						cmb.beginRendering(renderInfo);
+
+						ImGuiRenderer::Render(cmb);
+
+						cmb.endRendering();
+
+						{
+							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> PresentSrcKHR", DebugLabelColors::Barrier);
+
+							vk::ImageMemoryBarrier2 scBar{
+								.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+								.srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
+								.dstStageMask = vk::PipelineStageFlagBits2::eBottomOfPipe,
+								.dstAccessMask = vk::AccessFlagBits2::eNone,
+								.oldLayout = vk::ImageLayout::eColorAttachmentOptimal,
+								.newLayout = vk::ImageLayout::ePresentSrcKHR,
+								.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.image = VulkanEngine::GetSwapChainImage(),
+								.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+							};
+
+							vk::DependencyInfo depInfo{
+								.imageMemoryBarrierCount = 1,
+								.pImageMemoryBarriers = &scBar
+							};
+
+							cmb.pipelineBarrier2(depInfo);
+						}
+
+						break;
+					}
 				}
 			}
 
 			std::array<std::atomic<SceneRenderer*>, s_MaxSceneRendererCount> m_SceneRenderers{ nullptr };
 			std::array<std::atomic<uint32_t>, s_MaxSceneRendererCount> m_Generation{};
+			std::atomic<Mode> m_CurrentMode{ Mode::eDirectBlit };
+			std::atomic<SceneRendererHandle> m_MainRenderer{ UINT32_MAX };
 
 			std::vector<PendingCreation> m_PendingCreations;
 			std::vector<SceneRenderer*> m_PendingDestructions;

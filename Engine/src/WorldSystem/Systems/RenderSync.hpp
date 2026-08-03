@@ -18,6 +18,10 @@ namespace Cori {
 
 				void RequestResize(const vk::Extent2D extent);
 
+				[[nodiscard]] std::optional<ImTextureID> GetMainPRT() const;
+
+				void Bind();
+
 				bool Create(Graphics::SceneRenderer::CreateInfo&& createInfo);
 
 				static constexpr SystemPriority Priority = UINT16_MAX;

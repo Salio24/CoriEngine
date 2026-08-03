@@ -56,6 +56,7 @@ namespace Cori {
 			m_LayerStack.ClearStack();
 			Audio::Mixer::Shutdown();
 			Graphics::VulkanEngine::Stop();
+			m_WorkerPool.Stop();
 			AssetManager2::Shutdown();
 		}
 

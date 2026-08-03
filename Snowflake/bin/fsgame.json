@@ -1,0 +1,30 @@
+{
+  "paths": [
+    {
+      "alias": "APP_ROOT",
+      "path": "../../",
+      "root": "BIN"
+    },
+    {
+      "alias": "ENGINE_ROOT",
+      "path": "../../",
+      "root": "APP_ROOT"
+    },
+    {
+      "alias": "ENGINE_DATA",
+      "path": "Engine/enginedata",
+      "root": "ENGINE_ROOT"
+    },
+    {
+      "alias": "USER_DATA",
+      "path": "userdata",
+      "root": "APP_ROOT"
+    },
+    {
+      "alias": "ASSET_DIR",
+      "path": "assets",
+      "root": "APP_ROOT"
+    }
+  ]
+}
+

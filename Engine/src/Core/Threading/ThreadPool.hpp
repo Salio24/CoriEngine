@@ -31,9 +31,26 @@ namespace Cori {
 					}
 				}
 
+				void Stop() {
+					{
+						std::unique_lock lock(m_QueueMutex);
+						if (m_Stop) {
+							return;
+						}
+						m_Stop = true;
+					}
+					m_Condition.notify_all();
+					for (std::thread& worker : m_Workers) {
+						worker.join();
+					}
+				}
+
 				~ThreadPool() {
 					{
 						std::unique_lock lock(m_QueueMutex);
+						if (m_Stop) {
+							return;
+						}
 						m_Stop = true;
 					}
 					m_Condition.notify_all();

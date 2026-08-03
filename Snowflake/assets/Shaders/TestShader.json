@@ -1,0 +1,12 @@
+{
+    "Metadata": {
+        "assetTypename": "VertFragShaderPair",
+        "assetType": "eSecondary",
+        "assetDeletionPolicy": "eRefCounted"
+    },
+    "AssetData": {
+        "spv": "TestShader.spv",
+        "vertexEntry": "vertMain",
+        "fragmentEntry": "fragMain"
+    }
+}

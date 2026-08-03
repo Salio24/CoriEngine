@@ -12,6 +12,7 @@
 #include "Utility/GlazeUtils.hpp"
 #include "Core/Time.hpp"
 #include "Utility/BitHelpers.hpp"
+#include "Core/Threading/OneAtATime.hpp"
 
 #define CORI_ADD_ASSET_TRAITS(T, ...) \
 template <> struct AssetTraits<__VA_ARGS__ __VA_OPT__(::) T> { \
@@ -335,7 +336,7 @@ namespace Cori {
 		};
 
 		struct AssetDir {
-			const char* label{ "Empty AssetDir Label" };
+			std::string label{ "Empty AssetDir Label" };
 			std::filesystem::path dir;
 			std::filesystem::file_time_type dirTimestamp;
 		};
@@ -357,7 +358,7 @@ namespace Cori {
 						return;
 					}
 
-					id = Get().m_ReverseLookup[vectorKey].load(std::memory_order_acquire);
+					id = Get().m_ReverseLookup[vectorKey];
 					gen = T::Manager::BumpGeneration(handle);
 					T::Manager::SetAssetStatus(handle, AssetStatus::eLoading);
 				}
@@ -375,8 +376,31 @@ namespace Cori {
 				#endif
 			}
 
+			template <IsValidAsset T>
+			static void ChangePolicyImpl(const AssetDeletionPolicy newPolicy, const uint32_t vectorKey) {
+				auto& mutex = GetMutex();
+				std::lock_guard lk(mutex);
+				CORI_PROFILER_LOCK_MARK(mutex);
+				auto old = GetDeletionPoliciesVector()[vectorKey].load(std::memory_order_acquire);
+				if (old == newPolicy) {
+					return;
+				}
+
+				Handle<T> handle = Handle<T>(Get().m_RawHandles[vectorKey].load(std::memory_order_acquire));
+				if (handle.IsSet()) {
+					GetDeletionPoliciesVector()[vectorKey].store(newPolicy, std::memory_order_release);
+					if (old == AssetDeletionPolicy::eRefCounted) {
+						T::Manager::TryAddRef(handle);
+					}
+					else {
+						T::Manager::RemoveRef(handle);
+					}
+				}
+			}
+
 			struct AssetTypeOps {
 				void (*Reload)(uint32_t vectorKey);
+				void (*ChangePolicy)(AssetDeletionPolicy newPolicy, uint32_t vectorKey);
 				bool hotReload;
 				bool autoHotReload;
 			};
@@ -386,6 +410,7 @@ namespace Cori {
 				static bool oneshot = true;
 				static const AssetTypeOps ops{
 					.Reload = AssetHotReloadEnabled<T> ? &ReloadImpl<T> : nullptr,
+					.ChangePolicy = &ChangePolicyImpl<T>,
 					.hotReload = AssetHotReloadEnabled<T>,
 					.autoHotReload = AssetAutoHotReloadEnabled<T>
 				};
@@ -409,6 +434,7 @@ namespace Cori {
 
 			struct ProcessedMetadata {
 				uint64_t typeNameHash;
+				uint64_t assetDataHash;
 				AssetType type;
 				AssetDeletionPolicy policy;
 				std::optional<std::vector<std::string>> assetFiles;
@@ -483,8 +509,6 @@ namespace Cori {
 					}
 				}
 
-				CORI_DEBUG("loading {}, key {}", path, vectorKey);
-
 				if constexpr (std::derived_from<T, PrimaryAssetBase>) {
 					static_assert("not yet");
 				}
@@ -507,20 +531,22 @@ namespace Cori {
 				Get().m_RawHandles[vectorKey].store(newHandle, std::memory_order_release);
 			}
 
+			static void ChangePolicy(const AssetID id, const AssetDeletionPolicy newPolicy) {
+				CORI_CORE_ASSERT(Get().m_AssetDatabase.contains(id), "Invalid AssetID.");
+				auto vectorKey = Get().m_AssetDatabase[id].vectorKey;
+				auto typeHash = Get().m_TypeNameHashes[vectorKey].load(std::memory_order_acquire);
+				CORI_CORE_ASSERT(Get().m_AssetOps.contains(typeHash), "AssetOps is null for a loaded asset type with type hash {}", typeHash);
+				auto assetOps = Get().m_AssetOps[typeHash].load(std::memory_order_acquire);
+				assetOps->ChangePolicy(newPolicy, vectorKey);
+			}
+
 			static AssetRecord& GetAssetRecord(const AssetID id) {
 				CORI_CORE_ASSERT(Get().m_AssetDatabase.contains(id), "Invalid AssetID.");
 				return Get().m_AssetDatabase[id];
 			}
 
-			static void UnloadAsset(AssetID id) {
-
-			}
-
 			static void ScanDirectory(const AssetDirID dirID) {
-				std::unique_lock lk(Get().m_ScanLock, std::try_to_lock);
-				if (!lk.owns_lock()) {
-					return;
-				}
+				Threading::OneAtATime lk(Get().m_ScanRunning);
 
 				const auto& assetDirPath = Get().m_AssetDirs[dirID].dir;
 
@@ -536,179 +562,127 @@ namespace Cori {
 			static void OnUpdate(GameTimer& timer);
 
 			static void ScanAndReload() {
-				std::unique_lock lk(Get().m_SaRLock, std::try_to_lock);
-				if (!lk.owns_lock()) {
-					return;
-				}
+				Threading::OneAtATime lk(Get().m_SaRRunning);
 
 				CORI_PROFILE_FUNCTION();
 				uint32_t counter = 0;
 				for (const auto& rawHandle : std::ranges::subrange(Get().m_RawHandles.begin(), Get().m_RawHandles.begin() + Get().m_PublishedCount.load(std::memory_order_acquire))) {
 					uint32_t currentKey = counter++;
-					if (rawHandle.load(std::memory_order_acquire) != VersionedHandleBase::Null) {
-						auto typeHash = Get().m_TypeNameHashes[currentKey].load(std::memory_order_acquire);
-						if (!Get().m_AssetOps.contains(typeHash)) {
-							CORI_CORE_ASSERT(Get().m_AssetOps.contains(typeHash), "AssetOps is null for a loaded asset type with type hash {}", typeHash);
+
+					const auto& dirEntry = Get().m_AssetDirs[Get().m_ParentDirIDs[currentKey].load(std::memory_order_acquire)];
+					auto jsonPath = dirEntry.dir / Get().m_NonAtomicData[currentKey].load(std::memory_order_acquire)->jsonPath;
+
+					bool assetDataChanged = false;
+
+					auto oldTime = Get().m_JsonTimestamp[currentKey];
+					auto currentTime = last_write_time(jsonPath);
+					if (oldTime < currentTime) {
+						auto meta = ReloadMetadata(currentKey);
+						if (!meta) {
+							CORI_ERROR("err");
 							continue;
 						}
-						auto assetOps = Get().m_AssetOps[typeHash].load(std::memory_order_acquire);
-						if (!assetOps->hotReload) {
+
+						bool identityUpToDate = CompareIdentityMetadata(meta.value(), currentKey);
+						bool mutableUpToDate = CompareMutableMetadata(meta.value(), currentKey);
+
+						if (!identityUpToDate || !mutableUpToDate) {
+							// if we change metadata during Load method execution, very bad things can happen
+							auto& mutex = GetMutex();
+							std::lock_guard lk_(mutex);
+							CORI_PROFILER_LOCK_MARK(mutex);
+
+							if (!mutableUpToDate) {
+								ApplyMutableMetadata(meta.value(), currentKey);
+								mutableUpToDate = true;
+							}
+
+							if (!identityUpToDate && rawHandle.load(std::memory_order_acquire) == VersionedHandleBase::Null) {
+								ApplyIdentityMetadata(meta.value(), currentKey);
+								identityUpToDate = true;
+							}
+						}
+
+						if (meta.value().assetDataHash != Get().m_AssetDataHashes[currentKey].load(std::memory_order_acquire)) {
+							Get().m_AssetDataHashes[currentKey].store(meta.value().assetDataHash, std::memory_order_release);
+							assetDataChanged = true;
+						}
+
+						if (identityUpToDate) {
+							Get().m_JsonTimestamp[currentKey] = currentTime;
+						}
+					}
+
+					if (rawHandle.load(std::memory_order_acquire) == VersionedHandleBase::Null) {
+						continue;
+					}
+
+					auto typeHash = Get().m_TypeNameHashes[currentKey].load(std::memory_order_acquire);
+					CORI_CORE_ASSERT(Get().m_AssetOps.contains(typeHash), "AssetOps is null for a loaded asset type with type hash {}", typeHash);
+					auto assetOps = Get().m_AssetOps[typeHash].load(std::memory_order_acquire);
+					if (!assetOps->hotReload) {
+						continue;
+					}
+
+					if (assetDataChanged) {
+						//mark manually reloadable
+						if (assetOps->autoHotReload) {
+							CORI_DEBUG("reloading cuz of json {}", currentKey);
+							assetOps->Reload(currentKey);
 							continue;
 						}
-						auto& path = Get().m_NonAtomicData[currentKey].load(std::memory_order_acquire)->jsonPath;
-						auto oldTime = Get().m_JsonDataTimestamp[currentKey].load(std::memory_order_acquire);
-						auto currentTime = last_write_time(Get().m_AssetDirs[Get().m_ParentDirIDs[currentKey]].dir / path);
-						if (oldTime < currentTime) {
-							Get().m_JsonDataTimestamp[currentKey].store(currentTime, std::memory_order_release);
-							//mark manually reloadable
-							if (assetOps->autoHotReload) {
-								CORI_DEBUG("reloading cuz of json {}", currentKey);
-								assetOps->Reload(currentKey);
-								continue;
-							}
-						}
+					}
 
-						bool reload = false;
-						auto nonAtomicData = Get().m_NonAtomicData[currentKey].load(std::memory_order_acquire);
-						if (nonAtomicData->assetFiles) {
-							for (const auto& [assetPath, time] : std::views::zip(nonAtomicData->assetFiles.value(), Get().m_AssetFileStamps[currentKey])) {
-								auto newTime = last_write_time(assetPath);
-								if (newTime > time) {
-									time = newTime;
-									reload = true;
-								}
-							}
-						}
-
-						if (reload) {
-							if (assetOps->autoHotReload) {
-								CORI_DEBUG("reloading cuz of asset files {}", currentKey);
-								assetOps->Reload(currentKey);
-							}
-						}
-					} else {
-						auto nonAtomicData = Get().m_NonAtomicData[currentKey].load(std::memory_order_acquire);
-						auto& path = nonAtomicData->jsonPath;
-						auto oldTime = Get().m_JsonMetaTimestamp[currentKey].load(std::memory_order_acquire);
-						auto& dirEntry = Get().m_AssetDirs[Get().m_ParentDirIDs[currentKey]];
-						auto currentTime = last_write_time(Get().m_AssetDirs[Get().m_ParentDirIDs[currentKey]].dir / path);
-						if (oldTime < currentTime) {
-							auto meta = ReloadMetadata(currentKey);
-							if (!meta) {
-								CORI_ERROR("err");
-								continue;
-							}
-
-							if (CompareMetadata(meta.value(), currentKey)) {
-								Get().m_JsonMetaTimestamp[currentKey].store(currentTime, std::memory_order_release);
-								continue;
-							}
-
-
-							{
-								// if we change metadata during Load method execution, very bad things can happen
-								auto& mutex = GetMutex();
-								std::lock_guard lk(mutex);
-								CORI_PROFILER_LOCK_MARK(mutex);
-								if (rawHandle.load(std::memory_order_acquire) != VersionedHandleBase::Null) {
-									continue;
-								}
-
-								Get().m_TypeNameHashes[currentKey].store(meta.value().typeNameHash, std::memory_order_release);
-								Get().m_AssetTypes[currentKey].store(meta.value().type, std::memory_order_release);
-								Get().m_DeletionPolicies[currentKey].store(meta.value().policy, std::memory_order_release);
-
-								auto* newNonAtomicData = new NonAtomicAssetMeta();
-								newNonAtomicData->name = std::move(meta.value().name);
-								newNonAtomicData->jsonPath = nonAtomicData->jsonPath;
-								if (meta.value().assetFiles && !meta.value().assetFiles->empty()) {
-									auto& val = meta.value().assetFiles.value();
-									newNonAtomicData->assetFiles = std::vector<std::filesystem::path>{};
-									auto& stampsVec = Get().m_AssetFileStamps[currentKey];
-									stampsVec.clear();
-									for (auto& assetPath : val) {
-										std::filesystem::path path_ = dirEntry.dir / newNonAtomicData->jsonPath.parent_path() / assetPath;
-										auto time = last_write_time(path_);
-										newNonAtomicData->assetFiles->emplace_back(std::move(path_));
-										stampsVec.emplace_back(time);
-									}
-								}
-
-								Get().m_NonAtomicData[currentKey].store(newNonAtomicData, std::memory_order_release);
-								Get().m_AllSlots.emplace_back(newNonAtomicData);
-
-								Get().m_JsonMetaTimestamp[currentKey].store(currentTime, std::memory_order_release);
+					bool reload = false;
+					auto nonAtomicData = Get().m_NonAtomicData[currentKey].load(std::memory_order_acquire);
+					if (nonAtomicData->assetFiles) {
+						for (const auto& [assetPath, time] : std::views::zip(nonAtomicData->assetFiles.value(), Get().m_AssetFileStamps[currentKey])) {
+							auto newTime = last_write_time(assetPath);
+							if (newTime > time) {
+								time = newTime;
+								reload = true;
 							}
 						}
 					}
-				}
-			}
 
-			static void TestCase() {
-				#if 0
-				CORI_PROFILE_FUNCTION();
-				uint64_t counter = 0;
-				uint64_t counter2 = 0;
-
-				static std::unordered_map<AssetID, AssetRecord> copy;
-				{
-					std::lock_guard lk(GetMutex());
-					{
-						CORI_PROFILE_SCOPE("Copy");
-						copy = Get().m_AssetDatabase;
-					}
-				}
-
-
-				{
-					CORI_PROFILE_SCOPE("Disk");
-					for (auto& entry : copy | std::views::values) {
-						auto newStamp = std::filesystem::last_write_time(Get().m_AppRootPath / entry.path);
-						if (entry.pathTimestamp < newStamp) {
-							CORI_DEBUG("{}", entry.path.string());
-							entry.pathTimestamp = newStamp;
-							counter2++;
+					if (reload) {
+						if (assetOps->autoHotReload) {
+							CORI_DEBUG("reloading cuz of asset files {}", currentKey);
+							assetOps->Reload(currentKey);
 						}
-
-						counter++;
 					}
 				}
-
-				CORI_DEBUG("checked '{}', changed '{}'", counter, counter2);
-				#endif
 			}
 
 			static CORI_PROFILE_LOCKABLE_TYPE(std::mutex)& GetMutex() {
 				return Get().m_Mutex;
 			}
 
-			//static tbb::concurrent_vector<std::atomic<AssetStatus>>& GetAssetStatusesVector() {
-			//	return Get().m_AssetStatuses;
-			//}
-
 			static tbb::concurrent_vector<std::atomic<AssetDeletionPolicy>>& GetDeletionPoliciesVector() {
 				return Get().m_DeletionPolicies;
 			}
 
-			static std::optional<AssetDirID> AddAssetDir(const char* label, const std::filesystem::path& dir) {
+			static std::optional<AssetDirID> AddAssetDir(std::string label, const std::filesystem::path& dir) {
 				if (!exists(dir)) {
 					return std::nullopt;
 				}
 
-				AssetDirID key = Get().m_NextAssetDir++;
+				AssetDirID key = Get().m_PublishedDirCount;
 				const uint64_t newSizePowerOfTwo = Utility::GetNextPowerOfTwo(key + 1);
 				if (newSizePowerOfTwo >= Get().m_AssetDirs.size()) {
 					Get().m_AssetDirs.grow_to_at_least(newSizePowerOfTwo);
 				}
 
-				Get().m_AssetDirs[key] = AssetDir{ .label = label, .dir = dir, .dirTimestamp = last_write_time(dir) };
+				Get().m_AssetDirs[key] = AssetDir{ .label = std::move(label), .dir = dir, .dirTimestamp = last_write_time(dir) };
+
+				Get().m_PublishedDirCount++;
 
 				return key;
 			}
 
 			~AssetManager2() {
-				for (auto& ptr : m_AllSlots) {
-					delete ptr.load(std::memory_order_acquire);
+				for (auto* ptr : m_AllSlots) {
+					delete ptr;
 				}
 			}
 
@@ -740,6 +714,7 @@ namespace Cori {
 
 				return ProcessedMetadata{
 					.typeNameHash = Utility::HashString64(l.Metadata.assetTypename),
+					.assetDataHash = Utility::HashString64(l.AssetData.str),
 					.type = l.Metadata.assetType,
 					.policy = l.Metadata.assetDeletionPolicy.value_or(AssetDeletionPolicy::eRefCounted),
 					.assetFiles = std::move(l.Metadata.assetFiles),
@@ -747,13 +722,23 @@ namespace Cori {
 				};
 			}
 
-			static bool CompareMetadata(const ProcessedMetadata& meta, const uint32_t vectorKey) {
+			static std::filesystem::path GetAssetFileBasePath(const uint32_t vectorKey, const NonAtomicAssetMeta* nonAtomicMeta) {
+				const auto& dirEntry = Get().m_AssetDirs[Get().m_ParentDirIDs[vectorKey].load(std::memory_order_acquire)];
+				return dirEntry.dir / nonAtomicMeta->jsonPath.parent_path();
+			}
+
+			static bool CompareIdentityMetadata(const ProcessedMetadata& meta, const uint32_t vectorKey) {
 				if (meta.typeNameHash != Get().m_TypeNameHashes[vectorKey].load(std::memory_order_acquire)) {
 					return false;
 				}
 				if (meta.type != Get().m_AssetTypes[vectorKey].load(std::memory_order_acquire)) {
 					return false;
 				}
+
+				return true;
+			}
+
+			static bool CompareMutableMetadata(const ProcessedMetadata& meta, const uint32_t vectorKey) {
 				if (meta.policy != Get().m_DeletionPolicies[vectorKey].load(std::memory_order_acquire)) {
 					return false;
 				}
@@ -782,15 +767,50 @@ namespace Cori {
 					if (nonAtomicMeta->assetFiles.value().size() != meta.assetFiles.value().size()) {
 						return false;
 					}
-					auto& dirEntry = Get().m_AssetDirs[vectorKey];
+					const auto basePath = GetAssetFileBasePath(vectorKey, nonAtomicMeta);
 					for (const auto& [oldPath, newPath] : std::views::zip(nonAtomicMeta->assetFiles.value(), meta.assetFiles.value())) {
-						if (oldPath != dirEntry.dir / nonAtomicMeta->jsonPath.parent_path() / newPath) {
+						if (oldPath != basePath / newPath) {
 							return false;
 						}
 					}
 				}
 
 				return true;
+			}
+
+			static void ApplyIdentityMetadata(const ProcessedMetadata& meta, const uint32_t vectorKey) {
+				Get().m_TypeNameHashes[vectorKey].store(meta.typeNameHash, std::memory_order_release);
+				Get().m_AssetTypes[vectorKey].store(meta.type, std::memory_order_release);
+			}
+
+			static void ApplyMutableMetadata(ProcessedMetadata& meta, const uint32_t vectorKey) {
+				auto typeHash = Get().m_TypeNameHashes[vectorKey].load(std::memory_order_acquire);
+				CORI_CORE_ASSERT(Get().m_AssetOps.contains(typeHash), "AssetOps is null for a loaded asset type with type hash {}", typeHash);
+				auto assetOps = Get().m_AssetOps[typeHash].load(std::memory_order_acquire);
+				assetOps->ChangePolicy(meta.policy, vectorKey);
+
+				auto oldNonAtomicMeta = Get().m_NonAtomicData[vectorKey].load(std::memory_order_acquire);
+
+				auto* newNonAtomicMeta = new NonAtomicAssetMeta();
+				newNonAtomicMeta->jsonPath = oldNonAtomicMeta->jsonPath;
+				newNonAtomicMeta->name = std::move(meta.name);
+				//FIXME: propagate the change to the asset spoke
+
+				auto& stampsVec = Get().m_AssetFileStamps[vectorKey];
+				stampsVec.clear();
+				if (meta.assetFiles && !meta.assetFiles->empty()) {
+					const auto basePath = GetAssetFileBasePath(vectorKey, newNonAtomicMeta);
+					newNonAtomicMeta->assetFiles = std::vector<std::filesystem::path>{};
+					for (const auto& assetPath : meta.assetFiles.value()) {
+						std::filesystem::path resolvedPath = basePath / assetPath;
+						auto time = last_write_time(resolvedPath);
+						newNonAtomicMeta->assetFiles->emplace_back(std::move(resolvedPath));
+						stampsVec.emplace_back(time);
+					}
+				}
+
+				Get().m_NonAtomicData[vectorKey].store(newNonAtomicMeta, std::memory_order_release);
+				Get().m_AllSlots.emplace_back(newNonAtomicMeta);
 			}
 
 			static void ProcessFile(const std::filesystem::path& assetFilePath, const AssetDirID dirID) {
@@ -802,7 +822,7 @@ namespace Cori {
 
 				std::string hashString;
 				auto relativeAssetPath = std::filesystem::relative(assetFilePath, dirEntry.dir);
-				hashString.reserve(strlen(dirEntry.label) + 3 + relativeAssetPath.native().size());
+				hashString.reserve(dirEntry.label.size() + 3 + relativeAssetPath.native().size());
 				hashString.append(dirEntry.label);
 				hashString.append("://");
 				hashString.append(relativeAssetPath.generic_string());
@@ -829,7 +849,7 @@ namespace Cori {
 
 				AssetRecord entry;
 
-				uint32_t vectorKey = Get().m_NextVectorKey.fetch_add(1, std::memory_order_relaxed);
+				uint32_t vectorKey = Get().m_NextVectorKey++;
 				entry.vectorKey = vectorKey;
 
 				const uint64_t newSizePowerOfTwo = Utility::GetNextPowerOfTwo(vectorKey + 1);
@@ -850,12 +870,12 @@ namespace Cori {
 					Get().m_NonAtomicData.grow_to_at_least(newSizePowerOfTwo);
 				}
 
-				if (newSizePowerOfTwo >= Get().m_JsonMetaTimestamp.size()) {
-					Get().m_JsonMetaTimestamp.grow_to_at_least(newSizePowerOfTwo);
+				if (newSizePowerOfTwo >= Get().m_JsonTimestamp.size()) {
+					Get().m_JsonTimestamp.grow_to_at_least(newSizePowerOfTwo);
 				}
 
-				if (newSizePowerOfTwo >= Get().m_JsonDataTimestamp.size()) {
-					Get().m_JsonDataTimestamp.grow_to_at_least(newSizePowerOfTwo);
+				if (newSizePowerOfTwo >= Get().m_AssetDataHashes.size()) {
+					Get().m_AssetDataHashes.grow_to_at_least(newSizePowerOfTwo);
 				}
 
 				if (newSizePowerOfTwo >= Get().m_AssetTypes.size()) {
@@ -876,9 +896,9 @@ namespace Cori {
 
 				Get().m_DeletionPolicies[vectorKey].store(l.Metadata.assetDeletionPolicy.value_or(AssetDeletionPolicy::eRefCounted), std::memory_order_release);
 
-				Get().m_JsonDataTimestamp[vectorKey].store(std::filesystem::last_write_time(assetFilePath), std::memory_order_release);
-				Get().m_JsonMetaTimestamp[vectorKey].store(std::filesystem::last_write_time(assetFilePath), std::memory_order_release);
-				Get().m_ReverseLookup[vectorKey].store(pathHash, std::memory_order_release);
+				Get().m_JsonTimestamp[vectorKey] = std::filesystem::last_write_time(assetFilePath);
+				Get().m_AssetDataHashes[vectorKey].store(Utility::HashString64(l.AssetData.str), std::memory_order_release);
+				Get().m_ReverseLookup[vectorKey] = pathHash;
 
 				Get().m_TypeNameHashes[vectorKey].store(Utility::HashString64(l.Metadata.assetTypename), std::memory_order_release);
 				Get().m_AssetTypes[vectorKey].store(l.Metadata.assetType, std::memory_order_release);
@@ -908,9 +928,9 @@ namespace Cori {
 
 				Get().m_RawHandles[vectorKey].store(VersionedHandleBase::Null, std::memory_order_release);
 
-				Get().m_PublishedCount.store(Get().m_NextVectorKey.load(std::memory_order_relaxed), std::memory_order_release);
-
 				Get().m_AssetDatabase.emplace(pathHash, entry);
+
+				Get().m_PublishedCount.store(Get().m_NextVectorKey, std::memory_order_release);
 			}
 
 			//std::unordered_map<AssetID, AssetRecord> m_AssetDatabase;
@@ -918,32 +938,29 @@ namespace Cori {
 			tbb::concurrent_unordered_map<AssetID, AssetRecord> m_AssetDatabase;
 			tbb::concurrent_unordered_map<uint64_t, std::atomic<const AssetTypeOps*>> m_AssetOps;
 			tbb::concurrent_vector<AssetDir> m_AssetDirs;
-			std::mutex m_SaRLock;
-			std::mutex m_ScanLock;
+
+			std::atomic<bool> m_ScanRunning;
+			std::atomic<bool> m_SaRRunning;
+
 
 			tbb::concurrent_vector<std::atomic<NonAtomicAssetMeta*>> m_NonAtomicData;
-			tbb::concurrent_vector<std::atomic<NonAtomicAssetMeta*>> m_AllSlots;
+			tbb::concurrent_vector<NonAtomicAssetMeta*> m_AllSlots;
 
 			tbb::concurrent_vector<std::vector<std::filesystem::file_time_type>> m_AssetFileStamps; //purely internal, should not be read outside ScanDirectory or ScanAndReload methods
-			//tbb::concurrent_vector<std::filesystem::path> m_Paths;
-			//tbb::concurrent_vector<std::vector<std::pair<std::filesystem::path, std::filesystem::file_time_type>>> m_AssetFiles;
-			//tbb::concurrent_vector<std::string> m_Names;
 
-			tbb::concurrent_vector<std::atomic<AssetID>> m_ReverseLookup;
+			tbb::concurrent_vector<AssetID> m_ReverseLookup;
 			tbb::concurrent_vector<std::atomic<AssetDeletionPolicy>> m_DeletionPolicies;
 			tbb::concurrent_vector<std::atomic<AssetDirID>> m_ParentDirIDs;
 			tbb::concurrent_vector<std::atomic<uint64_t>> m_RawHandles;
-			tbb::concurrent_vector<std::atomic<std::filesystem::file_time_type>> m_JsonDataTimestamp;
-			tbb::concurrent_vector<std::atomic<std::filesystem::file_time_type>> m_JsonMetaTimestamp;
+			tbb::concurrent_vector<std::atomic<uint64_t>> m_AssetDataHashes;
+			tbb::concurrent_vector<std::filesystem::file_time_type> m_JsonTimestamp;
 			tbb::concurrent_vector<std::atomic<AssetType>> m_AssetTypes;
 			tbb::concurrent_vector<std::atomic<uint64_t>> m_TypeNameHashes;
 
 
-			AssetDirID m_NextAssetDir{ 0 };
-			std::atomic<uint32_t> m_NextVectorKey{ 0 };
+			AssetDirID m_PublishedDirCount{ 0 };
+			uint32_t m_NextVectorKey{ 0 };
 			std::atomic<uint32_t> m_PublishedCount{ 0 };
-
-			//std::filesystem::path m_AppRootPath;
 
 			CORI_PROFILE_LOCKABLE_N(std::mutex, m_Mutex, "AssetManager2 registry lock");
 
