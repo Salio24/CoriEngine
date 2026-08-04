@@ -15,19 +15,20 @@ namespace Cori {
 			WindowMode m_CurrentWindowMode{ WindowMode::EXCLUSIVE_FULLSCREEN };
 			std::string m_WindowTitle;
 
-			int32_t m_DisplayModeCount;
-			SDL_DisplayMode** m_SDLModes{ nullptr };
-			SDL_DisplayID m_PrimaryDisplayID{};
-
 			SDL_Window* m_Window{ nullptr };
-			bool m_VSync{ false };
-			bool m_WindowResizable{ false };
 
 			glm::vec2 m_MouseDelta{ 0.0f };
 
 			uint64_t m_OldestInputTimestamp{ 0 };
 
 			EventCallbackFn m_EventCallback;
+
+			SDL_DisplayMode** m_SDLModes{ nullptr };
+			SDL_DisplayID m_PrimaryDisplayID{};
+
+			int32_t m_DisplayModeCount;
+			bool m_VSync{ false };
+			bool m_WindowResizable{ false };
 
 			~Data() {
 				SDL_DestroyWindow(m_Window);
@@ -153,6 +154,8 @@ namespace Cori {
 			CORI_PROFILE_FUNCTION();
 			VerifyDisplayMode();
 			SDL_Event e;
+			SDL_Event wheelEvent{};
+			bool hasWheel = false;
 
 			static bool test_{ false };
 
@@ -160,7 +163,13 @@ namespace Cori {
 			m_Data->m_OldestInputTimestamp = 0;
 
 			while (SDL_PollEvent(&e)) {
-				ImGui_ImplSDL3_ProcessEvent(&e);
+				if (e.type == SDL_EVENT_MOUSE_WHEEL) {
+					if (!hasWheel) { wheelEvent = e; hasWheel = true; }
+					else { wheelEvent.wheel.x += e.wheel.x; wheelEvent.wheel.y += e.wheel.y; }
+				}
+				else {
+					ImGui_ImplSDL3_ProcessEvent(&e);
+				}
 
 				//Stamp the frame with the oldest human input it is about to act on, so the present
 				//timing subsystem can measure how long that input waited to become photons.
@@ -208,8 +217,8 @@ namespace Cori {
 					{
 						KeyPressedEvent keyPressedEvent(static_cast<CoriKeycode>(e.key.scancode), e.key.repeat);
 						if (keyPressedEvent.GetKeyCode() == CORI_KEY_O) {
-							test_ = !test_;
-							CORI_WARN("change2");
+							//test_ = !test_;
+							//CORI_WARN("change2");
 						}
 						m_Data->m_EventCallback(keyPressedEvent);
 						break;
@@ -250,6 +259,10 @@ namespace Cori {
 						break;
 					}
 				}
+			}
+
+			if (hasWheel) {
+				ImGui_ImplSDL3_ProcessEvent(&wheelEvent);
 			}
 
 			if (test_) {
@@ -317,7 +330,7 @@ namespace Cori {
 
 			m_Data->m_MouseDelta = { 0.0f, 0.0f };
 
-			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Relative mouse mode requested: {}, reads back as: {}, cursor visible: {}, window focused: {}", status, SDL_GetWindowRelativeMouseMode(m_Data->m_Window), SDL_CursorVisible(), (SDL_GetWindowFlags(m_Data->m_Window) & SDL_WINDOW_INPUT_FOCUS) != 0);
+			//CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Relative mouse mode requested: {}, reads back as: {}, cursor visible: {}, window focused: {}", status, SDL_GetWindowRelativeMouseMode(m_Data->m_Window), SDL_CursorVisible(), (SDL_GetWindowFlags(m_Data->m_Window) & SDL_WINDOW_INPUT_FOCUS) != 0);
 
 			return true;
 		}

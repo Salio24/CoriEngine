@@ -16,6 +16,7 @@
 
 #include "../src/Core/ImGuiLayer.hpp"
 #include "../src/ImGui/ImGuiPresets.hpp"
+#include "../src/ImGui/ConsolePanel.hpp"
 
 #include "../src/Core/EventSystem/MouseEvent.hpp"
 #include "../src/Core/EventSystem/AppEvent.hpp"

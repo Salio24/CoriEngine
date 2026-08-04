@@ -2,51 +2,25 @@
 //#define CORI_NO_FILE_LOGGING
 #include <Cori.hpp>
 #include <CoriEntry.hpp>
+#include "EditorLayer.hpp"
+#include "Core/Logger.hpp"
 
-class EditorLayer : public Cori::Core::Layer {
-public:
-	EditorLayer() : Layer("Example") {
+namespace Snowflake {
+	class Editor final : public Cori::Core::Application {
+	public:
+		Editor() : Application("Snowflake Editor") {
+			const auto result = PushLayer(new EditorLayer());
+			CORI_ASSERT(result, "Failed to push the editor layer. Error: {}", result.error().what());
 
-	}
+			CORI_INFO("Snowflake editor application created");
+		}
 
-	~EditorLayer() {
-
-	}
-
-	void OnEvent(Cori::Core::Event& event) override {
-
-	}
-
-	void OnImGuiRender(Cori::Core::GameTimer& gameTimer) override {
-
-	}
-
-	void OnUpdate(Cori::Core::GameTimer& gameTimer) override {
-
-	}
-
-	void OnTickUpdate(Cori::Core::GameTimer& gameTimer) override {
-
-
-	}
-
-private:
-
-};
-
-class Snowflake : public Cori::Core::Application {
-public:
-	Snowflake(): Application("Snowflake Editor") {
-		PushLayer(new EditorLayer());
-
-		CORI_INFO("Snowflake editor application created");
-	}
-
-	~Snowflake() {
-		CORI_INFO("Snowflake editor application destroyed");
-	}
-};
+		~Editor() override {
+			CORI_INFO("Snowflake editor application destroyed");
+		}
+	};
+}
 
 Cori::Core::Application* Cori::Core::CreateApplication() {
-	return new Snowflake();
+	return new Snowflake::Editor();
 }

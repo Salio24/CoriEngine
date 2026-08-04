@@ -7,7 +7,7 @@
     },
     {
       "alias": "ENGINE_ROOT",
-      "path": "../../",
+      "path": "../",
       "root": "APP_ROOT"
     },
     {

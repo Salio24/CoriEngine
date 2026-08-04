@@ -177,6 +177,7 @@ namespace Cori {
 
 			VulkanDeviceLossDebug::InitDeviceResources();
 
+			ImGuiRenderer::Init(m_Window);
 			VulkanImageViewManager::Init();
 			DeletionQueue::Init();
 			VulkanStreamingLine::Init();
@@ -208,6 +209,7 @@ namespace Cori {
 			VulkanMeshManager::Shutdown();
 			VulkanStreamingLine::Shutdown();
 			DeletionQueue::Shutdown();
+			ImGuiRenderer::Shutdown();
 			VulkanImageViewManager::Shutdown();
 
 			VulkanDeviceLossDebug::Shutdown();

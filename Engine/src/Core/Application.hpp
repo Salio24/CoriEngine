@@ -105,7 +105,7 @@ namespace Cori {
 			 * \n It is safe to call this function from any thread.
 			 * @tparam F Auto deduced callable type.
 			 * @tparam Args Auto deduced callable argument types.
-			 * @param f Task callable, no specific signature required.
+			 * @param f Task callable, no specific signatWure required.
 			 * @param args Arguments that will be passed to the callable task upon execution.
 			 * @return Future that will hold the result of invoke result of the passed callable.
 			 */

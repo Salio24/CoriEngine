@@ -107,6 +107,10 @@ namespace Cori {
 				Get().m_MainRenderer.store(newRenderer, std::memory_order_release);
 			}
 
+			static void PushPRTForInitialTransition(vk::Image PRTimage) {
+				Get().m_PRTInitialTransitionQueue.emplace_back(PRTimage);
+			}
+
 			~MasterRenderer() {
 				RenderThreadCommandQueue::Clear();
 				m_PendingCreations.clear();
@@ -350,6 +354,8 @@ namespace Cori {
 				}
 
 				if (!frameInfo.m_SkippedFrame) {
+					InitializeFreshPRTs(frameInfo.m_CommandBuffer);
+
 					for (uint32_t i = 0; i < nonDormantCounter; i++) {
 						SceneRenderer* ptr = nonDormant[i].first;
 						ptr->Stage2(frameInfo, frameContexts[i]);
@@ -371,6 +377,46 @@ namespace Cori {
 				return true;
 			}
 
+			void InitializeFreshPRTs(vk::CommandBuffer cmb) {
+				static std::vector<vk::ImageMemoryBarrier2> toShaderRead;
+
+				toShaderRead.clear();
+
+				for (const vk::Image image : m_PRTInitialTransitionQueue) {
+					toShaderRead.emplace_back(vk::ImageMemoryBarrier2{
+						.srcStageMask = vk::PipelineStageFlagBits2::eNone,
+						.srcAccessMask = vk::AccessFlagBits2::eNone,
+						.dstStageMask = vk::PipelineStageFlagBits2::eFragmentShader,
+						.dstAccessMask = vk::AccessFlagBits2::eShaderSampledRead,
+						.oldLayout = vk::ImageLayout::eUndefined,
+						.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal,
+						.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+						.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+						.image = image,
+						.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+					});
+				}
+
+
+				if (m_PRTInitialTransitionQueue.empty()) {
+					return;
+				}
+
+				CORI_VK_LABEL_F(cmb, DebugLabelColors::Composite, "Initialize {} fresh PRT image(s)", m_PRTInitialTransitionQueue.size());
+
+				{
+					CORI_VK_LABEL_INSERT(cmb, "Fresh PRT images -> ShaderReadOnlyOptimal", DebugLabelColors::Barrier);
+
+					vk::DependencyInfo depInfo{
+						.imageMemoryBarrierCount = static_cast<uint32_t>(toShaderRead.size()),
+						.pImageMemoryBarriers = toShaderRead.data()
+					};
+
+					m_PRTInitialTransitionQueue.clear();
+
+					cmb.pipelineBarrier2(depInfo);
+				}
+			}
 
 			void Composite(vk::CommandBuffer cmb, std::array<std::pair<SceneRenderer*, SceneRendererHandle>, s_MaxSceneRendererCount>& nonDormantRenderers, const uint32_t nonDormantRendererCount, const Mode mode, const SceneRendererHandle requestedHandle) {
 				CORI_VK_LABEL_F(cmb, DebugLabelColors::Composite, "Composite {} scene(s)", nonDormantRendererCount);
@@ -674,6 +720,34 @@ namespace Cori {
 					}
 				case Mode::eDockSpace:
 					{
+						if (nonDormantRendererCount > 0) {
+							CORI_VK_LABEL_INSERT(cmb, "Scene PRTs -> ShaderReadOnlyOptimal", DebugLabelColors::Barrier);
+
+							std::array<vk::ImageMemoryBarrier2, s_MaxSceneRendererCount> prtBarriers{};
+
+							for (uint32_t i = 0; i < nonDormantRendererCount; i++) {
+								prtBarriers[i] = vk::ImageMemoryBarrier2{
+									.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput | vk::PipelineStageFlagBits2::eTransfer,
+									.srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite | vk::AccessFlagBits2::eTransferWrite,
+									.dstStageMask = vk::PipelineStageFlagBits2::eFragmentShader,
+									.dstAccessMask = vk::AccessFlagBits2::eShaderSampledRead,
+									.oldLayout = vk::ImageLayout::eTransferSrcOptimal,
+									.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal,
+									.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+									.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+									.image = nonDormantRenderers[i].first->GetPRT().GetImage().m_Image,
+									.subresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 }
+								};
+							}
+
+							vk::DependencyInfo depInfo{
+								.imageMemoryBarrierCount = nonDormantRendererCount,
+								.pImageMemoryBarriers = prtBarriers.data()
+							};
+
+							cmb.pipelineBarrier2(depInfo);
+						}
+
 						{
 							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> eColorAttachmentOutput", DebugLabelColors::Barrier);
 
@@ -701,7 +775,7 @@ namespace Cori {
 						vk::RenderingAttachmentInfo colorAttachment = {
 							.imageView = VulkanEngine::GetSwapChainImageView(),
 							.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
-							.loadOp = vk::AttachmentLoadOp::eLoad,
+							.loadOp = vk::AttachmentLoadOp::eDontCare,
 							.storeOp = vk::AttachmentStoreOp::eStore
 						};
 
@@ -763,6 +837,8 @@ namespace Cori {
 			Threading::SPSCRing<MasterFrameData*> m_ReadyRing{ FRAMES_IN_FLIGHT };
 			Threading::SPSCRing<MasterFrameData*> m_RecycleRing{ FRAMES_IN_FLIGHT };
 			std::array<MasterFrameData, FRAMES_IN_FLIGHT> m_FrameDataStorage;
+
+			std::vector<vk::Image> m_PRTInitialTransitionQueue;
 
 
 			static std::unique_ptr<MasterRenderer> s_Instance;

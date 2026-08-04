@@ -33,6 +33,7 @@ namespace Cori {
 			m_Window->SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent, CORI_PLACEHOLDERS(1)));
 			m_Window->SetVSync(false);
 
+			ImGui::CreateContext();
 			Graphics::VulkanEngine::Start(m_Window->GetNativeWindow(), true, { m_Window->GetWidth(), m_Window->GetHeight() });
 
 			m_ImGuiLayer = new Internal::ImGuiLayer();
@@ -56,6 +57,7 @@ namespace Cori {
 			m_LayerStack.ClearStack();
 			Audio::Mixer::Shutdown();
 			Graphics::VulkanEngine::Stop();
+			ImGui::DestroyContext();
 			m_WorkerPool.Stop();
 			AssetManager2::Shutdown();
 		}
@@ -72,12 +74,6 @@ namespace Cori {
 			EventDispatcher dispatcher(event);
 			dispatcher.Dispatch<WindowCloseEvent>(CORI_BIND_EVENT_FN(Application::OnWindowClose));
 
-			dispatcher.Dispatch<KeyReleasedEvent>([this](const KeyReleasedEvent& e) -> bool {
-				if (e.GetKeyCode() == CORI_KEY_F9) {
-					m_RenderImGui = !m_RenderImGui;
-				}
-				return false;
-			});
 			dispatcher.Dispatch<WindowResizeEvent>([](const WindowResizeEvent& e) -> bool {
 				Graphics::VulkanEngine::ReportWindowResize({ e.GetWidth(), e.GetHeight() });
 				return false;

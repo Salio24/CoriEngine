@@ -84,6 +84,7 @@ project(main)
     #set(CMAKE_COLOR_DIAGNOSTICS ON CACHE BOOL "")
 
     add_subdirectory(${PROJECT_SOURCE_DIR}/Engine)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/Snowflake)
 
     if (CORI_BUILD_SANDBOX_APPS)
         add_subdirectory(${PROJECT_SOURCE_DIR}/Sandboxes/Sandbox)

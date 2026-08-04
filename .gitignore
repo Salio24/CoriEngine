@@ -61,6 +61,11 @@ rmSub.sh
 /Sandboxes/RendererSandbox/userdata/*
 /Sandboxes/PhysicsSandbox/userdata/*
 
+/Snowflake/userdata/*
+/Snowflake/bin/Debug/*
+/Snowflake/bin/Release/*
+/Snowflake/bin/RelWithDebInfo/*
+
 
 /notes.txt
 

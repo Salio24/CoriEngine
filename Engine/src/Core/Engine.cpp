@@ -6,8 +6,6 @@ namespace Cori {
 	namespace Core {
 		namespace Internal {
 			void Engine::Start(const bool asyncLogging, const bool fileLogging) {
-				Logger::EnableVirtualTerminalProcessing();
-
 				Logger::Init(asyncLogging, fileLogging);
 
 				Threading::CpuTopology::Init();

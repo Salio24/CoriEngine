@@ -8,7 +8,6 @@ namespace Cori {
 		namespace Internal {
 			ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {
 				IMGUI_CHECKVERSION();
-				ImGui::CreateContext();
 
 				ImGuiIO& io = ImGui::GetIO(); (void)io;
 
@@ -27,8 +26,6 @@ namespace Cori {
 					style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 				}
 
-				Graphics::ImGuiRenderer::Init(Application::GetWindow().GetNativeWindow());
-
 				CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::ImGui }, "ImGuiLayer created");
 			}
 
@@ -41,9 +38,6 @@ namespace Cori {
 			}
 
 			void ImGuiLayer::OnDetach() {
-				Graphics::ImGuiRenderer::Shutdown();
-				ImGui::DestroyContext();
-
 				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::ImGui }, "ImGuiLayer detached");
 			}
 

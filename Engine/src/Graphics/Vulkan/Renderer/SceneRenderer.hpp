@@ -559,8 +559,8 @@ namespace Cori {
 						//this is temporary, need to add support to external images to the render graph
 						{
 							vk::ImageMemoryBarrier2 prtBar{
-							   .srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
-							   .srcAccessMask = vk::AccessFlagBits2::eTransferWrite,
+							   .srcStageMask = vk::PipelineStageFlagBits2::eTransfer | vk::PipelineStageFlagBits2::eFragmentShader,
+							   .srcAccessMask = vk::AccessFlagBits2::eTransferWrite | vk::AccessFlagBits2::eShaderSampledRead,
 							   .dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
 							   .dstAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
 							   .oldLayout = vk::ImageLayout::eUndefined,

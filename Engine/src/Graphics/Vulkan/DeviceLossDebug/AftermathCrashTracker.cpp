@@ -314,7 +314,7 @@ namespace Cori {
 			}
 
 			void LogSummary(const GFSDK_Aftermath_GpuCrashDump_Decoder decoder) const {
-				const std::initializer_list<const char*> tags = { Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Aftermath };
+				const Cori::LogTagList tags = { Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Aftermath };
 
 				GFSDK_Aftermath_GpuCrashDump_DeviceInfo deviceInfo{};
 				if (GFSDK_Aftermath_SUCCEED(GFSDK_Aftermath_GpuCrashDump_GetDeviceInfo(decoder, &deviceInfo))) {
@@ -342,7 +342,7 @@ namespace Cori {
 			}
 
 			void LogPageFault(const GFSDK_Aftermath_GpuCrashDump_Decoder decoder) const {
-				const std::initializer_list<const char*> tags = { Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Aftermath };
+				const Cori::LogTagList tags = { Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Aftermath };
 
 				GFSDK_Aftermath_GpuCrashDump_PageFaultInfo pageFault{};
 				if (!GFSDK_Aftermath_SUCCEED(GFSDK_Aftermath_GpuCrashDump_GetPageFaultInfo(decoder, &pageFault))) {
@@ -376,7 +376,7 @@ namespace Cori {
 			}
 
 			void LogActiveShaders(const GFSDK_Aftermath_GpuCrashDump_Decoder decoder) const {
-				const std::initializer_list<const char*> tags = { Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Aftermath };
+				const Cori::LogTagList tags = { Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Aftermath };
 
 				uint32_t shaderCount = 0;
 				if (!GFSDK_Aftermath_SUCCEED(GFSDK_Aftermath_GpuCrashDump_GetActiveShadersInfoCount(decoder, &shaderCount)) || shaderCount == 0) {
@@ -394,7 +394,7 @@ namespace Cori {
 			}
 
 			void LogEventMarkers(const GFSDK_Aftermath_GpuCrashDump_Decoder decoder) const {
-				const std::initializer_list<const char*> tags = { Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Aftermath };
+				const Cori::LogTagList tags = { Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Aftermath };
 
 				uint32_t markerCount = 0;
 				if (!GFSDK_Aftermath_SUCCEED(GFSDK_Aftermath_GpuCrashDump_GetEventMarkersInfoCount(decoder, &markerCount)) || markerCount == 0) {
@@ -421,7 +421,7 @@ namespace Cori {
 			}
 
 			void LogWarpInfo(const std::vector<char>& json) const {
-				const std::initializer_list<const char*> tags = { Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Aftermath };
+				const Cori::LogTagList tags = { Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Aftermath };
 
 				const nlohmann::json parsed = nlohmann::json::parse(json.begin(), json.end(), nullptr, false, true);
 				if (parsed.is_discarded()) {
@@ -674,7 +674,7 @@ namespace Cori {
 				return;
 			}
 
-			const std::initializer_list<const char*> tags = { Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Aftermath };
+			const Cori::LogTagList tags = { Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::Aftermath };
 
 			const std::vector<vk::CheckpointDataNV> checkpoints = queue.getCheckpointDataNV();
 

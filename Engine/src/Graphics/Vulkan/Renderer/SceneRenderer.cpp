@@ -118,6 +118,11 @@ namespace Cori {
 			m_Batches.Reserve(128);
 			m_DrawGroups.Reserve(16);
 
+			//Constructed on the render thread out of ProcessPendingSceneRendererCreations, which is
+			//the only thread allowed to touch the ImGui Vulkan backend, so the descriptor set for
+			//the PRT is claimed here rather than on whoever asked for the scene renderer.
+			m_PRT.InitialRegisterWithImGui();
+
 			#ifdef DEBUG_BUILD
 			m_Name = createInfo.name;
 			#endif

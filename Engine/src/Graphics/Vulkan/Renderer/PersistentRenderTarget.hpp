@@ -1,5 +1,6 @@
 #pragma once
 #include <backends/imgui_impl_vulkan.h>
+#include "Graphics/Vulkan/DeletionQueue.hpp"
 #include "Graphics/Vulkan/VulkanImage.hpp"
 
 namespace Cori {
@@ -50,13 +51,14 @@ namespace Cori {
 				};
 
 				m_ImageView = m_Image.GetView(viewKey);
+				PushImageForInitialTransition();
 			}
 
 			~PersistentRenderTarget() {
 				DeletionQueue::PushImage(m_Image, DeletionQueue::GetMaxDelay());
 				uint64_t raw = m_ImGuiDescriptorSet.load(std::memory_order_relaxed);
 				if (raw != 0) {
-					DeletionQueue::PushDeleter([raw]{ ImGui_ImplVulkan_RemoveTexture(std::bit_cast<VkDescriptorSet>(raw)); }, DeletionQueue::GetMaxDelay());
+					DeletionQueue::PushDeleter([raw]{ ImGui_ImplVulkan_RemoveTexture(reinterpret_cast<VkDescriptorSet>(raw)); }, DeletionQueue::GetMaxDelay());
 				}
 			}
 
@@ -69,7 +71,6 @@ namespace Cori {
 			}
 
 			void Resize(vk::Extent2D extent) {
-				CORI_DEBUG("{}x{} -> {}x{}", m_Image.m_Extent3D.width, m_Image.m_Extent3D.height, extent.width, extent.height);
 				if (extent.width == m_Image.m_Extent3D.width && extent.height == m_Image.m_Extent3D.height) {
 					return;
 				}
@@ -77,7 +78,7 @@ namespace Cori {
 				DeletionQueue::PushImage(m_Image, DeletionQueue::GetMaxDelay());
 				uint64_t raw = m_ImGuiDescriptorSet.load(std::memory_order_relaxed);
 				if (raw != 0) {
-					DeletionQueue::PushDeleter([raw]{ ImGui_ImplVulkan_RemoveTexture(std::bit_cast<VkDescriptorSet>(raw)); }, DeletionQueue::GetMaxDelay());
+					DeletionQueue::PushDeleter([raw]{ ImGui_ImplVulkan_RemoveTexture(reinterpret_cast<VkDescriptorSet>(raw)); }, DeletionQueue::GetMaxDelay());
 				}
 
 				vk::ImageCreateInfo imageInfo{
@@ -115,6 +116,7 @@ namespace Cori {
 				};
 
 				m_ImageView = m_Image.GetView(viewKey);
+				PushImageForInitialTransition();
 
 				if (m_RegisterWithImGui) {
 					VkDescriptorSet set = ImGui_ImplVulkan_AddTexture(m_ImageView, static_cast<VkImageLayout>(vk::ImageLayout::eShaderReadOnlyOptimal));
@@ -138,6 +140,8 @@ namespace Cori {
 			[[nodiscard]] VkDescriptorSet GetImGuiDescriptorSet() const {
 				return reinterpret_cast<VkDescriptorSet>(m_ImGuiDescriptorSet.load(std::memory_order_acquire));
 			}
+
+			void PushImageForInitialTransition();
 
 		private:
 			VulkanImage m_Image;

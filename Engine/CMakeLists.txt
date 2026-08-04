@@ -50,20 +50,6 @@ project(CoriEngine)
     set(PROJECT_STATIC_RUNTIME ON CACHE BOOL "")
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/tmxlite/tmxlite EXCLUDE_FROM_ALL)
 
-    # dear imgui
-    add_library(imgui STATIC
-    ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/imgui.cpp
-    ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/imgui_demo.cpp
-    ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/imgui_draw.cpp
-    ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/imgui_tables.cpp
-    ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/imgui_widgets.cpp
-    # graphical backend v
-    ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_vulkan.cpp
-    ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_sdl3.cpp
-    )
-    target_include_directories(imgui PUBLIC ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui_club)
-    target_link_libraries(imgui PRIVATE SDL3::SDL3-static)
-
     # spdlog
     set(SPDLOG_BUILD_SHARED OFF CACHE BOOL "")
     if (CORI_CLANG_TIDY)
@@ -133,6 +119,22 @@ project(CoriEngine)
     set(MSDF_ATLAS_USE_SKIA OFF CACHE BOOL "")
     set(MSDFGEN_DISABLE_PNG ON CACHE BOOL "")
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/msdf-atlas-gen EXCLUDE_FROM_ALL)
+
+# dear imgui
+    add_library(imgui STATIC
+            ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/imgui.cpp
+            ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/imgui_demo.cpp
+            ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/imgui_draw.cpp
+            ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/imgui_tables.cpp
+            ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/imgui_widgets.cpp
+            # graphical backend v
+            ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_vulkan.cpp
+            ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/backends/imgui_impl_sdl3.cpp
+            ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/misc/freetype/imgui_freetype.cpp
+    )
+    target_compile_definitions(imgui PUBLIC IMGUI_ENABLE_FREETYPE)
+    target_include_directories(imgui PUBLIC ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui_club)
+    target_link_libraries(imgui PRIVATE SDL3::SDL3-static freetype)
 
     #tracy
     if (CORI_ENABLE_TRACY_PROFILER)
@@ -325,7 +327,8 @@ project(CoriEngine)
 
     # my shared lib
     add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES}
-            src/Core/Threading/OneAtATime.hpp)
+            src/Core/Threading/OneAtATime.hpp
+            src/Graphics/Vulkan/Renderer/PersistentRenderTarget.cpp)
     if (CORI_MY_CONFIG)
         target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
                 $<$<CONFIG:Debug>:CORI_MY_CONFIG>
