@@ -7,6 +7,8 @@
 #include "FileSystem/PathManager.hpp"
 #include "../Graphics/Vulkan/Renderer/SceneRenderer.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
+#include "Core/Console/Console.hpp"
+#include "Graphics/RendererSettings.hpp"
 
 //FIXME: remove include later
 #include "Graphics/Vulkan/Renderer/MasterRenderer.hpp"
@@ -17,11 +19,12 @@ namespace Cori {
 		Application* Application::s_Instance{ nullptr };
 
 		Application::Application(const char* windowName) : m_WorkerPool(std::thread::hardware_concurrency() == 1 ? 1 : std::max(1u, std::thread::hardware_concurrency() - 4)) {
-			//m_ManualStep = true;
 			CORI_CORE_ASSERT(!s_Instance, "Trying to construct application for the second time. Application already exists!");
 			s_Instance = this;
 
 			FileSystem::PathManager::Get();
+
+			Console::Init();
 
 			m_Window = Window::Create(windowName, false);
 			Graphics::RenderThreadCommandQueue::SetExecuterThreadId(std::this_thread::get_id());
@@ -30,11 +33,11 @@ namespace Cori {
 				Threading::CpuTopology::BindCurrentThreadToDomain(Threading::CpuTopology::PreferredDomain());
 			}
 
-			m_Window->SetEventCallback(CORI_BIND_EVENT_FN(Application::OnEvent, CORI_PLACEHOLDERS(1)));
+			m_Window->SetEventCallback(std::bind(&Application::OnEvent, this , std::placeholders::_1));
 			m_Window->SetVSync(false);
 
 			ImGui::CreateContext();
-			Graphics::VulkanEngine::Start(m_Window->GetNativeWindow(), true, { m_Window->GetWidth(), m_Window->GetHeight() });
+			Graphics::VulkanEngine::Start(m_Window->GetNativeWindow(), { m_Window->GetWidth(), m_Window->GetHeight() });
 
 			m_ImGuiLayer = new Internal::ImGuiLayer();
 			m_LayerStack.PushOverlay(m_ImGuiLayer);
@@ -44,7 +47,7 @@ namespace Cori {
 			Audio::Mixer::Init();
 
 			m_GameTimer.SetTickrate(120);
-			m_GameTimer.SetTickrateUpdateFunc(CORI_BIND_EVENT_FN(Application::TickrateUpdate, CORI_PLACEHOLDERS(1)));
+			m_GameTimer.SetTickrateUpdateFunc(std::bind(&Application::TickrateUpdate, this , std::placeholders::_1));
 
 			Graphics::VulkanEngine::EnterThreadedMode();
 
@@ -52,6 +55,7 @@ namespace Cori {
 		}
 
 		Application::~Application() {
+			Console::Shutdown();
 			Graphics::VulkanEngine::ExitThreadedMode();
 			World::SceneManager::Shutdown();
 			m_LayerStack.ClearStack();
@@ -72,7 +76,7 @@ namespace Cori {
 
 		void Application::OnEvent(Event& event) {
 			EventDispatcher dispatcher(event);
-			dispatcher.Dispatch<WindowCloseEvent>(CORI_BIND_EVENT_FN(Application::OnWindowClose));
+			dispatcher.Dispatch<WindowCloseEvent>(std::bind(&Application::OnWindowClose, this  ));
 
 			dispatcher.Dispatch<WindowResizeEvent>([](const WindowResizeEvent& e) -> bool {
 				Graphics::VulkanEngine::ReportWindowResize({ e.GetWidth(), e.GetHeight() });
@@ -130,15 +134,12 @@ namespace Cori {
 						while (success == false) {
 							success = true;
 
-							for (Layer* layer : m_LayerStack) {
-								success &= layer->ActiveScene.WaitForFrameData();
+							for (auto& handle : World::SceneManager::GetStorage() | std::views::values) {
+								success &= handle.WaitForFrameData();
 							}
 						}
 					}
 
-					//Stamped after the slot wait rather than after the pacing wait, so whatever the
-					//spin costs is folded into the next frame's budget instead of being spent behind
-					//the pacer's back.
 					m_FrameStartHostTime = Graphics::VulkanPresentTiming::HostNow();
 
 					m_Window->OnUpdate();
@@ -150,10 +151,10 @@ namespace Cori {
 						m_ImGuiLayer->StartFrame();
 
 						if (m_RenderImGui) {
-							for (Layer* layer : m_LayerStack) {
-								layer->OnImGuiRender(m_GameTimer);
-								layer->SceneImGuiRender(m_GameTimer);
-								if (layer->IsModal()) {
+							for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
+								--it;
+								(*it)->OnImGuiRender(m_GameTimer);
+								if ((*it)->IsModal()) {
 									break;
 								}
 							}
@@ -162,9 +163,9 @@ namespace Cori {
 						m_ImGuiLayer->EndFrame();
 					}
 
-					for (Layer* layer : m_LayerStack) {
-						layer->OnUpdate(m_GameTimer);
-						layer->SceneUpdate(m_GameTimer);
+					for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
+						--it;
+						(*it)->OnUpdate(m_GameTimer);
 					}
 
 					Graphics::MasterFrameData* MFD = Graphics::MasterRenderer::Get().PopRecycledFrameData();
@@ -173,6 +174,8 @@ namespace Cori {
 						.inputTimestampSdl = m_Window->GetOldestInputTimestamp(),
 						.frameStartHost = GetFrameStartHostTime()
 					};
+
+					MFD->settings = Graphics::g_RendererSettings;
 
 					bool result = Graphics::MasterRenderer::Get().PushFrameData(MFD);
 					CORI_CORE_ASSERT(result, "Push failed");
@@ -183,8 +186,8 @@ namespace Cori {
 						while (success == false) {
 							success = true;
 
-							for (Layer* layer : m_LayerStack) {
-								success &= layer->ActiveScene.PrepareFrameData();
+							for (auto& handle : World::SceneManager::GetStorage() | std::views::values) {
+								success &= handle.PrepareFrameData();
 							}
 						}
 					}
@@ -195,18 +198,11 @@ namespace Cori {
 						while (success == false) {
 							success = true;
 
-							for (Layer* layer : m_LayerStack) {
-								success &= layer->ActiveScene.SubmitForRender();
+							for (auto& handle : World::SceneManager::GetStorage() | std::views::values) {
+								success &= handle.SubmitForRender();
 							}
 						}
 					}
-
-					//Graphics::MasterRenderer::Get().Loop();
-
-					//AssetManager2::OnUpdate(m_GameTimer);
-
-					//Graphics::SceneRenderer::Get().Render();
-
 
 					m_LayerStack.ProcessQueue();
 				}
@@ -216,16 +212,16 @@ namespace Cori {
 		void Application::TickrateUpdate(GameTimer& gameTimer) {
 			CORI_PROFILE_SCOPE("Tick Update");
 
-			for (Layer* layer : m_LayerStack) {
-				layer->SceneTickrateUpdate(gameTimer);
-				layer->OnTickUpdate(gameTimer);
-				if (layer->IsModal()) {
+			for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
+				--it;
+				(*it)->OnTickUpdate(gameTimer);
+				if ((*it)->IsModal()) {
 					break;
 				}
 			}
 		}
 
-		bool Application::OnWindowClose() {
+		bool Core::Application::OnWindowClose() {
 			m_Running = false;
 			return true;
 		}

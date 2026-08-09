@@ -292,6 +292,24 @@ namespace Cori {
 				return !m_SceneRaw.expired();
 			}
 
+			void OnUpdate(Core::GameTimer& gameTimer) {
+				if (!m_SceneRaw.expired()) {
+					m_SceneRaw.lock()->OnUpdate(gameTimer);
+				}
+			}
+
+			void OnTickUpdate(Core::GameTimer& gameTimer) {
+				if (!m_SceneRaw.expired()) {
+					m_SceneRaw.lock()->OnTickUpdate(gameTimer);
+				}
+			}
+
+			void OnImGuiRender(Core::GameTimer& gameTimer) {
+				if (!m_SceneRaw.expired()) {
+					m_SceneRaw.lock()->OnImGuiRender(gameTimer);
+				}
+			}
+
 		protected:
 			friend Core::Layer;
 			friend Core::Application;
@@ -318,38 +336,6 @@ namespace Cori {
 				}
 
 				return true;
-			}
-
-			void OnUpdate(Core::GameTimer& gameTimer) {
-				if (!m_SceneRaw.expired()) {
-					m_SceneRaw.lock()->OnUpdate(gameTimer);
-				}
-			}
-
-			void OnTickUpdate(Core::GameTimer& gameTimer) {
-				if (!m_SceneRaw.expired()) {
-					m_SceneRaw.lock()->OnTickUpdate(gameTimer);
-				}
-			}
-
-			void OnImGuiRender(Core::GameTimer& gameTimer) {
-				if (!m_SceneRaw.expired()) {
-					m_SceneRaw.lock()->OnImGuiRender(gameTimer);
-				}
-			}
-
-			[[nodiscard]] bool OnUnbind() {
-				if (!m_SceneRaw.expired()) {
-					return m_SceneRaw.lock()->OnUnbind();
-				}
-				return false;
-			}
-
-			[[nodiscard]] bool OnBind() {
-				if (!m_SceneRaw.expired()) {
-					return m_SceneRaw.lock()->OnBind();
-				}
-				return false;
 			}
 
 		private:

@@ -1,10 +1,14 @@
 #pragma once
 #include <Cori.hpp>
 
+#include "ContentBrowser.hpp"
+
 namespace Snowflake {
+	class AssetPreviewLayer;
+
 	class EditorLayer final : public Cori::Core::Layer {
 	public:
-		EditorLayer();
+		explicit EditorLayer();
 
 		~EditorLayer() override;
 
@@ -32,6 +36,35 @@ namespace Snowflake {
 		void DrawWindowSettings();
 
 		void DrawConsole();
+
+		void DrawAssetBrowser();
+
+		struct PanelEntry {
+			const char* name;
+			bool* open;
+		};
+
+		[[nodiscard]] std::array<PanelEntry, 4> GetPanels();
+
+		void UpdateDockNavigation();
+
+		void FocusNeighbourDockNode(const ImGuiDir direction);
+
+		void UpdateWindowManipulation();
+
+		void ResizeWindow(ImGuiWindow* window, const ImVec2 delta);
+
+		void UpdateShortcuts();
+
+		void CloseFocusedWindow();
+
+		void DrawLauncher();
+
+		void OpenLauncher();
+
+		void CloseLauncher();
+
+		void ActivatePanel(const PanelEntry& panel);
 
 		void UpdateCameraCapture();
 
@@ -70,13 +103,39 @@ namespace Snowflake {
 		float m_CameraYaw{ s_InitialCameraYaw };
 		float m_CameraPitch{ s_InitialCameraPitch };
 
-		bool m_ViewportHovered{ false };
+		enum class WindowManipulation : uint8_t {
+			eNone,
+			eMove,
+			eResize
+		};
+
+		static constexpr float s_MinFloatingWindowSize{ 120.0f };
+		static constexpr float s_MinDockNodeSize{ 64.0f };
+
+		ImGuiID m_DockSpaceID{ 0 };
+
+		WindowManipulation m_WindowManipulation{ WindowManipulation::eNone };
+		ImGuiID m_ManipulatedWindow{ 0 };
+
+		bool m_ViewportFocused{ false };
 		bool m_CameraCaptureActive{ false };
 
 		bool m_ShowWindowSettings{ false };
 		bool m_RebuildLayout{ false };
 
+		static constexpr float s_LauncherWidth{ 420.0f };
+		static constexpr float s_LauncherAnchorRatio{ 0.15f };
+
+		bool m_ShowLauncher{ false };
+		bool m_LauncherJustOpened{ false };
+		int32_t m_LauncherSelection{ 0 };
+		char m_LauncherQuery[64]{};
+
 		Cori::ConsolePanel m_Console;
 		bool m_ShowConsole{ true };
+
+		ContentBrowser m_Browser{};
+
+		Cori::World::SceneHandle m_MainScene{ nullptr };
 	};
 }

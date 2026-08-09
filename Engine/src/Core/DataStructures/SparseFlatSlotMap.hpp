@@ -412,6 +412,29 @@ namespace Cori {
 						m_Data.Data()[index].~T();
 					});
 
+					if constexpr (requires { m_Data[0].valid; }) {
+						m_SlotStates.flip();
+
+						//FIXME: make iterate_bits_on counterpart that iterates on unset bits
+						m_SlotStates.iterate_bits_on([this, &grown](const size_t index) {
+							if constexpr (std::same_as<decltype(m_Data[0].valid), bool>) {
+								constexpr auto member = ^^T::valid;
+								constexpr uint64_t offset = std::meta::offset_of(member).bytes;
+								Byte* dst = reinterpret_cast<Byte*>(grown.Data() + index);
+								std::memset(dst + offset, 0x00, sizeof(bool));
+							}
+
+							if constexpr (std::same_as<decltype(m_Data[0].valid), uint32_t>) {
+								constexpr auto member = ^^T::valid;
+								constexpr uint64_t offset = std::meta::offset_of(member).bytes;
+								Byte* dst = reinterpret_cast<Byte*>(grown.Data() + index);
+								std::memset(dst + offset, 0x00, sizeof(uint32_t));
+							}
+						});
+
+						m_SlotStates.flip();
+					}
+
 					m_Data = std::move(grown);
 					m_Data.ReportChange(0, static_cast<uint64_t>(newCapacity) * sizeof(T));
 				}
@@ -435,7 +458,23 @@ namespace Cori {
 				T* slot = m_Data.Data() + index;
 
 				slot->~T();
-				std::memset(slot, s_PoisonValue, sizeof(T));
+
+				auto* p = reinterpret_cast<uint32_t*>(slot);
+				std::fill_n(p, sizeof(T) / sizeof(uint32_t), s_PoisonValue);
+
+				if constexpr (requires { m_Data[0].valid; }) {
+					if constexpr (std::same_as<decltype(m_Data[0].valid), bool>) {
+						constexpr auto member = ^^T::valid;
+						constexpr uint64_t offset = std::meta::offset_of(member).bytes;
+						std::memset(reinterpret_cast<Byte*>(slot) + offset, 0x00, sizeof(bool));
+					}
+
+					if constexpr (std::same_as<decltype(m_Data[0].valid), uint32_t>) {
+						constexpr auto member = ^^T::valid;
+						constexpr uint64_t offset = std::meta::offset_of(member).bytes;
+						std::memset(reinterpret_cast<Byte*>(slot) + offset, 0x00, sizeof(uint32_t));
+					}
+				}
 
 				m_Data.ReportChange(index * sizeof(T), sizeof(T));
 				m_SlotStates[index] = false;

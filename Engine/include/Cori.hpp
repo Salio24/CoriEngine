@@ -7,6 +7,7 @@
 #include "../src/Core/CoriKeycodes.hpp"
 #include "../src/Core/Error.hpp"
 #include "../src/Core/Input.hpp"
+#include "../src/Core/Console/Console.hpp"
 
 #include "../src/Utility/AABB.hpp"
 #include "../src/Utility/Random.hpp"
@@ -16,7 +17,7 @@
 
 #include "../src/Core/ImGuiLayer.hpp"
 #include "../src/ImGui/ImGuiPresets.hpp"
-#include "../src/ImGui/ConsolePanel.hpp"
+#include "../src/Core/Console/ConsolePanel.hpp"
 
 #include "../src/Core/EventSystem/MouseEvent.hpp"
 #include "../src/Core/EventSystem/AppEvent.hpp"

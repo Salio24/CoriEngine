@@ -306,6 +306,9 @@ project(CoriEngine)
         add_dependencies(tbbbind hwloc_ext)
     endif()
 
+    #efsw
+    add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/efsw EXCLUDE_FROM_ALL)
+
 
 #find_package (Vulkan REQUIRED)
 
@@ -327,8 +330,7 @@ project(CoriEngine)
 
     # my shared lib
     add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES}
-            src/Core/Threading/OneAtATime.hpp
-            src/Graphics/Vulkan/Renderer/PersistentRenderTarget.cpp)
+            src/Utility/TransparentStringHash.hpp)
     if (CORI_MY_CONFIG)
         target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
                 $<$<CONFIG:Debug>:CORI_MY_CONFIG>
@@ -443,7 +445,7 @@ project(CoriEngine)
     target_compile_options(${ENGINE_LIBRARY_NAME} PUBLIC -freflection)
 
     # should be public
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite exprtk boost_pfr Vulkan::Headers GPUOpen::VulkanMemoryAllocator VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp Vulkan::Loader gch::small_vector sul::dynamic_bitset fast_obj_lib glaze_glaze tbb SDL3::SDL3-static stdc++exp)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite exprtk boost_pfr Vulkan::Headers GPUOpen::VulkanMemoryAllocator VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp Vulkan::Loader gch::small_vector sul::dynamic_bitset fast_obj_lib glaze_glaze tbb SDL3::SDL3-static stdc++exp efsw-static)
 
     if (CORI_ENABLE_TRACY_PROFILER)
         target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC Tracy::TracyClient)

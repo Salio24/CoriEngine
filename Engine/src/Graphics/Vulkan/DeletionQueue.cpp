@@ -1,5 +1,6 @@
 #include "DeletionQueue.hpp"
 #include "VmaLeakLog.hpp"
+#include "backends/imgui_impl_vulkan.h"
 
 namespace Cori {
 	namespace Graphics {
@@ -59,6 +60,11 @@ namespace Cori {
 
 			Get().m_ShaderObjectQueue[Get().m_Counter].clear();
 
+			for (const auto id : Get().m_ImGuiTextureQueue[Get().m_Counter]) {
+				ImGui_ImplVulkan_RemoveTexture(reinterpret_cast<VkDescriptorSet>(id));
+			}
+
+			Get().m_ImGuiTextureQueue[Get().m_Counter].clear();
 
 			for (auto& block : Get().m_VirtBlockQueue[Get().m_Counter] | std::views::reverse) {
 				if (!block.isVirtualBlockEmpty()) {
@@ -115,6 +121,12 @@ namespace Cori {
 				}
 
 				m_VirtAllocQueue[i].clear();
+
+				for (const auto id : m_ImGuiTextureQueue[i]) {
+					ImGui_ImplVulkan_RemoveTexture(reinterpret_cast<VkDescriptorSet>(id));
+				}
+
+				m_ImGuiTextureQueue[i].clear();
 			}
 
 			for (uint32_t i = 0; i < s_BucketCount; i++) {

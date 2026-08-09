@@ -58,7 +58,7 @@ namespace Cori {
 				DeletionQueue::PushImage(m_Image, DeletionQueue::GetMaxDelay());
 				uint64_t raw = m_ImGuiDescriptorSet.load(std::memory_order_relaxed);
 				if (raw != 0) {
-					DeletionQueue::PushDeleter([raw]{ ImGui_ImplVulkan_RemoveTexture(reinterpret_cast<VkDescriptorSet>(raw)); }, DeletionQueue::GetMaxDelay());
+					DeletionQueue::PushImGuiTexture(raw, DeletionQueue::GetMaxDelay());
 				}
 			}
 
@@ -78,7 +78,7 @@ namespace Cori {
 				DeletionQueue::PushImage(m_Image, DeletionQueue::GetMaxDelay());
 				uint64_t raw = m_ImGuiDescriptorSet.load(std::memory_order_relaxed);
 				if (raw != 0) {
-					DeletionQueue::PushDeleter([raw]{ ImGui_ImplVulkan_RemoveTexture(reinterpret_cast<VkDescriptorSet>(raw)); }, DeletionQueue::GetMaxDelay());
+					DeletionQueue::PushImGuiTexture(raw, DeletionQueue::GetMaxDelay());
 				}
 
 				vk::ImageCreateInfo imageInfo{

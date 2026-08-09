@@ -13,6 +13,10 @@ struct Vertex {
 	uint32_t color;
 };
 
+struct CullData {
+	float4 planes[6];
+};
+
 struct ObjectData {
 	float4x4 transform;
 	float4 uvOffsets;
@@ -27,6 +31,12 @@ struct Mesh {
 	uint64_t firstVertexAddress;
 	uint32_t vertexType;
 	uint32_t version;
+	float bxCenter;
+	float byCenter;
+	float bzCenter;
+	float bxExtent;
+	float byExtent;
+	float bzExtent;
 };
 
 struct BatchInfo {

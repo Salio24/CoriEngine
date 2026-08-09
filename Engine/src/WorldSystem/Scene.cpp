@@ -117,13 +117,5 @@ namespace Cori {
 			result.error().Ignore();
 			return true;
 		}
-
-		bool Scene::OnBind() {
-			return true;
-		}
-
-		bool Scene::OnUnbind() {
-			return true;
-		}
 	}
 }

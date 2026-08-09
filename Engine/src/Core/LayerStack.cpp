@@ -130,7 +130,7 @@ namespace Cori {
 			if (m_LayerInsertIndex != 0) {
 				Layer* layer = m_Layers.at(m_LayerInsertIndex - 1);
 				layer->OnDetach();
-				m_Layers.erase(m_Layers.begin() + m_LayerInsertIndex);
+				m_Layers.erase(m_Layers.begin() + m_LayerInsertIndex - 1);
 				--m_LayerInsertIndex;
 				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Popped Layer '{}' from LayerStack.", layer->GetName());
 			}
@@ -140,7 +140,7 @@ namespace Cori {
 			if (m_OverlayLayerCount != 0) {
 				Layer* overlay = m_Layers.at(m_Layers.size() - 1 - m_OverlayLayerCount);
 				overlay->OnDetach();
-				m_Layers.erase(m_Layers.begin() + m_Layers.size() - m_OverlayLayerCount);
+				m_Layers.erase(m_Layers.begin() + m_Layers.size() - 1 - m_OverlayLayerCount);
 				--m_OverlayLayerCount;
 				CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::LayerStack }, "Popped Overlay Layer '{}' from LayerStack.", overlay->GetName());
 			}

@@ -43,6 +43,7 @@ struct PushConstants {
 	Mesh* meshDataBuffer; // read
 	GlobalAtomic* globalAtomic; // write
 	GroupCommandOffset* commandOffsets; // read
+	CullData* cullData;
 
 
 	uint32_t totalInstanceCount;
@@ -116,6 +117,31 @@ void compactMain(uint3 threadID : SV_DispatchThreadID) {
 	}
 }
 
-bool IsVisible (ObjectData object) {
-	return true;
+bool IsVisible(ObjectData object) {
+	BatchInfo batch = pc.batchInfos[object.ownerBatch];
+    Mesh mesh = pc.meshDataBuffer[batch.mesh.index];
+
+	if (mesh.version != batch.mesh.version) {
+    	return true;
+    }
+
+	float3 center = float3(mesh.bxCenter, mesh.byCenter, mesh.bzCenter);
+    float3 extent = float3(mesh.bxExtent, mesh.byExtent, mesh.bzExtent);
+
+	float3 worldCenter = mul(object.transform, float4(center, 1.0)).xyz;
+	float3 worldExtent = mul(abs((float3x3)object.transform), extent);
+
+    for (uint32_t i = 0; i < 6; i++) {
+    	float4 plane = pc.cullData.planes[i];
+
+    	float distance = dot(plane.xyz, worldCenter) + plane.w;
+    	float radius = dot(abs(plane.xyz), worldExtent);
+
+    	if (distance + radius < 0.0) {
+    		return false;
+    	}
+    }
+
+    return true;
+
 }

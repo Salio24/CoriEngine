@@ -21,7 +21,6 @@ const std::vector g_ValidationLayers = {
 	"VK_LAYER_KHRONOS_validation"
 };
 
-
 std::vector<const char*> Cori::Graphics::VulkanEngine::m_DeviceExtensions;
 std::vector<const char*> Cori::Graphics::VulkanEngine::m_OptionalDeviceExtensions;
 std::vector<const char*> Cori::Graphics::VulkanEngine::m_EnabledDeviceExtensions;
@@ -120,7 +119,7 @@ namespace Cori {
 	namespace Graphics {
 		VulkanEngine* VulkanEngine::s_Instance{ nullptr };
 
-		VulkanEngine::VulkanEngine(void* window, const bool enableValidationLayers, const vk::Extent2D swapChainExtent) {
+		VulkanEngine::VulkanEngine(void* window, const vk::Extent2D swapChainExtent) {
 			s_Instance = this;
 			PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = (PFN_vkGetInstanceProcAddr)SDL_Vulkan_GetVkGetInstanceProcAddr();
 			VULKAN_HPP_DEFAULT_DISPATCHER.init(vkGetInstanceProcAddr);
@@ -130,7 +129,7 @@ namespace Cori {
 			m_Window = window;
 			m_ValidationLayers = false;
 				#if defined(DEBUG_BUILD) && !defined(CORI_ENABLE_PROFILING)
-			m_ValidationLayers = enableValidationLayers;
+			m_ValidationLayers = g_RendererConfig.ValidationLayers;
 				#endif
 			m_DeviceExtensions.push_back(vk::KHRSwapchainExtensionName);
 			m_DeviceExtensions.push_back(vk::EXTMemoryPriorityExtensionName);
@@ -252,9 +251,9 @@ namespace Cori {
 			s_Instance = nullptr;
 		}
 
-		void VulkanEngine::Start(void* window, const bool enableValidationLayers, const vk::Extent2D swapChainExtent) {
+		void VulkanEngine::Start(void* window, const vk::Extent2D swapChainExtent) {
 			CORI_CORE_ASSERT(!s_Instance, "VulkanEngine is already initialized.");
-			new VulkanEngine(window, enableValidationLayers, swapChainExtent);
+			new VulkanEngine(window, swapChainExtent);
 		}
 
 		void VulkanEngine::Stop() {
@@ -398,11 +397,6 @@ namespace Cori {
 			frameData.m_CommandBuffer.setAlphaToCoverageEnableEXT(vk::False);
 
 			frameData.m_CommandBuffer.setPolygonModeEXT(vk::PolygonMode::eFill);
-			//vkCmdSetPolygonModeEXT(cmd, wireframe_mode && wireframe_enabled ? VK_POLYGON_MODE_LINE : VK_POLYGON_MODE_FILL);
-			//if (wireframe_mode && wireframe_enabled)
-			//{
-			//	vkCmdSetLineWidth(cmd, 1.0f);
-			//}
 
 			frameData.m_CommandBuffer.setCullMode(vk::CullModeFlagBits::eNone);
 			frameData.m_CommandBuffer.setFrontFace(vk::FrontFace::eCounterClockwise);
@@ -672,7 +666,12 @@ namespace Cori {
 				});
 
 				auto features = device.getFeatures2<vk::PhysicalDeviceFeatures2, vk::PhysicalDeviceVulkan13Features, vk::PhysicalDeviceVulkan12Features, vk::PhysicalDeviceVulkan11Features, vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT, vk::PhysicalDeviceMemoryPriorityFeaturesEXT, vk::PhysicalDeviceShaderObjectFeaturesEXT, vk::PhysicalDeviceDescriptorBufferFeaturesEXT>();
-				bool supportsRequiredFeatures = features.get<vk::PhysicalDeviceFeatures2>().features.samplerAnisotropy &&
+				bool supportsRequiredFeatures =
+					features.get<vk::PhysicalDeviceFeatures2>().features.multiDrawIndirect &&
+					features.get<vk::PhysicalDeviceFeatures2>().features.fillModeNonSolid &&
+					features.get<vk::PhysicalDeviceFeatures2>().features.wideLines &&
+					features.get<vk::PhysicalDeviceFeatures2>().features.samplerAnisotropy &&
+					features.get<vk::PhysicalDeviceFeatures2>().features.shaderInt64 &&
 					features.get<vk::PhysicalDeviceVulkan13Features>().dynamicRendering &&
 					features.get<vk::PhysicalDeviceVulkan13Features>().synchronization2 &&
 					features.get<vk::PhysicalDeviceVulkan12Features>().drawIndirectCount &&
@@ -826,6 +825,8 @@ namespace Cori {
 					{
 						.features = {
 							.multiDrawIndirect = true,
+							.fillModeNonSolid = true,
+							.wideLines = true,
 							.samplerAnisotropy = true,
 							.shaderInt64 = true
 						}

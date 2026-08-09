@@ -101,6 +101,498 @@ namespace Cori {
 			m_RecycleRing.Emplace(ptr);
 		}
 
+		std::optional<SceneRenderer::FrameContext> SceneRenderer::Stage1(const RendererSettings settings) {
+			CORI_PROFILE_FUNCTION();
+
+			//VulkanEngine::Get().CPUFrameStart();
+
+			uint32_t maxObjectCount = m_Objects.RawSize();
+			uint32_t maxBatchCount = m_Batches.RawSize();
+			uint32_t maxGroupCount = m_DrawGroups.RawSize();
+			if (maxObjectCount == 0 || maxBatchCount == 0 || maxGroupCount == 0) {
+				return std::nullopt;
+			}
+
+			auto commandOffsetsBuffer = VulkanVirtualBufferAllocator::CreateVirtualUploadBuffer(m_DrawGroups.RawSize() * sizeof(uint32_t), 4, VulkanEngine::GetNextFrameInFlight(), "Draw Group Command Offsets");
+
+			auto uniformBuffer = VulkanVirtualBufferAllocator::CreateVirtualUploadBuffer(sizeof(UniformData), alignof(UniformData), VulkanEngine::GetNextFrameInFlight(), "Uniform Data");
+
+			auto cullDataBuffer = VulkanVirtualBufferAllocator::CreateVirtualUploadBuffer(sizeof(CullData), alignof(CullData), VulkanEngine::GetNextFrameInFlight(), "Cull Data");
+
+			UniformData uniformData;
+
+			vk::Image prtImage = m_PRT.GetImage().m_Image;
+			vk::ImageView prtImageView = m_PRT.GetImageView();
+			vk::Extent2D prtExtent = { m_PRT.GetImage().m_Extent3D.width, m_PRT.GetImage().m_Extent3D.height };
+
+			uniformData.model = glm::mat4(1.0f);
+			uniformData.view = m_CameraSnapshot.view;
+			uniformData.proj = m_CameraSnapshot.projection;
+
+			if (!settings.FreezeCulling) {
+				if (settings.DisableCulling) {
+					for (auto& plane : m_CullData.planes) {
+						plane = { 0, 0, 0, 1 };
+					}
+				} else {
+					const glm::mat4 viewProj = uniformData.proj * uniformData.view;
+					const glm::mat4 t = glm::transpose(viewProj);
+
+					m_CullData.planes[0] = t[3] + t[0];
+					m_CullData.planes[1] = t[3] - t[0];
+					m_CullData.planes[2] = t[3] + t[1];
+					m_CullData.planes[3] = t[3] - t[1];
+					m_CullData.planes[4] = t[2];
+					m_CullData.planes[5] = t[3] - t[2];
+				}
+			}
+
+			{
+				CORI_PROFILE_SCOPE("Render Graph registry reset");
+
+				m_GraphPassRegistry.Reset();
+				m_GraphResourceRegistry.Reset(VulkanEngine::GetFrameIndex());
+			}
+
+			RenderGraph graph(m_GraphPassRegistry, m_GraphResourceRegistry);
+
+			{
+				CORI_PROFILE_SCOPE("Render Graph configuring");
+
+				auto GroupCommandOffsetsBufferHandle = graph.ImportBuffer(commandOffsetsBuffer, "Group Command Offsets Buffer"); // per group <uint32_t>, CPU - write, GPU - compute read, semi-retained mode
+				auto UniformDataBufferHandle = graph.ImportBuffer(uniformBuffer, "Uniform Data Buffer");
+
+				auto CullDataBufferHandle = graph.ImportBuffer(cullDataBuffer, "Cull Data Buffer");
+
+
+				CORI_CORE_ASSERT(maxObjectCount != 0 && maxBatchCount != 0 && maxGroupCount != 0, "something is zero")
+
+					#ifdef CORI_VALIDATION_LAYER
+				for (uint32_t objectIndex = 0; objectIndex < maxObjectCount; objectIndex++) {
+					if (!m_Objects.IsIndexValid(objectIndex)) {
+						continue;
+					}
+
+					const auto& object = std::as_const(m_Objects)[objectIndex];
+
+					if (object.valid == 0) {
+						continue;
+					}
+
+					if (object.m_OwnerBatch >= maxBatchCount) {
+						CORI_CORE_ASSERT(false, "Object {} is valid but references batch {}, out of range (batch count {}). The culling shaders would index the batch intermediate info buffer out of bounds.", objectIndex, object.m_OwnerBatch, maxBatchCount);
+						continue;
+					}
+
+					const auto& batch = std::as_const(m_BatchGPUInfo)[object.m_OwnerBatch];
+
+					CORI_CORE_ASSERT(batch.owner < maxGroupCount, "Batch {} (reached via object {}) references draw group {}, out of range (group count {}).", object.m_OwnerBatch, objectIndex, batch.owner, maxGroupCount);
+					CORI_CORE_ASSERT(VulkanMeshManager::IsHandleValid(batch.mesh), "Batch {} (reached via object {}) holds mesh handle [{}, {}], which is not valid. The vertex shader would fetch a garbage firstVertexAddress from it.", object.m_OwnerBatch, objectIndex, batch.mesh.GetIndex(), batch.mesh.GetVersion());
+				}
+					#endif
+
+				struct ComputePS{
+					uint64_t objectDataBuffer;
+					uint64_t compactedObjectIDBuffer;
+
+					uint64_t bii;
+
+					uint64_t commandBuffer;
+					uint64_t commandCountBuffer;
+					uint64_t batchInfos;
+					uint64_t meshDataBuffer;
+					uint64_t globalAtomic;
+					uint64_t commandOffsets;
+					uint64_t cullData;
+
+					uint32_t totalInstanceCount;
+					uint32_t totalBatchCount;
+				};
+
+				struct DrawPS{
+					uint64_t objectDataBuffer;
+					uint64_t compactedObjectIDBuffer;
+					uint64_t materialDataBuffer;
+					uint64_t shaderEffectDataBuffer;
+					uint64_t meshDataBuffer;
+					uint64_t textureAssetTable;
+					uint64_t batchInfo;
+					uint64_t uniformData;
+				};
+
+				auto DrawCommandBufferHandle = graph.CreateBuffer({ INDIRECT_COMMAND_SIZE * m_Batches.RawSize(), INDIRECT_COMMAND_SIZE }, "Draw Command Buffer"); //per batch <VkDrawIndexedIndirectCommand> CPU - none, GPU - compute write -> command submit read, immediate mode
+				auto DrawCommandCountBufferHandle = graph.CreateBuffer({ m_DrawGroups.RawSize() * sizeof(uint32_t), alignof(uint32_t) }, "Draw Command Count"); //per group <uint32_t> CPU - none, GPU - compute write -> indirect command read, immediate mode
+				auto BatchIntermediateInfoBufferHandle = graph.CreateBuffer({ m_Batches.RawSize() * sizeof(uint32_t), alignof(uint32_t) }, "Batch Intermediate Info"); //per batch <uint32_t> CPU - none, GPU - compute write/read atomic, immediate mode
+				auto InstanceAtomicCounterHandle = graph.CreateBuffer({ sizeof(uint32_t), alignof(uint32_t) }, "Instance Atomic Counter"); //atomic uint32_t, CPU - none, GPU - compute write/read atomic, immediate mode
+				auto CompactedInstanceListBufferHandle = graph.CreateBuffer({ m_Objects.RawSize() * sizeof(uint32_t), alignof(uint32_t) }, "Compacted Instance List Buffer"); //per visible instance <uint32_t> CPU - none, GPU - compute write -> vertex/fragment read, immediate mode
+
+				vk::ImageCreateInfo depthImageInfo{
+						.imageType = vk::ImageType::e2D,
+						.format = s_DepthFormat,
+						.extent = { prtExtent.width, prtExtent.height, 1 },
+						.mipLevels = 1,
+						.arrayLayers = 1,
+						.samples = vk::SampleCountFlagBits::e1,
+						.tiling = vk::ImageTiling::eOptimal,
+						.usage = vk::ImageUsageFlagBits::eDepthStencilAttachment,
+						.sharingMode = vk::SharingMode::eExclusive,
+						.initialLayout = vk::ImageLayout::eUndefined
+					};
+
+				vma::AllocationCreateInfo depthAllocInfo{
+						.usage = vma::MemoryUsage::eAuto,
+						.requiredFlags = vk::MemoryPropertyFlagBits::eDeviceLocal
+					};
+
+				VulkanImage::CreateInfo depthCreateInfo{
+						.imageCreateInfo = &depthImageInfo,
+						.allocationCreateInfo = &depthAllocInfo,
+						.name = "Scene Depth Buffer"
+					};
+
+				auto DepthBufferHandle = graph.CreateImage(depthCreateInfo, "Scene Depth Buffer");
+
+				auto& bufferCleanupPass = graph.CreatePass("Buffer Cleanup");
+				bufferCleanupPass.Writes(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
+				bufferCleanupPass.Writes(InstanceAtomicCounterHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
+				bufferCleanupPass.Writes(CompactedInstanceListBufferHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
+				bufferCleanupPass.Writes(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eTransfer, vk::AccessFlagBits2::eTransferWrite });
+				bufferCleanupPass.AssignWork([=](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
+					auto& dccb = registry.GetResource(DrawCommandCountBufferHandle);
+					auto& iac = registry.GetResource(InstanceAtomicCounterHandle);
+					auto& cilb = registry.GetResource(CompactedInstanceListBufferHandle);
+					auto& bii = registry.GetResource(BatchIntermediateInfoBufferHandle);
+					commandBuffer.fillBuffer(dccb.GetHeapHandle(), dccb.GetStartOffset(), dccb.GetSize(), 0);
+					commandBuffer.fillBuffer(iac.GetHeapHandle(), iac.GetStartOffset(), iac.GetSize(), 0);
+					commandBuffer.fillBuffer(cilb.GetHeapHandle(), cilb.GetStartOffset(), cilb.GetSize(), 0);
+					commandBuffer.fillBuffer(bii.GetHeapHandle(), bii.GetStartOffset(), bii.GetSize(), 0);
+				});
+
+				auto& cullPass = graph.CreatePass("Cull Pass");
+				cullPass.Writes(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+				cullPass.Reads(CullDataBufferHandle);
+				cullPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
+					ComputePS ps {
+							.objectDataBuffer = m_Objects.GetVulkanBuffer().GetBDA(),
+							.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
+							.bii = registry.GetResource(BatchIntermediateInfoBufferHandle).GetBDA(),
+							.commandBuffer = registry.GetResource(DrawCommandBufferHandle).GetBDA(),
+							.commandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle).GetBDA(),
+							.batchInfos = m_BatchGPUInfo.GetVulkanBuffer().GetBDA(),
+							.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
+							.globalAtomic = registry.GetResource(InstanceAtomicCounterHandle).GetBDA(),
+							.commandOffsets = registry.GetResource(GroupCommandOffsetsBufferHandle).GetBDA(),
+							.cullData = registry.GetResource(CullDataBufferHandle).GetBDA(),
+							.totalInstanceCount = maxObjectCount,
+							.totalBatchCount = maxBatchCount
+						};
+
+					commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(ComputePS), &ps);
+
+					//auto result = VulkanShaderManager::GetShader(cullShader);
+					//CORI_CORE_ASSERT(result, "Failed to get cullShader. Error: {}", to_string(result.error()));
+					//result.value().get().Bind(commandBuffer);
+
+					VulkanShaderManager::Bind(cullShader.GetHandle(), commandBuffer);
+					commandBuffer.dispatch(std::ceil(maxObjectCount / 64.0f), 1, 1);
+				});
+
+				auto& cmgPass = graph.CreatePass("Indirect Command Generation Pass");
+				cmgPass.Reads(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageRead });
+				cmgPass.Writes(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+				cmgPass.Writes(DrawCommandBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+				cmgPass.Writes(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+				cmgPass.Writes(InstanceAtomicCounterHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+				cmgPass.Reads(GroupCommandOffsetsBufferHandle);
+				cmgPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
+					ComputePS ps {
+							.objectDataBuffer = m_Objects.GetVulkanBuffer().GetBDA(),
+							.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
+							.bii = registry.GetResource(BatchIntermediateInfoBufferHandle).GetBDA(),
+							.commandBuffer = registry.GetResource(DrawCommandBufferHandle).GetBDA(),
+							.commandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle).GetBDA(),
+							.batchInfos = m_BatchGPUInfo.GetVulkanBuffer().GetBDA(),
+							.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
+							.globalAtomic = registry.GetResource(InstanceAtomicCounterHandle).GetBDA(),
+							.commandOffsets = registry.GetResource(GroupCommandOffsetsBufferHandle).GetBDA(),
+							.cullData = s_PoisonValue,
+							.totalInstanceCount = maxObjectCount,
+							.totalBatchCount = maxBatchCount
+						};
+
+					commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(ComputePS), &ps);
+
+					//auto result = VulkanShaderManager::GetShader(cmgShader);
+					//CORI_CORE_ASSERT(result, "Failed to get cmgShader. Error: {}", to_string(result.error()));
+					//result.value().get().Bind(commandBuffer);
+
+					VulkanShaderManager::Bind(cmgShader.GetHandle(), commandBuffer);
+					commandBuffer.dispatch(std::ceil(maxBatchCount / 64.0f), 1, 1);
+				});
+
+				auto& compactPass = graph.CreatePass("Compact Pass");
+				compactPass.Reads(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageRead });
+				compactPass.Writes(BatchIntermediateInfoBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+				compactPass.Writes(CompactedInstanceListBufferHandle, { vk::PipelineStageFlagBits2::eComputeShader, vk::AccessFlagBits2::eShaderStorageWrite });
+				compactPass.Reads(CullDataBufferHandle);
+				compactPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
+					ComputePS ps {
+							.objectDataBuffer = m_Objects.GetVulkanBuffer().GetBDA(),
+							.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
+							.bii = registry.GetResource(BatchIntermediateInfoBufferHandle).GetBDA(),
+							.commandBuffer = registry.GetResource(DrawCommandBufferHandle).GetBDA(),
+							.commandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle).GetBDA(),
+							.batchInfos = m_BatchGPUInfo.GetVulkanBuffer().GetBDA(),
+							.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
+							.globalAtomic = registry.GetResource(InstanceAtomicCounterHandle).GetBDA(),
+							.commandOffsets = registry.GetResource(GroupCommandOffsetsBufferHandle).GetBDA(),
+							.cullData = registry.GetResource(CullDataBufferHandle).GetBDA(),
+							.totalInstanceCount = maxObjectCount,
+							.totalBatchCount = maxBatchCount
+						};
+
+					commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(ComputePS), &ps);
+
+					//auto result = VulkanShaderManager::GetShader(compactShader);
+					//CORI_CORE_ASSERT(result, "Failed to get compactShader. Error: {}", to_string(result.error()));
+					//result.value().get().Bind(commandBuffer);
+
+					VulkanShaderManager::Bind(compactShader.GetHandle(), commandBuffer);
+					commandBuffer.dispatch(std::ceil(maxObjectCount / 64.0f), 1, 1);
+				});
+
+				auto& indirectPass = graph.CreatePass("Indirect Pass");
+				indirectPass.Reads(CompactedInstanceListBufferHandle, { vk::PipelineStageFlagBits2::eVertexShader, vk::AccessFlagBits2::eShaderStorageRead });
+				indirectPass.Reads(DrawCommandBufferHandle, { vk::PipelineStageFlagBits2::eDrawIndirect, vk::AccessFlagBits2::eIndirectCommandRead });
+				indirectPass.Reads(DrawCommandCountBufferHandle, { vk::PipelineStageFlagBits2::eDrawIndirect, vk::AccessFlagBits2::eIndirectCommandRead });
+				indirectPass.Reads(UniformDataBufferHandle);
+				indirectPass.Writes(DepthBufferHandle, {
+					.stageMask = vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
+					.accessMask = vk::AccessFlagBits2::eDepthStencilAttachmentRead | vk::AccessFlagBits2::eDepthStencilAttachmentWrite,
+					.imageLayout = vk::ImageLayout::eDepthAttachmentOptimal,
+					.subrange = { vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 } });
+				indirectPass.AssignWork([=, this](vk::CommandBuffer commandBuffer, RenderGraphResourceRegistry& registry) {
+					DrawPS ps {
+							.objectDataBuffer = m_Objects.GetVulkanBuffer().GetBDA(),
+							.compactedObjectIDBuffer = registry.GetResource(CompactedInstanceListBufferHandle).GetBDA(),
+							.materialDataBuffer = VulkanMaterialSystem::GetMaterialSlotMapBDA(),
+							.shaderEffectDataBuffer = VulkanShaderEffectManager::GetShaderEffectDataBufferBDA(),
+							.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
+							.textureAssetTable = VulkanTextureManager::GetTextureAssetTableBDA(),
+							.batchInfo = m_BatchGPUInfo.GetVulkanBuffer().GetBDA(),
+							.uniformData = registry.GetResource(UniformDataBufferHandle).GetBDA()
+						};
+
+					commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(DrawPS), &ps);
+
+					VulkanGlobalLayoutManager::BindDescriptorBuffer(commandBuffer);
+					commandBuffer.bindIndexBuffer(VulkanMeshManager::GetIndexBuffer().m_Buffer, 0, vk::IndexType::eUint32);
+
+					PipelineState currentPipelineState;
+					currentPipelineState.Change(commandBuffer);
+
+					uint32_t currentCommandOffset = 0;
+					Core::ConstHandle<ShaderEffect> currentShaderEffect;
+
+					auto& indirectCommandBuffer = registry.GetResource(DrawCommandBufferHandle);
+					auto& indirectCommandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle);
+
+					//this is temporary, need to add support to external images to the render graph
+					{
+						vk::ImageMemoryBarrier2 prtBar{
+								.srcStageMask = vk::PipelineStageFlagBits2::eTransfer | vk::PipelineStageFlagBits2::eFragmentShader,
+								.srcAccessMask = vk::AccessFlagBits2::eTransferWrite | vk::AccessFlagBits2::eShaderSampledRead,
+								.dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+								.dstAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
+								.oldLayout = vk::ImageLayout::eUndefined,
+								.newLayout = vk::ImageLayout::eColorAttachmentOptimal,
+								.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.image = prtImage,
+								.subresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 }
+							};
+
+						vk::DependencyInfo depInfo{
+								.imageMemoryBarrierCount = 1,
+								.pImageMemoryBarriers = &prtBar
+							};
+
+						commandBuffer.pipelineBarrier2(depInfo);
+					}
+
+					commandBuffer.setViewportWithCount(vk::Viewport(0.0f, 0.0f, static_cast<float>(prtExtent.width), static_cast<float>(prtExtent.height), 0.0f, 1.0f));
+					commandBuffer.setScissorWithCount(vk::Rect2D(vk::Offset2D(0, 0), prtExtent));
+
+					//temp
+					vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 0.0f);
+					vk::RenderingAttachmentInfo attachmentInfo = {
+							.imageView = prtImageView,
+							.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
+							.loadOp = vk::AttachmentLoadOp::eClear,
+							.storeOp = vk::AttachmentStoreOp::eStore,
+							.clearValue = clearColor
+						};
+
+					VulkanImage::ImageViewKey depthViewKey{
+							.type = vk::ImageViewType::e2D,
+							.subresourceRange = { vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1 }
+						};
+
+					vk::RenderingAttachmentInfo depthAttachmentInfo = {
+							.imageView = registry.GetResource(DepthBufferHandle).GetView(depthViewKey),
+							.imageLayout = vk::ImageLayout::eDepthAttachmentOptimal,
+							.loadOp = vk::AttachmentLoadOp::eClear,
+							.storeOp = vk::AttachmentStoreOp::eDontCare,
+							.clearValue = vk::ClearDepthStencilValue(0.0f, 0)
+						};
+
+					vk::RenderingInfo renderingInfo = {
+							.renderArea = { .offset = { 0, 0 }, .extent = prtExtent },
+							.layerCount = 1,
+							.colorAttachmentCount = 1,
+							.pColorAttachments = &attachmentInfo,
+							.pDepthAttachment = &depthAttachmentInfo
+						};
+					commandBuffer.beginRendering(renderingInfo);
+					//temp
+
+					for (uint32_t i = 0; i < m_DrawGroups.RawSize(); i++) {
+						if (m_DrawGroups.IsIndexValid(i)) {
+							auto& group = m_DrawGroups[i];
+							if (group.GetBatchCount() != 0) {
+								if (group.m_ShaderEffect != currentShaderEffect) {
+									auto pairHandleResult = VulkanShaderEffectManager::GetShaderEffectShaderPair(group.m_ShaderEffect);
+
+									CORI_CORE_ASSERT(pairHandleResult, "Group hold an invalid  shader effect handle.");
+
+									VulkanShaderManager::Bind(pairHandleResult.value().get().GetHandle(), commandBuffer);
+
+									auto pipelineState = VulkanShaderEffectManager::GetShaderEffectPipelineState(group.m_ShaderEffect).value();
+
+									if (pipelineState.get() != currentPipelineState) {
+										pipelineState.get().Change(commandBuffer);
+									}
+
+									currentPipelineState = pipelineState;
+									currentShaderEffect = group.m_ShaderEffect;
+								}
+
+								commandBuffer.drawIndexedIndirectCount(indirectCommandBuffer.GetHeapHandle(), currentCommandOffset * INDIRECT_COMMAND_SIZE + indirectCommandBuffer.GetStartOffset(), indirectCommandCountBuffer.GetHeapHandle(), i * sizeof(uint32_t) + indirectCommandCountBuffer.GetStartOffset(), group.GetBatchCount(), INDIRECT_COMMAND_SIZE);
+								currentCommandOffset += group.GetBatchCount();
+							}
+						}
+					}
+
+					if (settings.DrawAABBs && VulkanShaderManager::GetAssetStatus(aabbShader.GetHandle()) == AssetStatus::eLoaded) {
+						CORI_VK_LABEL(commandBuffer, "Debug AABBs", DebugLabelColors::Scene);
+
+						struct AABBPS {
+							uint64_t objectDataBuffer;
+							uint64_t batchInfoBuffer;
+							uint64_t meshDataBuffer;
+							uint64_t uniformData;
+						};
+
+						AABBPS ps{
+								.objectDataBuffer = m_Objects.GetVulkanBuffer().GetBDA(),
+								.batchInfoBuffer = m_BatchGPUInfo.GetVulkanBuffer().GetBDA(),
+								.meshDataBuffer = VulkanMeshManager::GetMeshAssetBufferBDA(),
+								.uniformData = registry.GetResource(UniformDataBufferHandle).GetBDA()
+							};
+
+						commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(AABBPS), &ps);
+
+						VulkanShaderManager::Bind(aabbShader.GetHandle(), commandBuffer);
+
+						const PipelineState state{
+								.cullMode = vk::CullModeFlagBits::eNone,
+								.depthCompareOp = vk::CompareOp::eGreater,
+								.depthTestEnable = true,
+								.depthWriteEnable = false
+							};
+
+						state.Change(commandBuffer);
+
+						commandBuffer.setLineWidth(1.0f);
+						commandBuffer.setPrimitiveTopology(vk::PrimitiveTopology::eLineList);
+
+						commandBuffer.draw(AABB_VERTEX_COUNT, maxObjectCount, 0, 0);
+
+						commandBuffer.setPrimitiveTopology(vk::PrimitiveTopology::eTriangleList);
+
+						if (settings.Wireframe) {
+							commandBuffer.setLineWidth(settings.WireframeLineWidth);
+						}
+					}
+
+					commandBuffer.endRendering();
+
+					{
+						vk::ImageMemoryBarrier2 prtBar{
+								.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+								.srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
+								.dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
+								.dstAccessMask = vk::AccessFlagBits2::eTransferRead,
+								.oldLayout = vk::ImageLayout::eColorAttachmentOptimal,
+								.newLayout = vk::ImageLayout::eTransferSrcOptimal,
+								.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.image = prtImage,
+								.subresourceRange = {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}
+							};
+
+						vk::DependencyInfo depInfo{
+								.imageMemoryBarrierCount = 1,
+								.pImageMemoryBarriers = &prtBar
+							};
+
+						commandBuffer.pipelineBarrier2(depInfo);
+					}
+				});
+			}
+
+			graph.Compile(VulkanEngine::GetFrameIndex(), VulkanEngine::GetNextFrameInFlight());
+
+			return FrameContext{
+					.commandOffsetsBuffer = commandOffsetsBuffer,
+					.uniformBuffer = uniformBuffer,
+					.cullDataBuffer = cullDataBuffer,
+					.graph = graph,
+					.uniformData = uniformData
+				};
+		}
+
+		void SceneRenderer::Stage2(VulkanEngine::FrameInfo& frameData, FrameContext& frameContext) {
+			if (m_DrawGroups.RawSize() > 0) {
+				uint32_t value = 0;
+				frameContext.commandOffsetsBuffer.UploadToAllocation<uint32_t>(std::span{&value, 1}, 0);
+			}
+
+			uint32_t commandOffset = 0;
+			for (uint32_t i = 0; i < m_DrawGroups.RawSize() - 1; i++) {
+				if (m_DrawGroups.IsIndexValid(i)) {
+					commandOffset += m_DrawGroups[i].GetBatchCount();
+				}
+
+				frameContext.commandOffsetsBuffer.UploadToAllocation<uint32_t>(std::span{&commandOffset, 1}, sizeof(uint32_t) * (i + 1));
+			}
+
+			frameContext.uniformBuffer.UploadToAllocation(std::span{&frameContext.uniformData, 1}, 0);
+			frameContext.cullDataBuffer.UploadToAllocation(std::span{&m_CullData, 1}, 0);
+
+			{
+				CORI_PROFILE_SCOPE("Renderer dynamic container sync");
+				m_Objects.Sync();
+				m_BatchGPUInfo.Sync();
+			}
+		}
+
+		void SceneRenderer::Stage3(VulkanEngine::FrameInfo& frameData, FrameContext& frameContext) {
+			CORI_VK_LABEL_F(frameData.m_CommandBuffer, DebugLabelColors::Scene, "Scene '{}'", m_Name);
+
+			frameContext.graph.Execute(frameData.m_CommandBuffer);
+		}
+
 		SceneRenderer::~SceneRenderer() {
 			VulkanMaterialSystem::RemoveOnShaderEffectSwappedListener(this);
 
@@ -113,132 +605,19 @@ namespace Cori {
 			: cullShader(Core::AssetManager2::Load<ComputeShader>("enginedata://shaders/Cull_Pass1.json")),
 			cmgShader(Core::AssetManager2::Load<ComputeShader>("enginedata://shaders/Cull_Pass2.json")),
 			compactShader(Core::AssetManager2::Load<ComputeShader>("enginedata://shaders/Cull_Pass3.json")),
+			aabbShader(Core::AssetManager2::Load<VertFragShaderPair>("enginedata://shaders/DebugAABBShader.json")),
 			m_PRT(createInfo.initialPRTExtent, createInfo.PRTFormat, createInfo.registerPRTWithImGui, GetNameForPRT(createInfo)) {
 			m_Objects.Reserve(256);
 			m_Batches.Reserve(128);
 			m_DrawGroups.Reserve(16);
 
-			//Constructed on the render thread out of ProcessPendingSceneRendererCreations, which is
-			//the only thread allowed to touch the ImGui Vulkan backend, so the descriptor set for
-			//the PRT is claimed here rather than on whoever asked for the scene renderer.
 			m_PRT.InitialRegisterWithImGui();
 
 			#ifdef DEBUG_BUILD
 			m_Name = createInfo.name;
 			#endif
 
-			//std::ifstream file(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "shaders/CullingShader.spv", std::ios::ate | std::ios::binary);
-			//if (!file.is_open()) {
-			//	throw std::runtime_error("failed to open file!");
-			//}
-			//
-			//std::vector<Byte> buffer(file.tellg());
-			//file.seekg(0, std::ios::beg);
-			//file.read(reinterpret_cast<char*>(buffer.data()), static_cast<std::streamsize>(buffer.size()));
-			//file.close()
-				#if 0
-			std::ifstream file_(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "shaders/TestShader.spv", std::ios::ate | std::ios::binary);
-			if (!file_.is_open()) {
-				throw std::runtime_error("failed to open file!");
-			}
-
-			std::vector<Byte> buffer_(file_.tellg());
-			file_.seekg(0, std::ios::beg);
-			file_.read(reinterpret_cast<char*>(buffer_.data()), static_cast<std::streamsize>(buffer_.size()));
-			file_.close();
-
-			testShader = VulkanShaderManager::CreateVertexShaderPair(buffer_.data(), buffer_.size(), "vertMain", "fragMain", "Test Shader");
-
-			std::ifstream file__(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "shaders/DefaultShader.spv", std::ios::ate | std::ios::binary);
-			if (!file__.is_open()) {
-				throw std::runtime_error("failed to open file!");
-			}
-
-			std::vector<Byte> buffer__(file__.tellg());
-			file__.seekg(0, std::ios::beg);
-			file__.read(reinterpret_cast<char*>(buffer__.data()), static_cast<std::streamsize>(buffer__.size()));
-			file__.close();
-
-			defaultShader = VulkanShaderManager::Get().AllocateShaderPairHandle();
-
-			VulkanShaderManager::Get().CreateShaderPair(defaultShader, buffer__.data(), buffer__.size(), "vertMain", buffer__.data(), buffer__.size(), "fragMain", "Default Shader");
-
-			float depth = 0.0f;
-
-			std::vector<StaticVertex> vertices = {
-					// Bottom-left
-					{glm::vec3(-0.5f, -0.5f, depth), 0, 0, glm::vec2(0, 0), 0xFFFFFFFF},
-
-					// Bottom-right
-					{glm::vec3(0.5f, -0.5f, depth), 0, 0, glm::vec2(1, 0), 0xFFFFFFFF},
-
-					// Top-right
-					{glm::vec3(0.5f, 0.5f, depth), 0, 0, glm::vec2(1, 1), 0xFFFFFFFF},
-
-					// Top-left
-					{glm::vec3(-0.5f, 0.5f, depth), 0, 0, glm::vec2(0, 1), 0xFFFFFFFF}
-				};
-
-			std::vector<uint32_t> indices = {
-					0, 1, 2, // first triangle
-					2, 3, 0 // second triangle
-				};
-
-				#endif
-
-			//quad = VulkanMeshManager::CreateMesh();
-			//VulkanMeshManager::LoadToMesh(quad, vertices, std::move(indices));
-
-			//auto image = Image::Create(FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "placeholders/uv_sample.png");
-			//texture = Core::AssetManager2::Load<Texture2>("assets/AssetNew.json");
-			//swordAlbedo = Core::AssetManager2::Load<Texture2>("assets/Textures/Sword_T_albedo.json");
-			//sword = Core::AssetManager2::Load<Mesh>("assets/Sword_M.json");
-
-			//texture = VulkanTextureManager::CreateTexture(vk::ImageType::e2D, vk::Format::eR8G8B8A8Srgb, { image->GetHeight(), image->GetWidth(), 1 }, 1, 1, vk::SampleCountFlagBits::e1, "UV sample texture");
-			//VulkanTextureManager::UpdateTexture(texture, std::span{ static_cast<Byte*>(image->GetPixelData()), image->GetHeight() * image->GetWidth() * 4 }, { 0, 0, 0 }, { image->GetHeight(), image->GetWidth(), 1 }, { vk::ImageAspectFlagBits::eColor, 0, 0, 1 });
-			//VulkanTextureManager::ChangeView(texture, vk::ImageViewType::e2D, { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 });
-
-				#if 0
-
-			PipelineState state{
-					.cullMode = vk::CullModeFlagBits::eNone,
-					.frontFace = vk::FrontFace::eCounterClockwise,
-				};
-
-			auto shaderEffect = VulkanMaterialSystem::CreateShaderEffect(testShader, state, {}, "Test Shader Effect");
-
-			MaterialData materialData{
-					.colorFactor = {1.0f, 1.0f, 1.0f, 1.0f},
-					.albedoTexture = swordAlbedo.GetHandle(),
-					.albedoSampler = 0
-				};
-
-			MaterialData materialData_{
-					.colorFactor = {1.0f, 1.0f, 1.0f, 1.0f},
-					.albedoTexture = VulkanTextureManager::GetPlaceholder<Texture2>(),
-					.albedoSampler = 0
-				};
-
-			material2 = VulkanMaterialSystem::CreateMaterial(shaderEffect, materialData_, "Test Material 2");
-
-			material = VulkanMaterialSystem::CreateMaterial(shaderEffect, materialData, "Test Material");
-
-
-				#endif
-
-			//glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(0.2f), glm::vec3(0.5f, 0.5, 0.5f));
-			//swordMaterial = Core::AssetManager2::Load<Material>("assets/Sword_Material.json");
-			//auto result = RegisterObject(sword, swordMaterial, transform);
-			//transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0f));
-			//if (!result) {
-			//	CORI_DEBUG("{}", to_string(result.error()));
-			//}
-
-			//RegisterObject(quad, material2, transform);
-
 			VulkanMaterialSystem::AddOnShaderEffectSwappedListener(this, OnMaterialShaderEffectChanged);
-			//FIXME: renderer crashes if we try to run it with no objects added, because we try to allocate virtual upload buffer with size 0 and vma becomes all whiny
-
 
 			for (auto& ptr : m_FrameDataAllocated) {
 				ptr = new FrameData();

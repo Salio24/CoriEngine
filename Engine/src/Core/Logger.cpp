@@ -169,7 +169,7 @@ namespace Cori {
 			return formatter;
 		};
 
-		const auto fileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("logs/cori_log.txt", maxSize, maxFiles);
+		const auto fileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("logs/cori_log.log", maxSize, maxFiles);
 		fileSink->set_formatter(makeFileFormatter());
 		std::vector<spdlog::sink_ptr> coreSinks;
 		std::vector<spdlog::sink_ptr> clientSinks;

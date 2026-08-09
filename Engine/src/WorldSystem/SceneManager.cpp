@@ -28,7 +28,7 @@ namespace Cori {
 				}
 			};
 
-			std::atomic<uint32_t> s_NextSceneID{ 1 };
+			uint32_t s_NextSceneID{ 1 };
 			std::unordered_map<uint32_t, SceneHandle> m_Handles;
 			std::unordered_map<std::string, std::shared_ptr<Scene>, TransparentHash, TransparentEqual> m_Scenes;
 		};
@@ -78,7 +78,7 @@ namespace Cori {
 
 			std::shared_ptr<Scene> scene = Scene::Create(name);
 			s_Data->m_Scenes.insert({ name, scene });
-			const uint32_t id = s_Data->s_NextSceneID.fetch_add(1, std::memory_order_relaxed);
+			const uint32_t id = s_Data->s_NextSceneID++;
 			scene->m_SceneID = id;
 			SceneHandle handle = SceneHandle(scene);
 			s_Data->m_Handles.insert({ id, handle });
@@ -107,6 +107,10 @@ namespace Cori {
 			}
 
 			return std::unexpected(Core::CoriError(std::format("Failed to destroy Scene '{}', this scene is active in some layer. (ref count is > 1", name)));
+		}
+
+		std::unordered_map<uint32_t, SceneHandle>& SceneManager::GetStorage() {
+			return s_Data->m_Handles;
 		}
 	}
 }

@@ -12,7 +12,7 @@
                 1.0,
                 1.0
             ],
-            "albedoTexture": "assets://Sponza/textures/Sponza_Tex_02.json",
+            "albedoTexture": "assets://Sponza/textures/Sponza_Tex_02_Albedo.json",
             "albedoSampler": "SponzaRepeat"
         },
         "shaderEffect": "assets://Sponza/effects/Sponza_Effect_02.json"

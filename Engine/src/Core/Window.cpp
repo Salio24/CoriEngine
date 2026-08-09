@@ -171,8 +171,6 @@ namespace Cori {
 					ImGui_ImplSDL3_ProcessEvent(&e);
 				}
 
-				//Stamp the frame with the oldest human input it is about to act on, so the present
-				//timing subsystem can measure how long that input waited to become photons.
 				switch (e.type) {
 				case SDL_EVENT_KEY_DOWN:
 				case SDL_EVENT_KEY_UP:

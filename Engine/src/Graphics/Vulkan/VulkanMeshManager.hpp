@@ -13,12 +13,20 @@
 
 namespace Cori {
 	namespace Graphics {
-
 		enum class VertexType : uint32_t {
 			eStatic
 		};
 
 		class VulkanMeshManager;
+
+		struct AABB3D {
+			float bxCenter{ 0 };
+			float byCenter{ 0 };
+			float bzCenter{ 0 };
+			float bxExtent{ 0 };
+			float byExtent{ 0 };
+			float bzExtent{ 0 };
+		};
 
 		struct Mesh : Core::SecondaryAssetBase {
 			using Manager = VulkanMeshManager;
@@ -27,6 +35,12 @@ namespace Cori {
 			uint64_t firstVertexAddress{ 0 };
 			uint32_t vertexType{ 0 };
 			uint32_t version{ 0 };
+			float bxCenter{ 0 };
+			float byCenter{ 0 };
+			float bzCenter{ 0 };
+			float bxExtent{ 0 };
+			float byExtent{ 0 };
+			float bzExtent{ 0 };
 		};
 
 		struct StaticVertex {
@@ -208,6 +222,13 @@ namespace Cori {
 					m_IndexData = std::move(other.m_IndexData);
 					m_CompleteVertexAlloc = other.m_CompleteVertexAlloc;
 
+					m_AABB.bxCenter = other.m_AABB.bxCenter;
+					m_AABB.byCenter = other.m_AABB.byCenter;
+					m_AABB.bzCenter = other.m_AABB.bzCenter;
+					m_AABB.bxExtent = other.m_AABB.bxExtent;
+					m_AABB.byExtent = other.m_AABB.byExtent;
+					m_AABB.bzExtent = other.m_AABB.bzExtent;
+
 					other.Release();
 				}
 
@@ -226,6 +247,13 @@ namespace Cori {
 
 					m_CompleteVertexAlloc = other.m_CompleteVertexAlloc;
 
+					m_AABB.bxCenter = other.m_AABB.bxCenter;
+					m_AABB.byCenter = other.m_AABB.byCenter;
+					m_AABB.bzCenter = other.m_AABB.bzCenter;
+					m_AABB.bxExtent = other.m_AABB.bxExtent;
+					m_AABB.byExtent = other.m_AABB.byExtent;
+					m_AABB.bzExtent = other.m_AABB.bzExtent;
+
 					other.Release();
 					return *this;
 				}
@@ -236,6 +264,8 @@ namespace Cori {
 						m_CompleteVertexAlloc = {};
 					}
 				}
+
+				AABB3D m_AABB;
 
 				std::variant<std::vector<StaticVertex>> m_VertexData;
 				std::vector<uint32_t> m_IndexData;
@@ -256,6 +286,16 @@ namespace Cori {
 				bool operator()(const fastObjIndex& a, const fastObjIndex& b) const {
 					return a.p == b.p && a.t == b.t && a.n == b.n;
 				}
+			};
+
+			struct AABBAtomics {
+				std::atomic<uint32_t> gen;
+				std::atomic<uint32_t> bxCenter;
+				std::atomic<uint32_t> byCenter;
+				std::atomic<uint32_t> bzCenter;
+				std::atomic<uint32_t> bxExtent;
+				std::atomic<uint32_t> byExtent;
+				std::atomic<uint32_t> bzExtent;
 			};
 
 		public:
@@ -307,6 +347,12 @@ namespace Cori {
 
 			[[nodiscard]] static uint64_t GetMeshAssetBufferBDA();
 
+			[[nodiscard]] static std::expected<AABB3D, ErrorCode> GetAABB3D(const Core::Handle<Mesh> handle);
+
+			static void AllocateExtras(const Core::Handle<Mesh> handle);
+
+			static void FreeExtras(const Core::Handle<Mesh> handle);
+
 			static constexpr bool EnableHotReload = true;
 			static constexpr bool EnableAutoHotReload = true;
 
@@ -326,7 +372,7 @@ namespace Cori {
 			std::pair<uint32_t, uint32_t> EnsureMetadataSlot(const uint32_t index);
 
 			template<typename VertexT = StaticVertex> requires std::same_as<VertexT, StaticVertex>
-			std::tuple<bool, vk::DeviceSize, std::optional<uint64_t>> LoadToMesh(const Core::Handle<Mesh> handle, std::vector<VertexT>&& vertices, std::vector<uint32_t>&& indices, const uint32_t loadGen, const std::optional<CompleteVertexAllocation>& completeVertexAlloc = std::nullopt);
+			std::tuple<bool, vk::DeviceSize, std::optional<uint64_t>> LoadToMesh(const Core::Handle<Mesh> handle, std::vector<VertexT>&& vertices, std::vector<uint32_t>&& indices, const uint32_t loadGen, const AABB3D& aabb, const std::optional<CompleteVertexAllocation>& completeVertexAlloc = std::nullopt);
 
 			VertexStorage* AllocateNewVertexStorage();
 
@@ -352,8 +398,9 @@ namespace Cori {
 			//VulkanFlatSlotMap<Mesh, 0, false> m_Meshes{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Mesh assets data buffer" };
 
 			std::vector<MeshMetadata> m_MeshMetadata;
+			tbb::concurrent_vector<AABBAtomics> m_AABBs;
 
-			// need to add holes tracking to this!
+			//FIXME: need to add holes tracking to this!
 			tbb::concurrent_vector<VertexStorage> m_VertexStorages;
 
 			vma::VirtualBlock m_IndexBufferBlock;

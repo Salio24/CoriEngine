@@ -73,7 +73,7 @@ namespace Cori {
 				});
 			}
 
-			static void Start(void* window, const bool enableValidationLayers, const vk::Extent2D swapChainExtent);
+			static void Start(void* window, const vk::Extent2D swapChainExtent);
 
 			static void Stop();
 
@@ -259,7 +259,7 @@ namespace Cori {
 			static bool s_VerboseValidationLayerLogging;
 			static bool s_EnableDeviceAddressBindingReport;
 		private:
-			VulkanEngine(void* window, const bool enableValidationLayers, const vk::Extent2D swapChainExtent);
+			VulkanEngine(void* window, const vk::Extent2D swapChainExtent);
 
 			void CreateInstance();
 

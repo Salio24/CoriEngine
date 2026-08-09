@@ -71,40 +71,10 @@ namespace Cori {
 			 */
 			[[nodiscard]] std::string_view GetName() const { return m_Name; }
 
-			/**
-			 * @brief Binds the Scene to the Layer.
-			 * @param name Name of the Scene to bind.
-			 * @return Expected object with void on success or CoriError<> on failure.
-			 */
-			std::expected<void, CoriError<>> BindScene(const std::string& name);
-
-			/**
-			 * @brief Unbinds the Scene from the Layer.
-			 * @return Expected object with void on success or CoriError<> on failure.
-			 */
-			std::expected<void, CoriError<>> UnbindScene();
-
-			/**
-			 * @brief A SceneHandle to the Scene that is currently bound.
-			 */
-			World::SceneHandle ActiveScene{ nullptr };
-
 			inline static Physics::DebugImguiRenderer m_DebugImGuiRenderer;
 
 		private:
 			friend class Application;
-
-			void SceneUpdate(GameTimer& gameTimer) {
-				ActiveScene.OnUpdate(gameTimer);
-			}
-
-			void SceneTickrateUpdate(GameTimer& gameTimer) {
-				ActiveScene.OnTickUpdate(gameTimer);
-			}
-
-			void SceneImGuiRender(GameTimer& gameTimer) {
-				ActiveScene.OnImGuiRender(gameTimer);
-			}
 
 			bool m_Modal{ false };
 			std::string m_Name;

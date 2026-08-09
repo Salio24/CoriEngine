@@ -3,6 +3,8 @@
 #include "Logger.hpp"
 #include "Utility/TemplateUtils.hpp"
 
+//FIXME: this is a hot pile of garbage, and is completely unnecessary. Will move everything to Cori::ErrorCode + plain logging once i have time.
+
 namespace Cori {
 	namespace Core {
 		/**

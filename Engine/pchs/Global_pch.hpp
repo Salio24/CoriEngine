@@ -49,6 +49,7 @@
 #include <stacktrace>
 #include <cinttypes>
 #include <unistd.h>
+#include <meta>
 
 #ifdef CORI_USE_SMID
 	#define GLM_FORCE_INTRINSICS

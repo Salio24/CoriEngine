@@ -110,6 +110,21 @@ namespace Cori {
 				Get().m_VirtBlockQueue[delay].emplace_back(block);
 			}
 
+			static void PushImGuiTexture(const ImTextureID id) {
+				PushImGuiTexture(id, s_DefaultDelay);
+			}
+
+			static void PushImGuiTexture(const ImTextureID id, uint32_t delay) {
+				if (delay >= s_BucketCount) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushImGuiTexture is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
+					delay = GetMaxDelay();
+				}
+
+				delay = (delay + Get().m_Counter) % s_BucketCount;
+
+				Get().m_ImGuiTextureQueue[delay].emplace_back(id);
+			}
+
 			static void Flush();
 
 			static constexpr uint32_t GetMaxDelay() {
@@ -142,7 +157,7 @@ namespace Cori {
 			std::array<std::vector<vk::ShaderEXT>, s_BucketCount> m_ShaderObjectQueue;
 			std::array<std::vector<QueuedVirtualAlloc>, s_BucketCount> m_VirtAllocQueue;
 			std::array<std::vector<vma::VirtualBlock>, s_BucketCount> m_VirtBlockQueue;
-
+			std::array<std::vector<ImTextureID>, s_BucketCount> m_ImGuiTextureQueue;
 
 			static std::unique_ptr<DeletionQueue> s_Instance;
 		};

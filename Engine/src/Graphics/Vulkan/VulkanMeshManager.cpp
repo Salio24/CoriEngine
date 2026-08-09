@@ -8,6 +8,7 @@ namespace Cori {
 		std::unique_ptr<VulkanMeshManager> VulkanMeshManager::s_Instance{ nullptr };
 
 		VulkanMeshManager::VulkanMeshManager() {
+			s_Instance = std::unique_ptr<VulkanMeshManager>(this);
 			auto& sharingSettings = VulkanEngine::GetBufferSharingSettings(BUFFER_USAGE);
 
 			vk::BufferCreateInfo vkIndexBufferInfo {
@@ -97,7 +98,34 @@ namespace Cori {
 			m_Meshes.EmplaceAt(m_PlaceholderMesh.GetIndex());
 
 			uint32_t indexCount = placeholderIndexData.size();
-			auto [success, indexOffset, ticket] = LoadToMesh<StaticVertex>(m_PlaceholderMesh, std::move(placeholderVertexData), std::move(placeholderIndexData), 0);
+			AABB3D aabb;
+
+			float bxMax = std::numeric_limits<float>::lowest();
+			float byMax = std::numeric_limits<float>::lowest();
+			float bzMax = std::numeric_limits<float>::lowest();
+			float bxMin = std::numeric_limits<float>::max();
+			float byMin = std::numeric_limits<float>::max();
+			float bzMin = std::numeric_limits<float>::max();
+
+			for (const uint32_t index : placeholderIndexData) {
+				const auto& vertex = placeholderVertexData[index];
+				bxMax = std::max(bxMax, vertex.position.x);
+				byMax = std::max(byMax, vertex.position.y);
+				bzMax = std::max(bzMax, vertex.position.z);
+				bxMin = std::min(bxMin, vertex.position.x);
+				byMin = std::min(byMin, vertex.position.y);
+				bzMin = std::min(bzMin, vertex.position.z);
+			}
+
+			aabb.bxCenter = (bxMax + bxMin) * 0.5f;
+			aabb.byCenter = (byMax + byMin) * 0.5f;
+			aabb.bzCenter = (bzMax + bzMin) * 0.5f;
+
+			aabb.bxExtent = (bxMax - bxMin) * 0.5f;
+			aabb.byExtent = (byMax - byMin) * 0.5f;
+			aabb.bzExtent = (bzMax - bzMin) * 0.5f;
+
+			auto [success, indexOffset, ticket] = LoadToMesh<StaticVertex>(m_PlaceholderMesh, std::move(placeholderVertexData), std::move(placeholderIndexData), 0, aabb);
 			CORI_CORE_ASSERT(success, "Failed to load placeholder mesh.");
 			if (!ticket) {
 				CORI_CORE_WARN_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::MeshManager }, "The load of placeholder was rejected by the streaming like due to backpressure, it was queued and will be loaded a bit later. AssignPlaceholder calls will assign an empty mesh in that window.");
@@ -125,7 +153,7 @@ namespace Cori {
 
 		void VulkanMeshManager::Init() {
 			CORI_CORE_ASSERT(!s_Instance, "VulkanShaderManager is already initialized.")
-			s_Instance = std::unique_ptr<VulkanMeshManager>(new VulkanMeshManager());
+			new VulkanMeshManager();
 		}
 
 		void VulkanMeshManager::Shutdown() {
@@ -249,7 +277,20 @@ namespace Cori {
 							CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handing worker vertex allocation (storage=%p @ byte offset %llu) to LoadToMesh", static_cast<void*>(payload.m_CompleteVertexAlloc.storage), static_cast<unsigned long long>(payload.m_CompleteVertexAlloc.offset));
 							CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eDebug, Cori::ProfileColors::Finalize, "%s Handle=[%u, %u] finalize: uploading parsed mesh (storage=%p, gen=%u) (id=%llu)", CORI_CLEAN_TYPE_NAME(Mesh), handle_.GetIndex(), handle_.GetVersion(), static_cast<void*>(payload.m_CompleteVertexAlloc.storage), gen_, static_cast<unsigned long long>(id_));
 
-							Get().LoadToMesh(handle_, std::move(std::get<std::vector<StaticVertex>>(payload.m_VertexData)), std::move(payload.m_IndexData), gen_, payload.m_CompleteVertexAlloc);
+							Get().LoadToMesh(handle_, std::move(std::get<std::vector<StaticVertex>>(payload.m_VertexData)), std::move(payload.m_IndexData), gen_, payload.m_AABB, payload.m_CompleteVertexAlloc);
+
+							auto& aabb = Get().m_AABBs[handle_.GetIndex()];
+							aabb.gen.fetch_add(1, std::memory_order_relaxed);
+							std::atomic_thread_fence(std::memory_order_release);
+
+							aabb.bxCenter.store(std::bit_cast<uint32_t>(payload.m_AABB.bxCenter), std::memory_order_relaxed);
+							aabb.byCenter.store(std::bit_cast<uint32_t>(payload.m_AABB.byCenter), std::memory_order_relaxed);
+							aabb.bzCenter.store(std::bit_cast<uint32_t>(payload.m_AABB.bzCenter), std::memory_order_relaxed);
+							aabb.bxExtent.store(std::bit_cast<uint32_t>(payload.m_AABB.bxExtent), std::memory_order_relaxed);
+							aabb.byExtent.store(std::bit_cast<uint32_t>(payload.m_AABB.byExtent), std::memory_order_relaxed);
+							aabb.bzExtent.store(std::bit_cast<uint32_t>(payload.m_AABB.bzExtent), std::memory_order_relaxed);
+
+							aabb.gen.fetch_add(1, std::memory_order_release);
 
 							payload.Release();
 						});
@@ -383,7 +424,37 @@ namespace Cori {
 					CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Outcome: Parsed, vertex allocation taken (storage=%p @ byte offset %llu), handed to FinalizeLoad", static_cast<void*>(ca.storage), static_cast<unsigned long long>(ca.offset));
 					CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eDebug, Cori::ProfileColors::Upload, "%s Handle=[%u, %u] worker took vertex allocation (storage=%p @ byte offset %llu), (gen=%u) (id=%llu)", CORI_CLEAN_TYPE_NAME(Mesh), handle.GetIndex(), handle.GetVersion(), static_cast<void*>(ca.storage), static_cast<unsigned long long>(ca.offset), gen, static_cast<unsigned long long>(id));
 
-					FinalizeLoad(handle, id, gen, vectorKey, WorkerPayload(std::move(vertexData), std::move(indexData), ca));
+					AABB3D aabb;
+
+					float bxMax = std::numeric_limits<float>::lowest();
+					float byMax = std::numeric_limits<float>::lowest();
+					float bzMax = std::numeric_limits<float>::lowest();
+					float bxMin = std::numeric_limits<float>::max();
+					float byMin = std::numeric_limits<float>::max();
+					float bzMin = std::numeric_limits<float>::max();
+
+					for (const uint32_t index : indexData) {
+						const auto& vertex = vertexData[index];
+						bxMax = std::max(bxMax, vertex.position.x);
+						byMax = std::max(byMax, vertex.position.y);
+						bzMax = std::max(bzMax, vertex.position.z);
+						bxMin = std::min(bxMin, vertex.position.x);
+						byMin = std::min(byMin, vertex.position.y);
+						bzMin = std::min(bzMin, vertex.position.z);
+					}
+
+					aabb.bxCenter = (bxMax + bxMin) * 0.5f;
+					aabb.byCenter = (byMax + byMin) * 0.5f;
+					aabb.bzCenter = (bzMax + bzMin) * 0.5f;
+
+					aabb.bxExtent = (bxMax - bxMin) * 0.5f;
+					aabb.byExtent = (byMax - byMin) * 0.5f;
+					aabb.bzExtent = (bzMax - bzMin) * 0.5f;
+
+					auto payload = WorkerPayload(std::move(vertexData), std::move(indexData), ca);
+					payload.m_AABB = aabb;
+
+					FinalizeLoad(handle, id, gen, vectorKey, std::move(payload));
 				}
 			});
 		}
@@ -575,6 +646,49 @@ namespace Cori {
 			return Get().m_Meshes.GetVulkanBuffer().GetBDA();
 		}
 
+		std::expected<AABB3D, ErrorCode> VulkanMeshManager::GetAABB3D(const Core::Handle<Mesh> handle) {
+			if (!IsHandleValid(handle)) {
+				return std::unexpected(ErrorCode::eInvalidHandle);
+			}
+
+			AABBAtomics& atomics = Get().m_AABBs[handle.GetIndex()];
+			uint32_t gen0 = atomics.gen.load(std::memory_order_acquire);
+			uint32_t gen1 = 0;
+			if (gen0 == 0) {
+				return std::unexpected(ErrorCode::eNotReady);
+			}
+
+			AABB3D aabb;
+
+			while (gen0 != gen1) {
+				gen0 = atomics.gen.load(std::memory_order_acquire);
+
+				aabb.bxCenter = std::bit_cast<float>(atomics.bxCenter.load(std::memory_order_relaxed));
+				aabb.byCenter = std::bit_cast<float>(atomics.byCenter.load(std::memory_order_relaxed));
+				aabb.bzCenter = std::bit_cast<float>(atomics.bzCenter.load(std::memory_order_relaxed));
+				aabb.bxExtent = std::bit_cast<float>(atomics.bxExtent.load(std::memory_order_relaxed));
+				aabb.byExtent = std::bit_cast<float>(atomics.byExtent.load(std::memory_order_relaxed));
+				aabb.bzExtent = std::bit_cast<float>(atomics.bzExtent.load(std::memory_order_relaxed));
+
+				std::atomic_thread_fence(std::memory_order_acquire);
+				gen1 = atomics.gen.load(std::memory_order_relaxed);
+			}
+
+			return aabb;
+		}
+
+		void VulkanMeshManager::AllocateExtras(const Core::Handle<Mesh> handle) {
+			const uint64_t newSizePowerOfTwo = Utility::GetNextPowerOfTwo(handle.GetIndex() + 1);
+
+			if (newSizePowerOfTwo >= Get().m_AABBs.size()) {
+				Get().m_AABBs.grow_to_at_least(newSizePowerOfTwo);
+			}
+		}
+
+		void VulkanMeshManager::FreeExtras(const Core::Handle<Mesh> handle) {
+			Get().m_AABBs[handle.GetIndex()].gen.store(0, std::memory_order_release);
+		}
+
 		bool VulkanMeshManager::IsHandleValidImpl(const Core::Handle<Mesh> handle) const {
 			return m_HandleAllocator.IsHandleValid(handle);
 		}
@@ -619,7 +733,7 @@ namespace Cori {
 		}
 
 		template<typename VertexT> requires std::same_as<VertexT, StaticVertex>
-		std::tuple<bool, vk::DeviceSize, std::optional<uint64_t>> VulkanMeshManager::LoadToMesh(const Core::Handle<Mesh> handle, std::vector<VertexT>&& vertices, std::vector<uint32_t>&& indices, const uint32_t loadGen, const std::optional<CompleteVertexAllocation>& completeVertexAlloc) {
+		std::tuple<bool, vk::DeviceSize, std::optional<uint64_t>> VulkanMeshManager::LoadToMesh(const Core::Handle<Mesh> handle, std::vector<VertexT>&& vertices, std::vector<uint32_t>&& indices, const uint32_t loadGen, const AABB3D& aabb, const std::optional<CompleteVertexAllocation>& completeVertexAlloc) {
 			constexpr VertexType vertexType = []{
 				if constexpr (std::is_same_v<VertexT, StaticVertex>) {
 					return VertexType::eStatic;
@@ -712,7 +826,13 @@ namespace Cori {
 					.firstIndex = 0,
 					.firstVertexAddress = vertexStorage->m_Buffer.GetBDA() + vertexOffset,
 					.vertexType = std::to_underlying(vertexType),
-					.version = handle.GetVersion()
+					.version = handle.GetVersion(),
+					.bxCenter = aabb.bxCenter,
+					.byCenter = aabb.byCenter,
+					.bzCenter = aabb.bzCenter,
+					.bxExtent = aabb.bxExtent,
+					.byExtent = aabb.byExtent,
+					.bzExtent = aabb.bzExtent
 				};
 
 				m_Meshes[handle] = mesh;
@@ -769,7 +889,13 @@ namespace Cori {
 				.firstIndex = 0,
 				.firstVertexAddress = vertexStorage->m_Buffer.GetBDA() + vertexOffset,
 				.vertexType = std::to_underlying(vertexType),
-				.version = handle.GetVersion()
+				.version = handle.GetVersion(),
+				.bxCenter = aabb.bxCenter,
+				.byCenter = aabb.byCenter,
+				.bzCenter = aabb.bzCenter,
+				.bxExtent = aabb.bxExtent,
+				.byExtent = aabb.byExtent,
+				.bzExtent = aabb.bzExtent
 			};
 
 			m_Meshes[handle] = mesh;
@@ -870,6 +996,12 @@ namespace Cori {
 			meshData.firstIndex = 0;
 			meshData.firstVertexAddress = 0;
 			meshData.vertexType = 0;
+			meshData.bxCenter = 0.0f;
+			meshData.byCenter = 0.0f;
+			meshData.bzCenter = 0.0f;
+			meshData.bxExtent = 0.0f;
+			meshData.byExtent = 0.0f;
+			meshData.bzExtent = 0.0f;
 		}
 
 		std::vector<VulkanMeshManager::MeshInTransfer>& VulkanMeshManager::FindInTransferSlot(const uint64_t value) {

@@ -1,9 +1,8 @@
 #pragma once
 #include "SceneRenderer.hpp"
-#include "FrameData.hpp"
 #include "Graphics/RenderThreadCommandQueue.hpp"
 #include "Graphics/RenderThreadWakeup.hpp"
-#include "Core/Threading/CpuTopology.hpp"
+#include "Graphics/RendererSettings.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -11,9 +10,11 @@ namespace Cori {
 
 		struct MasterFrameData {
 			FrameLatencyStamps latencyStamps{};
+			RendererSettings settings{};
 
 			void Clear() {
 				latencyStamps = {};
+				settings = {};
 			}
 		};
 
@@ -126,9 +127,7 @@ namespace Cori {
 			friend SceneRenderer;
 			void EnterThreadedMode() {
 				RenderThreadCommandQueue::ClearExecuterThreadId();
-				m_RenderThread = std::move(std::thread([this] {
-					RtTask();
-				}));
+				m_RenderThread = std::thread(&MasterRenderer::RtTask, this);
 			}
 
 			void ExitThreadedMode() {
@@ -141,49 +140,16 @@ namespace Cori {
 			}
 
 			constexpr static uint32_t GetAdmitDepth() {
-				return 1;
+				return 2; //FIXME: sooo turns out my ordering is wrong. and now i have a dead-lock with admit depth < 2 when main thread lags behind the rendering thread for 2 frames ;((
 			}
 
 		private:
-			void RtTask() {
-				SetThreadName("Render");
-				if (Threading::CpuTopology::ShouldBind()) {
-					Threading::CpuTopology::BindCurrentThreadToDomain(Threading::CpuTopology::PreferredDomain());
-				}
-
-				RenderThreadCommandQueue::SetExecuterThreadId(std::this_thread::get_id());
-
-				while (m_Running.load(std::memory_order_acquire)) {
-					CORI_PROFILE_FUNCTION();
-					CORI_PROFILER_PLOT("Render thread CPU", Threading::CpuTopology::CurrentCpu());
-					uint64_t wakeBefore = RenderThreadWakeup::Snapshot();
-
-					ProcessPendingSceneRendererCreations();
-					ProcessPendingSceneRendererDestructions();
-
-					if (!m_Running.load(std::memory_order_acquire)) {
-						break;
-					}
-
-					{
-						CORI_PROFILE_SCOPE("Master Frame");
-						if (TryRunFrame()) {
-							RenderThreadCommandQueue::DrainOnRenderThread();
-							continue;
-						}
-					}
-
-					if (RenderThreadCommandQueue::DrainOnRenderThread() > 0) {
-						continue;
-					}
-
-					if (RenderThreadWakeup::Snapshot() != wakeBefore) {
-						continue;
-					}
-
-					RenderThreadWakeup::WaitChanged(wakeBefore);
-				}
-			}
+			struct NonDormantSceneRenderer {
+				SceneRenderer* ptr{};
+				SceneRendererHandle handle{};
+				std::optional<SceneRenderer::FrameContext> context;
+			};
+			void RtTask();
 
 			static constexpr uint32_t s_MaxSceneRendererCount{ 16 };
 
@@ -258,124 +224,7 @@ namespace Cori {
 				return false;
 			}
 
-			bool TryRunFrame() {
-				uint64_t maxWatermark = 0;
-				FrameLatencyStamps latencyStamps{};
-
-				std::array<std::pair<SceneRenderer*, SceneRendererHandle>, s_MaxSceneRendererCount> nonDormant;
-				nonDormant.fill({ nullptr, UINT32_MAX});
-				uint32_t nonDormantCounter = 0;
-				SceneRendererHandle handleCounter = 0;
-
-				for (auto& renderer : m_SceneRenderers) {
-					SceneRenderer* ptr = renderer.load(std::memory_order_relaxed);
-					if (ptr) {
-						FrameData** dataPtr = ptr->PeekFrameData();
-						if (!dataPtr) {
-							if (ptr->IsDormant()) {
-								continue;
-							}
-
-							return false;
-						}
-
-						ptr->MarkNonDormant();
-						maxWatermark = std::max(maxWatermark, (*dataPtr)->rtcqWatermark);
-
-						nonDormantCounter++;
-						nonDormant[nonDormantCounter - 1].first = ptr;
-						nonDormant[nonDormantCounter - 1].second = handleCounter;
-					}
-					handleCounter++;
-				}
-
-				bool ghostFrame = false;
-				if (nonDormantCounter == 0) {
-					if (m_ReadyRing.Front()) {
-						ghostFrame = true;
-					}
-					else {
-						return false;
-					}
-				}
-
-				if (RenderThreadCommandQueue::DrainedCount() < maxWatermark) {
-					return false;
-				}
-
-				VulkanPresentTiming::ThrottlePresentQueue();
-
-				MasterFrameData** frameData = m_ReadyRing.Front();
-				if (!frameData) {
-					return false;
-				}
-
-				m_ReadyRing.Pop();
-
-				ImGuiRenderer::ProcessTexQueueRequests();
-
-				const FrameLatencyStamps& sceneStamps = (*frameData)->latencyStamps;
-
-				if (sceneStamps.inputTimestampSdl != 0) {
-					latencyStamps.inputTimestampSdl = sceneStamps.inputTimestampSdl;
-				}
-
-				if (sceneStamps.frameStartHost != 0) {
-					latencyStamps.frameStartHost = sceneStamps.frameStartHost;
-				}
-
-				SceneRendererHandle requestedHandle = m_MainRenderer.load(std::memory_order_acquire);
-				Mode mode = m_CurrentMode.load(std::memory_order_acquire);
-
-				(*frameData)->Clear();
-				m_RecycleRing.Emplace(*frameData);
-
-				if (nonDormantCounter == 0 && !ghostFrame) {
-					return false;
-				}
-
-				for (uint32_t i = 0; i < nonDormantCounter; i++) {
-					SceneRenderer* ptr = nonDormant[i].first;
-					ptr->ProcessFrameData();
-				}
-
-				static std::vector<SceneRenderer::FrameContext> frameContexts;
-				frameContexts.clear();
-
-				VulkanEngine::Get().CPUFrameStart();
-				for (uint32_t i = 0; i < nonDormantCounter; i++) {
-					SceneRenderer* ptr = nonDormant[i].first;
-					frameContexts.push_back(ptr->Stage1());
-				}
-
-				auto& frameInfo = VulkanEngine::Get().GPUFrameBegin();
-				if (!ghostFrame && !frameInfo.m_SkippedFrame) {
-					DeletionQueue::Flush();
-				}
-
-				if (!frameInfo.m_SkippedFrame) {
-					InitializeFreshPRTs(frameInfo.m_CommandBuffer);
-
-					for (uint32_t i = 0; i < nonDormantCounter; i++) {
-						SceneRenderer* ptr = nonDormant[i].first;
-						ptr->Stage2(frameInfo, frameContexts[i]);
-					}
-
-					VulkanEngine::Get().GPUFrameMiddlePointSync();
-
-					for (uint32_t i = 0; i < nonDormantCounter; i++) {
-						SceneRenderer* ptr = nonDormant[i].first;
-						ptr->Stage3(frameInfo, frameContexts[i]);
-					}
-
-					Composite(frameInfo.m_CommandBuffer, nonDormant, nonDormantCounter, mode, requestedHandle);
-				}
-
-				ImGuiRenderer::RecycleSnapshot();
-
-				VulkanEngine::Get().GPUFrameEnd(latencyStamps);
-				return true;
-			}
+			bool TryRunFrame();
 
 			void InitializeFreshPRTs(vk::CommandBuffer cmb) {
 				static std::vector<vk::ImageMemoryBarrier2> toShaderRead;
@@ -418,13 +267,13 @@ namespace Cori {
 				}
 			}
 
-			void Composite(vk::CommandBuffer cmb, std::array<std::pair<SceneRenderer*, SceneRendererHandle>, s_MaxSceneRendererCount>& nonDormantRenderers, const uint32_t nonDormantRendererCount, const Mode mode, const SceneRendererHandle requestedHandle) {
+			void Composite(vk::CommandBuffer cmb, std::array<NonDormantSceneRenderer, s_MaxSceneRendererCount>& nonDormantRenderers, const uint32_t nonDormantRendererCount, const uint32_t emptySceneCount, const Mode mode, const SceneRendererHandle requestedHandle) {
 				CORI_VK_LABEL_F(cmb, DebugLabelColors::Composite, "Composite {} scene(s)", nonDormantRendererCount);
 
 				switch (mode) {
 				case Mode::eDirectBlit:
 					{
-						if (nonDormantRendererCount == 0) {
+						if (nonDormantRendererCount == 0 || emptySceneCount == 0) {
 							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> PresentSrcKHR (skip)", DebugLabelColors::Barrier);
 
 							vk::ImageMemoryBarrier2 scBar{
@@ -451,8 +300,8 @@ namespace Cori {
 
 						SceneRenderer* chosen = nullptr;
 						for (uint32_t i = 0; i < nonDormantRendererCount; i++) {
-							if (nonDormantRenderers[i].second == requestedHandle) {
-								chosen = nonDormantRenderers[i].first;
+							if (nonDormantRenderers[i].handle == requestedHandle) {
+								chosen = nonDormantRenderers[i].ptr;
 							}
 						}
 
@@ -550,7 +399,7 @@ namespace Cori {
 					}
 				case Mode::eHybrid:
 					{
-						if (nonDormantRendererCount == 0) {
+						if (nonDormantRendererCount == 0 || emptySceneCount == 0) {
 							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> PresentSrcKHR (skip)", DebugLabelColors::Barrier);
 
 							vk::ImageMemoryBarrier2 scBar{
@@ -577,8 +426,8 @@ namespace Cori {
 
 						SceneRenderer* chosen = nullptr;
 						for (uint32_t i = 0; i < nonDormantRendererCount; i++) {
-							if (nonDormantRenderers[i].second == requestedHandle) {
-								chosen = nonDormantRenderers[i].first;
+							if (nonDormantRenderers[i].handle == requestedHandle) {
+								chosen = nonDormantRenderers[i].ptr;
 							}
 						}
 
@@ -724,6 +573,7 @@ namespace Cori {
 							CORI_VK_LABEL_INSERT(cmb, "Scene PRTs -> ShaderReadOnlyOptimal", DebugLabelColors::Barrier);
 
 							std::array<vk::ImageMemoryBarrier2, s_MaxSceneRendererCount> prtBarriers{};
+							uint32_t counter = 0;
 
 							for (uint32_t i = 0; i < nonDormantRendererCount; i++) {
 								prtBarriers[i] = vk::ImageMemoryBarrier2{
@@ -735,13 +585,15 @@ namespace Cori {
 									.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal,
 									.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
 									.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-									.image = nonDormantRenderers[i].first->GetPRT().GetImage().m_Image,
+									.image = nonDormantRenderers[i].ptr->GetPRT().GetImage().m_Image,
 									.subresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 }
 								};
+
+								counter++;
 							}
 
 							vk::DependencyInfo depInfo{
-								.imageMemoryBarrierCount = nonDormantRendererCount,
+								.imageMemoryBarrierCount = counter,
 								.pImageMemoryBarriers = prtBarriers.data()
 							};
 

@@ -14,13 +14,14 @@ namespace Cori {
 		 * @param cameraPos Position of the debug camera, use GetSize() with your main Graphics::CameraController to align the main camera and debug camera.
 		 * @param pixelsPerMeter Pixels in main camera per meter range. Use CORI_PIXELS_PER_METER.
 		 * @param layer Pointer to the layer you're calling this function from.
+		 * @param scene
 		 * @param mouseDrag Enable or disable dynamic object dragging with a mouse.
 		 * @param mouseForce Force to apply when using mouse drag.
 		 * @note Only usable in Layer OnImGuiRender method.
 		 */
-		[[maybe_unused]] static void Box2dDebugDraw(const glm::vec2 cameraSize, const glm::vec2 cameraPos, const int32_t pixelsPerMeter, Core::Layer* layer, const bool mouseDrag, const float mouseForce = 1000.0f) {
+		[[maybe_unused]] static void Box2dDebugDraw(const glm::vec2 cameraSize, const glm::vec2 cameraPos, const int32_t pixelsPerMeter, Core::Layer* layer, World::SceneHandle scene, const bool mouseDrag, const float mouseForce = 1000.0f) {
 			layer->m_DebugImGuiRenderer.ViewportCalc(cameraSize, pixelsPerMeter, cameraPos);
-			auto system = layer->ActiveScene.GetSystem<World::Systems::PhysicsSystem>();
+			auto system = scene.GetSystem<World::Systems::PhysicsSystem>();
 			if (system) {
 				layer->m_DebugImGuiRenderer.DrawShapes(system->lock()->GetWorld());
 				if (mouseDrag) {

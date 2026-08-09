@@ -19,28 +19,6 @@ template <> struct AssetTraits<__VA_ARGS__ __VA_OPT__(::) T> { \
 	static constexpr Utility::StringHash64 TypeHash = Utility::HashString64(#T); \
 }
 
-class ScopedTimer {
-public:
-	using clock = std::chrono::steady_clock;
-
-	explicit ScopedTimer(std::string_view name = "ScopedTimer")
-		: name_(name), start_(clock::now()) {}
-
-	~ScopedTimer() {
-		const auto end = clock::now();
-		const auto duration = std::chrono::duration<double, std::milli>(end - start_);
-		std::cout << name_ << " took " << std::fixed << std::setprecision(5)
-				  << duration.count() << " ms\n";
-	}
-
-	ScopedTimer(const ScopedTimer&) = delete;
-	ScopedTimer& operator=(const ScopedTimer&) = delete;
-
-private:
-	std::string_view name_;
-	clock::time_point start_;
-};
-
 namespace Cori {
 	namespace Core {
 		namespace Internal {
@@ -338,10 +316,10 @@ namespace Cori {
 		struct AssetDir {
 			std::string label{ "Empty AssetDir Label" };
 			std::filesystem::path dir;
-			std::filesystem::file_time_type dirTimestamp;
+			std::atomic<std::filesystem::file_time_type> dirTimestamp;
+			AssetDirID id;
+			std::atomic<uint64_t> gen; // if i even want to allow adding asset dirs after the startup, this should become a seqlock
 		};
-
-
 
 		class AssetManager2 {
 			template<IsValidAsset T>
@@ -454,6 +432,46 @@ namespace Cori {
 
 			static AssetManager2& Get();
 
+			static bool IsRegistered(const char* path) {
+				AssetID id = Utility::HashString64(path);
+				return Get().m_AssetDatabase.contains(id);
+			}
+
+			static bool IsRegistered(const AssetID id) {
+				return Get().m_AssetDatabase.contains(id);
+			}
+
+			static std::optional<uint64_t> GetAssetTypeHash(const AssetID id) {
+				if (!IsRegistered(id)) {
+					return std::nullopt;
+				}
+
+				uint32_t key = Get().m_AssetDatabase[id].vectorKey;
+				return Get().m_TypeNameHashes[key];
+			}
+
+			static uint64_t GetAssetTypeHash(const uint32_t key) {
+				CORI_CORE_ASSERT(Get().m_PublishedCount.load(std::memory_order_acquire) >= key, "Invalid vector key.");
+
+				return Get().m_TypeNameHashes[key];
+			}
+
+			static std::optional<uint32_t> GetAssetVectorKey(const AssetID id) {
+				if (!IsRegistered(id)) {
+					return std::nullopt;
+				}
+
+				return Get().m_AssetDatabase[id].vectorKey;;
+			}
+
+			template<typename F>
+			static void ForEachAssetDir(F&& f) {
+				auto publishedCount = Get().m_PublishedDirCount.load(std::memory_order_acquire);
+				for (auto& entry : std::ranges::subrange(Get().m_AssetDirs.begin(), Get().m_AssetDirs.begin() + publishedCount)) {
+					f(entry);
+				}
+			}
+
 			template<IsValidAsset T>
 			static AssetRef<T> Load(const char* path) {
 				AssetID id = Utility::HashString64(path);
@@ -462,6 +480,8 @@ namespace Cori {
 				uint32_t vectorKey;
 				std::filesystem::path fsPath;
 				std::string name;
+
+				auto& gg = Get();
 
 				{
 					auto& mutex = GetMutex();
@@ -545,15 +565,23 @@ namespace Cori {
 				return Get().m_AssetDatabase[id];
 			}
 
+			//FIXME: use file watcher instead of brute-forcing it, costs 2.4s!!!! on a torture test (1945 folders 12649 asset files)
 			static void ScanDirectory(const AssetDirID dirID) {
 				Threading::OneAtATime lk(Get().m_ScanRunning);
+				if (!lk.TryLock()) {
+					return;
+				}
 
-				const auto& assetDirPath = Get().m_AssetDirs[dirID].dir;
+				CORI_PROFILE_FUNCTION();
 
-				for (const auto& entry : std::filesystem::recursive_directory_iterator(assetDirPath)) {
+				auto& assetDir = Get().m_AssetDirs[dirID];
+
+				bool isNew = false;
+
+				for (const auto& entry : std::filesystem::recursive_directory_iterator(assetDir.dir)) {
 					if (entry.is_regular_file()) {
 						if (entry.path().extension() == ".json") {
-							ProcessFile(entry.path(), dirID);
+							isNew |= ProcessFile(entry.path(), dirID);
 						}
 					}
 				}
@@ -561,8 +589,12 @@ namespace Cori {
 
 			static void OnUpdate(GameTimer& timer);
 
+			//FIXME: use file watcher instead of brute-forcing it, costs 250ms on a torture test (1945 folders 12649 asset files)
 			static void ScanAndReload() {
 				Threading::OneAtATime lk(Get().m_SaRRunning);
+				if (!lk.TryLock()) {
+					return;
+				}
 
 				CORI_PROFILE_FUNCTION();
 				uint32_t counter = 0;
@@ -667,15 +699,26 @@ namespace Cori {
 					return std::nullopt;
 				}
 
-				AssetDirID key = Get().m_PublishedDirCount;
+				for (auto& assetDir : Get().m_AssetDirs) {
+					if (assetDir.label == label) {
+						return std::nullopt;
+					}
+				}
+
+				AssetDirID key = Get().m_PublishedDirCount.load(std::memory_order_relaxed);
 				const uint64_t newSizePowerOfTwo = Utility::GetNextPowerOfTwo(key + 1);
 				if (newSizePowerOfTwo >= Get().m_AssetDirs.size()) {
 					Get().m_AssetDirs.grow_to_at_least(newSizePowerOfTwo);
 				}
 
-				Get().m_AssetDirs[key] = AssetDir{ .label = std::move(label), .dir = dir, .dirTimestamp = last_write_time(dir) };
+				auto& assetDir = Get().m_AssetDirs[key];
+				assetDir.label = std::move(label);
+				assetDir.dir = dir;
+				assetDir.dirTimestamp.store(last_write_time(dir), std::memory_order_relaxed);
+				assetDir.gen.fetch_add(1, std::memory_order_relaxed);
+				assetDir.id = key;
 
-				Get().m_PublishedDirCount++;
+				Get().m_PublishedDirCount.fetch_add(1, std::memory_order_release);
 
 				return key;
 			}
@@ -794,7 +837,7 @@ namespace Cori {
 				auto* newNonAtomicMeta = new NonAtomicAssetMeta();
 				newNonAtomicMeta->jsonPath = oldNonAtomicMeta->jsonPath;
 				newNonAtomicMeta->name = std::move(meta.name);
-				//FIXME: propagate the change to the asset spoke
+				//FIXME: propagate the name change to the asset spoke
 
 				auto& stampsVec = Get().m_AssetFileStamps[vectorKey];
 				stampsVec.clear();
@@ -813,9 +856,9 @@ namespace Cori {
 				Get().m_AllSlots.emplace_back(newNonAtomicMeta);
 			}
 
-			static void ProcessFile(const std::filesystem::path& assetFilePath, const AssetDirID dirID) {
+			static bool ProcessFile(const std::filesystem::path& assetFilePath, const AssetDirID dirID) {
 				if (assetFilePath.filename() == "Samplers.json") {
-					return;
+					return false;
 				}
 
 				const auto& dirEntry = Get().m_AssetDirs[dirID];
@@ -830,7 +873,7 @@ namespace Cori {
 				AssetID pathHash = Utility::HashString64(hashString);
 
 				if (Get().m_AssetDatabase.contains(pathHash)) {
-					return;
+					return false;
 				}
 
 				JsonLayout l;
@@ -838,13 +881,13 @@ namespace Cori {
 				auto readError = glz::file_to_buffer(buffer, assetFilePath.c_str());
 				if (readError != glz::error_code::none) {
 					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::AssetManager }, "Failed to open asset file '{}', skipping it.", assetFilePath.string());
-					return;
+					return false;
 				}
 
 				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(l, buffer);
 				if (parseError) {
 					CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::AssetManager }, "Asset file '{}' metadata load failed, error: {}", assetFilePath.string(), glz::format_error(parseError, buffer));
-					return;
+					return false;
 				}
 
 				AssetRecord entry;
@@ -931,6 +974,7 @@ namespace Cori {
 				Get().m_AssetDatabase.emplace(pathHash, entry);
 
 				Get().m_PublishedCount.store(Get().m_NextVectorKey, std::memory_order_release);
+				return true;
 			}
 
 			//std::unordered_map<AssetID, AssetRecord> m_AssetDatabase;
@@ -958,7 +1002,7 @@ namespace Cori {
 			tbb::concurrent_vector<std::atomic<uint64_t>> m_TypeNameHashes;
 
 
-			AssetDirID m_PublishedDirCount{ 0 };
+			std::atomic<AssetDirID> m_PublishedDirCount{ 0 };
 			uint32_t m_NextVectorKey{ 0 };
 			std::atomic<uint32_t> m_PublishedCount{ 0 };
 

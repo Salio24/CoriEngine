@@ -1,0 +1,10 @@
+{
+    "Metadata": {
+        "assetTypename": "Texture2",
+        "assetType": "eSecondary",
+        "assetDeletionPolicy": "eRefCounted"
+    },
+    "AssetData": {
+        "image": "Sponza_Tex_04_Normal.jpg"
+    }
+}

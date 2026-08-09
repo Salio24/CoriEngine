@@ -85,3 +85,6 @@
 [submodule "Engine/thirdparty/imgui_club"]
 	path = Engine/thirdparty/imgui_club
 	url = https://github.com/ocornut/imgui_club
+[submodule "Engine/thirdparty/efsw"]
+	path = Engine/thirdparty/efsw
+	url = https://github.com/SpartanJ/efsw.git

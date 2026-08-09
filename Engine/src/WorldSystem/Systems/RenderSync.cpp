@@ -1,6 +1,7 @@
 #include "RenderSync.hpp"
 #include "WorldSystem/Components.hpp"
 #include "Core/Application.hpp"
+#include "Graphics/Vulkan/Renderer/FrameData.hpp"
 
 namespace Cori {
 	namespace World {

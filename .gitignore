@@ -65,6 +65,7 @@ rmSub.sh
 /Snowflake/bin/Debug/*
 /Snowflake/bin/Release/*
 /Snowflake/bin/RelWithDebInfo/*
+/Snowflake/assets/junk/*
 
 
 /notes.txt

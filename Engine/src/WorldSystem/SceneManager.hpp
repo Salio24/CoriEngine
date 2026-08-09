@@ -50,6 +50,9 @@ namespace Cori {
 			 */
 			[[nodiscard]] static std::expected<void, Core::CoriError<>> DestroyScene(const std::string& name);
 
+			[[nodiscard]] static std::unordered_map<uint32_t, SceneHandle>& GetStorage();
+
+
 		private:
 			friend Core::Application;
 			static void Init();

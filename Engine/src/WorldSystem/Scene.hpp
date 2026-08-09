@@ -186,8 +186,6 @@ namespace Cori {
 			//friend Core::Layer;
 			friend class SceneHandle;
 			friend class SceneManager;
-			[[nodiscard]] bool OnBind();
-			[[nodiscard]] bool OnUnbind();
 
 			void OnUpdate(Core::GameTimer& gameTimer);
 

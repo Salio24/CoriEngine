@@ -7,9 +7,9 @@ namespace Cori {
 
 namespace Cori {
 	[[nodiscard]] constexpr std::pair<std::string_view, std::string_view> SplitTagPrefix(const std::string_view payload) noexcept {
-		size_t tagEnd = 0;
+		uint64_t tagEnd = 0;
 		while (tagEnd < payload.size() && payload[tagEnd] == '[') {
-			const size_t close = payload.find(']', tagEnd);
+			const uint64_t close = payload.find(']', tagEnd);
 			if (close == std::string_view::npos) {
 				break;
 			}
