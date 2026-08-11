@@ -17,6 +17,8 @@ namespace Cori {
 			};
 
 			m_Materials.EmplaceAt(m_PlaceholderMaterial.GetIndex(), Material{ .customData = std::move(placeholderData), .shaderEffect = Core::AssetRef(VulkanShaderEffectManager::GetPlaceholder<ShaderEffect>()), .version = m_PlaceholderMaterial.GetVersion() });
+
+			m_HandleAllocator.PublishIdentity(m_PlaceholderMaterial, Core::MakeAssetDependencySet(std::as_const(m_Materials)[m_PlaceholderMaterial]));
 		}
 
 		void VulkanMaterialSystem::Init() {
@@ -68,6 +70,18 @@ namespace Cori {
 
 		AssetStatus VulkanMaterialSystem::GetAssetStatus(const Core::Handle<Material> handle) {
 			return Get().m_HandleAllocator.GetAssetStatus(handle);
+		}
+
+		uint32_t VulkanMaterialSystem::GetIdentityVersion(const Core::Handle<Material> handle) {
+			return Get().m_HandleAllocator.GetIdentityVersion(handle);
+		}
+
+		std::expected<std::pair<Core::AssetDependencySet, uint32_t>, ErrorCode> VulkanMaterialSystem::TryReadDependencies(const Core::Handle<Material> handle) {
+			return Get().m_HandleAllocator.TryReadDependencies(handle);
+		}
+
+		void VulkanMaterialSystem::PublishIdentity(const Core::Handle<Material> handle) {
+			Get().m_HandleAllocator.PublishIdentity(handle, Core::MakeAssetDependencySet(std::as_const(Get().m_Materials)[handle]));
 		}
 
 		void VulkanMaterialSystem::RegisterAtSlot(const Core::Handle<Material> handle) {
@@ -167,6 +181,8 @@ namespace Cori {
 							.version = handle.GetVersion()
 						});
 
+						PublishIdentity(handle);
+
 						CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: status=LoadFailed, emplaced PLACEHOLDER shader effect + MISSING albedo texture");
 						CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eError, Cori::ProfileColors::Destroy, "%s Handle=[%u, %u] LOAD FAILED, status=LoadFailed, PLACEHOLDER shader effect + MISSING albedo texture shown, (gen=%u) (id=%llu)", CORI_CLEAN_TYPE_NAME(Material), handle.GetIndex(), handle.GetVersion(), gen, static_cast<unsigned long long>(id));
 					}
@@ -219,6 +235,8 @@ namespace Cori {
 
 						CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Slot was free: emplaced the parsed material");
 					}
+
+					PublishIdentity(handle);
 
 					SetAssetStatus(handle, AssetStatus::eLoaded);
 					CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: LOADED, real material now usable");
@@ -307,6 +325,8 @@ namespace Cori {
 			material.shaderEffect = std::move(shaderEffect);
 			material.customData = std::move(data);
 
+			PublishIdentity(handle);
+
 			CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u], shader effect handle=[%u, %u], albedo texture handle=[%u, %u], albedo sampler=%u", handle.GetIndex(), handle.GetVersion(), shaderEffectHandle.GetIndex(), shaderEffectHandle.GetVersion(), albedoTextureHandle.GetIndex(), albedoTextureHandle.GetVersion(), albedoSampler);
 			CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: Material created directly into the slot (no streaming, no asset file)");
 			CORI_PROFILER_MSG_CFP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Load, "%s Handle=[%u, %u] CREATED in place (shader effect handle=[%u, %u], albedo texture handle=[%u, %u])", CORI_CLEAN_TYPE_NAME(Material), handle.GetIndex(), handle.GetVersion(), shaderEffectHandle.GetIndex(), shaderEffectHandle.GetVersion(), albedoTextureHandle.GetIndex(), albedoTextureHandle.GetVersion());
@@ -341,6 +361,7 @@ namespace Cori {
 			}
 
 			Get().m_Materials[handle].customData = std::move(data);
+			PublishIdentity(handle);
 			return {};
 		}
 
@@ -373,6 +394,8 @@ namespace Cori {
 
 			material.shaderEffect = std::move(newShaderEffect);
 
+			PublishIdentity(handle);
+
 			return {};
 		}
 
@@ -384,6 +407,8 @@ namespace Cori {
 			auto& placeholderData = std::as_const(m_Materials)[m_PlaceholderMaterial];
 			data.shaderEffect = placeholderData.shaderEffect;
 			data.customData = placeholderData.customData;
+
+			PublishIdentity(handle);
 
 			CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u] -> PLACEHOLDER material (copied from handle [%u, %u], placeholder shader effect and albedo texture refd)", handle.GetIndex(), handle.GetVersion(), m_PlaceholderMaterial.GetIndex(), m_PlaceholderMaterial.GetVersion());
 			CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eDebug, Cori::ProfileColors::Missing, "%s Handle=[%u, %u] assigned PLACEHOLDER material (copied from handle [%u, %u])", CORI_CLEAN_TYPE_NAME(Material), handle.GetIndex(), handle.GetVersion(), m_PlaceholderMaterial.GetIndex(), m_PlaceholderMaterial.GetVersion());

@@ -156,9 +156,10 @@ namespace Cori {
 					 * @param localRotation Local rotation to set.
 					 * @detals Local rotation is the rotation relative to the Entity parent transform (matrix), if an Entity doesn't have a parent, and thus is a root entity, the local rotation is its world rotation.
 					 */
-					void SetLocalRotation(const float localRotation) {
-						if (m_LocalRotation != localRotation) {
+					void SetLocalRotation(const float localRotation, const glm::vec3& axis) {
+						if (m_LocalRotation != localRotation || m_LocalRotationAxis != axis) {
 							m_LocalRotation = localRotation;
+							m_LocalRotationAxis = axis;
 							m_DirtyTransform = true;
 
 							entt::entity root = m_Owner.GetRawEntity();
@@ -240,8 +241,8 @@ namespace Cori {
 					 * @brief Retries the local rotation.
 					 * @return Local rotation.
 					 */
-					[[nodiscard]] float GetLocalRotation() const {
-						return m_LocalRotation;
+					[[nodiscard]] std::pair<float, glm::vec3> GetLocalRotation() const {
+						return { m_LocalRotation, m_LocalRotationAxis };
 					}
 
 					/**
@@ -275,7 +276,7 @@ namespace Cori {
 					 */
 					[[nodiscard]] glm::mat4 GetLocalTransform() const {
 						return glm::translate(glm::mat4(1.0f), m_LocalPosition) *
-								//glm::rotate(glm::mat4(1.0f), glm::radians(m_LocalRotation)) *
+								glm::rotate(glm::mat4(1.0f), glm::radians(m_LocalRotation), m_LocalRotationAxis) *
 									glm::scale(glm::mat4(1.0f), m_LocalScale);
 					}
 
@@ -286,6 +287,7 @@ namespace Cori {
 
 					//use quaternions
 					float m_LocalRotation{ 0.0f };
+					glm::vec3 m_LocalRotationAxis{ 1.0f };
 					glm::mat4 m_LastParentTransform{ 1.0f };
 					World::Entity m_Owner;
 				public:

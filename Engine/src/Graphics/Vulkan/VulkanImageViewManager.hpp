@@ -39,7 +39,7 @@ namespace Cori {
 					.flags = key.flags,
 					.image = image.m_Image,
 					.viewType = key.type,
-					.format = image.m_Format,
+					.format = key.format == vk::Format::eUndefined ? image.m_Format : key.format,
 					.components = key.components,
 					.subresourceRange = key.subresourceRange
 				};

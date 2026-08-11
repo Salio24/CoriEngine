@@ -1,4 +1,6 @@
 #include "MasterRenderer.hpp"
+#include "ThumbnailAtlas.hpp"
+#include "Graphics/Vulkan/VulkanTextureManager.hpp"
 #include "FrameData.hpp"
 #include "Core/Threading/CpuTopology.hpp"
 
@@ -24,10 +26,15 @@ namespace Cori {
 					break;
 				}
 
+				std::array<SceneRenderer*, s_MaxSceneRendererCount> ptrs{};
+				uint32_t counter = 0;
+				for (auto& atomic : m_SceneRenderers) {
+					ptrs[counter++] = atomic.load();
+				}
+
 				{
 					CORI_PROFILE_SCOPE("Master Frame");
 					bool result = TryRunFrame();
-					//CORI_DEBUG("TRF: {}", result);
 					if (result) {
 						RenderThreadCommandQueue::DrainOnRenderThread();
 						continue;
@@ -35,82 +42,60 @@ namespace Cori {
 				}
 
 				if (RenderThreadCommandQueue::DrainOnRenderThread() > 0) {
-					//CORI_DEBUG("drained");
 					continue;
 				}
 
 				if (RenderThreadWakeup::Snapshot() != wakeBefore) {
-					//CORI_DEBUG("snapshot change");
 					continue;
 				}
 
-				//CORI_DEBUG("nothing");
 				RenderThreadWakeup::WaitChanged(wakeBefore);
 			}
 		}
 
 		bool MasterRenderer::TryRunFrame() {
-			uint64_t maxWatermark = 0;
-			FrameLatencyStamps latencyStamps{};
-
-			std::array<NonDormantSceneRenderer, s_MaxSceneRendererCount> nonDormant;
-			nonDormant.fill({ nullptr, UINT32_MAX, std::nullopt });
-			uint32_t nonDormantCounter = 0;
-			SceneRendererHandle handleCounter = 0;
-			RendererSettings settings{};
-
-			for (auto& renderer : m_SceneRenderers) {
-				SceneRenderer* ptr = renderer.load(std::memory_order_relaxed);
-				if (ptr) {
-					FrameData** dataPtr = ptr->PeekFrameData();
-					if (!dataPtr) {
-						if (ptr->IsDormant()) {
-							continue;
-						}
-
-						//CORI_DEBUG("no frame data");
-						return false;
-					}
-
-					ptr->MarkNonDormant();
-					maxWatermark = std::max(maxWatermark, (*dataPtr)->rtcqWatermark);
-
-					nonDormantCounter++;
-					nonDormant[nonDormantCounter - 1].ptr = ptr;
-					nonDormant[nonDormantCounter - 1].handle = handleCounter;
-				}
-				handleCounter++;
+			MasterFrameData** frameDataPtr = m_ReadyRing.Front();
+			if (!frameDataPtr) {
+				return false;
 			}
 
-			bool ghostFrame = false;
-			if (nonDormantCounter == 0) {
-				if (m_ReadyRing.Front()) {
-					ghostFrame = true;
-				}
-				else {
-					//CORI_DEBUG("all dormant and no MFD");
-					return false;
-				}
-			}
+			MasterFrameData* frameData = *frameDataPtr;
 
-			if (RenderThreadCommandQueue::DrainedCount() < maxWatermark) {
+			if (RenderThreadCommandQueue::DrainedCount() < frameData->rtcqWatermark) {
 				return false;
 			}
 
 			VulkanPresentTiming::ThrottlePresentQueue();
 
-			MasterFrameData** frameData = m_ReadyRing.Front();
-			if (!frameData) {
-				//CORI_DEBUG("no MFD ");
-				return false;
-			}
-
 			m_ReadyRing.Pop();
 
-			ImGuiRenderer::ProcessTexQueueRequests();
+			std::array<ParticipatingRenderer, s_MaxSceneRendererCount> participants;
+			participants.fill({ nullptr, UINT32_MAX, std::nullopt, false });
+			uint32_t participantCount = 0;
 
-			const FrameLatencyStamps& sceneStamps = (*frameData)->latencyStamps;
-			settings = (*frameData)->settings;
+			for (uint32_t i = 0; i < frameData->participantCount; i++) {
+				const auto [handle, generation] = frameData->participants[i];
+
+				if (m_Generation[handle].load(std::memory_order_acquire) != generation) {
+					continue;
+				}
+
+				SceneRenderer* ptr = m_SceneRenderers[handle].load(std::memory_order_acquire);
+				if (!ptr) {
+					continue;
+				}
+
+				participants[participantCount].ptr = ptr;
+				participants[participantCount].handle = handle;
+				participantCount++;
+			}
+
+			ImGuiRenderer::ProcessTexQueueRequests();
+			VulkanTextureManager::ProcessImGuiBindingRequests();
+
+			FrameLatencyStamps latencyStamps{};
+			const FrameLatencyStamps& sceneStamps = frameData->latencyStamps;
+			const RendererSettings settings = frameData->settings;
 
 			if (sceneStamps.inputTimestampSdl != 0) {
 				latencyStamps.inputTimestampSdl = sceneStamps.inputTimestampSdl;
@@ -123,27 +108,20 @@ namespace Cori {
 			SceneRendererHandle requestedHandle = m_MainRenderer.load(std::memory_order_acquire);
 			Mode mode = m_CurrentMode.load(std::memory_order_acquire);
 
-			(*frameData)->Clear();
-			m_RecycleRing.Emplace(*frameData);
-
-			if (nonDormantCounter == 0 && !ghostFrame) {
-				//CORI_DEBUG("???? ");
-				return false;
-			}
-
-			for (uint32_t i = 0; i < nonDormantCounter; i++) {
-				SceneRenderer* ptr = nonDormant[i].ptr;
+			for (uint32_t i = 0; i < participantCount; i++) {
+				SceneRenderer* ptr = participants[i].ptr;
 				ptr->ProcessFrameData();
 			}
 
 			uint32_t emptySceneCount = 0;
 
 			VulkanEngine::Get().CPUFrameStart();
-			for (uint32_t i = 0; i < nonDormantCounter; i++) {
-				SceneRenderer* ptr = nonDormant[i].ptr;
-				nonDormant[i].context = ptr->Stage1(settings);
-				if (!nonDormant[i].context) {
+			for (uint32_t i = 0; i < participantCount; i++) {
+				SceneRenderer* ptr = participants[i].ptr;
+				participants[i].context = ptr->Stage1(settings);
+				if (!participants[i].context) {
 					emptySceneCount++;
+					participants[i].sceneEmpty = true;
 				}
 			}
 
@@ -154,40 +132,72 @@ namespace Cori {
 
 			}
 
-			if (!ghostFrame && !frameInfo.m_SkippedFrame) {
+			if (participantCount != 0 && !frameInfo.m_SkippedFrame) {
 				DeletionQueue::Flush();
 			}
 
 			if (!frameInfo.m_SkippedFrame) {
 				InitializeFreshPRTs(frameInfo.m_CommandBuffer);
 
-				for (uint32_t i = 0; i < nonDormantCounter; i++) {
-					if (!nonDormant[i].context) {
+				for (uint32_t i = 0; i < participantCount; i++) {
+					if (!participants[i].context) {
 						continue;
 					}
-					SceneRenderer* ptr = nonDormant[i].ptr;
-					ptr->Stage2(frameInfo, nonDormant[i].context.value());
+					SceneRenderer* ptr = participants[i].ptr;
+					ptr->Stage2(frameInfo, participants[i].context.value());
 				}
 
 				VulkanEngine::Get().GPUFrameMiddlePointSync();
 
-				for (uint32_t i = 0; i < nonDormantCounter; i++) {
-					if (!nonDormant[i].context) {
+				for (uint32_t i = 0; i < participantCount; i++) {
+					if (!participants[i].context) {
 						continue;
 					}
-					SceneRenderer* ptr = nonDormant[i].ptr;
-					ptr->Stage3(frameInfo, nonDormant[i].context.value());
+					SceneRenderer* ptr = participants[i].ptr;
+					ptr->Stage3(frameInfo, participants[i].context.value());
 				}
 
 				if (settings.Wireframe) {
 					frameInfo.m_CommandBuffer.setPolygonModeEXT(vk::PolygonMode::eFill);
 				}
-				Composite(frameInfo.m_CommandBuffer, nonDormant, nonDormantCounter, emptySceneCount, mode, requestedHandle);
+
+				std::array<ThumbnailAtlas::Copy, s_MaxSceneRendererCount> thumbnailCopies{};
+				uint32_t thumbnailCopyCount = 0;
+
+				for (uint32_t i = 0; i < participantCount; i++) {
+					if (participants[i].sceneEmpty) {
+						continue;
+					}
+
+					SceneRenderer* ptr = participants[i].ptr;
+					const std::optional<ThumbnailRect> rect = ptr->TakePendingThumbnailCopy();
+					if (!rect) {
+						continue;
+					}
+
+					const VulkanImage& sourceImage = ptr->GetPRT().GetImage();
+					thumbnailCopies[thumbnailCopyCount] = ThumbnailAtlas::Copy{
+						.sourceImage = sourceImage.m_Image,
+						.sourceExtent = { sourceImage.m_Extent3D.width, sourceImage.m_Extent3D.height },
+						.rect = rect.value()
+					};
+
+					thumbnailCopyCount++;
+					ptr->NotifyThumbnailCopyRecorded();
+				}
+
+				ThumbnailAtlas::Get().ExecuteCopies(frameInfo.m_CommandBuffer, std::span<const ThumbnailAtlas::Copy>(thumbnailCopies.data(), thumbnailCopyCount));
+
+				Composite(frameInfo.m_CommandBuffer, participants, participantCount, emptySceneCount, mode, requestedHandle);
 			}
 
 			ImGuiRenderer::RecycleSnapshot();
 
 			VulkanEngine::Get().GPUFrameEnd(latencyStamps);
+
+			frameData->Clear();
+			m_RecycleRing.Emplace(frameData);
+
 			return true;
 		}
 		std::unique_ptr<MasterRenderer> MasterRenderer::s_Instance{ nullptr };

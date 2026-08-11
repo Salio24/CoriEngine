@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Graphics/Vulkan/VulkanHeaders.hpp"
 namespace Cori {
 	namespace Graphics {
 		class AftermathCrashTracker {

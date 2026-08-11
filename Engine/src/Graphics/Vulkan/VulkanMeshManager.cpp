@@ -202,6 +202,18 @@ namespace Cori {
 			return Get().m_HandleAllocator.GetAssetStatus(handle);
 		}
 
+		uint32_t VulkanMeshManager::GetIdentityVersion(const Core::Handle<Mesh> handle) {
+			return Get().m_HandleAllocator.GetIdentityVersion(handle);
+		}
+
+		std::expected<std::pair<Core::AssetDependencySet, uint32_t>, ErrorCode> VulkanMeshManager::TryReadDependencies(const Core::Handle<Mesh> handle) {
+			return Get().m_HandleAllocator.TryReadDependencies(handle);
+		}
+
+		void VulkanMeshManager::PublishIdentity(const Core::Handle<Mesh> handle) {
+			Get().m_HandleAllocator.PublishIdentity(handle, Core::MakeAssetDependencySet(std::as_const(Get().m_Meshes)[handle]));
+		}
+
 		void VulkanMeshManager::RegisterAtSlot(const Core::Handle<Mesh> handle) {
 			CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Register);
 			CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u]", handle.GetIndex(), handle.GetVersion());
@@ -536,6 +548,7 @@ namespace Cori {
 
 						auto& meta = Get().m_MeshMetadata[inTransferMesh.mesh.GetIndex()];
 						meta.loaded = true;
+						PublishIdentity(inTransferMesh.mesh);
 						SetAssetStatus(inTransferMesh.mesh, AssetStatus::eLoaded);
 						CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Outcome: LOADED, real mesh now drawable (indexCount=%u, firstIndex=%u, firstVertexAddress=0x%llx), storage refs strong=%u weak=%u", meshData.indexCount, meshData.firstIndex, static_cast<unsigned long long>(meshData.firstVertexAddress), inTransferMesh.vertexStorage->GetStrongRefCount(), inTransferMesh.vertexStorage->GetWeakRefCount());
 						CORI_PROFILER_MSG_CFP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Loaded, "%s Handle=[%u, %u] LOADED, real mesh now drawable (indexCount=%u, firstIndex=%u) (ticket %llu)", CORI_CLEAN_TYPE_NAME(Mesh), inTransferMesh.mesh.GetIndex(), inTransferMesh.mesh.GetVersion(), meshData.indexCount, meshData.firstIndex, static_cast<unsigned long long>(ticket));
@@ -647,9 +660,7 @@ namespace Cori {
 		}
 
 		std::expected<AABB3D, ErrorCode> VulkanMeshManager::GetAABB3D(const Core::Handle<Mesh> handle) {
-			if (!IsHandleValid(handle)) {
-				return std::unexpected(ErrorCode::eInvalidHandle);
-			}
+			CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle.");
 
 			AABBAtomics& atomics = Get().m_AABBs[handle.GetIndex()];
 			uint32_t gen0 = atomics.gen.load(std::memory_order_acquire);
@@ -662,6 +673,9 @@ namespace Cori {
 
 			while (gen0 != gen1) {
 				gen0 = atomics.gen.load(std::memory_order_acquire);
+				if ((gen0 & 1u) != 0) {
+					continue;
+				}
 
 				aabb.bxCenter = std::bit_cast<float>(atomics.bxCenter.load(std::memory_order_relaxed));
 				aabb.byCenter = std::bit_cast<float>(atomics.byCenter.load(std::memory_order_relaxed));

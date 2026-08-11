@@ -3,6 +3,7 @@
 #include "Core/AssetManager/AssetManager2.hpp"
 #include "Utility/TransparentStringHash.hpp"
 #include "Graphics/Vulkan/VulkanMeshManager.hpp"
+#include "ThumbnailCache.hpp"
 
 namespace Snowflake {
 	class ContentBrowserWatcher final : private efsw::FileWatchListener {
@@ -222,7 +223,12 @@ namespace Snowflake {
 	public:
 		static constexpr const char* s_DefaultName{ "Content Browser" };
 
+		ContentBrowser() : m_Thumbnails(ThumbnailCache::Get()) {}
+
 		void Draw(bool* open, const char* name = s_DefaultName);
+
+		void OnUpdate(Cori::Core::GameTimer& gameTimer);
+		void OnTickUpdate(Cori::Core::GameTimer& gameTimer);
 
 	private:
 		static constexpr float s_MinTreeWidth{ 120.0f };
@@ -235,15 +241,18 @@ namespace Snowflake {
 
 		void DrawToolbar(const ContentBrowserWatcher::View& view);
 
-		void DrawTree(const ContentBrowserWatcher::View& view);
+		void DrawTree(const ContentBrowserWatcher::View& view, float bodyHeight);
 
 		float CardHeight() const;
 
-		void DrawGrid(const ContentBrowserWatcher::View& view);
+		uint32_t DrawGrid(const ContentBrowserWatcher::View& view, float bodyHeight);
 		void DrawCard(ImVec2 origin, float thumbnail, bool selected, bool hovered, const ImU32 selectedColor, const ImU32 hoveredColor) const;
 		static void DrawLabel(ImVec2 origin, float thumbnail, const char* text);
 		void DrawFolder(const ContentBrowserWatcher::View::FolderRow& folder, const ContentBrowserWatcher::View::FolderRow& parent, ImVec2 origin, float thumbnail);
 		void DrawAssetTile(const ContentBrowserWatcher::View::EntryRow& entry, ImVec2 origin, float thumbnail, ImVec2 surfaceOrigin);
+
+		std::shared_ptr<ThumbnailCache> m_Thumbnails;
+		std::unordered_map<Cori::Core::AssetID, ThumbnailHandle> m_ThumbnailHandles;
 
 		std::unordered_set<std::string> m_Expanded;
 		std::string m_SelectedDir;
@@ -257,6 +266,8 @@ namespace Snowflake {
 		uint32_t m_FocusedFolderIndex{ UINT32_MAX };
 		std::vector<uint32_t> m_FocusedFolderChildren;
 
+		std::string m_LastSelectedDir;
+		const ContentBrowserWatcher::View* m_LastSeen{};
 		ContentBrowserWatcher m_Watcher;
 	};
 }

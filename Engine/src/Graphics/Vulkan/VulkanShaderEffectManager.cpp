@@ -13,6 +13,8 @@ namespace Cori {
 			m_HandleAllocator.AddRef(m_PlaceholderEffect);
 
 			m_ShaderEffects.EmplaceAt(m_PlaceholderEffect.GetIndex(), ShaderEffect{ .shaders = Core::AssetRef(VulkanShaderManager::GetPlaceholder<VertFragShaderPair>()) });
+
+			m_HandleAllocator.PublishIdentity(m_PlaceholderEffect, Core::MakeAssetDependencySet(std::as_const(m_ShaderEffects)[m_PlaceholderEffect]));
 		}
 
 		void VulkanShaderEffectManager::Init() {
@@ -66,6 +68,18 @@ namespace Cori {
 			return Get().m_HandleAllocator.GetAssetStatus(handle);
 		}
 
+		uint32_t VulkanShaderEffectManager::GetIdentityVersion(const Core::Handle<ShaderEffect> handle) {
+			return Get().m_HandleAllocator.GetIdentityVersion(handle);
+		}
+
+		std::expected<std::pair<Core::AssetDependencySet, uint32_t>, ErrorCode> VulkanShaderEffectManager::TryReadDependencies(const Core::Handle<ShaderEffect> handle) {
+			return Get().m_HandleAllocator.TryReadDependencies(handle);
+		}
+
+		void VulkanShaderEffectManager::PublishIdentity(const Core::Handle<ShaderEffect> handle) {
+			Get().m_HandleAllocator.PublishIdentity(handle, Core::MakeAssetDependencySet(std::as_const(Get().m_ShaderEffects)[handle]));
+		}
+
 		void VulkanShaderEffectManager::RegisterAtSlot(const Core::Handle<ShaderEffect> handle) {
 			CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Register);
 			CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u]", handle.GetIndex(), handle.GetVersion());
@@ -91,8 +105,8 @@ namespace Cori {
 					CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Grew shader effect data %u -> %llu entries (index %u)", size, static_cast<unsigned long long>(Get().m_ShaderEffectData.Size()), index);
 				}
 
-				Get().m_ShaderEffects.EmplaceAt(handle.GetIndex(), Get().m_ShaderEffects[Get().m_PlaceholderEffect]);
-				//Get().AssignPlaceholder(handle);
+				ShaderEffect placeholderCopy = std::as_const(Get().m_ShaderEffects)[Get().m_PlaceholderEffect];
+				Get().m_ShaderEffects.EmplaceAt(handle.GetIndex(), std::move(placeholderCopy));
 				CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Outcome: Emplaced a copy of the PLACEHOLDER shader effect (from handle [%u, %u])", Get().m_PlaceholderEffect.GetIndex(), Get().m_PlaceholderEffect.GetVersion());
 			});
 		}
@@ -149,6 +163,7 @@ namespace Cori {
 
 							Get().m_ShaderEffectData[handle_.GetIndex()] = payload.data;
 
+							PublishIdentity(handle_);
 							SetAssetStatus(handle_, AssetStatus::eLoaded);
 							CORI_PROFILER_ZONE_TEXT_P(Cori::ProfileParts::RenderingAssets, "Outcome: LOADED, real shader effect now usable");
 							CORI_PROFILER_MSG_CFP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Loaded, "%s Handle=[%u, %u] LOADED, real shader effect now usable (shader pair handle=[%u, %u]) (gen=%u) (id=%llu)", CORI_CLEAN_TYPE_NAME(ShaderEffect), handle_.GetIndex(), handle_.GetVersion(), shaderPairHandle.GetIndex(), shaderPairHandle.GetVersion(), gen_, static_cast<unsigned long long>(id_));
@@ -180,8 +195,8 @@ namespace Cori {
 									CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Grew shader effect data %u -> %llu entries (index %u)", size, static_cast<unsigned long long>(Get().m_ShaderEffectData.Size()), index);
 								}
 
-								Get().m_ShaderEffects.EmplaceAt(handle_.GetIndex(), Get().m_ShaderEffects[Get().m_PlaceholderEffect]);
-								//Get().AssignPlaceholder(handle_);
+								ShaderEffect placeholderCopy = std::as_const(Get().m_ShaderEffects)[Get().m_PlaceholderEffect];
+								Get().m_ShaderEffects.EmplaceAt(handle_.GetIndex(), std::move(placeholderCopy));
 							}
 
 							SetAssetStatus(handle_, AssetStatus::eLoadFailed);

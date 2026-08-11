@@ -314,28 +314,16 @@ namespace Cori {
 			friend Core::Layer;
 			friend Core::Application;
 
-			bool WaitForFrameData() {
+			void PrepareFrameData() {
 				if (!m_SceneRaw.expired()) {
-					return m_SceneRaw.lock()->WaitForFrameData();
+					m_SceneRaw.lock()->PrepareFrameData();
 				}
-
-				return true;
 			}
 
-			bool PrepareFrameData() {
+			void SubmitForRender() {
 				if (!m_SceneRaw.expired()) {
-					return m_SceneRaw.lock()->PrepareFrameData();
+					m_SceneRaw.lock()->SubmitForRender();
 				}
-
-				return true;
-			}
-
-			bool SubmitForRender() {
-				if (!m_SceneRaw.expired()) {
-					return m_SceneRaw.lock()->SubmitForRender();
-				}
-
-				return true;
 			}
 
 		private:

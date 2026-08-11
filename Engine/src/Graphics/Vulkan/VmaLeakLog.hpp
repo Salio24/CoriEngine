@@ -12,6 +12,8 @@ namespace Cori {
 
 			static void BumpLeakAssertCounter();
 
+			static std::expected<std::filesystem::path, std::string> WriteLiveAllocationReport(const std::filesystem::path& destination = {});
+
 			static bool DumpLiveAllocations(std::string_view label);
 
 			static bool LogCollectedLeaks(std::string_view label);

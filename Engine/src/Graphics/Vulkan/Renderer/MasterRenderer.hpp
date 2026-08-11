@@ -8,13 +8,25 @@ namespace Cori {
 	namespace Graphics {
 		using SceneRendererHandle = uint32_t;
 
+		inline constexpr uint32_t s_MaxSceneRendererCount{ 16 };
+
+		struct FrameParticipant {
+			SceneRendererHandle handle{ 0 };
+			uint32_t generation{ 0 };
+		};
+
 		struct MasterFrameData {
 			FrameLatencyStamps latencyStamps{};
 			RendererSettings settings{};
+			std::array<FrameParticipant, s_MaxSceneRendererCount> participants{};
+			uint32_t participantCount{ 0 };
+			uint64_t rtcqWatermark{ 0 };
 
 			void Clear() {
 				latencyStamps = {};
 				settings = {};
+				participantCount = 0;
+				rtcqWatermark = 0;
 			}
 		};
 
@@ -70,34 +82,43 @@ namespace Cori {
 				return m_SceneRenderers[handle].load(std::memory_order_acquire);
 			}
 
-			[[nodiscard]] MasterFrameData* PopRecycledFrameData() {
-				if (m_ReadyRing.Size() < GetAdmitDepth()) {
-					MasterFrameData** ptr = m_RecycleRing.Front();
-					if (ptr) {
-						m_RecycleRing.Pop();
-						return *ptr;
-					}
-				}
+			void BeginFrame() {
+				CORI_CORE_ASSERT(!m_BuildingFrame, "MasterRenderer::BeginFrame was called twice without an EndFrame in between.");
 
-				return nullptr;
-			}
-
-			void WaitForRecycledFrameData() {
-				MasterFrameData* result = nullptr;
-				while (result == nullptr) {
+				while (m_BuildingFrame == nullptr) {
 					if (m_ReadyRing.Size() < GetAdmitDepth()) {
 						MasterFrameData** ptr = m_RecycleRing.Front();
 						if (ptr) {
-							result = *ptr;
+							m_BuildingFrame = *ptr;
+							m_RecycleRing.Pop();
 						}
 					}
 				}
 			}
 
-			bool PushFrameData(MasterFrameData* frameData) {
-				bool result = m_ReadyRing.TryEmplace(frameData);
+			void AddParticipant(const SceneRendererHandle handle) {
+				CORI_CORE_ASSERT(m_BuildingFrame, "MasterRenderer::AddParticipant was called outside of a BeginFrame/EndFrame pair.");
+				CORI_CORE_ASSERT(handle < s_MaxSceneRendererCount, "Invalid scene renderer handle passed to MasterRenderer::AddParticipant.");
+
+				m_BuildingFrame->participants[m_BuildingFrame->participantCount] = { handle, m_Generation[handle].load(std::memory_order_acquire) };
+				m_BuildingFrame->participantCount++;
+
+				CORI_CORE_ASSERT(m_BuildingFrame->participantCount <= s_MaxSceneRendererCount, "More participants than there are scene renderer slots.");
+			}
+
+			void EndFrame(const FrameLatencyStamps& latencyStamps, const RendererSettings& settings) {
+				CORI_CORE_ASSERT(m_BuildingFrame, "MasterRenderer::EndFrame was called without a matching BeginFrame.");
+
+				m_BuildingFrame->latencyStamps = latencyStamps;
+				m_BuildingFrame->settings = settings;
+				m_BuildingFrame->rtcqWatermark = RenderThreadCommandQueue::CurrentPushCount();
+
+				[[maybe_unused]] const bool result = m_ReadyRing.TryEmplace(m_BuildingFrame);
+				CORI_CORE_ASSERT(result, "MasterRenderer ready ring was full while publishing a frame.");
+
+				m_BuildingFrame = nullptr;
+
 				RenderThreadWakeup::Wake();
-				return result;
 			}
 
 			static void ChangeCompositeMode(const Mode newMode) {
@@ -140,18 +161,17 @@ namespace Cori {
 			}
 
 			constexpr static uint32_t GetAdmitDepth() {
-				return 2; //FIXME: sooo turns out my ordering is wrong. and now i have a dead-lock with admit depth < 2 when main thread lags behind the rendering thread for 2 frames ;((
+				return 1;
 			}
 
 		private:
-			struct NonDormantSceneRenderer {
+			struct ParticipatingRenderer {
 				SceneRenderer* ptr{};
 				SceneRendererHandle handle{};
-				std::optional<SceneRenderer::FrameContext> context;
+				std::optional<SceneRenderer::FrameContext> context{};
+				bool sceneEmpty{};
 			};
 			void RtTask();
-
-			static constexpr uint32_t s_MaxSceneRendererCount{ 16 };
 
 			MasterRenderer() {
 				for (uint32_t i = 0; i < s_MaxSceneRendererCount; i++) {
@@ -211,19 +231,6 @@ namespace Cori {
 				copy.clear();
 			}
 
-			bool HasNonDormantScene() {
-				for (auto& render : m_SceneRenderers) {
-					auto* raw = render.load(std::memory_order_relaxed);
-					if (raw) {
-						if (!raw->IsDormant()) {
-							return true;
-						}
-					}
-				}
-
-				return false;
-			}
-
 			bool TryRunFrame();
 
 			void InitializeFreshPRTs(vk::CommandBuffer cmb) {
@@ -267,13 +274,13 @@ namespace Cori {
 				}
 			}
 
-			void Composite(vk::CommandBuffer cmb, std::array<NonDormantSceneRenderer, s_MaxSceneRendererCount>& nonDormantRenderers, const uint32_t nonDormantRendererCount, const uint32_t emptySceneCount, const Mode mode, const SceneRendererHandle requestedHandle) {
-				CORI_VK_LABEL_F(cmb, DebugLabelColors::Composite, "Composite {} scene(s)", nonDormantRendererCount);
+			void Composite(vk::CommandBuffer cmb, std::array<ParticipatingRenderer, s_MaxSceneRendererCount>& participants, const uint32_t participantCount, const uint32_t emptySceneCount, const Mode mode, const SceneRendererHandle requestedHandle) {
+				CORI_VK_LABEL_F(cmb, DebugLabelColors::Composite, "Composite {} scene(s)", participantCount);
 
 				switch (mode) {
 				case Mode::eDirectBlit:
 					{
-						if (nonDormantRendererCount == 0 || emptySceneCount == 0) {
+						if (participantCount == 0 || emptySceneCount == participantCount) {
 							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> PresentSrcKHR (skip)", DebugLabelColors::Barrier);
 
 							vk::ImageMemoryBarrier2 scBar{
@@ -298,14 +305,14 @@ namespace Cori {
 							break;
 						}
 
-						SceneRenderer* chosen = nullptr;
-						for (uint32_t i = 0; i < nonDormantRendererCount; i++) {
-							if (nonDormantRenderers[i].handle == requestedHandle) {
-								chosen = nonDormantRenderers[i].ptr;
+						ParticipatingRenderer* participant = nullptr;
+						for (uint32_t i = 0; i < participantCount; i++) {
+							if (participants[i].handle == requestedHandle) {
+								participant = &participants[i];
 							}
 						}
 
-						if (chosen == nullptr) {
+						if (participant == nullptr || participant->sceneEmpty) {
 							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> PresentSrcKHR (skip)", DebugLabelColors::Barrier);
 
 							vk::ImageMemoryBarrier2 scBar{
@@ -329,6 +336,8 @@ namespace Cori {
 							cmb.pipelineBarrier2(depInfo);
 							break;
 						}
+
+						SceneRenderer* chosen = participant->ptr;
 
 						{
 							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> TransferDstOptimal", DebugLabelColors::Barrier);
@@ -399,7 +408,7 @@ namespace Cori {
 					}
 				case Mode::eHybrid:
 					{
-						if (nonDormantRendererCount == 0 || emptySceneCount == 0) {
+						if (participantCount == 0 || emptySceneCount == participantCount) {
 							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> PresentSrcKHR (skip)", DebugLabelColors::Barrier);
 
 							vk::ImageMemoryBarrier2 scBar{
@@ -424,14 +433,15 @@ namespace Cori {
 							break;
 						}
 
-						SceneRenderer* chosen = nullptr;
-						for (uint32_t i = 0; i < nonDormantRendererCount; i++) {
-							if (nonDormantRenderers[i].handle == requestedHandle) {
-								chosen = nonDormantRenderers[i].ptr;
+
+						ParticipatingRenderer* participant = nullptr;
+						for (uint32_t i = 0; i < participantCount; i++) {
+							if (participants[i].handle == requestedHandle) {
+								participant = &participants[i];
 							}
 						}
 
-						if (chosen == nullptr) {
+						if (participant == nullptr || participant->sceneEmpty) {
 							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> PresentSrcKHR (skip)", DebugLabelColors::Barrier);
 
 							vk::ImageMemoryBarrier2 scBar{
@@ -455,6 +465,8 @@ namespace Cori {
 							cmb.pipelineBarrier2(depInfo);
 							break;
 						}
+
+						SceneRenderer* chosen = participant->ptr;
 
 						{
 							CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> TransferDstOptimal", DebugLabelColors::Barrier);
@@ -569,28 +581,32 @@ namespace Cori {
 					}
 				case Mode::eDockSpace:
 					{
-						if (nonDormantRendererCount > 0) {
-							CORI_VK_LABEL_INSERT(cmb, "Scene PRTs -> ShaderReadOnlyOptimal", DebugLabelColors::Barrier);
+						std::array<vk::ImageMemoryBarrier2, s_MaxSceneRendererCount> prtBarriers{};
+						uint32_t counter = 0;
 
-							std::array<vk::ImageMemoryBarrier2, s_MaxSceneRendererCount> prtBarriers{};
-							uint32_t counter = 0;
-
-							for (uint32_t i = 0; i < nonDormantRendererCount; i++) {
-								prtBarriers[i] = vk::ImageMemoryBarrier2{
-									.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput | vk::PipelineStageFlagBits2::eTransfer,
-									.srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite | vk::AccessFlagBits2::eTransferWrite,
-									.dstStageMask = vk::PipelineStageFlagBits2::eFragmentShader,
-									.dstAccessMask = vk::AccessFlagBits2::eShaderSampledRead,
-									.oldLayout = vk::ImageLayout::eTransferSrcOptimal,
-									.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal,
-									.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-									.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-									.image = nonDormantRenderers[i].ptr->GetPRT().GetImage().m_Image,
-									.subresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 }
-								};
-
-								counter++;
+						for (uint32_t i = 0; i < participantCount; i++) {
+							if (participants[i].sceneEmpty) {
+								continue;
 							}
+
+							prtBarriers[counter] = vk::ImageMemoryBarrier2{
+								.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput | vk::PipelineStageFlagBits2::eTransfer,
+								.srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite | vk::AccessFlagBits2::eTransferWrite,
+								.dstStageMask = vk::PipelineStageFlagBits2::eFragmentShader,
+								.dstAccessMask = vk::AccessFlagBits2::eShaderSampledRead,
+								.oldLayout = vk::ImageLayout::eTransferSrcOptimal,
+								.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal,
+								.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								.image = participants[i].ptr->GetPRT().GetImage().m_Image,
+								.subresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 }
+							};
+
+							counter++;
+						}
+
+						if (counter > 0) {
+							CORI_VK_LABEL_INSERT(cmb, "Scene PRTs -> ShaderReadOnlyOptimal", DebugLabelColors::Barrier);
 
 							vk::DependencyInfo depInfo{
 								.imageMemoryBarrierCount = counter,
@@ -689,6 +705,7 @@ namespace Cori {
 			Threading::SPSCRing<MasterFrameData*> m_ReadyRing{ FRAMES_IN_FLIGHT };
 			Threading::SPSCRing<MasterFrameData*> m_RecycleRing{ FRAMES_IN_FLIGHT };
 			std::array<MasterFrameData, FRAMES_IN_FLIGHT> m_FrameDataStorage;
+			MasterFrameData* m_BuildingFrame{ nullptr };
 
 			std::vector<vk::Image> m_PRTInitialTransitionQueue;
 

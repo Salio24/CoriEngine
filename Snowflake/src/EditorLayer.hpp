@@ -1,7 +1,7 @@
 #pragma once
 #include <Cori.hpp>
 
-#include "ContentBrowser.hpp"
+#include "ContentBrowser/ContentBrowser.hpp"
 
 namespace Snowflake {
 	class AssetPreviewLayer;

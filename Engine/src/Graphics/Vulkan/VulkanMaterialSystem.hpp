@@ -97,6 +97,12 @@ namespace Cori {
 
 			[[nodiscard]] static AssetStatus GetAssetStatus(const Core::Handle<Material> handle);
 
+			[[nodiscard]] static uint32_t GetIdentityVersion(const Core::Handle<Material> handle);
+
+			[[nodiscard]] static std::expected<std::pair<Core::AssetDependencySet, uint32_t>, ErrorCode> TryReadDependencies(const Core::Handle<Material> handle);
+
+			static void PublishIdentity(const Core::Handle<Material> handle);
+
 			static void RegisterAtSlot(const Core::Handle<Material> handle);
 
 			static void Load(const Core::Handle<Material> handle, const Core::AssetID id, const uint32_t gen, const uint32_t vectorKey, std::filesystem::path path, std::string name = "");
@@ -144,7 +150,6 @@ namespace Cori {
 
 			template<typename T> using MaterialGPUStorage = VulkanGPUSyncedSequentialStorage<T, QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Material Slot Map">;
 			Core::SparseFlatSlotMap<Material, 0, false, MaterialGPUStorage> m_Materials;
-			//VulkanFlatSlotMap<Material, 0, false> m_Materials{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Material Slot Map" };
 
 			Core::Handle<Material> m_PlaceholderMaterial;
 

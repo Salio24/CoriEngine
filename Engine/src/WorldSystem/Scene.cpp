@@ -88,34 +88,24 @@ namespace Cori {
 			}
 		}
 
-		bool Scene::SubmitForRender() {
+		void Scene::SubmitForRender() {
 			auto result = GetSystem<Systems::RenderSync>();
 			if (result) {
-				return result.value().lock()->SubmitForRendering();
+				result.value().lock()->SubmitForRendering();
+				return;
 			}
 
 			result.error().Ignore();
-			return true;
 		}
 
-		bool Scene::WaitForFrameData() {
+		void Scene::PrepareFrameData() {
 			auto result = GetSystem<Systems::RenderSync>();
 			if (result) {
-				return result.value().lock()->WaitForFrameData();
+				result.value().lock()->PrepareFrameData();
+				return;
 			}
 
 			result.error().Ignore();
-			return true;
-		}
-
-		bool Scene::PrepareFrameData() {
-			auto result = GetSystem<Systems::RenderSync>();
-			if (result) {
-				return result.value().lock()->PrepareFrameData();
-			}
-
-			result.error().Ignore();
-			return true;
 		}
 	}
 }

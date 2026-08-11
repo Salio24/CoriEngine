@@ -2,6 +2,7 @@
 #include "VulkanEngine.hpp"
 #include "VulkanShaderManager.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
+#include "Core/AssetManager/AssetDependencies.hpp"
 #include "VulkanFlagsGlaze.hpp"
 #include "Core/DataStructures/SequentialStorage.hpp"
 #include "Core/DataStructures/SparseFlatSlotMap.hpp"
@@ -124,6 +125,12 @@ namespace Cori {
 
 			[[nodiscard]] static AssetStatus GetAssetStatus(const Core::Handle<ShaderEffect> handle);
 
+			[[nodiscard]] static uint32_t GetIdentityVersion(const Core::Handle<ShaderEffect> handle);
+
+			[[nodiscard]] static std::expected<std::pair<Core::AssetDependencySet, uint32_t>, ErrorCode> TryReadDependencies(const Core::Handle<ShaderEffect> handle);
+
+			static void PublishIdentity(const Core::Handle<ShaderEffect> handle);
+
 			static void RegisterAtSlot(const Core::Handle<ShaderEffect> handle);
 
 			static void Load(const Core::Handle<ShaderEffect> handle, const Core::AssetID id, const uint32_t gen, const uint32_t vectorKey, std::filesystem::path path, std::string name = "");
@@ -172,8 +179,6 @@ namespace Cori {
 			void AssignPlaceholder(const Core::Handle<ShaderEffect> handle);
 
 			Core::AssetHandleAllocator<ShaderEffect> m_HandleAllocator;
-
-			//Core::FlatSlotMap<ShaderEffect, 0, false> m_ShaderEffects;
 
 			Core::SparseFlatSlotMap<ShaderEffect, 0, false> m_ShaderEffects;
 

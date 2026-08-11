@@ -133,6 +133,7 @@ project(CoriEngine)
             ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/misc/freetype/imgui_freetype.cpp
     )
     target_compile_definitions(imgui PUBLIC IMGUI_ENABLE_FREETYPE)
+    target_compile_definitions(imgui PRIVATE IMGUI_IMPL_VULKAN_NO_PROTOTYPES)
     target_include_directories(imgui PUBLIC ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui_club)
     target_link_libraries(imgui PRIVATE SDL3::SDL3-static freetype)
 
@@ -330,7 +331,8 @@ project(CoriEngine)
 
     # my shared lib
     add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES}
-            src/Utility/TransparentStringHash.hpp)
+            src/Utility/TransparentStringHash.hpp
+            src/Graphics/Vulkan/VulkanHeaders.hpp)
     if (CORI_MY_CONFIG)
         target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
                 $<$<CONFIG:Debug>:CORI_MY_CONFIG>

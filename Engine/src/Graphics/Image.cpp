@@ -19,7 +19,7 @@ namespace Cori {
 		Image::Image(const std::filesystem::path& path) {
 			CORI_PROFILE_FUNCTION();
 
-			const std::filesystem::path placeholder = FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "placeholders/missing_texture32.png";
+			const std::filesystem::path placeholder = FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "textures/missing_texture32.png";
 			if (std::filesystem::exists(path)) {
 				m_Surface = IMG_Load(path.string().c_str());
 			} else {

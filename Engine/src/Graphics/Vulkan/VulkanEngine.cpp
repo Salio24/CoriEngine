@@ -16,6 +16,7 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include "VmaLeakLog.hpp"
 #include "DeviceLossDebug/VulkanDeviceLossDebug.hpp"
 #include "Renderer/MasterRenderer.hpp"
+#include "Renderer/ThumbnailAtlas.hpp"
 
 const std::vector g_ValidationLayers = {
 	"VK_LAYER_KHRONOS_validation"
@@ -135,6 +136,7 @@ namespace Cori {
 			m_DeviceExtensions.push_back(vk::EXTMemoryPriorityExtensionName);
 			m_DeviceExtensions.push_back(vk::EXTMemoryBudgetExtensionName);
 			m_DeviceExtensions.push_back(vk::EXTShaderObjectExtensionName);
+			m_DeviceExtensions.push_back(vk::KHRRobustness2ExtensionName);
 			//m_DeviceExtensions.push_back(vk::KHRPushDescriptorExtensionName);
 			//m_DeviceExtensions.push_back(vk::KHRUnifiedImageLayoutsExtensionName);
 			m_DeviceExtensions.push_back(vk::EXTExtendedDynamicState3ExtensionName);
@@ -188,6 +190,7 @@ namespace Cori {
 			VulkanMaterialSystem::Init();
 			VulkanVirtualBufferAllocator::Init();
 			VulkanDynamicContainerUploadManager::Init();
+			ThumbnailAtlas::Init();
 			MasterRenderer::Init();
 		}
 
@@ -207,6 +210,7 @@ namespace Cori {
 			VulkanGlobalLayoutManager::Shutdown();
 			VulkanMeshManager::Shutdown();
 			VulkanStreamingLine::Shutdown();
+			ThumbnailAtlas::Shutdown();
 			DeletionQueue::Shutdown();
 			ImGuiRenderer::Shutdown();
 			VulkanImageViewManager::Shutdown();
@@ -665,13 +669,14 @@ namespace Cori {
 					return supported;
 				});
 
-				auto features = device.getFeatures2<vk::PhysicalDeviceFeatures2, vk::PhysicalDeviceVulkan13Features, vk::PhysicalDeviceVulkan12Features, vk::PhysicalDeviceVulkan11Features, vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT, vk::PhysicalDeviceMemoryPriorityFeaturesEXT, vk::PhysicalDeviceShaderObjectFeaturesEXT, vk::PhysicalDeviceDescriptorBufferFeaturesEXT>();
+				auto features = device.getFeatures2<vk::PhysicalDeviceFeatures2, vk::PhysicalDeviceVulkan13Features, vk::PhysicalDeviceVulkan12Features, vk::PhysicalDeviceVulkan11Features, vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT, vk::PhysicalDeviceMemoryPriorityFeaturesEXT, vk::PhysicalDeviceShaderObjectFeaturesEXT, vk::PhysicalDeviceDescriptorBufferFeaturesEXT, vk::PhysicalDeviceRobustness2FeaturesKHR>();
 				bool supportsRequiredFeatures =
 					features.get<vk::PhysicalDeviceFeatures2>().features.multiDrawIndirect &&
 					features.get<vk::PhysicalDeviceFeatures2>().features.fillModeNonSolid &&
 					features.get<vk::PhysicalDeviceFeatures2>().features.wideLines &&
 					features.get<vk::PhysicalDeviceFeatures2>().features.samplerAnisotropy &&
 					features.get<vk::PhysicalDeviceFeatures2>().features.shaderInt64 &&
+					features.get<vk::PhysicalDeviceFeatures2>().features.robustBufferAccess &&
 					features.get<vk::PhysicalDeviceVulkan13Features>().dynamicRendering &&
 					features.get<vk::PhysicalDeviceVulkan13Features>().synchronization2 &&
 					features.get<vk::PhysicalDeviceVulkan12Features>().drawIndirectCount &&
@@ -692,7 +697,10 @@ namespace Cori {
 					features.get<vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT>().extendedDynamicState &&
 					features.get<vk::PhysicalDeviceMemoryPriorityFeaturesEXT>().memoryPriority &&
 					features.get<vk::PhysicalDeviceShaderObjectFeaturesEXT>().shaderObject &&
-					features.get<vk::PhysicalDeviceDescriptorBufferFeaturesEXT>().descriptorBuffer;
+					features.get<vk::PhysicalDeviceDescriptorBufferFeaturesEXT>().descriptorBuffer &&
+					features.get<vk::PhysicalDeviceRobustness2FeaturesKHR>().robustBufferAccess2 &&
+					features.get<vk::PhysicalDeviceRobustness2FeaturesKHR>().robustImageAccess2 &&
+					features.get<vk::PhysicalDeviceRobustness2FeaturesKHR>().nullDescriptor;
 
 				if (vk13support && supportsGraphics && supportsAllRequiredExtensions && supportsRequiredFeatures) {
 					score+= 1000;
@@ -821,9 +829,11 @@ namespace Cori {
 			                   vk::PhysicalDeviceAddressBindingReportFeaturesEXT,
 			                   vk::PhysicalDevicePresentTimingFeaturesEXT,
 			                   vk::PhysicalDevicePresentId2FeaturesKHR,
-			                   vk::PhysicalDevicePresentWait2FeaturesKHR> featureChain = {
+			                   vk::PhysicalDevicePresentWait2FeaturesKHR,
+								vk::PhysicalDeviceRobustness2FeaturesKHR> featureChain = {
 					{
 						.features = {
+							.robustBufferAccess = true,
 							.multiDrawIndirect = true,
 							.fillModeNonSolid = true,
 							.wideLines = true,
@@ -862,7 +872,12 @@ namespace Cori {
 					{ .reportAddressBinding = addressBindingReportEnabled },
 					{ .presentTiming = presentTimingEnabled },
 					{ .presentId2 = presentTimingEnabled },
-					{ .presentWait2 = presentWaitEnabled }
+					{ .presentWait2 = presentWaitEnabled },
+					{
+						.robustBufferAccess2 = true,
+						.robustImageAccess2 = true,
+						.nullDescriptor = true
+					}
 				};
 
 			if (!deviceFaultEnabled) {

@@ -176,11 +176,9 @@ namespace Cori {
 				return m_SceneID;
 			}
 
-			bool WaitForFrameData();
+			void PrepareFrameData();
 
-			bool PrepareFrameData();
-
-			bool SubmitForRender();
+			void SubmitForRender();
 
 		protected:
 			//friend Core::Layer;

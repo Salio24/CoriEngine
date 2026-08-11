@@ -204,12 +204,6 @@ namespace Cori {
 			}
 		};
 
-		struct SwapChainImageData {
-			vk::Image swapChainImage = nullptr;
-			vk::ImageView swapChainImageView = nullptr;
-			vk::Extent2D imageExtent;
-		};
-
 		struct ScratchBufferTag {};
 		struct UploadBufferTag {};
 
@@ -231,8 +225,6 @@ namespace Cori {
 			}
 
 			void Reset(const uint64_t currentFrameIndex) {
-				m_SwapChainImageData = {};
-				m_SwapChainImageRetrieved = false;
 				m_Nodes.clear();
 				m_ImageStateCacheSize = 0;
 
@@ -269,15 +261,6 @@ namespace Cori {
 				auto& node = GetNode(handle);
 				auto resourceData = std::get<Internal::DynamicContainerResourceData>(node.resourceData);
 				return *static_cast<const VulkanFlatSlotMap<T>*>(resourceData);
-			}
-
-			void RegisterSwapChainImage(const SwapChainImageData& data) {
-				m_SwapChainImageData = data;
-			}
-
-			SwapChainImageData& GetSwapChainImageData() {
-				m_SwapChainImageRetrieved = true;
-				return m_SwapChainImageData;
 			}
 
 		protected:
@@ -363,9 +346,6 @@ namespace Cori {
 			std::vector<Internal::ImageState> m_ImageStateCache;
 
 			std::unordered_map<Internal::PooledImageDescription, std::vector<Internal::PooledImage>, Internal::PooledImageDescription::Hasher> m_ImagePool;
-
-			SwapChainImageData m_SwapChainImageData;
-			bool m_SwapChainImageRetrieved{ false };
 
 			uint32_t m_ImageStateCacheSize{ 0 };
 
@@ -931,10 +911,6 @@ namespace Cori {
 			void Execute(vk::CommandBuffer cmb) {
 				for (const auto& passHandle : m_PassRegistry->m_SortedPassOrder) {
 					const Pass& pass = m_PassRegistry->GetPass(passHandle);
-
-					if (m_ResourceRegistry->m_SwapChainImageRetrieved) {
-						break;
-					}
 
 					CORI_PROFILE_SCOPE_DYNAMIC_NAME(pass.m_Name);
 					CORI_PROFILE_GPU_ZONE_DYNAMIC_NAME_CP(Cori::ProfileParts::RenderingLoop, VulkanEngine::GetGraphicsGPUProfilerContext(), cmb, pass.m_Name, Cori::ProfileColors::GPUPass);

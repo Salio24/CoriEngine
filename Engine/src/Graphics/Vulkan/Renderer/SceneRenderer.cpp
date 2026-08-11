@@ -37,26 +37,13 @@ namespace Cori {
 		}
 
 		FrameData* SceneRenderer::PopRecycledFrameData() {
-			if (m_ReadyRing.Size() < MasterRenderer::GetAdmitDepth()) {
-				FrameData** ptr = m_RecycleRing.Front();
-				if (ptr) {
-					m_RecycleRing.Pop();
-					return *ptr;
-				}
+			FrameData** ptr = m_RecycleRing.Front();
+			if (!ptr) {
+				return nullptr;
 			}
 
-			return nullptr;
-		}
-
-		FrameData* SceneRenderer::PeekRecycledFrameData() {
-			if (m_ReadyRing.Size() < MasterRenderer::GetAdmitDepth()) {
-				FrameData** ptr = m_RecycleRing.Front();
-				if (ptr) {
-					return *ptr;
-				}
-			}
-
-			return nullptr;
+			m_RecycleRing.Pop();
+			return *ptr;
 		}
 
 		void SceneRenderer::ProcessFrameData() {
@@ -94,6 +81,10 @@ namespace Cori {
 				m_CameraSnapshot = ptr->cameraSnapshot.value();
 			}
 
+			if (ptr->thumbnailCopy.has_value()) {
+				m_PendingThumbnailCopy = ptr->thumbnailCopy;
+			}
+
 			if (ptr->resizeRequest.has_value()) {
 				m_PRT.Resize(ptr->resizeRequest.value());
 			}
@@ -103,8 +94,6 @@ namespace Cori {
 
 		std::optional<SceneRenderer::FrameContext> SceneRenderer::Stage1(const RendererSettings settings) {
 			CORI_PROFILE_FUNCTION();
-
-			//VulkanEngine::Get().CPUFrameStart();
 
 			uint32_t maxObjectCount = m_Objects.RawSize();
 			uint32_t maxBatchCount = m_Batches.RawSize();
@@ -289,10 +278,6 @@ namespace Cori {
 
 					commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(ComputePS), &ps);
 
-					//auto result = VulkanShaderManager::GetShader(cullShader);
-					//CORI_CORE_ASSERT(result, "Failed to get cullShader. Error: {}", to_string(result.error()));
-					//result.value().get().Bind(commandBuffer);
-
 					VulkanShaderManager::Bind(cullShader.GetHandle(), commandBuffer);
 					commandBuffer.dispatch(std::ceil(maxObjectCount / 64.0f), 1, 1);
 				});
@@ -322,10 +307,6 @@ namespace Cori {
 
 					commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(ComputePS), &ps);
 
-					//auto result = VulkanShaderManager::GetShader(cmgShader);
-					//CORI_CORE_ASSERT(result, "Failed to get cmgShader. Error: {}", to_string(result.error()));
-					//result.value().get().Bind(commandBuffer);
-
 					VulkanShaderManager::Bind(cmgShader.GetHandle(), commandBuffer);
 					commandBuffer.dispatch(std::ceil(maxBatchCount / 64.0f), 1, 1);
 				});
@@ -352,10 +333,6 @@ namespace Cori {
 						};
 
 					commandBuffer.pushConstants(VulkanGlobalLayoutManager::GetGlobalPipelineLayout(), vk::ShaderStageFlagBits::eAll, 0, sizeof(ComputePS), &ps);
-
-					//auto result = VulkanShaderManager::GetShader(compactShader);
-					//CORI_CORE_ASSERT(result, "Failed to get compactShader. Error: {}", to_string(result.error()));
-					//result.value().get().Bind(commandBuffer);
 
 					VulkanShaderManager::Bind(compactShader.GetHandle(), commandBuffer);
 					commandBuffer.dispatch(std::ceil(maxObjectCount / 64.0f), 1, 1);
@@ -397,7 +374,6 @@ namespace Cori {
 					auto& indirectCommandBuffer = registry.GetResource(DrawCommandBufferHandle);
 					auto& indirectCommandCountBuffer = registry.GetResource(DrawCommandCountBufferHandle);
 
-					//this is temporary, need to add support to external images to the render graph
 					{
 						vk::ImageMemoryBarrier2 prtBar{
 								.srcStageMask = vk::PipelineStageFlagBits2::eTransfer | vk::PipelineStageFlagBits2::eFragmentShader,
@@ -423,7 +399,6 @@ namespace Cori {
 					commandBuffer.setViewportWithCount(vk::Viewport(0.0f, 0.0f, static_cast<float>(prtExtent.width), static_cast<float>(prtExtent.height), 0.0f, 1.0f));
 					commandBuffer.setScissorWithCount(vk::Rect2D(vk::Offset2D(0, 0), prtExtent));
 
-					//temp
 					vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 0.0f);
 					vk::RenderingAttachmentInfo attachmentInfo = {
 							.imageView = prtImageView,
@@ -454,7 +429,6 @@ namespace Cori {
 							.pDepthAttachment = &depthAttachmentInfo
 						};
 					commandBuffer.beginRendering(renderingInfo);
-					//temp
 
 					for (uint32_t i = 0; i < m_DrawGroups.RawSize(); i++) {
 						if (m_DrawGroups.IsIndexValid(i)) {

@@ -6,6 +6,8 @@
 #include "AssetManager/AssetLoadStatus.hpp"
 #include "Core/DataStructures/FlatSlotMap.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
+#include "Core/AssetManager/AssetDependencies.hpp"
+#include <backends/imgui_impl_vulkan.h>
 #include "VulkanFlagsGlaze.hpp"
 #include "Graphics/RenderThreadCommandQueue.hpp"
 #include "Core/AssetManager/AssetHandleAllocator.hpp"
@@ -250,6 +252,20 @@ namespace Cori {
 
 			[[nodiscard]] static AssetStatus GetAssetStatus(const Core::Handle<Texture2> handle);
 
+			[[nodiscard]] static uint32_t GetIdentityVersion(const Core::Handle<Texture2> handle);
+
+			[[nodiscard]] static std::expected<std::pair<Core::AssetDependencySet, uint32_t>, ErrorCode> TryReadDependencies(const Core::Handle<Texture2> handle);
+
+			static void PublishIdentity(const Core::Handle<Texture2> handle);
+
+			static std::expected<void, ErrorCode> RequestImGuiBinding(const Core::Handle<Texture2> handle);
+
+			[[nodiscard]] static std::optional<ImTextureID> GetImGuiBinding(const Core::Handle<Texture2> handle);
+
+			static void ProcessImGuiBindingRequests();
+
+			static void ReleaseImGuiBinding(const Core::Handle<Texture2> handle);
+
 			static void RegisterAtSlot(const Core::Handle<Texture2> handle);
 
 			static void Load(const Core::Handle<Texture2> handle, const Core::AssetID id, const uint32_t gen, const uint32_t vectorKey, std::filesystem::path path, std::string name = "");
@@ -301,7 +317,10 @@ namespace Cori {
 
 			Core::SparseFlatSlotMap<Texture2, 0, false> m_TexturePool;
 
-			//Core::FlatSlotMap<Texture2, 0, false> m_TexturePool;
+			tbb::concurrent_vector<std::atomic<uint64_t>> m_ImGuiDescriptorSets;
+			std::mutex m_ImGuiBindingMutex;
+			std::vector<Core::Handle<Texture2>> m_PendingImGuiBindings;
+			std::vector<Core::Handle<Texture2>> m_ImGuiBindingScratch;
 
 			Core::Handle<Texture2> m_PlaceholderTexture;
 			Core::Handle<Texture2> m_WhiteTexture;

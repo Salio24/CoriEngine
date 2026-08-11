@@ -1,6 +1,7 @@
 #pragma once
 //implementation based on https://github.com/rigtorp/SPSCQueue
 
+//TODO: use atomic notifies instead of hard spinlock
 namespace Cori {
 	namespace Threading {
 		template<typename T>

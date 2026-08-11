@@ -1,12 +1,24 @@
 #include "VulkanTextureManager.hpp"
 #include "Core/Application.hpp"
+#include "efsw/efsw.hpp"
 
 namespace Cori {
 	namespace Graphics {
 		std::unique_ptr<VulkanTextureManager> VulkanTextureManager::s_Instance{ nullptr };
 
+		namespace {
+			constexpr std::array s_TextureViewFormats{ vk::Format::eR8G8B8A8Srgb, vk::Format::eR8G8B8A8Unorm };
+
+			constexpr vk::ImageFormatListCreateInfo s_TextureFormatList{
+				.viewFormatCount = static_cast<uint32_t>(s_TextureViewFormats.size()),
+				.pViewFormats = s_TextureViewFormats.data()
+			};
+		}
+
 		VulkanTextureManager::VulkanTextureManager() {
 			vk::ImageCreateInfo imageCreateInfo {
+				.pNext = &s_TextureFormatList,
+				.flags = vk::ImageCreateFlagBits::eMutableFormat,
 				.imageType = vk::ImageType::e2D,
 				.format = vk::Format::eR8G8B8A8Srgb,
 				.extent = vk::Extent3D{ 8, 8, 1 },
@@ -218,6 +230,104 @@ namespace Cori {
 			return Get().m_HandleAllocator.GetAssetStatus(handle);
 		}
 
+		uint32_t VulkanTextureManager::GetIdentityVersion(const Core::Handle<Texture2> handle) {
+			return Get().m_HandleAllocator.GetIdentityVersion(handle);
+		}
+
+		std::expected<std::pair<Core::AssetDependencySet, uint32_t>, ErrorCode> VulkanTextureManager::TryReadDependencies(const Core::Handle<Texture2> handle) {
+			return Get().m_HandleAllocator.TryReadDependencies(handle);
+		}
+
+		std::expected<void, ErrorCode> VulkanTextureManager::RequestImGuiBinding(const Core::Handle<Texture2> handle) {
+			if (!IsHandleValid(handle)) {
+				return std::unexpected(ErrorCode::eInvalidHandle);
+			}
+
+			if (handle.GetIndex() < Get().m_ImGuiDescriptorSets.size() && Get().m_ImGuiDescriptorSets[handle.GetIndex()].load(std::memory_order_acquire) != 0) {
+				return std::unexpected(ErrorCode::eRedundantCall);
+			}
+
+			std::lock_guard lk(Get().m_ImGuiBindingMutex);
+			if (std::ranges::find(Get().m_PendingImGuiBindings, handle) == Get().m_PendingImGuiBindings.end()) {
+				Get().m_PendingImGuiBindings.emplace_back(handle);
+			}
+
+			return {};
+		}
+
+		std::optional<ImTextureID> VulkanTextureManager::GetImGuiBinding(const Core::Handle<Texture2> handle) {
+			if (handle.GetIndex() >= Get().m_ImGuiDescriptorSets.size()) {
+				return std::nullopt;
+			}
+
+			const uint64_t raw = Get().m_ImGuiDescriptorSets[handle.GetIndex()].load(std::memory_order_acquire);
+			if (raw == 0) {
+				return std::nullopt;
+			}
+
+			return reinterpret_cast<ImTextureID>(reinterpret_cast<VkDescriptorSet>(raw));
+		}
+
+		void VulkanTextureManager::ProcessImGuiBindingRequests() {
+
+			{
+				std::lock_guard lk(Get().m_ImGuiBindingMutex);
+				Get().m_ImGuiBindingScratch.swap(Get().m_PendingImGuiBindings);
+			}
+
+			if (Get().m_ImGuiBindingScratch.empty()) {
+				return;
+			}
+
+			for (const Core::Handle<Texture2> handle : Get().m_ImGuiBindingScratch) {
+				if (!IsHandleValid(handle)) {
+					continue;
+				}
+
+				const uint32_t index = handle.GetIndex();
+				if (index >= Get().m_ImGuiDescriptorSets.size()) {
+					Get().m_ImGuiDescriptorSets.grow_to_at_least(Utility::GetNextPowerOfTwo(index + 1));
+				}
+
+				if (Get().m_ImGuiDescriptorSets[index].load(std::memory_order_acquire) != 0) {
+					continue;
+				}
+
+				auto& texture = Get().m_TexturePool[handle];
+				if (!texture.view) {
+					continue;
+				}
+
+				const VulkanImage::ImageViewKey viewKey{
+					.type = vk::ImageViewType::e2D,
+					.format = vk::Format::eR8G8B8A8Unorm,
+					.subresourceRange = { vk::ImageAspectFlagBits::eColor, 0, texture.image.m_MipLevels, 0, texture.image.m_ArrayLayers }
+				};
+
+				VkDescriptorSet set = ImGui_ImplVulkan_AddTexture(texture.image.GetView(viewKey), static_cast<VkImageLayout>(s_DstLayout));
+				Get().m_ImGuiDescriptorSets[index].store(reinterpret_cast<uint64_t>(set), std::memory_order_release);
+			}
+
+			Get().m_ImGuiBindingScratch.clear();
+		}
+
+		void VulkanTextureManager::ReleaseImGuiBinding(const Core::Handle<Texture2> handle) {
+			VulkanTextureManager& self = Get();
+
+			if (handle.GetIndex() >= self.m_ImGuiDescriptorSets.size()) {
+				return;
+			}
+
+			const uint64_t raw = self.m_ImGuiDescriptorSets[handle.GetIndex()].exchange(0, std::memory_order_acq_rel);
+			if (raw != 0) {
+				DeletionQueue::PushDeleter([raw] { ImGui_ImplVulkan_RemoveTexture(reinterpret_cast<VkDescriptorSet>(raw)); }, DeletionQueue::GetMaxDelay());
+			}
+		}
+
+		void VulkanTextureManager::PublishIdentity(const Core::Handle<Texture2> handle) {
+			Get().m_HandleAllocator.PublishIdentity(handle, Core::MakeAssetDependencySet(std::as_const(Get().m_TexturePool)[handle]));
+		}
+
 		void VulkanTextureManager::RegisterAtSlot(const Core::Handle<Texture2> handle) {
 			CORI_PROFILE_FUNCTION_CP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Register);
 			CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u]", handle.GetIndex(), handle.GetVersion());
@@ -377,10 +487,12 @@ namespace Cori {
 					height = image->GetHeight();
 				}
 
-				//later when i make a proper image loading, the image allocation can run in parallel with the image parsing, we get the image metadata, spin a worker with high priority (tbb) that creates the texture
+				//later when i make a proper image loading, the image allocation/decode can run in parallel with the image parsing, we get the image metadata, spin a worker with high priority (tbb) that creates the texture
 				{
 					CORI_PROFILE_SCOPE_CP(Cori::ProfileParts::RenderingAssets, "Texture allocation and FinalizeLoad submit", Cori::ProfileColors::Upload);
 					vk::ImageCreateInfo imageCreateInfo {
+						.pNext = &s_TextureFormatList,
+						.flags = vk::ImageCreateFlagBits::eMutableFormat,
 						.imageType = vk::ImageType::e2D,
 						.format = vk::Format::eR8G8B8A8Srgb,
 						.extent = { width, height, 1 },
@@ -554,6 +666,8 @@ namespace Cori {
 
 						texture.loaded = true;
 
+						ReleaseImGuiBinding(inTransferTexture.texture);
+						PublishIdentity(inTransferTexture.texture);
 						SetAssetStatus(inTransferTexture.texture, AssetStatus::eLoaded);
 						CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Outcome: LOADED, real texture now visible (descriptor %u)", texture.descriptorIndex);
 						CORI_PROFILER_MSG_CFP(Cori::ProfileParts::RenderingAssets, Cori::ProfileColors::Loaded, "%s Handle=[%u, %u] LOADED, real texture now visible (descriptor %u) (ticket %llu)", CORI_CLEAN_TYPE_NAME(Texture2), inTransferTexture.texture.GetIndex(), inTransferTexture.texture.GetVersion(), texture.descriptorIndex, static_cast<unsigned long long>(ticket));
@@ -887,47 +1001,53 @@ namespace Cori {
 
 		void VulkanTextureManager::LoadSamplers() {
 			std::lock_guard lk(m_SamplerMutex);
-			std::filesystem::path config = FileSystem::PathManager::GetAliasedPath("ASSET_DIR") / "Samplers.json";
+			std::filesystem::path userConfig = FileSystem::PathManager::GetAliasedPath("ASSET_DIR") / "Samplers.json";
+			std::filesystem::path engineConfig = FileSystem::PathManager::GetAliasedPath("ENGINE_DATA") / "Samplers.json";
 
-			std::string buffer;
-			auto readError = glz::file_to_buffer(buffer, config.c_str());
-			if (readError != glz::error_code::none) {
-				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Failed to open sampler config file '{}', skipping it.", config.string());
-			}
-
-			//the fallback here is only for glaze to not bitch about a single sampler object in the json that failed to parse, so it doesnt abort parsing.
-			//Even tho it will say that it got a fallback sampler in the console when parsing fails, the sampler won't be actually added, i rely on GetSampler to return a default sampler when it cant find a sampler with the given alias.
-			std::vector<Utility::GlazeWithFallback<SamplerJsonDef, []{ return SamplerJsonDef{ .internalValue = UINT32_MAX }; }, "Sampler config in VulkanTextureManager. Fallback is just to skip this one, the actual vulkan sampler will not be created from this fallback entry.">> samplers;
-
-			auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(samplers, buffer);
-			if (parseError) {
-				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::AssetManager }, "Failed to parse sampler configs from 'Samplers.json', error: {}", glz::format_error(parseError, buffer));
-				return;
-			}
-
-			for (auto& def : samplers) {
-				if (def->internalValue != UINT32_MAX) {
-					vk::SamplerCreateInfo info{
-						.flags = def->Flags,
-						.magFilter = def->MagFilter,
-						.minFilter = def->MinFilter,
-						.addressModeU = def->AddressModeU,
-						.addressModeV = def->AddressModeV,
-						.addressModeW = def->AddressModeW,
-						.mipLodBias = def->MipLoadBias,
-						.anisotropyEnable = def->AnisotropyEnable,
-						.maxAnisotropy = def->MaxAnisotropy,
-						.compareEnable = def->CompareEnable,
-						.compareOp = def->CompareOp,
-						.minLod = def->MinLod,
-						.maxLod = def->MaxLod,
-						.borderColor = def->BorderColor,
-						.unnormalizedCoordinates = def->UnnormalizedCoordinates
-					};
-
-					static_cast<void>(GetOrCreateSamplerImpl(info, def->Alias.c_str()));
+			auto ProcessConfig = [this](const std::filesystem::path& config) {
+				std::string buffer;
+				auto readError = glz::file_to_buffer(buffer, config.c_str());
+				if (readError != glz::error_code::none) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::TextureManager }, "Failed to open sampler config file '{}', skipping it.", config.string());
 				}
-			}
+
+				//the fallback here is only for glaze to not bitch about a single sampler object in the json that failed to parse, so it doesnt abort parsing.
+				//Even tho it will say that it got a fallback sampler in the console when parsing fails, the sampler won't be actually added, i rely on GetSampler to return a default sampler when it cant find a sampler with the given alias.
+				std::vector<Utility::GlazeWithFallback<SamplerJsonDef, []{ return SamplerJsonDef{ .internalValue = UINT32_MAX }; }, "Sampler config in VulkanTextureManager. Fallback is just to skip this one, the actual vulkan sampler will not be created from this fallback entry.">> samplers;
+
+				auto parseError = glz::read<Utility::ReflectEnumsOpts{}>(samplers, buffer);
+				if (parseError) {
+					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::AssetManager }, "Failed to parse sampler configs from 'Samplers.json', error: {}", glz::format_error(parseError, buffer));
+					return;
+				}
+
+				for (auto& def : samplers) {
+					if (def->internalValue != UINT32_MAX) {
+						vk::SamplerCreateInfo info{
+							.flags = def->Flags,
+							.magFilter = def->MagFilter,
+							.minFilter = def->MinFilter,
+							.addressModeU = def->AddressModeU,
+							.addressModeV = def->AddressModeV,
+							.addressModeW = def->AddressModeW,
+							.mipLodBias = def->MipLoadBias,
+							.anisotropyEnable = def->AnisotropyEnable,
+							.maxAnisotropy = def->MaxAnisotropy,
+							.compareEnable = def->CompareEnable,
+							.compareOp = def->CompareOp,
+							.minLod = def->MinLod,
+							.maxLod = def->MaxLod,
+							.borderColor = def->BorderColor,
+							.unnormalizedCoordinates = def->UnnormalizedCoordinates
+						};
+
+						static_cast<void>(GetOrCreateSamplerImpl(info, def->Alias.c_str()));
+					}
+				}
+			};
+
+			ProcessConfig(userConfig);
+			ProcessConfig(engineConfig);
 		}
 	}
 }

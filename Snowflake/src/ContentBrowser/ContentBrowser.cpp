@@ -1,13 +1,15 @@
 #include "ContentBrowser.hpp"
 #include "GlobalFuncs.hpp"
 #include "imgui_internal.h"
-#include "LogTags.hpp"
+#include "../LogTags.hpp"
 #include "Utility/ImGuiHelpers.hpp"
 
 namespace {
 	constexpr std::string_view s_JsonExtension{ ".json" };
 
 	constexpr uint64_t s_MeshTypeHash = Cori::Utility::HashString64(std::meta::identifier_of(^^Cori::Graphics::Mesh));
+	constexpr uint64_t s_MaterialTypeHash = Cori::Utility::HashString64(std::meta::identifier_of(^^Cori::Graphics::Material));
+	constexpr uint64_t s_TextureTypeHash = Cori::Utility::HashString64(std::meta::identifier_of(^^Cori::Graphics::Texture2));
 
 	struct TypeDisplay {
 		uint64_t hash;
@@ -23,12 +25,6 @@ namespace {
 		TypeDisplay{ Cori::Utility::HashString64("VertFragShaderPair"), "Shader", IM_COL32(240, 190, 70, 255) },
 		TypeDisplay{ Cori::Utility::HashString64("ComputeShader"), "Compute Shader", IM_COL32(240, 150, 70, 255) }
 	};
-
-	ImU32 Fade(const ImU32 color, const float alpha) {
-		ImVec4 unpacked = ImGui::ColorConvertU32ToFloat4(color);
-		unpacked.w *= alpha;
-		return ImGui::ColorConvertFloat4ToU32(unpacked);
-	}
 
 	const char* TypeName(const uint64_t typeHash) {
 		for (const TypeDisplay& display : s_TypeDisplays) {
@@ -463,8 +459,6 @@ namespace Snowflake {
 		for (uint64_t i = 0; i < scratch.files.count; i++) {
 			auto& fileName = scratch.files[i];
 
-			//Skips this one file, it does not end the pass. Every listed name comes through here and most of them
-			//are already known, so returning here would drop every file after the first one that already existed.
 			if (folder.entries.contains(fileName)) {
 				continue;
 			}
@@ -757,68 +751,95 @@ namespace Snowflake {
 
 	void ContentBrowser::Draw(bool* open, const char* name) {
 		CORI_PROFILE_FUNCTION();
-		{
-			if (open != nullptr && !*open) {
-				return;
+
+		if (m_Thumbnails) {
+			m_Thumbnails->Tick();
+		}
+
+		if (open != nullptr && !*open) {
+			return;
+		}
+
+		ImGui::SetNextWindowSize(ImVec2(920.0f, 420.0f), ImGuiCond_FirstUseEver);
+
+		if (!ImGui::Begin(name, open, ImGuiWindowFlags_NoCollapse)) {
+			ImGui::End();
+			return;
+		}
+
+
+		const std::shared_ptr<const ContentBrowserWatcher::View> view = m_Watcher.GetView();
+		if (view.get() != m_LastSeen) {
+			if (m_LastSelectedDir != m_SelectedDir) {
+				m_ThumbnailHandles.clear();
+				m_Thumbnails->ReleaseAll();
+				m_LastSelectedDir = m_SelectedDir;
 			}
+			m_LastSeen = view.get();
+		}
 
-			ImGui::SetNextWindowSize(ImVec2(920.0f, 420.0f), ImGuiCond_FirstUseEver);
+		if (view == nullptr) {
+			ImGui::TextDisabled("Scanning...");
+			ImGui::End();
+			return;
+		}
 
-			if (!ImGui::Begin(name, open, ImGuiWindowFlags_NoCollapse)) {
-				ImGui::End();
-				return;
-			}
+		DrawToolbar(*view);
 
-			const std::shared_ptr<const ContentBrowserWatcher::View> view = m_Watcher.GetView();
+		if (view->folders.empty()) {
+			ImGui::TextDisabled("No asset directories are registered.");
+			ImGui::End();
+			return;
+		}
 
-			if (view == nullptr) {
-				ImGui::TextDisabled("Scanning...");
-				ImGui::End();
-				return;
-			}
-
-			DrawToolbar(*view);
-
-			if (view->folders.empty()) {
-				ImGui::TextDisabled("No asset directories are registered.");
-				ImGui::End();
-				return;
-			}
-
-			if (!m_TreeSeeded) {
-				for (const ContentBrowserWatcher::View::FolderRow& row : view->folders) {
-					if (row.depth == 0) {
-						m_Expanded.insert(row.virtualDir);
-					}
+		if (!m_TreeSeeded) {
+			for (const ContentBrowserWatcher::View::FolderRow& row : view->folders) {
+				if (row.depth == 0) {
+					m_Expanded.insert(row.virtualDir);
 				}
+			}
 
+			if (m_SelectedDir != view->folders.front().virtualDir) {
 				m_SelectedDir = view->folders.front().virtualDir;
 				m_Watcher.SelectFolder(m_SelectedDir);
-				m_TreeSeeded = true;
 			}
 
-			float available = ImGui::GetContentRegionAvail().x;
-			m_TreeWidth = std::clamp(m_TreeWidth, s_MinTreeWidth, std::max(s_MinTreeWidth, available - 200.0f));
+			m_TreeSeeded = true;
+		}
 
-			float bodyHeight = std::max(ImGui::GetContentRegionAvail().y, 1.0f);
+		float available = ImGui::GetContentRegionAvail().x;
+		m_TreeWidth = std::clamp(m_TreeWidth, s_MinTreeWidth, std::max(s_MinTreeWidth, available - 200.0f));
 
-			DrawTree(*view);
+		float bodyHeight = std::max(ImGui::GetContentRegionAvail().y, 1.0f);
 
-			ImGui::SameLine(0.0f, 0.0f);
+		DrawTree(*view, bodyHeight);
 
-			ImGui::InvisibleButton("##splitter", ImVec2(s_SplitterWidth, bodyHeight));
-			if (ImGui::IsItemActive()) {
-				m_TreeWidth += ImGui::GetIO().MouseDelta.x;
-			}
-			if (ImGui::IsItemHovered() || ImGui::IsItemActive()) {
-				ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
-			}
+		ImGui::SameLine(0.0f, 0.0f);
 
-			ImGui::SameLine(0.0f, 0.0f);
+		ImGui::InvisibleButton("##splitter", ImVec2(s_SplitterWidth, bodyHeight));
+		if (ImGui::IsItemActive()) {
+			m_TreeWidth += ImGui::GetIO().MouseDelta.x;
+		}
+		if (ImGui::IsItemHovered() || ImGui::IsItemActive()) {
+			ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
+		}
 
-			DrawGrid(*view);
+		ImGui::SameLine(0.0f, 0.0f);
 
-			ImGui::End();
+		uint32_t total = DrawGrid(*view, bodyHeight);
+
+		ImGui::End();
+	}
+
+	void ContentBrowser::OnUpdate(Cori::Core::GameTimer& gameTimer) {
+		if (m_Thumbnails) {
+			m_Thumbnails->OnUpdate(gameTimer);
+		}
+	}
+
+	void ContentBrowser::OnTickUpdate(Cori::Core::GameTimer& gameTimer) {
+		if (m_Thumbnails) {
+			m_Thumbnails->OnTickUpdate(gameTimer);
 		}
 	}
 
@@ -845,9 +866,21 @@ namespace Snowflake {
 		ImGui::Separator();
 	}
 
-	void ContentBrowser::DrawTree(const ContentBrowserWatcher::View& view) {
-		ImGui::BeginChild("##tree", ImVec2(m_TreeWidth, 0.0f), ImGuiChildFlags_Borders);
+	void ContentBrowser::DrawTree(const ContentBrowserWatcher::View& view, const float bodyHeight) {
+		ImGui::BeginChild("##tree", ImVec2(m_TreeWidth, bodyHeight), ImGuiChildFlags_Borders);
 
+		const ImU32 selectedColor = ImGui::GetColorU32(ImGuiCol_Header);
+		const ImU32 heldColor = ImGui::GetColorU32(ImGuiCol_HeaderActive);
+		const ImU32 hoveredColor = Cori::Utility::Fade(selectedColor, 0.35f);
+		const float highlightRounding = ImGui::GetStyle().SelectableRounding;
+
+		ImDrawList* drawList = ImGui::GetWindowDrawList();
+		drawList->ChannelsSplit(2);
+		drawList->ChannelsSetCurrent(1);
+
+		ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32_BLACK_TRANS);
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32_BLACK_TRANS);
+		ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32_BLACK_TRANS);
 
 		uint32_t skipDepth = UINT32_MAX;
 		int32_t counter = -1;
@@ -899,9 +932,21 @@ namespace Snowflake {
 
 			bool open = ImGui::TreeNodeEx(name.c_str(), flags);
 
+			const bool selected = (flags & ImGuiTreeNodeFlags_Selected) != 0;
+			const bool hovered = ImGui::IsItemHovered();
+			if (selected || hovered) {
+				const ImU32 highlight = selected ? (ImGui::IsItemActive() ? heldColor : selectedColor) : hoveredColor;
+
+				drawList->ChannelsSetCurrent(0);
+				drawList->AddRectFilled(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), highlight, highlightRounding);
+				drawList->ChannelsSetCurrent(1);
+			}
+
 			if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()) {
-				m_SelectedDir = virtualDir;
-				m_Watcher.SelectFolder(m_SelectedDir);
+				if (m_SelectedDir != virtualDir) {
+					m_SelectedDir = virtualDir;
+					m_Watcher.SelectFolder(m_SelectedDir);
+				}
 			}
 
 			ImGui::PopID();
@@ -926,6 +971,9 @@ namespace Snowflake {
 			}
 		}
 
+		ImGui::PopStyleColor(3);
+		drawList->ChannelsMerge();
+
 		ImGui::EndChild();
 	}
 
@@ -933,19 +981,29 @@ namespace Snowflake {
 		return m_TileSize + ImGui::GetTextLineHeight() * s_LabelLines + s_CardPadding * 3.0f;
 	}
 
-	void ContentBrowser::DrawGrid(const ContentBrowserWatcher::View& view) {
-		float statusHeight = ImGui::GetFrameHeightWithSpacing();
+	uint32_t ContentBrowser::DrawGrid(const ContentBrowserWatcher::View& view, const float bodyHeight) {
+		ImGui::BeginGroup();
 
-		ImGui::BeginChild("##grid", ImVec2(0.0f, -statusHeight), ImGuiChildFlags_Borders);
+		float pathHeight = ImGui::GetTextLineHeight() + ImGui::GetStyle().WindowPadding.y * 2.0f;
+		float gridHeight = std::max(bodyHeight - pathHeight - ImGui::GetStyle().ItemSpacing.y, 1.0f);
+
+		ImGui::BeginChild("##path", ImVec2(0.0f, pathHeight), ImGuiChildFlags_Borders);
 
 		if (view.selectedDir.empty()) {
 			ImGui::TextDisabled("Nothing selected.");
 			ImGui::EndChild();
-			return;
+
+			ImGui::BeginChild("##grid", ImVec2(0.0f, gridHeight), ImGuiChildFlags_Borders);
+			ImGui::EndChild();
+
+			ImGui::EndGroup();
+			return 0;
 		}
 
 		ImGui::TextUnformatted(view.selectedDir.c_str());
-		ImGui::Separator();
+		ImGui::EndChild();
+
+		ImGui::BeginChild("##grid", ImVec2(0.0f, gridHeight), ImGuiChildFlags_Borders);
 
 		ImVec2 surfaceOrigin = ImGui::GetWindowPos();
 		ImVec2 surfaceSize = ImGui::GetWindowSize();
@@ -998,8 +1056,9 @@ namespace Snowflake {
 		ImGui::Dummy(ImVec2(1.0f, 1.0f));
 
 		ImGui::EndChild();
+		ImGui::EndGroup();
 
-		ImGui::Text("%u item%s", total, total == 1 ? "" : "s");
+		return total;
 	}
 
 	void ContentBrowser::DrawCard(const ImVec2 origin, const float thumbnail, const bool selected, const bool hovered, const ImU32 selectedColor, const ImU32 hoveredColor) const {
@@ -1040,16 +1099,16 @@ namespace Snowflake {
 		bool hovered = ImGui::IsItemHovered();
 		bool activated = ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && hovered;
 
-		DrawCard(origin, thumbnail, false, hovered, ImGui::GetColorU32(ImGuiCol_NavCursor), Fade(ImGui::GetColorU32(ImGuiCol_NavCursor), 0.6f));
+		DrawCard(origin, thumbnail, false, hovered, ImGui::GetColorU32(ImGuiCol_CheckMark), Cori::Utility::Fade(ImGui::GetColorU32(ImGuiCol_CheckMark), 0.6f));
 
 		ImDrawList* drawList = ImGui::GetWindowDrawList();
 
 		ImVec2 min(origin.x + s_CardPadding + thumbnail * 0.12f, origin.y + s_CardPadding + thumbnail * 0.24f);
 		ImVec2 max(origin.x + s_CardPadding + thumbnail * 0.88f, origin.y + s_CardPadding + thumbnail * 0.78f);
 
-		ImU32 folderColor = ImGui::GetColorU32(ImGuiCol_NavCursor);
+		ImU32 folderColor = ImGui::GetColorU32(ImGuiCol_CheckMark);
 
-		drawList->AddRectFilled(ImVec2(min.x, min.y - thumbnail * 0.09f), ImVec2(min.x + (max.x - min.x) * 0.45f, min.y + 2.0f), Fade(folderColor, 0.75f), 2.0f);
+		drawList->AddRectFilled(ImVec2(min.x, min.y - thumbnail * 0.09f), ImVec2(min.x + (max.x - min.x) * 0.45f, min.y + 2.0f), Cori::Utility::Fade(folderColor, 0.75f), 2.0f);
 		drawList->AddRectFilled(min, max, folderColor, 3.0f);
 
 		DrawLabel(origin, thumbnail, folder.name.c_str());
@@ -1057,8 +1116,12 @@ namespace Snowflake {
 		ImGui::PopID();
 
 		if (activated) {
-			m_SelectedDir = folder.virtualDir;
-			m_Watcher.SelectFolder(m_SelectedDir);
+			if (m_SelectedDir != folder.virtualDir) {
+				m_SelectedDir = folder.virtualDir;
+				m_Watcher.SelectFolder(m_SelectedDir);
+			}
+			m_ThumbnailHandles.clear();
+			m_Thumbnails->ReleaseAll();
 			if (!m_Expanded.contains(folder.virtualDir) && folder.childCount > 0) {
 				m_Expanded.insert(folder.virtualDir);
 			}
@@ -1101,18 +1164,55 @@ namespace Snowflake {
 			}
 		}
 
-		DrawCard(origin, thumbnail, entry.id == m_SelectedAsset && entry.validated, hovered, accent, Fade(accent, 0.6f));
+		DrawCard(origin, thumbnail, entry.id == m_SelectedAsset && entry.validated, hovered, accent, Cori::Utility::Fade(accent, 0.6f));
 
 		ImDrawList* drawList = ImGui::GetWindowDrawList();
 
 		ImVec2 thumbMin(origin.x + s_CardPadding, origin.y + s_CardPadding);
 		ImVec2 thumbMax(thumbMin.x + thumbnail, thumbMin.y + thumbnail);
 
+		const bool previewable = entry.validated && (hash == s_MeshTypeHash || hash == s_MaterialTypeHash || hash == s_TextureTypeHash);
+
+		if (previewable && m_Thumbnails) {
+			auto it = m_ThumbnailHandles.find(entry.id);
+			if (it == m_ThumbnailHandles.end()) {
+				ThumbnailHandle requested = ThumbnailCache::GetInvalidHandle();
+
+				if (hash == s_MeshTypeHash) {
+					requested = m_Thumbnails->RequestMesh(
+						Cori::Core::AssetManager2::Load<Cori::Graphics::Mesh>(entry.virtualPath.c_str()),
+						static_cast<uint32_t>(thumbnail));
+				}
+				else if (hash == s_MaterialTypeHash) {
+					requested = m_Thumbnails->RequestMaterial(
+						Cori::Core::AssetManager2::Load<Cori::Graphics::Material>(entry.virtualPath.c_str()),
+						static_cast<uint32_t>(thumbnail));
+				}
+				else {
+					requested = m_Thumbnails->RequestTexture(
+						Cori::Core::AssetManager2::Load<Cori::Graphics::Texture2>(entry.virtualPath.c_str()));
+				}
+
+				if (requested != ThumbnailCache::GetInvalidHandle()) {
+					it = m_ThumbnailHandles.try_emplace(entry.id, requested).first;
+				}
+			}
+
+			if (it != m_ThumbnailHandles.end()) {
+				m_Thumbnails->Resize(it->second, static_cast<uint32_t>(thumbnail));
+
+				if (const auto placement = m_Thumbnails->TryGetPlacement(it->second)) {
+					drawList->AddImage(placement->texture, thumbMin, thumbMax, placement->uv0, placement->uv1);
+					drewPreview = true;
+				}
+			}
+		}
+
 		if (!drewPreview) {
 			ImVec2 center((thumbMin.x + thumbMax.x) * 0.5f, (thumbMin.y + thumbMax.y) * 0.5f);
 			float radius = thumbnail * 0.22f;
 
-			drawList->AddRectFilled(ImVec2(center.x - radius, center.y - radius), ImVec2(center.x + radius, center.y + radius), Fade(accent, 0.35f), 4.0f);
+			drawList->AddRectFilled(ImVec2(center.x - radius, center.y - radius), ImVec2(center.x + radius, center.y + radius), Cori::Utility::Fade(accent, 0.35f), 4.0f);
 			drawList->AddRect(ImVec2(center.x - radius, center.y - radius), ImVec2(center.x + radius, center.y + radius), accent, 4.0f, 0, 1.5f);
 		}
 

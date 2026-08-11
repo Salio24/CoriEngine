@@ -1,6 +1,7 @@
 #pragma once
 #include "SceneRenderer.hpp"
 #include "CameraSnapshot.hpp"
+#include "ThumbnailRect.hpp"
 
 namespace Cori {
 	namespace Graphics {
@@ -25,14 +26,14 @@ namespace Cori {
 			std::vector<Core::Handle<RenderObject>> deletedObjects;
 			std::optional<CameraSnapshot> cameraSnapshot;
 			std::optional<vk::Extent2D> resizeRequest;
-			uint64_t rtcqWatermark{ 0 };
+			std::optional<ThumbnailRect> thumbnailCopy;
 
 			void Clear() {
 				patches.clear();
 				deletedObjects.clear();
 				cameraSnapshot = {};
 				resizeRequest.reset();
-				rtcqWatermark = 0;
+				thumbnailCopy.reset();
 			}
 		};
 	}

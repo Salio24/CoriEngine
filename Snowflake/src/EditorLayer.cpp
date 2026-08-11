@@ -1,4 +1,5 @@
 #include "EditorLayer.hpp"
+#include "Theme.hpp"
 #include <imgui_internal.h>
 #include <cmath>
 #include <cstring>
@@ -19,6 +20,113 @@ namespace {
 
 		CollectLeafDockNodes(node->ChildNodes[0], out);
 		CollectLeafDockNodes(node->ChildNodes[1], out);
+	}
+
+	void SetupImGuiStyle() {
+		using namespace Snowflake::Theme;
+
+		const Palette& flavor = Flavor;
+		ImGuiStyle& style = ImGui::GetStyle();
+
+		style.Alpha = 1.0f;
+		style.DisabledAlpha = 0.6f;
+		style.WindowPadding = ImVec2(6.0f, 6.0f);
+		style.WindowRounding = 8.0f;
+		style.WindowBorderSize = 1.0f;
+		style.WindowMinSize = ImVec2(20.0f, 32.0f);
+		style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
+		style.WindowMenuButtonPosition = ImGuiDir_None;
+		style.ChildRounding = 4.0f;
+		style.ChildBorderSize = 1.0f;
+		style.PopupRounding = 6.0f;
+		style.PopupBorderSize = 1.0f;
+		style.FramePadding = ImVec2(8.0f, 4.0f);
+		style.FrameRounding = 4.0f;
+		style.FrameBorderSize = 0.0f;
+		style.ItemSpacing = ImVec2(6.0f, 4.0f);
+		style.ItemInnerSpacing = ImVec2(4.0f, 4.0f);
+		style.CellPadding = ImVec2(6.0f, 3.0f);
+		style.IndentSpacing = 20.0f;
+		style.ColumnsMinSpacing = 4.0f;
+		style.ScrollbarSize = 12.0f;
+		style.ScrollbarRounding = 6.0f;
+		style.ScrollbarPadding = 3.0f;
+		style.GrabMinSize = 10.0f;
+		style.GrabRounding = 5.0f;
+		style.TabRounding = 4.0f;
+		style.TabBorderSize = 0.0f;
+		style.TabBarOverlineSize = 2.0f;
+		style.TabCloseButtonMinWidthUnselected = 0.0f;
+		style.MenuItemRounding = 4.0f;
+		style.SelectableRounding = 4.0f;
+		style.SeparatorTextBorderSize = 1.0f;
+		style.ColorButtonPosition = ImGuiDir_Right;
+		style.ButtonTextAlign = ImVec2(0.5f, 0.5f);
+		style.SelectableTextAlign = ImVec2(0.0f, 0.0f);
+
+		style.Colors[ImGuiCol_Text] = flavor.text;
+		style.Colors[ImGuiCol_TextDisabled] = flavor.overlay0;
+		style.Colors[ImGuiCol_WindowBg] = flavor.base;
+		style.Colors[ImGuiCol_ChildBg] = flavor.mantle;
+		style.Colors[ImGuiCol_PopupBg] = flavor.mantle;
+		style.Colors[ImGuiCol_Border] = AccentTint(0.55f);
+		style.Colors[ImGuiCol_BorderShadow] = Transparent;
+		style.Colors[ImGuiCol_FrameBg] = flavor.surface0;
+		style.Colors[ImGuiCol_FrameBgHovered] = flavor.surface1;
+		style.Colors[ImGuiCol_FrameBgActive] = flavor.surface2;
+		style.Colors[ImGuiCol_TitleBg] = flavor.mantle;
+		style.Colors[ImGuiCol_TitleBgActive] = flavor.surface0;
+		style.Colors[ImGuiCol_TitleBgCollapsed] = flavor.crust;
+		style.Colors[ImGuiCol_MenuBarBg] = flavor.mantle;
+		style.Colors[ImGuiCol_ScrollbarBg] = Transparent;
+		style.Colors[ImGuiCol_ScrollbarGrab] = flavor.surface1;
+		style.Colors[ImGuiCol_ScrollbarGrabHovered] = flavor.surface2;
+		style.Colors[ImGuiCol_ScrollbarGrabActive] = Accent;
+		style.Colors[ImGuiCol_CheckMark] = Accent;
+		style.Colors[ImGuiCol_CheckboxSelectedBg] = AccentTint(0.25f);
+		style.Colors[ImGuiCol_SliderGrab] = Accent;
+		style.Colors[ImGuiCol_SliderGrabActive] = flavor.lavender;
+		style.Colors[ImGuiCol_Button] = flavor.surface0;
+		style.Colors[ImGuiCol_ButtonHovered] = flavor.surface1;
+		style.Colors[ImGuiCol_ButtonActive] = AccentTint(0.55f);
+		style.Colors[ImGuiCol_Header] = AccentTint(0.65f);
+		style.Colors[ImGuiCol_HeaderHovered] = AccentTint(0.45f);
+		style.Colors[ImGuiCol_HeaderActive] = AccentTint(0.85f);
+		style.Colors[ImGuiCol_Separator] = flavor.surface1;
+		style.Colors[ImGuiCol_SeparatorHovered] = AccentTint(0.7f);
+		style.Colors[ImGuiCol_SeparatorActive] = Accent;
+		style.Colors[ImGuiCol_ResizeGrip] = AccentTint(0.2f);
+		style.Colors[ImGuiCol_ResizeGripHovered] = AccentTint(0.5f);
+		style.Colors[ImGuiCol_ResizeGripActive] = AccentTint(0.75f);
+		style.Colors[ImGuiCol_InputTextCursor] = flavor.rosewater;
+		style.Colors[ImGuiCol_TabHovered] = flavor.surface1;
+		style.Colors[ImGuiCol_Tab] = flavor.mantle;
+		style.Colors[ImGuiCol_TabSelected] = flavor.base;
+		style.Colors[ImGuiCol_TabSelectedOverline] = Accent;
+		style.Colors[ImGuiCol_TabDimmed] = flavor.crust;
+		style.Colors[ImGuiCol_TabDimmedSelected] = flavor.base;
+		style.Colors[ImGuiCol_TabDimmedSelectedOverline] = flavor.overlay0;
+		style.Colors[ImGuiCol_DockingPreview] = AccentTint(0.35f);
+		style.Colors[ImGuiCol_DockingEmptyBg] = flavor.crust;
+		style.Colors[ImGuiCol_PlotLines] = flavor.lavender;
+		style.Colors[ImGuiCol_PlotLinesHovered] = Accent;
+		style.Colors[ImGuiCol_PlotHistogram] = Accent;
+		style.Colors[ImGuiCol_PlotHistogramHovered] = flavor.pink;
+		style.Colors[ImGuiCol_TableHeaderBg] = flavor.mantle;
+		style.Colors[ImGuiCol_TableBorderStrong] = flavor.surface1;
+		style.Colors[ImGuiCol_TableBorderLight] = flavor.surface0;
+		style.Colors[ImGuiCol_TableRowBg] = Transparent;
+		style.Colors[ImGuiCol_TableRowBgAlt] = WithAlpha(flavor.surface0, 0.4f);
+		style.Colors[ImGuiCol_TextLink] = Accent;
+		style.Colors[ImGuiCol_TextSelectedBg] = AccentTint(0.35f);
+		style.Colors[ImGuiCol_TreeLines] = flavor.surface1;
+		style.Colors[ImGuiCol_DragDropTarget] = Accent;
+		style.Colors[ImGuiCol_DragDropTargetBg] = AccentTint(0.15f);
+		style.Colors[ImGuiCol_UnsavedMarker] = flavor.peach;
+		style.Colors[ImGuiCol_NavCursor] = Accent;
+		style.Colors[ImGuiCol_NavWindowingHighlight] = AccentTint(0.7f);
+		style.Colors[ImGuiCol_NavWindowingDimBg] = Scrim;
+		style.Colors[ImGuiCol_ModalWindowDimBg] = Scrim;
 	}
 
 	struct MnemonicAnchor {
@@ -267,6 +375,7 @@ namespace Snowflake {
 			LoadSponza();
 		}
 		Cori::Graphics::MasterRenderer::ChangeCompositeMode(Cori::Graphics::MasterRenderer::Mode::eDockSpace);
+		SetupImGuiStyle();
 	}
 
 	EditorLayer::~EditorLayer() {
@@ -294,7 +403,7 @@ namespace Snowflake {
 
 		Cori::Graphics::SceneRenderer::CreateInfo info{
 			.initialPRTExtent = initialPRTExtent,
-			.PRTFormat = vk::Format::eR8G8B8A8Srgb,
+			.PRTFormat = vk::Format::eR8G8B8A8Unorm,
 			#ifdef DEBUG_BUILD
 			.name = "Snowflake viewport",
 			#endif
@@ -370,7 +479,7 @@ namespace Snowflake {
 		DrawWindowSettings();
 		DrawLauncher();
 
-		m_Browser.Draw(nullptr, "eHashMaps");
+		m_Browser.Draw(nullptr);
 
 		UpdateDockNavigation();
 		ImGui::ShowDebugLogWindow();
@@ -921,10 +1030,12 @@ namespace Snowflake {
 		UpdateCamera(static_cast<float>(gameTimer.GetDeltaTime()));
 
 		m_MainScene.OnUpdate(gameTimer);
+		m_Browser.OnUpdate(gameTimer);
 	}
 
 	void EditorLayer::OnTickUpdate([[maybe_unused]] Cori::Core::GameTimer& gameTimer) {
 		m_MainScene.OnTickUpdate(gameTimer);
+		m_Browser.OnTickUpdate(gameTimer);
 	}
 
 	void EditorLayer::FlushViewportResize() {

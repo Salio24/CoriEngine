@@ -10,38 +10,18 @@ namespace Cori {
 				Graphics::MasterRenderer::Get().DestroySceneRenderer(m_RendererHandle);
 			}
 
-			bool RenderSync::WaitForFrameData() {
-				if (m_Pending) {
-					return true;
+			void RenderSync::PrepareFrameData() {
+				if (m_Asleep || m_Pending) {
+					return;
 				}
 
 				auto* renderer = Graphics::MasterRenderer::Get().Resolve(m_RendererHandle);
 				if (!renderer) {
-					return true;
-				}
-
-				Graphics::FrameData* fd = renderer->PeekRecycledFrameData();
-				if (!fd) {
-					return false;
-				}
-
-				return true;
-			}
-
-			bool RenderSync::PrepareFrameData() {
-				if (m_Pending) {
-					return true;
-				}
-
-				auto* renderer = Graphics::MasterRenderer::Get().Resolve(m_RendererHandle);
-				if (!renderer) {
-					return true;
+					return;
 				}
 
 				Graphics::FrameData* fd = renderer->PopRecycledFrameData();
-				if (!fd) {
-					return false;
-				}
+				CORI_CORE_ASSERT(fd, "SceneRenderer had no recycled frame data available when RenderSync::PrepareFrameData was called.");
 
 				fd->Clear();
 
@@ -145,14 +125,17 @@ namespace Cori {
 					m_NewExtent = false;
 				}
 
+				if (m_PendingThumbnailCopy) {
+					fd->thumbnailCopy = m_PendingThumbnailCopy;
+					m_PendingThumbnailCopy.reset();
+				}
+
 				fd->deletedObjects.swap(m_PendingRemovals);
 				m_PendingRemovals.clear();
 
 				m_Owner.Clear<Components::Entity::Internal::RenderComponentDirtyFlag, Components::Entity::Internal::TransformDirtyForRendererFlag>();
 
-				m_FrameSubmitted = false;
 				m_Pending = fd;
-				return true;
 			}
 
 			bool RenderSync::Create(Graphics::SceneRenderer::CreateInfo&& createInfo) {
@@ -166,36 +149,52 @@ namespace Cori {
 				return true;
 			}
 
-			bool RenderSync::SubmitForRendering() {
-				if (m_FrameSubmitted) {
-					return true;
+			void RenderSync::SubmitForRendering() {
+				if (!m_Pending) {
+					return;
 				}
 
 				auto* renderer = Graphics::MasterRenderer::Get().Resolve(m_RendererHandle);
 				if (!renderer) {
-					return true;
+					return;
 				}
 
-				if (!m_Pending) {
-					return true;
-				}
+				[[maybe_unused]] const bool success = renderer->PushFrameData(m_Pending);
+				CORI_CORE_ASSERT(success, "SceneRenderer ready ring was full when RenderSync::SubmitForRendering was called.");
 
-				m_Pending->rtcqWatermark = Graphics::RenderThreadCommandQueue::CurrentPushCount();
+				m_Pending = nullptr;
 
-				bool success = renderer->PushFrameData(m_Pending);
-				if (success) {
-					m_Pending = nullptr;
-					m_FrameSubmitted = true;
-					Graphics::RenderThreadWakeup::Wake();
-					return true;
-				}
+				Graphics::MasterRenderer::Get().AddParticipant(m_RendererHandle);
+			}
 
-				return false;
+			void RenderSync::Sleep() {
+				m_Asleep = true;
+			}
+
+			void RenderSync::WakeUp() {
+				m_Asleep = false;
+			}
+
+			bool RenderSync::IsAsleep() const {
+				return m_Asleep;
 			}
 
 			void RenderSync::RequestResize(const vk::Extent2D extent) {
 				m_ViewportExtent = extent;
 				m_NewExtent = true;
+			}
+
+			void RenderSync::RequestThumbnailCopy(const Graphics::ThumbnailRect rect) {
+				m_PendingThumbnailCopy = rect;
+			}
+
+			uint64_t RenderSync::GetThumbnailCopyCount() const {
+				const auto* renderer = Graphics::MasterRenderer::Get().Resolve(m_RendererHandle);
+				if (renderer) {
+					return renderer->GetThumbnailCopyCount();
+				}
+
+				return 0;
 			}
 
 			std::optional<ImTextureID> RenderSync::GetMainPRT() const {
@@ -210,6 +209,10 @@ namespace Cori {
 				}
 
 				return reinterpret_cast<ImTextureID>(set);
+			}
+
+			Graphics::SceneRendererHandle RenderSync::GetRendererHandle() const {
+				return m_RendererHandle;
 			}
 
 			void RenderSync::Bind() {

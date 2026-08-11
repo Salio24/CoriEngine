@@ -1,23 +1,22 @@
 #pragma once
 #include "Core/AssetManager/AssetManager2.hpp"
+#include "Core/AssetManager/AssetDependency.hpp"
 #include "Core/Threading/ConcurrentHandleAllocator.hpp"
 
 namespace Cori {
 	namespace Core {
-		//only used in spokes that live outside main thread
-		//TODO: add the asset concept here
 		template<typename T, uint16_t REUSE_THRESHOLD = 64>
 		class AssetHandleAllocator : public Threading::ConcurrentHandleAllocatorBase<AssetHandleAllocator<T, REUSE_THRESHOLD>, T, REUSE_THRESHOLD> {
 		public:
 			void AddRef(const Handle<T> handle) {
-				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::AddRef called with an invalid handle");
+				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::AddRef called with an invalid handle ({}, {})", handle.GetIndex(), handle.GetVersion());
 
 				const uint32_t prev = m_RefCounts[handle.GetIndex()].fetch_add(1, std::memory_order_relaxed);
 				CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::Assets, Cori::eTrace, Cori::ProfileColors::Refcount, "%s Handle=[%u, %u] AddRef refs %u -> %u", CORI_CLEAN_TYPE_NAME(T), handle.GetIndex(), handle.GetVersion(), prev, prev + 1);
 			}
 
 			[[nodiscard]] bool TryAddRef(const Handle<T> handle) {
-				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::TryAddRef called with an invalid handle");
+				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::TryAddRef called with an invalid handle ({}, {})", handle.GetIndex(), handle.GetVersion());
 
 				auto& rc = m_RefCounts[handle.GetIndex()];
 				uint32_t cur = rc.load(std::memory_order_relaxed);
@@ -34,7 +33,7 @@ namespace Cori {
 			}
 
 			void RemoveRef(const Handle<T> handle) {
-				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::RemoveRef called with an invalid handle");
+				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::RemoveRef called with an invalid handle ({}, {})", handle.GetIndex(), handle.GetVersion());
 
 				uint32_t prev = m_RefCounts[handle.GetIndex()].fetch_sub(1, std::memory_order_release);
 				CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::Assets, Cori::eTrace, Cori::ProfileColors::Refcount, "%s Handle=[%u, %u] RemoveRef refs %u -> %u%s", CORI_CLEAN_TYPE_NAME(T), handle.GetIndex(), handle.GetVersion(), prev, prev - 1, prev == 1 ? " (terminal, queueing unload)" : "");
@@ -43,48 +42,84 @@ namespace Cori {
 				}
 				std::atomic_thread_fence(std::memory_order_acquire);
 
-				//const uint32_t n = m_ReservedCount.load(std::memory_order_acquire);
-				//for (uint32_t i = 0; i < n; i++) {
-				//	if (Handle<T>(m_ReservedHandles[i].load(std::memory_order_relaxed)) == handle) {
-				//		return;
-				//	}
-				//}
-
-				//CORI_CORE_ASSERT(AssetManager2::GetDeletionPoliciesVector()[GetBoundVectorKey(handle)].load(std::memory_order_acquire) == AssetDeletionPolicy::eRefCounted, "Keep-alive slot reached terminal zero — self-ref missing.");
-
-				//if (AssetManager2::GetDeletionPoliciesVector()[GetBoundVectorKey(handle)].load(std::memory_order_acquire) != AssetDeletionPolicy::eRefCounted) {
-				//	return;
-				//}
-
 				T::Manager::QueueUnload(handle);
 			}
 
 			[[nodiscard]] AssetID GetBoundAssetID(const Handle<T> handle) const {
-				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::GetBoundAssetID called with an invalid handle");
+				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::GetBoundAssetID called with an invalid handle ({}, {})", handle.GetIndex(), handle.GetVersion());
 				AssetID result = m_AssetIDs[handle.GetIndex()].load(std::memory_order_acquire);
 				CORI_CORE_ASSERT(result != UINT64_MAX, "AssetHandleAllocator::GetBoundAssetID called with a reserved handle.");
 				return result;
 			}
 
 			[[nodiscard]] uint32_t GetBoundVectorKey(const Handle<T> handle) const {
-				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::GetBoundVectorKey called with an invalid handle");
+				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::GetBoundVectorKey called with an invalid handle ({}, {})", handle.GetIndex(), handle.GetVersion());
 				uint32_t vectorKey = m_VectorKeys[handle.GetIndex()].load(std::memory_order_acquire);
 				CORI_CORE_ASSERT(vectorKey != UINT32_MAX, "AssetHandleAllocator::GetBoundVectorKey called with a reserved handle.");
 				return vectorKey;
 			}
 
 			[[nodiscard]] uint32_t GetGeneration(const Handle<T> handle) const {
-				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::GetGeneration called with an invalid handle");
+				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::GetGeneration called with an invalid handle ({}, {})", handle.GetIndex(), handle.GetVersion());
 				return m_LoadGenerations[handle.GetIndex()].load(std::memory_order_acquire);
 			}
 
+			void PublishIdentity(const Handle<T> handle, const AssetDependencySet& dependencies) {
+				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::PublishIdentity called with an invalid handle ({}, {})", handle.GetIndex(), handle.GetVersion());
+
+				auto& identity = m_IdentityVersions[handle.GetIndex()];
+				const uint32_t start = identity.load(std::memory_order_relaxed);
+
+				CORI_CORE_ASSERT((start & 1u) == 0, "AssetHandleAllocator::PublishIdentity re-entered while a publish was already in flight, writers must be serialized.");
+
+				identity.store(start + 1, std::memory_order_relaxed);
+				std::atomic_thread_fence(std::memory_order_release);
+
+				m_Dependencies[handle.GetIndex()] = dependencies;
+
+				identity.store(start + 2, std::memory_order_release);
+
+				CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::Assets, Cori::eTrace, Cori::ProfileColors::Bind, "%s Handle=[%u, %u] identity published -> %u (%u dependencies)", CORI_CLEAN_TYPE_NAME(T), handle.GetIndex(), handle.GetVersion(), start + 2, dependencies.count);
+			}
+
+			[[nodiscard]] uint32_t GetIdentityVersion(const Handle<T> handle) const {
+				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::GetIdentityVersion called with an invalid handle ({}, {})", handle.GetIndex(), handle.GetVersion());
+				return m_IdentityVersions[handle.GetIndex()].load(std::memory_order_acquire);
+			}
+
+			[[nodiscard]] std::expected<std::pair<AssetDependencySet, uint32_t>, ErrorCode> TryReadDependencies(const Handle<T> handle) const {
+				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::TryReadDependencies called with an invalid handle ({}, {})", handle.GetIndex(), handle.GetVersion());
+
+				const auto& identity = m_IdentityVersions[handle.GetIndex()];
+				uint32_t first = identity.load(std::memory_order_acquire);
+
+				if (first == 0) {
+					return std::unexpected(ErrorCode::eNotReady);
+				}
+
+				while (true) {
+					first = identity.load(std::memory_order_acquire);
+					if ((first & 1u) != 0) {
+						continue;
+					}
+
+					AssetDependencySet set = m_Dependencies[handle.GetIndex()];
+
+					std::atomic_thread_fence(std::memory_order_acquire);
+
+					if (identity.load(std::memory_order_relaxed) == first) {
+						return std::make_pair(set, first);
+					}
+				}
+			}
+
 			void SetAssetStatus(const Handle<T> handle, const AssetStatus newStatus) {
-				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::SetAssetStatus called with an invalid handle");
+				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::SetAssetStatus called with an invalid handle ({}, {})", handle.GetIndex(), handle.GetVersion());
 				m_AssetStatuses[handle.GetIndex()].store(newStatus, std::memory_order_release);
 			}
 
 			[[nodiscard]] AssetStatus GetAssetStatus(const Handle<T> handle) const {
-				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::GetAssetStatus called with an invalid handle");
+				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::GetAssetStatus called with an invalid handle ({}, {})", handle.GetIndex(), handle.GetVersion());
 				return m_AssetStatuses[handle.GetIndex()].load(std::memory_order_acquire);
 			}
 
@@ -130,6 +165,14 @@ namespace Cori {
 				if (newSizePowerOfTwo >= m_AssetStatuses.size()) {
 					m_AssetStatuses.grow_to_at_least(newSizePowerOfTwo);
 				}
+
+				if (newSizePowerOfTwo >= m_IdentityVersions.size()) {
+					m_IdentityVersions.grow_to_at_least(newSizePowerOfTwo);
+				}
+
+				if (newSizePowerOfTwo >= m_Dependencies.size()) {
+					m_Dependencies.grow_to_at_least(newSizePowerOfTwo);
+				}
 			}
 
 			void AllocateExtras(const Handle<T> handle) {
@@ -155,6 +198,8 @@ namespace Cori {
 			tbb::concurrent_vector<std::atomic<uint64_t>> m_AssetIDs;
 			tbb::concurrent_vector<std::atomic<uint32_t>> m_LoadGenerations;
 			tbb::concurrent_vector<std::atomic<AssetStatus>> m_AssetStatuses;
+			tbb::concurrent_vector<std::atomic<uint32_t>> m_IdentityVersions;
+			tbb::concurrent_vector<AssetDependencySet> m_Dependencies;
 
 			std::array<std::atomic<uint64_t>, 8> m_ReservedHandles{};
 			std::atomic<uint32_t> m_ReservedCount{ 0 };

@@ -1,0 +1,20 @@
+{
+    "Metadata": {
+        "assetTypename": "Material",
+        "assetType": "eSecondary",
+        "assetDeletionPolicy": "eRefCounted"
+    },
+    "AssetData": {
+        "materialData": {
+            "colorFactor": [
+                0.75,
+                0.75,
+                0.78,
+                1.0
+            ],
+            "albedoTexture": "enginedata://textures/white.json",
+            "albedoSampler": "Default"
+        },
+        "shaderEffect": "enginedata://PreviewEffect.json"
+    }
+}

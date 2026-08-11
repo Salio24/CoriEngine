@@ -14,7 +14,8 @@ namespace Cori {
 		eImmutableObject,
 		eFailedToOpenFile,
 		eParseFailure,
-		eCreationFailure
+		eCreationFailure,
+		eRedundantCall
 	};
 
 	inline constexpr std::string_view to_string(ErrorCode code) {

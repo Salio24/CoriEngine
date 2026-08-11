@@ -46,7 +46,7 @@ namespace Cori {
 	 */
 	class LogTag {
 	public:
-		explicit LogTag(const std::string_view name, const LogTag* parent = nullptr) noexcept : m_Name(name), m_Parent(parent) {
+		explicit LogTag(const std::string_view name, const LogTag* parent = nullptr, const LogLevel floor = LogLevel::eTrace) noexcept : m_Name(name), m_Parent(parent), m_Floor(floor) {
 			LogTag* head = s_Head.load(std::memory_order_relaxed);
 			m_Next = head;
 			while (!s_Head.compare_exchange_weak(head, this, std::memory_order_release, std::memory_order_relaxed)) {
@@ -100,7 +100,7 @@ namespace Cori {
 		std::string_view m_Name;
 		const LogTag* m_Parent{ nullptr };
 		LogTag* m_Next{ nullptr };
-		mutable std::atomic<LogLevel> m_Floor{ LogLevel::eTrace };
+		mutable std::atomic<LogLevel> m_Floor;
 
 		static inline constinit std::atomic<LogTag*> s_Head{ nullptr };
 	};

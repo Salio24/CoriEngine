@@ -16,6 +16,7 @@
 #include "Graphics/RendererSettings.hpp"
 
 #include "PersistentRenderTarget.hpp"
+#include "ThumbnailRect.hpp"
 #include "CameraSnapshot.hpp"
 
 namespace Cori {
@@ -106,10 +107,6 @@ namespace Cori {
 				CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle passed to SceneRenderer::RegisterObject");
 
 				auto shaderEffect = VulkanMaterialSystem::GetMaterialShaderEffect(material.GetHandle());
-
-				//if (!shaderEffect) {
-				//	return std::unexpected(shaderEffect.error());
-				//}
 
 				auto [groupIndex, batchIndex] = FindAppropriateGroupAndBatch(shaderEffect.value().get().GetHandle(), std::move(mesh));
 
@@ -245,37 +242,34 @@ namespace Cori {
 
 				auto [newGroup, newBatch] = FindAppropriateGroupAndBatch(newShaderEffect.value().get().GetHandle(), std::move(mesh));
 				m_Objects[handle].m_OwnerBatch = newBatch;
+				m_Objects[handle].m_Material = std::move(newMaterial);
 				m_Batches[newBatch].IncrementObjectCounter();
 			}
 
 			static void OnMaterialShaderEffectChanged(void* instance, const Core::Handle<Material> material, [[maybe_unused]] const Core::ConstHandle<ShaderEffect> oldShaderEffect, const Core::ConstHandle<ShaderEffect> newShaderEffect);
 
-			[[nodiscard]] bool IsDormant() const {
-				return m_IsDormant;
-			}
-
-			void MarkNonDormant() {
-				m_IsDormant = false;
-			}
-
 			[[nodiscard]] FrameData* PopRecycledFrameData();
-
-			[[nodiscard]] FrameData* PeekRecycledFrameData();
 
 			bool PushFrameData(FrameData* frameData) {
 				return m_ReadyRing.TryEmplace(frameData);
 			}
 
-			[[nodiscard]] bool IsReady() {
-				return m_ReadyRing.Front() != nullptr;
-			}
-
-			[[nodiscard]] FrameData** PeekFrameData() {
-				return m_ReadyRing.Front();
-			}
-
 			[[nodiscard]] PersistentRenderTarget& GetPRT() {
 				return m_PRT;
+			}
+
+			[[nodiscard]] std::optional<ThumbnailRect> TakePendingThumbnailCopy() {
+				std::optional<ThumbnailRect> pending = m_PendingThumbnailCopy;
+				m_PendingThumbnailCopy.reset();
+				return pending;
+			}
+
+			void NotifyThumbnailCopyRecorded() {
+				m_ThumbnailCopyCount.fetch_add(1, std::memory_order_release);
+			}
+
+			[[nodiscard]] uint64_t GetThumbnailCopyCount() const {
+				return m_ThumbnailCopyCount.load(std::memory_order_acquire);
 			}
 
 			void ProcessFrameData();
@@ -287,12 +281,6 @@ namespace Cori {
 			};
 
 			struct CullData {
-				//glm::vec4 left{};
-				//glm::vec4 right{};
-				//glm::vec4 bottom{};
-				//glm::vec4 top{};
-				//glm::vec4 near{};
-				//glm::vec4 far{};
 				alignas(16) std::array<glm::vec4, 6> planes;
 			};
 
@@ -370,7 +358,6 @@ namespace Cori {
 			}
 
 			Threading::ConcurrentHandleAllocator<RenderObject, 64> m_RenderObjectAllocator;
-			//VulkanFlatSlotMap<RenderObject, 0, false> m_Objects{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Render Object SlotMap" };
 
 			template<typename T> using ObjectsGPUStorage = VulkanGPUSyncedSequentialStorage<T, QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Render Object SlotMap">;
 
@@ -397,11 +384,12 @@ namespace Cori {
 			CameraSnapshot m_CameraSnapshot;
 			PersistentRenderTarget m_PRT;
 
+			std::optional<ThumbnailRect> m_PendingThumbnailCopy;
+			std::atomic<uint64_t> m_ThumbnailCopyCount{ 0 };
+
 			#ifdef DEBUG_BUILD
 			std::string m_Name;
 			#endif
-
-			bool m_IsDormant{ true };
 
 			Threading::SPSCRing<FrameData*> m_ReadyRing{ FRAMES_IN_FLIGHT };
 			Threading::SPSCRing<FrameData*> m_RecycleRing{ FRAMES_IN_FLIGHT };

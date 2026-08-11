@@ -57,12 +57,12 @@ namespace Cori {
 		Application::~Application() {
 			Console::Shutdown();
 			Graphics::VulkanEngine::ExitThreadedMode();
-			World::SceneManager::Shutdown();
 			m_LayerStack.ClearStack();
+			World::SceneManager::Shutdown();
 			Audio::Mixer::Shutdown();
+			m_WorkerPool.Stop();
 			Graphics::VulkanEngine::Stop();
 			ImGui::DestroyContext();
-			m_WorkerPool.Stop();
 			AssetManager2::Shutdown();
 		}
 
@@ -125,19 +125,7 @@ namespace Cori {
 
 					{
 						CORI_PROFILE_SCOPE("MasterFrameData wait");
-						Graphics::MasterRenderer::Get().WaitForRecycledFrameData();
-					}
-
-					{
-						CORI_PROFILE_SCOPE("FrameData wait");
-						bool success = false;
-						while (success == false) {
-							success = true;
-
-							for (auto& handle : World::SceneManager::GetStorage() | std::views::values) {
-								success &= handle.WaitForFrameData();
-							}
-						}
+						Graphics::MasterRenderer::Get().BeginFrame();
 					}
 
 					m_FrameStartHostTime = Graphics::VulkanPresentTiming::HostNow();
@@ -168,41 +156,26 @@ namespace Cori {
 						(*it)->OnUpdate(m_GameTimer);
 					}
 
-					Graphics::MasterFrameData* MFD = Graphics::MasterRenderer::Get().PopRecycledFrameData();
-
-					MFD->latencyStamps = Graphics::FrameLatencyStamps{
-						.inputTimestampSdl = m_Window->GetOldestInputTimestamp(),
-						.frameStartHost = GetFrameStartHostTime()
-					};
-
-					MFD->settings = Graphics::g_RendererSettings;
-
-					bool result = Graphics::MasterRenderer::Get().PushFrameData(MFD);
-					CORI_CORE_ASSERT(result, "Push failed");
-
 					{
 						CORI_PROFILE_SCOPE("FrameData preparation");
-						bool success = false;
-						while (success == false) {
-							success = true;
-
-							for (auto& handle : World::SceneManager::GetStorage() | std::views::values) {
-								success &= handle.PrepareFrameData();
-							}
+						for (auto& handle : World::SceneManager::GetStorage() | std::views::values) {
+							handle.PrepareFrameData();
 						}
 					}
 
 					{
 						CORI_PROFILE_SCOPE("Application submit to renderer");
-						bool success = false;
-						while (success == false) {
-							success = true;
-
-							for (auto& handle : World::SceneManager::GetStorage() | std::views::values) {
-								success &= handle.SubmitForRender();
-							}
+						for (auto& handle : World::SceneManager::GetStorage() | std::views::values) {
+							handle.SubmitForRender();
 						}
 					}
+
+					Graphics::MasterRenderer::Get().EndFrame(
+						Graphics::FrameLatencyStamps{
+							.inputTimestampSdl = m_Window->GetOldestInputTimestamp(),
+							.frameStartHost = GetFrameStartHostTime()
+						},
+						Graphics::g_RendererSettings);
 
 					m_LayerStack.ProcessQueue();
 				}

@@ -20,6 +20,8 @@ project(Snowflake)
 
     target_compile_options(${EXECUTABLE_NAME} PRIVATE -w)
 
+    target_include_directories(${EXECUTABLE_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+
     target_compile_definitions(${EXECUTABLE_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
         $<$<CONFIG:RelWithDebInfo>:DEBUG_BUILD>

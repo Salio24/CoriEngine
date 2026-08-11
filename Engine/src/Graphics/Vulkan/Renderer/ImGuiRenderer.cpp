@@ -19,6 +19,70 @@ namespace Cori {
 
 		std::unique_ptr<ImGuiRenderer::Data> ImGuiRenderer::s_Data{};
 
+		// The ImGui Vulkan backend maps and unmaps its vertex/index buffers every frame multiple times (A LOT!). Each one is a syscall taking system-wide mmap_lock, on my system it lead to stutters under some conditions.
+		namespace {
+			struct PersistentMappings {
+				std::unordered_map<VkDeviceMemory, void*> m_Bases;
+				std::mutex m_Mutex;
+			};
+
+			PersistentMappings& GetPersistentMappings() {
+				static PersistentMappings s_Mappings;
+				return s_Mappings;
+			}
+
+			VKAPI_ATTR VkResult VKAPI_CALL PersistentMapMemory(VkDevice device, VkDeviceMemory memory, VkDeviceSize offset, VkDeviceSize, VkMemoryMapFlags flags, void** ppData) {
+				auto& mappings = GetPersistentMappings();
+				std::lock_guard lk(mappings.m_Mutex);
+
+				auto it = mappings.m_Bases.find(memory);
+				if (it == mappings.m_Bases.end()) {
+					void* base = nullptr;
+					const VkResult result = VULKAN_HPP_DEFAULT_DISPATCHER.vkMapMemory(device, memory, 0, VK_WHOLE_SIZE, flags, &base);
+					if (result != VK_SUCCESS) {
+						return result;
+					}
+
+					it = mappings.m_Bases.emplace(memory, base).first;
+				}
+
+				*ppData = static_cast<uint8_t*>(it->second) + offset;
+				return VK_SUCCESS;
+			}
+
+			VKAPI_ATTR void VKAPI_CALL PersistentUnmapMemory(VkDevice, VkDeviceMemory) {}
+
+			VKAPI_ATTR void VKAPI_CALL PersistentFreeMemory(VkDevice device, VkDeviceMemory memory, const VkAllocationCallbacks* allocator) {
+				{
+					auto& mappings = GetPersistentMappings();
+					std::lock_guard lk(mappings.m_Mutex);
+					mappings.m_Bases.erase(memory);
+				}
+
+				VULKAN_HPP_DEFAULT_DISPATCHER.vkFreeMemory(device, memory, allocator);
+			}
+
+			PFN_vkVoidFunction LoadImGuiVulkanFunction(const char* name, void* userData) {
+				const std::string_view function{ name };
+
+				if (function == "vkMapMemory") {
+					return reinterpret_cast<PFN_vkVoidFunction>(&PersistentMapMemory);
+				}
+				if (function == "vkUnmapMemory") {
+					return reinterpret_cast<PFN_vkVoidFunction>(&PersistentUnmapMemory);
+				}
+				if (function == "vkFreeMemory") {
+					return reinterpret_cast<PFN_vkVoidFunction>(&PersistentFreeMemory);
+				}
+
+				if (PFN_vkVoidFunction deviceFunction = VULKAN_HPP_DEFAULT_DISPATCHER.vkGetDeviceProcAddr(static_cast<VkDevice>(userData), name)) {
+					return deviceFunction;
+				}
+
+				return VULKAN_HPP_DEFAULT_DISPATCHER.vkGetInstanceProcAddr(static_cast<VkInstance>(VulkanEngine::GetInstance()), name);
+			}
+		}
+
 		void ImGuiRenderer::Init(void* window) {
 			CORI_CORE_ASSERT(!s_Data, "ImGuiRenderer::Init called twice.");
 
@@ -52,6 +116,9 @@ namespace Cori {
 			vulkanInfo.CheckVkResultFn = [](VkResult result) {
 				CORI_CORE_ASSERT(result == VK_SUCCESS, "ImGui Vulkan Error: {}", vk::to_string(static_cast<vk::Result>(result)));
 			};
+
+			bool functionsLoaded = ImGui_ImplVulkan_LoadFunctions(VK_API_VERSION_1_3, &LoadImGuiVulkanFunction, static_cast<VkDevice>(VulkanEngine::GetLogicalDevice()));
+			CORI_CORE_ASSERT(functionsLoaded, "Failed to load Vulkan functions for the ImGui backend.");
 
 			bool success = ImGui_ImplVulkan_Init(&vulkanInfo);
 			CORI_CORE_ASSERT(success, "Failed to initialize ImGui with Vulkan.");

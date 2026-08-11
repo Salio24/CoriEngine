@@ -4,6 +4,7 @@
 #include "Core/DataStructures/FlatSlotMap.hpp"
 #include "AssetManagerEnums.hpp"
 #include "AssetManager/AssetLoadStatus.hpp"
+#include "Core/AssetManager/AssetDependency.hpp"
 #include "Core/ErrorCodes.hpp"
 #include "Utility/StringHash.hpp"
 #include "nlohmann/json.hpp"
@@ -99,6 +100,12 @@ namespace Cori {
 		template<typename T>
 		concept SpokeHasFreeExtras = requires(const Handle<T> handle) {
 			{ T::Manager::FreeExtras(handle) } -> std::same_as<void>;
+		};
+
+		template<typename T>
+		concept SpokePublishesIdentity = requires(const Handle<T> handle) {
+			{ T::Manager::GetIdentityVersion(handle) } -> std::same_as<uint32_t>;
+			{ T::Manager::TryReadDependencies(handle) } -> std::same_as<std::expected<std::pair<AssetDependencySet, uint32_t>, ErrorCode>>;
 		};
 
 		//TODO: add a 'Serialize' requirement for the asset types that can be saved back to disk (e.g. ShaderEffect, Material etc, all the assets that are just configs)
@@ -376,9 +383,53 @@ namespace Cori {
 				}
 			}
 
+			template<IsValidAsset T>
+			static uint32_t GetIdentityVersionImpl(const uint32_t vectorKey) {
+				const Handle<T> handle = Handle<T>(Get().m_RawHandles[vectorKey].load(std::memory_order_acquire));
+				if (!handle.IsSet() || !T::Manager::IsHandleValid(handle)) {
+					return 0;
+				}
+
+				return T::Manager::GetIdentityVersion(handle);
+			}
+
+			template<IsValidAsset T>
+			static std::expected<std::pair<AssetDependencySet, uint32_t>, ErrorCode> TryReadDependenciesImpl(const uint32_t vectorKey) {
+				const Handle<T> handle = Handle<T>(Get().m_RawHandles[vectorKey].load(std::memory_order_acquire));
+				if (!handle.IsSet() || !T::Manager::IsHandleValid(handle)) {
+					return std::unexpected(ErrorCode::eInvalidHandle);
+				}
+
+				return T::Manager::TryReadDependencies(handle);
+			}
+
+			template<IsValidAsset T>
+			static uint32_t GetIdentityVersionByHandleImpl(const uint32_t index, const uint32_t version) {
+				const Handle<T> handle(index, version);
+				if (!T::Manager::IsHandleValid(handle)) {
+					return 0;
+				}
+
+				return T::Manager::GetIdentityVersion(handle);
+			}
+
+			template<IsValidAsset T>
+			static AssetStatus GetAssetStatusByHandleImpl(const uint32_t index, const uint32_t version) {
+				const Handle<T> handle(index, version);
+				if (!T::Manager::IsHandleValid(handle)) {
+					return AssetStatus::eUnspecified;
+				}
+
+				return T::Manager::GetAssetStatus(handle);
+			}
+
 			struct AssetTypeOps {
 				void (*Reload)(uint32_t vectorKey);
 				void (*ChangePolicy)(AssetDeletionPolicy newPolicy, uint32_t vectorKey);
+				uint32_t (*GetIdentityVersion)(uint32_t vectorKey);
+				std::expected<std::pair<AssetDependencySet, uint32_t>, ErrorCode> (*TryReadDependencies)(uint32_t vectorKey);
+				uint32_t (*GetIdentityVersionByHandle)(uint32_t index, uint32_t version);
+				AssetStatus (*GetAssetStatusByHandle)(uint32_t index, uint32_t version);
 				bool hotReload;
 				bool autoHotReload;
 			};
@@ -389,6 +440,19 @@ namespace Cori {
 				static const AssetTypeOps ops{
 					.Reload = AssetHotReloadEnabled<T> ? &ReloadImpl<T> : nullptr,
 					.ChangePolicy = &ChangePolicyImpl<T>,
+					.GetIdentityVersion = [] {
+						if constexpr (SpokePublishesIdentity<T>) { return &GetIdentityVersionImpl<T>; }
+						else { return static_cast<uint32_t(*)(uint32_t)>(nullptr); }
+					}(),
+					.TryReadDependencies = [] {
+						if constexpr (SpokePublishesIdentity<T>) { return &TryReadDependenciesImpl<T>; }
+						else { return static_cast<std::expected<std::pair<AssetDependencySet, uint32_t>, ErrorCode>(*)(uint32_t)>(nullptr); }
+					}(),
+					.GetIdentityVersionByHandle = [] {
+						if constexpr (SpokePublishesIdentity<T>) { return &GetIdentityVersionByHandleImpl<T>; }
+						else { return static_cast<uint32_t(*)(uint32_t, uint32_t)>(nullptr); }
+					}(),
+					.GetAssetStatusByHandle = &GetAssetStatusByHandleImpl<T>,
 					.hotReload = AssetHotReloadEnabled<T>,
 					.autoHotReload = AssetAutoHotReloadEnabled<T>
 				};
@@ -454,6 +518,64 @@ namespace Cori {
 				CORI_CORE_ASSERT(Get().m_PublishedCount.load(std::memory_order_acquire) >= key, "Invalid vector key.");
 
 				return Get().m_TypeNameHashes[key];
+			}
+
+			static uint32_t GetIdentityVersion(const uint32_t vectorKey) {
+				const uint64_t typeHash = GetAssetTypeHash(vectorKey);
+				const auto it = Get().m_AssetOps.find(typeHash);
+				if (it == Get().m_AssetOps.end()) {
+					return 0;
+				}
+
+				const AssetTypeOps* ops = it->second.load(std::memory_order_acquire);
+				if (!ops || !ops->GetIdentityVersion) {
+					return 0;
+				}
+
+				return ops->GetIdentityVersion(vectorKey);
+			}
+
+			[[nodiscard]] static std::expected<std::pair<AssetDependencySet, uint32_t>, ErrorCode> TryReadDependencies(const uint32_t vectorKey) {
+				const uint64_t typeHash = GetAssetTypeHash(vectorKey);
+				const auto it = Get().m_AssetOps.find(typeHash);
+				if (it == Get().m_AssetOps.end()) {
+					return std::unexpected(ErrorCode::eObjectDoesNotExist);
+				}
+
+				const AssetTypeOps* ops = it->second.load(std::memory_order_acquire);
+				if (!ops || !ops->TryReadDependencies) {
+					return std::unexpected(ErrorCode::eNotReady);
+				}
+
+				return ops->TryReadDependencies(vectorKey);
+			}
+
+			[[nodiscard]] static uint32_t GetDependencyIdentityVersion(const AssetDependency& dependency) {
+				const auto it = Get().m_AssetOps.find(dependency.typeHash);
+				if (it == Get().m_AssetOps.end()) {
+					return 0;
+				}
+
+				const AssetTypeOps* ops = it->second.load(std::memory_order_acquire);
+				if (!ops || !ops->GetIdentityVersionByHandle) {
+					return 0;
+				}
+
+				return ops->GetIdentityVersionByHandle(dependency.index, dependency.version);
+			}
+
+			[[nodiscard]] static AssetStatus GetDependencyStatus(const AssetDependency& dependency) {
+				const auto it = Get().m_AssetOps.find(dependency.typeHash);
+				if (it == Get().m_AssetOps.end()) {
+					return AssetStatus::eUnspecified;
+				}
+
+				const AssetTypeOps* ops = it->second.load(std::memory_order_acquire);
+				if (!ops || !ops->GetAssetStatusByHandle) {
+					return AssetStatus::eUnspecified;
+				}
+
+				return ops->GetAssetStatusByHandle(dependency.index, dependency.version);
 			}
 
 			static std::optional<uint32_t> GetAssetVectorKey(const AssetID id) {

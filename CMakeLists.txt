@@ -70,6 +70,7 @@ project(main)
         message(FATAL_ERROR "CoriEngine thirdparty dependencies not found. Are you sure you cloned the repo recursively? Try running 'git submodule update --init --recursive' to download dependencies.")
     endif()
     set(CMAKE_CXX_STANDARD 26)
+    set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
     if (NOT CORI_FORCE_AVX2 AND CORI_USE_NATIVE)
         add_compile_options(-march=native)

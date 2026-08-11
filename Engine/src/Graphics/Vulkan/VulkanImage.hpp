@@ -15,6 +15,7 @@ namespace Cori {
 			struct ImageViewKey {
 				vk::ImageViewCreateFlags flags{};
 				vk::ImageViewType type;
+				vk::Format format{ vk::Format::eUndefined };
 				vk::ComponentMapping components{};
 				vk::ImageSubresourceRange subresourceRange;
 
@@ -28,6 +29,7 @@ namespace Cori {
 
 						Utility::HashCombine(hash, static_cast<uint32_t>(key.flags));
 						Utility::HashCombine(hash, static_cast<uint32_t>(key.type));
+						Utility::HashCombine(hash, static_cast<uint32_t>(key.format));
 						Utility::HashCombine(hash, static_cast<uint32_t>(key.components.r));
 						Utility::HashCombine(hash, static_cast<uint32_t>(key.components.g));
 						Utility::HashCombine(hash, static_cast<uint32_t>(key.components.b));

@@ -1,2 +1,2 @@
 #pragma once
-#define CORI_PROFILER_STACK_DEPTH 10
+#define CORI_PROFILER_STACK_DEPTH 0

@@ -1,4 +1,5 @@
 #pragma once
+#include "VulkanHeaders.hpp"
 
 namespace Cori {
 	namespace Graphics {

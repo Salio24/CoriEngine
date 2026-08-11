@@ -5,6 +5,7 @@
 #include "Core/DataStructures/FlatSlotMap.hpp"
 #include "AssetManager/AssetLoadStatus.hpp"
 #include "Core/AssetManager/AssetManager2.hpp"
+#include "Core/AssetManager/AssetDependencies.hpp"
 #include "Core/AssetManager/AssetHandleAllocator.hpp"
 #include "Graphics/RenderThreadCommandQueue.hpp"
 #include <fast_obj.h>
@@ -333,6 +334,12 @@ namespace Cori {
 
 			[[nodiscard]] static AssetStatus GetAssetStatus(const Core::Handle<Mesh> handle);
 
+			[[nodiscard]] static uint32_t GetIdentityVersion(const Core::Handle<Mesh> handle);
+
+			[[nodiscard]] static std::expected<std::pair<Core::AssetDependencySet, uint32_t>, ErrorCode> TryReadDependencies(const Core::Handle<Mesh> handle);
+
+			static void PublishIdentity(const Core::Handle<Mesh> handle);
+
 			static void RegisterAtSlot(const Core::Handle<Mesh> handle);
 
 			static void Load(const Core::Handle<Mesh> handle, const Core::AssetID id, const uint32_t gen, const uint32_t vectorKey, std::filesystem::path path, std::string name = "");
@@ -391,11 +398,8 @@ namespace Cori {
 
 			Core::AssetHandleAllocator<Mesh> m_HandleAllocator;
 
-			//VulkanFlatSlotMap<Mesh, 0, false> m_Meshes{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Mesh assets data buffer" };
-
 			template<typename T> using MeshGPUStorage = VulkanGPUSyncedSequentialStorage<T, QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Mesh assets data buffer">;
 			Core::SparseFlatSlotMap<Mesh, 0, false, MeshGPUStorage> m_Meshes;
-			//VulkanFlatSlotMap<Mesh, 0, false> m_Meshes{ QueueUsageFlagBits::eGraphics, vk::BufferUsageFlagBits::eShaderDeviceAddress, "Mesh assets data buffer" };
 
 			std::vector<MeshMetadata> m_MeshMetadata;
 			tbb::concurrent_vector<AABBAtomics> m_AABBs;

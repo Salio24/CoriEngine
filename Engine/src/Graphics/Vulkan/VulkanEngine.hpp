@@ -9,6 +9,8 @@
 //#include <vulkan/vk_platform.h>
 //#include <vulkan/vulkan_to_string.hpp>
 //#include <vulkan/vulkan_format_traits.hpp>
+//#include "Profiling/GPUProfiler.hpp"
+#include "VulkanHeaders.hpp"
 #include "vk_mem_alloc.hpp"
 #include "VulkanDebugLabels.hpp"
 #include "DeviceLossDebug/VulkanDeviceLossDebug.hpp"

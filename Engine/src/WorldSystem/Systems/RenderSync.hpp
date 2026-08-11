@@ -10,15 +10,25 @@ namespace Cori {
 			public:
 				~RenderSync() override;
 
-				bool WaitForFrameData();
+				void PrepareFrameData();
 
-				bool PrepareFrameData();
+				void SubmitForRendering();
 
-				bool SubmitForRendering();
+				void Sleep();
+
+				void WakeUp();
+
+				[[nodiscard]] bool IsAsleep() const;
 
 				void RequestResize(const vk::Extent2D extent);
 
+				void RequestThumbnailCopy(const Graphics::ThumbnailRect rect);
+
+				[[nodiscard]] uint64_t GetThumbnailCopyCount() const;
+
 				[[nodiscard]] std::optional<ImTextureID> GetMainPRT() const;
+
+				[[nodiscard]] Graphics::SceneRendererHandle GetRendererHandle() const;
 
 				void Bind();
 
@@ -35,9 +45,11 @@ namespace Cori {
 				vk::Extent2D m_ViewportExtent{};
 				bool m_NewExtent{ false };
 
+				std::optional<Graphics::ThumbnailRect> m_PendingThumbnailCopy;
+
 				Graphics::FrameData* m_Pending{ nullptr };
 
-				bool m_FrameSubmitted{ false };
+				bool m_Asleep{ false };
 
 				std::vector<Core::Handle<Graphics::RenderObject>> m_PendingRemovals;
 			};
