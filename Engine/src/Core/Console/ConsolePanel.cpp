@@ -191,32 +191,29 @@ namespace Cori {
 
 		ImGui::SetNextWindowSize(ImVec2(980.0f, 420.0f), ImGuiCond_FirstUseEver);
 
-		if (!ImGui::Begin(name, open, ImGuiWindowFlags_NoCollapse)) {
-			ImGui::End();
-			return;
+		if (ImGui::Begin(name, open, ImGuiWindowFlags_NoCollapse)) {
+			if (m_FilterDirty) {
+				RebuildVisible();
+			}
+
+			DrawToolbar();
+
+			ImGui::Separator();
+
+			const float completionHeight = CompletionHeight();
+			const float bodyHeight = -(ImGui::GetFrameHeightWithSpacing() + (completionHeight > 0.0f ? completionHeight + ImGui::GetStyle().ItemSpacing.y : 0.0f));
+
+			if (m_ShowTagPane) {
+				DrawTagPane(bodyHeight);
+				ImGui::SameLine();
+			}
+
+			DrawEntries(bodyHeight);
+
+			DrawCompletions(completionHeight);
+
+			DrawPrompt();
 		}
-
-		if (m_FilterDirty) {
-			RebuildVisible();
-		}
-
-		DrawToolbar();
-
-		ImGui::Separator();
-
-		const float completionHeight = CompletionHeight();
-		const float bodyHeight = -(ImGui::GetFrameHeightWithSpacing() + (completionHeight > 0.0f ? completionHeight + ImGui::GetStyle().ItemSpacing.y : 0.0f));
-
-		if (m_ShowTagPane) {
-			DrawTagPane(bodyHeight);
-			ImGui::SameLine();
-		}
-
-		DrawEntries(bodyHeight);
-
-		DrawCompletions(completionHeight);
-
-		DrawPrompt();
 
 		ImGui::End();
 	}
@@ -355,37 +352,34 @@ namespace Cori {
 			return;
 		}
 
-		if (!ImGui::BeginChild("##completions", ImVec2(0.0f, height), ImGuiChildFlags_Borders, ImGuiWindowFlags_NoNavInputs)) {
-			ImGui::EndChild();
-			return;
+		if (ImGui::BeginChild("##completions", ImVec2(0.0f, height), ImGuiChildFlags_Borders, ImGuiWindowFlags_NoNavInputs)) {
+			const float contentWidth = ImGui::GetContentRegionAvail().x;
+
+			for (int32_t i = 0; i < static_cast<int32_t>(m_Completions.size()); ++i) {
+				const Core::ConsoleCompletion& completion = m_Completions[i];
+				const bool selected = i == m_CompletionIndex;
+
+				m_CompletionScratch.assign(completion.m_Text.data(), completion.m_Text.size());
+
+				ImGui::PushID(i);
+				if (ImGui::Selectable(m_CompletionScratch.c_str(), selected)) {
+					m_AcceptIndex = i;
+				}
+
+				if (!completion.m_Detail.empty()) {
+					const float detailWidth = ImGui::CalcTextSize(completion.m_Detail.c_str()).x;
+					ImGui::SameLine(contentWidth - detailWidth);
+					ImGui::TextDisabled("%s", completion.m_Detail.c_str());
+				}
+
+				if (selected && m_ScrollToSelection) {
+					ImGui::SetScrollHereY(0.5f);
+				}
+				ImGui::PopID();
+			}
+
+			m_ScrollToSelection = false;
 		}
-
-		const float contentWidth = ImGui::GetContentRegionAvail().x;
-
-		for (int32_t i = 0; i < static_cast<int32_t>(m_Completions.size()); ++i) {
-			const Core::ConsoleCompletion& completion = m_Completions[i];
-			const bool selected = i == m_CompletionIndex;
-
-			m_CompletionScratch.assign(completion.m_Text.data(), completion.m_Text.size());
-
-			ImGui::PushID(i);
-			if (ImGui::Selectable(m_CompletionScratch.c_str(), selected)) {
-				m_AcceptIndex = i;
-			}
-
-			if (!completion.m_Detail.empty()) {
-				const float detailWidth = ImGui::CalcTextSize(completion.m_Detail.c_str()).x;
-				ImGui::SameLine(contentWidth - detailWidth);
-				ImGui::TextDisabled("%s", completion.m_Detail.c_str());
-			}
-
-			if (selected && m_ScrollToSelection) {
-				ImGui::SetScrollHereY(0.5f);
-			}
-			ImGui::PopID();
-		}
-
-		m_ScrollToSelection = false;
 
 		ImGui::EndChild();
 	}

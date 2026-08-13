@@ -145,5 +145,92 @@ namespace Cori {
 				m_VirtBlockQueue[i].clear();
 			}
 		}
+		void DeletionQueue::PushDeleter(std::function<void()>&& deleter, uint32_t delay) {
+			if (delay >= s_BucketCount) {
+				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushDeleter is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
+				delay = GetMaxDelay();
+			}
+
+			delay = (delay + Get().m_Counter) % s_BucketCount;
+
+			Get().m_Deleters[delay].push_back(std::move(deleter));
+		}
+
+		void DeletionQueue::PushBuffer(VulkanBuffer& buffer, uint32_t delay) {
+			if (delay >= s_BucketCount) {
+				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushBuffer is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
+				delay = GetMaxDelay();
+			}
+
+			delay = (delay + Get().m_Counter) % s_BucketCount;
+
+			Get().m_BufferQueue[delay].push_back(buffer);
+		}
+
+		void DeletionQueue::PushImage(VulkanImage& image, uint32_t delay) {
+			if (delay >= s_BucketCount) {
+				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushImage is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
+				delay = GetMaxDelay();
+			}
+
+			delay = (delay + Get().m_Counter) % s_BucketCount;
+
+			Get().m_ImageQueue[delay].push_back(image);
+		}
+
+		void DeletionQueue::PushShaderObject(vk::ShaderEXT object, uint32_t delay) {
+			if (delay >= s_BucketCount) {
+				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushShaderObject is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
+				delay = GetMaxDelay();
+			}
+
+			delay = (delay + Get().m_Counter) % s_BucketCount;
+
+			Get().m_ShaderObjectQueue[delay].push_back(object);
+		}
+
+		void DeletionQueue::PushVirtualAlloc(vma::VirtualAllocation allocation, vma::VirtualBlock block, uint32_t delay, const std::optional<std::weak_ptr<std::mutex>>& mutex) {
+			if (delay >= s_BucketCount) {
+				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushVirtualAlloc is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
+				delay = GetMaxDelay();
+			}
+
+			delay = (delay + Get().m_Counter) % s_BucketCount;
+
+			Get().m_VirtAllocQueue[delay].emplace_back(allocation, block, mutex);
+		}
+
+		void DeletionQueue::PushVirtualBlock(vma::VirtualBlock block, uint32_t delay) {
+			if (delay >= s_BucketCount) {
+				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushVirtualBlock is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
+				delay = GetMaxDelay();
+			}
+
+			delay = (delay + Get().m_Counter) % s_BucketCount;
+
+			Get().m_VirtBlockQueue[delay].emplace_back(block);
+		}
+
+		void DeletionQueue::PushImGuiTexture(const ImTextureID id, uint32_t delay) {
+			if (delay >= s_BucketCount) {
+				CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushImGuiTexture is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
+				delay = GetMaxDelay();
+			}
+
+			delay = (delay + Get().m_Counter) % s_BucketCount;
+
+			Get().m_ImGuiTextureQueue[delay].emplace_back(id);
+		}
+
+		DeletionQueue::DeletionQueue() {
+			for (uint32_t i = 0; i < s_BucketCount; i++) {
+				m_Deleters[i].reserve(64);
+				m_BufferQueue[i].reserve(64);
+				m_ImageQueue[i].reserve(64);
+				m_VirtAllocQueue[i].reserve(64);
+				m_VirtBlockQueue[i].reserve(64);
+			}
+		}
+
 	}
 }

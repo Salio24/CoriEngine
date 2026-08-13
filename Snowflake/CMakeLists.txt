@@ -6,7 +6,7 @@ project(Snowflake)
     set(EXECUTABLE_NAME ${PROJECT_NAME})
 
     # build binary output dir
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/$<CONFIG>)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/${CORI_BUILD_NAME})
 
     # source files
     file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/src/*.cpp)

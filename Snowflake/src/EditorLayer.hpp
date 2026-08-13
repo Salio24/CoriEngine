@@ -79,7 +79,8 @@ namespace Snowflake {
 
 		static constexpr const char* s_SceneName{ "Test Scene" };
 
-		static constexpr glm::vec3 s_InitialCameraPosition{ -13.0f, 0.0f, 0.7f };
+		const glm::vec3 s_InitialCameraPosition{ -13.0f, 0.0f, 0.7f };
+
 		static constexpr float s_InitialCameraYaw{ 0.0f };
 		static constexpr float s_InitialCameraPitch{ 0.0f };
 

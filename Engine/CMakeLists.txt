@@ -356,7 +356,7 @@ project(CoriEngine)
     )
 
     if (CORI_USE_AVX2 OR CORI_USE_NATIVE OR CORI_FORCE_AVX2)
-        target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
+        target_compile_definitions(${ENGINE_LIBRARY_NAME} PUBLIC
                 $<$<CONFIG:Debug>:CORI_USE_SMID>
                 $<$<CONFIG:RelWithDebInfo>:CORI_USE_SMID>
                 $<$<CONFIG:Release>:CORI_USE_SMID>
@@ -377,9 +377,9 @@ project(CoriEngine)
 
     # build binary output dir
     set_target_properties(${ENGINE_LIBRARY_NAME} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/$<CONFIG>
-        ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/$<CONFIG>
-        LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/$<CONFIG>
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/${CORI_BUILD_NAME}
+        ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/${CORI_BUILD_NAME}
+        LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/${CORI_BUILD_NAME}
     )
 
     # includes

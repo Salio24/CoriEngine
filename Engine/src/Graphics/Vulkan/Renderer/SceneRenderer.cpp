@@ -598,5 +598,204 @@ namespace Cori {
 				m_RecycleRing.Emplace(ptr);
 			}
 		}
+		void SceneRenderer::RegisterObject(const Core::Handle<RenderObject> handle, Core::AssetRef<Mesh> mesh, Core::AssetRef<Material> material, const glm::mat4& transform, const glm::vec4& UVs) {
+			CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle passed to SceneRenderer::RegisterObject");
+
+			auto shaderEffect = VulkanMaterialSystem::GetMaterialShaderEffect(material.GetHandle());
+
+			auto [groupIndex, batchIndex] = FindAppropriateGroupAndBatch(shaderEffect.value().get().GetHandle(), std::move(mesh));
+
+			m_Batches[batchIndex].IncrementObjectCounter();
+			m_TotalObjectCount++;
+
+			if (handle.GetIndex() >= m_Objects.RawSize()) {
+				m_Objects.Reserve(handle.GetIndex() * 2);
+			}
+
+			m_Objects.EmplaceAt(handle.GetIndex(), transform, UVs, std::move(material), batchIndex);
+		}
+
+		void SceneRenderer::UnregisterObject(const Core::Handle<RenderObject> handle) {
+			CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle passed to SceneRenderer::UnregisterObject");
+
+			const auto& object = std::as_const(m_Objects)[handle];
+
+			auto& ownerBatch = m_Batches[object.m_OwnerBatch];
+			ownerBatch.DecrementObjectCounter();
+			m_TotalObjectCount--;
+
+			if (ownerBatch.GetObjectCount() == 0) {
+				DestroyBatch(object.m_OwnerBatch);
+			}
+
+			m_Objects.RemoveAt(handle.GetIndex());
+			m_RenderObjectAllocator.Free(handle);
+		}
+
+		std::expected<std::reference_wrapper<const glm::mat4>, ErrorCode> SceneRenderer::GetRenderObjectTransform(const Core::Handle<RenderObject> handle) {
+			if (!IsHandleValid(handle)) {
+				return std::unexpected(ErrorCode::eInvalidHandle);
+			}
+
+			return std::cref(std::as_const(m_Objects)[handle].m_Transform);
+		}
+
+		void SceneRenderer::ChangeRenderObjectTransform(const Core::Handle<RenderObject> handle, const glm::mat4& newTransform) {
+			CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle passed to SceneRenderer::ChangeRenderObjectTransform");
+
+			m_Objects[handle].m_Transform = newTransform;
+
+			return;
+		}
+
+		std::expected<std::reference_wrapper<const glm::vec4>, ErrorCode> SceneRenderer::GetRenderObjectUVOffsets(const Core::Handle<RenderObject> handle) {
+			if (!IsHandleValid(handle)) {
+				return std::unexpected(ErrorCode::eInvalidHandle);
+			}
+
+			return std::cref(std::as_const(m_Objects)[handle].m_UVOffsets);
+		}
+
+		void SceneRenderer::ChangeRenderObjectUVOffsets(const Core::Handle<RenderObject> handle, const glm::vec4& newUVOffsets) {
+			CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle passed to SceneRenderer::ChangeRenderObjectUVOffsets");
+
+			m_Objects[handle].m_UVOffsets = newUVOffsets;
+		}
+
+		std::expected<Core::Handle<Mesh>, ErrorCode> SceneRenderer::GetRenderObjectMesh(const Core::Handle<RenderObject> handle) {
+			if (!IsHandleValid(handle)) {
+				return std::unexpected(ErrorCode::eInvalidHandle);
+			}
+
+			return m_Batches[std::as_const(m_Objects)[handle].m_OwnerBatch].m_Mesh.GetHandle();
+		}
+
+		void SceneRenderer::ChangeRenderObjectMesh(const Core::Handle<RenderObject> handle, Core::AssetRef<Mesh> newMesh) {
+			CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle passed to SceneRenderer::ChangeRenderObjectMesh");
+
+			auto batchID = std::as_const(m_Objects)[handle].m_OwnerBatch;
+			auto& batch = m_Batches[batchID];
+
+			auto oldMesh = batch.m_Mesh;
+			if (oldMesh.GetAssetID() == newMesh.GetAssetID()) {
+				return;
+			}
+
+			auto drawGroupID = std::as_const(m_BatchGPUInfo)[batchID].owner;
+			auto shaderEffect = m_DrawGroups[drawGroupID].m_ShaderEffect;
+
+			batch.DecrementObjectCounter();
+			if (batch.GetObjectCount() == 0) {
+				DestroyBatch(batchID);
+			}
+
+			auto [newGroup, newBatch] = FindAppropriateGroupAndBatch(shaderEffect, std::move(newMesh));
+			m_Objects[handle].m_OwnerBatch = newBatch;
+			m_Batches[newBatch].IncrementObjectCounter();
+		}
+
+		std::expected<Core::Handle<Material>, ErrorCode> SceneRenderer::GetRenderObjectMaterial(const Core::Handle<RenderObject> handle) {
+			if (!IsHandleValid(handle)) {
+				return std::unexpected(ErrorCode::eInvalidHandle);
+			}
+
+			//yes const casts are bad and all, but this is a workaround to avoid marking sector as dirty, while at the same time retrieving non const material handle.
+			auto& materialRef = const_cast<Core::AssetRef<Material>&>(std::as_const(m_Objects)[handle].m_Material);
+
+			return materialRef.GetHandle();
+		}
+
+		void SceneRenderer::ChangeRenderObjectMaterial(const Core::Handle<RenderObject> handle, Core::AssetRef<Material> newMaterial) {
+			CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle passed to SceneRenderer::ChangeRenderObjectMaterial");
+
+			const auto& constObjectRef = std::as_const(m_Objects)[handle];
+
+			if (newMaterial.GetHandle() == constObjectRef.m_Material.GetHandle()) {
+				return;
+			}
+
+			auto newShaderEffect = VulkanMaterialSystem::GetMaterialShaderEffect(newMaterial.GetHandle());
+			auto oldShaderEffect = VulkanMaterialSystem::GetMaterialShaderEffect(constObjectRef.m_Material.GetHandle());
+			if (oldShaderEffect) {
+				if (oldShaderEffect.value().get().GetHandle() == newShaderEffect.value().get().GetHandle()) {
+					m_Objects[handle].m_Material = newMaterial;
+					return;
+				}
+			}
+
+			auto& oldBatch = m_Batches[constObjectRef.m_OwnerBatch];
+			auto mesh = oldBatch.m_Mesh;
+
+			oldBatch.DecrementObjectCounter();
+			if (oldBatch.GetObjectCount() == 0) {
+				DestroyBatch(constObjectRef.m_OwnerBatch);
+			}
+
+			auto [newGroup, newBatch] = FindAppropriateGroupAndBatch(newShaderEffect.value().get().GetHandle(), std::move(mesh));
+			m_Objects[handle].m_OwnerBatch = newBatch;
+			m_Objects[handle].m_Material = std::move(newMaterial);
+			m_Batches[newBatch].IncrementObjectCounter();
+		}
+
+		std::optional<ThumbnailRect> SceneRenderer::TakePendingThumbnailCopy() {
+			std::optional<ThumbnailRect> pending = m_PendingThumbnailCopy;
+			m_PendingThumbnailCopy.reset();
+			return pending;
+		}
+
+		std::pair<SceneRenderer::DrawGroupIndex, BatchIndex> SceneRenderer::FindAppropriateGroupAndBatch(const Core::ConstHandle<ShaderEffect> shaderEffect, Core::AssetRef<Mesh> mesh) {
+			CORI_CORE_ASSERT(mesh.IsInitialized(), "Uninitialized mesh asset ref passed to FindAppropriateGroupAndBatch in SceneRenderer.");
+			auto [it, groupInserted] = m_SubBatchLookup.try_emplace(shaderEffect, std::pair<DrawGroupIndex, std::unordered_map<Core::Handle<Mesh>, BatchIndex>>{});
+
+			if (groupInserted) {
+				auto handle = m_DrawGroups.Emplace(shaderEffect);
+
+				it->second.first = handle.GetIndex();
+				it->second.second.reserve(64);
+			}
+
+			auto [it_, batchInserted] = it->second.second.try_emplace(mesh.GetHandle(), BatchIndex{});
+
+			if (batchInserted) {
+				auto handle = m_Batches.Emplace(mesh);
+
+				m_BatchGPUInfo.Resize(m_Batches.Capacity());
+
+				m_BatchGPUInfo[handle.GetIndex()] = BatchGPUInfo{ mesh.GetHandle(), it->second.first };
+
+				it_->second = handle.GetIndex();
+
+				auto& group = m_DrawGroups[it->second.first];
+				group.IncrementBatchCounter();
+			}
+
+			return std::make_pair(it->second.first, it_->second);
+		}
+
+		void SceneRenderer::DestroyBatch(const BatchIndex batchID) {
+			auto groupID = std::as_const(m_BatchGPUInfo)[batchID].owner;
+
+			auto& group = m_DrawGroups[groupID];
+			group.DecrementBatchCounter();
+
+			auto mesh = m_Batches[batchID].m_Mesh;
+
+			if (group.GetBatchCount() == 0) {
+				DestroyGroup(groupID);
+			} else {
+				m_SubBatchLookup.at(group.m_ShaderEffect).second.erase(mesh.GetHandle());
+			}
+
+			m_Batches.Remove({ batchID, 1 });
+		}
+
+		void SceneRenderer::DestroyGroup(const DrawGroupIndex groupID) {
+			auto& group = m_DrawGroups[groupID];
+
+			m_SubBatchLookup.erase(group.m_ShaderEffect);
+
+			m_DrawGroups.Remove({ groupID, 1 });
+		}
+
 	}
 }

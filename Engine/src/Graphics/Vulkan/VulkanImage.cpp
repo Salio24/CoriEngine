@@ -51,5 +51,41 @@ namespace Cori {
 		void VulkanImage::DestroyView(const ImageViewKey& key) {
 			VulkanImageViewManager::DestroyView(*this, key);
 		}
+		std::size_t VulkanImage::ImageViewKey::Hasher::operator()(const ImageViewKey& key) const noexcept {
+			uint64_t hash;
+
+			Utility::HashCombine(hash, static_cast<uint32_t>(key.flags));
+			Utility::HashCombine(hash, static_cast<uint32_t>(key.type));
+			Utility::HashCombine(hash, static_cast<uint32_t>(key.format));
+			Utility::HashCombine(hash, static_cast<uint32_t>(key.components.r));
+			Utility::HashCombine(hash, static_cast<uint32_t>(key.components.g));
+			Utility::HashCombine(hash, static_cast<uint32_t>(key.components.b));
+			Utility::HashCombine(hash, static_cast<uint32_t>(key.components.a));
+			Utility::HashCombine(hash, static_cast<uint32_t>(key.subresourceRange.aspectMask));
+			Utility::HashCombine(hash, key.subresourceRange.baseMipLevel);
+			Utility::HashCombine(hash, key.subresourceRange.levelCount);
+			Utility::HashCombine(hash, key.subresourceRange.baseArrayLayer);
+			Utility::HashCombine(hash, key.subresourceRange.layerCount);
+
+			return hash;
+		}
+
+		vk::ImageAspectFlags VulkanImage::GetAspectMask() const {
+			if (vk::hasDepthComponent(m_Format) || vk::hasStencilComponent(m_Format)) {
+				vk::ImageAspectFlags aspect;
+				if (vk::hasDepthComponent(m_Format)) {
+					aspect |= vk::ImageAspectFlagBits::eDepth;
+				}
+
+				if (vk::hasStencilComponent(m_Format)) {
+					aspect |= vk::ImageAspectFlagBits::eStencil;
+				}
+
+				return aspect;
+			}
+
+			return vk::ImageAspectFlagBits::eColor;
+		}
+
 	}
 }

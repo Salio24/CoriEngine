@@ -133,93 +133,28 @@ namespace Cori {
 					 * @param localPosition Local position to set.
 					 * @detals Local position is the position relative to the Entity parent transform (I mean matrix transform in this context), if an Entity doesn't have a parent, and thus is a root entity, the local position is its world position.
 					 */
-					void SetLocalPosition(const glm::vec3& localPosition) {
-						if (m_LocalPosition != localPosition) {
-							m_LocalPosition = localPosition;
-							m_DirtyTransform = true;
-
-							entt::entity root = m_Owner.GetRawEntity();
-							entt::entity currentParent = m_Owner.GetComponents<Hierarchy>().m_Parent;
-							while (m_Owner.GetRawHandle().registry()->valid(currentParent)) {
-								root = currentParent;
-								currentParent = m_Owner.GetRawHandle().registry()->get<Hierarchy>(root).m_Parent;
-							}
-
-							if (!m_Owner.GetRawHandle().registry()->all_of<Internal::DirtyTransformFlag>(root)) {
-								m_Owner.GetRawHandle().registry()->emplace<Internal::DirtyTransformFlag>(root);
-							}
-						}
-					}
+					void SetLocalPosition(const glm::vec3& localPosition);
 
 					/**
 					 * @brief Changes the local rotation of the Entity.
 					 * @param localRotation Local rotation to set.
 					 * @detals Local rotation is the rotation relative to the Entity parent transform (matrix), if an Entity doesn't have a parent, and thus is a root entity, the local rotation is its world rotation.
 					 */
-					void SetLocalRotation(const float localRotation, const glm::vec3& axis) {
-						if (m_LocalRotation != localRotation || m_LocalRotationAxis != axis) {
-							m_LocalRotation = localRotation;
-							m_LocalRotationAxis = axis;
-							m_DirtyTransform = true;
-
-							entt::entity root = m_Owner.GetRawEntity();
-							entt::entity currentParent = m_Owner.GetComponents<Hierarchy>().m_Parent;
-							while (m_Owner.GetRawHandle().registry()->valid(currentParent)) {
-								root = currentParent;
-								currentParent = m_Owner.GetRawHandle().registry()->get<Hierarchy>(root).m_Parent;
-							}
-
-							if (!m_Owner.GetRawHandle().registry()->all_of<Internal::DirtyTransformFlag>(root)) {
-								m_Owner.GetRawHandle().registry()->emplace<Internal::DirtyTransformFlag>(root);
-							}
-						}
-					}
+					void SetLocalRotation(const float localRotation, const glm::vec3& axis);
 
 					/**
 					 * @brief Changes the local scale of the Entity.
 					 * @param localScale Local scale to set.
 					 * @detals Local scale is the scale relative to the Entity parent transform (matrix), if an Entity doesn't have a parent, and thus is a root entity, the local scale is its world scale.
 					 */
-					void SetLocalScale(const glm::vec3& localScale) {
-						if (m_LocalScale != localScale) {
-							m_LocalScale = localScale;
-							m_DirtyTransform = true;
-
-							entt::entity root = m_Owner.GetRawEntity();
-							entt::entity currentParent = m_Owner.GetComponents<Hierarchy>().m_Parent;
-							while (m_Owner.GetRawHandle().registry()->valid(currentParent)) {
-								root = currentParent;
-								currentParent = m_Owner.GetRawHandle().registry()->get<Hierarchy>(root).m_Parent;
-							}
-
-							if (!m_Owner.GetRawHandle().registry()->all_of<Internal::DirtyTransformFlag>(root)) {
-								m_Owner.GetRawHandle().registry()->emplace<Internal::DirtyTransformFlag>(root);
-							}
-						}
-					}
+					void SetLocalScale(const glm::vec3& localScale);
 
 					/**
 					 * @brief Changes the local depth of the Entity.
 					 * @param localDepth Local depth to set.
 					 * @detals Local depth is the depth relative to the Entity parent depth, if an Entity doesn't have a parent, and thus is a root entity, the local depth is its world depth.
 					 */
-					void SetLocalDepth(const int16_t localDepth) {
-						if (m_LocalDepthOffset != localDepth) {
-							m_LocalDepthOffset = localDepth;
-							m_DirtyDepth = true;
-
-							entt::entity root = m_Owner.GetRawEntity();
-							entt::entity currentParent = m_Owner.GetComponents<Hierarchy>().m_Parent;
-							while (m_Owner.GetRawHandle().registry()->valid(currentParent)) {
-								root = currentParent;
-								currentParent = m_Owner.GetRawHandle().registry()->get<Hierarchy>(root).m_Parent;
-							}
-
-							if (!m_Owner.GetRawHandle().registry()->all_of<Internal::DirtyTransformFlag>(root)) {
-								m_Owner.GetRawHandle().registry()->emplace<Internal::DirtyTransformFlag>(root);
-							}
-						}
-					}
+					void SetLocalDepth(const int16_t localDepth);
 
 					/**
 					 * @brief Retries the local position.
@@ -274,11 +209,7 @@ namespace Cori {
 					 * @brief Calculates a local transform (matrix) of the Entity, combines all the positions (position, rotation, scale, depth) data, but does take into account parent transform.
 					 * @return Calculated local transform (matrix).
 					 */
-					[[nodiscard]] glm::mat4 GetLocalTransform() const {
-						return glm::translate(glm::mat4(1.0f), m_LocalPosition) *
-								glm::rotate(glm::mat4(1.0f), glm::radians(m_LocalRotation), m_LocalRotationAxis) *
-									glm::scale(glm::mat4(1.0f), m_LocalScale);
-					}
+					[[nodiscard]] glm::mat4 GetLocalTransform() const;
 
 				private:
 					friend Systems::Transform;
@@ -303,35 +234,11 @@ namespace Cori {
 				struct Rendering {
 					Rendering(Core::AssetRef<Graphics::Mesh> mesh, Core::AssetRef<Graphics::Material> material, const glm::vec4& uvOffsets) : m_Mesh(std::move(mesh)), m_Material(std::move(material)), m_UvOffsets(uvOffsets) {}
 
-					void ChangeMesh(Core::AssetRef<Graphics::Mesh> newMesh) {
-						m_Mesh = std::move(newMesh);
+					void ChangeMesh(Core::AssetRef<Graphics::Mesh> newMesh);
 
-						m_MeshDirty = true;
+					void ChangeMaterial(Core::AssetRef<Graphics::Material> newMaterial);
 
-						if (!m_Owner.HasComponents<Internal::RenderComponentDirtyFlag>()) {
-							m_Owner.AddComponent<Internal::RenderComponentDirtyFlag>();
-						}
-					}
-
-					void ChangeMaterial(Core::AssetRef<Graphics::Material> newMaterial) {
-						m_Material = std::move(newMaterial);
-
-						m_MaterialDirty = true;
-
-						if (!m_Owner.HasComponents<Internal::RenderComponentDirtyFlag>()) {
-							m_Owner.AddComponent<Internal::RenderComponentDirtyFlag>();
-						}
-					}
-
-					void ChangeUVOffsets(const glm::vec4& newUvOffsets) {
-						m_UvOffsets = newUvOffsets;
-
-						m_UvOffsetsDirty = true;
-
-						if (!m_Owner.HasComponents<Internal::RenderComponentDirtyFlag>()) {
-							m_Owner.AddComponent<Internal::RenderComponentDirtyFlag>();
-						}
-					}
+					void ChangeUVOffsets(const glm::vec4& newUvOffsets);
 
 					[[nodiscard]] Core::AssetRef<Graphics::Mesh> GetMesh() const {
 						return m_Mesh;
@@ -428,70 +335,42 @@ namespace Cori {
 					 * @param name Name of the track, will be later used to retrieve the created track from the AudioSource cache.
 					 * @return Shared pointer to the created Track object.
 					 */
-					std::shared_ptr<Audio::Track> AddTrack(const std::string& name) {
-						std::shared_ptr<Audio::Track> track = Audio::Track::Create(name);
-						m_AudioTracks.insert({name, track});
-						return track;
-					}
+					std::shared_ptr<Audio::Track> AddTrack(const std::string& name);
 
 					/**
 					 * @brief Adds a Track to the AudioSource cache.
 					 * @param name Name of the track, will be later used to retrieve the created track from the AudioSource cache.
 					 * @return Shared pointer to the created Track object.
 					 */
-					std::shared_ptr<Audio::Track> AddTrack(const char* name) {
-						std::shared_ptr<Audio::Track> track = Audio::Track::Create(name);
-						m_AudioTracks.insert({name, track});
-						return track;
-					}
+					std::shared_ptr<Audio::Track> AddTrack(const char* name);
 
 					/**
 					 * @brief Removes a Track from the AudioSource, and deletes it if it is not referenced anywhere.
 					 * @param name Name of the Track remove.
 					 * @note If a track with the specified name is not found in AudioSource cache, nothing will happen.
 					 */
-					void RemoveTrack(const std::string& name) {
-						if (m_AudioTracks.contains(name)) {
-							m_AudioTracks.erase(name);
-						}
-					}
+					void RemoveTrack(const std::string& name);
 
 					/**
 					 * @brief Removes a Track from the AudioSource, and deletes it if it is not referenced anywhere.
 					 * @param name Name of the Track remove.
 					 * @note If a track with the specified name is not found in AudioSource cache, nothing will happen.
 					 */
-					void RemoveTrack(const char* name) {
-						if (m_AudioTracks.contains(name)) {
-							m_AudioTracks.erase(name);
-						}
-					}
+					void RemoveTrack(const char* name);
 
 					/**
 					 * @brief Retries a Track from the AudioSource cache.
 					 * @param name Name of the Track to retrieve.
 					 * @return Expected object with the shared pointer to the requested Track on success, or CoriError on failure.
 					 */
-					std::expected<std::shared_ptr<Audio::Track>, Core::CoriError<>> GetTrack(const std::string& name) {
-						if (m_AudioTracks.contains(name)) {
-							return m_AudioTracks.at(name);
-						}
-
-						return std::unexpected(Core::CoriError(std::format("No audio Track is found with the specified name '{}'", name)));
-					}
+					std::expected<std::shared_ptr<Audio::Track>, Core::CoriError<>> GetTrack(const std::string& name);
 
 					/**
 					 * @brief Retries a Track from the AudioSource cache.
 					 * @param name Name of the Track to retrieve.
 					 * @return Expected object with the shared pointer to the requested Track on success, or CoriError on failure.
 					 */
-					std::expected<std::shared_ptr<Audio::Track>, Core::CoriError<>> GetTrack(const char* name) {
-						if (m_AudioTracks.contains(name)) {
-							return m_AudioTracks.at(name);
-						}
-
-						return std::unexpected(Core::CoriError(std::format("No audio Track is found with the specified name '{}'", name)));
-					}
+					std::expected<std::shared_ptr<Audio::Track>, Core::CoriError<>> GetTrack(const char* name);
 
 				private:
 					struct TransparentHash {

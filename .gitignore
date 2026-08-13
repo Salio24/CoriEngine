@@ -47,15 +47,18 @@ rmSub.sh
 /Sandboxes/Sandbox/bin/Debug/*
 /Sandboxes/Sandbox/bin/Release/*
 /Sandboxes/Sandbox/bin/RelWithDebInfo/*
+/Sandboxes/Sandbox/bin/cmake-build*
 
 /Sandboxes/RendererSandbox/bin/Debug/*
 /Sandboxes/RendererSandbox/bin/Release/*
 /Sandboxes/RendererSandbox/bin/RelWithDebInfo/*
+/Sandboxes/RendererSandbox/bin/cmake-build*
 /Sandboxes/RendererSandbox/assets/junk/*
 
 /Sandboxes/PhysicsSandbox/bin/Debug/*
 /Sandboxes/PhysicsSandbox/bin/Release/*
 /Sandboxes/PhysicsSandbox/bin/RelWithDebInfo/*
+/Sandboxes/PhysicsSandbox/bin/cmake-build*
 
 /Sandboxes/Sandbox/userdata/*
 /Sandboxes/RendererSandbox/userdata/*
@@ -66,6 +69,7 @@ rmSub.sh
 /Snowflake/bin/Release/*
 /Snowflake/bin/RelWithDebInfo/*
 /Snowflake/assets/junk/*
+/Snowflake/bin/cmake-build*
 
 
 /notes.txt

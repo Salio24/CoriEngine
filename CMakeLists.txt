@@ -84,6 +84,8 @@ project(main)
 
     #set(CMAKE_COLOR_DIAGNOSTICS ON CACHE BOOL "")
 
+    get_filename_component(CORI_BUILD_NAME "${CMAKE_BINARY_DIR}" NAME)
+
     add_subdirectory(${PROJECT_SOURCE_DIR}/Engine)
     add_subdirectory(${PROJECT_SOURCE_DIR}/Snowflake)
 

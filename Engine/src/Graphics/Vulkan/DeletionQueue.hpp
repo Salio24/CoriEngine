@@ -24,106 +24,43 @@ namespace Cori {
 				PushDeleter(std::move(deleter), s_DefaultDelay);
 			}
 
-			static void PushDeleter(std::function<void()>&& deleter, uint32_t delay) {
-				if (delay >= s_BucketCount) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushDeleter is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
-					delay = GetMaxDelay();
-				}
-
-				delay = (delay + Get().m_Counter) % s_BucketCount;
-
-				Get().m_Deleters[delay].push_back(std::move(deleter));
-			}
+			static void PushDeleter(std::function<void()>&& deleter, uint32_t delay);
 
 			static void PushBuffer(VulkanBuffer& buffer) {
 				PushBuffer(buffer, s_DefaultDelay);
 			}
 
-			static void PushBuffer(VulkanBuffer& buffer, uint32_t delay) {
-				if (delay >= s_BucketCount) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushBuffer is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
-					delay = GetMaxDelay();
-				}
-
-				delay = (delay + Get().m_Counter) % s_BucketCount;
-
-				Get().m_BufferQueue[delay].push_back(buffer);
-			}
+			static void PushBuffer(VulkanBuffer& buffer, uint32_t delay);
 
 			static void PushImage(VulkanImage& image) {
 				PushImage(image, s_DefaultDelay);
 			}
 
-			static void PushImage(VulkanImage& image, uint32_t delay) {
-				if (delay >= s_BucketCount) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushImage is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
-					delay = GetMaxDelay();
-				}
-
-				delay = (delay + Get().m_Counter) % s_BucketCount;
-
-				Get().m_ImageQueue[delay].push_back(image);
-			}
+			static void PushImage(VulkanImage& image, uint32_t delay);
 
 			static void PushShaderObject(vk::ShaderEXT object) {
 				PushShaderObject(object, s_DefaultDelay);
 			}
 
-			static void PushShaderObject(vk::ShaderEXT object, uint32_t delay) {
-				if (delay >= s_BucketCount) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushShaderObject is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
-					delay = GetMaxDelay();
-				}
-
-				delay = (delay + Get().m_Counter) % s_BucketCount;
-
-				Get().m_ShaderObjectQueue[delay].push_back(object);
-			}
+			static void PushShaderObject(vk::ShaderEXT object, uint32_t delay);
 
 			static void PushVirtualAlloc(vma::VirtualAllocation allocation, vma::VirtualBlock block, const std::optional<std::weak_ptr<std::mutex>>& mutex = std::nullopt) {
 				PushVirtualAlloc(allocation, block, s_DefaultDelay, mutex);
 			}
 
-			static void PushVirtualAlloc(vma::VirtualAllocation allocation, vma::VirtualBlock block, uint32_t delay, const std::optional<std::weak_ptr<std::mutex>>& mutex = std::nullopt) {
-				if (delay >= s_BucketCount) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushVirtualAlloc is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
-					delay = GetMaxDelay();
-				}
-
-				delay = (delay + Get().m_Counter) % s_BucketCount;
-
-				Get().m_VirtAllocQueue[delay].emplace_back(allocation, block, mutex);
-			}
+			static void PushVirtualAlloc(vma::VirtualAllocation allocation, vma::VirtualBlock block, uint32_t delay, const std::optional<std::weak_ptr<std::mutex>>& mutex = std::nullopt);
 
 			static void PushVirtualBlock(vma::VirtualBlock block) {
 				PushVirtualBlock(block, s_DefaultDelay);
 			}
 
-			static void PushVirtualBlock(vma::VirtualBlock block, uint32_t delay) {
-				if (delay >= s_BucketCount) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushVirtualBlock is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
-					delay = GetMaxDelay();
-				}
-
-				delay = (delay + Get().m_Counter) % s_BucketCount;
-
-				Get().m_VirtBlockQueue[delay].emplace_back(block);
-			}
+			static void PushVirtualBlock(vma::VirtualBlock block, uint32_t delay);
 
 			static void PushImGuiTexture(const ImTextureID id) {
 				PushImGuiTexture(id, s_DefaultDelay);
 			}
 
-			static void PushImGuiTexture(const ImTextureID id, uint32_t delay) {
-				if (delay >= s_BucketCount) {
-					CORI_CORE_ERROR_TAGGED({ Logger::Tags::Graphics::Self, Logger::Tags::Graphics::Vulkan::Self, Logger::Tags::Graphics::Vulkan::DeletionQueue }, "Delay '{}' provided to PushImGuiTexture is higher or equal than the total bucket count '{}', it will be clamped.", delay, s_BucketCount);
-					delay = GetMaxDelay();
-				}
-
-				delay = (delay + Get().m_Counter) % s_BucketCount;
-
-				Get().m_ImGuiTextureQueue[delay].emplace_back(id);
-			}
+			static void PushImGuiTexture(const ImTextureID id, uint32_t delay);
 
 			static void Flush();
 
@@ -137,15 +74,7 @@ namespace Cori {
 			void FlushAll();
 
 		private:
-			DeletionQueue() {
-				for (uint32_t i = 0; i < s_BucketCount; i++) {
-					m_Deleters[i].reserve(64);
-					m_BufferQueue[i].reserve(64);
-					m_ImageQueue[i].reserve(64);
-					m_VirtAllocQueue[i].reserve(64);
-					m_VirtBlockQueue[i].reserve(64);
-				}
-			}
+			DeletionQueue();
 
 			static constexpr uint32_t s_DefaultDelay{ FRAMES_IN_FLIGHT - 1 };
 			static constexpr uint32_t s_BucketCount{ FRAMES_IN_FLIGHT * 2 + 2 };

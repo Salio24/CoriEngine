@@ -35,35 +35,16 @@ namespace Cori {
 				WorkerPayload() = delete;
 				WorkerPayload(VulkanImage&& image, std::vector<Byte>&& pixelData) : m_Image(std::move(image)), m_PixelData(std::move(pixelData)) {}
 
-				~WorkerPayload() {
-					m_Image.Destroy();
-				}
+				~WorkerPayload();
 
 				WorkerPayload(const WorkerPayload& other) = delete;
 				WorkerPayload& operator=(const WorkerPayload& other) = delete;
 
-				WorkerPayload(WorkerPayload&& other) noexcept {
-					m_Image = other.m_Image;
-					m_PixelData = std::move(other.m_PixelData);
-					other.Release();
-				}
+				WorkerPayload(WorkerPayload&& other) noexcept;
 
-				WorkerPayload& operator=(WorkerPayload&& other) noexcept {
-					if (m_Image.m_Image) {
-						m_Image.Destroy();
-					}
+				WorkerPayload& operator=(WorkerPayload&& other) noexcept;
 
-					m_Image = other.m_Image;
-					m_PixelData = std::move(other.m_PixelData);
-					other.Release();
-					return *this;
-				}
-
-				void Release() {
-					CORI_PROFILE_FUNCTION();
-					m_Image = {};
-					m_PixelData = std::vector<Byte>{};
-				}
+				void Release();
 
 				VulkanImage m_Image;
 				std::vector<Byte> m_PixelData;
@@ -125,78 +106,7 @@ namespace Cori {
 			};
 
 			struct SCIHasher {
-				std::size_t operator()(const vk::SamplerCreateInfo& info) const noexcept {
-					uint64_t hash;
-
-					Utility::HashCombine(hash, static_cast<uint32_t>(info.flags));
-					Utility::HashCombine(hash, static_cast<uint32_t>(info.magFilter));
-					Utility::HashCombine(hash, static_cast<uint32_t>(info.minFilter));
-					Utility::HashCombine(hash, static_cast<uint32_t>(info.mipmapMode));
-					Utility::HashCombine(hash, static_cast<uint32_t>(info.addressModeU));
-					Utility::HashCombine(hash, static_cast<uint32_t>(info.addressModeV));
-					Utility::HashCombine(hash, static_cast<uint32_t>(info.addressModeW));
-					Utility::HashCombine(hash, info.mipLodBias);
-					Utility::HashCombine(hash, static_cast<uint32_t>(info.anisotropyEnable));
-					Utility::HashCombine(hash, info.maxAnisotropy);
-					Utility::HashCombine(hash, static_cast<uint32_t>(info.compareEnable));
-					Utility::HashCombine(hash, static_cast<uint32_t>(info.compareOp));
-					Utility::HashCombine(hash, info.minLod);
-					Utility::HashCombine(hash, info.maxLod);
-					Utility::HashCombine(hash, static_cast<uint32_t>(info.borderColor));
-					Utility::HashCombine(hash, static_cast<uint32_t>(info.unnormalizedCoordinates));
-
-					if (info.pNext) {
-						vk::StructureType type = *static_cast<const vk::StructureType*>(info.pNext);
-						switch (type) {
-						case vk::StructureType::eSamplerBlockMatchWindowCreateInfoQCOM:
-							{
-								const auto* data = static_cast<const vk::SamplerBlockMatchWindowCreateInfoQCOM*>(info.pNext);
-								Utility::HashCombine(hash, data->windowExtent.height);
-								Utility::HashCombine(hash, data->windowExtent.width);
-								Utility::HashCombine(hash, static_cast<uint32_t>(data->windowCompareMode));
-								break;
-							}
-						case vk::StructureType::eSamplerBorderColorComponentMappingCreateInfoEXT:
-							{
-								const auto* data = static_cast<const vk::SamplerBorderColorComponentMappingCreateInfoEXT*>(info.pNext);
-								Utility::HashCombine(hash, data->components.r);
-								Utility::HashCombine(hash, data->components.g);
-								Utility::HashCombine(hash, data->components.b);
-								Utility::HashCombine(hash, data->components.a);
-								Utility::HashCombine(hash, static_cast<uint32_t>(data->srgb));
-								break;
-							}
-						case vk::StructureType::eSamplerCubicWeightsCreateInfoQCOM:
-							{
-								const auto* data = static_cast<const vk::SamplerCubicWeightsCreateInfoQCOM*>(info.pNext);
-								Utility::HashCombine(hash, static_cast<uint32_t>(data->cubicWeights));
-								break;
-							}
-						case vk::StructureType::eSamplerCustomBorderColorCreateInfoEXT:
-							{
-								const auto* data = static_cast<const vk::SamplerCustomBorderColorCreateInfoEXT*>(info.pNext);
-								Utility::HashCombine(hash, data->customBorderColor.uint32[0]);
-								Utility::HashCombine(hash, data->customBorderColor.uint32[1]);
-								Utility::HashCombine(hash, data->customBorderColor.uint32[2]);
-								Utility::HashCombine(hash, data->customBorderColor.uint32[3]);
-								Utility::HashCombine(hash, static_cast<uint32_t>(data->format));
-								break;
-							}
-						case vk::StructureType::eSamplerReductionModeCreateInfo:
-							{
-								const auto* data = static_cast<const vk::SamplerReductionModeCreateInfo*>(info.pNext);
-								Utility::HashCombine(hash, static_cast<uint32_t>(data->reductionMode));
-								break;
-							}
-						default:
-							{
-								break;
-							}
-						}
-					}
-
-					return hash;
-				}
+				std::size_t operator()(const vk::SamplerCreateInfo& info) const noexcept;
 			};
 
 			struct TransparentHash {

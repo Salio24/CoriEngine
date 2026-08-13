@@ -24,24 +24,7 @@ namespace Cori {
 				auto operator<=>(const ImageViewKey& other) const = default;
 
 				struct Hasher {
-					std::size_t operator()(const ImageViewKey& key) const noexcept {
-						uint64_t hash;
-
-						Utility::HashCombine(hash, static_cast<uint32_t>(key.flags));
-						Utility::HashCombine(hash, static_cast<uint32_t>(key.type));
-						Utility::HashCombine(hash, static_cast<uint32_t>(key.format));
-						Utility::HashCombine(hash, static_cast<uint32_t>(key.components.r));
-						Utility::HashCombine(hash, static_cast<uint32_t>(key.components.g));
-						Utility::HashCombine(hash, static_cast<uint32_t>(key.components.b));
-						Utility::HashCombine(hash, static_cast<uint32_t>(key.components.a));
-						Utility::HashCombine(hash, static_cast<uint32_t>(key.subresourceRange.aspectMask));
-						Utility::HashCombine(hash, key.subresourceRange.baseMipLevel);
-						Utility::HashCombine(hash, key.subresourceRange.levelCount);
-						Utility::HashCombine(hash, key.subresourceRange.baseArrayLayer);
-						Utility::HashCombine(hash, key.subresourceRange.layerCount);
-
-						return hash;
-					}
+					std::size_t operator()(const ImageViewKey& key) const noexcept;
 				};
 			};
 
@@ -53,22 +36,7 @@ namespace Cori {
 
 			void DestroyView(const ImageViewKey& key);
 
-			[[nodiscard]] vk::ImageAspectFlags GetAspectMask() const {
-				if (vk::hasDepthComponent(m_Format) || vk::hasStencilComponent(m_Format)) {
-					vk::ImageAspectFlags aspect;
-					if (vk::hasDepthComponent(m_Format)) {
-						aspect |= vk::ImageAspectFlagBits::eDepth;
-					}
-
-					if (vk::hasStencilComponent(m_Format)) {
-						aspect |= vk::ImageAspectFlagBits::eStencil;
-					}
-
-					return aspect;
-				}
-
-				return vk::ImageAspectFlagBits::eColor;
-			}
+			[[nodiscard]] vk::ImageAspectFlags GetAspectMask() const;
 
 			[[nodiscard]] uint64_t GetRawHandle() const {
 				return reinterpret_cast<uint64_t>(static_cast<VkImage>(m_Image));

@@ -35,6 +35,10 @@ int32_t main([[maybe_unused]] int32_t argc, [[maybe_unused]] char** argv) {
 	}
 	#endif
 
+	#ifdef CORI_USE_SMID
+	printf("test");
+	#endif
+
 	bool asyncLogging = false;
 	#ifdef CORI_ASYNC_LOGGING
 		asyncLogging = true;

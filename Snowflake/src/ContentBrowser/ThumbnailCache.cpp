@@ -568,7 +568,7 @@ namespace Snowflake {
 		const float cosPitch = std::cos(pitch);
 
 		const glm::vec3 viewDirection = glm::normalize(glm::vec3{cosPitch * std::cos(yaw), cosPitch * std::sin(yaw), std::sin(pitch)});
-		constexpr glm::vec3 cameraForward{1.0f, 0.0f, 0.0f};
+		const glm::vec3 cameraForward{1.0f, 0.0f, 0.0f};
 
 		const glm::vec3 cross = glm::cross(viewDirection, cameraForward);
 		const float sine = glm::length(cross);

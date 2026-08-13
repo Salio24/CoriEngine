@@ -1305,5 +1305,42 @@ namespace Cori {
 				SetDebugName(semaphore, name);
 			}
 		}
+		bool VulkanEngine::IsDeviceExtensionEnabled(const std::string_view extension) {
+			return std::ranges::any_of(m_EnabledDeviceExtensions, [extension](const char* enabled) {
+				return extension == enabled;
+			});
+		}
+
+		void VulkanEngine::AddWaitSemaphore(const vk::Semaphore semaphore, const vk::PipelineStageFlags waitDstStageMask) {
+			for (uint32_t i = 0; i < Get().m_WaitSemaphores.size(); i++) {
+				if (Get().m_WaitSemaphores[i] == semaphore && Get().m_WaitDstStageMasks[i] == waitDstStageMask) {
+					return;
+				}
+			}
+
+			Get().m_WaitSemaphores.emplace_back(semaphore);
+			Get().m_TimelineWaitValues.emplace_back(0);
+			Get().m_WaitDstStageMasks.emplace_back(waitDstStageMask);
+		}
+
+		void VulkanEngine::AddWaitTimelineSemaphore(const vk::Semaphore semaphore, const uint64_t value, const vk::PipelineStageFlags waitDstStageMask) {
+			for (uint32_t i = 0; i < Get().m_WaitSemaphores.size(); i++) {
+				if (Get().m_WaitSemaphores[i] == semaphore && Get().m_WaitDstStageMasks[i] == waitDstStageMask) {
+					if (Get().m_TimelineWaitValues[i] < value) {
+						Get().m_TimelineWaitValues[i] = value;
+						return;
+					}
+					
+					return;
+				}
+			}
+
+			Get().m_WaitSemaphores.emplace_back(semaphore);
+			Get().m_TimelineWaitValues.emplace_back(value);
+			Get().m_WaitDstStageMasks.emplace_back(waitDstStageMask);
+
+			Get().m_TimelineSemaphoresPresent = true;
+		}
+
 	}
 }

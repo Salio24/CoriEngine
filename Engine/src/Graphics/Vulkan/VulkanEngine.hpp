@@ -69,11 +69,7 @@ namespace Cori {
 				m_InstanceExtensions.push_back(extension);
 			}
 
-			[[nodiscard]] static bool IsDeviceExtensionEnabled(const std::string_view extension) {
-				return std::ranges::any_of(m_EnabledDeviceExtensions, [extension](const char* enabled) {
-					return extension == enabled;
-				});
-			}
+			[[nodiscard]] static bool IsDeviceExtensionEnabled(const std::string_view extension);
 
 			static void Start(void* window, const vk::Extent2D swapChainExtent);
 
@@ -192,36 +188,9 @@ namespace Cori {
 				return Get().m_TransferGPUProfilerContext;
 			}
 
-			static void AddWaitSemaphore(const vk::Semaphore semaphore, const vk::PipelineStageFlags waitDstStageMask) {
-				for (uint32_t i = 0; i < Get().m_WaitSemaphores.size(); i++) {
-					if (Get().m_WaitSemaphores[i] == semaphore && Get().m_WaitDstStageMasks[i] == waitDstStageMask) {
-						return;
-					}
-				}
+			static void AddWaitSemaphore(const vk::Semaphore semaphore, const vk::PipelineStageFlags waitDstStageMask);
 
-				Get().m_WaitSemaphores.emplace_back(semaphore);
-				Get().m_TimelineWaitValues.emplace_back(0);
-				Get().m_WaitDstStageMasks.emplace_back(waitDstStageMask);
-			}
-
-			static void AddWaitTimelineSemaphore(const vk::Semaphore semaphore, const uint64_t value, const vk::PipelineStageFlags waitDstStageMask) {
-				for (uint32_t i = 0; i < Get().m_WaitSemaphores.size(); i++) {
-					if (Get().m_WaitSemaphores[i] == semaphore && Get().m_WaitDstStageMasks[i] == waitDstStageMask) {
-						if (Get().m_TimelineWaitValues[i] < value) {
-							Get().m_TimelineWaitValues[i] = value;
-							return;
-						}
-						
-						return;
-					}
-				}
-
-				Get().m_WaitSemaphores.emplace_back(semaphore);
-				Get().m_TimelineWaitValues.emplace_back(value);
-				Get().m_WaitDstStageMasks.emplace_back(waitDstStageMask);
-
-				Get().m_TimelineSemaphoresPresent = true;
-			}
+			static void AddWaitTimelineSemaphore(const vk::Semaphore semaphore, const uint64_t value, const vk::PipelineStageFlags waitDstStageMask);
 
 			static vk::ImageView GetSwapChainImageView() {
 				return Get().m_SwapChainImageViews[Get().m_CurrentSwapChainImageIndex];

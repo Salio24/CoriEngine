@@ -203,68 +203,16 @@ namespace Cori {
 				WorkerPayload() = delete;
 				WorkerPayload(std::variant<std::vector<StaticVertex>>&& vertexData, std::vector<uint32_t>&& indexData, const CompleteVertexAllocation& completeVertexAllocation) : m_VertexData(std::move(vertexData)), m_IndexData(std::move(indexData)), m_CompleteVertexAlloc(completeVertexAllocation) {}
 
-				~WorkerPayload() {
-					if (m_CompleteVertexAlloc.allocation && m_CompleteVertexAlloc.storage) {
-						{
-							std::lock_guard lk(*m_CompleteVertexAlloc.storage->m_Mutex);
-							m_CompleteVertexAlloc.storage->m_Block.free(m_CompleteVertexAlloc.allocation);
-						}
-						m_CompleteVertexAlloc.storage->RemoveStrongRef();
-						m_CompleteVertexAlloc.storage->RemoveWeakRef();
-						m_CompleteVertexAlloc = {};
-					}
-				}
+				~WorkerPayload();
 
 				WorkerPayload(const WorkerPayload& other) = delete;
 				WorkerPayload& operator=(const WorkerPayload& other) = delete;
 
-				WorkerPayload(WorkerPayload&& other) noexcept {
-					m_VertexData = std::move(other.m_VertexData);
-					m_IndexData = std::move(other.m_IndexData);
-					m_CompleteVertexAlloc = other.m_CompleteVertexAlloc;
+				WorkerPayload(WorkerPayload&& other) noexcept;
 
-					m_AABB.bxCenter = other.m_AABB.bxCenter;
-					m_AABB.byCenter = other.m_AABB.byCenter;
-					m_AABB.bzCenter = other.m_AABB.bzCenter;
-					m_AABB.bxExtent = other.m_AABB.bxExtent;
-					m_AABB.byExtent = other.m_AABB.byExtent;
-					m_AABB.bzExtent = other.m_AABB.bzExtent;
+				WorkerPayload& operator=(WorkerPayload&& other) noexcept;
 
-					other.Release();
-				}
-
-				WorkerPayload& operator=(WorkerPayload&& other) noexcept {
-					m_VertexData = std::move(other.m_VertexData);
-					m_IndexData = std::move(other.m_IndexData);
-
-					if (m_CompleteVertexAlloc.allocation && m_CompleteVertexAlloc.storage) {
-						{
-							std::lock_guard lk(*m_CompleteVertexAlloc.storage->m_Mutex);
-							m_CompleteVertexAlloc.storage->m_Block.free(m_CompleteVertexAlloc.allocation);
-						}
-						m_CompleteVertexAlloc.storage->RemoveStrongRef();
-						m_CompleteVertexAlloc.storage->RemoveWeakRef();
-					}
-
-					m_CompleteVertexAlloc = other.m_CompleteVertexAlloc;
-
-					m_AABB.bxCenter = other.m_AABB.bxCenter;
-					m_AABB.byCenter = other.m_AABB.byCenter;
-					m_AABB.bzCenter = other.m_AABB.bzCenter;
-					m_AABB.bxExtent = other.m_AABB.bxExtent;
-					m_AABB.byExtent = other.m_AABB.byExtent;
-					m_AABB.bzExtent = other.m_AABB.bzExtent;
-
-					other.Release();
-					return *this;
-				}
-
-				void Release() {
-					if (m_CompleteVertexAlloc.storage) {
-						//m_CompleteVertexAlloc.storage->RemoveStrongRef();
-						m_CompleteVertexAlloc = {};
-					}
-				}
+				void Release();
 
 				AABB3D m_AABB;
 
