@@ -1,0 +1,5 @@
+<map id="Cori::Physics::ShapeUserData" name="Cori::Physics::ShapeUserData">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,106,219,134"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Entity.html" title="Entities are the essential part of WorldSystem." alt="" coords="42,5,182,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,49,115,105,109,105,109,49"/>
+</map>

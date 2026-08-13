@@ -1,0 +1,30 @@
+<map id="Cori::World::Systems::Animation::PlayAnimation" name="Cori::World::Systems::Animation::PlayAnimation">
+<area shape="rect" id="Node000001" title="Allows you to play animation sequence without having an entity to do so on. Fire and forget style." alt="" coords="5,301,205,346"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title="Retries the references to the requested components of the entity." alt="" coords="285,168,424,213"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,298,296,218,299,223,150,303"/>
+<area shape="rect" id="Node000009" href="$classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#af689d043f4e794006318b01a4f2b5351" title="Plays a sequence of animations. @detials Animation sequence can be either looped or no,..." alt="" coords="253,301,457,346"/>
+<area shape="poly" id="edge13_Node000001_Node000009" title=" " alt="" coords="205,321,237,321,237,326,205,326"/>
+<area shape="rect" id="Node000012" href="$structCori_1_1World_1_1Components_1_1Entity_1_1Transform.html#a1d9aa082eb8a4be7e5caeb8900e68dd1" title="Changes the local position of the Entity." alt="" coords="253,370,456,432"/>
+<area shape="poly" id="edge16_Node000001_Node000012" title=" " alt="" coords="181,344,239,362,238,368,179,349"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Entity.html#aa3f3f27e39668c2253dcfd9fbeccb0a5" title="Gets the debuting string for logging." alt="" coords="527,168,666,213"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="425,196,511,196,511,202,425,201"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="990,135,1129,179"/>
+<area shape="poly" id="edge12_Node000002_Node000006" title=" " alt="" coords="392,211,490,267,557,297,630,324,708,344,788,352,827,350,866,345,904,334,940,319,975,294,1003,261,1026,225,1042,193,1046,195,1030,228,1008,264,979,297,943,323,906,339,867,350,828,356,788,357,707,349,628,329,554,302,488,272,389,216"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="526,185,440,184,440,179,526,179"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="551,168,549,158,557,149,573,143,597,141,623,144,638,150,636,155,622,149,597,147,574,149,560,153,554,159,556,167"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="769,75,909,119"/>
+<area shape="poly" id="edge5_Node000003_Node000004" title=" " alt="" coords="656,165,764,123,766,128,658,170"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1World_1_1Entity.html#a30781f71b31406df4a5176779ae088e9" title="Retrieves the name of the entity." alt="" coords="769,5,909,50"/>
+<area shape="poly" id="edge6_Node000003_Node000005" title=" " alt="" coords="615,165,666,113,699,85,735,60,754,50,756,55,738,65,702,89,670,117,619,169"/>
+<area shape="poly" id="edge10_Node000003_Node000006" title=" " alt="" coords="667,183,974,160,974,166,667,188"/>
+<area shape="rect" id="Node000007" href="$classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="769,195,909,239"/>
+<area shape="poly" id="edge9_Node000003_Node000007" title=" " alt="" coords="667,195,754,205,754,210,666,201"/>
+<area shape="rect" id="Node000008" href="$classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="769,264,909,309"/>
+<area shape="poly" id="edge11_Node000003_Node000008" title=" " alt="" coords="648,211,737,249,755,256,753,261,735,254,646,216"/>
+<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="770,50,646,88,506,134,427,164,425,159,504,129,645,83,768,45"/>
+<area shape="poly" id="edge8_Node000005_Node000006" title=" " alt="" coords="910,45,943,60,988,90,1026,122,1023,126,985,94,940,65,908,50"/>
+<area shape="rect" id="Node000010" href="$classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#ab6714a3d796704638f7ad394d00cf31c" title=" " alt="" coords="505,384,688,445"/>
+<area shape="poly" id="edge14_Node000009_Node000010" title=" " alt="" coords="425,344,458,356,507,375,505,380,456,361,423,349"/>
+<area shape="rect" id="Node000011" href="$classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#a36b3901d92e7d6db30f8142c352c3154" title="Stops the current animation." alt="" coords="736,392,942,437"/>
+<area shape="poly" id="edge15_Node000010_Node000011" title=" " alt="" coords="689,412,721,412,721,417,689,417"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="Cori::Graphics::Font" name="Cori::Graphics::Font">
+<area shape="rect" id="Node000001" title="Font asset to be used when rendering text. Pretty expensive to create if not cached,..." alt="" coords="115,98,263,126"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Profiling_1_1Trackable.html" title=" " alt="" coords="5,5,186,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="133,58,176,95,172,99,130,62"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="209,5,358,50"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="249,62,206,99,202,95,245,58"/>
+</map>

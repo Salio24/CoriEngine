@@ -1,0 +1,15 @@
+<map id="Track.hpp" name="Track.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="124,5,209,33"/>
+<area shape="rect" id="Node000002" href="$Trackable_8hpp.html" title=" " alt="" coords="5,157,176,184"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,35,132,56,113,82,102,112,96,142,90,141,96,111,108,80,128,52,149,31"/>
+<area shape="rect" id="Node000004" href="$Mixer_8hpp.html" title=" " alt="" coords="202,157,288,184"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="184,31,206,52,226,80,238,111,245,141,240,142,233,112,221,82,202,56,181,35"/>
+<area shape="rect" id="Node000006" href="$Sound_8hpp.html" title=" " alt="" coords="122,81,211,109"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="169,34,169,65,164,65,164,34"/>
+<area shape="rect" id="Node000003" href="$InstanceMetrics_8hpp.html" title=" " alt="" coords="14,232,167,260"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="93,185,93,217,88,217,88,185"/>
+<area shape="rect" id="Node000005" href="$IDDefs_8hpp.html" title=" " alt="" coords="198,232,292,260"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="248,185,248,217,242,217,242,185"/>
+<area shape="poly" id="edge6_Node000006_Node000002" title=" " alt="" coords="155,111,117,148,113,144,151,107"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="182,107,222,144,218,148,179,111"/>
+</map>

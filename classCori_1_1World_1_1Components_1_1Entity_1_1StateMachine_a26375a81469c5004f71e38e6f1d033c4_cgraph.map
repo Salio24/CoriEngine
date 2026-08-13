@@ -1,0 +1,7 @@
+<map id="Cori::World::Components::Entity::StateMachine::SetStateIfNotInState" name="Cori::World::Components::Entity::StateMachine::SetStateIfNotInState">
+<area shape="rect" id="Node000001" title="Sets an Entity to the state only if it is not currently in that state." alt="" coords="5,48,189,110"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html#a45229dfba37f129d88e7feb52d8083f5" title="Cheks if an Entity is in a specific state." alt="" coords="237,5,420,67"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="188,59,221,53,222,58,189,65"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Components_1_1Entity_1_1StateMachine.html#a4c4e6eefa1fe124f9885d9e23de9f9cb" title="Changes the current state to the specified one." alt="" coords="237,91,420,152"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="189,93,222,99,221,104,188,98"/>
+</map>

@@ -1,0 +1,22 @@
+<map id="Cori::World::Scene::RemoveEntityFromCache" name="Cori::World::Scene::RemoveEntityFromCache">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,200,149"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Entity.html#aa3f3f27e39668c2253dcfd9fbeccb0a5" title="Gets the debuting string for logging." alt="" coords="248,104,387,149"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="200,124,232,124,232,129,200,129"/>
+<area shape="poly" id="edge5_Node000002_Node000002" title=" " alt="" coords="281,104,280,94,286,85,299,80,317,78,337,80,350,86,347,91,336,85,317,83,300,85,289,90,285,96,286,103"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title="Retries the references to the requested components of the entity." alt="" coords="622,32,762,77"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="386,114,434,101,606,72,607,77,436,107,388,119"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="810,32,949,77"/>
+<area shape="poly" id="edge11_Node000002_Node000004" title=" " alt="" coords="344,102,385,73,434,47,522,17,595,4,669,6,762,17,799,25,798,30,761,23,669,11,595,10,524,22,436,52,387,77,347,106"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="435,104,574,149"/>
+<area shape="poly" id="edge6_Node000002_Node000005" title=" " alt="" coords="387,124,420,124,420,129,387,129"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1World_1_1Entity.html#a30781f71b31406df4a5176779ae088e9" title="Retrieves the name of the entity." alt="" coords="435,174,574,218"/>
+<area shape="poly" id="edge7_Node000002_Node000006" title=" " alt="" coords="381,147,429,165,427,170,379,152"/>
+<area shape="rect" id="Node000007" href="$classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="435,243,574,288"/>
+<area shape="poly" id="edge10_Node000002_Node000007" title=" " alt="" coords="342,147,384,187,437,229,443,233,440,237,433,233,381,191,339,151"/>
+<area shape="rect" id="Node000008" href="$classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="435,312,574,357"/>
+<area shape="poly" id="edge12_Node000002_Node000008" title=" " alt="" coords="332,148,372,220,402,261,437,298,440,301,437,305,433,302,398,265,368,223,327,151"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="622,55,533,65,436,83,370,101,369,96,434,77,532,60,622,49"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="762,52,794,52,794,57,762,57"/>
+<area shape="poly" id="edge8_Node000006_Node000003" title=" " alt="" coords="554,171,573,159,618,123,657,86,661,90,622,127,576,164,556,175"/>
+<area shape="poly" id="edge9_Node000006_Node000004" title=" " alt="" coords="565,171,803,80,805,85,567,176"/>
+</map>

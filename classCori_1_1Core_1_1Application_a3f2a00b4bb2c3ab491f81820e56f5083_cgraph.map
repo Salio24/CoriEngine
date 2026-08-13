@@ -1,0 +1,11 @@
+<map id="Cori::Core::Application::Application" name="Cori::Core::Application::Application">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,28,172,72"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Internal_1_1API.html#a7543e489856a0ceeac6632acce9e90a5" title=" " alt="" coords="220,28,390,72"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,47,204,47,204,52,172,52"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Graphics_1_1CoriGraphicsAPI.html#a28ae27c33c31d358e18f01e64478759a" title=" " alt="" coords="438,28,641,72"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="391,47,422,47,422,52,391,52"/>
+<area shape="rect" id="Node000004" href="$namespaceCori_1_1Graphics.html#ac10cdf39fd3a5b64fb82ad5cd57d4668" title=" " alt="" coords="689,5,921,33"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="641,35,673,32,674,37,642,41"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1Core_1_1Window.html#a675130786b522717fb797d28166b1da5" title="Returns the graphical API used by this window." alt="" coords="732,57,878,102"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="642,58,717,67,717,72,642,64"/>
+</map>

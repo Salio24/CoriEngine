@@ -1,0 +1,5 @@
+<map id="Cori::World::Components::Entity::Tag" name="Cori::World::Components::Entity::Tag">
+<area shape="rect" id="Node000001" title="Every Entity by default has a tag component, it holds a non&#45;unique entity 64bit hashed tag." alt="" coords="8,106,192,151"/>
+<area shape="rect" id="Node000002" href="$structCori_1_1Utility_1_1HashedTag64.html" title="HashedTag that uses a 64bit string hash (FNV&#45;1a)." alt="" coords="5,5,195,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,49,103,105,97,105,97,49"/>
+</map>

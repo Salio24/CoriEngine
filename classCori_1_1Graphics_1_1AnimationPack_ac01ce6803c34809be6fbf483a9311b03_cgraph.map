@@ -1,0 +1,15 @@
+<map id="Cori::Graphics::AnimationPack::Create" name="Cori::Graphics::AnimationPack::Create">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,73,193,118"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1AnimationPack.html#a9d7eb51b6b9f0267d84fc1f29751f961" title=" " alt="" coords="241,39,428,83"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="193,79,225,74,226,80,194,84"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1Core_1_1Application.html#a5c5b313999b3ab9f5089f79345a8bf8d" title="Getter for the GameTimer." alt="" coords="251,108,418,153"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="194,107,236,113,235,118,193,112"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Graphics_1_1Image.html#a8a1e6ccfa0bed29acbb6f2d1136398b5" title="Creates an Image from the picture at the specified path." alt="" coords="757,5,918,50"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="428,47,476,42,741,28,741,33,476,48,429,52"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1Graphics_1_1SpriteAtlas.html#a48a37d8964aa80bd73576cd5a8aaf9a2" title="Creates a SpriteAtlas." alt="" coords="476,81,667,126"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="429,75,461,81,460,86,428,80"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="652,78,741,52,743,57,653,83"/>
+<area shape="poly" id="edge5_Node000004_Node000004" title=" " alt="" coords="526,81,525,71,533,62,548,57,572,55,597,57,613,64,610,69,596,62,572,60,549,62,536,67,530,73,532,80"/>
+<area shape="rect" id="Node000005" href="$structCori_1_1FileSystem_1_1Internal_1_1PathDefines.html#a764405f16de7bfaa989d3cbc2e9b0279" title=" " alt="" coords="715,81,960,126"/>
+<area shape="poly" id="edge6_Node000004_Node000005" title=" " alt="" coords="668,101,700,101,700,106,668,106"/>
+</map>

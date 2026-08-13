@@ -1,0 +1,5 @@
+<map id="Cori::Graphics::Texture2D" name="Cori::Graphics::Texture2D">
+<area shape="rect" id="Node000001" title="A regular 2D texture with 1 layer." alt="" coords="5,81,192,109"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Texture.html" title="Abstract class for textures." alt="" coords="14,5,183,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,49,101,81,96,81,96,49"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Cori::World::Components::Entity::QuadAnimator::OnTickUpdate" name="Cori::World::Components::Entity::QuadAnimator::OnTickUpdate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,189,67"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#a36b3901d92e7d6db30f8142c352c3154" title="Stops the current animation." alt="" coords="237,14,442,58"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="189,34,221,34,221,39,189,39"/>
+</map>

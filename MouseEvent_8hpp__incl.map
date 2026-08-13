@@ -1,0 +1,11 @@
+<map id="MouseEvent.hpp" name="MouseEvent.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="65,5,194,33"/>
+<area shape="rect" id="Node000002" href="$Event_8hpp.html" title=" " alt="" coords="5,81,92,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,36,76,73,72,69,114,32"/>
+<area shape="rect" id="Node000003" href="$CoriMouseCodes_8hpp.html" title=" " alt="" coords="116,81,309,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="146,32,188,69,185,73,143,36"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="72,157,169,184"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="198,111,150,149,147,145,194,107"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="192,157,414,184"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="230,107,277,145,274,149,227,111"/>
+</map>

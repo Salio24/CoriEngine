@@ -1,0 +1,5 @@
+<map id="Cori::Graphics::Image" name="Cori::Graphics::Image">
+<area shape="rect" id="Node000001" title="Used to load an image. It can flip and image and add padding to it. Mainly used for texture loading." alt="" coords="15,98,176,126"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Profiling_1_1Trackable.html" title=" " alt="" coords="5,5,186,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="98,66,98,97,93,97,93,66"/>
+</map>

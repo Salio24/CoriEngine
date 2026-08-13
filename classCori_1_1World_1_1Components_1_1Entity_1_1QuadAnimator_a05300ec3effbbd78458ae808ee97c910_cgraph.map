@@ -1,0 +1,9 @@
+<map id="Cori::World::Components::Entity::QuadAnimator::Play" name="Cori::World::Components::Entity::QuadAnimator::Play">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,52,210,97"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#ab6714a3d796704638f7ad394d00cf31c" title=" " alt="" coords="258,44,441,106"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="210,72,242,72,242,78,210,78"/>
+<area shape="rect" id="Node000003" href="$structCori_1_1World_1_1Components_1_1Entity_1_1QuadRenderer.html#a2c96fd69fc8673157f92eb55f5ccb36f" title="Returns a const reference to the currently active texture." alt="" coords="500,5,683,67"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="441,58,484,51,485,56,442,63"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1World_1_1Components_1_1Entity_1_1QuadAnimator.html#a36b3901d92e7d6db30f8142c352c3154" title=" " alt="" coords="489,91,694,136"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="442,87,474,92,473,97,441,92"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="Cori::World::Entity::DestroyChildren" name="Cori::World::Entity::DestroyChildren">
+<area shape="rect" id="Node000001" title="Destroys all children (and they grandchildren) that the entity has." alt="" coords="5,40,145,85"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Systems_1_1Hierarchy.html#aa290cae4fe74cb961204414b90d4f799" title=" " alt="" coords="193,40,397,85"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,60,177,60,177,65,145,65"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Entity.html#ac9d21daa112e64d4f43f54715aef21b2" title="Gets a raw entt::entity if you need to interact with entt directly." alt="" coords="445,5,584,50"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="397,44,430,38,430,44,398,49"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1World_1_1Entity.html#a37ec856a07cae6aab81663ef9bf44ee1" title="Gets a raw entt::handle if you need to interact with entt directly." alt="" coords="445,75,584,119"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="398,76,430,81,430,86,397,81"/>
+</map>

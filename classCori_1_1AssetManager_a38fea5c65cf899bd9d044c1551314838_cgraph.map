@@ -1,0 +1,5 @@
+<map id="Cori::AssetManager::Preload" name="Cori::AssetManager::Preload">
+<area shape="rect" id="Node000001" title="Preloads a group (or one) of assets into the cache." alt="" coords="5,5,154,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1AssetManager.html#a260467acee6791a7dc3e19db26a51b5c" title="Gets the asset from the asset manager cache, it works with any asset that has a Descriptor defined." alt="" coords="202,14,381,42"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,25,186,25,186,30,154,30"/>
+</map>

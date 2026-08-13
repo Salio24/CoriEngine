@@ -1,0 +1,23 @@
+<map id="SpriteAtlas.cpp" name="SpriteAtlas.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="311,5,430,33"/>
+<area shape="rect" id="Node000002" href="$SpriteAtlas_8hpp.html" title=" " alt="" coords="216,81,336,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="355,36,306,73,303,69,352,31"/>
+<area shape="rect" id="Node000008" href="$PathManager_8hpp.html" title=" " alt="" coords="388,81,598,109"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="394,31,460,71,457,75,391,36"/>
+<area shape="rect" id="Node000003" href="$Texture_8hpp.html" title=" " alt="" coords="198,157,295,184"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="273,110,260,143,255,141,268,108"/>
+<area shape="rect" id="Node000004" href="$Image_8hpp.html" title=" " alt="" coords="5,232,96,260"/>
+<area shape="poly" id="edge7_Node000002_Node000004" title=" " alt="" coords="258,111,84,226,81,222,255,107"/>
+<area shape="rect" id="Node000005" href="$Trackable_8hpp.html" title=" " alt="" coords="145,308,316,336"/>
+<area shape="poly" id="edge8_Node000002_Node000005" title=" " alt="" coords="298,107,334,134,372,172,387,194,396,216,397,239,387,261,361,287,329,305,326,300,358,283,383,259,391,238,391,217,382,196,368,176,331,138,294,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="212,187,100,229,98,224,211,182"/>
+<area shape="rect" id="Node000007" href="$AssetLoadStatus_8hpp.html" title=" " alt="" coords="119,232,374,260"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="249,185,249,217,244,217,244,185"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="84,258,186,299,184,304,82,263"/>
+<area shape="rect" id="Node000006" href="$InstanceMetrics_8hpp.html" title=" " alt="" coords="154,384,307,411"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="233,336,233,368,228,368,228,336"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="448,157,538,184"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="496,109,496,141,490,141,490,109"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="562,157,686,184"/>
+<area shape="poly" id="edge11_Node000008_Node000010" title=" " alt="" coords="518,107,589,147,586,151,515,112"/>
+</map>

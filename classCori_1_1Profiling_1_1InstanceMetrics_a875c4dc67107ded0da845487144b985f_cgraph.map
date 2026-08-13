@@ -1,0 +1,5 @@
+<map id="Cori::Profiling::InstanceMetrics::GetAliveCount" name="Cori::Profiling::InstanceMetrics::GetAliveCount">
+<area shape="rect" id="Node000001" title="Checks how many instances of type T is alive, including derived classes." alt="" coords="5,5,178,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Profiling_1_1InstanceMetrics.html#a179a01917fe48888a883a1c41c7d8ceb" title="Checks how many instances of type T is alive, not including derived classes." alt="" coords="226,5,436,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,25,210,25,210,30,178,30"/>
+</map>

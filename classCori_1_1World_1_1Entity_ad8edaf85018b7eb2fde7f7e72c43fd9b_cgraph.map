@@ -1,0 +1,27 @@
+<map id="Cori::World::Entity::FindChildByName" name="Cori::World::Entity::FindChildByName">
+<area shape="rect" id="Node000001" title="Finds a children entity by name." alt="" coords="5,375,150,419"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Systems_1_1Hierarchy.html#a644a17ea284e41c20a44169d10c12891" title=" " alt="" coords="198,375,412,419"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,394,182,394,182,400,150,400"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1World_1_1Entity.html#aa7d26560a1832af95311745558492c18" title="Retries the references to the requested components of the entity." alt="" coords="460,168,599,213"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="329,372,491,221,495,225,333,376"/>
+<area shape="rect" id="Node000007" href="$classCori_1_1World_1_1Entity.html#a6cf1d86ebe80c09050b81bb33a4288f3" title="Checks if the entity has all the specified components." alt="" coords="1022,229,1161,274"/>
+<area shape="poly" id="edge15_Node000002_Node000007" title=" " alt="" coords="412,402,531,404,673,397,749,389,825,376,901,358,973,335,1017,311,1054,283,1058,287,1020,316,975,339,902,363,826,381,750,394,674,402,531,409,412,407"/>
+<area shape="rect" id="Node000010" href="$classCori_1_1World_1_1Entity.html#a37ec856a07cae6aab81663ef9bf44ee1" title="Gets a raw entt::handle if you need to interact with entt directly." alt="" coords="460,435,599,479"/>
+<area shape="poly" id="edge14_Node000002_Node000010" title=" " alt="" coords="391,417,446,432,444,437,390,422"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1World_1_1Entity.html#aa3f3f27e39668c2253dcfd9fbeccb0a5" title="Gets the debuting string for logging." alt="" coords="647,168,787,213"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="600,196,632,197,632,202,600,202"/>
+<area shape="poly" id="edge13_Node000003_Node000007" title=" " alt="" coords="571,211,687,269,760,297,835,318,905,329,935,327,973,318,1013,302,1048,281,1051,285,1015,307,975,324,936,332,905,335,834,324,758,302,685,274,569,216"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="647,184,615,184,615,179,647,179"/>
+<area shape="poly" id="edge5_Node000004_Node000004" title=" " alt="" coords="681,168,680,158,686,149,698,143,717,141,737,144,749,150,747,155,736,149,717,147,700,149,689,153,685,159,686,167"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1World_1_1Entity.html#ab4a5426dc479bf437f31a4081cf4f292" title="Gets the entity ID." alt="" coords="835,75,974,119"/>
+<area shape="poly" id="edge6_Node000004_Node000005" title=" " alt="" coords="762,165,843,124,845,129,765,170"/>
+<area shape="rect" id="Node000006" href="$classCori_1_1World_1_1Entity.html#a30781f71b31406df4a5176779ae088e9" title="Retrieves the name of the entity." alt="" coords="835,5,974,50"/>
+<area shape="poly" id="edge7_Node000004_Node000006" title=" " alt="" coords="733,166,775,115,833,60,838,56,842,61,836,64,779,118,737,169"/>
+<area shape="poly" id="edge11_Node000004_Node000007" title=" " alt="" coords="787,175,877,168,926,171,975,180,1015,196,1051,218,1048,222,1013,201,973,185,926,176,877,173,787,180"/>
+<area shape="rect" id="Node000008" href="$classCori_1_1World_1_1Entity.html#a65785a2159a6ed5ab34c56ac7ef337d6" title="Gets the entity version." alt="" coords="835,195,974,239"/>
+<area shape="poly" id="edge10_Node000004_Node000008" title=" " alt="" coords="787,198,820,202,819,208,787,203"/>
+<area shape="rect" id="Node000009" href="$classCori_1_1World_1_1Entity.html#a1b1b4e604aed1c1e80b149e3ef2ec1ad" title="Checks if the actual entity behind this handle is valid." alt="" coords="835,264,974,309"/>
+<area shape="poly" id="edge12_Node000004_Node000009" title=" " alt="" coords="763,211,836,249,846,254,843,259,833,254,760,216"/>
+<area shape="poly" id="edge8_Node000006_Node000003" title=" " alt="" coords="844,53,648,134,589,163,586,158,646,129,842,48"/>
+<area shape="poly" id="edge9_Node000006_Node000007" title=" " alt="" coords="960,48,976,60,1009,97,1038,138,1078,214,1073,216,1033,141,1005,100,972,64,957,53"/>
+</map>

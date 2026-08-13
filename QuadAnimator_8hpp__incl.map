@@ -1,0 +1,32 @@
+<map id="QuadAnimator.hpp" name="QuadAnimator.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="408,5,552,33"/>
+<area shape="rect" id="Node000002" href="$AnimationPack_8hpp.html" title=" " alt="" coords="268,81,415,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="456,36,380,76,378,71,454,31"/>
+<area shape="rect" id="Node000011" href="$Entity_8hpp.html" title=" " alt="" coords="530,81,707,109"/>
+<area shape="poly" id="edge14_Node000001_Node000011" title=" " alt="" coords="506,31,582,71,579,76,503,36"/>
+<area shape="rect" id="Node000003" href="$Trackable_8hpp.html" title=" " alt="" coords="5,384,176,411"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="267,105,209,112,149,123,98,139,79,148,67,158,53,183,45,210,43,239,46,268,61,324,79,369,74,371,56,326,41,269,38,239,40,209,48,181,63,155,77,144,96,134,147,118,208,107,267,99"/>
+<area shape="rect" id="Node000005" href="$SpriteAtlas_8hpp.html" title=" " alt="" coords="77,157,258,184"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="311,112,213,153,211,148,309,107"/>
+<area shape="rect" id="Node000009" href="$Graphics_2Animator_2Animation_8hpp.html" title=" " alt="" coords="283,157,399,184"/>
+<area shape="poly" id="edge11_Node000002_Node000009" title=" " alt="" coords="344,109,344,141,338,141,338,109"/>
+<area shape="rect" id="Node000010" href="$AnimationFrame_8hpp.html" title=" " alt="" coords="424,157,581,184"/>
+<area shape="poly" id="edge12_Node000002_Node000010" title=" " alt="" coords="371,107,461,148,459,153,369,112"/>
+<area shape="rect" id="Node000004" href="$InstanceMetrics_8hpp.html" title=" " alt="" coords="14,459,167,487"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="93,412,93,444,88,444,88,412"/>
+<area shape="poly" id="edge10_Node000005_Node000003" title=" " alt="" coords="165,186,118,309,100,369,95,368,113,307,160,184"/>
+<area shape="rect" id="Node000006" href="$Texture_8hpp.html" title=" " alt="" coords="263,232,360,260"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="195,183,274,223,272,227,192,187"/>
+<area shape="rect" id="Node000007" href="$Image_8hpp.html" title=" " alt="" coords="128,308,218,336"/>
+<area shape="poly" id="edge9_Node000005_Node000007" title=" " alt="" coords="171,184,175,292,169,292,166,185"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="288,263,212,303,210,298,286,258"/>
+<area shape="rect" id="Node000008" href="$AssetLoadStatus_8hpp.html" title=" " alt="" coords="242,308,496,336"/>
+<area shape="poly" id="edge8_Node000006_Node000008" title=" " alt="" coords="324,259,352,294,348,297,320,262"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="160,338,118,375,115,371,157,334"/>
+<area shape="poly" id="edge13_Node000010_Node000006" title=" " alt="" coords="469,187,361,229,359,224,467,182"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="626,232,731,260"/>
+<area shape="poly" id="edge15_Node000011_Node000012" title=" " alt="" coords="624,108,632,143,646,183,664,218,660,220,641,185,627,144,619,110"/>
+<area shape="rect" id="Node000013" href="$StringHash_8hpp.html" title=" " alt="" coords="656,157,821,184"/>
+<area shape="poly" id="edge16_Node000011_Node000013" title=" " alt="" coords="641,107,706,146,703,151,639,111"/>
+<area shape="poly" id="edge17_Node000013_Node000012" title=" " alt="" coords="730,187,701,222,697,218,726,183"/>
+</map>

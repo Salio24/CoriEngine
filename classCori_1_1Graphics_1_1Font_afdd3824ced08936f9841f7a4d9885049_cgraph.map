@@ -1,0 +1,9 @@
+<map id="Cori::Graphics::Font::Create" name="Cori::Graphics::Font::Create">
+<area shape="rect" id="Node000001" title="Creates a Font object." alt="" coords="5,75,154,119"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Graphics_1_1Font.html#a812cdc5052722b95fe242a3bc9c40181" title=" " alt="" coords="211,5,359,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,72,201,53,203,58,149,77"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1AssetManager.html#a7f17c96404a7eeae4f4bcebfae691abc" title="Checks if an asset type have placeholder registered." alt="" coords="211,75,359,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="154,94,195,94,195,100,154,100"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1Core_1_1Application.html#aceaa04f6e7ec7b72f7728f0e9aab62bc" title="Submits a task to be executed on the worker thread." alt="" coords="202,144,368,189"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="149,117,203,136,201,141,147,122"/>
+</map>

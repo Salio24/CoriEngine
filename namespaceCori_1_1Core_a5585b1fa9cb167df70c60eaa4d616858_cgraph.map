@@ -1,0 +1,7 @@
+<map id="Cori::Core::format_as" name="Cori::Core::format_as">
+<area shape="rect" id="Node000001" title="Needed for fmt/spadlog." alt="" coords="5,14,165,42"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1Event.html#a26d0871fc6502150a001352a47bdbc3f" title="Returns the name of the Event." alt="" coords="213,5,351,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="165,25,197,25,197,30,165,30"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Core_1_1Event.html#a2b72405936a555efbfa708452eecb325" title="This will give you the string version of EventType." alt="" coords="399,5,537,50"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="352,25,383,25,383,30,352,30"/>
+</map>

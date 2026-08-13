@@ -1,0 +1,7 @@
+<map id="Cori::Graphics::Renderer2D::SubmitText" name="Cori::Graphics::Renderer2D::SubmitText">
+<area shape="rect" id="Node000001" title="Draws a UTF&#45;32 fixed length encoded string." alt="" coords="5,40,193,85"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1AssetManager.html#a3ff7ff1e32563f96a85f70b2af4cc0c6" title="Retrieves the instance of placeholder for a specified asset type." alt="" coords="241,5,389,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="193,45,225,39,226,45,194,50"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Graphics_1_1Font.html#a5c5dec5db334501e3139f6950dabdccb" title=" " alt="" coords="241,75,389,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="194,75,226,80,225,85,193,80"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="23,75,168,119"/>
+<area shape="rect" id="Node000001" href="$classCori_1_1Graphics_1_1AnimationPack.html" title="Represents a pack of sprite animations that were loaded from the drive from the pair of an image file..." alt="" coords="234,54,452,82"/>
+<area shape="poly" id="edge43_Node000000_Node000001" title=" " alt="" coords="183,84,233,78,233,83,184,89"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1Graphics_1_1Font.html" title="Font asset to be used when rendering text. Pretty expensive to create if not cached,..." alt="" coords="269,114,417,142"/>
+<area shape="poly" id="edge44_Node000000_Node000003" title=" " alt="" coords="184,105,269,116,268,121,183,110"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Profiling_1_1Trackable.html" title=" " alt="" coords="5,5,186,50"/>
+<area shape="poly" id="edge45_Node000002_Node000001" title=" " alt="" coords="202,42,254,51,253,56,201,47"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1Profiling_1_1Trackable.html" title=" " alt="" coords="5,144,186,189"/>
+<area shape="poly" id="edge46_Node000004_Node000003" title=" " alt="" coords="200,147,268,137,268,142,201,153"/>
+</map>

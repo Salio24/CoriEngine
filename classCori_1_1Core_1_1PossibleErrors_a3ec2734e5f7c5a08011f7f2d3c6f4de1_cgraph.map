@@ -1,0 +1,5 @@
+<map id="Cori::Core::PossibleErrors::GetWhat" name="Cori::Core::PossibleErrors::GetWhat">
+<area shape="rect" id="Node000001" title="Simply returns the formated error message held inside the execution object." alt="" coords="5,5,191,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1PossibleErrors.html#a98e960a7705e0f1f197aaeaedc744a7d" title="Returns a pointer to the exception held inside of the object." alt="" coords="239,5,424,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,25,223,25,223,30,191,30"/>
+</map>

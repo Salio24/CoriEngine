@@ -1,0 +1,7 @@
+<map id="Cori::Core::KeyPressedEvent::ToString" name="Cori::Core::KeyPressedEvent::ToString">
+<area shape="rect" id="Node000001" title="Returns the name of the Event." alt="" coords="5,24,211,68"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Logger.html#ae1423ff2a56c6e626feed2760a51c85a" title=" " alt="" coords="275,5,448,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="211,32,259,27,260,33,212,38"/>
+<area shape="rect" id="Node000003" href="$namespaceCori_1_1Core.html#a09d0f7f06afa9053cc89a211ed71a82a" title=" " alt="" coords="259,57,464,85"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="212,53,243,57,243,62,211,59"/>
+</map>

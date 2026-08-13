@@ -1,0 +1,5 @@
+<map id="Cori::World::Components::Scene::Camera" name="Cori::World::Components::Scene::Camera">
+<area shape="rect" id="Node000001" title="A Scene context component with all the graphical camera data." alt="" coords="5,106,189,151"/>
+<area shape="rect" id="Node000002" href="$structCori_1_1Utility_1_1AABB.html" title="Axis&#45;Aligned bounding box." alt="" coords="28,5,166,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,49,100,105,94,105,94,49"/>
+</map>

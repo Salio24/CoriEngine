@@ -1,0 +1,5 @@
+<map id="Cori::ImGuiPresets::FpsCounter" name="Cori::ImGuiPresets::FpsCounter">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,148,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1GameTimer.html#af909d0acb3d2af9f219b0c650cdd70db" title="Gets the time in seconds since application start." alt="" coords="196,5,365,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,25,180,25,180,30,148,30"/>
+</map>

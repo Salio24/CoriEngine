@@ -1,0 +1,5 @@
+<map id="Cori::World::StaticEntityView::Get" name="Cori::World::StaticEntityView::Get">
+<area shape="rect" id="Node000001" title="Retries the components from an entity, both the components and the entity should be in a view,..." alt="" coords="5,5,182,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Entity.html#ac9d21daa112e64d4f43f54715aef21b2" title="Gets a raw entt::entity if you need to interact with entt directly." alt="" coords="230,5,369,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="182,25,214,25,214,30,182,30"/>
+</map>

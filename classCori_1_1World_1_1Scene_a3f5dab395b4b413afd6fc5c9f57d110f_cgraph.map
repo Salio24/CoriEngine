@@ -1,0 +1,7 @@
+<map id="Cori::World::Scene::CreateEntity" name="Cori::World::Scene::CreateEntity">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,40,146,85"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Entity.html#a7b8dc8e2678b0b088fcbc94bad61a931" title="Adds a component to the entity." alt="" coords="219,5,358,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,48,203,39,204,44,147,54"/>
+<area shape="rect" id="Node000003" href="$structCori_1_1Utility_1_1HashedTag64.html#ab454e3afd80fb5ed6d3774a826e1fd1a" title="Gets the name the tag was declared with." alt="" coords="194,75,383,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="147,71,179,76,178,82,146,76"/>
+</map>

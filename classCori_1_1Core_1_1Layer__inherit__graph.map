@@ -1,0 +1,5 @@
+<map id="Cori::Core::Layer" name="Cori::Core::Layer">
+<area shape="rect" id="Node000001" title="An abstract class that is ment to be used as a template for defining layers." alt="" coords="12,5,142,33"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1Internal_1_1ImGuiLayer.html" title=" " alt="" coords="5,81,149,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,49,80,80,74,80,74,49"/>
+</map>

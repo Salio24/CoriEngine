@@ -1,0 +1,7 @@
+<map id="Cori::Graphics::AnimationPack" name="Cori::Graphics::AnimationPack">
+<area shape="rect" id="Node000001" title="Represents a pack of sprite animations that were loaded from the drive from the pair of an image file..." alt="" coords="272,48,490,76"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Profiling_1_1Trackable.html" title=" " alt="" coords="24,5,205,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="221,39,271,45,271,51,220,44"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,75,224,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="239,78,271,74,271,79,240,83"/>
+</map>

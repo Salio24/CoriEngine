@@ -1,0 +1,5 @@
+<map id="Cori::Core::MouseButtonEvent" name="Cori::Core::MouseButtonEvent">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,81,222,109"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1Event.html" title="An abstract class that is ment to be used as a template for defining events." alt="" coords="48,5,179,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,49,116,81,111,81,111,49"/>
+</map>

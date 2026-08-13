@@ -1,0 +1,5 @@
+<map id="Cori::World::Scene::CreateBlankEntity" name="Cori::World::Scene::CreateBlankEntity">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,153,50"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1World_1_1Entity.html#a7b8dc8e2678b0b088fcbc94bad61a931" title="Adds a component to the entity." alt="" coords="201,5,340,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,25,186,25,186,30,153,30"/>
+</map>

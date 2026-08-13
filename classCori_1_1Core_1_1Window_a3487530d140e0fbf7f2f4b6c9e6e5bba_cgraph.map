@@ -1,0 +1,24 @@
+<map id="Cori::Core::Window::SetScreenMode" name="Cori::Core::Window::SetScreenMode">
+<area shape="rect" id="Node000001" title="Changes the current ScreenMode." alt="" coords="5,53,151,98"/>
+<area shape="rect" id="Node000002" href="$classCori_1_1Core_1_1Window.html#adf479affc833e89a9275b708d7c24572" title="Changes the current WindowMode." alt="" coords="199,53,344,98"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,72,183,72,183,78,151,78"/>
+<area shape="rect" id="Node000003" href="$classCori_1_1FileSystem_1_1PathManager.html#a70c92136e32723b75a6a44cbbf8bdec7" title="Retries the full aliased path defined in fsgame.json." alt="" coords="404,8,625,52"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="344,59,389,51,390,56,345,64"/>
+<area shape="rect" id="Node000005" href="$classCori_1_1FileSystem_1_1BinaryFileManager.html#ae43b1979ebab8a97a5ddfb13c14f4129" title="Saves an instance of an aggregate struct onto the disk." alt="" coords="392,88,637,132"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="345,83,377,87,376,93,344,88"/>
+<area shape="rect" id="Node000004" href="$classCori_1_1Logger.html#a7e782f29b9eebd80d6a801e80d074318" title=" " alt="" coords="696,5,867,33"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="625,23,680,21,681,26,625,28"/>
+<area shape="rect" id="Node000006" href="$namespaceCori_1_1Utility.html#aadae1036bd08323331712cb16b48813e" title="Computes the 64bit FNV&#45;1a string hash." alt="" coords="926,56,1081,84"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="637,97,685,93,910,74,910,80,686,98,638,102"/>
+<area shape="rect" id="Node000007" href="$namespaceCori_1_1Utility.html#aca6f01473d2cc64923d437335438aa44" title="Generates a stable, unique ID for an aggregate struct at compile&#45;time." alt="" coords="685,108,878,152"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="638,116,670,119,669,124,637,122"/>
+<area shape="rect" id="Node000011" href="$classCori_1_1Core_1_1UUID.html#ae7543c82e2aac1352d77a7d85ba8e435" title=" " alt="" coords="688,176,875,204"/>
+<area shape="poly" id="edge11_Node000005_Node000011" title=" " alt="" coords="585,130,686,162,710,169,709,174,685,167,583,135"/>
+<area shape="poly" id="edge7_Node000007_Node000006" title=" " alt="" coords="866,104,934,86,935,91,867,110"/>
+<area shape="rect" id="Node000008" href="$namespaceCori_1_1Utility_1_1Internal.html#a9337758a0302ac0fc6b64644e5f1b4ce" title=" " alt="" coords="927,108,1080,152"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="878,127,911,127,911,132,878,132"/>
+<area shape="rect" id="Node000009" href="$namespaceCori_1_1Utility_1_1Internal.html#a52092d326bf9b42dd65b632131a3748f" title=" " alt="" coords="1129,108,1310,152"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="1080,127,1113,127,1113,132,1080,132"/>
+<area shape="rect" id="Node000010" href="$namespaceCori_1_1Utility_1_1Internal.html#a3915b814d3c7b0d4b5a7920c4cd9d597" title=" " alt="" coords="1358,108,1511,152"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="1311,127,1343,127,1343,132,1311,132"/>
+</map>
