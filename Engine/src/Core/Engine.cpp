@@ -19,7 +19,14 @@ namespace Cori {
 							CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self }, "RenderDoc or nsight environment variable detected. Current session is wayland, switching to XWayland for them to be happy.");
 							SDL_SetHint("SDL_VIDEO_DRIVER", "x11");
 						} else {
-							SDL_SetHint("SDL_VIDEO_DRIVER", "wayland");
+							const char* sdlEnv = std::getenv("SDL_VIDEO_DRIVER");
+							if (!sdlEnv) {
+								SDL_SetHint("SDL_VIDEO_DRIVER", "wayland");
+							} else {
+								if (strcmp(sdlEnv, "") == 0) {
+									SDL_SetHint("SDL_VIDEO_DRIVER", "wayland");
+								}
+							}
 						}
 					}
 				}

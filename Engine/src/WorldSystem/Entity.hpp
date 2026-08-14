@@ -187,7 +187,7 @@ namespace Cori {
 			 * @note Entity IDs can be reused, to differentiate one entity from the other, you need to compare entity ID and entity version. To get a unique entity ID use ```GetEUID()``` method.
 			 */
 			[[nodiscard]] uint32_t GetID() const {
-				return entt::to_integral(m_EntityHandle.entity());
+				return entt::to_entity(m_EntityHandle.entity());
 			}
 
 			/**
@@ -202,8 +202,8 @@ namespace Cori {
 			 * @brief Gets the EUID (entity unique ID). A combination of entity ID and version, it is unique for every entity.
 			 * @return EUID.
 			 */
-			[[nodiscard]] uint64_t GetEUID() const {
-				return static_cast<uint64_t>(GetID()) << 32 | GetVersion();
+			[[nodiscard]] uint32_t GetEUID() const {
+				return entt::to_integral(m_EntityHandle.entity());
 			}
 
 			/**

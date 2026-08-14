@@ -351,7 +351,6 @@ namespace {
 }
 
 namespace Snowflake {
-	//EditorLayer::EditorLayer(AssetPreviewLayer* previewLayer) : Layer("Snowflake Editor"), m_PreviewLayer(previewLayer) {
 	EditorLayer::EditorLayer()
 		: Layer("Snowflake Editor") {
 		ImGuiIO& io = ImGui::GetIO();
@@ -371,6 +370,7 @@ namespace Snowflake {
 		m_PanelExtent = initialPRTExtent;
 		m_PRTExtent = initialPRTExtent;
 
+		//FIXME: move the scene ownership to a different layer completely, also add a way to disable keyboard and mouse event ignoring (e.g. ImGuiLayer::OnEvent) when focused on the viewport
 		if (CreateTestScene(initialPRTExtent)) {
 			LoadSponza();
 		}
@@ -489,7 +489,7 @@ namespace Snowflake {
 		m_MainScene.OnImGuiRender(gameTimer);
 	}
 
-	std::array<EditorLayer::PanelEntry, 4> EditorLayer::GetPanels() {
+	std::array<EditorLayer::PanelEntry, 3> EditorLayer::GetPanels() {
 		return {
 			PanelEntry{ s_ViewportPanel, nullptr },
 			PanelEntry{ Cori::ConsolePanel::s_DefaultName, &m_ShowConsole },
@@ -610,9 +610,9 @@ namespace Snowflake {
 		ImGui::SetNextItemWidth(-FLT_MIN);
 		const bool submitted = ImGui::InputTextWithHint("##query", "Open panel...", m_LauncherQuery, sizeof(m_LauncherQuery), ImGuiInputTextFlags_EnterReturnsTrue);
 
-		const std::array<PanelEntry, 4> panels = GetPanels();
+		const std::array<PanelEntry, 3> panels = GetPanels();
 
-		std::array<const PanelEntry*, 4> matches{};
+		std::array<const PanelEntry*, 3> matches{};
 		int32_t matchCount = 0;
 
 		for (const PanelEntry& panel : panels) {
@@ -1001,7 +1001,40 @@ namespace Snowflake {
 			const std::optional<ImTextureID> prt = renderSync ? renderSync->GetMainPRT() : std::nullopt;
 
 			if (prt) {
+				const ImVec2 imageOrigin = ImGui::GetCursorScreenPos();
+
 				ImGui::Image(prt.value(), region);
+
+				if (!m_CameraCaptureActive && ImGui::IsItemHovered()) {
+					const ImVec2 mouse = ImGui::GetIO().MousePos;
+
+					const float u = (mouse.x - imageOrigin.x) / std::max(region.x, 1.0f);
+					const float v = (mouse.y - imageOrigin.y) / std::max(region.y, 1.0f);
+
+					if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
+						m_ClickPickTicket = renderSync->RequestPick(u, v);
+					}
+
+					else if (m_ClickPickTicket == s_NoPickTicket && HasHoverPickInputChanged(mouse)) {
+						m_LastHoverPickPos = mouse;
+						m_LastHoverPickCameraPosition = m_CameraPosition;
+						m_LastHoverPickCameraYaw = m_CameraYaw;
+						m_LastHoverPickCameraPitch = m_CameraPitch;
+
+						const uint64_t ticket = renderSync->RequestPick(u, v);
+
+						if (m_HoverAcceptFromTicket == s_NoPickTicket) {
+							m_HoverAcceptFromTicket = ticket;
+						}
+					}
+				}
+				else {
+					m_HoveredEntity = entt::null;
+					m_HoverAcceptFromTicket = s_NoPickTicket;
+					m_LastHoverPickPos = ImVec2(-1.0f, -1.0f);
+				}
+
+				DrawSelectionOverlay(imageOrigin);
 			}
 			else {
 				ImGui::TextUnformatted("Waiting for the scene render target...");
@@ -1009,6 +1042,75 @@ namespace Snowflake {
 		}
 
 		ImGui::End();
+	}
+
+	void EditorLayer::DrawSelectionOverlay(const ImVec2 imageOrigin) {
+		if (m_SelectedEntity == entt::null || !m_MainScene.IsValid()) {
+			return;
+		}
+
+		if (!m_MainScene.GetRegistry().valid(m_SelectedEntity)) {
+			m_SelectedEntity = entt::null;
+			return;
+		}
+
+		const Cori::World::Entity entity{ entt::handle{ m_MainScene.GetRegistry(), m_SelectedEntity } };
+		const std::string_view name = entity.GetName();
+
+		ImGui::SetCursorScreenPos(ImVec2(imageOrigin.x + 8.0f, imageOrigin.y + 8.0f));
+		ImGui::Text("Selected: %.*s [%u]", static_cast<int32_t>(name.size()), name.data(), entt::to_integral(m_SelectedEntity));
+	}
+
+	bool EditorLayer::HasHoverPickInputChanged(const ImVec2 mouse) const {
+		return mouse.x != m_LastHoverPickPos.x
+			|| mouse.y != m_LastHoverPickPos.y
+			|| m_CameraPosition != m_LastHoverPickCameraPosition
+			|| m_CameraYaw != m_LastHoverPickCameraYaw
+			|| m_CameraPitch != m_LastHoverPickCameraPitch;
+	}
+
+	entt::entity EditorLayer::ResolvePickedEntity(const Cori::Graphics::PickResult& result) {
+		if (result.entityID == Cori::Graphics::s_NullEntityID || !m_MainScene.IsValid()) {
+			return entt::null;
+		}
+
+		const auto picked = static_cast<entt::entity>(result.entityID);
+
+		if (!m_MainScene.GetRegistry().valid(picked)) {
+			return entt::null;
+		}
+
+		return picked;
+	}
+
+	void EditorLayer::PollPickResults() {
+		const auto renderSync = m_RenderSync.lock();
+		if (!renderSync) {
+			return;
+		}
+
+		Cori::Graphics::PickResult result;
+		while (renderSync->PollPickResult(result)) {
+			if (result.ticket == m_ClickPickTicket) {
+				m_ClickPickTicket = s_NoPickTicket;
+				m_SelectedEntity = ResolvePickedEntity(result);
+			}
+			else if (result.ticket >= m_HoverAcceptFromTicket) {
+				m_HoveredEntity = ResolvePickedEntity(result);
+			}
+		}
+
+		if (m_SelectedEntity != entt::null && m_MainScene.IsValid() && !m_MainScene.GetRegistry().valid(m_SelectedEntity)) {
+			m_SelectedEntity = entt::null;
+		}
+
+		renderSync->ClearHighlights();
+
+		if (m_HoveredEntity != m_SelectedEntity) {
+			renderSync->AddHighlight(m_HoveredEntity, s_HoverOutlineColor);
+		}
+
+		renderSync->AddHighlight(m_SelectedEntity, s_SelectionOutlineColor);
 	}
 
 	void EditorLayer::DrawWindowSettings() {
@@ -1027,6 +1129,7 @@ namespace Snowflake {
 
 	void EditorLayer::OnUpdate(Cori::Core::GameTimer& gameTimer) {
 		FlushViewportResize();
+		PollPickResults();
 		UpdateCameraCapture();
 		UpdateCamera(static_cast<float>(gameTimer.GetDeltaTime()));
 

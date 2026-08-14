@@ -659,6 +659,13 @@ namespace Cori {
 			return Get().m_Meshes.GetVulkanBuffer().GetBDA();
 		}
 
+		std::pair<uint32_t, uint32_t> VulkanMeshManager::GetDrawRange(const Core::Handle<Mesh> handle) {
+			CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle.");
+
+			const auto& mesh = std::as_const(Get().m_Meshes)[handle];
+			return { mesh.indexCount, mesh.firstIndex };
+		}
+
 		std::expected<AABB3D, ErrorCode> VulkanMeshManager::GetAABB3D(const Core::Handle<Mesh> handle) {
 			CORI_CORE_ASSERT(IsHandleValid(handle), "Invalid handle.");
 

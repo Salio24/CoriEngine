@@ -302,6 +302,10 @@ namespace Cori {
 
 			[[nodiscard]] static uint64_t GetMeshAssetBufferBDA();
 
+			//{ indexCount, firstIndex }. render thread only, the mesh slot map is published from ProcessUpdates.
+			//an indexCount of 0 means the mesh has no drawable data yet.
+			[[nodiscard]] static std::pair<uint32_t, uint32_t> GetDrawRange(const Core::Handle<Mesh> handle);
+
 			[[nodiscard]] static std::expected<AABB3D, ErrorCode> GetAABB3D(const Core::Handle<Mesh> handle);
 
 			static void AllocateExtras(const Core::Handle<Mesh> handle);

@@ -44,7 +44,7 @@ namespace Snowflake {
 			bool* open;
 		};
 
-		[[nodiscard]] std::array<PanelEntry, 4> GetPanels();
+		[[nodiscard]] std::array<PanelEntry, 3> GetPanels();
 
 		void UpdateDockNavigation();
 
@@ -71,6 +71,14 @@ namespace Snowflake {
 		void UpdateCamera(const float deltaTime);
 
 		void FlushViewportResize();
+
+		void PollPickResults();
+
+		[[nodiscard]] bool HasHoverPickInputChanged(const ImVec2 mouse) const;
+
+		[[nodiscard]] entt::entity ResolvePickedEntity(const Cori::Graphics::PickResult& result);
+
+		void DrawSelectionOverlay(const ImVec2 imageOrigin);
 
 		static constexpr const char* s_ViewportPanel{ "Viewport" };
 		static constexpr const char* s_DockHostWindow{ "SnowflakeDockHost" };
@@ -120,6 +128,22 @@ namespace Snowflake {
 
 		bool m_ViewportFocused{ false };
 		bool m_CameraCaptureActive{ false };
+
+		entt::entity m_SelectedEntity{ entt::null };
+		entt::entity m_HoveredEntity{ entt::null };
+
+		static constexpr uint64_t s_NoPickTicket{ UINT64_MAX };
+
+		static constexpr uint32_t s_HoverOutlineColor{ 0xFFB86CFF };
+		static constexpr uint32_t s_SelectionOutlineColor{ 0x4DA6FFFF };
+
+		uint64_t m_ClickPickTicket{ s_NoPickTicket };
+		uint64_t m_HoverAcceptFromTicket{ s_NoPickTicket };
+
+		ImVec2 m_LastHoverPickPos{ -1.0f, -1.0f };
+		glm::vec3 m_LastHoverPickCameraPosition{};
+		float m_LastHoverPickCameraYaw{ 0.0f };
+		float m_LastHoverPickCameraPitch{ 0.0f };
 
 		bool m_ShowWindowSettings{ false };
 		bool m_RebuildLayout{ false };

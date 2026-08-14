@@ -807,10 +807,10 @@ namespace Snowflake {
 			m_TreeSeeded = true;
 		}
 
-		float available = ImGui::GetContentRegionAvail().x;
-		m_TreeWidth = std::clamp(m_TreeWidth, s_MinTreeWidth, std::max(s_MinTreeWidth, available - 200.0f));
+		auto available = ImGui::GetContentRegionAvail();
+		m_TreeWidth = std::clamp(m_TreeWidth, s_MinTreeWidth, std::max(s_MinTreeWidth, available.x - 200.0f));
 
-		float bodyHeight = std::max(ImGui::GetContentRegionAvail().y, 1.0f);
+		float bodyHeight = std::max(available.y, 1.0f);
 
 		DrawTree(*view, bodyHeight);
 
@@ -826,7 +826,7 @@ namespace Snowflake {
 
 		ImGui::SameLine(0.0f, 0.0f);
 
-		uint32_t total = DrawGrid(*view, bodyHeight);
+		DrawGrid(*view, bodyHeight);
 
 		ImGui::End();
 	}
@@ -858,7 +858,7 @@ namespace Snowflake {
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(128.0f);
-		ImGui::SliderFloat("##tilesize", &m_TileSize, s_MinTileSize, s_MaxTileSize, "%.0f px");
+		ImGui::SliderInt("##tilesize", &m_TileSize, s_MinTileSize, s_MaxTileSize, "%d px");
 
 		ImGui::Text("last pass %.3f ms (%s), visited %zu, listed %zu", view.stats.lastPassMs, view.stats.lastPassTargeted ? "targeted" : "full", view.stats.visited, view.stats.listed);
 		ImGui::Text("last pass changes: folders +%zu -%zu, assets +%zu -%zu, validated %zu, parked %zu, retried %zu", view.stats.foldersAdded, view.stats.foldersRemoved, view.stats.entriesAdded, view.stats.entriesRemoved, view.stats.validated, view.stats.timedOut, view.stats.retried);

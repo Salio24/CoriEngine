@@ -17,6 +17,8 @@
 
 #include "PersistentRenderTarget.hpp"
 #include "ThumbnailRect.hpp"
+#include "PickRequest.hpp"
+#include "HighlightRequest.hpp"
 #include "CameraSnapshot.hpp"
 
 namespace Cori {
@@ -27,7 +29,7 @@ namespace Cori {
 
 		struct RenderObject {
 			RenderObject() = delete;
-			RenderObject(const glm::mat4& transform, const glm::vec4& uvOffsets, Core::AssetRef<Material> material, const BatchIndex batch) : m_Transform(transform), m_UVOffsets(uvOffsets), m_Material(std::move(material)), m_OwnerBatch(batch) {}
+			RenderObject(const glm::mat4& transform, const glm::vec4& uvOffsets, Core::AssetRef<Material> material, const BatchIndex batch, const uint32_t entity) : m_Transform(transform), m_UVOffsets(uvOffsets), m_Material(std::move(material)), m_OwnerBatch(batch), entityID(entity) {}
 		private:
 			friend SceneRenderer;
 			alignas(16) glm::mat4 m_Transform{ 0.0f };
@@ -36,7 +38,13 @@ namespace Cori {
 			BatchIndex m_OwnerBatch{ 0 };
 		public:
 			uint32_t valid{ 0 };
+			EntityValueType entityID{ s_NullEntityID };
+			uint32_t pad1{};
+			uint32_t pad2{};
+			uint32_t pad3{};
 		};
+
+		static_assert(sizeof(RenderObject) == 112, "CHANGE THE SLANG DEFINE!");
 
 		class SceneRenderer {
 			using DrawGroupIndex = uint32_t;
@@ -103,7 +111,7 @@ namespace Cori {
 				return m_RenderObjectAllocator.Allocate();
 			}
 
-			void RegisterObject(const Core::Handle<RenderObject> handle, Core::AssetRef<Mesh> mesh, Core::AssetRef<Material> material, const glm::mat4& transform, const glm::vec4& UVs = { 0.0f, 0.0f, 1.0f, 1.0f } );
+			void RegisterObject(const Core::Handle<RenderObject> handle, Core::AssetRef<Mesh> mesh, Core::AssetRef<Material> material, const glm::mat4& transform, const EntityValueType entityID, const glm::vec4& UVs = { 0.0f, 0.0f, 1.0f, 1.0f } );
 
 			void UnregisterObject(const Core::Handle<RenderObject> handle);
 
@@ -149,6 +157,10 @@ namespace Cori {
 				return m_ThumbnailCopyCount.load(std::memory_order_acquire);
 			}
 
+			void DrainPickReadback();
+
+			[[nodiscard]] bool PollPickResult(PickResult& result);
+
 			void ProcessFrameData();
 
 			struct UniformData {
@@ -167,13 +179,14 @@ namespace Cori {
 				VulkanVirtualBuffer cullDataBuffer;
 				RenderGraph graph;
 				UniformData uniformData;
+				std::optional<PickRequest> pick;
 			};
 
 			std::optional<FrameContext> Stage1(const RendererSettings settings);
 
 			void Stage2(VulkanEngine::FrameInfo& frameData, FrameContext& frameContext);
 
-			void Stage3(VulkanEngine::FrameInfo& frameData, FrameContext& frameContext);
+			void Stage3(const VulkanEngine::FrameInfo& frameData, FrameContext& frameContext);
 
 			~SceneRenderer();
 
@@ -204,6 +217,11 @@ namespace Cori {
 			Core::AssetRef<ComputeShader> cmgShader;
 			Core::AssetRef<ComputeShader> compactShader;
 			Core::AssetRef<VertFragShaderPair> aabbShader;
+			Core::AssetRef<VertFragShaderPair> pickingShader;
+			Core::AssetRef<VertFragShaderPair> outlineShader;
+
+
+			std::vector<HighlightRequest> m_Highlights;
 
 			CullData m_CullData;
 
@@ -216,6 +234,12 @@ namespace Cori {
 			std::optional<ThumbnailRect> m_PendingThumbnailCopy;
 			std::atomic<uint64_t> m_ThumbnailCopyCount{ 0 };
 
+			std::optional<PickRequest> m_PendingPick;
+			VulkanBuffer m_PickReadbackBuffer;
+			Threading::SPSCRing<PickResult> m_PickResultRing{ FRAMES_IN_FLIGHT + 2};
+
+			std::array<uint64_t, FRAMES_IN_FLIGHT> m_PickSlotTickets{};
+
 			#ifdef DEBUG_BUILD
 			std::string m_Name;
 			#endif
@@ -224,10 +248,15 @@ namespace Cori {
 			Threading::SPSCRing<FrameData*> m_RecycleRing{ FRAMES_IN_FLIGHT };
 			std::array<FrameData*, FRAMES_IN_FLIGHT> m_FrameDataAllocated{};
 
+			void* m_PickReadbackMapped{ nullptr };
+
 			static constexpr uint32_t INDIRECT_COMMAND_SIZE = 20;
 
-			//12 edges of the AABB box, 2 vertices each
 			static constexpr uint32_t AABB_VERTEX_COUNT = 24;
+
+			static constexpr uint32_t OUTLINE_RADIUS = 2;
+
+			static constexpr uint32_t OUTLINE_RING_INSTANCES = 8;
 
 			static constexpr vk::Format s_DepthFormat = vk::Format::eD32Sfloat;
 

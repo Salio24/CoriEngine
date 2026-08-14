@@ -63,6 +63,7 @@ namespace Cori {
 					patch.isNewTransform = true;
 
 					patch.handle = rc.m_RenderObjectHandle;
+					patch.entityID = e.GetEUID();
 					fd->patches.emplace_back(patch);
 				}
 
@@ -97,6 +98,7 @@ namespace Cori {
 					}
 
 					patch.handle = rc.m_RenderObjectHandle;
+					patch.entityID = e.GetEUID();
 					fd->patches.emplace_back(patch);
 				}
 
@@ -110,6 +112,7 @@ namespace Cori {
 					patch.isNewTransform = true;
 
 					patch.handle = rc.m_RenderObjectHandle;
+					patch.entityID = e.GetEUID();
 					fd->patches.emplace_back(patch);
 				}
 
@@ -129,6 +132,13 @@ namespace Cori {
 					fd->thumbnailCopy = m_PendingThumbnailCopy;
 					m_PendingThumbnailCopy.reset();
 				}
+
+				if (m_PendingPick) {
+					fd->pickRequest = m_PendingPick;
+					m_PendingPick.reset();
+				}
+
+				fd->highlights = m_Highlights;
 
 				fd->deletedObjects.swap(m_PendingRemovals);
 				m_PendingRemovals.clear();
@@ -186,6 +196,38 @@ namespace Cori {
 
 			void RenderSync::RequestThumbnailCopy(const Graphics::ThumbnailRect rect) {
 				m_PendingThumbnailCopy = rect;
+			}
+
+			uint64_t RenderSync::RequestPick(const float u, const float v) {
+				const uint64_t ticket = m_NextPickTicket++;
+				m_PendingPick = Graphics::PickRequest{ .ticket = ticket, .u = u, .v = v };
+				return ticket;
+			}
+
+			void RenderSync::ClearHighlights() {
+				m_Highlights.clear();
+			}
+
+			void RenderSync::AddHighlight(const entt::entity entity, const uint32_t color) {
+				if (entity == entt::null || !m_Owner.GetRegistry().valid(entity)) {
+					return;
+				}
+
+				const auto* rc = m_Owner.GetRegistry().try_get<Components::Entity::Rendering>(entity);
+				if (!rc || rc->m_RenderObjectHandle.GetIndex() == UINT32_MAX) {
+					return;
+				}
+
+				m_Highlights.emplace_back(Graphics::HighlightRequest{ .color = color, .renderObjectIndex = rc->m_RenderObjectHandle.GetIndex() });
+			}
+
+			bool RenderSync::PollPickResult(Graphics::PickResult& result) {
+				auto* renderer = Graphics::MasterRenderer::Get().Resolve(m_RendererHandle);
+				if (!renderer) {
+					return false;
+				}
+
+				return renderer->PollPickResult(result);
 			}
 
 			uint64_t RenderSync::GetThumbnailCopyCount() const {

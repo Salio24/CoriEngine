@@ -258,7 +258,7 @@ namespace Snowflake {
 		std::string m_SelectedDir;
 		Cori::Core::AssetID m_SelectedAsset{ 0 };
 
-		float m_TileSize{ 96.0f };
+		int32_t m_TileSize{ 96 };
 		float m_TreeWidth{ 220.0f };
 		bool m_ShowPending{ true };
 		bool m_TreeSeeded{ false };

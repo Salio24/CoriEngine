@@ -677,8 +677,11 @@ namespace Cori {
 					features.get<vk::PhysicalDeviceFeatures2>().features.samplerAnisotropy &&
 					features.get<vk::PhysicalDeviceFeatures2>().features.shaderInt64 &&
 					features.get<vk::PhysicalDeviceFeatures2>().features.robustBufferAccess &&
+					features.get<vk::PhysicalDeviceFeatures2>().features.fragmentStoresAndAtomics &&
+					features.get<vk::PhysicalDeviceVulkan12Features>().shaderBufferInt64Atomics &&
 					features.get<vk::PhysicalDeviceVulkan13Features>().dynamicRendering &&
 					features.get<vk::PhysicalDeviceVulkan13Features>().synchronization2 &&
+					features.get<vk::PhysicalDeviceVulkan13Features>().shaderDemoteToHelperInvocation &&
 					features.get<vk::PhysicalDeviceVulkan12Features>().drawIndirectCount &&
 					features.get<vk::PhysicalDeviceVulkan12Features>().descriptorIndexing &&
 					features.get<vk::PhysicalDeviceVulkan12Features>().runtimeDescriptorArray &&
@@ -838,15 +841,18 @@ namespace Cori {
 							.fillModeNonSolid = true,
 							.wideLines = true,
 							.samplerAnisotropy = true,
+							.fragmentStoresAndAtomics = true,
 							.shaderInt64 = true
 						}
 					},
 					{
+						.shaderDemoteToHelperInvocation = true,
 						.synchronization2 = true,
 						.dynamicRendering = true
 					},
 					{
 						.drawIndirectCount = true,
+						.shaderBufferInt64Atomics = true,
 						.descriptorIndexing = true,
 						.shaderSampledImageArrayNonUniformIndexing = true,
 						.shaderStorageBufferArrayNonUniformIndexing = true,

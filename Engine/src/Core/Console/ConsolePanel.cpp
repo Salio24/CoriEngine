@@ -225,6 +225,19 @@ namespace Cori {
 			m_SuppressPromptChar = true;
 		}
 
+		if (m_AcceptIndex >= 0 && m_AcceptIndex < static_cast<int32_t>(m_Completions.size())) {
+			const auto [completed, newCaret] = BuildCompletedLine(m_CompletionLine, m_CompletionCaret, m_AcceptIndex);
+
+			const uint64_t count = std::min(completed.size(), m_InputBuffer.size() - 1);
+			std::memcpy(m_InputBuffer.data(), completed.data(), count);
+			m_InputBuffer[count] = '\0';
+
+			m_PendingCaret = std::min(newCaret, count);
+
+			CloseCompletions();
+			ImGui::SetKeyboardFocusHere();
+		}
+
 		ImGui::SetNextItemWidth(-FLT_MIN);
 
 		constexpr ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory | ImGuiInputTextFlags_CallbackAlways | ImGuiInputTextFlags_CallbackCharFilter;
@@ -233,7 +246,7 @@ namespace Cori {
 
 		m_SuppressPromptChar = false;
 
-		if (!ImGui::IsItemActive() && !submitted) {
+		if (!ImGui::IsItemActive() && !submitted && !m_CompletionHot && m_AcceptIndex < 0) {
 			CloseCompletions();
 		}
 
@@ -317,7 +330,7 @@ namespace Cori {
 
 		m_CycleEnd = m_CycleBegin + rendered.size();
 
-		m_CompletionLine.assign(result);
+		m_CompletionLine = result;
 		m_CompletionCaret = caret;
 	}
 
@@ -328,7 +341,7 @@ namespace Cori {
 
 		m_Cycling = false;
 
-		m_CompletionLine.assign(line);
+		m_CompletionLine = line;
 		m_CompletionCaret = caret;
 
 		std::string_view word;
@@ -349,21 +362,27 @@ namespace Cori {
 
 	void ConsolePanel::DrawCompletions(const float height) {
 		if (height <= 0.0f) {
+			m_CompletionHot = false;
 			return;
 		}
 
 		if (ImGui::BeginChild("##completions", ImVec2(0.0f, height), ImGuiChildFlags_Borders, ImGuiWindowFlags_NoNavInputs)) {
+			m_CompletionHot = ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
 			const float contentWidth = ImGui::GetContentRegionAvail().x;
 
 			for (int32_t i = 0; i < static_cast<int32_t>(m_Completions.size()); ++i) {
 				const Core::ConsoleCompletion& completion = m_Completions[i];
 				const bool selected = i == m_CompletionIndex;
 
-				m_CompletionScratch.assign(completion.m_Text.data(), completion.m_Text.size());
+				m_CompletionScratch = { completion.m_Text.data(), completion.m_Text.size() };
 
 				ImGui::PushID(i);
 				if (ImGui::Selectable(m_CompletionScratch.c_str(), selected)) {
 					m_AcceptIndex = i;
+				}
+
+				if (ImGui::IsItemHovered()) {
+					m_CompletionIndex = i;
 				}
 
 				if (!completion.m_Detail.empty()) {
@@ -500,6 +519,13 @@ namespace Cori {
 	}
 
 	int ConsolePanel::OnPromptAlways(ImGuiInputTextCallbackData* data) {
+		if (m_PendingCaret != std::string::npos) {
+			data->CursorPos = static_cast<int>(std::min(m_PendingCaret, static_cast<uint64_t>(data->BufTextLen)));
+			data->SelectionStart = data->CursorPos;
+			data->SelectionEnd = data->CursorPos;
+			m_PendingCaret = std::string::npos;
+		}
+
 		const std::string_view line(data->Buf, static_cast<uint64_t>(data->BufTextLen));
 		const auto caret = static_cast<uint64_t>(data->CursorPos);
 

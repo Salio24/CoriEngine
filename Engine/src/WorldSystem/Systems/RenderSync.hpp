@@ -26,6 +26,14 @@ namespace Cori {
 
 				[[nodiscard]] uint64_t GetThumbnailCopyCount() const;
 
+				[[nodiscard]] uint64_t RequestPick(const float u, const float v);
+
+				[[nodiscard]] bool PollPickResult(Graphics::PickResult& result);
+
+				void ClearHighlights();
+
+				void AddHighlight(const entt::entity entity, const uint32_t color);
+
 				[[nodiscard]] std::optional<ImTextureID> GetMainPRT() const;
 
 				[[nodiscard]] Graphics::SceneRendererHandle GetRendererHandle() const;
@@ -46,6 +54,11 @@ namespace Cori {
 				bool m_NewExtent{ false };
 
 				std::optional<Graphics::ThumbnailRect> m_PendingThumbnailCopy;
+
+				std::optional<Graphics::PickRequest> m_PendingPick;
+				uint64_t m_NextPickTicket{ 1 };
+
+				std::vector<Graphics::HighlightRequest> m_Highlights;
 
 				Graphics::FrameData* m_Pending{ nullptr };
 

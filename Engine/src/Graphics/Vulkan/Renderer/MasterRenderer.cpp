@@ -126,6 +126,14 @@ namespace Cori {
 			}
 
 			auto& frameInfo = VulkanEngine::Get().GPUFrameBegin();
+
+			for (auto& renderer : m_SceneRenderers) {
+				SceneRenderer* ptr = renderer.load(std::memory_order_acquire);
+				if (ptr) {
+					ptr->DrainPickReadback();
+				}
+			}
+
 			if (settings.Wireframe) {
 				frameInfo.m_CommandBuffer.setLineWidth(settings.WireframeLineWidth);
 				frameInfo.m_CommandBuffer.setPolygonModeEXT(vk::PolygonMode::eLine);

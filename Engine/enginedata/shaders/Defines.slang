@@ -23,6 +23,10 @@ struct ObjectData {
 	Handle material;
 	uint32_t ownerBatch;
 	uint32_t valid;
+	uint32_t entityID;
+	uint32_t pad1;
+	uint32_t pad2;
+	uint32_t pad3;
 };
 
 struct Mesh {

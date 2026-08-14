@@ -175,6 +175,8 @@ namespace Cori {
 		bool m_Cycling{ false };
 		bool m_ScrollToSelection{ false };
 		bool m_SuppressPromptChar{ false };
+		bool m_CompletionHot{ false };
+		uint64_t m_PendingCaret{ std::string::npos };
 
 		std::string m_RowScratch;
 

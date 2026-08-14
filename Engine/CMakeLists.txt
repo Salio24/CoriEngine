@@ -330,9 +330,8 @@ project(CoriEngine)
     )
 
     # my shared lib
-    add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES}
-            src/Utility/TransparentStringHash.hpp
-            src/Graphics/Vulkan/VulkanHeaders.hpp)
+    add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES})
+
     if (CORI_MY_CONFIG)
         target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE
                 $<$<CONFIG:Debug>:CORI_MY_CONFIG>

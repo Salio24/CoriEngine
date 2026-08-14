@@ -1,0 +1,13 @@
+{
+    "Metadata": {
+        "assetTypename": "VertFragShaderPair",
+        "assetType": "eSecondary",
+        "assetDeletionPolicy": "eRefCounted",
+        "assetFiles": [ "OutlineShader.spv" ]
+    },
+    "AssetData": {
+        "spv": "OutlineShader.spv",
+        "vertexEntry": "vertMain",
+        "fragmentEntry": "fragMain"
+    }
+}
