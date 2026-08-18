@@ -44,8 +44,8 @@ namespace Cori {
 		m_Tail = std::max(m_Tail, bufferTail);
 
 		if (m_HasSelection) {
-			const bool anchorEvicted = m_SelectAnchor.m_Sequence < m_Tail;
-			const bool headEvicted = m_SelectHead.m_Sequence < m_Tail;
+			bool anchorEvicted = m_SelectAnchor.m_Sequence < m_Tail;
+			bool headEvicted = m_SelectHead.m_Sequence < m_Tail;
 
 			if (anchorEvicted && headEvicted) {
 				ClearSelection();
@@ -63,7 +63,7 @@ namespace Cori {
 
 	void ConsolePanel::RetireOldestVisible() {
 		const VisibleEntry& entry = GetVisible(0);
-		const auto levelIndex = static_cast<uint64_t>(entry.m_Level);
+		auto levelIndex = static_cast<uint64_t>(entry.m_Level);
 
 		if (!entry.m_Continuation && levelIndex < m_LevelCounts.size() && m_LevelCounts[levelIndex] > 0) {
 			--m_LevelCounts[levelIndex];
@@ -90,7 +90,7 @@ namespace Cori {
 		m_Visible[m_VisibleHead % LogBuffer::s_Capacity] = VisibleEntry{ .m_Sequence = sequence, .m_Level = record.m_Level, .m_Continuation = record.m_Continuation };
 		++m_VisibleHead;
 
-		const auto levelIndex = static_cast<uint64_t>(record.m_Level);
+		auto levelIndex = static_cast<uint64_t>(record.m_Level);
 		if (!record.m_Continuation && levelIndex < m_LevelCounts.size()) {
 			++m_LevelCounts[levelIndex];
 		}
@@ -170,7 +170,7 @@ namespace Cori {
 			}
 		}
 
-		const auto byLabel = [this](const uint32_t lhs, const uint32_t rhs) {
+		auto byLabel = [this](const uint32_t lhs, const uint32_t rhs) {
 			return m_TagNodes[lhs].m_Label < m_TagNodes[rhs].m_Label;
 		};
 
@@ -200,8 +200,8 @@ namespace Cori {
 
 			ImGui::Separator();
 
-			const float completionHeight = CompletionHeight();
-			const float bodyHeight = -(ImGui::GetFrameHeightWithSpacing() + (completionHeight > 0.0f ? completionHeight + ImGui::GetStyle().ItemSpacing.y : 0.0f));
+			float completionHeight = CompletionHeight();
+			float bodyHeight = -(ImGui::GetFrameHeightWithSpacing() + (completionHeight > 0.0f ? completionHeight + ImGui::GetStyle().ItemSpacing.y : 0.0f));
 
 			if (m_ShowTagPane) {
 				DrawTagPane(bodyHeight);
@@ -226,9 +226,9 @@ namespace Cori {
 		}
 
 		if (m_AcceptIndex >= 0 && m_AcceptIndex < static_cast<int32_t>(m_Completions.size())) {
-			const auto [completed, newCaret] = BuildCompletedLine(m_CompletionLine, m_CompletionCaret, m_AcceptIndex);
+			auto [completed, newCaret] = BuildCompletedLine(m_CompletionLine, m_CompletionCaret, m_AcceptIndex);
 
-			const uint64_t count = std::min(completed.size(), m_InputBuffer.size() - 1);
+			uint64_t count = std::min(completed.size(), m_InputBuffer.size() - 1);
 			std::memcpy(m_InputBuffer.data(), completed.data(), count);
 			m_InputBuffer[count] = '\0';
 
@@ -242,7 +242,7 @@ namespace Cori {
 
 		constexpr ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory | ImGuiInputTextFlags_CallbackAlways | ImGuiInputTextFlags_CallbackCharFilter;
 
-		const bool submitted = ImGui::InputText("##input", m_InputBuffer.data(), m_InputBuffer.size(), flags, &ConsolePanel::PromptCallback, this);
+		bool submitted = ImGui::InputText("##input", m_InputBuffer.data(), m_InputBuffer.size(), flags, &ConsolePanel::PromptCallback, this);
 
 		m_SuppressPromptChar = false;
 
@@ -291,7 +291,7 @@ namespace Cori {
 
 		uint64_t begin = caret;
 		while (begin > 0) {
-			const char previous = line[begin - 1];
+			char previous = line[begin - 1];
 			if (previous == ' ' || previous == '\t' || previous == '"') {
 				break;
 			}
@@ -319,7 +319,7 @@ namespace Cori {
 		result.append(line.substr(0, std::min(m_CycleBegin, line.size())));
 		result.append(rendered);
 
-		const uint64_t caret = result.size();
+		uint64_t caret = result.size();
 		result.append(line.substr(std::min(m_CycleEnd, line.size())));
 
 		data->DeleteChars(0, data->BufTextLen);
@@ -356,7 +356,7 @@ namespace Cori {
 			return 0.0f;
 		}
 
-		const auto rows = static_cast<float>(std::min(static_cast<int32_t>(m_Completions.size()), s_MaxVisibleCompletions));
+		auto rows = static_cast<float>(std::min(static_cast<int32_t>(m_Completions.size()), s_MaxVisibleCompletions));
 		return rows * ImGui::GetTextLineHeightWithSpacing() + ImGui::GetStyle().WindowPadding.y * 2.0f;
 	}
 
@@ -368,11 +368,11 @@ namespace Cori {
 
 		if (ImGui::BeginChild("##completions", ImVec2(0.0f, height), ImGuiChildFlags_Borders, ImGuiWindowFlags_NoNavInputs)) {
 			m_CompletionHot = ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
-			const float contentWidth = ImGui::GetContentRegionAvail().x;
+			float contentWidth = ImGui::GetContentRegionAvail().x;
 
 			for (int32_t i = 0; i < static_cast<int32_t>(m_Completions.size()); ++i) {
 				const Core::ConsoleCompletion& completion = m_Completions[i];
-				const bool selected = i == m_CompletionIndex;
+				bool selected = i == m_CompletionIndex;
 
 				m_CompletionScratch = { completion.m_Text.data(), completion.m_Text.size() };
 
@@ -404,7 +404,7 @@ namespace Cori {
 	}
 
 	void ConsolePanel::MoveCompletionSelection(const int32_t delta) {
-		const auto count = static_cast<int32_t>(m_Completions.size());
+		auto count = static_cast<int32_t>(m_Completions.size());
 		if (count == 0) {
 			return;
 		}
@@ -424,7 +424,7 @@ namespace Cori {
 
 		uint64_t wordBegin = caret;
 		while (wordBegin > 0) {
-			const char previous = line[wordBegin - 1];
+			char previous = line[wordBegin - 1];
 			if (previous == ' ' || previous == '\t' || previous == '"') {
 				break;
 			}
@@ -440,7 +440,7 @@ namespace Cori {
 		}
 
 		const std::string_view text = m_Completions[static_cast<uint64_t>(index)].m_Text;
-		const bool needsQuotes = text.find(' ') != std::string_view::npos;
+		bool needsQuotes = text.find(' ') != std::string_view::npos;
 
 		std::string result;
 		result.append(line.substr(0, wordBegin));
@@ -455,7 +455,7 @@ namespace Cori {
 		}
 		result += ' ';
 
-		const uint64_t newCaret = result.size();
+		uint64_t newCaret = result.size();
 		result.append(line.substr(tailBegin));
 
 		return { result, newCaret };
@@ -483,7 +483,7 @@ namespace Cori {
 		}
 		m_HistoryPos = -1;
 
-		const Core::ConsoleResult result = Core::Console::Execute(command);
+		Core::ConsoleResult result = Core::Console::Execute(command);
 
 		if (result) {
 			if (!result->empty()) {
@@ -527,10 +527,10 @@ namespace Cori {
 		}
 
 		const std::string_view line(data->Buf, static_cast<uint64_t>(data->BufTextLen));
-		const auto caret = static_cast<uint64_t>(data->CursorPos);
+		auto caret = static_cast<uint64_t>(data->CursorPos);
 
 		if (m_AcceptIndex >= 0 && m_AcceptIndex < static_cast<int32_t>(m_Completions.size())) {
-			const auto [completed, newCaret] = BuildCompletedLine(line, caret, m_AcceptIndex);
+			auto [completed, newCaret] = BuildCompletedLine(line, caret, m_AcceptIndex);
 			m_AcceptIndex = -1;
 
 			data->DeleteChars(0, data->BufTextLen);
@@ -552,11 +552,11 @@ namespace Cori {
 
 	int ConsolePanel::OnPromptCompletion(ImGuiInputTextCallbackData* data) {
 		const std::string_view line(data->Buf, static_cast<uint64_t>(data->BufTextLen));
-		const auto caret = std::min(static_cast<uint64_t>(data->CursorPos), line.size());
+		auto caret = std::min(static_cast<uint64_t>(data->CursorPos), line.size());
 
 		uint64_t wordBegin = caret;
 		while (wordBegin > 0) {
-			const char previous = line[wordBegin - 1];
+			char previous = line[wordBegin - 1];
 			if (previous == ' ' || previous == '\t' || previous == '"') {
 				break;
 			}
@@ -576,11 +576,12 @@ namespace Cori {
 		}
 
 		if (!word.empty()) {
-			if (const std::string usage = Core::Console::Usage(word); !usage.empty()) {
+			const std::string usage = Core::Console::Usage(word);
+			if (!usage.empty()) {
 				CORI_LOG_CORE_TAGGED(::Cori::LogLevel::eInfo, { Logger::Tags::Core::Self, Logger::Tags::Core::Console }, "{}", usage);
 
 				const Core::CVarDesc* desc = Core::Console::Find(word);
-				const bool hasValueList = desc != nullptr && (desc->IsEnum() || desc->m_Type == Core::CVarType::eBool);
+				bool hasValueList = desc != nullptr && (desc->IsEnum() || desc->m_Type == Core::CVarType::eBool);
 
 				if (hasValueList && caret == line.size()) {
 					data->InsertChars(data->CursorPos, " ");
@@ -590,13 +591,14 @@ namespace Cori {
 		}
 
 		if (m_Completions.empty()) {
-			if (const std::string usage = Core::Console::ContextUsage(line, caret); !usage.empty()) {
+			const std::string usage = Core::Console::ContextUsage(line, caret);
+			if (!usage.empty()) {
 				CORI_LOG_CORE_TAGGED(::Cori::LogLevel::eInfo, { Logger::Tags::Core::Self, Logger::Tags::Core::Console }, "{}", usage);
 			}
 			return 0;
 		}
 
-		const auto [completed, newCaret] = BuildCompletedLine(line, caret, 0);
+		auto [completed, newCaret] = BuildCompletedLine(line, caret, 0);
 
 		data->DeleteChars(0, data->BufTextLen);
 		data->InsertChars(0, completed.c_str(), completed.c_str() + completed.size());
@@ -613,7 +615,7 @@ namespace Cori {
 
 	int ConsolePanel::OnPromptHistory(ImGuiInputTextCallbackData* data) {
 		if (m_CompletionOpen && m_Completions.size() > 1) {
-			const int32_t delta = data->EventKey == ImGuiKey_UpArrow ? -1 : 1;
+			int32_t delta = data->EventKey == ImGuiKey_UpArrow ? -1 : 1;
 			if (!m_Cycling) {
 				BeginCycle(std::string_view(data->Buf, static_cast<uint64_t>(data->BufTextLen)), static_cast<uint64_t>(data->CursorPos));
 			}
@@ -627,8 +629,8 @@ namespace Cori {
 			return 0;
 		}
 
-		const int32_t previous = m_HistoryPos;
-		const auto count = static_cast<int32_t>(m_History.size());
+		int32_t previous = m_HistoryPos;
+		auto count = static_cast<int32_t>(m_History.size());
 
 		if (data->EventKey == ImGuiKey_UpArrow) {
 			if (m_HistoryPos < 0) {
@@ -713,8 +715,8 @@ namespace Cori {
 			ImGui::TextDisabled("%zu selected / %zu / %zu", static_cast<uint64_t>(CountSelectedRows()), static_cast<uint64_t>(GetVisibleCount()), static_cast<uint64_t>(GetHeldCount()));
 		}
 
-		const auto levelBadge = [this](const LogLevel level) {
-			const auto index = static_cast<uint64_t>(level);
+		auto levelBadge = [this](const LogLevel level) {
+			auto index = static_cast<uint64_t>(level);
 			if (index >= m_LevelCounts.size() || m_LevelCounts[index] == 0) {
 				return;
 			}
@@ -775,7 +777,7 @@ namespace Cori {
 
 		ImGui::PushID(static_cast<int>(index));
 
-		const bool open = ImGui::TreeNodeEx(node.m_Label.c_str(), flags);
+		bool open = ImGui::TreeNodeEx(node.m_Label.c_str(), flags);
 
 		constexpr float comboWidth = 76.0f;
 
@@ -805,15 +807,15 @@ namespace Cori {
 
 			ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-			const float lineHeight = ImGui::GetTextLineHeight();
-			const float rowWidth = std::max(m_MaxRowWidth, ImGui::GetContentRegionAvail().x);
+			float lineHeight = ImGui::GetTextLineHeight();
+			float rowWidth = std::max(m_MaxRowWidth, ImGui::GetContentRegionAvail().x);
 
 			ImGuiListClipper clipper;
 			clipper.Begin(static_cast<int>(GetVisibleCount()), lineHeight + ImGui::GetStyle().ItemSpacing.y);
 
 			while (clipper.Step()) {
-				const auto first = static_cast<uint64_t>(clipper.DisplayStart);
-				const auto last = static_cast<uint64_t>(clipper.DisplayEnd);
+				auto first = static_cast<uint64_t>(clipper.DisplayStart);
+				auto last = static_cast<uint64_t>(clipper.DisplayEnd);
 
 				m_VisibleRowsThisFrame.clear();
 				for (uint64_t row = first; row < last; ++row) {
@@ -850,25 +852,25 @@ namespace Cori {
 	void ConsolePanel::DrawEntry(const uint64_t row, const LogRecord& record, ImDrawList* drawList, const float lineHeight, const float rowWidth) {
 		const VisibleEntry& entry = GetVisible(row);
 
-		const ImVec2 origin = ImGui::GetCursorScreenPos();
+		ImVec2 origin = ImGui::GetCursorScreenPos();
 
 		ImGui::PushID(static_cast<int>(entry.m_Sequence));
 		ImGui::InvisibleButton("##row", ImVec2(rowWidth, lineHeight));
-		const bool pressed = ImGui::IsItemActivated();
+		bool pressed = ImGui::IsItemActivated();
 		ImGui::PopID();
 
 		if (record.m_Sequence != entry.m_Sequence) {
 			return;
 		}
 
-		const uint64_t messageStart = BuildLine(record);
+		uint64_t messageStart = BuildLine(record);
 		const std::string_view line = m_RowScratch;
 
 		const char* begin = m_RowScratch.data();
 		const char* end = begin + m_RowScratch.size();
 
 		if (pressed) {
-			const uint32_t index = CharIndexAt(line, ImGui::GetIO().MousePos.x - origin.x);
+			uint32_t index = CharIndexAt(line, ImGui::GetIO().MousePos.x - origin.x);
 
 			m_SelectAnchor = TextCursor{ .m_Sequence = entry.m_Sequence, .m_Char = ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) ? 0 : index };
 			m_SelectHead = TextCursor{ .m_Sequence = entry.m_Sequence, .m_Char = ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) ? static_cast<uint32_t>(line.size()) : index };
@@ -876,7 +878,7 @@ namespace Cori {
 			m_Selecting = !ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left);
 		}
 		else if (m_Selecting && ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-			const float mouseY = ImGui::GetIO().MousePos.y;
+			float mouseY = ImGui::GetIO().MousePos.y;
 
 			if (mouseY >= origin.y && mouseY < origin.y + lineHeight) {
 				m_SelectHead = TextCursor{ .m_Sequence = entry.m_Sequence, .m_Char = CharIndexAt(line, ImGui::GetIO().MousePos.x - origin.x) };
@@ -884,15 +886,15 @@ namespace Cori {
 		}
 
 		if (m_HasSelection) {
-			const auto [selectionBegin, selectionEnd] = GetSelectionRange();
+			auto [selectionBegin, selectionEnd] = GetSelectionRange();
 
 			if (entry.m_Sequence >= selectionBegin.m_Sequence && entry.m_Sequence <= selectionEnd.m_Sequence) {
-				const uint64_t from = entry.m_Sequence == selectionBegin.m_Sequence ? std::min<uint64_t>(selectionBegin.m_Char, line.size()) : 0;
-				const uint64_t to = entry.m_Sequence == selectionEnd.m_Sequence ? std::min<uint64_t>(selectionEnd.m_Char, line.size()) : line.size();
+				uint64_t from = entry.m_Sequence == selectionBegin.m_Sequence ? std::min<uint64_t>(selectionBegin.m_Char, line.size()) : 0;
+				uint64_t to = entry.m_Sequence == selectionEnd.m_Sequence ? std::min<uint64_t>(selectionEnd.m_Char, line.size()) : line.size();
 
 				if (to > from || entry.m_Sequence != selectionEnd.m_Sequence) {
-					const float x0 = origin.x + ImGui::CalcTextSize(begin, begin + from).x;
-					const float x1 = origin.x + ImGui::CalcTextSize(begin, begin + to).x + (entry.m_Sequence != selectionEnd.m_Sequence ? ImGui::CalcTextSize(" ").x : 0.0f);
+					float x0 = origin.x + ImGui::CalcTextSize(begin, begin + from).x;
+					float x1 = origin.x + ImGui::CalcTextSize(begin, begin + to).x + (entry.m_Sequence != selectionEnd.m_Sequence ? ImGui::CalcTextSize(" ").x : 0.0f);
 
 					drawList->AddRectFilled(ImVec2(x0, origin.y), ImVec2(x1, origin.y + lineHeight), ImGui::GetColorU32(ImGuiCol_TextSelectedBg));
 				}
@@ -918,7 +920,7 @@ namespace Cori {
 		m_RowScratch.clear();
 
 		if (!record.m_Continuation) {
-			const auto separate = [this] {
+			auto separate = [this] {
 				if (!m_RowScratch.empty()) {
 					m_RowScratch.push_back(' ');
 				}
@@ -952,7 +954,7 @@ namespace Cori {
 			}
 		}
 
-		const uint64_t messageStart = m_RowScratch.size();
+		uint64_t messageStart = m_RowScratch.size();
 		m_RowScratch.append(record.m_Message);
 
 		return messageStart;
@@ -977,14 +979,14 @@ namespace Cori {
 			return 0;
 		}
 
-		const auto [selectionBegin, selectionEnd] = GetSelectionRange();
+		auto [selectionBegin, selectionEnd] = GetSelectionRange();
 
-		const auto lowerBoundRow = [this](const uint64_t sequence) {
+		auto lowerBoundRow = [this](const uint64_t sequence) {
 			uint64_t low = 0;
 			uint64_t high = GetVisibleCount();
 
 			while (low < high) {
-				const uint64_t mid = low + (high - low) / 2;
+				uint64_t mid = low + (high - low) / 2;
 
 				if (GetVisible(mid).m_Sequence < sequence) {
 					low = mid + 1;
@@ -1033,7 +1035,7 @@ namespace Cori {
 	}
 
 	void ConsolePanel::CopyToClipboard() {
-		const bool ranged = m_HasSelection && m_SelectAnchor != m_SelectHead;
+		bool ranged = m_HasSelection && m_SelectAnchor != m_SelectHead;
 		if (!ranged) {
 			return;
 		}
@@ -1041,7 +1043,7 @@ namespace Cori {
 		TextCursor selectionBegin{};
 		TextCursor selectionEnd{};
 
-		const auto range = GetSelectionRange();
+		auto range = GetSelectionRange();
 		selectionBegin = range.first;
 		selectionEnd = range.second;
 
@@ -1049,7 +1051,7 @@ namespace Cori {
 		sequences.reserve(GetVisibleCount());
 
 		for (uint64_t row = 0; row < GetVisibleCount(); ++row) {
-			const uint64_t sequence = GetVisible(row).m_Sequence;
+			uint64_t sequence = GetVisible(row).m_Sequence;
 
 			if (ranged && (sequence < selectionBegin.m_Sequence || sequence > selectionEnd.m_Sequence)) {
 				continue;
@@ -1103,8 +1105,8 @@ namespace Cori {
 
 		if (ImGui::BeginCombo(label, LogLevelName(level))) {
 			for (uint8_t i = 0; i <= static_cast<uint8_t>(highest); ++i) {
-				const auto candidate = static_cast<LogLevel>(i);
-				const bool selected = candidate == level;
+				auto candidate = static_cast<LogLevel>(i);
+				bool selected = candidate == level;
 
 				if (ImGui::Selectable(LogLevelName(candidate), selected)) {
 					level = candidate;

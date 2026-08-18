@@ -563,7 +563,7 @@ namespace Cori {
 					commandBuffer.setViewportWithCount(vk::Viewport(0.0f, 0.0f, static_cast<float>(prtExtent.width), static_cast<float>(prtExtent.height), 0.0f, 1.0f));
 					commandBuffer.setScissorWithCount(vk::Rect2D(vk::Offset2D(0, 0), prtExtent));
 
-					vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 0.0f);
+					vk::ClearValue clearColor = vk::ClearColorValue(0.0f, 0.0f, 0.0f, 1.0f);
 					vk::RenderingAttachmentInfo attachmentInfo = {
 							.imageView = prtImageView,
 							.imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
@@ -666,6 +666,7 @@ namespace Cori {
 					commandBuffer.endRendering();
 
 					//drawn here rather than as its own graph pass because the PRT is imported, so the graph can not order a separate pass against the scene draw or against the handover below
+					//FIXME: this looks ugly in tracy cuz 2 passes are shown as 1 'Indirect Pass', add support to external images to render graph
 					if (recordOutline) {
 						CORI_VK_LABEL(commandBuffer, "Outline", DebugLabelColors::Scene);
 
