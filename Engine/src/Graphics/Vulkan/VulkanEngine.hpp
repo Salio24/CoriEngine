@@ -245,6 +245,7 @@ namespace Cori {
 			void CreateGPUProfilerContexts();
 
 			void InitializeVMA();
+
 			vk::Extent2D GetTargetSwapChainExtent();
 
 			void CreateSwapChain();

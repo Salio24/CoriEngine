@@ -10,6 +10,7 @@
 /Tools/TracyCapture/*
 /Tools/internal/*
 /cmake-*
+*__pycache__*
 
 # git submodules 
 /Engine/thirdparty/freetype/*

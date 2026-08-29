@@ -120,6 +120,9 @@ project(CoriEngine)
     set(MSDFGEN_DISABLE_PNG ON CACHE BOOL "")
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/msdf-atlas-gen EXCLUDE_FROM_ALL)
 
+    #vulkan headers
+    add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/Vulkan-Headers)
+
 # dear imgui
     add_library(imgui STATIC
             ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui/imgui.cpp
@@ -135,7 +138,7 @@ project(CoriEngine)
     target_compile_definitions(imgui PUBLIC IMGUI_ENABLE_FREETYPE)
     target_compile_definitions(imgui PRIVATE IMGUI_IMPL_VULKAN_NO_PROTOTYPES)
     target_include_directories(imgui PUBLIC ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui_club)
-    target_link_libraries(imgui PRIVATE SDL3::SDL3-static freetype)
+    target_link_libraries(imgui PRIVATE SDL3::SDL3-static freetype Vulkan::Headers)
 
     #tracy
     if (CORI_ENABLE_TRACY_PROFILER)
@@ -211,15 +214,11 @@ project(CoriEngine)
     set(BUILD_TESTING OFF)
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/pfr EXCLUDE_FROM_ALL)
 
-
-    add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/Vulkan-Headers)
-
     #vma
     add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/VulkanMemoryAllocator-Hpp EXCLUDE_FROM_ALL)
     #note: this implicitly includes vulkan headers
 
     #vulkan loader
-    set(LOADER_CODEGEN ON)
     set(LOADER_ENABLE_ADDRESS_SANITIZER OFF)
     set(LOADER_ENABLE_THREAD_SANITIZER OFF)
 
