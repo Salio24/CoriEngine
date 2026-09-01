@@ -57,10 +57,28 @@ namespace Cori {
 
 			CORI_CORE_VERIFY(m_Data->m_SDLModes, "Failed to get screen modes, Window '{}' can not be created. SDL_Error: {}",  title, SDL_GetError());
 
+			const SDL_DisplayMode* desktopMode = SDL_GetDesktopDisplayMode(m_Data->m_PrimaryDisplayID);
+			const float desktopPixelDensity = (desktopMode && desktopMode->pixel_density > 0.0f) ? desktopMode->pixel_density : 1.0f;
+
 			for (int32_t i = 0; i < m_Data->m_DisplayModeCount; i++) {
-				ScreenMode mode(m_Data->m_SDLModes[i]->w, m_Data->m_SDLModes[i]->h, m_Data->m_SDLModes[i]->refresh_rate, i);
-				m_Data->m_ScreenModes.emplace_back(mode);
+				const SDL_DisplayMode* sdlMode = m_Data->m_SDLModes[i];
+				const float pixelDensity = sdlMode->pixel_density > 0.0f ? sdlMode->pixel_density : 1.0f;
+
+				ScreenMode mode(sdlMode->w, sdlMode->h, sdlMode->refresh_rate, pixelDensity, i);
+
+				const auto duplicate = std::ranges::find_if(m_Data->m_ScreenModes, [&mode](const ScreenMode& existing) {
+					return existing.m_Width == mode.m_Width && existing.m_Height == mode.m_Height && existing.m_RefreshRate == mode.m_RefreshRate;
+				});
+
+				if (duplicate == m_Data->m_ScreenModes.end()) {
+					m_Data->m_ScreenModes.emplace_back(mode);
+				}
+				else if (std::abs(mode.m_PixelDensity - desktopPixelDensity) < std::abs(duplicate->m_PixelDensity - desktopPixelDensity)) {
+					*duplicate = mode;
+				}
 			}
+
+			CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Display {} reports {} display modes, which collapse into {} distinct resolutions.", m_Data->m_PrimaryDisplayID, m_Data->m_DisplayModeCount, m_Data->m_ScreenModes.size());
 
 			ScreenMode mode = m_Data->m_ScreenModes[0];
 
@@ -75,16 +93,17 @@ namespace Cori {
 					CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to read the saved window configuration from '{}', falling back to the default screen mode. Error: {}", savePath.string(), data.error().what());
 				}
 				else if (data->m_SDLModeIndex >= static_cast<uint32_t>(m_Data->m_DisplayModeCount) || data->m_ModeIndex >= m_Data->m_ScreenModes.size()) {
-					CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "The saved window configuration points at screen mode {} (SDL mode {}), but this display only reports {} modes. Falling back to the default screen mode.", data->m_ModeIndex, data->m_SDLModeIndex, m_Data->m_DisplayModeCount);
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "The saved window configuration points at screen mode {} (SDL mode {}), but this display only reports {} resolutions across {} modes. Falling back to the default screen mode.", data->m_ModeIndex, data->m_SDLModeIndex, m_Data->m_ScreenModes.size(), m_Data->m_DisplayModeCount);
 				}
-				else if (m_Data->m_SDLModes[data->m_SDLModeIndex]->w != data->m_Width || m_Data->m_SDLModes[data->m_SDLModeIndex]->h != data->m_Height || m_Data->m_SDLModes[data->m_SDLModeIndex]->refresh_rate != data->m_RefreshRate ||
-					m_Data->m_ScreenModes[data->m_ModeIndex].m_Width != data->m_Width || m_Data->m_ScreenModes[data->m_ModeIndex].m_Height != data->m_Height || m_Data->m_ScreenModes[data->m_ModeIndex].m_RefreshRate != data->m_RefreshRate) {
-					CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "The saved window configuration ({}x{} {} Hz) no longer describes the mode it was saved under, the display setup has most likely changed. Falling back to the default screen mode.", data->m_Width, data->m_Height, data->m_RefreshRate);
+				else if (const ScreenMode& savedMode = m_Data->m_ScreenModes[data->m_ModeIndex];
+					savedMode.m_Width != data->m_Width || savedMode.m_Height != data->m_Height || savedMode.m_RefreshRate != data->m_RefreshRate || savedMode.m_PixelDensity != data->m_PixelDensity || savedMode.m_SDLModeIndex != data->m_SDLModeIndex) {
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "The saved window configuration ({}x{} pixels, {} Hz, {}x pixel density) no longer describes the mode it was saved under, the display setup has most likely changed. Falling back to the default screen mode.", data->m_Width, data->m_Height, data->m_RefreshRate, data->m_PixelDensity);
 				}
 				else {
 					mode.m_Width = data->m_Width;
 					mode.m_Height = data->m_Height;
 					mode.m_RefreshRate = data->m_RefreshRate;
+					mode.m_PixelDensity = data->m_PixelDensity;
 					mode.m_SDLModeIndex = data->m_SDLModeIndex;
 					m_Data->m_CurrentWindowMode = data->m_WindowMode;
 					m_Data->m_CurrentScreenMode = data->m_ModeIndex;
@@ -105,8 +124,8 @@ namespace Cori {
 
 			const SDL_PropertiesID props = SDL_CreateProperties();
 			SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, m_Data->m_WindowTitle.c_str());
-			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, m_Data->m_ScreenModes[0].m_Width);
-			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, m_Data->m_ScreenModes[0].m_Height);
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, std::lround(static_cast<float>(m_Data->m_ScreenModes[0].m_Width) / desktopPixelDensity));
+			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, std::lround(static_cast<float>(m_Data->m_ScreenModes[0].m_Height) / desktopPixelDensity));
 			//SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, 800);
 			//SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, 600);
 			SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, displayBounds.x);
@@ -114,6 +133,7 @@ namespace Cori {
 			SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_FULLSCREEN_BOOLEAN, false);
 			SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_VULKAN_BOOLEAN, true);
 			//SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_RESIZABLE_BOOLEAN, true);
+			SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_HIGH_PIXEL_DENSITY_BOOLEAN, true);
 
 
 			m_Data->m_Window = SDL_CreateWindowWithProperties(props);
@@ -162,7 +182,14 @@ namespace Cori {
 			m_Data->m_MouseDelta = { 0.0f, 0.0f };
 			m_Data->m_OldestInputTimestamp = 0;
 
+			const float pixelDensity = GetPixelDensity();
+
 			while (SDL_PollEvent(&e)) {
+				if (e.type == SDL_EVENT_MOUSE_MOTION) {
+					e.motion.x *= pixelDensity;
+					e.motion.y *= pixelDensity;
+				}
+
 				if (e.type == SDL_EVENT_MOUSE_WHEEL) {
 					if (!hasWheel) { wheelEvent = e; hasWheel = true; }
 					else { wheelEvent.wheel.x += e.wheel.x; wheelEvent.wheel.y += e.wheel.y; }
@@ -196,11 +223,29 @@ namespace Cori {
 							break;
 						}
 
-						int x, y;
+						WindowLogicalResizeEvent resizeEvent(GetLogicalWidth(), GetLogicalHeight());
+						m_Data->m_EventCallback(resizeEvent);
 
-						SDL_GetWindowSizeInPixels(m_Data->m_Window, &x, &y);
+						break;
+					}
+				case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+					{
+						if (e.window.windowID != SDL_GetWindowID(m_Data->m_Window)) {
+							break;
+						}
 
-						WindowResizeEvent resizeEvent(GetWidth(), GetHeight());
+						WindowPixelResizeEvent resizeEvent(GetPixelWidth(), GetPixelHeight());
+						m_Data->m_EventCallback(resizeEvent);
+
+						break;
+					}
+				case SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED:
+					{
+						if (e.window.windowID != SDL_GetWindowID(m_Data->m_Window)) {
+							break;
+						}
+
+						WindowDisplayScaleChangedEvent resizeEvent(GetDisplayScale());
 						m_Data->m_EventCallback(resizeEvent);
 
 						break;
@@ -270,26 +315,64 @@ namespace Cori {
 			}
 		}
 
-		int32_t Window::GetWidth() const {
-			//if (m_Data->m_CurrentWindowMode != WindowMode::BORDERLESS_WINDOWED) {
-			//	return m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Width;
-			//}
-			//return m_Data->m_ScreenModes[0].m_Width;
-
+		int32_t Window::GetPixelWidth() const {
 			int x, y;
 			SDL_GetWindowSizeInPixels(m_Data->m_Window, &x, &y);
 			return x;
 		}
 
-		int32_t Window::GetHeight() const {
-			//if (m_Data->m_CurrentWindowMode != WindowMode::BORDERLESS_WINDOWED) {
-			//	return m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Height;
-			//}
-			//return m_Data->m_ScreenModes[0].m_Height;
-
+		int32_t Window::GetPixelHeight() const {
 			int x, y;
 			SDL_GetWindowSizeInPixels(m_Data->m_Window, &x, &y);
 			return y;
+		}
+
+		int32_t Window::GetLogicalWidth() const {
+			int x, y;
+			SDL_GetWindowSize(m_Data->m_Window, &x, &y);
+			return x;
+		}
+
+		int32_t Window::GetLogicalHeight() const {
+			int x, y;
+			SDL_GetWindowSize(m_Data->m_Window, &x, &y);
+			return y;
+		}
+
+		float Window::GetPixelDensity() const {
+			const float pixelDensity = SDL_GetWindowPixelDensity(m_Data->m_Window);
+			if (pixelDensity <= 0.0f) {
+				CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to query the pixel density of window '{}', assuming 1.0. SDL_Error: {}", m_Data->m_WindowTitle, SDL_GetError());
+				return 1.0f;
+			}
+			return pixelDensity;
+		}
+
+		float Window::GetDisplayScale() const {
+			const float displayScale = SDL_GetWindowDisplayScale(m_Data->m_Window);
+			if (displayScale <= 0.0f) {
+				CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to query the display scale of window '{}', assuming 1.0. SDL_Error: {}", m_Data->m_WindowTitle, SDL_GetError());
+				return 1.0f;
+			}
+			return displayScale;
+		}
+
+		std::pair<int32_t, int32_t> Window::GetLogicalSizeForScreenMode(const ScreenMode& mode) const {
+			const float pixelDensity = GetPixelDensity();
+
+			auto logicalWidth = static_cast<int32_t>(std::lround(static_cast<float>(mode.m_Width) / pixelDensity));
+			auto logicalHeight = static_cast<int32_t>(std::lround(static_cast<float>(mode.m_Height) / pixelDensity));
+
+			SDL_Rect usableBounds;
+			if (SDL_GetDisplayUsableBounds(SDL_GetDisplayForWindow(m_Data->m_Window), &usableBounds)) {
+				logicalWidth = std::min(logicalWidth, usableBounds.w);
+				logicalHeight = std::min(logicalHeight, usableBounds.h);
+			}
+			else {
+				CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to query the usable bounds of the display window '{}' is on, screen mode '{}' will be applied without clamping it to what the desktop can hold. SDL_Error: {}", m_Data->m_WindowTitle, mode.m_ModeName, SDL_GetError());
+			}
+
+			return { std::max(logicalWidth, 1), std::max(logicalHeight, 1) };
 		}
 
 		// ReSharper disable once CppMemberFunctionMayBeConst
@@ -364,16 +447,18 @@ namespace Cori {
 				return;
 			}
 
+			static constexpr int32_t s_RoundingTolerance{ 1 };
+
 			const ScreenMode& previousMode = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode];
-			if (previousMode.m_Width == w && previousMode.m_Height == h) {
+			if (std::abs(previousMode.m_Width - w) <= s_RoundingTolerance && std::abs(previousMode.m_Height - h) <= s_RoundingTolerance) {
 				return;
 			}
 
-			static std::vector<std::pair<SDL_DisplayMode*, int32_t>> candidates{ 5 };
+			static std::vector<std::pair<const ScreenMode*, int32_t>> candidates{ 5 };
 			candidates.clear();
-			for (int32_t i = 0; i < m_Data->m_DisplayModeCount; i++) {
-				if (m_Data->m_SDLModes[i]->w == w && m_Data->m_SDLModes[i]->h == h) {
-					candidates.emplace_back(m_Data->m_SDLModes[i], i);
+			for (int32_t i = 0; i < static_cast<int32_t>(m_Data->m_ScreenModes.size()); i++) {
+				if (m_Data->m_ScreenModes[i].m_Width == w && m_Data->m_ScreenModes[i].m_Height == h) {
+					candidates.emplace_back(&m_Data->m_ScreenModes[i], i);
 				}
 			}
 
@@ -383,7 +468,7 @@ namespace Cori {
 				if (lastReportedWidth != w || lastReportedHeight != h) {
 					lastReportedWidth = w;
 					lastReportedHeight = h;
-					CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window '{}' is {}x{}, which matches neither the current screen mode '{}' nor any of the {} modes this display reports. Keeping screen mode {} and leaving the saved configuration untouched.", m_Data->m_WindowTitle, w, h, previousMode.m_ModeName, m_Data->m_DisplayModeCount, m_Data->m_CurrentScreenMode);
+					CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window '{}' is {}x{} pixels, which matches neither the current screen mode '{}' nor any of the {} resolutions this display reports. Keeping screen mode {} and leaving the saved configuration untouched.", m_Data->m_WindowTitle, w, h, previousMode.m_ModeName, m_Data->m_ScreenModes.size(), m_Data->m_CurrentScreenMode);
 				}
 				return;
 			}
@@ -392,13 +477,13 @@ namespace Cori {
 			int32_t bestCandidate = candidates.front().second;
 
 			for (const auto& candidate : candidates) {
-				if (candidate.first->refresh_rate > maxRefreshRate) {
-					maxRefreshRate = candidate.first->refresh_rate;
+				if (candidate.first->m_RefreshRate > maxRefreshRate) {
+					maxRefreshRate = candidate.first->m_RefreshRate;
 					bestCandidate = candidate.second;
 				}
 			}
 
-			CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window '{}' is {}x{} but its screen mode was '{}', adopting screen mode {} '{}' ({} of {} display modes matched that size, the one with the highest refresh rate was taken).", m_Data->m_WindowTitle, w, h, previousMode.m_ModeName, bestCandidate, m_Data->m_ScreenModes[bestCandidate].m_ModeName, candidates.size(), m_Data->m_DisplayModeCount);
+			CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window '{}' is {}x{} pixels but its screen mode was '{}', adopting screen mode {} '{}' ({} of {} resolutions matched that size, the one with the highest refresh rate was taken).", m_Data->m_WindowTitle, w, h, previousMode.m_ModeName, bestCandidate, m_Data->m_ScreenModes[bestCandidate].m_ModeName, candidates.size(), m_Data->m_ScreenModes.size());
 
 			m_Data->m_CurrentScreenMode = bestCandidate;
 
@@ -409,7 +494,7 @@ namespace Cori {
 			const std::filesystem::path savePath = FileSystem::PathManager::GetAliasedPath("USER_DATA") / "settings/window.bin";
 			std::filesystem::create_directories(savePath.parent_path());
 			const ScreenMode& currentMode = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode];
-			const WindowSaveData data{ .m_Width = currentMode.m_Width, .m_Height = currentMode.m_Height, .m_RefreshRate = currentMode.m_RefreshRate, .m_WindowMode = m_Data->m_CurrentWindowMode, .m_SDLModeIndex = currentMode.m_SDLModeIndex, .m_ModeIndex = m_Data->m_CurrentScreenMode, .m_Resizable = m_Data->m_WindowResizable };
+			const WindowSaveData data{ .m_Width = currentMode.m_Width, .m_Height = currentMode.m_Height, .m_RefreshRate = currentMode.m_RefreshRate, .m_PixelDensity = currentMode.m_PixelDensity, .m_WindowMode = m_Data->m_CurrentWindowMode, .m_SDLModeIndex = currentMode.m_SDLModeIndex, .m_ModeIndex = m_Data->m_CurrentScreenMode, .m_Resizable = m_Data->m_WindowResizable };
 			FileSystem::BinaryFileManager::SaveAggregateStruct(data, savePath);
 		}
 
@@ -451,19 +536,12 @@ namespace Cori {
 						CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to add border to the window. SDL_Error: {}", SDL_GetError());
 					}
 
-					const SDL_DisplayMode* desktopMode = SDL_GetCurrentDisplayMode(m_Data->m_PrimaryDisplayID);
+					const ScreenMode& screenMode = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode];
+					const auto [logicalWidth, logicalHeight] = GetLogicalSizeForScreenMode(screenMode);
 
-					if (m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Width <= desktopMode->w && m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Height <= desktopMode->h) {
-						success = SDL_SetWindowSize(m_Data->m_Window, m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Width, m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Height);
-						if (!success) {
-							return std::unexpected(CoriError(std::format("Failed to set window mode to 'Windowed'. SDL_Error: {}", SDL_GetError())));
-						}
-					}
-					else {
-						success = SDL_SetWindowSize(m_Data->m_Window, desktopMode->w, desktopMode->h);
-						if (!success) {
-							return std::unexpected(CoriError(std::format("Failed to set window mode to 'Windowed'. SDL_Error: {}", SDL_GetError())));
-						}
+					success = SDL_SetWindowSize(m_Data->m_Window, logicalWidth, logicalHeight);
+					if (!success) {
+						return std::unexpected(CoriError(std::format("Failed to set window mode to 'Windowed'. SDL_Error: {}", SDL_GetError())));
 					}
 
 					const bool windowMoveSuccess = SDL_SetWindowPosition(m_Data->m_Window, SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID), SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID));
@@ -471,7 +549,7 @@ namespace Cori {
 						CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to set window position to the center of the main screen. (This is expected on Wayland) SDL_Error: {}", SDL_GetError());
 					}
 
-					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window set to 'Windowed' mode. Screen mode: (Width: {}, Height: {})", m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Width, m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Height);
+					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window set to 'Windowed' mode. Screen mode: (Width: {}, Height: {}) pixels, requested from the window manager as {}x{} points.", screenMode.m_Width, screenMode.m_Height, logicalWidth, logicalHeight);
 
 					m_Data->m_CurrentWindowMode = mode;
 
@@ -523,7 +601,7 @@ namespace Cori {
 						return std::unexpected(CoriError(std::format("Failed to set window mode to 'Exclusive Fullscreen'. SDL_Error: {}", SDL_GetError())));
 					}
 
-					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window set to 'Exclusive Fullscreen' mode. Screen mode: (Width: {}, Height: {}, Refresh Rate: {})", sdlMode->w, sdlMode->h, sdlMode->refresh_rate);
+					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window set to 'Exclusive Fullscreen' mode. Screen mode: (Width: {}, Height: {}, Refresh Rate: {}), which SDL describes as {}x{} points at {}x pixel density.", m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Width, m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Height, sdlMode->refresh_rate, sdlMode->w, sdlMode->h, sdlMode->pixel_density);
 
 					m_Data->m_CurrentWindowMode = mode;
 
@@ -549,22 +627,12 @@ namespace Cori {
 					}
 					m_Data->m_WindowResizable = true;
 
-					const SDL_DisplayMode* desktopMode = SDL_GetCurrentDisplayMode(m_Data->m_PrimaryDisplayID);
-					if (!desktopMode) {
-						return std::unexpected(CoriError(std::format("Failed to set window mode to 'Resizable'. SDL_Error: {}", SDL_GetError())));
-					}
+					const ScreenMode& screenMode = m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode];
+					const auto [logicalWidth, logicalHeight] = GetLogicalSizeForScreenMode(screenMode);
 
-					if (m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Width <= desktopMode->w && m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Height <= desktopMode->h) {
-						success = SDL_SetWindowSize(m_Data->m_Window, m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Width, m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Height);
-						if (!success) {
-							return std::unexpected(CoriError(std::format("Failed to set window mode to 'Resizable'. SDL_Error: {}", SDL_GetError())));
-						}
-					}
-					else {
-						success = SDL_SetWindowSize(m_Data->m_Window, desktopMode->w, desktopMode->h);
-						if (!success) {
-							return std::unexpected(CoriError(std::format("Failed to set window mode to 'Resizable'. SDL_Error: {}", SDL_GetError())));
-						}
+					success = SDL_SetWindowSize(m_Data->m_Window, logicalWidth, logicalHeight);
+					if (!success) {
+						return std::unexpected(CoriError(std::format("Failed to set window mode to 'Resizable'. SDL_Error: {}", SDL_GetError())));
 					}
 
 					const bool windowMoveSuccess = SDL_SetWindowPosition(m_Data->m_Window, SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID), SDL_WINDOWPOS_CENTERED_DISPLAY(m_Data->m_PrimaryDisplayID));
@@ -572,7 +640,7 @@ namespace Cori {
 						CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Failed to set window position to the center of the main screen. (This is expected on Wayland) SDL_Error: {}", SDL_GetError());
 					}
 
-					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window set to 'Resizable' mode. Screen mode: (Width: {}, Height: {})", m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Width, m_Data->m_ScreenModes[m_Data->m_CurrentScreenMode].m_Height);
+					CORI_CORE_DEBUG_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Window set to 'Resizable' mode. Screen mode: (Width: {}, Height: {}) pixels, requested from the window manager as {}x{} points.", screenMode.m_Width, screenMode.m_Height, logicalWidth, logicalHeight);
 
 					m_Data->m_CurrentWindowMode = mode;
 

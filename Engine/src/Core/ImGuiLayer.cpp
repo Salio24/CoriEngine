@@ -13,6 +13,7 @@ namespace Cori {
 
 				io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
 				io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // Enable docking
+
 				//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable multi-viewport
 				// big L wayland
 				// no multi-viewport support with threading, at least for now
@@ -21,10 +22,10 @@ namespace Cori {
 
 				ImGuiStyle &style = ImGui::GetStyle();
 
-				if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-					style.WindowRounding = 0.0f;
-					style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-				}
+				//if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+				//	style.WindowRounding = 0.0f;
+				//	style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+				//}
 
 				CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::ImGui }, "ImGuiLayer created");
 			}
@@ -55,6 +56,13 @@ namespace Cori {
 			void ImGuiLayer::StartFrame() {
 				CORI_PROFILE_FUNCTION();
 				Graphics::ImGuiRenderer::StartFrame();
+
+				// ImGui snaps text to integers in its own coordinate space, so that space has to be pixels for glyphs to land on the pixel grid.
+				const auto& window = Application::GetWindow();
+				ImGuiIO& io = ImGui::GetIO();
+				io.DisplaySize = { static_cast<float>(window.GetPixelWidth()), static_cast<float>(window.GetPixelHeight()) };
+				io.DisplayFramebufferScale = { 1.0f, 1.0f };
+
 				ImGui::NewFrame();
 			}
 

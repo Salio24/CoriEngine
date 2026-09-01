@@ -513,7 +513,7 @@ namespace Cori {
 
 					CORI_VK_LABEL_INSERT_F(cmb, DebugLabelColors::Composite, "Blit PRT {}x{} -> swapchain {}x{}", prtExtent.width, prtExtent.height, scExtent.width, scExtent.height);
 
-					cmb.blitImage(chosen->GetPRT().GetImage().m_Image, vk::ImageLayout::eTransferSrcOptimal, VulkanEngine::GetSwapChainImage(), vk::ImageLayout::eTransferDstOptimal, blit, vk::Filter::eNearest);
+					cmb.blitImage(chosen->GetPRT().GetImage().m_Image, vk::ImageLayout::eTransferSrcOptimal, VulkanEngine::GetSwapChainImage(), vk::ImageLayout::eTransferDstOptimal, blit, vk::Filter::eLinear);
 
 					{
 						CORI_VK_LABEL_INSERT(cmb, "Swapchain image -> PresentSrcKHR", DebugLabelColors::Barrier);

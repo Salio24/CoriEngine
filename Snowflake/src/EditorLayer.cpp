@@ -5,6 +5,8 @@
 #include <cstring>
 #include <format>
 
+#include "Utility/ImGuiScale.hpp"
+
 namespace {
 	void CollectLeafDockNodes(ImGuiDockNode* node, std::vector<ImGuiDockNode*>& out) {
 		if (!node) {
@@ -129,6 +131,65 @@ namespace {
 		style.Colors[ImGuiCol_ModalWindowDimBg] = Scrim;
 	}
 
+	void ApplyImGuiScale(const float scale) {
+		ImGui::GetStyle() = ImGuiStyle();
+		SetupImGuiStyle();
+
+		ImGuiStyle& style = ImGui::GetStyle();
+		style._MainScale *= scale;
+    	style.WindowPadding = { style.WindowPadding.x * scale, style.WindowPadding.y * scale } ;
+    	style.WindowRounding = style.WindowRounding * scale;
+    	style.WindowBorderSize = style.WindowBorderSize * scale;
+    	style.WindowMinSize = { style.WindowMinSize.x * scale, style.WindowMinSize.y * scale };
+    	style.WindowBorderHoverPadding = style.WindowBorderHoverPadding * scale;
+    	style.ChildRounding = style.ChildRounding * scale;
+    	style.ChildBorderSize = style.ChildBorderSize * scale;
+    	style.PopupRounding = style.PopupRounding * scale;
+    	style.PopupBorderSize = style.PopupBorderSize * scale;
+    	style.FramePadding = { style.FramePadding.x * scale, style.FramePadding.y * scale };
+    	style.FrameBorderSize = style.FrameBorderSize * scale;
+    	style.FrameRounding = style.FrameRounding * scale;
+    	style.ItemSpacing = { style.ItemSpacing.x * scale, style.ItemSpacing.y * scale };
+    	style.ItemInnerSpacing = { style.ItemInnerSpacing.x * scale, style.ItemInnerSpacing.y * scale };
+    	style.CellPadding = { style.CellPadding.x * scale, style.CellPadding.y * scale };
+    	style.TouchExtraPadding = { style.TouchExtraPadding.x * scale, style.TouchExtraPadding.y * scale };
+    	style.IndentSpacing = style.IndentSpacing * scale;
+    	style.ColumnsMinSpacing = style.ColumnsMinSpacing * scale;
+    	style.ScrollbarSize = style.ScrollbarSize * scale;
+    	style.ScrollbarRounding = style.ScrollbarRounding * scale;
+    	style.ScrollbarPadding = style.ScrollbarPadding * scale;
+    	style.GrabMinSize = style.GrabMinSize * scale;
+    	style.GrabRounding = style.GrabRounding * scale;
+    	style.LogSliderDeadzone = style.LogSliderDeadzone * scale;
+    	style.ImageRounding = style.ImageRounding * scale;
+    	style.ImageBorderSize = style.ImageBorderSize * scale;
+    	style.TabRounding = style.TabRounding * scale;
+    	style.TabBorderSize = style.TabBorderSize * scale;
+    	style.TabMinWidthBase = style.TabMinWidthBase * scale;
+    	style.TabMinWidthShrink = style.TabMinWidthShrink * scale;
+    	style.TabCloseButtonMinWidthSelected = (style.TabCloseButtonMinWidthSelected > 0.0f && style.TabCloseButtonMinWidthSelected != FLT_MAX) ? style.TabCloseButtonMinWidthSelected * scale : style.TabCloseButtonMinWidthSelected;
+    	style.TabCloseButtonMinWidthUnselected = (style.TabCloseButtonMinWidthUnselected > 0.0f && style.TabCloseButtonMinWidthUnselected != FLT_MAX) ? style.TabCloseButtonMinWidthUnselected * scale : style.TabCloseButtonMinWidthUnselected;
+    	style.TabBarBorderSize = style.TabBarBorderSize * scale;
+    	style.TabBarOverlineSize = style.TabBarOverlineSize * scale;
+    	style.TreeLinesSize = style.TreeLinesSize * scale;
+    	style.TreeLinesRounding = style.TreeLinesRounding * scale;
+    	style.MenuItemRounding = style.MenuItemRounding * scale;
+    	style.SelectableRounding = style.SelectableRounding * scale;
+    	style.DragDropTargetRounding = style.DragDropTargetRounding * scale;
+    	style.DragDropTargetBorderSize = style.DragDropTargetBorderSize * scale;
+    	style.DragDropTargetPadding = style.DragDropTargetPadding * scale;
+    	style.ColorMarkerSize = style.ColorMarkerSize * scale;
+    	style.InputTextCursorSize = style.InputTextCursorSize * scale;
+    	style.SeparatorSize = style.SeparatorSize * scale;
+    	style.SeparatorTextBorderSize = style.SeparatorTextBorderSize * scale;
+    	style.SeparatorTextPadding = { style.SeparatorTextPadding.x * scale, style.SeparatorTextPadding.y * scale };
+    	style.DockingSeparatorSize = style.DockingSeparatorSize * scale;
+    	style.DisplayWindowPadding = { style.DisplayWindowPadding.x * scale, style.DisplayWindowPadding.y * scale };
+    	style.DisplaySafeAreaPadding = { style.DisplaySafeAreaPadding.x * scale, style.DisplaySafeAreaPadding.y * scale };
+    	style.MouseCursorScale = style.MouseCursorScale * scale;
+		style.FontScaleDpi = scale;
+	}
+
 	struct MnemonicAnchor {
 		ImDrawList* drawList;
 		ImVec2 textPos;
@@ -138,7 +199,7 @@ namespace {
 		const ImGuiWindow* window = ImGui::GetCurrentWindowRead();
 		const ImGuiStyle& style = ImGui::GetStyle();
 
-		const float labelOffset = static_cast<float>(window->DC.MenuColumns.OffsetLabel);
+		const float labelOffset = window->DC.MenuColumns.OffsetLabel;
 		const float barOffset = window->DC.LayoutType == ImGuiLayoutType_Horizontal ? IM_TRUNC(style.ItemSpacing.x * 0.5f) : 0.0f;
 
 		return MnemonicAnchor{
@@ -267,7 +328,7 @@ namespace {
 			return;
 		}
 
-		ImGui::SetNextWindowSize(ImVec2(560.0f, 640.0f), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(Cori::Utility::ScaleUIUnit(560.0f), Cori::Utility::ScaleUIUnit(640.0f)), ImGuiCond_FirstUseEver);
 
 		if (ImGui::Begin("Style Colors (debug)", &open)) {
 			const ImGuiStyle& style = ImGui::GetStyle();
@@ -365,7 +426,7 @@ namespace Snowflake {
 			}
 		}
 
-		const vk::Extent2D initialPRTExtent{static_cast<uint32_t>(window.GetWidth()), static_cast<uint32_t>(window.GetHeight())};
+		const vk::Extent2D initialPRTExtent{static_cast<uint32_t>(window.GetPixelWidth()), static_cast<uint32_t>(window.GetPixelHeight())};
 
 		m_PanelExtent = initialPRTExtent;
 		m_PRTExtent = initialPRTExtent;
@@ -375,7 +436,7 @@ namespace Snowflake {
 			LoadSponza();
 		}
 		Cori::Graphics::MasterRenderer::ChangeCompositeMode(Cori::Graphics::MasterRenderer::Mode::eDockSpace);
-		SetupImGuiStyle();
+		ApplyImGuiScale(window.GetDisplayScale());
 	}
 
 	EditorLayer::~EditorLayer() {
@@ -466,7 +527,14 @@ namespace Snowflake {
 		CORI_INFO("Sponza: requested {} meshes over {} materials", std::size(sponzaMeshMaterials), sponzaMaterialCount);
 	}
 
-	void EditorLayer::OnEvent([[maybe_unused]] Cori::Core::Event& event) {}
+	void EditorLayer::OnEvent(Cori::Core::Event& event) {
+		Cori::Core::EventDispatcher dispatcher(event);
+
+		dispatcher.Dispatch<Cori::Core::WindowDisplayScaleChangedEvent>([](const Cori::Core::WindowDisplayScaleChangedEvent& e) -> bool {
+			ApplyImGuiScale(e.GetScale());
+			return false;
+		});
+	}
 
 	void EditorLayer::OnImGuiRender([[maybe_unused]] Cori::Core::GameTimer& gameTimer) {
 		UpdateWindowManipulation();
@@ -573,7 +641,7 @@ namespace Snowflake {
 			ImGuiCond_Always,
 			ImVec2(0.5f, 0.0f));
 
-		ImGui::SetNextWindowSize(ImVec2(s_LauncherWidth, 0.0f), ImGuiCond_Always);
+		ImGui::SetNextWindowSize({ Cori::Utility::ScaleUIUnit(s_LauncherWidth), 0.0f }, ImGuiCond_Always);
 
 		if (m_LauncherJustOpened) {
 			ImGui::SetNextWindowFocus();
@@ -740,13 +808,13 @@ namespace Snowflake {
 
 		if (window->DockNode == nullptr) {
 			ImGuiWindow* root = window->RootWindow;
-			const ImVec2 size(std::max(root->Size.x + delta.x, s_MinFloatingWindowSize), std::max(root->Size.y + delta.y, s_MinFloatingWindowSize));
+			const ImVec2 size(std::max(root->Size.x + delta.x, Cori::Utility::ScaleUIUnit(s_MinFloatingWindowSize)), std::max(root->Size.y + delta.y, Cori::Utility::ScaleUIUnit(s_MinFloatingWindowSize)));
 			ImGui::SetWindowSize(root, size, ImGuiCond_Always);
 			return;
 		}
 
-		ApplyDockResize(window->DockNode, ImGuiAxis_X, delta.x, s_MinDockNodeSize);
-		ApplyDockResize(window->DockNode, ImGuiAxis_Y, delta.y, s_MinDockNodeSize);
+		ApplyDockResize(window->DockNode, ImGuiAxis_X, delta.x, Cori::Utility::ScaleUIUnit(s_MinDockNodeSize));
+		ApplyDockResize(window->DockNode, ImGuiAxis_Y, delta.y, Cori::Utility::ScaleUIUnit(s_MinDockNodeSize));
 	}
 
 	void EditorLayer::UpdateDockNavigation() {
@@ -982,9 +1050,11 @@ namespace Snowflake {
 		if (visible) {
 			const ImVec2 region = ImGui::GetContentRegionAvail();
 
+			auto fbs = ImGui::GetIO().DisplayFramebufferScale;
+
 			const vk::Extent2D panelExtent{
-				static_cast<uint32_t>(std::max(region.x, 1.0f)),
-				static_cast<uint32_t>(std::max(region.y, 1.0f))
+				static_cast<uint32_t>(std::lround(std::max(region.x * fbs.x, 1.0f))),
+				static_cast<uint32_t>(std::lround(std::max(region.y * fbs.y, 1.0f)))
 			};
 
 			if (panelExtent.width == m_PanelExtent.width && panelExtent.height == m_PanelExtent.height) {
@@ -1057,7 +1127,7 @@ namespace Snowflake {
 		const Cori::World::Entity entity{ entt::handle{ m_MainScene.GetRegistry(), m_SelectedEntity } };
 		const std::string_view name = entity.GetName();
 
-		ImGui::SetCursorScreenPos(ImVec2(imageOrigin.x + 8.0f, imageOrigin.y + 8.0f));
+		ImGui::SetCursorScreenPos(ImVec2(imageOrigin.x + Cori::Utility::ScaleUIUnit(s_SelectionOverlayInset), imageOrigin.y + Cori::Utility::ScaleUIUnit(s_SelectionOverlayInset)));
 		ImGui::Text("Selected: %.*s [%u]", static_cast<int32_t>(name.size()), name.data(), entt::to_integral(m_SelectedEntity));
 	}
 
@@ -1118,7 +1188,7 @@ namespace Snowflake {
 			return;
 		}
 
-		ImGui::SetNextWindowSize(ImVec2(420.0f, 0.0f), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize({ Cori::Utility::ScaleUIUnit(s_WindowSettingsWidth), 0.0f }, ImGuiCond_FirstUseEver);
 
 		if (ImGui::Begin(s_WindowSettingsWindow, &m_ShowWindowSettings, ImGuiWindowFlags_AlwaysAutoResize)) {
 			Cori::ImGuiPresets::ScreenModeAndResolutionDropdowns();

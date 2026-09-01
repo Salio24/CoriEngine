@@ -27,21 +27,21 @@ namespace Cori {
 
 			/**
 			 * @brief Retrieves the current mouse X position on screen.
-			 * @return Mouse position on X in screen coordinates.
+			 * @return Mouse position on X in screen pixel coordinate space.
 			 */
-			static int32_t GetMouseX();
+			static float GetMouseX();
 
 			/**
 			 * @brief Retrieves the current mouse Y position on screen.
-			 * @return Mouse position on Y in screen coordinates.
+			 * @return Mouse position on Y in screen pixel coordinate space.
 			 */
-			static int32_t GetMouseY();
+			static float GetMouseY();
 
 			/**
 			 * @brief Retrieves the current mouse position on screen.
-			 * @return Mouse position in screen coordinates.
+			 * @return Mouse position in screen pixel coordinate space.
 			 */
-			static glm::ivec2 GetMousePosition();
+			static glm::vec2 GetMousePosition();
 
 			/**
 			 * @brief Retrieves how far the mouse moved during the last event pump.

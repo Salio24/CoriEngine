@@ -1,8 +1,10 @@
 #include "ContentBrowser.hpp"
 #include "GlobalFuncs.hpp"
 #include "imgui_internal.h"
-#include "../LogTags.hpp"
+#include "LogTags.hpp"
+#include "Core/Application.hpp"
 #include "Utility/ImGuiHelpers.hpp"
+#include "Utility/ImGuiScale.hpp"
 
 namespace {
 	constexpr std::string_view s_JsonExtension{ ".json" };
@@ -749,6 +751,8 @@ namespace Snowflake {
 		}
 	}
 
+	ContentBrowser::ContentBrowser() : m_Thumbnails(ThumbnailCache::Get()), m_TileSize(static_cast<int32_t>(Cori::Utility::ScaleUIUnit(s_DefaultTileSize))), m_TreeWidth(Cori::Utility::ScaleUIUnit(s_DefaultTreeWidth)) {}
+
 	void ContentBrowser::Draw(bool* open, const char* name) {
 		CORI_PROFILE_FUNCTION();
 
@@ -760,7 +764,7 @@ namespace Snowflake {
 			return;
 		}
 
-		ImGui::SetNextWindowSize(ImVec2(920.0f, 420.0f), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize({ Cori::Utility::ScaleUIUnit(s_DefaultWindowWidth), Cori::Utility::ScaleUIUnit(s_DefaultWindowHeight) }, ImGuiCond_FirstUseEver);
 
 		if (!ImGui::Begin(name, open, ImGuiWindowFlags_NoCollapse)) {
 			ImGui::End();
@@ -808,7 +812,7 @@ namespace Snowflake {
 		}
 
 		auto available = ImGui::GetContentRegionAvail();
-		m_TreeWidth = std::clamp(m_TreeWidth, s_MinTreeWidth, std::max(s_MinTreeWidth, available.x - 200.0f));
+		m_TreeWidth = std::clamp(m_TreeWidth, Cori::Utility::ScaleUIUnit(s_MinTreeWidth), std::max(Cori::Utility::ScaleUIUnit(s_MinTreeWidth), available.x - Cori::Utility::ScaleUIUnit(s_MinGridWidth)));
 
 		float bodyHeight = std::max(available.y, 1.0f);
 
@@ -816,7 +820,7 @@ namespace Snowflake {
 
 		ImGui::SameLine(0.0f, 0.0f);
 
-		ImGui::InvisibleButton("##splitter", ImVec2(s_SplitterWidth, bodyHeight));
+		ImGui::InvisibleButton("##splitter", { Cori::Utility::ScaleUIUnit(s_SplitterWidth), bodyHeight });
 		if (ImGui::IsItemActive()) {
 			m_TreeWidth += ImGui::GetIO().MouseDelta.x;
 		}
@@ -857,8 +861,8 @@ namespace Snowflake {
 		}
 
 		ImGui::SameLine();
-		ImGui::SetNextItemWidth(128.0f);
-		ImGui::SliderInt("##tilesize", &m_TileSize, s_MinTileSize, s_MaxTileSize, "%d px");
+		ImGui::SetNextItemWidth(Cori::Utility::ScaleUIUnit(s_TileSizeSliderWidth));
+		ImGui::SliderInt("##tilesize", &m_TileSize, static_cast<int32_t>(Cori::Utility::ScaleUIUnit(s_MinTileSize)), static_cast<int32_t>(Cori::Utility::ScaleUIUnit(s_MaxTileSize)), "%d px");
 
 		ImGui::Text("last pass %.3f ms (%s), visited %zu, listed %zu", view.stats.lastPassMs, view.stats.lastPassTargeted ? "targeted" : "full", view.stats.visited, view.stats.listed);
 		ImGui::Text("last pass changes: folders +%zu -%zu, assets +%zu -%zu, validated %zu, parked %zu, retried %zu", view.stats.foldersAdded, view.stats.foldersRemoved, view.stats.entriesAdded, view.stats.entriesRemoved, view.stats.validated, view.stats.timedOut, view.stats.retried);
@@ -978,7 +982,7 @@ namespace Snowflake {
 	}
 
 	float ContentBrowser::CardHeight() const {
-		return m_TileSize + ImGui::GetTextLineHeight() * s_LabelLines + s_CardPadding * 3.0f;
+		return m_TileSize + ImGui::GetTextLineHeight() * s_LabelLines + Cori::Utility::ScaleUIUnit(s_CardPadding) * 3.0f;
 	}
 
 	uint32_t ContentBrowser::DrawGrid(const ContentBrowserWatcher::View& view, const float bodyHeight) {
@@ -1010,7 +1014,7 @@ namespace Snowflake {
 
 		ImGuiStyle& style = ImGui::GetStyle();
 
-		float cardWidth = m_TileSize + s_CardPadding * 2.0f;
+		float cardWidth = m_TileSize + Cori::Utility::ScaleUIUnit(s_CardPadding) * 2.0f;
 		float itemWidth = cardWidth + style.ItemSpacing.x;
 		float itemHeight = CardHeight() + style.ItemSpacing.y;
 
@@ -1023,6 +1027,7 @@ namespace Snowflake {
 		uint32_t total = childrenFolderCount + view.entries.size();
 		uint32_t columns = static_cast<uint32_t>(std::max(1.0f, std::floor(ImGui::GetContentRegionAvail().x / itemWidth)));
 		uint32_t rows = (total + columns - 1) / columns;
+		constexpr float fbScale = 1.0f;
 
 		float baseX = ImGui::GetCursorPosX();
 		float baseY = ImGui::GetCursorPosY();
@@ -1044,11 +1049,11 @@ namespace Snowflake {
 				ImVec2 origin = ImGui::GetCursorScreenPos();
 
 				if (item < childrenFolderCount) {
-					DrawFolder(view.folders[m_FocusedFolderChildren[item]], view.folders[m_FocusedFolderIndex], origin, m_TileSize);
+					DrawFolder(view.folders[m_FocusedFolderChildren[item]], view.folders[m_FocusedFolderIndex], origin, static_cast<float>(m_TileSize), fbScale);
 					continue;
 				}
 
-				DrawAssetTile(view.entries[item - childrenFolderCount], origin, m_TileSize, surfaceOrigin);
+				DrawAssetTile(view.entries[item - childrenFolderCount], origin, static_cast<float>(m_TileSize), fbScale, surfaceOrigin);
 			}
 		}
 
@@ -1064,7 +1069,7 @@ namespace Snowflake {
 	void ContentBrowser::DrawCard(const ImVec2 origin, const float thumbnail, const bool selected, const bool hovered, const ImU32 selectedColor, const ImU32 hoveredColor) const {
 		ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-		ImVec2 max(origin.x + thumbnail + s_CardPadding * 2.0f, origin.y + CardHeight());
+		ImVec2 max(origin.x + thumbnail + Cori::Utility::ScaleUIUnit(s_CardPadding) * 2.0f, origin.y + CardHeight());
 
 		ImGuiStyle& style = ImGui::GetStyle();
 
@@ -1080,38 +1085,84 @@ namespace Snowflake {
 	void ContentBrowser::DrawLabel(const ImVec2 origin, const float thumbnail, const char* text) {
 		ImDrawList* drawList = ImGui::GetWindowDrawList();
 
+		const float cardPadding = Cori::Utility::ScaleUIUnit(s_CardPadding);
+
 		float wrapWidth = thumbnail;
-		float top = origin.y + thumbnail + s_CardPadding * 2.0f;
+		float top = origin.y + thumbnail + cardPadding * 2.0f;
 
 		ImVec2 size = ImGui::CalcTextSize(text, nullptr, false, wrapWidth);
-		ImVec2 position(origin.x + s_CardPadding + std::max(0.0f, (wrapWidth - size.x) * 0.5f), top);
+		ImVec2 position(origin.x + cardPadding + std::max(0.0f, (wrapWidth - size.x) * 0.5f), top);
 
-		drawList->PushClipRect(ImVec2(origin.x, top), ImVec2(origin.x + thumbnail + s_CardPadding * 2.0f, top + ImGui::GetTextLineHeight() * s_LabelLines), true);
+		drawList->PushClipRect(ImVec2(origin.x, top), ImVec2(origin.x + thumbnail + cardPadding * 2.0f, top + ImGui::GetTextLineHeight() * s_LabelLines), true);
 		drawList->AddText(nullptr, 0.0f, position, ImGui::GetColorU32(ImGuiCol_Text), text, nullptr, wrapWidth);
 		drawList->PopClipRect();
 	}
 
-	void ContentBrowser::DrawFolder(const ContentBrowserWatcher::View::FolderRow& folder, const ContentBrowserWatcher::View::FolderRow& parent, const ImVec2 origin, const float thumbnail) {
+	void ContentBrowser::DrawFolder(const ContentBrowserWatcher::View::FolderRow& folder, const ContentBrowserWatcher::View::FolderRow& parent, const ImVec2 origin, const float thumbnailSize, float fbScale) {
 		ImGui::PushID(folder.virtualDir.c_str());
 
-		ImGui::InvisibleButton("##tile", ImVec2(thumbnail + s_CardPadding * 2.0f, CardHeight()));
+		const float cardPadding = Cori::Utility::ScaleUIUnit(s_CardPadding);
+
+		ImGui::InvisibleButton("##tile", ImVec2(thumbnailSize + cardPadding * 2.0f, CardHeight()));
 
 		bool hovered = ImGui::IsItemHovered();
 		bool activated = ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && hovered;
 
-		DrawCard(origin, thumbnail, false, hovered, ImGui::GetColorU32(ImGuiCol_CheckMark), Cori::Utility::Fade(ImGui::GetColorU32(ImGuiCol_CheckMark), 0.6f));
+		DrawCard(origin, thumbnailSize, false, hovered, ImGui::GetColorU32(ImGuiCol_CheckMark), Cori::Utility::Fade(ImGui::GetColorU32(ImGuiCol_CheckMark), 0.6f));
 
 		ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-		ImVec2 min(origin.x + s_CardPadding + thumbnail * 0.12f, origin.y + s_CardPadding + thumbnail * 0.24f);
-		ImVec2 max(origin.x + s_CardPadding + thumbnail * 0.88f, origin.y + s_CardPadding + thumbnail * 0.78f);
+		const float width = thumbnailSize * 0.82f;
+		const float height = width * 0.92f;
+
+		const float left = origin.x + cardPadding + (thumbnailSize - width) * 0.5f;
+		const float top = origin.y + cardPadding + (thumbnailSize - height) * 0.5f;
+		const float right = left + width;
+		const float bottom = top + height;
+
+		const float rounding = width * 0.075f;
+		const float tabWidth = width * 0.35f;
+		const float tabHeight = height * 0.12f;
+		const float tabSlant = width * 0.15f;
+		const float tabShoulder = width * 0.05f;
+		const float tabFillet = width * 0.05f;
+
+		const float slantLength = std::sqrt(tabSlant * tabSlant + tabHeight * tabHeight);
+		const float slantX = tabSlant / slantLength;
+		const float slantY = tabHeight / slantLength;
+
+		const ImVec2 tabCorner(left + tabWidth, top);
+		const ImVec2 bodyCorner(left + tabWidth + tabSlant, top + tabHeight);
+
+		const float sheetTop = top + height * 0.24f;
+		const float sheetInset = width * 0.10f;
+		const float frontTop = top + height * 0.335f;
 
 		ImU32 folderColor = ImGui::GetColorU32(ImGuiCol_CheckMark);
 
-		drawList->AddRectFilled(ImVec2(min.x, min.y - thumbnail * 0.09f), ImVec2(min.x + (max.x - min.x) * 0.45f, min.y + 2.0f), Cori::Utility::Fade(folderColor, 0.75f), 2.0f);
-		drawList->AddRectFilled(min, max, folderColor, 3.0f);
+		if (hovered) {
+			folderColor = Cori::Utility::Shade(folderColor, 1.12f);
+		}
 
-		DrawLabel(origin, thumbnail, folder.name.c_str());
+		const ImU32 backColor = Cori::Utility::Shade(folderColor, 0.38f);
+		const ImU32 sheetColor = Cori::Utility::Hex32ToImU32(0xf2f0eeFF);
+
+		drawList->PathClear();
+		drawList->PathArcTo(ImVec2(left + rounding, top + rounding), rounding, IM_PI, IM_PI * 1.5f);
+		drawList->PathLineTo(ImVec2(tabCorner.x - tabShoulder, tabCorner.y));
+		drawList->PathBezierQuadraticCurveTo(tabCorner, ImVec2(tabCorner.x + slantX * tabShoulder, tabCorner.y + slantY * tabShoulder));
+		drawList->PathLineTo(ImVec2(bodyCorner.x - slantX * tabFillet, bodyCorner.y - slantY * tabFillet));
+		drawList->PathBezierQuadraticCurveTo(bodyCorner, ImVec2(bodyCorner.x + tabFillet, bodyCorner.y));
+		drawList->PathArcTo(ImVec2(right - rounding, top + tabHeight + rounding), rounding, IM_PI * 1.5f, IM_PI * 2.0f);
+		drawList->PathArcTo(ImVec2(right - rounding, bottom - rounding), rounding, 0.0f, IM_PI * 0.5f);
+		drawList->PathArcTo(ImVec2(left + rounding, bottom - rounding), rounding, IM_PI * 0.5f, IM_PI);
+		drawList->PathFillConcave(backColor);
+
+		drawList->AddRectFilled(ImVec2(left + sheetInset, sheetTop), ImVec2(right - sheetInset, frontTop + rounding), sheetColor, width * 0.078f, ImDrawFlags_RoundCornersTop);
+
+		drawList->AddRectFilled(ImVec2(left, frontTop), ImVec2(right, bottom), folderColor, rounding);
+
+		DrawLabel(origin, thumbnailSize, folder.name.c_str());
 
 		ImGui::PopID();
 
@@ -1132,10 +1183,13 @@ namespace Snowflake {
 		}
 	}
 
-	void ContentBrowser::DrawAssetTile(const ContentBrowserWatcher::View::EntryRow& entry, const ImVec2 origin, const float thumbnail, const ImVec2 surfaceOrigin) {
+	void ContentBrowser::DrawAssetTile(const ContentBrowserWatcher::View::EntryRow& entry, const ImVec2 origin, const float thumbnailSize, float fbScale, const ImVec2 surfaceOrigin) {
 		ImGui::PushID(entry.virtualPath.c_str());
 
-		ImGui::InvisibleButton("##tile", ImVec2(thumbnail + s_CardPadding * 2.0f, CardHeight()));
+		const float cardPadding = Cori::Utility::ScaleUIUnit(s_CardPadding);
+
+
+		ImGui::InvisibleButton("##tile", ImVec2(thumbnailSize + cardPadding * 2.0f, CardHeight()));
 
 		bool hovered = ImGui::IsItemHovered();
 
@@ -1164,12 +1218,12 @@ namespace Snowflake {
 			}
 		}
 
-		DrawCard(origin, thumbnail, entry.id == m_SelectedAsset && entry.validated, hovered, accent, Cori::Utility::Fade(accent, 0.6f));
+		DrawCard(origin, thumbnailSize, entry.id == m_SelectedAsset && entry.validated, hovered, accent, Cori::Utility::Fade(accent, 0.6f));
 
 		ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-		ImVec2 thumbMin(origin.x + s_CardPadding, origin.y + s_CardPadding);
-		ImVec2 thumbMax(thumbMin.x + thumbnail, thumbMin.y + thumbnail);
+		ImVec2 thumbMin(origin.x + cardPadding, origin.y + cardPadding);
+		ImVec2 thumbMax(thumbMin.x + thumbnailSize, thumbMin.y + thumbnailSize);
 
 		const bool previewable = entry.validated && (hash == s_MeshTypeHash || hash == s_MaterialTypeHash || hash == s_TextureTypeHash);
 
@@ -1181,12 +1235,12 @@ namespace Snowflake {
 				if (hash == s_MeshTypeHash) {
 					requested = m_Thumbnails->RequestMesh(
 						Cori::Core::AssetManager2::Load<Cori::Graphics::Mesh>(entry.virtualPath.c_str()),
-						static_cast<uint32_t>(thumbnail));
+						static_cast<uint32_t>(std::lround(std::max(thumbnailSize * fbScale, 1.0f))));
 				}
 				else if (hash == s_MaterialTypeHash) {
 					requested = m_Thumbnails->RequestMaterial(
 						Cori::Core::AssetManager2::Load<Cori::Graphics::Material>(entry.virtualPath.c_str()),
-						static_cast<uint32_t>(thumbnail));
+						static_cast<uint32_t>(std::lround(std::max(thumbnailSize * fbScale, 1.0f))));
 				}
 				else {
 					requested = m_Thumbnails->RequestTexture(
@@ -1199,7 +1253,7 @@ namespace Snowflake {
 			}
 
 			if (it != m_ThumbnailHandles.end()) {
-				m_Thumbnails->Resize(it->second, static_cast<uint32_t>(thumbnail));
+				m_Thumbnails->Resize(it->second, static_cast<uint32_t>(std::lround(std::max(thumbnailSize * fbScale, 1.0f))));
 
 				if (const auto placement = m_Thumbnails->TryGetPlacement(it->second)) {
 					drawList->AddImage(placement->texture, thumbMin, thumbMax, placement->uv0, placement->uv1);
@@ -1210,7 +1264,7 @@ namespace Snowflake {
 
 		if (!drewPreview) {
 			ImVec2 center((thumbMin.x + thumbMax.x) * 0.5f, (thumbMin.y + thumbMax.y) * 0.5f);
-			float radius = thumbnail * 0.22f;
+			float radius = thumbnailSize * 0.22f;
 
 			drawList->AddRectFilled(ImVec2(center.x - radius, center.y - radius), ImVec2(center.x + radius, center.y + radius), Cori::Utility::Fade(accent, 0.35f), 4.0f);
 			drawList->AddRect(ImVec2(center.x - radius, center.y - radius), ImVec2(center.x + radius, center.y + radius), accent, 4.0f, 0, 1.5f);
@@ -1218,7 +1272,7 @@ namespace Snowflake {
 
 		drawList->AddRectFilled(ImVec2(thumbMin.x, thumbMax.y - 3.0f), thumbMax, accent);
 
-		DrawLabel(origin, thumbnail, entry.label.c_str());
+		DrawLabel(origin, thumbnailSize, entry.label.c_str());
 
 		if (hovered) {
 			ImGui::SetTooltip("%s\n%s\n%s", entry.virtualPath.c_str(), typeName, status);

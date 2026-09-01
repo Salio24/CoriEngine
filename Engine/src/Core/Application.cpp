@@ -37,7 +37,7 @@ namespace Cori {
 			m_Window->SetVSync(false);
 
 			ImGui::CreateContext();
-			Graphics::VulkanEngine::Start(m_Window->GetNativeWindow(), { m_Window->GetWidth(), m_Window->GetHeight() });
+			Graphics::VulkanEngine::Start(m_Window->GetNativeWindow(), { m_Window->GetPixelWidth(), m_Window->GetPixelHeight() });
 
 			m_ImGuiLayer = new Internal::ImGuiLayer();
 			m_LayerStack.PushOverlay(m_ImGuiLayer);
@@ -78,7 +78,7 @@ namespace Cori {
 			EventDispatcher dispatcher(event);
 			dispatcher.Dispatch<WindowCloseEvent>(std::bind(&Application::OnWindowClose, this  ));
 
-			dispatcher.Dispatch<WindowResizeEvent>([](const WindowResizeEvent& e) -> bool {
+			dispatcher.Dispatch<WindowPixelResizeEvent>([](const WindowPixelResizeEvent& e) -> bool {
 				Graphics::VulkanEngine::ReportWindowResize({ e.GetWidth(), e.GetHeight() });
 				return false;
 			});

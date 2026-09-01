@@ -148,6 +148,9 @@ namespace Snowflake {
 		bool m_ShowWindowSettings{ false };
 		bool m_RebuildLayout{ false };
 
+		static constexpr float s_WindowSettingsWidth{ 420.0f };
+		static constexpr float s_SelectionOverlayInset{ 8.0f };
+
 		static constexpr float s_LauncherWidth{ 420.0f };
 		static constexpr float s_LauncherAnchorRatio{ 0.15f };
 

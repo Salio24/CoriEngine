@@ -13,22 +13,23 @@ namespace Cori {
 			return (state & SDL_BUTTON_MASK(button)) != 0;
 		}
 
-		int32_t Input::GetMouseX() {
+		float Input::GetMouseX() {
 			float x;
 			SDL_GetMouseState(&x, nullptr);
-			return static_cast<int32_t>(x);
+			return x * Application::GetWindow().GetPixelDensity();
 		}
 
-		int32_t Input::GetMouseY() {
+		float Input::GetMouseY() {
 			float y;
 			SDL_GetMouseState(nullptr, &y);
-			return static_cast<int32_t>(y);
+			return y * Application::GetWindow().GetPixelDensity();
 		}
 
-		glm::ivec2 Input::GetMousePosition() {
+		glm::vec2 Input::GetMousePosition() {
 			float x, y;
 			SDL_GetMouseState(&x, &y);
-			return { x, y };
+			const float pixelDensity = Application::GetWindow().GetPixelDensity();
+			return { x * pixelDensity, y * pixelDensity };
 		}
 
 		glm::vec2 Input::GetMouseDelta() {

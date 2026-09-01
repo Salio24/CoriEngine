@@ -39,6 +39,16 @@ namespace Cori {
 			return color;
 		}
 
+		constexpr ImU32 Shade(const ImU32 color, const float factor) {
+			ImVec4 unpacked = ImGui::ColorConvertU32ToFloat4(color);
+
+			unpacked.x = std::min(unpacked.x * factor, 1.0f);
+			unpacked.y = std::min(unpacked.y * factor, 1.0f);
+			unpacked.z = std::min(unpacked.z * factor, 1.0f);
+
+			return ImGui::ColorConvertFloat4ToU32(unpacked);
+		}
+
 		constexpr ImVec4 WithAlpha(const ImVec4 color, const float alpha) {
 			return { color.x, color.y, color.z, alpha };
 		}

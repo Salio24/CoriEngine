@@ -223,7 +223,7 @@ namespace Snowflake {
 	public:
 		static constexpr const char* s_DefaultName{ "Content Browser" };
 
-		ContentBrowser() : m_Thumbnails(ThumbnailCache::Get()) {}
+		ContentBrowser();
 
 		void Draw(bool* open, const char* name = s_DefaultName);
 
@@ -232,10 +232,16 @@ namespace Snowflake {
 
 	private:
 		static constexpr float s_MinTreeWidth{ 120.0f };
+		static constexpr float s_DefaultTreeWidth{ 220.0f };
+		static constexpr float s_MinGridWidth{ 200.0f };
 		static constexpr float s_SplitterWidth{ 4.0f };
+		static constexpr float s_TileSizeSliderWidth{ 128.0f };
+		static constexpr float s_DefaultWindowWidth{ 920.0f };
+		static constexpr float s_DefaultWindowHeight{ 420.0f };
 
 		static constexpr float s_MinTileSize{ 48.0f };
 		static constexpr float s_MaxTileSize{ 256.0f };
+		static constexpr float s_DefaultTileSize{ 96.0f };
 		static constexpr float s_CardPadding{ 6.0f };
 		static constexpr float s_LabelLines{ 2.0f };
 
@@ -248,8 +254,8 @@ namespace Snowflake {
 		uint32_t DrawGrid(const ContentBrowserWatcher::View& view, float bodyHeight);
 		void DrawCard(ImVec2 origin, float thumbnail, bool selected, bool hovered, const ImU32 selectedColor, const ImU32 hoveredColor) const;
 		static void DrawLabel(ImVec2 origin, float thumbnail, const char* text);
-		void DrawFolder(const ContentBrowserWatcher::View::FolderRow& folder, const ContentBrowserWatcher::View::FolderRow& parent, ImVec2 origin, float thumbnail);
-		void DrawAssetTile(const ContentBrowserWatcher::View::EntryRow& entry, ImVec2 origin, float thumbnail, ImVec2 surfaceOrigin);
+		void DrawFolder(const ContentBrowserWatcher::View::FolderRow& folder, const ContentBrowserWatcher::View::FolderRow& parent, ImVec2 origin, float thumbnailSize, float fbScale);
+		void DrawAssetTile(const ContentBrowserWatcher::View::EntryRow& entry, ImVec2 origin, float thumbnailSize, float fbScale, ImVec2 surfaceOrigin);
 
 		std::shared_ptr<ThumbnailCache> m_Thumbnails;
 		std::unordered_map<Cori::Core::AssetID, ThumbnailHandle> m_ThumbnailHandles;
@@ -258,8 +264,8 @@ namespace Snowflake {
 		std::string m_SelectedDir;
 		Cori::Core::AssetID m_SelectedAsset{ 0 };
 
-		int32_t m_TileSize{ 96 };
-		float m_TreeWidth{ 220.0f };
+		int32_t m_TileSize{};
+		float m_TreeWidth{};
 		bool m_ShowPending{ true };
 		bool m_TreeSeeded{ false };
 

@@ -48,7 +48,7 @@ namespace Cori {
 			 * @note This is up to the user to overload, by default return the same thing GetName() does.
 			 * @return Event name.
 			 */
-			[[nodiscard]] virtual std::string ToString() const { return GetName(); }
+			[[nodiscard]] virtual std::string to_string() const { return GetName(); }
 
 
 			/**
@@ -99,14 +99,14 @@ namespace Cori {
 		 * @brief  Needed for CoriError.
 		 */
 		inline std::ostream& operator<<(std::ostream& os, const Event& e) {
-			return os << e.ToString();
+			return os << e.to_string();
 		}
 
 		/**
 		 * @brief Needed for fmt/spadlog.
 		 */
 		inline std::string format_as(const Event& e) {
-			return std::string(e.ToString());
+			return std::string(e.to_string());
 		}
 
 		using EventCallbackFn = std::function<void(Event&)>;

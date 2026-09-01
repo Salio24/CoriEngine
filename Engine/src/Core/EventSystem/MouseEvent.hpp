@@ -13,7 +13,7 @@ namespace Cori {
 			[[nodiscard]] int32_t GetX() const { return m_MouseX; }
 			[[nodiscard]] int32_t GetY() const { return m_MouseY; }
 
-			[[nodiscard]] std::string ToString() const override {
+			[[nodiscard]] std::string to_string() const override {
 				return std::string("MouseMovedEvent: (") + std::to_string(m_MouseX) + std::string(", ") + std::to_string(m_MouseY) + std::string(")");
 			}
 
@@ -32,7 +32,7 @@ namespace Cori {
 			int16_t GetXOffset() const { return m_xDirection; }
 			int16_t GetYOffset() const { return m_yDirection; }
 
-			std::string ToString() const override {
+			std::string to_string() const override {
 				return std::string("MouseScrolledEvent: (") + std::to_string(m_xDirection) + std::string(", ") + std::to_string(m_yDirection) + std::string(")");
 			}
 			EVENT_CLASS_TYPE(MouseScrolledEvent)
@@ -58,7 +58,7 @@ namespace Cori {
 			explicit MouseButtonPressedEvent(const CoriMouseKeycode button)
 				: MouseButtonEvent(button) {}
 
-			std::string ToString() const override {
+			std::string to_string() const override {
 				return std::string("MouseButtonPressedEvent: ") + CoriGetKeyName(m_Button);
 			}
 			EVENT_CLASS_TYPE(MouseButtonEvent)
@@ -69,7 +69,7 @@ namespace Cori {
 			explicit MouseButtonReleasedEvent(const CoriMouseKeycode button)
 				: MouseButtonEvent(button) {}
 
-			std::string ToString() const override {
+			std::string to_string() const override {
 				return std::string("MouseButtonReleasedEvent: ") + CoriGetKeyName(m_Button);
 
 			}

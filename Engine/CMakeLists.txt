@@ -329,7 +329,8 @@ project(CoriEngine)
     )
 
     # my shared lib
-    add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES})
+    add_library(${ENGINE_LIBRARY_NAME} STATIC ${MY_SOURCES}
+            src/Utility/ImGuiScale.hpp)
 
     if (CORI_MY_CONFIG)
         target_compile_definitions(${ENGINE_LIBRARY_NAME} PRIVATE

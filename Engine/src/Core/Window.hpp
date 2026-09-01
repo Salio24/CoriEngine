@@ -6,19 +6,24 @@ namespace Cori {
 		namespace Internal {
 			class ImGuiLayer;
 		}
+		/**
+		 * @brief A resolution the display can be driven at, always expressed in pixels.
+		 * @details SDL reports a display mode as a size plus a pixel density, but exclusive fullscreen ignores the density and uses the size alone, so the size is the pixel count and m_PixelDensity is only there to tell otherwise identical modes apart. Windowed modes reach that same pixel count by dividing by the density of the display the window is on, which is what GetLogicalSizeForScreenMode does.
+		 */
 		struct ScreenMode {
 			int32_t m_Width{};
 			int32_t m_Height{};
 			float m_RefreshRate{};
+			float m_PixelDensity{ 1.0f };
 			std::string m_ModeName;
 
 		protected:
 			friend class Window;
 			ScreenMode() = default;
 
-			ScreenMode(const int32_t width, const int32_t height, const float refreshRate, const uint32_t modeIndex)
-				: m_Width(width), m_Height(height), m_RefreshRate(refreshRate), m_SDLModeIndex(modeIndex) {
-				m_ModeName = std::to_string(m_Width) + "x" + std::to_string(m_Height) + " " + std::to_string(m_RefreshRate) + " Hz";
+			ScreenMode(const int32_t pixelWidth, const int32_t pixelHeight, const float refreshRate, const float pixelDensity, const uint32_t modeIndex)
+				: m_Width(pixelWidth), m_Height(pixelHeight), m_RefreshRate(refreshRate), m_PixelDensity(pixelDensity), m_SDLModeIndex(modeIndex) {
+				m_ModeName = std::format("{}x{} {} Hz {} PD", m_Width, m_Height, m_RefreshRate, m_PixelDensity);
 			}
 
 			uint32_t m_SDLModeIndex{ 1000 }; //impossible initial number
@@ -42,13 +47,37 @@ namespace Cori {
 			 * @brief Give the current window width.
 			 * @return Window width in pixels.
 			 */
-			[[nodiscard]] int32_t GetWidth() const;
+			[[nodiscard]] int32_t GetPixelWidth() const;
 
 			/**
 			 * @brief Give the current window height.
 			 * @return Window height in pixels.
 			 */
-			[[nodiscard]] int32_t GetHeight() const;
+			[[nodiscard]] int32_t GetPixelHeight() const;
+
+			/**
+			 * @brief Give the current window width.
+			 * @return Window width in logical points.
+			 */
+			[[nodiscard]] int32_t GetLogicalWidth() const;
+
+			/**
+			 * @brief Give the current window height.
+			 * @return Window height in logical points.
+			 */
+			[[nodiscard]] int32_t GetLogicalHeight() const;
+
+			/**
+			 * @brief Gives the ratio of pixels to logical points for this window.
+			 * @return Pixel density.
+			 */
+			[[nodiscard]] float GetPixelDensity() const;
+
+			/**
+			 * @brief Gives the scale the user expects content to be displayed at, the pixel density and the display content scale folded together.
+			 * @return Display scale.
+			 */
+			[[nodiscard]] float GetDisplayScale() const;
 
 			/**
 			 * @brief Changes the VSync state.
@@ -132,6 +161,13 @@ namespace Cori {
 			 */
 			std::expected<void, CoriError<>> SetWindowMode(WindowMode mode);
 
+			/**
+			 * @brief Converts the pixel size of a ScreenMode into the logical size, clamped to what the display can actually display.
+			 * @param mode ScreenMode
+			 * @return Width and height in logical points.
+			 */
+			[[nodiscard]] std::pair<int32_t, int32_t> GetLogicalSizeForScreenMode(const ScreenMode& mode) const;
+
 		private:
 			friend Internal::ImGuiLayer;
 			[[nodiscard]] void* GetNativeWindow() const;
@@ -140,6 +176,7 @@ namespace Cori {
 				int32_t m_Width{};
 				int32_t m_Height{};
 				float m_RefreshRate{};
+				float m_PixelDensity{};
 				WindowMode m_WindowMode{};
 				uint32_t m_SDLModeIndex{};
 				uint32_t m_ModeIndex{};

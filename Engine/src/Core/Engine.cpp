@@ -13,7 +13,8 @@ namespace Cori {
 				CORI_CORE_INFO_TAGGED({ Logger::Tags::Core::Self }, "Starting Cori Engine.");
 
 				const char* sessionType = std::getenv("XDG_SESSION_TYPE");
-				if (sessionType) {
+				bool overridePresent = static_cast<bool>(std::getenv("XDG_SESSION_TYPE"));
+				if (sessionType && !overridePresent) {
 					if (std::string(sessionType) == "wayland") {
 						if (std::getenv("ENABLE_VULKAN_RENDERDOC_CAPTURE" ) || std::getenv("ENABLE_NVIDIA_NSIGHT_CAPTURE")) {
 							CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self }, "RenderDoc or nsight environment variable detected. Current session is wayland, switching to XWayland for them to be happy.");
