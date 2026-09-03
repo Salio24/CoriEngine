@@ -191,8 +191,4 @@ namespace Cori {
 			static std::unique_ptr<VulkanShaderEffectManager> s_Instance;
 		};
 	}
-
-	namespace Core {
-		CORI_ADD_ASSET_TRAITS(ShaderEffect, Graphics);
-	}
 }

@@ -257,8 +257,4 @@ namespace Cori {
 			static std::unique_ptr<VulkanTextureManager> s_Instance;
 		};
 	}
-
-	namespace Core {
-		CORI_ADD_ASSET_TRAITS(Texture2, Graphics);
-	}
 }

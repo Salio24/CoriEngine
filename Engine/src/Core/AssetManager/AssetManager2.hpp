@@ -15,11 +15,6 @@
 #include "Utility/BitHelpers.hpp"
 #include "Core/Threading/OneAtATime.hpp"
 
-#define CORI_ADD_ASSET_TRAITS(T, ...) \
-template <> struct AssetTraits<__VA_ARGS__ __VA_OPT__(::) T> { \
-	static constexpr Utility::StringHash64 TypeHash = Utility::HashString64(#T); \
-}
-
 namespace Cori {
 	namespace Core {
 		namespace Internal {
@@ -29,11 +24,6 @@ namespace Cori {
 
 		using AssetID = Utility::StringHash64;
 		using AssetDirID = uint16_t;
-
-		template <typename T>
-		struct AssetTraits {
-			static_assert(sizeof(T) == 0, "Asset type not registered!");
-		};
 
 		struct PrimaryAssetBase {
 
@@ -49,7 +39,6 @@ namespace Cori {
 		template<typename T>
 		concept IsRegisteredAsset = requires {
 			typename T::Manager;
-			requires std::same_as<Utility::StringHash64, std::remove_cvref_t<decltype(AssetTraits<T>::TypeHash)>>;
 		};
 
 		template<typename T>
@@ -128,6 +117,11 @@ namespace Cori {
 
 		template<typename T>
 		concept IsValidAsset = IsAssetBase<T> && IsRegisteredAsset<T> && HasValidSpoke<T>;
+
+		template <IsValidAsset T>
+		struct AssetTraits {
+			static constexpr Utility::StringHash64 TypeHash = Utility::HashString64(std::meta::identifier_of(^^T));
+		};
 
 		template<typename T>
 		concept CanHotReload = AssetHotReloadEnabled<T> && HasValidSpoke<T>;
@@ -209,14 +203,15 @@ namespace Cori {
 				return m_Handle.IsSet();
 			}
 
-			[[nodiscard]] AssetID GetAssetID() const {
+			[[nodiscard]] std::optional<AssetID> GetAssetID() const {
 				if (m_Handle.IsSet()) {
-					return T::Manager::GetAssetID(m_Handle);
+					AssetID result = T::Manager::GetAssetID(m_Handle);
+					return result != UINT64_MAX ? std::optional(result) : std::nullopt;
 				}
 
 				CORI_CORE_ERROR("GetAssetID called on a moved AssetRef<{}>, returning 0.", CORI_CLEAN_TYPE_NAME(T));
 
-				return 0;
+				return std::nullopt;
 			}
 		protected:
 			friend class AssetManager2;
@@ -519,6 +514,8 @@ namespace Cori {
 
 			static std::optional<uint32_t> GetAssetVectorKey(const AssetID id);
 
+			[[nodiscard]] static std::string GetAssetDisplayName(const AssetID id);
+
 			template<typename F>
 			static void ForEachAssetDir(F&& f) {
 				auto publishedCount = Get().m_PublishedDirCount.load(std::memory_order_acquire);
@@ -529,15 +526,23 @@ namespace Cori {
 
 			template<IsValidAsset T>
 			static AssetRef<T> Load(const char* path) {
-				AssetID id = Utility::HashString64(path);
+				return Load<T>(Utility::HashString64(path), path);
+			}
+
+			template<IsValidAsset T>
+			static AssetRef<T> Load(const AssetID id) {
+				return Load<T>(id, "Path missing, AssetID only variant of Load was called.");
+			}
+
+
+			template<IsValidAsset T>
+			static AssetRef<T> Load(const AssetID id, const char* path) {
 				Handle<T> handle;
 				uint32_t gen;
 				uint32_t vectorKey;
 				std::filesystem::path fsPath;
 				std::string name;
-
-				auto& gg = Get();
-
+				
 				{
 					auto& mutex = GetMutex();
 					std::lock_guard lk(mutex);

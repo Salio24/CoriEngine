@@ -115,6 +115,25 @@ namespace Cori {
 			return Get().m_AssetDatabase[id].vectorKey;;
 		}
 
+		std::string AssetManager2::GetAssetDisplayName(const AssetID id) {
+			if (id == 0 || !IsRegistered(id)) {
+				return {};
+			}
+
+			const uint32_t vectorKey = Get().m_AssetDatabase[id].vectorKey;
+			const NonAtomicAssetMeta* meta = Get().m_NonAtomicData[vectorKey].load(std::memory_order_acquire);
+
+			if (!meta) {
+				return {};
+			}
+
+			if (meta->name) {
+				return meta->name.value();
+			}
+
+			return meta->jsonPath.stem().string();
+		}
+
 		void AssetManager2::ChangePolicy(const AssetID id, const AssetDeletionPolicy newPolicy) {
 			CORI_CORE_ASSERT(Get().m_AssetDatabase.contains(id), "Invalid AssetID.");
 			auto vectorKey = Get().m_AssetDatabase[id].vectorKey;

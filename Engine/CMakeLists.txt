@@ -137,8 +137,14 @@ project(CoriEngine)
     )
     target_compile_definitions(imgui PUBLIC IMGUI_ENABLE_FREETYPE)
     target_compile_definitions(imgui PRIVATE IMGUI_IMPL_VULKAN_NO_PROTOTYPES)
-    target_include_directories(imgui PUBLIC ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui_club)
+    target_include_directories(imgui PUBLIC
+            ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui
+            ${CORI_ENGINE_SOURCE_DIR}/thirdparty/imgui_club
+            ${CORI_ENGINE_SOURCE_DIR}/thirdparty/ImViewGuizmo)
     target_link_libraries(imgui PRIVATE SDL3::SDL3-static freetype Vulkan::Headers)
+
+    add_subdirectory(${CORI_ENGINE_SOURCE_DIR}/thirdparty/ImGuizmo EXCLUDE_FROM_ALL)
+    target_link_libraries(imguizmo PRIVATE imgui)
 
     #tracy
     if (CORI_ENABLE_TRACY_PROFILER)
@@ -446,7 +452,7 @@ project(CoriEngine)
     target_compile_options(${ENGINE_LIBRARY_NAME} PUBLIC -freflection)
 
     # should be public
-    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite exprtk boost_pfr Vulkan::Headers GPUOpen::VulkanMemoryAllocator VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp Vulkan::Loader gch::small_vector sul::dynamic_bitset fast_obj_lib glaze_glaze tbb SDL3::SDL3-static stdc++exp efsw-static)
+    target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC EnTT::EnTT spdlog::spdlog magic_enum::magic_enum imgui glm::glm nlohmann_json::nlohmann_json box2d::box2d stduuid utf8cpp tmxlite exprtk boost_pfr Vulkan::Headers GPUOpen::VulkanMemoryAllocator VulkanMemoryAllocator-Hpp::VulkanMemoryAllocator-Hpp Vulkan::Loader gch::small_vector sul::dynamic_bitset fast_obj_lib glaze_glaze tbb SDL3::SDL3-static stdc++exp efsw-static imguizmo)
 
     if (CORI_ENABLE_TRACY_PROFILER)
         target_link_libraries(${ENGINE_LIBRARY_NAME} PUBLIC Tracy::TracyClient)

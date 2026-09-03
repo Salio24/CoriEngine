@@ -1,7 +1,10 @@
 #pragma once
 #include <Cori.hpp>
+#include <ImGuizmo.h>
 
+#include "AssetDragDropPayload.hpp"
 #include "ContentBrowser/ContentBrowser.hpp"
+#include "Inspector/ComponentInspector.hpp"
 
 namespace Snowflake {
 	class AssetPreviewLayer;
@@ -39,12 +42,28 @@ namespace Snowflake {
 
 		void DrawAssetBrowser();
 
+		void DrawInspector();
+
+		void UpdateViewportPicking(const ImVec2 imageOrigin, const ImVec2 region, const bool imageHovered, const bool imageClicked, const bool dragInFlight);
+
+		void HandleViewportAssetDrop(const ImVec2 imageOrigin, const ImVec2 region);
+
+		void ApplyAssetToEntity(const AssetDragDropPayload& payload, const entt::entity target);
+
+		void DrawObjectGizmo(const ImVec2 imageOrigin, const ImVec2 region);
+
+		void DrawViewGizmo(const ImVec2 imageOrigin, const ImVec2 region);
+
+		void DrawViewportToolbar(const ImVec2 imageOrigin);
+
+		Cori::World::Entity CreatePlaceholderEntity();
+
 		struct PanelEntry {
 			const char* name;
 			bool* open;
 		};
 
-		[[nodiscard]] std::array<PanelEntry, 3> GetPanels();
+		[[nodiscard]] std::array<PanelEntry, 4> GetPanels();
 
 		void UpdateDockNavigation();
 
@@ -55,6 +74,8 @@ namespace Snowflake {
 		void ResizeWindow(ImGuiWindow* window, const ImVec2 delta);
 
 		void UpdateShortcuts();
+
+		void UpdateGizmoShortcuts();
 
 		void CloseFocusedWindow();
 
@@ -84,6 +105,7 @@ namespace Snowflake {
 		static constexpr const char* s_DockHostWindow{ "SnowflakeDockHost" };
 		static constexpr const char* s_DockSpaceID{ "SnowflakeDockSpace" };
 		static constexpr const char* s_WindowSettingsWindow{ "Window" };
+		static constexpr const char* s_InspectorPanel{ ComponentInspector::s_DefaultName };
 
 		static constexpr const char* s_SceneName{ "Test Scene" };
 
@@ -102,6 +124,19 @@ namespace Snowflake {
 
 		static constexpr uint32_t s_ResizeSettleFrames{ 2 };
 
+		static constexpr float s_EntitySpawnDistance{ 2.0f };
+
+		static constexpr float s_ViewGuizmoOrbitDistance{ 8.0f };
+
+		static constexpr float s_ViewGuizmoSnapDuration{ 0.35f };
+
+		static constexpr float s_ViewGizmoRadius{ 80.0f };
+		static constexpr float s_ViewGizmoMargin{ 12.0f };
+
+		static constexpr float s_TranslateSnap{ 0.1f };
+		static constexpr float s_RotateSnap{ 5.0f };
+		static constexpr float s_ScaleSnap{ 0.1f };
+
 		std::weak_ptr<Cori::World::Systems::RenderSync> m_RenderSync;
 
 		vk::Extent2D m_PanelExtent{};
@@ -111,6 +146,18 @@ namespace Snowflake {
 		glm::vec3 m_CameraPosition{ s_InitialCameraPosition };
 		float m_CameraYaw{ s_InitialCameraYaw };
 		float m_CameraPitch{ s_InitialCameraPitch };
+
+		std::optional<glm::vec3> m_OrbitPivot{};
+
+		bool m_ViewSnapActive{ false };
+		float m_ViewSnapElapsed{ 0.0f };
+		glm::vec3 m_ViewSnapPivot{};
+		float m_ViewSnapStartDistance{ 0.0f };
+		float m_ViewSnapTargetDistance{ 0.0f };
+		float m_ViewSnapStartYaw{ 0.0f };
+		float m_ViewSnapYawDelta{ 0.0f };
+		float m_ViewSnapStartPitch{ 0.0f };
+		float m_ViewSnapTargetPitch{ 0.0f };
 
 		enum class WindowManipulation : uint8_t {
 			eNone,
@@ -136,9 +183,19 @@ namespace Snowflake {
 
 		static constexpr uint32_t s_HoverOutlineColor{ 0xFFB86CFF };
 		static constexpr uint32_t s_SelectionOutlineColor{ 0x4DA6FFFF };
+		static constexpr uint32_t s_DropTargetOutlineColor{ 0x50C878FF };
 
 		uint64_t m_ClickPickTicket{ s_NoPickTicket };
 		uint64_t m_HoverAcceptFromTicket{ s_NoPickTicket };
+
+		uint64_t m_DropPickTicket{ s_NoPickTicket };
+		AssetDragDropPayload m_PendingDropPayload{};
+		bool m_DropHoverActive{ false };
+
+		ImGuizmo::OPERATION m_GizmoOperation{ ImGuizmo::TRANSLATE };
+		bool m_GizmoAABBCorrection{ true };
+		bool m_GizmoEnabled{ true };
+		bool m_GizmoSnap{ false };
 
 		ImVec2 m_LastHoverPickPos{ -1.0f, -1.0f };
 		glm::vec3 m_LastHoverPickCameraPosition{};
@@ -163,6 +220,11 @@ namespace Snowflake {
 		bool m_ShowConsole{ true };
 
 		ContentBrowser m_Browser{};
+
+		ComponentInspector m_Inspector{};
+		bool m_ShowInspector{ true };
+
+		uint32_t m_CreatedEntityCount{ 0 };
 
 		Cori::World::SceneHandle m_MainScene{ nullptr };
 	};

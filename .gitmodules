@@ -88,3 +88,9 @@
 [submodule "Engine/thirdparty/efsw"]
 	path = Engine/thirdparty/efsw
 	url = https://github.com/SpartanJ/efsw.git
+[submodule "Engine/thirdparty/ImViewGuizmo"]
+	path = Engine/thirdparty/ImViewGuizmo
+	url = https://github.com/Ka1serM/ImViewGuizmo.git
+[submodule "Engine/thirdparty/ImGuizmo"]
+	path = Engine/thirdparty/ImGuizmo
+	url = https://github.com/CedricGuillemet/ImGuizmo.git

@@ -9,6 +9,10 @@ namespace Snowflake {
 			static inline Cori::LogTag ContentBrowser{ "Content Browser", &Self };
 
 			static inline Cori::LogTag ThumbnailCache{ "Thumbnail Cache", &Self, Cori::LogLevel::eInfo };
+
+			static inline Cori::LogTag Inspector{ "Inspector", &Self };
+
+			static inline Cori::LogTag Viewport{ "Viewport", &Self };
 		};
 	};
 }

@@ -267,9 +267,4 @@ namespace Cori {
 			static std::unique_ptr<VulkanShaderManager> s_Instance;
 		};
 	}
-
-	namespace Core {
-		CORI_ADD_ASSET_TRAITS(VertFragShaderPair, Graphics);
-		CORI_ADD_ASSET_TRAITS(ComputeShader, Graphics);
-	}
 }

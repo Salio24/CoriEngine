@@ -134,6 +134,14 @@ namespace Cori {
 				auto& placeholder = m_Meshes[m_PlaceholderMesh];
 				placeholder.indexCount = indexCount;
 				placeholder.firstIndex = indexOffset / sizeof(uint32_t);
+				Get().m_AABBs[m_PlaceholderMesh.GetIndex()].gen = 2;
+				Get().m_AABBs[m_PlaceholderMesh.GetIndex()].bxCenter.store(std::bit_cast<uint32_t>(aabb.bxCenter), std::memory_order_relaxed);
+				Get().m_AABBs[m_PlaceholderMesh.GetIndex()].byCenter.store(std::bit_cast<uint32_t>(aabb.byCenter), std::memory_order_relaxed);
+				Get().m_AABBs[m_PlaceholderMesh.GetIndex()].bzCenter.store(std::bit_cast<uint32_t>(aabb.bzCenter), std::memory_order_relaxed);
+				Get().m_AABBs[m_PlaceholderMesh.GetIndex()].bxExtent.store(std::bit_cast<uint32_t>(aabb.bxExtent), std::memory_order_relaxed);
+				Get().m_AABBs[m_PlaceholderMesh.GetIndex()].byExtent.store(std::bit_cast<uint32_t>(aabb.byExtent), std::memory_order_relaxed);
+				Get().m_AABBs[m_PlaceholderMesh.GetIndex()].bzExtent.store(std::bit_cast<uint32_t>(aabb.bzExtent), std::memory_order_relaxed);
+
 			}
 		}
 
@@ -332,6 +340,10 @@ namespace Cori {
 								}
 
 								Get().m_Meshes.EmplaceAt(handle_.GetIndex());
+								Get().AssignPlaceholder(handle_);
+							}
+
+							if (currentGen == 1) {
 								Get().AssignPlaceholder(handle_);
 							}
 
@@ -726,6 +738,21 @@ namespace Cori {
 			placeholderData.version = handle.GetVersion();
 			m_Meshes[handle] = placeholderData;
 
+			auto& placeholderAABB = m_AABBs[m_PlaceholderMesh.GetIndex()];
+
+			auto& aabb = m_AABBs[handle.GetIndex()];
+			aabb.gen.fetch_add(1, std::memory_order_relaxed);
+			std::atomic_thread_fence(std::memory_order_release);
+
+			aabb.bxCenter.store(std::bit_cast<uint32_t>(placeholderAABB.bxCenter.load(std::memory_order_relaxed)), std::memory_order_relaxed);
+			aabb.byCenter.store(std::bit_cast<uint32_t>(placeholderAABB.byCenter.load(std::memory_order_relaxed)), std::memory_order_relaxed);
+			aabb.bzCenter.store(std::bit_cast<uint32_t>(placeholderAABB.bzCenter.load(std::memory_order_relaxed)), std::memory_order_relaxed);
+			aabb.bxExtent.store(std::bit_cast<uint32_t>(placeholderAABB.bxExtent.load(std::memory_order_relaxed)), std::memory_order_relaxed);
+			aabb.byExtent.store(std::bit_cast<uint32_t>(placeholderAABB.byExtent.load(std::memory_order_relaxed)), std::memory_order_relaxed);
+			aabb.bzExtent.store(std::bit_cast<uint32_t>(placeholderAABB.bzExtent.load(std::memory_order_relaxed)), std::memory_order_relaxed);
+
+			aabb.gen.fetch_add(1, std::memory_order_release);
+
 			m_MeshMetadata[handle.GetIndex()].placeholderAssigned = true;
 
 			CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u] -> PLACEHOLDER cube mesh (indexCount=%u, firstIndex=%u)", handle.GetIndex(), handle.GetVersion(), placeholderData.indexCount, placeholderData.firstIndex);
@@ -738,6 +765,19 @@ namespace Cori {
 
 			m_Meshes[handle] = Mesh{ .version = handle.GetVersion() };
 			m_MeshMetadata[handle.GetIndex()].placeholderAssigned = true;
+
+			auto& aabb = m_AABBs[handle.GetIndex()];
+			aabb.gen.fetch_add(1, std::memory_order_relaxed);
+			std::atomic_thread_fence(std::memory_order_release);
+
+			aabb.bxCenter.store(std::bit_cast<uint32_t>(0.0f), std::memory_order_relaxed);
+			aabb.byCenter.store(std::bit_cast<uint32_t>(0.0f), std::memory_order_relaxed);
+			aabb.bzCenter.store(std::bit_cast<uint32_t>(0.0f), std::memory_order_relaxed);
+			aabb.bxExtent.store(std::bit_cast<uint32_t>(0.0f), std::memory_order_relaxed);
+			aabb.byExtent.store(std::bit_cast<uint32_t>(0.0f), std::memory_order_relaxed);
+			aabb.bzExtent.store(std::bit_cast<uint32_t>(0.0f), std::memory_order_relaxed);
+
+			aabb.gen.fetch_add(1, std::memory_order_release);
 
 			CORI_PROFILER_ZONE_TEXT_FP(Cori::ProfileParts::RenderingAssets, "Handle=[%u, %u] -> PLACEHOLDER empty mesh (indexCount=0, nothing drawn)", handle.GetIndex(), handle.GetVersion());
 			CORI_PROFILER_MSG_SCFP(Cori::ProfileParts::RenderingAssets, Cori::eDebug, Cori::ProfileColors::Missing, "%s Handle=[%u, %u] assigned PLACEHOLDER empty mesh (indexCount=0, nothing drawn)", CORI_CLEAN_TYPE_NAME(Mesh), handle.GetIndex(), handle.GetVersion());

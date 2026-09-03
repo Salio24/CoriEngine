@@ -1,4 +1,5 @@
 #include "ContentBrowser.hpp"
+#include "AssetDragDropPayload.hpp"
 #include "GlobalFuncs.hpp"
 #include "imgui_internal.h"
 #include "LogTags.hpp"
@@ -1216,6 +1217,21 @@ namespace Snowflake {
 				accent = Cori::Utility::Hex32ToImU32(0xff8f00FF);
 				status = "Pending";
 			}
+		}
+
+		if (entry.validated && ImGui::BeginDragDropSource()) {
+			AssetDragDropPayload payload{
+				.id = entry.id,
+				.vectorKey = entry.vectorKey,
+				.typeHash = hash
+			};
+
+			ImGui::SetDragDropPayload(AssetDragDropPayload::s_PayloadType, &payload, sizeof(payload));
+
+			ImGui::TextUnformatted(entry.label.c_str());
+			ImGui::TextDisabled("%s", typeName);
+
+			ImGui::EndDragDropSource();
 		}
 
 		DrawCard(origin, thumbnailSize, entry.id == m_SelectedAsset && entry.validated, hovered, accent, Cori::Utility::Fade(accent, 0.6f));

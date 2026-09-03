@@ -32,7 +32,7 @@ struct ObjectData {
 struct Mesh {
 	uint32_t indexCount;
 	uint32_t firstIndex;
-	uint64_t firstVertexAddress;
+	Vertex* firstVertexAddress;
 	uint32_t vertexType;
 	uint32_t version;
 	float bxCenter;

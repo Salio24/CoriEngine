@@ -10,6 +10,7 @@ project(Snowflake)
 
     # source files
     file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/src/*.cpp)
+    set_source_files_properties(${PROJECT_SOURCE_DIR}/src/ViewGizmo.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_compile_options(-g)

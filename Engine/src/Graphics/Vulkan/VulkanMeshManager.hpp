@@ -384,8 +384,4 @@ namespace Cori {
 			static std::unique_ptr<VulkanMeshManager> s_Instance;
 		};
 	}
-
-	namespace Core {
-		CORI_ADD_ASSET_TRAITS(Mesh, Graphics);
-	}
 }

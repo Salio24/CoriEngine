@@ -158,8 +158,4 @@ namespace Cori {
 			static std::unique_ptr<VulkanMaterialSystem> s_Instance;
 		};
 	}
-
-	namespace Core {
-		CORI_ADD_ASSET_TRAITS(Material, Graphics);
-	}
 }

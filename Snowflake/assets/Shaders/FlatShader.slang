@@ -53,7 +53,7 @@ VSOutput vertMain(uint32_t instanceIndex : SV_VulkanInstanceID, uint32_t vertexI
 	MaterialCombinedData material = pc.materialDataBuffer[obj.material.index];
 	Mesh mesh = pc.meshAssetDataBuffer[pc.batchInfoBuffer[obj.ownerBatch].mesh.index];
 
-	Vertex v = ((Vertex*)mesh.firstVertexAddress)[vertexID];
+	Vertex v = mesh.firstVertexAddress[vertexID];
 
 	float4x4 modelMatrix = mul(pc.uniformBuffer.model, obj.transform);
 	float4 worldPos = mul(modelMatrix, float4(v.position, 1.0));

@@ -26,6 +26,9 @@ namespace Cori {
 			SDL_DisplayMode** m_SDLModes{ nullptr };
 			SDL_DisplayID m_PrimaryDisplayID{};
 
+			float m_PreCaptureMouseX{ 0.0f };
+			float m_PreCaptureMouseY{ 0.0f };
+
 			int32_t m_DisplayModeCount;
 			bool m_VSync{ false };
 			bool m_WindowResizable{ false };
@@ -402,6 +405,13 @@ namespace Cori {
 			if (status && !(SDL_GetWindowFlags(m_Data->m_Window) & SDL_WINDOW_INPUT_FOCUS)) {
 				CORI_CORE_WARN_TAGGED({ Logger::Tags::Core::Self, Logger::Tags::Core::Window }, "Refused to enable relative mouse mode, window '{}' does not have input focus. Relative motion will not be enabled.", m_Data->m_WindowTitle);
 				return false;
+			}
+
+			if (status) {
+				SDL_GetMouseState(&m_Data->m_PreCaptureMouseX, &m_Data->m_PreCaptureMouseY);
+			}
+			else {
+				SDL_WarpMouseInWindow(m_Data->m_Window, m_Data->m_PreCaptureMouseX, m_Data->m_PreCaptureMouseY);
 			}
 
 			if (!SDL_SetWindowRelativeMouseMode(m_Data->m_Window, status)) {

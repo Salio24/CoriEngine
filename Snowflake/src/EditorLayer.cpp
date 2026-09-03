@@ -5,9 +5,29 @@
 #include <cstring>
 #include <format>
 
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/quaternion.hpp>
+
+#include "LogTags.hpp"
+#include "ViewGizmo.hpp"
 #include "Utility/ImGuiScale.hpp"
 
 namespace {
+	Snowflake::ViewGizmo::Vector3 ToGizmoBasis(const glm::vec3 engineVector) {
+		return { engineVector.x, engineVector.z, -engineVector.y };
+	}
+
+	glm::vec3 FromGizmoBasis(const Snowflake::ViewGizmo::Vector3 gizmoVector) {
+		return { gizmoVector.x, -gizmoVector.z, gizmoVector.y };
+	}
+
+	float WrapDegrees(const float degrees) {
+		const float wrapped = std::fmod(degrees + 180.0f, 360.0f);
+
+		return wrapped < 0.0f ? wrapped + 180.0f : wrapped - 180.0f;
+	}
+
 	void CollectLeafDockNodes(ImGuiDockNode* node, std::vector<ImGuiDockNode*>& out) {
 		if (!node) {
 			return;
@@ -416,6 +436,8 @@ namespace Snowflake {
 		: Layer("Snowflake Editor") {
 		ImGuiIO& io = ImGui::GetIO();
 
+		ViewGizmo::Initialize();
+
 		io.Fonts->AddFontFromFileTTF((Cori::FileSystem::PathManager::GetAliasedPath("ASSET_DIR") / "fonts/ttf/JetBrainsMono-Regular.ttf").c_str(), 16.0f);
 
 		Cori::Core::Window& window = Cori::Core::Application::GetWindow();
@@ -537,33 +559,66 @@ namespace Snowflake {
 	}
 
 	void EditorLayer::OnImGuiRender([[maybe_unused]] Cori::Core::GameTimer& gameTimer) {
+		ImGuizmo::BeginFrame();
+		ViewGizmo::BeginFrame();
+
 		UpdateWindowManipulation();
 		UpdateShortcuts();
+		UpdateGizmoShortcuts();
 
 		DrawDockSpace();
 		DrawViewport();
 		DrawConsole();
 		DrawAssetBrowser();
+		DrawInspector();
 		DrawWindowSettings();
 		DrawLauncher();
 
 		m_Browser.Draw(nullptr);
 
 		UpdateDockNavigation();
-		ImGui::ShowDebugLogWindow();
-		ImGui::ShowIDStackToolWindow();
-		DrawStyleColorsDebugWindow();
+		//ImGui::ShowDebugLogWindow();
+		//ImGui::ShowIDStackToolWindow();
+		//DrawStyleColorsDebugWindow();
 
 		m_MainScene.OnImGuiRender(gameTimer);
 	}
 
-	std::array<EditorLayer::PanelEntry, 3> EditorLayer::GetPanels() {
+	std::array<EditorLayer::PanelEntry, 4> EditorLayer::GetPanels() {
 		return {
 			PanelEntry{ s_ViewportPanel, nullptr },
 			PanelEntry{ Cori::ConsolePanel::s_DefaultName, &m_ShowConsole },
-			//PanelEntry{ AssetBrowserPanel::s_DefaultName, &m_ShowAssetBrowser },
+			PanelEntry{ s_InspectorPanel, &m_ShowInspector },
 			PanelEntry{ s_WindowSettingsWindow, &m_ShowWindowSettings }
 		};
+	}
+
+	void EditorLayer::UpdateGizmoShortcuts() {
+		if (m_CameraCaptureActive || !m_ViewportFocused || ImGui::GetIO().WantTextInput) {
+			return;
+		}
+
+		const ImGuiIO& io = ImGui::GetIO();
+
+		if (io.KeyCtrl || io.KeyAlt || io.KeySuper) {
+			return;
+		}
+
+		if (ImGui::IsKeyPressed(ImGuiKey_W, false)) {
+			m_GizmoOperation = ImGuizmo::TRANSLATE;
+		}
+
+		if (ImGui::IsKeyPressed(ImGuiKey_E, false)) {
+			m_GizmoOperation = ImGuizmo::ROTATE;
+		}
+
+		if (ImGui::IsKeyPressed(ImGuiKey_R, false)) {
+			m_GizmoOperation = ImGuizmo::SCALE;
+		}
+
+		if (ImGui::IsKeyPressed(ImGuiKey_X, false)) {
+			m_GizmoAABBCorrection = !m_GizmoAABBCorrection;
+		}
 	}
 
 	void EditorLayer::UpdateShortcuts() {
@@ -678,9 +733,9 @@ namespace Snowflake {
 		ImGui::SetNextItemWidth(-FLT_MIN);
 		const bool submitted = ImGui::InputTextWithHint("##query", "Open panel...", m_LauncherQuery, sizeof(m_LauncherQuery), ImGuiInputTextFlags_EnterReturnsTrue);
 
-		const std::array<PanelEntry, 3> panels = GetPanels();
+		const std::array<PanelEntry, 4> panels = GetPanels();
 
-		std::array<const PanelEntry*, 3> matches{};
+		std::array<const PanelEntry*, 4> matches{};
 		int32_t matchCount = 0;
 
 		for (const PanelEntry& panel : panels) {
@@ -972,10 +1027,15 @@ namespace Snowflake {
 		ImGui::DockBuilderSetNodeSize(dockSpaceID, dockSpaceSize);
 
 		ImGuiID bottomNode = 0;
+		ImGuiID upperNode = 0;
+		ImGui::DockBuilderSplitNode(dockSpaceID, ImGuiDir_Down, 0.34f, &bottomNode, &upperNode);
+
+		ImGuiID inspectorNode = 0;
 		ImGuiID viewportNode = 0;
-		ImGui::DockBuilderSplitNode(dockSpaceID, ImGuiDir_Down, 0.34f, &bottomNode, &viewportNode);
+		ImGui::DockBuilderSplitNode(upperNode, ImGuiDir_Right, 0.24f, &inspectorNode, &viewportNode);
 
 		ImGui::DockBuilderDockWindow(s_ViewportPanel, viewportNode);
+		ImGui::DockBuilderDockWindow(s_InspectorPanel, inspectorNode);
 		ImGui::DockBuilderDockWindow(Cori::ConsolePanel::s_DefaultName, bottomNode);
 		//ImGui::DockBuilderDockWindow(AssetBrowserPanel::s_DefaultName, bottomNode);
 		ImGui::DockBuilderFinish(dockSpaceID);
@@ -1004,13 +1064,19 @@ namespace Snowflake {
 		}
 
 		if (BeginMenuMnemonic("Entity", 1)) {
-			ImGui::TextDisabled("Nothing here yet");
+			if (MenuItemMnemonic("Create Cube", 0)) {
+				CreatePlaceholderEntity();
+			}
 			ImGui::EndMenu();
 		}
 
 		if (BeginMenuMnemonic("View", 0)) {
 			if (MenuItemMnemonic(Cori::ConsolePanel::s_DefaultName, 0, m_ShowConsole)) {
 				m_ShowConsole = !m_ShowConsole;
+			}
+
+			if (MenuItemMnemonic(s_InspectorPanel, 0, m_ShowInspector)) {
+				m_ShowInspector = !m_ShowInspector;
 			}
 
 			//if (MenuItemMnemonic(AssetBrowserPanel::s_DefaultName, 0, m_ShowAssetBrowser)) {
@@ -1075,35 +1141,23 @@ namespace Snowflake {
 
 				ImGui::Image(prt.value(), region);
 
-				if (!m_CameraCaptureActive && ImGui::IsItemHovered()) {
-					const ImVec2 mouse = ImGui::GetIO().MousePos;
+				bool dragInFlight = false;
 
-					const float u = (mouse.x - imageOrigin.x) / std::max(region.x, 1.0f);
-					const float v = (mouse.y - imageOrigin.y) / std::max(region.y, 1.0f);
+				const ImGuiPayload* payload = ImGui::GetDragDropPayload();
+				dragInFlight = !(!payload || !payload->IsDataType(AssetDragDropPayload::s_PayloadType) || payload->DataSize != static_cast<int32_t>(sizeof(AssetDragDropPayload)));
 
-					if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
-						m_ClickPickTicket = renderSync->RequestPick(u, v);
-					}
 
-					else if (m_ClickPickTicket == s_NoPickTicket && HasHoverPickInputChanged(mouse)) {
-						m_LastHoverPickPos = mouse;
-						m_LastHoverPickCameraPosition = m_CameraPosition;
-						m_LastHoverPickCameraYaw = m_CameraYaw;
-						m_LastHoverPickCameraPitch = m_CameraPitch;
+				bool imageHovered = ImGui::IsItemHovered(dragInFlight ? ImGuiHoveredFlags_AllowWhenBlockedByActiveItem : ImGuiHoveredFlags_None);
+				bool imageClicked = !dragInFlight && ImGui::IsItemClicked(ImGuiMouseButton_Left);
 
-						const uint64_t ticket = renderSync->RequestPick(u, v);
+				HandleViewportAssetDrop(imageOrigin, region);
 
-						if (m_HoverAcceptFromTicket == s_NoPickTicket) {
-							m_HoverAcceptFromTicket = ticket;
-						}
-					}
-				}
-				else {
-					m_HoveredEntity = entt::null;
-					m_HoverAcceptFromTicket = s_NoPickTicket;
-					m_LastHoverPickPos = ImVec2(-1.0f, -1.0f);
-				}
+				DrawObjectGizmo(imageOrigin, region);
+				DrawViewGizmo(imageOrigin, region);
 
+				UpdateViewportPicking(imageOrigin, region, imageHovered, imageClicked, dragInFlight);
+
+				DrawViewportToolbar(imageOrigin);
 				DrawSelectionOverlay(imageOrigin);
 			}
 			else {
@@ -1112,6 +1166,339 @@ namespace Snowflake {
 		}
 
 		ImGui::End();
+	}
+
+	void EditorLayer::UpdateViewportPicking(const ImVec2 imageOrigin, const ImVec2 region, const bool imageHovered, const bool imageClicked, const bool dragInFlight) {
+		auto renderSync = m_RenderSync.lock();
+
+		bool gizmoOwnsMouse = ImGuizmo::IsUsingAny() || ImGuizmo::IsOver() || ViewGizmo::IsUsing() || ViewGizmo::IsOver();
+
+		if (!renderSync || m_CameraCaptureActive || !imageHovered || (gizmoOwnsMouse && !dragInFlight)) {
+			m_HoveredEntity = entt::null;
+			m_HoverAcceptFromTicket = s_NoPickTicket;
+			m_LastHoverPickPos = ImVec2(-1.0f, -1.0f);
+			return;
+		}
+
+		ImVec2 mouse = ImGui::GetIO().MousePos;
+
+		float u = (mouse.x - imageOrigin.x) / std::max(region.x, 1.0f);
+		float v = (mouse.y - imageOrigin.y) / std::max(region.y, 1.0f);
+
+		if (imageClicked) {
+			m_ClickPickTicket = renderSync->RequestPick(u, v);
+		}
+
+		else if (m_ClickPickTicket == s_NoPickTicket && HasHoverPickInputChanged(mouse)) {
+			m_LastHoverPickPos = mouse;
+			m_LastHoverPickCameraPosition = m_CameraPosition;
+			m_LastHoverPickCameraYaw = m_CameraYaw;
+			m_LastHoverPickCameraPitch = m_CameraPitch;
+
+			uint64_t ticket = renderSync->RequestPick(u, v);
+
+			if (m_HoverAcceptFromTicket == s_NoPickTicket) {
+				m_HoverAcceptFromTicket = ticket;
+			}
+		}
+	}
+
+	void EditorLayer::HandleViewportAssetDrop(const ImVec2 imageOrigin, const ImVec2 region) {
+		m_DropHoverActive = false;
+
+		if (!ImGui::BeginDragDropTarget()) {
+			return;
+		}
+
+		constexpr ImGuiDragDropFlags flags = ImGuiDragDropFlags_AcceptBeforeDelivery | ImGuiDragDropFlags_AcceptNoDrawDefaultRect;
+
+		bool delivered = false;
+		AssetDragDropPayload* payload = nullptr;
+
+		const ImGuiPayload* impayload = ImGui::AcceptDragDropPayload(AssetDragDropPayload::s_PayloadType, flags);
+
+		if (!(!impayload || impayload->DataSize != static_cast<int32_t>(sizeof(AssetDragDropPayload)))) {
+			delivered = impayload->IsDelivery();
+			payload = static_cast<AssetDragDropPayload*>(impayload->Data);
+		}
+
+		if (payload) {
+			bool droppable = payload->Is(Cori::Core::AssetTraits<Cori::Graphics::Material>::TypeHash) || payload->Is(Cori::Core::AssetTraits<Cori::Graphics::Mesh>::TypeHash);
+
+			if (droppable) {
+				m_DropHoverActive = true;
+
+				if (delivered) {
+					ImVec2 mouse = ImGui::GetIO().MousePos;
+
+					float u = (mouse.x - imageOrigin.x) / std::max(region.x, 1.0f);
+					float v = (mouse.y - imageOrigin.y) / std::max(region.y, 1.0f);
+					auto renderSync = m_RenderSync.lock();
+					if (renderSync) {
+						m_PendingDropPayload = *payload;
+						m_DropPickTicket = renderSync->RequestPick(u, v);
+					}
+				}
+			}
+		}
+
+		ImGui::EndDragDropTarget();
+	}
+
+	void EditorLayer::ApplyAssetToEntity(const AssetDragDropPayload& payload, const entt::entity target) {
+		if (!payload.IsSet() || target == entt::null || !m_MainScene.IsValid() || !m_MainScene.GetRegistry().valid(target)) {
+			return;
+		}
+
+		Cori::World::Entity entity{ entt::handle{ m_MainScene.GetRegistry(), target } };
+
+		if (!entity.HasComponents<Cori::World::Components::Entity::Rendering>()) {
+			return;
+		}
+
+		auto& rendering = entity.GetComponents<Cori::World::Components::Entity::Rendering>();
+
+		if (payload.Is(Cori::Core::AssetTraits<Cori::Graphics::Material>::TypeHash)) {
+			rendering.ChangeMaterial(Cori::Core::AssetManager2::Load<Cori::Graphics::Material>(payload.id));
+			return;
+		}
+
+		if (payload.Is(Cori::Core::AssetTraits<Cori::Graphics::Mesh>::TypeHash)) {
+			rendering.ChangeMesh(Cori::Core::AssetManager2::Load<Cori::Graphics::Mesh>(payload.id));
+		}
+	}
+
+	void EditorLayer::DrawObjectGizmo(const ImVec2 imageOrigin, const ImVec2 region) {
+		ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+		ImGuizmo::SetRect(imageOrigin.x, imageOrigin.y, region.x, region.y);
+		ImGuizmo::SetOrthographic(false);
+
+		if (!m_GizmoEnabled || m_CameraCaptureActive || m_SelectedEntity == entt::null || !m_MainScene.IsValid() || !m_MainScene.GetRegistry().valid(m_SelectedEntity)) {
+			return;
+		}
+
+		Cori::World::Entity entity{ entt::handle{ m_MainScene.GetRegistry(), m_SelectedEntity } };
+
+		if (!entity.HasComponents<Cori::World::Components::Entity::Transform>()) {
+			return;
+		}
+
+		auto& tc = entity.GetComponents<Cori::World::Components::Entity::Transform>();
+		auto& rc = entity.GetComponents<Cori::World::Components::Entity::Rendering>();
+
+		auto& camera = m_MainScene.GetActiveCamera();
+
+		glm::mat4 view = camera.GetViewMatrix();
+
+		if (m_GizmoAABBCorrection) {
+			auto AABB = Cori::Graphics::VulkanMeshManager::GetAABB3D(rc.GetMesh().GetHandle());
+			if (!AABB) {
+				return;
+			}
+			view = glm::translate(view, { AABB.value().bxCenter, AABB.value().byCenter, AABB.value().bzCenter });
+		}
+
+		glm::mat4 projection = camera.GetProjectionMatrix();
+		projection[1][1] *= -1.0f;
+
+		glm::mat4 world = tc.m_WorldTransform;
+
+		float snap = s_TranslateSnap;
+
+		if (m_GizmoOperation == ImGuizmo::ROTATE) {
+			snap = s_RotateSnap;
+		}
+		else if (m_GizmoOperation == ImGuizmo::SCALE) {
+			snap = s_ScaleSnap;
+		}
+
+		glm::vec3 snapValues{ snap };
+
+		bool snapping = m_GizmoSnap || ImGui::GetIO().KeyCtrl;
+
+		if (!ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), m_GizmoOperation, ImGuizmo::MODE::WORLD,
+			glm::value_ptr(world), nullptr, snapping ? glm::value_ptr(snapValues) : nullptr)) {
+			return;
+		}
+
+		glm::mat4 parentWorld = tc.m_WorldTransform * glm::inverse(tc.GetLocalTransform());
+		glm::mat4 local = glm::inverse(parentWorld) * world;
+
+		glm::vec3 scale{ glm::length(glm::vec3(local[0])), glm::length(glm::vec3(local[1])), glm::length(glm::vec3(local[2]))
+		};
+
+		if (scale.x < 0.0001f || scale.y < 0.0001f || scale.z < 0.0001f) {
+			return;
+		}
+
+		glm::mat3 rotationBasis{ glm::vec3(local[0]) / scale.x, glm::vec3(local[1]) / scale.y, glm::vec3(local[2]) / scale.z };
+
+		glm::quat rotation = glm::normalize(glm::quat_cast(rotationBasis));
+		float angleDegrees = glm::degrees(glm::angle(rotation));
+
+		tc.SetLocalPosition(glm::vec3(local[3]));
+		tc.SetLocalScale(scale);
+
+		if (std::abs(angleDegrees) < 0.0001f) {
+			tc.SetLocalRotation(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+		}
+		else {
+			tc.SetLocalRotation(angleDegrees, glm::axis(rotation));
+		}
+
+		m_Inspector.InvalidateRotationCache();
+	}
+
+	void EditorLayer::DrawViewGizmo(const ImVec2 imageOrigin, const ImVec2 region) {
+		if (m_CameraCaptureActive || !m_MainScene.IsValid()) {
+			m_OrbitPivot.reset();
+			m_ViewSnapActive = false;
+			return;
+		}
+
+		auto& camera = m_MainScene.GetActiveCamera();
+
+		glm::vec3 forward = camera.GetForward();
+
+		glm::vec3 orbitPivot = m_OrbitPivot.value_or(m_CameraPosition + forward * s_ViewGuizmoOrbitDistance);
+
+		float radius = Cori::Utility::ScaleUIUnit(s_ViewGizmoRadius);
+		float margin = Cori::Utility::ScaleUIUnit(s_ViewGizmoMargin);
+
+		auto up = Cori::Graphics::CameraController::GetWorldUp();
+		glm::vec2 center = { imageOrigin.x + region.x - margin - radius, imageOrigin.y + margin + radius };
+		ViewGizmo::Result result = ViewGizmo::Rotate(ToGizmoBasis(m_CameraPosition), ToGizmoBasis(forward), ToGizmoBasis(up), ToGizmoBasis(orbitPivot), center.x, center.y);
+
+		bool dragging = ViewGizmo::IsUsing() || m_OrbitPivot.has_value();
+
+		if (ViewGizmo::IsUsing()) {
+			if (!m_OrbitPivot) {
+				m_OrbitPivot = orbitPivot;
+			}
+		}
+		else {
+			m_OrbitPivot.reset();
+		}
+
+		if (result.modified) {
+			glm::vec3 newForward = glm::normalize(FromGizmoBasis(result.forward));
+			glm::vec3 newPosition = FromGizmoBasis(result.position);
+
+			float newYaw = std::abs(newForward.z) < 0.9999f ? glm::degrees(std::atan2(newForward.y, newForward.x)) : m_CameraYaw;
+
+			float newPitch = std::clamp(glm::degrees(std::asin(std::clamp(newForward.z, -1.0f, 1.0f))), -89.0f, 89.0f);
+
+			if (dragging) {
+				m_ViewSnapActive = false;
+
+				m_CameraPosition = newPosition;
+				m_CameraYaw = newYaw;
+				m_CameraPitch = newPitch;
+			}
+			else {
+				m_ViewSnapActive = true;
+				m_ViewSnapElapsed = 0.0f;
+				m_ViewSnapPivot = orbitPivot;
+				m_ViewSnapStartDistance = glm::length(m_CameraPosition - orbitPivot);
+				m_ViewSnapTargetDistance = glm::length(newPosition - orbitPivot);
+				m_ViewSnapStartYaw = m_CameraYaw;
+				m_ViewSnapYawDelta = WrapDegrees(newYaw - m_CameraYaw);
+				m_ViewSnapStartPitch = m_CameraPitch;
+				m_ViewSnapTargetPitch = newPitch;
+			}
+		}
+
+		bool cameraMoved = result.modified || m_ViewSnapActive;
+
+		if (m_ViewSnapActive) {
+			m_ViewSnapElapsed += ImGui::GetIO().DeltaTime;
+
+			float t = std::min(m_ViewSnapElapsed / s_ViewGuizmoSnapDuration, 1.0f);
+			float eased = 1.0f - (1.0f - t) * (1.0f - t);
+
+			m_CameraYaw = m_ViewSnapStartYaw + m_ViewSnapYawDelta * eased;
+			m_CameraPitch = glm::mix(m_ViewSnapStartPitch, m_ViewSnapTargetPitch, eased);
+
+			camera.SetYawPitch(m_CameraYaw, m_CameraPitch);
+
+			m_CameraPosition = m_ViewSnapPivot - camera.GetForward() * glm::mix(m_ViewSnapStartDistance, m_ViewSnapTargetDistance, eased);
+
+			if (t >= 1.0f) {
+				m_ViewSnapActive = false;
+			}
+		}
+
+		if (!cameraMoved) {
+			return;
+		}
+
+		camera.SetPosition3D(m_CameraPosition);
+		camera.SetYawPitch(m_CameraYaw, m_CameraPitch);
+
+		camera.RecalculateVP();
+	}
+
+	void EditorLayer::DrawViewportToolbar(const ImVec2 imageOrigin) {
+		const float inset = Cori::Utility::ScaleUIUnit(s_SelectionOverlayInset);
+
+		ImGui::SetCursorScreenPos(ImVec2(imageOrigin.x + inset, imageOrigin.y + inset));
+
+		ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, ImGui::GetStyle().FrameRounding);
+		ImGui::BeginChild("##viewportToolbar", ImVec2(0.0f, 0.0f), ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_Borders);
+
+		auto operationButton = [this](const char* label, const ImGuizmo::OPERATION operation, const char* tooltip) {
+			bool active = m_GizmoOperation == operation;
+
+			if (active) {
+				ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+			}
+
+			if (ImGui::Button(label)) {
+				m_GizmoOperation = operation;
+			}
+
+			if (active) {
+				ImGui::PopStyleColor();
+			}
+
+			ImGui::SetItemTooltip("%s", tooltip);
+			ImGui::SameLine();
+		};
+
+		operationButton("T", ImGuizmo::TRANSLATE, "Translate (W)");
+		operationButton("R", ImGuizmo::ROTATE, "Rotate (E)");
+		operationButton("S", ImGuizmo::SCALE, "Scale (R)");
+
+		ImGui::Checkbox("AABB Correction", &m_GizmoAABBCorrection);
+
+		ImGui::SetItemTooltip("Gizmo space (X)");
+		ImGui::SameLine();
+
+		ImGui::EndChild();
+		ImGui::PopStyleVar();
+	}
+
+	Cori::World::Entity EditorLayer::CreatePlaceholderEntity() {
+		auto entity = m_MainScene.CreateEntity(std::format("Entity_{:03}", ++m_CreatedEntityCount));
+
+		entity.AddComponent<Cori::World::Components::Entity::Rendering>(
+			Cori::Core::AssetRef<Cori::Graphics::Mesh>(Cori::Graphics::VulkanMeshManager::GetPlaceholder<Cori::Graphics::Mesh>()),
+			Cori::Core::AssetManager2::Load<Cori::Graphics::Material>("assets://WhiteMaterial.json"),
+			glm::vec4{ 0.0f, 0.0f, 1.0f, 1.0f });
+
+		auto& transform = entity.GetComponents<Cori::World::Components::Entity::Transform>();
+		transform.SetLocalPosition(m_CameraPosition + m_MainScene.GetActiveCamera().GetForward() * s_EntitySpawnDistance);
+
+		m_SelectedEntity = entity.GetRawEntity();
+		m_Inspector.InvalidateRotationCache();
+
+		CORI_INFO_TAGGED({ Tags::Snowflake::Self, Tags::Snowflake::Viewport }, "Created entity '{}' {} metres in front of the camera.", entity.GetName(), s_EntitySpawnDistance);
+
+		return entity;
+	}
+
+	void EditorLayer::DrawInspector() {
+		m_Inspector.Draw(&m_ShowInspector, m_MainScene, m_SelectedEntity);
 	}
 
 	void EditorLayer::DrawSelectionOverlay(const ImVec2 imageOrigin) {
@@ -1127,7 +1514,7 @@ namespace Snowflake {
 		const Cori::World::Entity entity{ entt::handle{ m_MainScene.GetRegistry(), m_SelectedEntity } };
 		const std::string_view name = entity.GetName();
 
-		ImGui::SetCursorScreenPos(ImVec2(imageOrigin.x + Cori::Utility::ScaleUIUnit(s_SelectionOverlayInset), imageOrigin.y + Cori::Utility::ScaleUIUnit(s_SelectionOverlayInset)));
+		ImGui::SetCursorScreenPos(ImVec2(imageOrigin.x + Cori::Utility::ScaleUIUnit(s_SelectionOverlayInset), ImGui::GetCursorScreenPos().y));
 		ImGui::Text("Selected: %.*s [%u]", static_cast<int32_t>(name.size()), name.data(), entt::to_integral(m_SelectedEntity));
 	}
 
@@ -1165,6 +1552,13 @@ namespace Snowflake {
 				m_ClickPickTicket = s_NoPickTicket;
 				m_SelectedEntity = ResolvePickedEntity(result);
 			}
+			else if (result.ticket == m_DropPickTicket) {
+				m_DropPickTicket = s_NoPickTicket;
+
+				ApplyAssetToEntity(m_PendingDropPayload, ResolvePickedEntity(result));
+
+				m_PendingDropPayload = {};
+			}
 			else if (result.ticket >= m_HoverAcceptFromTicket) {
 				m_HoveredEntity = ResolvePickedEntity(result);
 			}
@@ -1176,11 +1570,16 @@ namespace Snowflake {
 
 		renderSync->ClearHighlights();
 
-		if (m_HoveredEntity != m_SelectedEntity) {
+		if (m_DropHoverActive && m_HoveredEntity != entt::null) {
+			renderSync->AddHighlight(m_HoveredEntity, s_DropTargetOutlineColor);
+		}
+		else if (m_HoveredEntity != m_SelectedEntity) {
 			renderSync->AddHighlight(m_HoveredEntity, s_HoverOutlineColor);
 		}
 
-		renderSync->AddHighlight(m_SelectedEntity, s_SelectionOutlineColor);
+		if (!m_DropHoverActive || m_SelectedEntity != m_HoveredEntity) {
+			renderSync->AddHighlight(m_SelectedEntity, s_SelectionOutlineColor);
+		}
 	}
 
 	void EditorLayer::DrawWindowSettings() {

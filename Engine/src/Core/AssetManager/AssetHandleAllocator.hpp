@@ -48,7 +48,7 @@ namespace Cori {
 			[[nodiscard]] AssetID GetBoundAssetID(const Handle<T> handle) const {
 				CORI_CORE_ASSERT(this->IsHandleValid(handle), "AssetHandleAllocator::GetBoundAssetID called with an invalid handle ({}, {})", handle.GetIndex(), handle.GetVersion());
 				AssetID result = m_AssetIDs[handle.GetIndex()].load(std::memory_order_acquire);
-				CORI_CORE_ASSERT(result != UINT64_MAX, "AssetHandleAllocator::GetBoundAssetID called with a reserved handle.");
+				//CORI_CORE_ASSERT(result != UINT64_MAX, "AssetHandleAllocator::GetBoundAssetID called with a reserved handle.");
 				return result;
 			}
 
